@@ -7,11 +7,13 @@
 :root{--bg:#f8f9fb;--surface:#fff;--border:#e5e7eb;--text:#1f2937;--muted:#6b7280;--dim:#9ca3af;--blue:#2563eb;--blue-bg:#eff6ff;--purple:#7c3aed;--purple-bg:#f5f3ff;--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--red:#dc2626;--red-bg:#fef2f2;--radius:8px;--font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.8;font-size:14px}
+button{font:inherit}
 .app{display:flex;min-height:100vh}
 
 /* Sidebar */
 .sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10}
-.sidebar-title{padding:16px 20px 12px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700}
+.sidebar-title{padding:16px 20px 12px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-toggle{display:none;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:6px;padding:4px 9px;font-size:12px;line-height:1.4;cursor:pointer}
 .nav-tree{padding:8px 0}
 .nav-group{margin-bottom:2px}
 .nav-group-label{display:flex;align-items:center;gap:6px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);user-select:none}
@@ -59,6 +61,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 .kp .body p{margin-bottom:10px}
 .kp .body ul{margin:6px 0 10px 18px}
 .kp .body li{margin-bottom:4px}
+.kp pre{overflow-x:auto;max-width:100%;padding:12px 14px;border:1px solid var(--border);border-radius:6px;background:#f7f9fc;font-size:12px;line-height:1.65;white-space:pre-wrap;overflow-wrap:anywhere}
 .kp .refs{margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
 .kp .refs a{font-size:11px;color:var(--blue);text-decoration:none;margin-right:12px}
 .kp .refs a:hover{text-decoration:underline}
@@ -80,15 +83,44 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:
 
 .local-notice{background:var(--amber-bg);border:1px solid #fde68a;border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;font-size:13px;color:var(--amber)}
 .local-notice b{color:#92400e}
+.qa-details{margin-top:6px}
+.qa-details summary{cursor:pointer;color:var(--blue);font-weight:600;list-style-position:inside}
+.qa-details[open] summary{margin-bottom:10px}
+.section,.kp,.eval-dim{scroll-margin-top:118px}
 @media(max-width:1100px){.content.eval-view{grid-template-columns:1fr}}
-@media(max-width:760px){.app{display:block}.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid var(--border)}.top-tabs{overflow-x:auto;padding:0 8px}.top-tab{padding:12px 14px;white-space:nowrap}.content,.qa-banner{padding-left:16px;padding-right:16px}.good-bad{grid-template-columns:1fr!important}}
+@media(max-width:760px){
+  body{font-size:14px;line-height:1.7}
+  .app{display:block}
+  .top-tabs{display:flex;height:52px;padding:0;overflow:hidden}
+  .top-tab{flex:1;min-width:0;padding:12px 4px 11px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+  .sidebar{width:100%;height:auto;position:fixed;top:52px;left:0;overflow:visible;border-right:none;border-bottom:1px solid var(--border);z-index:19}
+  .sidebar-title{padding:9px 16px;font-size:13px}
+  .nav-toggle{display:inline-flex;align-items:center;justify-content:center}
+  .nav-tree{display:none;max-height:52vh;overflow-y:auto;padding:6px 0;background:var(--surface);border-top:1px solid var(--border)}
+  .sidebar.mobile-open .nav-tree{display:block}
+  .nav-group-label{padding:8px 16px;font-size:12px}
+  .nav-item{padding:7px 16px 7px 34px;font-size:12px}
+  .qa-banner{margin-top:42px;padding:14px 16px}
+  .qa-banner h3{font-size:14px;margin-bottom:5px}
+  .qa-item{font-size:13px;line-height:1.7;margin-bottom:8px}
+  .content{padding:18px 16px}
+  .section{margin-bottom:28px}
+  .section-title{font-size:17px;line-height:1.45}
+  .section-desc{line-height:1.7;margin-bottom:14px}
+  .kp,.eval-dim{padding:16px;margin-bottom:12px}
+  .kp h4,.eval-dim h4{font-size:14px;line-height:1.55}
+  .kp .body,.eval-dim .check-list{font-size:13px;line-height:1.8}
+  .kp pre{font-size:11px;padding:10px}
+  .eval-dim .good-bad{grid-template-columns:1fr;gap:8px}
+  .section,.kp,.eval-dim{scroll-margin-top:150px}
+}
 </style>
 </head>
 <body>
 <div class="app">
 
 <aside class="sidebar">
-  <div class="sidebar-title">AI Agent 开发知识体系</div>
+  <div class="sidebar-title"><span id="navTitle">AI Agent 开发知识体系</span><button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" title="展开目录">目录</button></div>
   <div class="nav-tree" id="navTree"></div>
 </aside>
 
@@ -448,9 +480,9 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
 
 const EVAL = {
   qa: [
-    {q:"怎么知道我的 Agent 设计得好不好？",a:"用 9 个维度的检查清单逐项评估——架构合理性/推理质量/工具使用/记忆有效性/检索质量/安全性/性能成本/可维护性/Git演进。每个维度有明确的好坏标准。"},
-    {q:"评估维度从哪里来？不是拍脑袋？",a:"从 Agent 的 6 大能力域推导——每个能力域对应一个质量维度。比如推理决策能力→推理质量评估；工具协议能力→工具使用评估。第 9 个维度(Git演进)是工程成熟度评估。"},
-    {q:"评估完之后怎么改进？",a:"每个维度都有明确的改进方向，关联到第 1 页的知识体系。比如记忆有效性评估发现问题→看第 1 页记忆系统的压缩策略和防污染设计→应用到你的 Agent A。"},
+    {q:"怎么知道我的 Agent 设计得好不好？",a:"用 7 个核心维度评估：任务推理、工具执行、知识上下文、安全边界、可靠性恢复、效率成本、可观测与持续评估。它们覆盖 Agent 从理解请求到稳定交付结果的完整闭环。"},
+    {q:"哪些内容不属于 Agent 评价维度？",a:"Git 历史、代码目录、架构风格和发布流程属于工程审查方法或实现手段。它们能帮助定位问题，但不能代替对 Agent 实际任务表现、安全和稳定性的评价。"},
+    {q:"评估完之后怎么改进？",a:"先按失败轨迹归因：任务没完成看推理和工具；答非所问看知识上下文；越权看安全；反复失败看可靠性；过慢或过贵看效率。每次修复都加入回归集验证。"},
   ],
   dims: [
     {
@@ -591,12 +623,79 @@ const EVAL = {
   ]
 };
 
+// Core quality dimensions measure observed Agent behavior, not repository history.
+const AGENT_EVALUATION_DIMS = [
+  {
+    title:"任务完成与推理", num:1,
+    why:"Agent 的价值首先是正确、完整地完成用户目标，而不是展示冗长过程。",
+    checks:`<ul><li>任务完成率、关键约束满足率和澄清问题质量。</li><li>规划是否围绕原始目标，是否有目标漂移和无效步骤。</li><li>完成、失败或信息不足时是否在正确时机终止。</li></ul>`,
+    good:`<b>好的：</b>多步任务有清晰计划，观察到新事实后能调整；证据不足时主动请求必要信息。`,
+    bad:`<b>不好的：</b>为“多做一些”调用无关工具，或在信息不足时强行给出确定答案。`,
+    improve:`改进：用真实任务构建评测集；增加目标对齐、最大步数和完成条件检查。`,
+    link:"→ 关联知识：推理与决策 → ReAct / Plan-Execute / 终止策略"
+  },
+  {
+    title:"工具执行与工作流控制", num:2,
+    why:"正确选择工具、传递合法参数并控制副作用，决定 Agent 能不能真正做事。",
+    checks:`<ul><li>工具选择、参数合法性、调用顺序和结果使用是否正确。</li><li>失败后是否区分重试、换工具、降级与向用户说明。</li><li>不可逆操作是否具备审批、审计与幂等保护。</li></ul>`,
+    good:`<b>好的：</b>服务端校验参数，工具错误作为 Observation 回传；无依赖调用并行，有副作用调用可审计。`,
+    bad:`<b>不好的：</b>模型输出什么 JSON 就执行什么；失败被静默吞掉，重试还会重复创建外部记录。`,
+    improve:`改进：收紧 Tool Schema；增加参数校验、超时、幂等键和审批节点。`,
+    link:"→ 关联知识：工具与协议 → Function Calling / 工具安全控制"
+  },
+  {
+    title:"知识与上下文质量", num:3,
+    why:"检索、会话上下文和记忆共同决定答案是否基于正确、相关、最新的事实。",
+    checks:`<ul><li>正确证据是否被召回，答案是否忠于证据并提供可核验引用。</li><li>上下文是否保留用户约束、时间和权限，而不被无关历史污染。</li><li>知识更新后索引、缓存和答案版本是否一致。</li></ul>`,
+    good:`<b>好的：</b>先评估 Recall@K，再评估引用正确性；记忆按任务和用户隔离，过期事实可以更新。`,
+    bad:`<b>不好的：</b>只看最终文案；检索没有权限过滤，或摘要丢失关键约束。`,
+    improve:`改进：建立带标准证据的评测集；记录文档版本、权限和记忆写入来源。`,
+    link:"→ 关联知识：记忆系统 / 检索增强 RAG"
+  },
+  {
+    title:"安全、权限与可信边界", num:4,
+    why:"Agent 会接触不可信输入和真实业务系统，安全边界必须由代码与权限系统保证。",
+    checks:`<ul><li>是否覆盖注入攻击、越权调用和敏感数据外泄等对抗测试。</li><li>工具是否最小权限，敏感操作是否要求确认或人工审批。</li><li>检索、缓存、日志和 Trace 是否按用户或租户隔离并脱敏。</li></ul>`,
+    good:`<b>好的：</b>模型只能提出调用建议；服务端负责授权、范围校验、审批和审计。`,
+    bad:`<b>不好的：</b>把密钥或高权限接口交给模型；仅靠 Prompt 声明“不要泄露数据”。`,
+    improve:`改进：工具白名单和服务端授权；建立注入、数据越权和副作用攻击回归集。`,
+    link:"→ 关联知识：工程落地 → 安全防护 / Human-in-the-loop"
+  },
+  {
+    title:"可靠性与恢复能力", num:5,
+    why:"线上 Agent 必须能面对模型波动、依赖超时和中断恢复，而不是一次失败就丢失任务。",
+    checks:`<ul><li>模型、检索和工具异常时是否有超时、重试预算、熔断和明确降级。</li><li>任务能否从 checkpoint 恢复，外部副作用是否幂等、可查询和可重放。</li><li>复杂任务的成功率、重复调用率和部分失败处理是否可量化。</li></ul>`,
+    good:`<b>好的：</b>必要步骤失败停在可恢复点，可选步骤失败返回部分结果；恢复前先确认外部状态。`,
+    bad:`<b>不好的：</b>无限重试，或服务重启后忘记已经发过消息、扣过款。`,
+    improve:`改进：给节点定义超时、重试和降级；保存 checkpoint 与幂等键，并做故障演练。`,
+    link:"→ 关联知识：工程落地 → 上线与故障恢复"
+  },
+  {
+    title:"效率与成本", num:6,
+    why:"质量相同的前提下，更快、更省且可预测的 Agent 才能稳定规模化使用。",
+    checks:`<ul><li>端到端 P50/P95 延迟、首 Token 时间、平均步数和单任务成本。</li><li>是否为简单请求分流，为复杂推理使用合适模型和上下文预算。</li><li>并行、缓存、摘要和重排优化是否同时验证质量没有下降。</li></ul>`,
+    good:`<b>好的：</b>简单请求不进入复杂 Agent；无依赖工具并行，缓存键包含权限和知识版本。`,
+    bad:`<b>不好的：</b>所有输入都走最大模型和完整链路，优化后只看成本不看完成率。`,
+    improve:`改进：按 Trace 定位瓶颈；建立质量、延迟和成本三者共同的发布护栏。`,
+    link:"→ 关联知识：工程落地 → 性能与成本优化"
+  },
+  {
+    title:"可观测性与持续评估", num:7,
+    why:"没有可回放轨迹和稳定评测集，团队无法证明改动变好，也无法快速定位退化。",
+    checks:`<ul><li>是否能从最终答案回溯到模型、检索、工具、版本和关键输入摘要。</li><li>是否同时评估结果质量、轨迹质量、安全风险、延迟和成本。</li><li>变更是否经过版本化回归、灰度和回滚。</li></ul>`,
+    good:`<b>好的：</b>每次任务有 trace_id；变更先跑回归集再灰度，并对异常指标自动暂停。`,
+    bad:`<b>不好的：</b>只用几条 Demo 判断效果，线上问题只能靠零散日志猜测。`,
+    improve:`改进：建立真实、边界和对抗样本；记录版本与阈值，定期人工校准评审。`,
+    link:"→ 关联知识：工程落地 → 可观测性 + 评估体系"
+  }
+];
+
 // ==================== RENDER ====================
 let currentTab = 'knowledge';
 
 function buildNav(tab = currentTab) {
   const tree = document.getElementById('navTree');
-  const title = document.querySelector('.sidebar-title');
+  const title = document.getElementById('navTitle');
   let html = '';
 
   if(tab === 'knowledge') {
@@ -611,8 +710,8 @@ function buildNav(tab = currentTab) {
     });
   } else {
     title.textContent = 'Agent 系统评估框架';
-    html = `<div class="nav-group"><div class="nav-group-label"><span class="arrow open">▶</span>🔍 九项评估维度</div><div class="nav-children show">`;
-    EVAL.dims.forEach(dim => {
+    html = `<div class="nav-group"><div class="nav-group-label"><span class="arrow open">▶</span>🔍 七项核心评估</div><div class="nav-children show">`;
+    AGENT_EVALUATION_DIMS.forEach(dim => {
       html += `<div class="nav-item" onclick="scrollToSection('eval-${dim.num}',this)">${dim.num}. ${dim.title}</div>`;
     });
     html += `</div></div>`;
@@ -630,15 +729,23 @@ function scrollToSection(id, navItem) {
   if(navItem) navItem.classList.add('active');
   const el = document.getElementById(id);
   if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+  if(window.matchMedia('(max-width: 760px)').matches) setMobileNav(false);
+}
+
+function setMobileNav(open) {
+  const sidebar = document.querySelector('.sidebar');
+  const toggle = document.getElementById('navToggle');
+  sidebar.classList.toggle('mobile-open', open);
+  toggle.setAttribute('aria-expanded', String(open));
+  toggle.textContent = open ? '收起目录' : '目录';
 }
 
 function renderQA(tab) {
   const banner = document.getElementById('qaBanner');
   const qa = tab==='knowledge' ? KNOWLEDGE.qa : EVAL.qa;
-  let html = `<h3>📋 我关注的问题与回答</h3>`;
-  qa.forEach(item => {
-    html += `<div class="qa-item"><div class="q">${item.q}</div><div class="a">${item.a}</div></div>`;
-  });
+  let html = `<h3>📋 本页学习提示</h3><details class="qa-details"><summary>查看常见问题与回答（${qa.length} 条）</summary>`;
+  qa.forEach(item => { html += `<div class="qa-item"><div class="q">${item.q}</div><div class="a">${item.a}</div></div>`; });
+  html += `</details>`;
   banner.innerHTML = html;
 }
 
@@ -662,7 +769,7 @@ function renderKnowledge() {
 
 function renderEval() {
   let html = '';
-  EVAL.dims.forEach(dim => {
+  AGENT_EVALUATION_DIMS.forEach(dim => {
     html += `<div class="section" id="eval-${dim.num}"><div class="eval-dim"><h4><span class="num">${dim.num}</span>${dim.title}</h4>`;
     html += `<div class="why">为什么评估这个：${dim.why}</div>`;
     html += `<div class="check-list">${dim.checks}</div>`;
@@ -688,11 +795,16 @@ function switchTab(tab) {
   if(tab==='knowledge') content.innerHTML = renderKnowledge();
   else content.innerHTML = renderEval();
   buildNav(tab);
+  setMobileNav(false);
 }
 
 // Init
 buildTab();
 function buildTab(){document.querySelectorAll('.top-tab').forEach(tab=>{tab.addEventListener('click',function(){switchTab(this.dataset.tab)})})}
+document.getElementById('navToggle').addEventListener('click', () => {
+  const sidebar = document.querySelector('.sidebar');
+  setMobileNav(!sidebar.classList.contains('mobile-open'));
+});
 buildNav();
 const requestedTab = new URLSearchParams(window.location.search).get('tab');
 switchTab(['knowledge','eval'].includes(requestedTab) ? requestedTab : 'knowledge');
