@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Agent 开发知识体系</title>
+<style>
+:root{--bg:#f8f9fb;--surface:#fff;--border:#e5e7eb;--text:#1f2937;--muted:#6b7280;--dim:#9ca3af;--blue:#2563eb;--blue-bg:#eff6ff;--purple:#7c3aed;--purple-bg:#f5f3ff;--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--red:#dc2626;--red-bg:#fef2f2;--radius:8px;--font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.8;font-size:14px}
+.app{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:240px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10}
+.sidebar-title{padding:16px 20px 12px;border-bottom:1px solid var(--border);font-size:14px;font-weight:700}
+.nav-tree{padding:8px 0}
+.nav-group{margin-bottom:2px}
+.nav-group-label{display:flex;align-items:center;gap:6px;padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;color:var(--text);user-select:none}
+.nav-group-label:hover{background:var(--bg)}
+.nav-group-label .arrow{font-size:10px;color:var(--dim);transition:transform .2s;width:12px}
+.nav-group-label .arrow.open{transform:rotate(90deg)}
+.nav-children{display:none}
+.nav-children.show{display:block}
+.nav-item{padding:5px 16px 5px 36px;font-size:12px;color:var(--muted);cursor:pointer;border-left:2px solid transparent}
+.nav-item:hover{background:var(--bg);color:var(--text)}
+.nav-item.active{color:var(--blue);border-left-color:var(--blue);background:var(--blue-bg);font-weight:600}
+
+/* Main */
+.main{flex:1;min-width:0}
+.top-tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);padding:0 20px;position:sticky;top:0;z-index:20}
+.top-tab{padding:14px 24px;font-size:14px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.top-tab:hover{color:var(--text)}
+.top-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+/* Q&A Banner */
+.qa-banner{background:var(--surface);border-bottom:1px solid var(--border);padding:20px 28px}
+.qa-banner h3{font-size:15px;font-weight:700;margin-bottom:10px;color:var(--amber)}
+.qa-item{margin-bottom:10px;font-size:13px;line-height:1.8}
+.qa-item .q{font-weight:600;color:var(--text)}
+.qa-item .q::before{content:"Q: ";color:var(--blue);font-weight:700}
+.qa-item .a{color:var(--muted);margin-left:0}
+.qa-item .a::before{content:"A: ";color:var(--green);font-weight:700}
+
+/* Content */
+.content{padding:24px 28px;width:100%;max-width:none}
+.content.knowledge-view{max-width:1440px}
+.content.eval-view{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.content.eval-view .section{margin-bottom:0}
+.section{margin-bottom:40px}
+.section-title{font-size:18px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.section-title .icon{font-size:22px}
+.section-desc{font-size:13px;color:var(--muted);margin-bottom:20px}
+.kp{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px;transition:border-color .15s}
+.kp:hover{border-color:var(--blue)}
+.kp h4{font-size:15px;font-weight:600;margin-bottom:8px}
+.kp .tags{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.kp .tag{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--bg);color:var(--dim)}
+.kp .body{font-size:13px;line-height:1.9;color:var(--text)}
+.kp .body b{color:var(--text)}
+.kp .body p{margin-bottom:10px}
+.kp .body ul{margin:6px 0 10px 18px}
+.kp .body li{margin-bottom:4px}
+.kp .refs{margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
+.kp .refs a{font-size:11px;color:var(--blue);text-decoration:none;margin-right:12px}
+.kp .refs a:hover{text-decoration:underline}
+
+/* Eval dimensions */
+.eval-dim{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 24px;margin-bottom:16px}
+.eval-dim h4{font-size:15px;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.eval-dim h4 .num{width:24px;height:24px;border-radius:50%;background:var(--purple);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+.eval-dim .why{font-size:12px;color:var(--amber);margin-bottom:10px;font-style:italic}
+.eval-dim .check-list{font-size:13px;color:var(--text);line-height:1.9}
+.eval-dim .check-list b{color:var(--text)}
+.eval-dim .good-bad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
+.eval-dim .good{background:var(--green-bg);border-radius:var(--radius);padding:10px 14px;font-size:12px}
+.eval-dim .bad{background:var(--red-bg);border-radius:var(--radius);padding:10px 14px;font-size:12px}
+.eval-dim .good b{color:var(--green)}
+.eval-dim .bad b{color:var(--red)}
+.eval-dim .link{font-size:11px;color:var(--blue);margin-top:8px}
+.eval-dim .improve{font-size:12px;background:var(--amber-bg);border-radius:var(--radius);padding:8px 12px;margin-top:8px;color:var(--amber)}
+
+.local-notice{background:var(--amber-bg);border:1px solid #fde68a;border-radius:var(--radius);padding:16px 20px;margin-bottom:20px;font-size:13px;color:var(--amber)}
+.local-notice b{color:#92400e}
+@media(max-width:1100px){.content.eval-view{grid-template-columns:1fr}}
+@media(max-width:760px){.app{display:block}.sidebar{width:100%;height:auto;position:relative;border-right:none;border-bottom:1px solid var(--border)}.top-tabs{overflow-x:auto;padding:0 8px}.top-tab{padding:12px 14px;white-space:nowrap}.content,.qa-banner{padding-left:16px;padding-right:16px}.good-bad{grid-template-columns:1fr!important}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<aside class="sidebar">
+  <div class="sidebar-title">AI Agent 开发知识体系</div>
+  <div class="nav-tree" id="navTree"></div>
+</aside>
+
+<div class="main">
+<div class="top-tabs">
+  <button class="top-tab active" data-tab="knowledge">📚 知识体系</button>
+  <button class="top-tab" data-tab="eval">🔍 评估框架</button>
+</div>
+
+<div class="qa-banner" id="qaBanner"><h3>页面正在加载</h3><div class="qa-item"><div class="a">正在初始化知识体系内容。</div></div></div>
+<div class="content" id="content"><div class="local-notice">如果此提示长时间不消失，说明页面脚本加载失败，请强制刷新或检查控制台错误。</div></div>
+
+</div>
+</div>
+
+<script>
+window.addEventListener("error", function(event) {
+  const banner = document.getElementById("qaBanner");
+  const content = document.getElementById("content");
+  if (banner) banner.innerHTML = '<div class="qa-banner"><h3>页面加载失败</h3></div>';
+  if (content) content.innerHTML = '<div class="local-notice"><b>页面脚本执行失败：</b>' + String(event.message || "未知错误") + '</div>';
+});
+</script>
+
+<script>
+// ==================== DATA ====================
+const KNOWLEDGE = {
+  qa: [
+    {q:"作为 Agent 开发者需要掌握哪些知识？",a:"6 大类——①推理与决策 ②工具与协议 ③记忆系统 ④检索增强(RAG) ⑤多Agent协作 ⑥工程落地。前四类是 Agent 的内部能力，第五类是多 Agent 系统设计，第六类是把 Agent 变成生产系统的工程能力。"},
+    {q:"这些知识之间是什么关系？",a:"推理决策是大脑、工具协议是手脚、记忆是经验、RAG 是外部知识源、多Agent是团队协作、工程落地是生产保障。一个完整的 Agent 系统六者缺一不可，但优先级——推理决策和工具协议是核心中的核心。"},
+    {q:"哪些必须深入到能从零手写？",a:"推理决策（能从零写 ReAct Loop）、工具协议（能手写 Function Calling 解析和 MCP Server）、记忆系统（能设计三层架构）。RAG 和多Agent 需要理解原理并能调优。工程落地需要知道指标和工具，不一定要从零搭。"},
+  ],
+  categories: [
+    {
+      id:"reasoning", icon:"🧠", name:"推理与决策",
+      desc:"Agent 如何思考、规划、做出决策。这是 Agent 区别于 Chatbot 的核心——不只是生成文本，而是闭环决策。",
+      items: [
+        {
+          title:"ReAct 范式：推理+行动交替循环",
+          tags:["ReAct","核心","必会"],
+          body:`<p><b>ReAct = Reasoning + Acting</b>（Google 2022）。核心思想：让 LLM 在生成中交替进行<b>推理(Thought)和行动(Action)</b>，并接收外部工具返回的<b>观察(Observation)</b>，把推理锚定在真实数据上。</p>
+<p><b>标准循环：</b></p>
+<ul>
+<li><b>Thought</b>：LLM 分析当前状态，决定下一步做什么</li>
+<li><b>Action</b>：调用工具（Function Call），如 search_order(order_id="123")</li>
+<li><b>Observation</b>：工具返回结果，如 {"status":"已发货","items":[...]}</li>
+<li>回到 Thought，基于 Observation 决定下一步，直到输出 Final Answer</li>
+</ul>
+<p><b>为什么 ReAct 比 CoT 好：</b>CoT 纯靠模型内部知识推理，容易"空想"——比如模型不知道今天天气，只能猜。ReAct 调天气 API 获取真实数据，推理基于事实。</p>
+<p><b>消息格式设计：</b>Observation 用 <b>tool 角色而非 assistant 角色</b>回传。因为 Observation 是外部系统返回的内容，不是模型生成的。如果放 assistant 角色，模型会以为自己说了这些话，后续推理会混乱。</p>
+<p><b>消息格式示例：</b></p>
+<pre>system: 你是客服Agent，可用工具：search_order
+user: 帮我查订单123的状态
+assistant: Thought: 用户要查订单状态，调用search_order
+        Action: search_order(order_id="123")
+tool: {"status":"已发货","carrier":"顺丰"}
+assistant: Thought: 订单已发货，用顺丰。用户可能想查物流
+        Final Answer: 您的订单123已通过顺丰发货。</pre>
+<p><b>终止条件设计：</b>①最大步数硬限制（通常 10 步）；②LLM 主动输出 finish_reason=stop；③连续 2 步调用相同工具且参数相同→疑似死循环→强制停止。</p>
+<p><b>生产实践：</b>ReAct 的 Token 消耗通常高于 CoT（每步都要携带历史）。系统 A 可采用混合模式——简单任务用 Plan-Execute（节省 Token），不确定路径的任务才用 ReAct。</p>`,
+          refs:[{t:"ReAct: Synergizing Reasoning and Acting (Google 2022)",u:"https://arxiv.org/abs/2210.03629"}]
+        },
+        {
+          title:"CoT / Plan-Execute / ToT / Reflection 对比与选型",
+          tags:["CoT","Plan-Execute","ToT","Reflection","选型"],
+          body:`<p><b>四种推理范式核心区别：</b></p>
+<ul>
+<li><b>CoT (Chain of Thought)</b>：纯脑内推理，一步步想，不调工具。适合数学题、逻辑推理等不需要外部数据的任务。<b>缺点：</b>知识截止日期前的内容可能过时或幻觉。</li>
+<li><b>ReAct</b>：推理+行动交替。每步 Thought→Action→Observation。<b>适合</b>需要查资料、调 API 的任务。<b>代价</b>：Token 消耗 4-8x。</li>
+<li><b>Plan-and-Execute</b>：先制定完整计划，再逐步执行。<b>省 Token</b>（一次规划）、可控性强，但灵活度低——中间步骤发现错误时调整成本高。</li>
+<li><b>Tree of Thoughts (ToT)</b>：每步探索多条推理路径，用 BFS/DFS+评估函数选最优。<b>效果好但 Token 消耗是 CoT 的 3 倍</b>，只适合需要探索多路径的复杂推理。</li>
+<li><b>Reflection / Reflexion</b>：让 Agent 自我审查输出质量，决定是否重试或修正。Reflexion 框架通过 episodic memory 存储失败经验，下次遇到类似任务避免重复犯错。<b>HumanEval 通过率从 80% 提升到 91%</b>。</li>
+</ul>
+<p><b>选型决策树：</b></p>
+<ul>
+<li>任务路径不确定，需要观察中间结果 → <b>ReAct</b></li>
+<li>步骤明确可预判 → <b>Plan-Execute</b>（省 Token 可控）</li>
+<li>需要探索多种可能解 → <b>ToT</b>（贵但准）</li>
+<li>长链路任务容易出错 → <b>Reflection</b>（加倍 Token 但提升成功率）</li>
+<li>生产级系统 → <b>混合</b>：大步骤 Plan-Execute 规划，子步骤 ReAct 灵活执行，关键节点 Reflection 自检</li>
+</ul>
+<p><b>关键 trade-off：</b>系统 A 在复杂任务上采用 ReAct 可提升任务完成率，但会增加 Token 消耗。因此简单查询走直接生成或固定流程，复杂多步任务才启用 ReAct。</p>`,
+          refs:[{t:"Tree of Thoughts (Yao et al. 2023)",u:"https://arxiv.org/abs/2305.10601"},{t:"Reflexion: Language Agents with Verbal RL (Shinn et al. 2023)",u:"https://arxiv.org/abs/2303.11366"}]
+        },
+        {
+          title:"Agent Loop 设计与终止策略",
+          tags:["Agent Loop","终止条件","死循环"],
+          body:`<p><b>Agent Loop 是 Agent 的核心工作引擎</b>——Think → Act → Observe 的循环，直到任务完成。</p>
+<p><b>完整循环示例（退换货场景）：</b></p>
+<pre>Round 1: Think "需要查订单" → Act search_order(123) → Observe {status:"已发货"}
+Round 2: Think "已发货不能直接退，需查退货政策" → Act check_policy(category="book") → Observe {returnable:true}
+Round 3: Think "符合退货条件" → Act create_return(order_id=123) → Observe {return_id:"R456"}
+Round 4: Think "任务完成" → 输出最终回复</pre>
+<p><b>防死循环三层设计：</b></p>
+<ul>
+<li><b>第一层：硬限制</b>——max_steps=10，到了强制停止。在 System Prompt 里动态更新"你已经执行了 X/N 步"，模型会自觉收敛。</li>
+<li><b>第二层：循环检测</b>——连续 2 步调用相同工具且参数相同 → 疑似死循环 → 强制跳出并告知用户"我可能需要更多信息"。</li>
+<li><b>第三层：Token 预算</b>——设单次任务最大 Token 消耗，超限自动停止。</li>
+</ul>
+<p><b>错误处理设计：</b>工具调用失败时，把错误信息包装为 Observation 回传 LLM，让它自主决定重试/换工具/降级。不要在代码层静默吞掉错误——LLM 看不到错误就不知道要调整策略。</p>`,
+          refs:[]
+        },
+      ]
+    },
+    {
+      id:"tools", icon:"🔧", name:"工具与协议",
+      desc:"Agent 如何与外部世界交互。从 Function Calling 到 MCP/A2A 标准协议。",
+      items: [
+        {
+          title:"Function Calling 完整实现",
+          tags:["FC","核心","必会"],
+          body:`<p><b>三步走流程：</b></p>
+<ul>
+<li><b>定义阶段</b>：在 API 的 tools 参数或 System Prompt 中定义 Tool Schema——name、description（给 LLM 看的，要说清何时用）、parameters（JSON Schema，含 type/enum/required）。</li>
+<li><b>调用阶段</b>：LLM 判断需要调工具，输出 function_call JSON（function.name + function.arguments）。</li>
+<li><b>执行阶段</b>：代码层解析 JSON → Pydantic 校验参数 → 执行实际函数 → 将结果包装为 tool 角色消息回传 LLM。</li>
+</ul>
+<p><b>Schema 设计原则（踩过的坑）：</b></p>
+<ul>
+<li>参数尽量用 <b>enum</b> 而非 free text——减少 LLM 输出随机性。如支付方式用 enum["alipay","wechat"] 而非 string。</li>
+<li><b>number vs integer 要区分</b>——LLM 真的会搞混。金额是 number，数量是 integer。</li>
+<li>description 要写<b>使用场景</b>而非定义——"当用户提供订单号时调用此工具查询订单详情"而非"查询订单"。</li>
+<li>必填字段标 required，可选字段给 default 值。</li>
+</ul>
+<p><b>稳定性保障三层：</b></p>
+<ul>
+<li><b>校验层</b>：Pydantic 验证参数格式，不合法→回传错误信息让 LLM 重生成（最多 2 次）。</li>
+<li><b>执行层</b>：try/except 包裹，超时 30s，网络错误重试 3 次（指数退避）。</li>
+<li><b>权限层</b>：所有工具调用经网关——敏感操作（支付/删除/外发）需 Human-in-the-loop 审批。</li>
+</ul>
+<p><b>安全关键原则</b>：LLM 永远不直接执行任何操作——tool_calls 只是建议，代码层有最终决定权。</p>`,
+          refs:[{t:"OpenAI Function Calling Guide",u:"https://platform.openai.com/docs/guides/function-calling"}]
+        },
+        {
+          title:"MCP 协议：架构、实现与局限",
+          tags:["MCP","标准化","2026热点"],
+          body:`<p><b>MCP (Model Context Protocol)</b> 是 Anthropic 提出、捐给 Linux Foundation 的<b>工具调用标准协议</b>。定义了 LLM 与外部系统的通用通信接口。</p>
+<p><b>三层架构：</b></p>
+<ul>
+<li><b>Host</b>：LLM 应用（你的 Agent 系统）</li>
+<li><b>Client</b>：协议客户端，1:1 连接一个 Server</li>
+<li><b>Server</b>：暴露三种能力——Tools（模型可调用的函数）、Resources（应用可控的数据）、Prompts（预定义提示模板）</li>
+</ul>
+<p><b>传输层</b>：stdio（本地进程通信）或 SSE（远程服务）。</p>
+<p><b>核心价值——一次开发，多模型复用：</b></p>
+<ul>
+<li>原来开发一个"查数据库慢 SQL"工具，要分别适配 OpenAI/Claude/通义千问的 Function Calling 格式</li>
+<li>用 MCP 写一次，任何支持 MCP 的模型都能调用</li>
+</ul>
+<p><b>vs Function Calling 的关系：</b>FC 是各模型厂商的 API 能力（格式略有差异）；MCP 是工具层的标准协议。<b>打个比方</b>——FC 像各自厂商的拨号盘，MCP 像定义了全球统一的电话号码格式。</p>
+<p><b>vs Skill 的关系：</b>Skill 是能力单元（"查天气"），FC 是调用方式，MCP 是通信协议。三者层次不同。</p>
+<p><b>局限（必须知道）：①</b>协议还在快速迭代，兼容性风险；<b>②</b>多一层抽象增加 50-100ms 延迟；<b>③</b>流式支持不完善；<b>④</b>安全信任模型（工具提供方和调用方）仍在建设中。</p>
+<p><b>vs A2A 的关系：</b>MCP 管 Agent↔工具（垂直集成），A2A 管 Agent↔Agent（水平协作）。一个完整的多 Agent 系统两者都需要。</p>`,
+          refs:[{t:"MCP Specification",u:"https://modelcontextprotocol.io/"},{t:"Google A2A Protocol",u:"https://github.com/google/A2A"}]
+        },
+        {
+          title:"工具设计模式：错误处理与安全控制",
+          tags:["错误处理","安全","权限"],
+          body:`<p><b>工具调用失败的三层处理：</b></p>
+<ul>
+<li><b>参数校验失败</b>：LLM 输出的 JSON 格式不对（多了字段/类型错误/缺必填）→ 用 Pydantic 校验 → 错误信息回传 LLM 让它重生成（"参数 amount 应为 number，你传了 string"）→ 最多 2 次，2 次失败降级返回提示。</li>
+<li><b>执行失败</b>：网络超时/临时故障 → 自动重试（指数退避：1s/2s/4s，最多 3 次）→ 3 次都失败 → 降级（告知用户当前无法完成+建议替代方案或转人工）。</li>
+<li><b>业务拒绝</b>：如余额不足/权限不够 → 不重试，直接告知用户原因+建议操作。</li>
+</ul>
+<p><b>安全控制四层（从外到内）：</b></p>
+<ul>
+<li><b>输入过滤</b>：检测恶意模式（"忽略指令"/异常长度/特殊分隔符）</li>
+<li><b>权限白名单</b>：Agent 只能调用预定义的工具集合，不能调用未注册的</li>
+<li><b>参数范围校验</b>：金额不能为负/数量不能超库存/操作目标必须在白名单内</li>
+<li><b>敏感操作审批</b>：支付/删除/对外发送 → 必须经过 Human-in-the-loop 确认</li>
+</ul>
+<p><b>审计日志</b>：每次工具调用记录完整信息——时间/工具名/入参/出参/耗时/成功失败/操作人（LLM还是人工）。出问题可回溯。</p>`,
+          refs:[]
+        },
+      ]
+    },
+    {
+      id:"memory", icon:"💾", name:"记忆系统",
+      desc:"Agent 的记忆架构、存储方案、压缩策略和上下文工程。",
+      items: [
+        {
+          title:"三层记忆架构设计",
+          tags:["核心","必会","架构"],
+          body:`<p><b>工业界标准的三层记忆架构：</b></p>
+<ul>
+<li><b>工作记忆 (Working Memory)</b>：当前任务轨迹和中间结果。存 Redis/内存，生命周期=单任务。存的是"刚才查了订单123，状态=已发货"这类中间结果。任务结束即清。</li>
+<li><b>短期记忆 (Short-term)</b>：当前会话最近 N 轮摘要。存 Redis+TTL(30min)，生命周期=单会话。每次对话结束做 summarize。</li>
+<li><b>长期记忆 (Long-term)</b>：用户画像/偏好/关键事实。存<b>向量库</b>(语义检索)+<b>关系库</b>(精确查询)，持久化。</li>
+</ul>
+<p><b>三层的关系不是简单的时长划分，而是用途不同：</b></p>
+<ul>
+<li>工作记忆解决"当前任务进行中需要什么"</li>
+<li>短期记忆解决"本次对话的上下文连贯性"</li>
+<li>长期记忆解决"跨会话的个性化"</li>
+</ul>
+<p><b>写入原则（防污染）：①</b>区分"事实"与"推断"——用户说"少糖"是事实，推断"用户喜欢健康饮品"是推断。推断带置信度。<b>②</b>带时间戳——三个月前的偏好可能已不适用。<b>③</b>命名空间隔离——不同 Agent/任务不共享记忆空间。</p>
+<p><b>存储选型：①</b>工作记忆——Python dict(单机)或 Redis Hash(分布式)；<b>②</b>短期记忆——Redis String(TTL 30min)；<b>③</b>长期记忆——Milvus/Qdrant(向量)+PostgreSQL(结构化)。</p>`,
+          refs:[{t:"MemGPT: Towards LLMs as Operating Systems",u:"https://arxiv.org/abs/2310.08560"}]
+        },
+        {
+          title:"上下文工程与压缩策略",
+          tags:["上下文","压缩","Token"],
+          body:`<p><b>上下文工程的本质</b>不是"塞得下"，而是<b>"塞对的"</b>。核心挑战是<b>注意力竞争</b>——上下文越长，模型对关键信息的注意力越稀释（Lost in the Middle 现象）。</p>
+<p><b>Token 预算管理器：</b></p>
+<pre>总窗口 8192 tokens
+- System Prompt: 500
+- 工具定义: 800  
+- 留给对话: 6892
+→ 超过 5000(75%) 时自动触发压缩</pre>
+<p><b>四种压缩策略：</b></p>
+<ul>
+<li><b>关键实体抽取</b>：保留人名/日期/金额/订单号等不可丢失的实体</li>
+<li><b>结构化摘要</b>：用轻量模型对旧对话做 summarize，保留 5 维度——用户意图/已提取实体/待完成操作/当前进度/异常情况</li>
+<li><b>滑动窗口</b>：最近 5 轮完整保留，更早的只留摘要</li>
+<li><b>选择性遗忘</b>：基于重要性评分丢弃无关内容</li>
+</ul>
+<p><b>关键原则——优先压缩模型输出，而非用户输入。</b>因为 LLM 的输出有很多填充词和客套话，信息密度低；用户的原始输入每句话都有价值。</p>
+<p><b>踩过的坑：</b>长日志不能直接丢给 LLM 总结——100 页日志一次性塞进去，LLM 只看头尾忽略中间。要<b>分段处理</b>，每两段之间留 20% 重叠防止关键信息在分段边界丢失。</p>`,
+          refs:[]
+        },
+      ]
+    },
+    {
+      id:"rag", icon:"🔍", name:"检索增强 (RAG)",
+      desc:"检索增强生成的完整链路：从文档处理到答案生成。",
+      items: [
+        {
+          title:"RAG 全链路：7 步完整流程",
+          tags:["RAG","核心","必会"],
+          body:`<p><b>7 步全链路，每步都有优化空间：</b></p>
+<p><b>① Query 预处理</b>——用户说"咋退"→改写为标准查询"如何申请退货退款"。技术：Query Rewriting（补全简写/纠正错别字）、Query Expansion（生成多个同义查询增加召回）。</p>
+<p><b>② Embedding 向量化</b>——用 Embedding 模型（BGE-M3 / text2vec / OpenAI ada-002）将 query 转为稠密向量。</p>
+<p><b>③ 双路召回</b>——向量检索（语义相似/TopK=20）+ BM25（精确关键词/TopK=20），两者取并集。</p>
+<p><b>④ 混合融合</b>——RRF (Reciprocal Rank Fusion) 或加权求和合并两个排序列表。RRF 公式：score=Σ 1/(k+rank_i)，k=60。加权求和需要 A/B 测试确定权重。</p>
+<p><b>⑤ Rerank 重排序</b>——用交叉编码器（BGE-Reranker-v2 / Cohere Rerank）对候选做精排，从 40 条筛到 5 条。Rerank 是 RAG 性价比最高的优化点。</p>
+<p><b>⑥ TopK 截断</b>——保留前 K 条（通常 3-5 条），作为 LLM 的参考上下文。K 值不是拍脑袋——测过 K=3/5/10，K=5 在召回率和精确度之间平衡最好。</p>
+<p><b>⑦ 注入 LLM</b>——按相关性排序+标注来源+注入 System Prompt，LLM 基于检索内容生成答案，强制要求引用来源。</p>
+<p><b>每个参数都要有实验验证</b>——不是"经验值"，是"A/B 测试后 0.3:0.7 时准确率最高"。</p>`,
+          refs:[{t:"RAG (Lewis et al. 2020)",u:"https://arxiv.org/abs/2005.11401"}]
+        },
+        {
+          title:"混合检索 / Rerank / Agentic RAG / GraphRAG",
+          tags:["混合检索","Rerank","Agentic RAG","GraphRAG"],
+          body:`<p><b>为什么需要混合检索：</b>向量检索擅长语义匹配（"退款"="退货"）但弱于精确关键词（订单号 ORD-12345 会被泛化）。BM25 擅长精确匹配但不懂语义。<b>两者互补</b>——向量抓"软匹配"，BM25 抓"硬匹配"。</p>
+<p><b>融合比例不是标准答案</b>——取决于文档类型。FAQ 类（语义模糊）向量权重高；规则手册类（关键词重要）BM25 权重高。需要 A/B 测试。</p>
+<p><b>Rerank 价值：</b>向量检索是"粗排"——从百万文档中快速召回 Top20。但 Top20 里约一半是噪声。Rerank 用交叉编码器逐对精排，准确率从 60% 提到 95%+。代价：比向量检索慢 10-100 倍，只对 Top20-50 做。</p>
+<p><b>Agentic RAG：</b>传统 RAG 是"检索→生成"一次性的。Agentic RAG 用 Agent 循环控制——检索→Agent 判断是否充分→不足则改写 query 再检索→多轮迭代→生成。适合多跳推理/跨文档对比。代价：Token 消耗是传统 RAG 的 3-5 倍。</p>
+<p><b>GraphRAG：</b>在 RAG 基础上引入知识图谱——从文档中抽取实体和关系构建图结构。检索时沿图边做多跳遍历。适合理解实体间复杂关系的查询（供应链分析/组织架构）。代价：图谱构建和维护成本高。</p>`,
+          refs:[{t:"GraphRAG (2024)",u:"https://arxiv.org/abs/2404.16130"}]
+        },
+      ]
+    },
+    {
+      id:"multi-agent", icon:"🤖", name:"多 Agent 协作",
+      desc:"多 Agent 系统的架构模式、通信机制、编排框架和状态管理。",
+      items: [
+        {
+          title:"多 Agent 协作模式与选型",
+          tags:["Multi-Agent","协作","编排"],
+          body:`<p><b>四种协作模式：</b></p>
+<ul>
+<li><b>主从模式 (Orchestrator+Worker)</b>：中央编排器分配任务，Worker 执行并返回。适合确定性流程（如代码 Review Pipeline）。优势——可控性强；劣势——单点故障。</li>
+<li><b>对等模式 (消息总线)</b>：Agent 间平等通信，无中心节点。适合开放协作（如 AutoGen 的 group chat）。优势——无单点故障；劣势——协调复杂。</li>
+<li><b>层级模式 (Manager→Specialist)</b>：Manager 接收请求后分发给专业 Agent。适合专业分工（如软件工程团队——PM Agent→架构师Agent→开发Agent→QA Agent）。</li>
+<li><b>辩论模式</b>：多个 Agent 生成竞争性回答，通过辩论或投票选出最优。提高准确率但 Token 成本翻倍。</li>
+</ul>
+<p><b>核心原则：能用单 Agent 不拆多。</b>拆的原因必须是——任务可分解+独立+可并行。不是"看起来高级"就上多 Agent。</p>
+<p><b>多 Agent 的三大风险：①</b>通信开销（Agent 间传递信息消耗 Token）；<b>②</b>状态一致性（一个 Agent 修改了共享状态，另一个不知道）；<b>③</b>上下文污染（一个 Agent 的错误输出污染另一个的推理）。</p>
+<p><b>防污染设计：①</b>上下文隔离——每个子 Agent 有独立的 context window，只通过结构化消息通信；<b>②</b>消息协议——Agent 间通信用固定 JSON 格而非自然语言；<b>③</b>计划控制——子 Agent 只返回"计划增量"，经编排器检查后才合并。</p>
+<p><b>框架对比：AutoGen</b>（Microsoft，对话式，最灵活）；<b>CrewAI</b>（角色+任务，最易上手）；<b>LangGraph</b>（状态图，最可控）；<b>MetaGPT</b>（SOPs，适合软件开发）。</p>`,
+          refs:[{t:"AutoGen (Microsoft 2023)",u:"https://arxiv.org/abs/2308.08155"},{t:"MetaGPT (2023)",u:"https://arxiv.org/abs/2308.00352"}]
+        },
+      ]
+    },
+    {
+      id:"engineering", icon:"⚙️", name:"工程落地",
+      desc:"把 Agent 从 Demo 变成生产系统——架构、安全、性能、评估、可观测、部署。",
+      items: [
+        {
+          title:"Agent 系统架构设计（五层）",
+          tags:["架构","系统设计","必会"],
+          body:`<p><b>生产级 Agent 五层架构：</b></p>
+<ul>
+<li><b>接入层</b>：多渠道对接（Web/App/公众号/企微），统一消息格式</li>
+<li><b>对话管理层</b>：意图识别+多轮状态跟踪+上下文管理。关键——80% 简单问题走 FAQ 匹配，不进 Agent 核心层（省 Token）</li>
+<li><b>Agent 核心层</b>：规划(Planning)+工具调用+反思(Reflection)+记忆(Memory)。状态机设计——每步有 Checkpoint，失败可回滚</li>
+<li><b>工具层</b>：知识库检索/工单系统/用户信息/外部 API。工具注册与发现</li>
+<li><b>输出管控层</b>：敏感词过滤+内容审核+话术规范+格式校验。不管 LLM 说了什么，最后必须过这道防线</li>
+</ul>
+<p><b>稳定性保障四级兜底：</b>超时→重试→降级（LLM 挂了走规则引擎）→人工介入。每一步的成功率和延迟实时监控大盘。</p>
+<p><b>Human-in-the-loop 断点设计：</b>只在不可逆操作前设断点（资金/外发/敏感数据）。审批异步不阻塞主流程，30s 超时自动降级。完整审计日志。</p>`,
+          refs:[]
+        },
+        {
+          title:"安全防护：幻觉控制 + Prompt 注入防御",
+          tags:["安全","幻觉","注入","必会"],
+          body:`<p><b>幻觉多层防御（生产级 Agent 对幻觉零容忍）：</b></p>
+<ul>
+<li><b>RAG 约束</b>：所有回答必须基于检索到的文档，强制要求引用来源</li>
+<li><b>置信度校验</b>：让 LLM 自评回答把握度（0-10 分），低于 7 分触发人工审核</li>
+<li><b>事实核查</b>：用 NLI 模型比对输出与原文（entailment/contradiction/neutral），不一致打回重生成</li>
+<li><b>外挂白名单/规则引擎</b>：如 SKU 白名单硬拦截——模型不能推荐菜单外的商品。蜜雪冰城"茅台柠檬水"幻觉不是靠 prompt 解决，是靠外挂白名单解决</li>
+<li><b>关键场景人工复核</b>：金融/医疗等高风险领域必须过人工</li>
+</ul>
+<p><b>Prompt Injection 防御三层：</b></p>
+<ul>
+<li><b>输入过滤</b>：检测"忽略""覆盖""你现在的角色是"等指令性语言+异常长度+特殊分隔符</li>
+<li><b>运行时防御</b>：安全规则不只在 System Prompt 开头写一次，而是<b>每次 LLM 调用的 messages 末尾追加</b>——因为 LLM 更关注最近的文本（recency bias）</li>
+<li><b>权限硬限制</b>：即使注入成功，Agent 也只是换了个回答文案——工具白名单里根本没有"修改支付金额"的工具</li>
+</ul>
+<p><b>不要靠 Prompt 防注入，要工程硬限制。</b></p>`,
+          refs:[{t:"Universal Adversarial Attacks on Aligned LMs",u:"https://arxiv.org/abs/2307.15043"}]
+        },
+        {
+          title:"性能与成本优化",
+          tags:["性能","成本","Token","延迟"],
+          body:`<p><b>Token 成本优化三层：</b></p>
+<ul>
+<li><b>入口分流</b>：80% 简单问题走 FAQ/规则引擎，不进 Agent LLM 调用——从源头省钱</li>
+<li><b>模型分级</b>：简单步骤用小模型（GPT-4o-mini/Qwen-Turbo），复杂推理才用大模型</li>
+<li><b>缓存复用</b>：相同/相似 query 的 Embedding/检索结果/摘要都缓存。命中率通常 20-30%</li>
+</ul>
+<p><b>实际效果：分层+缓存组合可降低 50-70% Token 成本。</b></p>
+<p><b>延迟优化：</b></p>
+<ul>
+<li><b>并行工具调用</b>：无依赖的工具同时调（asyncio.gather）。查订单和查库存没有依赖关系，同时发</li>
+<li><b>流式输出</b>：SSE 逐 token 推送，用户感知延迟降低 50%+</li>
+<li><b>预计算</b>：高频 Tool 结果预加载/热门知识预缓存</li>
+<li><b>分模型策略</b>：意图识别用轻量模型（100ms），确认需要核心推理后才换大模型</li>
+</ul>
+<p><b>关键——先诊断再用药。</b>加全链路 tracing，定位瓶颈是检索慢还是 LLM 推理慢，不同瓶颈不同优化。</p>`,
+          refs:[]
+        },
+        {
+          title:"可观测性 + 评估体系",
+          tags:["可观测","评估","LangSmith"],
+          body:`<p><b>可观测性三支柱：</b></p>
+<ul>
+<li><b>Logs</b>：每步 LLM 调用的输入/输出/耗时/Token 数，每个 Tool 调用的参数/结果/耗时/成功失败</li>
+<li><b>Traces</b>：全链路追踪——一次 Agent 任务从开始到结束的完整调用链（可视化 DAG）</li>
+<li><b>Metrics</b>：各维度聚合——成功率/幻觉率/P50-P99 延迟/Token 消耗趋势/工具调用失败率</li>
+</ul>
+<p><b>工具选型：</b>LangSmith（LangChain 官方/Agent trace+回放+评测）、LangFuse（开源/自托管）、Arize Phoenix（开源/可观测+评估）。</p>
+<p><b>核心价值</b>——出问题时 5 分钟定位到具体步骤，而非猜测。</p>
+<p><b>评估体系：</b></p>
+<ul>
+<li><b>离线评估</b>：构建分层评测集（简单30%+复杂40%+对抗30%），每个 case 标注 gold trajectory。指标——任务完成率/步数效率/工具调用准确率/幻觉率</li>
+<li><b>在线评估</b>：用户追问率/点踩率/转人工率/任务完成时间。A/B 实验对比新旧版本</li>
+<li><b>非确定性处理</b>：同一 case 跑 5 次取中位数+方差</li>
+</ul>`,
+          refs:[{t:"AgentBench: Evaluating LLMs as Agents",u:"https://arxiv.org/abs/2308.03688"}]
+        },
+      ]
+    },
+  ]
+};
+
+const EVAL = {
+  qa: [
+    {q:"怎么知道我的 Agent 设计得好不好？",a:"用 9 个维度的检查清单逐项评估——架构合理性/推理质量/工具使用/记忆有效性/检索质量/安全性/性能成本/可维护性/Git演进。每个维度有明确的好坏标准。"},
+    {q:"评估维度从哪里来？不是拍脑袋？",a:"从 Agent 的 6 大能力域推导——每个能力域对应一个质量维度。比如推理决策能力→推理质量评估；工具协议能力→工具使用评估。第 9 个维度(Git演进)是工程成熟度评估。"},
+    {q:"评估完之后怎么改进？",a:"每个维度都有明确的改进方向，关联到第 1 页的知识体系。比如记忆有效性评估发现问题→看第 1 页记忆系统的压缩策略和防污染设计→应用到你的 Agent A。"},
+  ],
+  dims: [
+    {
+      title:"架构合理性", num:1,
+      why:"架构是地基——架构不好，后面所有优化都是在沙地上盖楼。",
+      checks:`<p><b>检查点：</b></p>
+<ul>
+<li>组件职责是否单一明确？每个模块能否用一句话描述职责而不需要"和/或"？</li>
+<li>组件间耦合度如何？替换记忆模块(从 Redis 换 PostgreSQL)是否需要改规划模块？</li>
+<li>是否有清晰的错误传播路径？工具失败后，错误信息如何传到 LLM？</li>
+<li>扩展新工具的成本？加一个新工具需要改几处代码？</li>
+</ul>`,
+      good:`<b>好的：</b>Agent A 的 Planning 模块只接收 intent 和 context，输出 plan JSON，不直接调用任何工具。替换记忆层只需实现接口。`,
+      bad:`<b>不好的：</b>Planning 模块在生成计划的同时直接调用了 search_order——职责混淆。规划代码中直接 import 了 Redis 客户端类——高耦合。`,
+      improve:`改进：定义 Memory 接口(get/set/delete)，规划层通过接口调用，底层可替换。加 Tool Registry 自动发现新工具。`,
+      link:"→ 关联知识：工具与协议 → 工具设计模式"
+    },
+    {
+      title:"推理质量", num:2,
+      why:"Agent 的核心价值在于推理决策——推理质量直接决定任务完成率。",
+      checks:`<p><b>检查点：</b></p>
+<ul>
+<li>平均几步完成任务？过多说明推理效率低</li>
+<li>推理过程中是否出现"目标漂移"——走着走着偏离原始目标</li>
+<li>面对模糊指令时，Agent 是合理推断还是胡猜</li>
+<li>Reflection 是否被有效使用——错误后能否自我修正</li>
+</ul>`,
+      good:`<b>好的：</b>Agent A 处理退货任务平均 4 步完成，每步 Thought 清晰展示推理逻辑，遇到"已发货不能退"时自动查退货政策并调整方案。`,
+      bad:`<b>不好的：</b>Agent A 处理退货任务跑了 12 步——查了订单后顺手查了用户历史订单"了解一下"，结果跑偏了。`,
+      improve:`改进：每步加"目标对齐检查"——在 Thought 中要求模型评估"当前操作是否服务于原始目标"。设 max_steps=10 硬限制。`,
+      link:"→ 关联知识：推理与决策 → ReAct / Plan-Execute / Reflection"
+    },
+    {
+      title:"工具使用", num:3,
+      why:"工具是 Agent 的手脚——工具调用质量决定 Agent 能否真正完成任务。",
+      checks:`<p><b>检查点：</b></p>
+<ul>
+<li>是否调用了正确的工具？参数是否正确？</li>
+<li>工具调用失败后的处理策略——重试/换工具/降级</li>
+<li>多工具调用的顺序是否合理——有依赖的是否串行，无依赖的是否并行</li>
+<li>LLM 生成的 tool_call JSON 格式错误率</li>
+</ul>`,
+      good:`<b>好的：</b>JSON 格式错误率 < 2%，Pydantic 校验失败后自动重生成，工具失败后 LLM 看到 Observation 中的错误信息并自主决定换策略。`,
+      bad:`<b>不好的：</b>JSON 格式错误率 15%，错误被代码层静默吞掉，LLM 不知道工具失败继续推理导致幻觉。`,
+      improve:`改进：①优化 Tool Schema description（更精确的"何时使用"说明）；②加 Pydantic 校验层+错误回传；③用 enum 替代 free text 减少随机性。`,
+      link:"→ 关联知识：工具与协议 → Function Calling / 工具设计模式"
+    },
+    {
+      title:"记忆有效性", num:4,
+      why:"记忆决定 Agent 能否跨轮次保持上下文连贯——记忆不好，Agent 就会失忆。",
+      checks:`<p><b>检查点：</b></p>
+<ul>
+<li>多轮对话后是否记得用户之前说的关键信息</li>
+<li>长期记忆是否有效——用户画像是否准确</li>
+<li>记忆检索的主键设计是否合理——会不会跨任务污染</li>
+<li>上下文压缩后信息丢失率——摘要是否保留了关键信息</li>
+</ul>`,
+      good:`<b>好的：</b>Agent A 记得用户 5 轮前说"少冰"，第 8 轮点新饮品时自动沿用偏好。长期记忆检索带时间衰减因子。`,
+      bad:`<b>不好的：</b>Agent A 第 3 轮就忘了用户说过"不要珍珠"，第 5 轮又推荐了含珍珠的饮品。上下文压缩时把"用户过敏花生"这个关键信息摘要丢了。`,
+      improve:`改进：①关键实体(过敏/偏好)不压缩，始终保留在上下文；②长期记忆加访问频率淘汰机制；③工作记忆用 task_id 隔离防跨任务污染。`,
+      link:"→ 关联知识：记忆系统 → 三层架构 / 上下文工程"
+    },
+    {
+      title:"检索质量", num:5,
+      why:"RAG 是 Agent 获取外部知识的核心——检索不准，回答就是错的。",
+      checks:`<p><b>检查点：</b></p>
+<ul>
+<li>检索准确率——召回的文档是否真正相关</li>
+<li>TopK 截断是否合理——会不会漏掉关键信息或引入过多噪声</li>
+<li>混合检索比例是否经过 A/B 验证</li>
+<li>Rerank 后准确率提升多少——有没有量化数据</li>
+</ul>`,
+      good:`<b>好的：</b>Agent A 的 RAG 链路：向量+BM25 混合检索(0.3:0.7)，Rerank 后 Top5 准确率 95%+。每个参数都有 A/B 测试数据支撑。`,
+      bad:`<b>不好的：</b>纯向量检索，TopK=10（太多噪声导致模型被带偏产生幻觉），没有 Rerank，参数全是"经验值"。`,
+      improve:`改进：①加 BM25 做混合检索；②加 Rerank 精排（BGE-Reranker-v2）；③A/B 测试确定最优 TopK（通常 K=5）。`,
+      link:"→ 关联知识：检索增强(RAG) → 全链路 / 混合检索 / Rerank"
+    },
+    {
+      title:"安全性", num:6,
+      why:"安全不是功能，是基础属性——一个不安全的 Agent 不应该上线。",
+      checks:`<p><b>检查点：</b></p>
+<ul>
+<li>LLM 能否直接执行有副作用的操作？答案必须是不能</li>
+<li>Prompt Injection 防御——输入"忽略之前指令"Agent 会照做吗</li>
+<li>幻觉对用户的影响有多大——风险等级决定防护投入</li>
+<li>是否有完整审计日志——每次操作可回溯</li>
+</ul>`,
+      good:`<b>好的：</b>Agent A 的支付工具在执行前必须经 Human-in-the-loop 审批。三层注入防御（输入过滤+运行时规则追加+权限白名单）。`,
+      bad:`<b>不好的：</b>Agent A 可以直接调用退款接口——LLM 说了"退款 100 元"代码就执行了。没有注入防御。没有审计日志。`,
+      improve:`改进：①所有副作用操作加 Human-in-the-loop；②三层注入防御；③加外挂白名单/规则引擎；④完整审计日志。`,
+      link:"→ 关联知识：工程落地 → 安全防护 / Human-in-the-loop"
+    },
+    {
+      title:"性能与成本", num:7,
+      why:"性能影响用户体验，成本决定 Agent 能否规模化部署。",
+      checks:`<table><tr><th>指标</th><th>目标</th></tr>
+<tr><td>P50 延迟</td><td>&lt;5s(简单)/&lt;15s(复杂)</td></tr>
+<tr><td>平均步数</td><td>&lt;5步(简单)/&lt;10步(复杂)</td></tr>
+<tr><td>Token消耗/任务</td><td>&lt;5000(简单)/&lt;20000(复杂)</td></tr>
+<tr><td>首Token延迟</td><td>&lt;1s</td></tr></table>`,
+      good:`<b>好的：</b>简单问题走 FAQ 匹配(200ms)，Agent 只处理 20% 复杂问题。Token 成本通过模型分级+缓存降低 60%。`,
+      bad:`<b>不好的：</b>所有问题都走 Agent 全流程(平均 8 步/20000 Token)，简单"你好"也要烧 5000 Token。`,
+      improve:`改进：①入口分流(80% 走 FAQ)；②模型分级(意图用轻量，推理用大)；③缓存高频结果；④并行无依赖工具调用。`,
+      link:"→ 关联知识：工程落地 → 性能与成本优化"
+    },
+    {
+      title:"可维护性", num:8,
+      why:"可维护性决定长期成本——好维护的 Agent 迭代快，难维护的改一行怕三天。",
+      checks:`<p><b>检查点：</b></p>
+<ul>
+<li>Prompt 是否有版本管理？修改后如何回滚/对比效果？</li>
+<li>工具接口是否向后兼容？改参数后旧 Agent 是否需要全部更新？</li>
+<li>可观测性——出问题能否 5 分钟定位到具体步骤？</li>
+<li>文档——新人接手需要多久？</li>
+</ul>`,
+      good:`<b>好的：</b>Agent A 的 Prompt 用 YAML 管理+版本号+AB测试框架。全链路 Trace 接了 LangSmith。改 Prompt 后自动跑评测集对比。`,
+      bad:`<b>不好的：</b>Prompt 硬编码在 Python 源码里。没有 Trace。出问题全靠猜。`,
+      improve:`改进：①Prompt 抽到配置文件+版本管理；②接 LangSmith/LangFuse 做全链路 Trace；③写故障处理手册。`,
+      link:"→ 关联知识：工程落地 → 可观测性 / 部署"
+    },
+    {
+      title:"Git 演进分析", num:9,
+      why:"通过 Git 历史理解项目演进路径——技术决策、架构变更、问题修复。评估项目成熟度。",
+      checks:`<p><b>5 步分析法（输入本地仓库目录路径）：</b></p>
+<ul>
+<li><b>Step 1</b>：git log --oneline --graph --all 画版本总览</li>
+<li><b>Step 2</b>：git tag -l 列版本标签，git diff v1.0..v2.0 --stat 分析变更规模</li>
+<li><b>Step 3</b>：git log --diff-filter=R -M 追踪文件重命名/移动，识别模块拆分合并</li>
+<li><b>Step 4</b>：搜索 commit message 关键词("refactor"/"breaking"/"fix critical")标记重大变更</li>
+<li><b>Step 5</b>：总结演进模式——从单体→微服务？每次重大变更因为什么触发？</li>
+</ul>
+<p><b>量化指标：</b>fix commit 占比(&lt;30%为健康)、平均 commit 间隔、contributor 活跃度。</p>`,
+      good:`<b>好的：</b>Agent A 的 Git 历史显示——随着迭代，核心模块逐渐稳定(commits 集中在功能扩展)，fix 占比 18%，架构从单 Agent 逐步演进到多 Agent。`,
+      bad:`<b>不好的：</b>Agent A 频繁大规模重构(反复推翻设计)，fix commit 占比 60%，核心 commit 缺少说明。`,
+      improve:`改进：①每次重大变更写 ADR(Architecture Decision Record)；②降低 fix 占比(先写测试再改代码)；③commit message 规范化(Conventional Commits)。`,
+      link:"→ 关联知识：工程落地 → 架构设计 / 部署"
+    },
+  ]
+};
+
+// ==================== RENDER ====================
+let currentTab = 'knowledge';
+
+function buildNav(tab = currentTab) {
+  const tree = document.getElementById('navTree');
+  const title = document.querySelector('.sidebar-title');
+  let html = '';
+
+  if(tab === 'knowledge') {
+    title.textContent = 'AI Agent 开发知识体系';
+    KNOWLEDGE.categories.forEach(cat => {
+      html += `<div class="nav-group"><div class="nav-group-label" onclick="toggleNav(this)"><span class="arrow open">▶</span>${cat.icon} ${cat.name}</div><div class="nav-children show">`;
+      cat.items.forEach((item,i) => {
+        const itemTitle = item.title.length > 20 ? item.title.substring(0,20)+'...' : item.title;
+        html += `<div class="nav-item" onclick="scrollToSection('${cat.id}-${i}',this)">${itemTitle}</div>`;
+      });
+      html += `</div></div>`;
+    });
+  } else {
+    title.textContent = 'Agent 系统评估框架';
+    html = `<div class="nav-group"><div class="nav-group-label"><span class="arrow open">▶</span>🔍 九项评估维度</div><div class="nav-children show">`;
+    EVAL.dims.forEach(dim => {
+      html += `<div class="nav-item" onclick="scrollToSection('eval-${dim.num}',this)">${dim.num}. ${dim.title}</div>`;
+    });
+    html += `</div></div>`;
+  }
+  tree.innerHTML = html;
+}
+
+function toggleNav(el) {
+  el.querySelector('.arrow').classList.toggle('open');
+  el.nextElementSibling.classList.toggle('show');
+}
+
+function scrollToSection(id, navItem) {
+  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
+  if(navItem) navItem.classList.add('active');
+  const el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderQA(tab) {
+  const banner = document.getElementById('qaBanner');
+  const qa = tab==='knowledge' ? KNOWLEDGE.qa : EVAL.qa;
+  let html = `<h3>📋 我关注的问题与回答</h3>`;
+  qa.forEach(item => {
+    html += `<div class="qa-item"><div class="q">${item.q}</div><div class="a">${item.a}</div></div>`;
+  });
+  banner.innerHTML = html;
+}
+
+function renderKnowledge() {
+  let html = '';
+  KNOWLEDGE.categories.forEach(cat => {
+    html += `<div class="section"><h2 class="section-title">${cat.icon} ${cat.name}</h2><p class="section-desc">${cat.desc}</p>`;
+    cat.items.forEach((item,i) => {
+      html += `<div class="kp" id="${cat.id}-${i}"><h4>${item.title}</h4>`;
+      if(item.tags) html += `<div class="tags">${item.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
+      html += `<div class="body">${item.body}</div>`;
+      if(item.refs && item.refs.length) {
+        html += `<div class="refs">引用：${item.refs.map(r=>`<a href="${r.u}" target="_blank">📄 ${r.t}</a>`).join('')}</div>`;
+      }
+      html += `</div>`;
+    });
+    html += `</div>`;
+  });
+  return html;
+}
+
+function renderEval() {
+  let html = '';
+  EVAL.dims.forEach(dim => {
+    html += `<div class="section" id="eval-${dim.num}"><div class="eval-dim"><h4><span class="num">${dim.num}</span>${dim.title}</h4>`;
+    html += `<div class="why">为什么评估这个：${dim.why}</div>`;
+    html += `<div class="check-list">${dim.checks}</div>`;
+    if(dim.good && dim.bad) {
+      html += `<div class="good-bad"><div class="good">${dim.good}</div><div class="bad">${dim.bad}</div></div>`;
+    }
+    if(dim.improve) html += `<div class="improve">💡 ${dim.improve}</div>`;
+    if(dim.link) html += `<div class="link">${dim.link}</div>`;
+    html += `</div></div>`;
+  });
+  return html;
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));
+  document.querySelector(`.top-tab[data-tab="${tab}"]`).classList.add('active');
+  
+  document.querySelector('.sidebar').style.display = 'block';
+  renderQA(tab);
+  const content = document.getElementById('content');
+  content.className = `content ${tab}-view`;
+  if(tab==='knowledge') content.innerHTML = renderKnowledge();
+  else content.innerHTML = renderEval();
+  buildNav(tab);
+}
+
+// Init
+buildTab();
+function buildTab(){document.querySelectorAll('.top-tab').forEach(tab=>{tab.addEventListener('click',function(){switchTab(this.dataset.tab)})})}
+buildNav();
+const requestedTab = new URLSearchParams(window.location.search).get('tab');
+switchTab(['knowledge','eval'].includes(requestedTab) ? requestedTab : 'knowledge');
+</script>
+</body>
+</html>
