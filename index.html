@@ -881,8 +881,9 @@ function renderKnowledge() {
   return html;
 }
 
+function evaluationOutputContract(){return `<section class="workbench"><div class="kicker">评估交付物</div><h2>一次 Agent 评估，最后应交付什么？</h2><p>不是一个总分，而是一条能追溯到任务与证据的判断链。</p><div class="flow"><div><b>1. 已有优势</b><span>当前设计已经覆盖了哪些任务风险，例如授权、状态恢复或证据引用。</span><small>说明优势为何成立</small></div><div><b>2. 问题与风险</b><span>指出发生在任务、工具、状态或终态的具体缺口，并标明它是事实还是待核实假设。</span><small>定位到失效环节</small></div><div><b>3. 改进方案</b><span>写清改什么、为何可能缓解问题、会带来什么成本或副作用，以及何时不该用。</span><small>给出可执行动作</small></div><div><b>4. 证据与置信度</b><span>说明外部来源支持的机制和范围，列出反例后给出强候选、待补充或不建议。</span><small>不把引用当效果结论</small></div><div><b>5. 评估图</b><span>把任务契约、执行证据、优势与风险、改进方案连成一条可追溯路径。</span><small>任务 → 证据 → 判断 → 建议</small></div></div><div class="evidence"><b>资料决定深度：</b>任务 + 当前设计，可做架构审查；再加执行轨迹，可定位失败步骤与状态偏移；再加重复结果，才可比较稳定表现与实际差异。</div><div class="evidence"><b>输出边界：</b>没有目标 Agent 的任务、设计或轨迹时，本页只给基于公开证据的静态候选；不能把它写成该 Agent 已有优点、已有缺陷或已经提升。</div></section>`}
 function renderEval() {
-  let html = evaluationReferences() + evalWorkbench() + comparisonBoardV2() + evaluationContractMap() + toolEvaluationLayers() + evidenceLadder() + evidenceClaimsV2() + evaluationSources();
+  let html = evaluationOutputContract() + evaluationReferences() + evalWorkbench() + comparisonBoardV2() + evaluationContractMap() + toolEvaluationLayers() + evidenceLadder() + evidenceClaimsV2() + evaluationSources();
   AGENT_EVALUATION_DIMS.forEach(dim => {
     html += `<div class="section" id="eval-${dim.num}"><div class="eval-dim"><h4><span class="num">${dim.num}</span>${dim.title}</h4>`;
     html += `<div class="why">为什么评估这个：${dim.why}</div>`;
