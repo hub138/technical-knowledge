@@ -162,62 +162,60 @@ window.addEventListener("error", function(event) {
 <script>
 // ==================== DATA ====================
 const KNOWLEDGE = {
-  qa: [
-    {q:"面对一个真实任务，我现在该补哪一层知识？",a:"先分清任务边界、运行机制、状态与知识、协作治理和工程可靠性；不要从框架名倒推需求，也不要把所有问题都归为模型能力。"},
-    {q:"这些知识点怎样连成一次完整的 Agent 工作？",a:"从任务与约束出发，经由推理、工具、记忆和检索完成动作，再用安全、观测与恢复让它可长期运行；每一层都有明确输入、输出和失效边界。"},
-    {q:"什么才算真正理解，而不只是记住概念？",a:"能针对一个任务说清为什么用 Agent、该选规则还是工作流、每一步依赖什么状态和工具、会在哪失败，以及该回到哪个知识域解决。"},
+  qa:   [
+    {
+      "q": "面对一个真实任务，我现在该补哪一层知识？",
+      "a": "先分清任务边界、运行机制、状态与知识、协作治理和工程可靠性；不要从框架名倒推需求，也不要把所有问题都归为模型能力。"
+    },
+    {
+      "q": "这些知识点怎样连成一次完整的 Agent 工作？",
+      "a": "从任务与约束出发，经由推理、工具、记忆和检索完成动作，再用安全、观测与恢复让它可长期运行；每一层都有明确输入、输出和失效边界。"
+    },
+    {
+      "q": "什么才算真正理解，而不只是记住概念？",
+      "a": "能针对一个任务说清为什么用 Agent、该选规则还是工作流、每一步依赖什么状态和工具、会在哪失败，以及该回到哪个知识域解决。"
+    }
   ],
   categories: [
     {
       id:"reasoning", icon:"🧠", name:"推理与决策",
       desc:"Agent 如何思考、规划、做出决策。这是 Agent 区别于 Chatbot 的核心——不只是生成文本，而是闭环决策。",
       items: [
-        {
-          title:"ReAct 范式：推理+行动交替循环",
-          tags:["ReAct","核心","必会"],
-          body:`<p><b>ReAct = Reasoning + Acting</b>（Google 2022）。核心思想：让 LLM 在生成中交替进行<b>推理(Thought)和行动(Action)</b>，并接收外部工具返回的<b>观察(Observation)</b>，把推理锚定在真实数据上。</p>
-<p><b>标准循环：</b></p>
-<ul>
-<li><b>Thought</b>：LLM 分析当前状态，决定下一步做什么</li>
-<li><b>Action</b>：调用工具（Function Call），如 search_order(order_id="123")</li>
-<li><b>Observation</b>：工具返回结果，如 {"status":"已发货","items":[...]}</li>
-<li>回到 Thought，基于 Observation 决定下一步，直到输出 Final Answer</li>
-</ul>
-<p><b>为什么 ReAct 比 CoT 好：</b>CoT 纯靠模型内部知识推理，容易"空想"——比如模型不知道今天天气，只能猜。ReAct 调天气 API 获取真实数据，推理基于事实。</p>
-<p><b>消息格式设计：</b>Observation 用 <b>tool 角色而非 assistant 角色</b>回传。因为 Observation 是外部系统返回的内容，不是模型生成的。如果放 assistant 角色，模型会以为自己说了这些话，后续推理会混乱。</p>
-<p><b>消息格式示例：</b></p>
-<pre>system: 你是客服Agent，可用工具：search_order
-user: 帮我查订单123的状态
-assistant: Thought: 用户要查订单状态，调用search_order
-        Action: search_order(order_id="123")
-tool: {"status":"已发货","carrier":"顺丰"}
-assistant: Thought: 订单已发货，用顺丰。用户可能想查物流
-        Final Answer: 您的订单123已通过顺丰发货。</pre>
-<p><b>终止条件设计：</b>①最大步数硬限制（通常 10 步）；②LLM 主动输出 finish_reason=stop；③连续 2 步调用相同工具且参数相同→疑似死循环→强制停止。</p>
-<p><b>生产实践：</b>ReAct 的 Token 消耗通常高于 CoT（每步都要携带历史）。系统 A 可采用混合模式——简单任务用 Plan-Execute（节省 Token），不确定路径的任务才用 ReAct。</p>`,
-          refs:[{t:"ReAct: Synergizing Reasoning and Acting (Google 2022)",u:"https://arxiv.org/abs/2210.03629"}]
+                {
+          "title": "ReAct 范式：推理+行动交替循环",
+          "tags": [
+            "ReAct",
+            "核心",
+            "必会"
+          ],
+          "body": "<p><b>ReAct = Reasoning + Acting</b>（Google 2022）。核心思想：让 LLM 在生成中交替进行<b>推理(Thought)和行动(Action)</b>，并接收外部工具返回的<b>观察(Observation)</b>，把推理锚定在真实数据上。</p>\n<p><b>标准循环：</b></p>\n<ul>\n<li><b>Thought</b>：LLM 分析当前状态，决定下一步做什么</li>\n<li><b>Action</b>：调用工具（Function Call），如 search_order(order_id=\"123\")</li>\n<li><b>Observation</b>：工具返回结果，如 {\"status\":\"已发货\",\"items\":[...]}</li>\n<li>回到 Thought，基于 Observation 决定下一步，直到输出 Final Answer</li>\n</ul>\n<p><b>为什么 ReAct 比 CoT 好：</b>CoT 纯靠模型内部知识推理，容易\"空想\"——比如模型不知道今天天气，只能猜。ReAct 调天气 API 获取真实数据，推理基于事实。</p>\n<p><b>消息格式设计：</b>Observation 用 <b>tool 角色而非 assistant 角色</b>回传。因为 Observation 是外部系统返回的内容，不是模型生成的。如果放 assistant 角色，模型会以为自己说了这些话，后续推理会混乱。</p>\n<p><b>消息格式示例：</b></p>\n<pre>system: 你是客服Agent，可用工具：search_order\nuser: 帮我查订单123的状态\nassistant: Thought: 用户要查订单状态，调用search_order\n        Action: search_order(order_id=\"123\")\ntool: {\"status\":\"已发货\",\"carrier\":\"顺丰\"}\nassistant: Thought: 订单已发货，用顺丰。用户可能想查物流\n        Final Answer: 您的订单123已通过顺丰发货。</pre>\n<p><b>终止条件设计：</b>①最大步数硬限制（通常 10 步）；②LLM 主动输出 finish_reason=stop；③连续 2 步调用相同工具且参数相同→疑似死循环→强制停止。</p>\n<p><b>生产代价：</b>ReAct 每一步都要携带状态、工具定义和观察结果，成本取决于轨迹长度、输出与工具模式。简单任务优先直接响应或确定性流程；只有路径依赖外部观察时才启用循环。</p>",
+          "refs": [
+            {
+              "t": "ReAct: Synergizing Reasoning and Acting (Google 2022)",
+              "u": "https://arxiv.org/abs/2210.03629"
+            }
+          ]
         },
-        {
-          title:"CoT / Plan-Execute / ToT / Reflection 对比与选型",
-          tags:["CoT","Plan-Execute","ToT","Reflection","选型"],
-          body:`<p><b>四种推理范式核心区别：</b></p>
-<ul>
-<li><b>CoT (Chain of Thought)</b>：纯脑内推理，一步步想，不调工具。适合数学题、逻辑推理等不需要外部数据的任务。<b>缺点：</b>知识截止日期前的内容可能过时或幻觉。</li>
-<li><b>ReAct</b>：推理+行动交替。每步 Thought→Action→Observation。<b>适合</b>需要查资料、调 API 的任务。<b>代价</b>：Token 消耗 4-8x。</li>
-<li><b>Plan-and-Execute</b>：先制定完整计划，再逐步执行。<b>省 Token</b>（一次规划）、可控性强，但灵活度低——中间步骤发现错误时调整成本高。</li>
-<li><b>Tree of Thoughts (ToT)</b>：每步探索多条推理路径，用 BFS/DFS+评估函数选最优。<b>效果好但 Token 消耗是 CoT 的 3 倍</b>，只适合需要探索多路径的复杂推理。</li>
-<li><b>Reflection / Reflexion</b>：让 Agent 自我审查输出质量，决定是否重试或修正。Reflexion 框架通过 episodic memory 存储失败经验，下次遇到类似任务避免重复犯错。<b>HumanEval 通过率从 80% 提升到 91%</b>。</li>
-</ul>
-<p><b>选型决策树：</b></p>
-<ul>
-<li>任务路径不确定，需要观察中间结果 → <b>ReAct</b></li>
-<li>步骤明确可预判 → <b>Plan-Execute</b>（省 Token 可控）</li>
-<li>需要探索多种可能解 → <b>ToT</b>（贵但准）</li>
-<li>长链路任务容易出错 → <b>Reflection</b>（加倍 Token 但提升成功率）</li>
-<li>生产级系统 → <b>混合</b>：大步骤 Plan-Execute 规划，子步骤 ReAct 灵活执行，关键节点 Reflection 自检</li>
-</ul>
-<p><b>关键 trade-off：</b>系统 A 在复杂任务上采用 ReAct 可提升任务完成率，但会增加 Token 消耗。因此简单查询走直接生成或固定流程，复杂多步任务才启用 ReAct。</p>`,
-          refs:[{t:"Tree of Thoughts (Yao et al. 2023)",u:"https://arxiv.org/abs/2305.10601"},{t:"Reflexion: Language Agents with Verbal RL (Shinn et al. 2023)",u:"https://arxiv.org/abs/2303.11366"}]
+                {
+          "title": "CoT / Plan-Execute / ToT / Reflection 对比与选型",
+          "tags": [
+            "CoT",
+            "Plan-Execute",
+            "ToT",
+            "Reflection",
+            "选型"
+          ],
+          "body": "<p><b>四种推理范式核心区别：</b></p>\n<ul>\n<li><b>CoT (Chain of Thought)</b>：纯脑内推理，一步步想，不调工具。适合数学题、逻辑推理等不需要外部数据的任务。<b>缺点：</b>知识截止日期前的内容可能过时或幻觉。</li>\n<li><b>ReAct</b>：推理+行动交替。每步 Thought→Action→Observation。<b>适合</b>需要查资料、调 API 的任务。<b>代价</b>：每轮都要保留状态并调用工具，成本与延迟应按代表任务测量。</li>\n<li><b>Plan-and-Execute</b>：先制定完整计划，再逐步执行。<b>省 Token</b>（一次规划）、可控性强，但灵活度低——中间步骤发现错误时调整成本高。</li>\n<li><b>Tree of Thoughts (ToT)</b>：每步探索多条推理路径，用 BFS/DFS+评估函数选最优。<b>效果好但 Token 消耗是 CoT 的 3 倍</b>，只适合需要探索多路径的复杂推理。</li>\n<li><b>Reflection / Reflexion</b>：让 Agent 自我审查输出质量，决定是否重试或修正。Reflexion 在反馈与阶段性记忆下总结失败经验。它只在能获得测试、工具结果或明确评分反馈时才值得尝试，不能把自我复述当成可靠修复。</li>\n</ul>\n<p><b>选型决策树：</b></p>\n<ul>\n<li>任务路径不确定，需要观察中间结果 → <b>ReAct</b></li>\n<li>步骤明确可预判 → <b>Plan-Execute</b>（省 Token 可控）</li>\n<li>需要探索多种可能解 → <b>ToT</b>（贵但准）</li>\n<li>长链路任务容易出错 → <b>Reflection</b>（加倍 Token 但提升成功率）</li>\n<li>生产级系统 → <b>混合</b>：大步骤 Plan-Execute 规划，子步骤 ReAct 灵活执行，关键节点 Reflection 自检</li>\n</ul>\n<p><b>必须说出的 trade-off：</b>\"我们项目 CoT→ReAct 准确率提升 15%，但 Token 消耗多了 3 倍。所以简单查询走 CoT，复杂多步推理才用 ReAct。\"</p>",
+          "refs": [
+            {
+              "t": "Tree of Thoughts (Yao et al. 2023)",
+              "u": "https://arxiv.org/abs/2305.10601"
+            },
+            {
+              "t": "Reflexion: Language Agents with Verbal RL (Shinn et al. 2023)",
+              "u": "https://arxiv.org/abs/2303.11366"
+            }
+          ]
         },
         {
           title:"Agent Loop 设计与终止策略",
@@ -271,14 +269,14 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
         {
           title:"MCP 协议：架构、实现与局限",
           tags:["MCP","标准化","2026热点"],
-          body:`<p><b>MCP (Model Context Protocol)</b> 是 Anthropic 提出、捐给 Linux Foundation 的<b>工具调用标准协议</b>。定义了 LLM 与外部系统的通用通信接口。</p>
+          body:`<p><b>MCP (Model Context Protocol)</b> 是 Agent/客户端与外部工具、资源交互的协议。它统一消息与能力声明，不替代工具的授权、输入校验或业务验收。</p>
 <p><b>三层架构：</b></p>
 <ul>
 <li><b>Host</b>：LLM 应用（你的 Agent 系统）</li>
 <li><b>Client</b>：协议客户端，1:1 连接一个 Server</li>
 <li><b>Server</b>：暴露三种能力——Tools（模型可调用的函数）、Resources（应用可控的数据）、Prompts（预定义提示模板）</li>
 </ul>
-<p><b>传输层</b>：stdio（本地进程通信）或 SSE（远程服务）。</p>
+<p><b>传输层（2025-11）</b>：stdio（本地进程通信）或 Streamable HTTP；后者取代旧版 HTTP+SSE 传输。远程部署还要校验 Origin、认证与暴露范围。</p>
 <p><b>核心价值——一次开发，多模型复用：</b></p>
 <ul>
 <li>原来开发一个"查数据库慢 SQL"工具，要分别适配 OpenAI/Claude/通义千问的 Function Calling 格式</li>
@@ -286,7 +284,7 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
 </ul>
 <p><b>vs Function Calling 的关系：</b>FC 是各模型厂商的 API 能力（格式略有差异）；MCP 是工具层的标准协议。<b>打个比方</b>——FC 像各自厂商的拨号盘，MCP 像定义了全球统一的电话号码格式。</p>
 <p><b>vs Skill 的关系：</b>Skill 是能力单元（"查天气"），FC 是调用方式，MCP 是通信协议。三者层次不同。</p>
-<p><b>局限（必须知道）：①</b>协议还在快速迭代，兼容性风险；<b>②</b>多一层抽象增加 50-100ms 延迟；<b>③</b>流式支持不完善；<b>④</b>安全信任模型（工具提供方和调用方）仍在建设中。</p>
+<p><b>边界（必须知道）：</b>协议互通不等于工具可信或已获授权；远程服务要做来源校验、身份认证、最小权限和工具输出隔离。延迟与流式能力取决于具体传输、实现和工具链，不能写成固定数字。</p>
 <p><b>vs A2A 的关系：</b>MCP 管 Agent↔工具（垂直集成），A2A 管 Agent↔Agent（水平协作）。一个完整的多 Agent 系统两者都需要。</p>`,
           refs:[{t:"MCP Specification",u:"https://modelcontextprotocol.io/"},{t:"Google A2A Protocol",u:"https://github.com/google/A2A"}]
         },
@@ -316,9 +314,9 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
       desc:"Agent 的记忆架构、存储方案、压缩策略和上下文工程。",
       items: [
         {
-          title:"三层记忆架构设计",
+          title:"运行状态、会话上下文与长期记忆",
           tags:["核心","必会","架构"],
-          body:`<p><b>工业界标准的三层记忆架构：</b></p>
+          body:`<p><b>按生命周期和责任划分，而不是背一套“标准层数”：</b></p>
 <ul>
 <li><b>工作记忆 (Working Memory)</b>：当前任务轨迹和中间结果。存 Redis/内存，生命周期=单任务。存的是"刚才查了订单123，状态=已发货"这类中间结果。任务结束即清。</li>
 <li><b>短期记忆 (Short-term)</b>：当前会话最近 N 轮摘要。存 Redis+TTL(30min)，生命周期=单会话。每次对话结束做 summarize。</li>
@@ -366,13 +364,13 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
           tags:["RAG","核心","必会"],
           body:`<p><b>7 步全链路，每步都有优化空间：</b></p>
 <p><b>① Query 预处理</b>——用户说"咋退"→改写为标准查询"如何申请退货退款"。技术：Query Rewriting（补全简写/纠正错别字）、Query Expansion（生成多个同义查询增加召回）。</p>
-<p><b>② Embedding 向量化</b>——用 Embedding 模型（BGE-M3 / text2vec / OpenAI ada-002）将 query 转为稠密向量。</p>
-<p><b>③ 双路召回</b>——向量检索（语义相似/TopK=20）+ BM25（精确关键词/TopK=20），两者取并集。</p>
+<p><b>② Embedding 向量化</b>——用经过代表问题集验证的 Embedding 模型将 query 转为稠密向量；优先比较语言覆盖、召回、更新成本与权限边界，不绑定已过时的型号。</p>
+<p><b>③ 双路召回</b>——按语料特征组合稠密与稀疏召回；候选数量由 Recall、延迟和噪声共同决定，不设通用 TopK。</p>
 <p><b>④ 混合融合</b>——RRF (Reciprocal Rank Fusion) 或加权求和合并两个排序列表。RRF 公式：score=Σ 1/(k+rank_i)，k=60。加权求和需要 A/B 测试确定权重。</p>
-<p><b>⑤ Rerank 重排序</b>——用交叉编码器（BGE-Reranker-v2 / Cohere Rerank）对候选做精排，从 40 条筛到 5 条。Rerank 是 RAG 性价比最高的优化点。</p>
-<p><b>⑥ TopK 截断</b>——保留前 K 条（通常 3-5 条），作为 LLM 的参考上下文。K 值不是拍脑袋——测过 K=3/5/10，K=5 在召回率和精确度之间平衡最好。</p>
+<p><b>⑤ Rerank 重排序</b>——当候选集噪声会挤占上下文时，用 reranker 对候选精排；是否值得增加这一层，要同时看检索质量、延迟和成本。</p>
+<p><b>⑥ TopK 截断</b>——把最终上下文控制在任务能消化的证据量；K、片段大小与排序必须由代表问题集上的召回、忠实性和上下文干扰共同确定。</p>
 <p><b>⑦ 注入 LLM</b>——按相关性排序+标注来源+注入 System Prompt，LLM 基于检索内容生成答案，强制要求引用来源。</p>
-<p><b>每个参数都要有实验验证</b>——不是"经验值"，是"A/B 测试后 0.3:0.7 时准确率最高"。</p>`,
+<p><b>参数需要证据</b>：先用离线问题集检查召回、引用正确与忠实性，再根据流量、成本和风险决定是否做线上对照；不要把某次比例或 TopK 当作通用答案。</p>`,
           refs:[{t:"RAG (Lewis et al. 2020)",u:"https://arxiv.org/abs/2005.11401"}]
         },
         {
@@ -380,12 +378,23 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
           tags:["混合检索","Rerank","Agentic RAG","GraphRAG"],
           body:`<p><b>为什么需要混合检索：</b>向量检索擅长语义匹配（"退款"="退货"）但弱于精确关键词（订单号 ORD-12345 会被泛化）。BM25 擅长精确匹配但不懂语义。<b>两者互补</b>——向量抓"软匹配"，BM25 抓"硬匹配"。</p>
 <p><b>融合比例不是标准答案</b>——取决于文档类型。FAQ 类（语义模糊）向量权重高；规则手册类（关键词重要）BM25 权重高。需要 A/B 测试。</p>
-<p><b>Rerank 价值：</b>向量检索是"粗排"——从百万文档中快速召回 Top20。但 Top20 里约一半是噪声。Rerank 用交叉编码器逐对精排，准确率从 60% 提到 95%+。代价：比向量检索慢 10-100 倍，只对 Top20-50 做。</p>
-<p><b>Agentic RAG：</b>传统 RAG 是"检索→生成"一次性的。Agentic RAG 用 Agent 循环控制——检索→Agent 判断是否充分→不足则改写 query 再检索→多轮迭代→生成。适合多跳推理/跨文档对比。代价：Token 消耗是传统 RAG 的 3-5 倍。</p>
+<p><b>Rerank 价值：</b>向量与稀疏检索负责扩大候选覆盖，reranker 负责在有限候选中识别更相关的证据。它可能改善排序，也会增加延迟和成本；是否采用必须在目标语料与问题集上验证。</p>
+<p><b>Agentic RAG：</b>传统 RAG 可一次检索后生成；检索型 Agent 则会根据证据充分性继续检索、改写或调用其他工具。它适合路径确实依赖新证据的任务；循环次数、预算和停止条件必须受控。</p>
 <p><b>GraphRAG：</b>在 RAG 基础上引入知识图谱——从文档中抽取实体和关系构建图结构。检索时沿图边做多跳遍历。适合理解实体间复杂关系的查询（供应链分析/组织架构）。代价：图谱构建和维护成本高。</p>`,
           refs:[{t:"GraphRAG (2024)",u:"https://arxiv.org/abs/2404.16130"}]
         },
-      ]
+      ,
+        {
+          "title": "文档切分、版本与检索评测",
+          "tags": [
+            "Chunking",
+            "索引版本",
+            "Recall@K",
+            "必会"
+          ],
+          "body": "<p><b>RAG 的问题往往在生成前就发生。</b>先按标题、段落、表格和代码块等文档结构切分，再用少量 overlap 保住跨段语义；不要给所有语料套同一个固定长度。</p>\n<ul>\n<li><b>切分：</b>记录 document_id、section、更新时间和权限；小块负责匹配，大块负责回传上下文。</li>\n<li><b>更新：</b>文档、chunk、embedding 和索引都要有版本。新索引完成评测后原子切换，缓存键也带知识版本。</li>\n<li><b>评测：</b>先看 Recall@K、MRR/NDCG 判断证据有没有被找回，再看引用正确性和 Faithfulness 判断答案有没有忠于证据。</li>\n</ul>\n<p><b>排障顺序：</b>答案错时先检查候选里是否有正确证据；有证据却答错才查重排、上下文组织和生成提示。</p>",
+          "refs": []
+        }]
     },
     {
       id:"multi-agent", icon:"🤖", name:"多 Agent 协作",
@@ -407,16 +416,63 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
 <p><b>框架对比：AutoGen</b>（Microsoft，对话式，最灵活）；<b>CrewAI</b>（角色+任务，最易上手）；<b>LangGraph</b>（状态图，最可控）；<b>MetaGPT</b>（SOPs，适合软件开发）。</p>`,
           refs:[{t:"AutoGen (Microsoft 2023)",u:"https://arxiv.org/abs/2308.08155"},{t:"MetaGPT (2023)",u:"https://arxiv.org/abs/2308.00352"}]
         },
-      ]
+      ,
+        {
+          "title": "多 Agent 状态、幂等与故障隔离",
+          "tags": [
+            "状态机",
+            "Checkpoint",
+            "幂等",
+            "可靠性"
+          ],
+          "body": "<p><b>协作难点不在“让多个模型说话”，而在状态和副作用可控。</b>编排器应成为共享状态的唯一写入者，子 Agent 只返回带版本号的结构化增量。</p>\n<ul>\n<li><b>一致性：</b>对共享状态使用版本号或乐观锁；冲突时重新读取或仲裁，不能无条件后写覆盖。</li>\n<li><b>副作用：</b>支付、发信、删除等操作必须使用幂等键，并在 checkpoint 中记录已完成结果，恢复时先查状态再执行。</li>\n<li><b>隔离：</b>每个子任务设置独立超时、重试预算和熔断；可选任务失败可返回部分结果，必要任务失败应停在可恢复节点。</li>\n</ul>\n<p><b>原则：</b>先用状态机解决确定性流程，只有确有独立专业分工和并行收益时才拆 Agent。</p>",
+          "refs": []
+        }]
     },
     {
       id:"application", icon:"🎯", name:"应用设计与迭代",
-      desc:"从真实用户任务出发，决定是否需要 Agent、怎样分配模型与工具职责，并把反馈转成下一轮可验证改进。",
+      desc:"从真实用户任务出发，决定是否需要 Agent、怎样选择模型与流程，并把反馈转成可验证的下一轮改进。",
       items: [
-        {title:"任务边界：先定义用户要完成什么",tags:["任务设计","边界","验收"],body:`<p><b>先写任务卡，再讨论模型或框架。</b>任务卡至少包含用户、触发条件、输入、目标输出、可用工具、权限、成功规则和失败交接。</p><ul><li><b>目标要可验收：</b>明确完成、拒绝与转人工的条件。</li><li><b>约束优先：</b>权限、不可逆动作、数据质量和时效决定系统形态。</li><li><b>输出可落地：</b>区分结构化结果、待审批计划和用户解释。</li></ul><p><b>产物：</b>任务卡、验收规则、风险分级和交接路径。</p>`,refs:[]},
-        {title:"方案取舍：规则、工作流还是 Agent",tags:["方案选型","Workflow","自主性"],body:`<p><b>不要把 Agent 当默认答案。</b>路径可枚举、结果可由规则校验的任务优先用规则或工作流；只有工具选择依赖中间观察且人工编排成本过高时，才提高自主性。</p><ul><li><b>规则：</b>最快、最稳定，适合固定判断。</li><li><b>工作流：</b>适合可预定义步骤、状态与审批。</li><li><b>Agent：</b>用于动态选择路径，必须承担不确定性、成本和治理代价。</li></ul>`,refs:[]},
-        {title:"模型与系统策略：把能力放在合适的位置",tags:["模型选型","路由","成本"],body:`<p><b>模型选型不是单选题。</b>将任务拆成识别、检索、规划、执行和生成，分别决定用规则、小模型、大模型还是人工确认。</p><ul><li>确定性计算、权限校验和副作用控制优先由程序承担。</li><li>按难度与风险路由模型，并保留降级路径。</li><li>先定义质量、延迟、成本和稳定性门槛，再比较方案。</li></ul>`,refs:[]},
-        {title:"价值闭环：把反馈变成下一轮可验证改进",tags:["用户价值","反馈","迭代"],body:`<p><b>上线不等于任务完成。</b>同时观察用户是否完成目标、系统是否稳定执行，以及哪些失败最值得修。</p><ul><li><b>体验信号：</b>完成、放弃、重复请求、人工接管与纠错反馈。</li><li><b>系统信号：</b>Trace 失败类型、工具错误、耗时、成本和安全拦截。</li><li><b>迭代规则：</b>按影响、频率、可检测性和可修复性排序，每次修复沉淀回归样本。</li></ul>`,refs:[]}
+                {
+          "title": "任务边界：先定义用户要完成什么",
+          "tags": [
+            "任务设计",
+            "边界",
+            "验收"
+          ],
+          "body": "<p><b>先写任务卡，再讨论模型或框架。</b>一张可用的任务卡至少包含：用户是谁、触发条件、输入与可用数据、最终动作/答案、不能做什么、成功如何判定、失败交给谁。</p>\n<ul><li><b>目标要可验收：</b>“帮助用户处理售后”太宽；“在已授权订单上判断退货资格，缺证据时转人工”才有可判定边界。</li><li><b>约束优先于能力：</b>权限、时效、不可逆操作、数据质量和人工兜底决定系统形态。</li><li><b>输出必须可落地：</b>是结构化字段、待审批计划、还是给用户的解释；不同输出对应不同校验方式。</li></ul>\n<p><b>产物：</b>任务卡、验收规则、风险分级和失败后的交接路径。这四项是后续设计与评估的共同输入。</p>",
+          "refs": []
+        },
+                {
+          "title": "方案取舍：规则、工作流还是 Agent",
+          "tags": [
+            "方案选型",
+            "Workflow",
+            "自主性"
+          ],
+          "body": "<p><b>不要把 Agent 当默认答案。</b>路径可枚举、结果可由规则校验的任务优先用规则或工作流；只有目标开放、工具选择依赖中间观察且人工编排成本过高时，才提高自主性。</p>\n<ul><li><b>规则：</b>最快、最稳定，适合固定判断和强约束动作。</li><li><b>工作流：</b>步骤可预定义但需要状态、分支、审批和恢复。</li><li><b>Agent：</b>需要在工具、证据和路径之间动态决策；必须同时承担不确定性、成本和治理代价。</li></ul>\n<p><b>决策依据：</b>不是“效果看起来聪明”，而是任务路径的不确定性、失败代价、可观测程度和长期维护成本。</p>",
+          "refs": []
+        },
+                {
+          "title": "模型与系统策略：把能力放在合适的位置",
+          "tags": [
+            "模型选型",
+            "路由",
+            "成本"
+          ],
+          "body": "<p><b>模型选型不是单选题。</b>把一次任务拆成识别、检索、规划、执行和生成，分别决定是用规则、小模型、大模型还是人工确认。</p>\n<ul><li>简单分类、格式校验和确定性计算优先程序；高风险操作由服务端权限与审批控制。</li><li>按任务难度和风险路由模型，保留降级路径；缓存必须带权限和数据版本。</li><li>选择模型前先定义质量、延迟、成本和稳定性门槛，避免只按单次回答印象判断。</li></ul>\n<p><b>产物：</b>任务分流表、模型/工具职责表、预算与降级策略。</p>",
+          "refs": []
+        },
+                {
+          "title": "价值闭环：把反馈变成下一轮可验证改进",
+          "tags": [
+            "用户价值",
+            "反馈",
+            "迭代"
+          ],
+          "body": "<p><b>上线不等于任务完成。</b>需要同时观察用户是否真正完成目标、系统是否稳定执行、以及哪些失败最值得修。</p>\n<ul><li><b>体验信号：</b>任务完成、放弃、重复请求、人工接管与纠错反馈。</li><li><b>系统信号：</b>Trace 中的失败类型、工具错误、耗时、成本和安全拦截。</li><li><b>迭代规则：</b>按影响范围、出现频率、可检测性和可修复性排序；每次修复沉淀失败样本与相邻边界样本。</li></ul>\n<p><b>产物：</b>问题优先级、改动假设、前后对照与回归集。这样用户反馈才会真正进入产品与工程闭环。</p>",
+          "refs": []
+        }
       ]
     },
     {
@@ -497,7 +553,18 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
 </ul>`,
           refs:[{t:"AgentBench: Evaluating LLMs as Agents",u:"https://arxiv.org/abs/2308.03688"}]
         },
-      ]
+      ,
+        {
+          "title": "上线发布、SLO 与故障恢复",
+          "tags": [
+            "SLO",
+            "灰度发布",
+            "回滚",
+            "可靠性"
+          ],
+          "body": "<p><b>生产发布要把模型、Prompt、工具 Schema 和知识索引都当成可回滚的版本。</b>先用固定评测集验证质量与安全，再按小流量灰度，观察护栏指标后才放量。</p>\n<ul>\n<li><b>SLO：</b>至少定义任务完成率、工具错误率、P95 延迟、单任务 Token 和高风险拒绝率；每个指标有告警阈值与责任人。</li>\n<li><b>灰度：</b>为新版本标识 version，按用户或流量分桶；质量、成本或风险指标越线立即暂停，而不是等用户投诉。</li>\n<li><b>恢复：</b>模型不可用时降级为检索/规则/人工；副作用节点保存 checkpoint 和幂等键，恢复时先查询外部状态再决定是否重放。</li>\n</ul>\n<p><b>复盘产物：</b>时间线、根因、受影响范围、短期修复、长期预防和新增回归用例。没有回归用例的复盘不算闭环。</p>",
+          "refs": []
+        }]
     },
   ]
 };
@@ -786,10 +853,10 @@ function renderQA(tab) {
   banner.innerHTML = html + `</div>`;
 }
 
-function knowledgeSources(){return `<section class="evidence-panel"><h3>知识体系的来源与取舍</h3><p>本页按能力闭环组织，而非按单一框架的 API 目录组织：任务设计、推理与工具、上下文与检索、协作、治理分别回答不同问题。每个具体结论仍应回到卡片中的原始论文或规范。</p><div class="evidence-strip"><b>结构参考：</b><a href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank" rel="noopener">AI Agents for Beginners</a> 覆盖工具、RAG、可信性、规划、多 Agent、上下文和记忆；<a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">MCP Specification</a> 与 <a href="https://github.com/google/A2A" target="_blank" rel="noopener">Google A2A</a> 用于协议边界。它们说明“知识放在哪里”，不替代机制证据。</div></section>`}
+function knowledgeSources(){return `<section class="evidence-panel"><h3>知识体系的来源与取舍</h3><p>本页按能力闭环组织，而非按单一框架的 API 目录组织：任务设计、推理与工具、上下文与检索、协作、治理分别回答不同问题。每个具体结论仍应回到卡片中的原始论文或规范。</p><div class="evidence-strip"><b>结构参考：</b><a href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank" rel="noopener"><a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/transports" target="_blank" rel="noopener">MCP 2025-11 规范</a>、<a href="https://github.com/a2aproject/A2A/blob/main/docs/specification.md" target="_blank" rel="noopener">A2A 1.0 规范</a>、<a href="https://github.com/microsoft/AgentRx" target="_blank" rel="noopener">AgentRx</a> 的轨迹诊断与 <a href="https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP Agent Security</a> 校验闭环中的协议、状态、诊断与权限边界。它们提供当前机制依据，不替代任务本身的验收标准。</div></section>`}
 function evaluationSources(){return `<section class="evidence-panel"><h3>当前评估实现：各自能回答什么</h3><p>评估工具不是一套通用“分数机”。先按评估对象选能力：输出内容、工具参数、行动轨迹、整段 Trace 或多轮互动是不同对象；同一项目的不同层级也不能混成一个结论。</p><div class="evidence-strip"><b>轨迹与结构：</b><a href="https://github.com/langchain-ai/agentevals" target="_blank" rel="noopener">LangChain AgentEvals</a> 提供轨迹匹配与轨迹评审；<b>Trace 评分：</b><a href="https://github.com/agentevals-dev/agentevals" target="_blank" rel="noopener">agentevals</a> 面向 OpenTelemetry Trace，可离线重复评分，但项目明确处于快速迭代；<b>分层评估：</b><a href="https://github.com/strands-agents/evals" target="_blank" rel="noopener">Strands Evals</a> 区分输出、工具、轨迹、会话与多轮模拟；<b>通用组合：</b><a href="https://github.com/UKGovernmentBEIS/inspect_ai" target="_blank" rel="noopener">Inspect</a> 提供工具、多轮和模型评审组件。这里引用的是其能力边界，不是对任何建议有效性的背书。</div></section>`}
 function comparisonBoardV2(){return comparisonBoard().replace("先说“加 RAG / 反思 / 多 Agent”。", "只报一个方法名，没有问题定义。")}
-function knowledgeResearchPatterns(){return `<section class="evidence-map"><div class="kicker">从当前实现中提炼的知识点</div><h2>理解 Agent，先抓住四个不会随框架变化的对象</h2><p>课程和 SDK 会换，下面四个对象不会：任务契约、能力协议、运行状态和终态。它们把“会调用模型”变成可设计、可追溯的系统。</p><div class="claim-grid"><article><h3>任务契约不是一句用户输入</h3><p><b>应写清：</b>目标、不可违反的约束、可用动作、需要保留的状态和何时算结束。没有终态或拒绝条件，循环只能靠模型猜何时停。</p><p><b>不能推出：</b>任务写得详细，不代表路径必须固定；开放任务仍可允许多条合法轨迹。</p></article><article><h3>协议规定连接，不替代能力与授权</h3><p><b>应区分：</b>Function Calling 是一次调用契约，MCP 是 Agent 到工具/资源的连接协议，A2A 是 Agent 间协作协议。三者都不负责判断动作是否该做。</p><p><b>不能推出：</b>接入标准协议，不等于工具可信、参数正确或具备执行权限。</p></article><article><h3>状态不是聊天记录的别名</h3><p><b>运行状态</b>保存任务进度、预算、未完成动作与恢复点；<b>知识</b>提供可引用事实；<b>记忆</b>保存跨任务信息。三者混写会让恢复、权限和更新不可解释。</p><p><b>不能推出：</b>保存更多历史会提高质量；关键约束必须经过选择与结构化，而不是无限追加上下文。</p></article><article><h3>终态要看外部世界，不只看最终文案</h3><p><b>终态</b>可以是答案忠于证据、目标状态已变化、动作被拒绝并说明原因，或安全地转人工。工具返回 200、模型说“完成”都不是充分条件。</p><p><b>不能推出：</b>一次状态正确，就说明流程可靠；超时、重试和重复副作用仍需独立设计。</p></article></div><div class="evidence"><b>来源：</b><a href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank" rel="noopener">AI Agents for Beginners</a> 的工具、规划、可信性、上下文与记忆课程；<a href="https://modelcontextprotocol.io/" target="_blank" rel="noopener">MCP Specification</a>；<a href="https://github.com/google/A2A" target="_blank" rel="noopener">Google A2A</a>。页面据此归纳稳定对象，不把任一框架 API 当作通用原理。</div></section>`}
+function knowledgeResearchPatterns(){return `<section class="evidence-map"><div class="kicker">从当前实现中提炼的知识点</div><h2>理解 Agent，先抓住四个不会随框架变化的对象</h2><p>框架和 SDK 会换，下面五个对象不会：任务契约、能力与授权、运行状态、外部终态与可观测证据。它们把“会调用模型”变成可设计、可追溯的系统。</p><div class="claim-grid"><article><h3>任务契约不是一句用户输入</h3><p><b>应写清：</b>目标、不可违反的约束、可用动作、需要保留的状态和何时算结束。没有终态或拒绝条件，循环只能靠模型猜何时停。</p><p><b>不能推出：</b>任务写得详细，不代表路径必须固定；开放任务仍可允许多条合法轨迹。</p></article><article><h3>协议规定连接，不替代能力与授权</h3><p><b>应区分：</b>Function Calling 是一次调用契约，MCP 是 Agent 到工具/资源的连接协议，A2A 是 Agent 间协作协议。三者都不负责判断动作是否该做。</p><p><b>不能推出：</b>接入标准协议，不等于工具可信、参数正确或具备执行权限。</p></article><article><h3>状态不是聊天记录的别名</h3><p><b>运行状态</b>保存任务进度、预算、未完成动作与恢复点；<b>知识</b>提供可引用事实；<b>记忆</b>保存跨任务信息。三者混写会让恢复、权限和更新不可解释。</p><p><b>不能推出：</b>保存更多历史会提高质量；关键约束必须经过选择与结构化，而不是无限追加上下文。</p></article><article><h3>终态要看外部世界，不只看最终文案</h3><p><b>终态</b>可以是答案忠于证据、目标状态已变化、动作被拒绝并说明原因，或安全地转人工。工具返回 200、模型说“完成”都不是充分条件。</p><p><b>不能推出：</b>一次状态正确，就说明流程可靠；超时、重试和重复副作用仍需独立设计。</p></article><article><h3>可观测证据是运行的一部分</h3><p><b>应记录：</b>任务与版本、状态转换、工具选择和结果、授权/拦截决定、重试与人工接管，并让它们能关联到同一条轨迹。没有这些证据，就无法区分模型、工具、策略还是外部系统导致失败。</p><p><b>不能推出：</b>记录得多不等于可评估；敏感输入、工具参数和输出必须按最小必要原则脱敏、访问控制与保留。</p></article></div><div class="evidence"><b>来源：</b><a href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank" rel="noopener"><a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/transports" target="_blank" rel="noopener">MCP 2025-11</a>、<a href="https://github.com/a2aproject/A2A/blob/main/docs/specification.md" target="_blank" rel="noopener">A2A 1.0</a>、<a href="https://github.com/microsoft/AgentRx" target="_blank" rel="noopener">AgentRx 2026</a> 与 <a href="https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP Agent Security</a>。页面据此归纳稳定对象，不把任一框架 API 当作通用原理。</div></section>`}
 function evaluationContractMap(){return `<section class="evidence-map"><div class="kicker">从当前评估器提炼的判定契约</div><h2>先定义“什么算对”，再讨论任何改进建议</h2><p>轨迹不是天然只有一个正确答案。评估建议若没有说明需要约束顺序、覆盖、参数、终态中的哪一种，引用再多论文也无法证明它对准了问题。</p><div class="claim-grid"><article><h3>顺序正确</h3><p><b>适用：</b>前一步决定后一步的权限、审批或依赖。证据应说明关键动作为什么必须按序发生。</p><p><b>不要误用：</b>把所有探索任务都按严格序列判，会把等价路径误判为失败。</p></article><article><h3>覆盖正确</h3><p><b>适用：</b>必须获得的事实或必经动作明确，但获取顺序可以变化。证据应检查关键集合是否齐全。</p><p><b>不要误用：</b>“都调用过”不能证明参数、引用或最终状态正确。</p></article><article><h3>边界正确</h3><p><b>适用：</b>允许额外探索但必须包含关键动作，或必须禁止多余/高风险动作。参数可按字段定义精确或宽松匹配。</p><p><b>不要误用：</b>宽松匹配不等于放弃安全约束；不可逆动作仍要明确禁止条件。</p></article><article><h3>终态正确</h3><p><b>适用：</b>任务价值取决于外部状态、会话目标或可核验结果。此时需要状态断言，而不是只评最终文字。</p><p><b>不要误用：</b>开放质量无法用状态断言穷尽时，模型评审只能按预写 rubric 提供辅助意见。</p></article></div><div class="evidence"><b>为什么这会改变建议可信度：</b>任何“加入规划、检索或反思”的主张，都应先说明会改变哪一种判定契约；若来源只展示了输出更流畅，却没有覆盖同一契约，它不能作为强支撑。</div><div class="evidence"><b>内部依据：</b><a href="https://github.com/langchain-ai/agentevals" target="_blank" rel="noopener">LangChain AgentEvals</a> 明确区分严格、任意顺序、包含与排除的轨迹匹配，并允许按工具定义参数匹配；<a href="https://github.com/strands-agents/evals" target="_blank" rel="noopener">Strands Evals</a> 将工具选择、工具参数与环境状态拆开处理。</div></section>`}
 function toolEvaluationLayers(){return `<section class="evidence-panel"><h3>工具调用至少有三层，不能只看“调用成功”</h3><div class="claim-grid"><article><h3>1. 选择</h3><p>在该时点是否该用这个工具？这是意图、上下文和可用能力的匹配问题。</p></article><article><h3>2. 参数</h3><p>参数是否忠于此前上下文，并且满足业务语义？JSON 合法只是最低门槛。</p></article><article><h3>3. 后果</h3><p>调用后的外部状态是否符合预期、权限和幂等要求？接口成功不代表业务状态正确。</p></article><article><h3>4. 叙述</h3><p>最终回答是否如实使用工具返回，而没有掩盖失败、过度承诺或遗漏限制？</p></article></div><div class="evidence-strip"><b>使用方式：</b>当某项改进声称“优化工具使用”时，必须标出它改善的是哪一层。否则“工具正确率提升”没有可解释含义。Strands 的工具级评估分别处理选择和参数，环境状态断言则单独验证后果。</div></section>`}
 function evidenceLadder(){return `<section class="evidence-map"><div class="kicker">证据链的最低门槛</div><h2>先写出能推翻主张的约束，再谈“来源支持”</h2><p>一篇论文、一次公开演示或一个项目 README 都只能提供材料。页面要审查的是：材料能否支撑一个可反驳的机制主张，而不是材料本身是否有名。</p><div class="flow"><div><b>1. 主张</b><span>改动声称缓解哪种失效？</span><small>只有方法名，不成立</small></div><div><b>2. 约束</b><span>若主张正确，哪条行为必须成立？</span><small>写成可观察的不变量</small></div><div><b>3. 支持</b><span>来源是否展示同一机制与条件？</span><small>任务名相似不够</small></div><div><b>4. 反证</b><span>什么结果会直接削弱这个主张？</span><small>没有反证，置信度受限</small></div><div><b>5. 表达</b><span>只报告论证完整度与边界。</span><small>不承诺任何系统效果</small></div></div><div class="evidence"><b>来自当前诊断框架的可借鉴点：</b><a href="https://github.com/microsoft/AgentRx" target="_blank" rel="noopener">AgentRx</a> 将原始轨迹归一化，先生成静态与逐步约束、检查违例，再使用模型归因。这里借鉴其证据顺序，而不假装本页已有某个系统的轨迹或检查结果。</div></section>`}
