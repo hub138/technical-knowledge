@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "agent-foundation"
-version = "0.1.0"
-description = "Framework-neutral primitives for supervising and recording agent sessions"
+version = "0.2.0"
+description = "Framework-neutral primitives for agent sessions, context, and memory"
 requires-python = ">=3.10"
 
 [tool.pytest.ini_options]
