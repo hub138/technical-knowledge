@@ -41,6 +41,7 @@ button{font:inherit}
 .qa-item .q::before{content:"Q: ";color:var(--blue);font-weight:700}
 .qa-item .a{color:var(--muted);margin-left:0}
 .qa-item .a::before{content:"A: ";color:var(--green);font-weight:700}
+.qa-focus-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.qa-focus-item{padding:11px 13px;border-top:2px solid var(--blue);background:#f8fbff}.qa-focus-item:nth-child(2){border-top-color:var(--green);background:#f3fbf7}.qa-focus-item:nth-child(3){border-top-color:var(--amber);background:#fffaf0}.qa-focus-item:nth-child(4){border-top-color:var(--purple);background:var(--purple-bg)}.qa-focus-item b{display:block;font-size:13px;line-height:1.5;margin-bottom:4px}.qa-focus-item span{display:block;font-size:12px;line-height:1.6;color:var(--muted)}
 
 /* Content */
 .content{padding:24px 28px;width:100%;max-width:none}
@@ -81,6 +82,7 @@ button{font:inherit}
 .eval-dim .link{font-size:11px;color:var(--blue);margin-top:8px}
 .eval-dim .improve{font-size:12px;background:var(--amber-bg);border-radius:var(--radius);padding:8px 12px;margin-top:8px;color:var(--amber)}
 .workbench,.system-map,.scenario-matrix,.comparison-board{margin:0 0 28px;padding:22px 24px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.knowledge-compass{margin:0 0 28px;padding:22px 24px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}.compass-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--border);border-radius:7px;overflow:hidden}.compass-step{padding:15px 16px;border-right:1px solid var(--border);background:#fff}.compass-step:last-child{border-right:0}.compass-step h3{font-size:14px;line-height:1.45;margin-bottom:6px}.compass-step p{font-size:12px;line-height:1.65;color:var(--muted)}.compass-step b{display:block;margin-top:8px;font-size:11px;color:var(--green)}
 .content.eval-view .workbench,.content.eval-view .scenario-matrix,.content.eval-view .comparison-board{grid-column:1/-1}
 .kicker{font-size:12px;color:var(--blue);font-weight:700;margin-bottom:5px}.workbench h2,.system-map h2,.scenario-matrix h2,.comparison-board h2{font-size:18px;line-height:1.45;margin-bottom:6px}.workbench>p,.system-map>p,.scenario-matrix>p,.comparison-board>p{font-size:13px;color:var(--muted);margin-bottom:17px}
 .flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--border);border-radius:7px;overflow:hidden}.flow>div{min-height:125px;padding:14px 15px;border-right:1px solid var(--border)}.flow>div:last-child{border:0}.flow b{display:block;font-size:13px;margin-bottom:5px}.flow span,.flow small{display:block;font-size:12px;color:var(--muted);line-height:1.6}.flow small{color:var(--green);font-weight:700;margin-top:7px}
@@ -111,6 +113,7 @@ button{font:inherit}
   .qa-banner{margin-top:42px;padding:14px 16px}
   .qa-banner h3{font-size:14px;margin-bottom:5px}
   .qa-item{font-size:13px;line-height:1.7;margin-bottom:8px}
+  .qa-focus-grid{grid-template-columns:1fr}
   .content{padding:18px 16px}
   .section{margin-bottom:28px}
   .section-title{font-size:17px;line-height:1.45}
@@ -121,7 +124,7 @@ button{font:inherit}
   .kp pre{font-size:11px;padding:10px}
   .eval-dim .good-bad{grid-template-columns:1fr;gap:8px}
   .section,.kp,.eval-dim{scroll-margin-top:150px}
-  .workbench,.system-map,.scenario-matrix,.comparison-board{padding:17px 16px}.flow,.question-grid,.scenario-grid,.diagnostic-grid{grid-template-columns:1fr}.flow>div{min-height:auto;border-right:0;border-bottom:1px solid var(--border)}.flow>div:last-child{border-bottom:0}.map-row{display:block;border-bottom:1px solid var(--border)}.map-row>div{border-left:0;border-top:1px solid var(--border)}.map-row>div:first-child{border-top:0}.compare{grid-template-columns:1fr}.compare>div{height:25px;transform:rotate(90deg)}.matrix{display:block;overflow-x:auto;min-width:560px}
+  .workbench,.knowledge-compass,.system-map,.scenario-matrix,.comparison-board{padding:17px 16px}.flow,.question-grid,.scenario-grid,.diagnostic-grid,.compass-grid{grid-template-columns:1fr}.flow>div,.compass-step{min-height:auto;border-right:0;border-bottom:1px solid var(--border)}.flow>div:last-child,.compass-step:last-child{border-bottom:0}.map-row{display:block;border-bottom:1px solid var(--border)}.map-row>div{border-left:0;border-top:1px solid var(--border)}.map-row>div:first-child{border-top:0}.compare{grid-template-columns:1fr}.compare>div{height:25px;transform:rotate(90deg)}.matrix{display:block;overflow-x:auto;min-width:560px}
 }
 </style>
 </head>
@@ -158,9 +161,10 @@ window.addEventListener("error", function(event) {
 // ==================== DATA ====================
 const KNOWLEDGE = {
   qa: [
-    {q:"作为 Agent 开发者需要掌握哪些知识？",a:"6 大类——①推理与决策 ②工具与协议 ③记忆系统 ④检索增强(RAG) ⑤多Agent协作 ⑥工程落地。前四类是 Agent 的内部能力，第五类是多 Agent 系统设计，第六类是把 Agent 变成生产系统的工程能力。"},
-    {q:"这些知识之间是什么关系？",a:"推理决策是大脑、工具协议是手脚、记忆是经验、RAG 是外部知识源、多Agent是团队协作、工程落地是生产保障。一个完整的 Agent 系统六者缺一不可，但优先级——推理决策和工具协议是核心中的核心。"},
-    {q:"哪些必须深入到能从零手写？",a:"推理决策（能从零写 ReAct Loop）、工具协议（能手写 Function Calling 解析和 MCP Server）、记忆系统（能设计三层架构）。RAG 和多Agent 需要理解原理并能调优。工程落地需要知道指标和工具，不一定要从零搭。"},
+    {q:"用户到底要完成什么，失败时谁来接手？",a:"先写任务卡：用户、输入、目标输出、权限、风险、成功规则与交接路径。没有边界就无法选对方案。"},
+    {q:"该用规则、工作流还是 Agent？",a:"按路径不确定性、失败代价与维护成本选择；能枚举的步骤优先规则或工作流，开放决策才进入 Agent。"},
+    {q:"一次任务如何可靠地运行？",a:"理解目标后，推理、工具、状态、知识和终止机制形成闭环；每个节点都有可观察信号和控制边界。"},
+    {q:"怎样让它长期变好？",a:"用真实运行中的失败与反馈形成任务集、改动假设、对照验证和回归样本，再进入评估页作决策。"},
   ],
   categories: [
     {
@@ -405,6 +409,16 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
       ]
     },
     {
+      id:"application", icon:"🎯", name:"应用设计与迭代",
+      desc:"从真实用户任务出发，决定是否需要 Agent、怎样分配模型与工具职责，并把反馈转成下一轮可验证改进。",
+      items: [
+        {title:"任务边界：先定义用户要完成什么",tags:["任务设计","边界","验收"],body:`<p><b>先写任务卡，再讨论模型或框架。</b>任务卡至少包含用户、触发条件、输入、目标输出、可用工具、权限、成功规则和失败交接。</p><ul><li><b>目标要可验收：</b>明确完成、拒绝与转人工的条件。</li><li><b>约束优先：</b>权限、不可逆动作、数据质量和时效决定系统形态。</li><li><b>输出可落地：</b>区分结构化结果、待审批计划和用户解释。</li></ul><p><b>产物：</b>任务卡、验收规则、风险分级和交接路径。</p>`,refs:[]},
+        {title:"方案取舍：规则、工作流还是 Agent",tags:["方案选型","Workflow","自主性"],body:`<p><b>不要把 Agent 当默认答案。</b>路径可枚举、结果可由规则校验的任务优先用规则或工作流；只有工具选择依赖中间观察且人工编排成本过高时，才提高自主性。</p><ul><li><b>规则：</b>最快、最稳定，适合固定判断。</li><li><b>工作流：</b>适合可预定义步骤、状态与审批。</li><li><b>Agent：</b>用于动态选择路径，必须承担不确定性、成本和治理代价。</li></ul>`,refs:[]},
+        {title:"模型与系统策略：把能力放在合适的位置",tags:["模型选型","路由","成本"],body:`<p><b>模型选型不是单选题。</b>将任务拆成识别、检索、规划、执行和生成，分别决定用规则、小模型、大模型还是人工确认。</p><ul><li>确定性计算、权限校验和副作用控制优先由程序承担。</li><li>按难度与风险路由模型，并保留降级路径。</li><li>先定义质量、延迟、成本和稳定性门槛，再比较方案。</li></ul>`,refs:[]},
+        {title:"价值闭环：把反馈变成下一轮可验证改进",tags:["用户价值","反馈","迭代"],body:`<p><b>上线不等于任务完成。</b>同时观察用户是否完成目标、系统是否稳定执行，以及哪些失败最值得修。</p><ul><li><b>体验信号：</b>完成、放弃、重复请求、人工接管与纠错反馈。</li><li><b>系统信号：</b>Trace 失败类型、工具错误、耗时、成本和安全拦截。</li><li><b>迭代规则：</b>按影响、频率、可检测性和可修复性排序，每次修复沉淀回归样本。</li></ul>`,refs:[]}
+      ]
+    },
+    {
       id:"engineering", icon:"⚙️", name:"工程落地",
       desc:"把 Agent 从 Demo 变成生产系统——架构、安全、性能、评估、可观测、部署。",
       items: [
@@ -489,9 +503,10 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
 
 const EVAL = {
   qa: [
-    {q:"怎么知道我的 Agent 设计得好不好？",a:"用 7 个核心维度评估：任务推理、工具执行、知识上下文、安全边界、可靠性恢复、效率成本、可观测与持续评估。它们覆盖 Agent 从理解请求到稳定交付结果的完整闭环。"},
-    {q:"哪些内容不属于 Agent 评价维度？",a:"Git 历史、代码目录、架构风格和发布流程属于工程审查方法或实现手段。它们能帮助定位问题，但不能代替对 Agent 实际任务表现、安全和稳定性的评价。"},
-    {q:"评估完之后怎么改进？",a:"先按失败轨迹归因：任务没完成看推理和工具；答非所问看知识上下文；越权看安全；反复失败看可靠性；过慢或过贵看效率。每次修复都加入回归集验证。"},
+    {q:"要证明哪个真实任务变好了？",a:"先确定用户任务、成功规则、不可接受结果与样本分层；没有任务定义，分数没有业务含义。"},
+    {q:"基线、变量和预算是否冻结？",a:"同一任务集、相同判定口径与预算下，一次只改一个主要因素，才能归因。"},
+    {q:"证据是否足以相信结果？",a:"确定结果用程序断言，开放质量做盲评和人工校准；随机任务必须重复运行并看分布。"},
+    {q:"何时保留、何时回退？",a:"主指标稳定提升且安全、质量、延迟、成本等护栏均达标才保留；否则保留失败样本继续定位。"},
   ],
   dims: [
     {
@@ -701,10 +716,11 @@ const AGENT_EVALUATION_DIMS = [
 
 const EVIDENCE = {1:'任务集、成功规则、失败轨迹与重复运行。',2:'工具选择/参数正确率、调用日志与最终状态。',3:'问题-证据标注集、Recall@K、引用正确性与权限过滤。',4:'对抗集、审批记录、脱敏日志与权限审计。',5:'故障注入、恢复记录、重复副作用与降级比例。',6:'P50/P95、步骤数、Token/费用及质量护栏。',7:'可回放 Trace、版本、回归报告与人工复核。'};
 
+function knowledgeCompass(){return `<section class="knowledge-compass"><div class="kicker">先回答用户最需要知道的事</div><h2>一个完整的 Agent 知识闭环，应该帮你做出哪些判断？</h2><p>这里不是技术名词目录。带着一个真实需求进入时，先把下面四个问题答清，再进入对应知识域。</p><div class="compass-grid"><section class="compass-step"><h3>1. 这个问题值得用 Agent 吗？</h3><p>用户目标是什么？路径是否开放？规则或工作流能否更稳定地完成？</p><b>先读：应用设计与迭代</b></section><section class="compass-step"><h3>2. 它如何完成一次任务？</h3><p>如何理解目标、选择工具、使用状态与知识、控制循环，并在不确定处停下来？</p><b>再读：推理、工具、记忆、RAG</b></section><section class="compass-step"><h3>3. 它如何长期可用？</h3><p>如何控制权限、副作用、故障恢复、版本、成本和可观测性？</p><b>再读：协作与工程落地</b></section><section class="compass-step"><h3>4. 它如何持续变好？</h3><p>从真实运行中找失败，提出单一改动假设，用固定任务与护栏决定保留还是回退。</p><b>衔接：评估框架</b></section></div></section>`}
 function learningWorkbench(){return `<section class="workbench"><div class="kicker">从知识到可验证改进</div><h2>先定义交付，再讨论 Agent 能力</h2><p>没有基线、判定规则与对照运行，任何“优化了”都只是印象。每次改动都应留下可复查的证据。</p><div class="flow"><div><b>1. 定义任务</b><span>目标、约束、成功和失败。</span><small>任务卡与验收规则</small></div><div><b>2. 记录基线</b><span>冻结模型、提示、工具和数据版本。</span><small>基线报告与 Trace</small></div><div><b>3. 定位失败</b><span>按推理、证据、工具、安全、恢复归因。</span><small>失败分类表</small></div><div><b>4. 提出改动</b><span>一次验证一个主要假设，写出代价。</span><small>改动假设</small></div><div><b>5. 验证沉淀</b><span>重复运行、盲评、抽检，达标再灰度。</span><small>决策与回归用例</small></div></div></section>`}
 function applicationCanvas(){return `<section class="workbench"><div class="kicker">应用层 Agent 设计问题</div><h2>页面需要先回答的，不是框架名</h2><p>功能交付、缺陷修复、代码演进和业务操作的验收不同。先把应用写成可验收工作单，才能知道该改哪里。</p><div class="question-grid"><div><b>替谁完成什么结果？</b><span>输入、最终产物、不可做的事和人工确认点。</span></div><div><b>成功如何自动判定？</b><span>优先测试、断言、状态变化和可验证事实。</span></div><div><b>最坏失败是什么？</b><span>错误影响、权限边界、回滚和必须人工检查的动作。</span></div><div><b>什么支持改动？</b><span>基线、候选、重复运行、失败样本与发布决定。</span></div></div><div class="scenario-grid"><article><h3>功能交付</h3><p>需求被完整实现，而非生成更多代码。</p><ul><li>测试与验收断言</li><li>改动范围与回归</li></ul><small>PR、测试报告、验收证据</small></article><article><h3>缺陷修复</h3><p>先稳定复现，再定位根因和最小补丁。</p><ul><li>复现用例转绿</li><li>邻近回归集通过</li></ul><small>根因、补丁、回归用例</small></article><article><h3>代码演进</h3><p>行为保持，同时改善目标质量。</p><ul><li>兼容/性能/安全检查</li><li>迁移与回滚计划</li></ul><small>计划、差异、迁移记录</small></article><article><h3>业务操作</h3><p>正确完成授权动作，且可审计恢复。</p><ul><li>账户、对象、状态断言</li><li>幂等与审批</li></ul><small>结构化结果、审计、恢复点</small></article></div></section>`}
 function systemMap(){return `<section class="system-map"><div class="kicker">系统地图：症状该落在哪一层</div><h2>输入、决策、执行与治理的可观测位置</h2><p>遇到“结果不好”时先定位节点，再选择改动杠杆，避免把所有问题都归咎于模型或 Prompt。</p><div class="map-row"><div>请求与状态</div><div><b>用户目标</b>范围与成功条件。<span>信号：意图歧义</span><small>杠杆：澄清策略</small></div><div><b>输入边界</b>权限与不可信内容。<span>信号：拦截率</span><small>杠杆：授权校验</small></div><div><b>上下文</b>记忆与检索证据。<span>信号：召回率</span><small>杠杆：切分排序</small></div><div><b>任务状态</b>步骤、预算与版本。<span>信号：冲突率</span><small>杠杆：checkpoint</small></div></div><div class="map-row"><div>决策与执行</div><div><b>规划器</b>拆步骤与终止。<span>信号：漂移/步数</span><small>杠杆：计划约束</small></div><div><b>工具网关</b>选择、校验、执行。<span>信号：成功率</span><small>杠杆：Schema/重试</small></div><div><b>外部系统</b>检索、API、数据库。<span>信号：超时/错误</span><small>杠杆：降级/缓存</small></div><div><b>结果编排</b>合并证据与动作。<span>信号：引用正确</span><small>杠杆：输出校验</small></div></div><div class="diagnostic-grid"><div><h3>回答错但自信</h3><p>先查证据是否召回、引用是否支持答案，再查生成。</p></div><div><h3>任务反复绕圈</h3><p>查目标状态、Observation、步骤和 Token 预算。</p></div><div><h3>一次好一次坏</h3><p>查随机性、输入分层、依赖与评审一致性。</p></div></div></section>`}
-function evalWorkbench(){return `<section class="workbench"><div class="kicker">评估不是单一分数</div><h2>从“看起来更好”到“有证据证明更好”</h2><p>结果、轨迹、安全、延迟和成本会相互牵制。必须用真实任务、规则判分、模型盲评、人工校准和稳定性统计共同决策。</p><div class="flow"><div><b>A. 设定基线</b><span>冻结任务、版本和预算。</span><small>不与基线比，不宣称改进</small></div><div><b>B. 控制变量</b><span>一次只改一个主要因素。</span><small>避免同时改一切</small></div><div><b>C. 多次运行</b><span>报告均值、中位数、方差与最差值。</span><small>防单次偶然胜出</small></div><div><b>D. 多维判分</b><span>结果、轨迹、安全、成本分别判定。</span><small>设置质量与安全护栏</small></div><div><b>E. 发布决策</b><span>达标保留，退化回滚并加入回归。</span><small>可审计决策</small></div></div><div class="evidence"><b>外部参考：</b><a href="https://arxiv.org/abs/2308.03688" target="_blank">AgentBench</a> 用多环境交互评估通用能力；<a href="https://arxiv.org/abs/2307.13854" target="_blank">WebArena</a> 面向多步网页任务；<a href="https://arxiv.org/abs/2306.05685" target="_blank">MT-Bench</a> 说明模型评审需处理位置、长度和自偏好风险。它们不能替代自己的任务夹具。</div></section>`}
+function evalWorkbench(){return `<section class="workbench"><div class="kicker">先回答用户最需要知道的事</div><h2>这次改动，真的让 Agent 变好了吗？</h2><p>评估页只解决一个决策问题：候选方案是否在真实任务上稳定优于基线，同时没有突破安全、成本、延迟或其他任务的底线。</p><div class="question-grid"><div><b>评什么？</b><span>先选真实用户任务，写出成功、失败与不可接受结果。</span></div><div><b>和谁比？</b><span>冻结基线、数据、预算与判定口径，避免只展示新方案。</span></div><div><b>凭什么信？</b><span>规则断言、盲评、人工校准和重复运行各自承担不同证据责任。</span></div><div><b>如何决定？</b><span>主指标提升且所有护栏达标，才保留并进入灰度。</span></div></div><div class="flow"><div><b>A. 设定基线</b><span>冻结任务、版本和预算。</span><small>不与基线比，不宣称改进</small></div><div><b>B. 控制变量</b><span>一次只改一个主要因素。</span><small>避免同时改一切</small></div><div><b>C. 多次运行</b><span>报告均值、中位数、方差与最差值。</span><small>防单次偶然胜出</small></div><div><b>D. 多维判分</b><span>结果、轨迹、安全、成本分别判定。</span><small>设置质量与安全护栏</small></div><div><b>E. 发布决策</b><span>达标保留，退化回滚并加入回归。</span><small>可审计决策</small></div></div><div class="evidence"><b>外部参考：</b><a href="https://arxiv.org/abs/2308.03688" target="_blank">AgentBench</a> 用多环境交互评估通用能力；<a href="https://arxiv.org/abs/2307.13854" target="_blank">WebArena</a> 面向多步网页任务；<a href="https://arxiv.org/abs/2306.05685" target="_blank">MT-Bench</a> 说明模型评审需处理位置、长度和自偏好风险。它们不能替代自己的任务夹具。</div></section>`}
 function scenarioMatrix(){return `<section class="scenario-matrix"><div class="kicker">应用层验收矩阵</div><h2>不同功能，必须用不同的“好”来衡量</h2><p>通用基准只说明能力边界；去留决定来自业务任务夹具、护栏和失败样本。</p><table class="matrix"><thead><tr><th>应用</th><th>自动证据</th><th>人工复核</th><th>改动验证</th></tr></thead><tbody><tr><td>功能交付</td><td>构建、测试、验收断言</td><td>需求与范围</td><td>同任务集比较通过率与回归数</td></tr><tr><td>缺陷修复</td><td>稳定复现与修复断言</td><td>根因与补丁最小性</td><td>比较定位时间、复发率与邻近回归</td></tr><tr><td>代码演进</td><td>兼容、性能与安全检查</td><td>架构与迁移计划</td><td>比较质量门槛、迁移失败与回滚</td></tr><tr><td>业务操作</td><td>状态机、权限与幂等断言</td><td>高风险审批</td><td>比较动作正确率、越权和恢复成功率</td></tr></tbody></table><div class="evidence"><b>优先级：</b>先处理影响大、出现频繁、可稳定检测且有明确修复杠杆的问题。没有可验收结果时，先用确定性工作流或人工节点。</div></section>`}
 function comparisonBoard(){return `<section class="comparison-board"><div class="kicker">前后对照：展示模板，不是性能宣称</div><h2>把“加了一个方法”写成可验证记录</h2><p>固定任务集、预算与判定规则，只改一个主要因素；数值应由自己的运行产生。</p><div class="compare"><section><h3>基线</h3><ul><li>直接检索后生成。</li><li>只看最终回答。</li><li>单次运行决定去留。</li></ul></section><div>→</div><section><h3>候选</h3><ul><li>记录候选证据、排序与引用。</li><li>先验证召回，再验证回答。</li><li>重复运行并设安全和延迟门槛。</li></ul></section></div><table class="matrix"><thead><tr><th>指标</th><th>基线</th><th>候选</th><th>门槛</th></tr></thead><tbody><tr><td>证据召回</td><td>0.68</td><td>0.79</td><td>至少 0.75</td></tr><tr><td>引用正确</td><td>0.72</td><td>0.86</td><td>至少 0.82</td></tr><tr><td>P95</td><td>3.1s</td><td>3.6s</td><td>不高于 4.0s</td></tr><tr><td>高风险越权</td><td>1/30</td><td>0/30</td><td>必须为 0</td></tr></tbody></table></section>`}
 
@@ -761,14 +777,14 @@ function setMobileNav(open) {
 function renderQA(tab) {
   const banner = document.getElementById('qaBanner');
   const qa = tab==='knowledge' ? KNOWLEDGE.qa : EVAL.qa;
-  let html = `<h3>📋 本页学习提示</h3><details class="qa-details"><summary>查看常见问题与回答（${qa.length} 条）</summary>`;
-  qa.forEach(item => { html += `<div class="qa-item"><div class="q">${item.q}</div><div class="a">${item.a}</div></div>`; });
-  html += `</details>`;
-  banner.innerHTML = html;
+  const heading = tab === 'knowledge' ? '先用这四个问题定位你需要的知识' : '先用这四个问题判断改动能否成立';
+  let html = `<h3>${heading}</h3><div class="qa-focus-grid">`;
+  qa.forEach(item => { html += `<div class="qa-focus-item"><b>${item.q}</b><span>${item.a}</span></div>`; });
+  banner.innerHTML = html + `</div>`;
 }
 
 function renderKnowledge() {
-  let html = learningWorkbench() + applicationCanvas() + systemMap();
+  let html = knowledgeCompass() + learningWorkbench() + applicationCanvas() + systemMap();
   KNOWLEDGE.categories.forEach(cat => {
     html += `<div class="section"><h2 class="section-title">${cat.icon} ${cat.name}</h2><p class="section-desc">${cat.desc}</p>`;
     cat.items.forEach((item,i) => {
