@@ -1,1 +1,5 @@
 local-notes.md
+.technical-knowledge.log
+.technical-knowledge.pid
+__pycache__/
+*.py[cod]
