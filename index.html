@@ -11,7 +11,7 @@ button{font:inherit}
 .app{display:flex;min-height:100vh}
 
 /* Sidebar */
-.sidebar{width:276px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10}
+.sidebar{width:300px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10}
 .sidebar-title{padding:18px 20px 14px;border-bottom:1px solid var(--border);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:12px}
 .nav-toggle{display:none;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:6px;padding:5px 10px;font-size:13px;line-height:1.4;cursor:pointer}
 .nav-tree{padding:8px 0}
@@ -28,7 +28,7 @@ button{font:inherit}
 
 /* Main */
 .main{flex:1;min-width:0}
-.top-tabs{display:flex;background:var(--surface);border-bottom:2px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:20}
+.top-tabs{display:none}
 .top-tab{padding:16px 26px;font-size:16px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
 .top-tab:hover{color:var(--text)}
 .top-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
@@ -112,16 +112,16 @@ button{font:inherit}
 @media(max-width:760px){
   body{font-size:16px;line-height:1.76}
   .app{display:block}
-  .top-tabs{display:flex;height:58px;padding:0;overflow:hidden}
-  .top-tab{flex:1;min-width:0;padding:15px 4px 13px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
-  .sidebar{width:100%;height:auto;position:fixed;top:58px;left:0;overflow:visible;border-right:none;border-bottom:1px solid var(--border);z-index:19}
+  .top-tabs{display:none}
+  .sidebar{width:100%;height:auto;position:fixed;top:0;left:0;overflow:visible;border-right:none;border-bottom:1px solid var(--border);z-index:19}
+  .main{padding-top:58px}
   .sidebar-title{padding:11px 16px;font-size:16px}
   .nav-toggle{display:inline-flex;align-items:center;justify-content:center}
   .nav-tree{display:none;max-height:52vh;overflow-y:auto;padding:6px 0;background:var(--surface);border-top:1px solid var(--border)}
   .sidebar.mobile-open .nav-tree{display:block}
   .nav-group-label{padding:10px 16px;font-size:14px}
   .nav-item{padding:8px 16px 8px 36px;font-size:14px}
-  .qa-banner{margin-top:48px;padding:18px 16px}
+  .qa-banner{margin-top:0;padding:18px 16px}
   .qa-banner h3{font-size:17px;margin-bottom:7px}
   .qa-item{font-size:16px;line-height:1.76;margin-bottom:9px}
   .qa-focus-grid{grid-template-columns:1fr}
@@ -166,6 +166,12 @@ button{font:inherit}
 <style>
 .recommendation-discipline{border-top:3px solid var(--amber)}.recommendation-discipline .confidence-grid{margin:18px 0}.recommendation-discipline .evidence{margin-bottom:0}.recommendation-discipline .reflection-list{margin:14px 0 0;padding:15px 18px;border:1px solid var(--border);background:#fffaf0}.reflection-list b{display:block;margin-bottom:7px}.reflection-list ol{margin:0;padding-left:20px}.reflection-list li{margin:4px 0;color:var(--muted);font-size:15px;line-height:1.72}
 .evaluation-contract .evaluation-scope{grid-template-columns:repeat(4,minmax(0,1fr))}.evaluation-contract .evaluation-scope>div:nth-child(2){border-right:1px solid var(--border)}.evaluation-contract .evaluation-scope>div:last-child{border-right:0}.evaluation-stage-map{border-top:3px solid var(--green)}.evaluation-stage-map>p,.evidence-record-template>p{max-width:900px}.stage-map-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin:18px 0;border:1px solid var(--border);background:var(--border)}.stage-map-grid section{min-width:0;padding:14px 15px;background:#fff}.stage-map-grid b,.stage-map-grid span,.stage-map-grid small{display:block}.stage-map-grid b{font-size:14px;line-height:1.45}.stage-map-grid span{margin-top:5px;font-size:13px;line-height:1.62;color:var(--muted)}.stage-map-grid small{margin-top:8px;font-size:12px;line-height:1.55;color:var(--amber)}.evidence-record-template{border-top:3px solid var(--purple)}.evidence-record-grid{display:grid;grid-template-columns:minmax(260px,2fr) minmax(0,3fr);gap:14px;margin:18px 0}.evidence-record-grid>section{min-width:0;padding:15px 16px;border:1px solid var(--border);background:#fff}.evidence-record-grid>section>b{display:block;margin-bottom:9px;font-size:14px}.evidence-record-grid dl{margin:0}.evidence-record-grid dt{margin-top:8px;font-size:13px;font-weight:750;color:var(--purple)}.evidence-record-grid dd{margin:2px 0 0;font-size:13px;line-height:1.62;color:var(--muted)}.evidence-chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 0}.evidence-chain span{padding:3px 6px;border:1px solid #d7c8f5;background:var(--purple-bg);color:var(--purple);font-size:12px;font-weight:700}.evidence-chain i{font-style:normal;color:var(--purple);font-weight:800}.evidence-record-grid p{margin:2px 0 0;font-size:13px;line-height:1.65;color:var(--muted)}@media(max-width:1100px){.evaluation-contract .evaluation-scope{grid-template-columns:repeat(2,minmax(0,1fr))}.evaluation-contract .evaluation-scope>div:nth-child(2){border-right:0}.evaluation-contract .evaluation-scope>div:nth-child(-n+2){border-bottom:1px solid var(--border)}}@media(max-width:760px){.evaluation-contract .evaluation-scope,.stage-map-grid,.evidence-record-grid{grid-template-columns:1fr}.evaluation-contract .evaluation-scope>div,.evaluation-contract .evaluation-scope>div:nth-child(2){border-right:0}.evaluation-contract .evaluation-scope>div:nth-child(-n+2){border-bottom:1px solid var(--border)}.stage-map-grid{gap:1px}.evidence-record-template .output-schema{font-size:11px;padding:12px}.evidence-chain{align-items:flex-start}.evidence-chain i{transform:rotate(90deg);margin:2px 5px}}
+</style>
+<style>
+.agent-parser{border-top:3px solid var(--purple)}.agent-parser>p{max-width:960px}.parser-role-grid,.parser-lens-grid,.parser-output-grid{display:grid;gap:1px;margin:18px 0;border:1px solid var(--border);background:var(--border)}.parser-role-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.parser-lens-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.parser-output-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.parser-role-grid>section,.parser-lens-grid>section,.parser-output-grid>section{min-width:0;padding:15px 16px;background:var(--surface)}.parser-role-grid b,.parser-lens-grid b,.parser-output-grid b{display:block;font-size:14px;line-height:1.45;margin-bottom:6px}.parser-role-grid p,.parser-lens-grid p,.parser-output-grid p{margin:0;font-size:13px;line-height:1.65;color:var(--muted)}.parser-role-grid small,.parser-lens-grid small,.parser-output-grid small{display:block;margin-top:8px;font-size:11px;line-height:1.55;color:var(--green);font-weight:700}.parser-flow{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin:18px 0;border:1px solid var(--border);overflow:hidden}.parser-flow>div{position:relative;min-height:130px;padding:15px;border-right:1px solid var(--border);background:#fff}.parser-flow>div:last-child{border-right:0}.parser-flow b,.parser-flow span,.parser-flow small{display:block}.parser-flow b{font-size:14px;margin-bottom:6px}.parser-flow span{font-size:12px;line-height:1.65;color:var(--muted)}.parser-flow small{margin-top:8px;font-size:11px;line-height:1.45;color:var(--purple);font-weight:700}.parser-flow>div:not(:last-child)::after{content:"→";position:absolute;right:-10px;top:48px;z-index:2;color:var(--purple);font-size:18px;font-weight:700}.parser-boundary{margin:16px 0;padding:14px 16px;border-left:3px solid var(--purple);background:var(--purple-bg);font-size:14px;line-height:1.72}.parser-boundary b{color:var(--purple)}.parser-artifact{margin-top:18px;padding:15px 16px;border:1px solid var(--border);background:#f7f9fc}.parser-artifact h3{font-size:14px;margin:0 0 8px}.parser-artifact ul{margin:0;padding-left:18px}.parser-artifact li{margin:4px 0;font-size:13px;line-height:1.65;color:var(--muted)}@media(max-width:1100px){.parser-flow{grid-template-columns:repeat(3,minmax(0,1fr))}.parser-flow>div:nth-child(3){border-right:0}.parser-flow>div:nth-child(-n+3){border-bottom:1px solid var(--border)}.parser-lens-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.parser-output-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.parser-role-grid,.parser-lens-grid,.parser-output-grid,.parser-flow{grid-template-columns:1fr}.parser-role-grid>section,.parser-lens-grid>section,.parser-output-grid>section,.parser-flow>div{border-right:0;border-bottom:1px solid var(--border)}.parser-role-grid>section:last-child,.parser-lens-grid>section:last-child,.parser-output-grid>section:last-child,.parser-flow>div:last-child{border-bottom:0}.parser-flow>div{min-height:0}.parser-flow>div:not(:last-child)::after{content:"↓";right:auto;left:calc(50% - 5px);top:auto;bottom:-21px}.parser-flow{overflow:visible;margin-bottom:32px}}
+</style>
+<style>
+.kicker{font-size:12px;color:#64748b;font-weight:700;line-height:1.5;margin-bottom:7px}.workspace-nav{padding:8px 0 10px;border-bottom:1px solid var(--border);margin-bottom:7px}.workspace-nav .nav-item{padding-left:20px;font-weight:600}.nav-group-label.active{color:var(--blue);background:var(--blue-bg);box-shadow:inset 2px 0 0 var(--blue)}.eval-route{padding-left:38px}.eval-page-header{margin:2px 0 28px;padding-bottom:19px;border-bottom:1px solid var(--border)}.eval-page-header h1{font-size:28px;line-height:1.32;font-weight:750;margin:0 0 7px}.eval-page-header p{max-width:780px;margin:0;color:var(--muted);font-size:16px;line-height:1.75}.eval-page-header .eyebrow{display:block;margin-bottom:7px;color:#64748b;font-size:12px;font-weight:700}.eval-page-header .page-hint{display:inline-block;margin-top:10px;color:#475569;font-size:13px;font-weight:600}.content.eval-view{max-width:1320px}.content.eval-view .workbench,.content.eval-view .system-map,.content.eval-view .scenario-matrix,.content.eval-view .comparison-board{margin-bottom:24px}.parser-role-grid p,.parser-lens-grid p,.parser-output-grid p{font-size:14px}.parser-role-grid small,.parser-lens-grid small,.parser-output-grid small{font-size:12px}.parser-flow span{font-size:13px}.parser-flow small{font-size:12px}.parser-boundary{border:1px solid #ddd6fe;background:#faf9ff}.parser-boundary b{color:#5b3a9b}@media(max-width:760px){.sidebar{width:100%}.eval-page-header{margin-bottom:20px;padding-bottom:15px}.eval-page-header h1{font-size:23px}.eval-page-header p{font-size:15px}.workspace-nav .nav-item,.eval-route{padding-left:18px}.parser-role-grid p,.parser-lens-grid p,.parser-output-grid p{font-size:14px}}
 </style>
 </head>
 <body>
@@ -324,7 +330,7 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
 <p><b>vs Skill 的关系：</b>Skill 是能力单元（"查天气"），FC 是调用方式，MCP 是通信协议。三者层次不同。</p>
 <p><b>边界（必须知道）：</b>协议互通不等于工具可信或已获授权；远程服务要做来源校验、身份认证、最小权限和工具输出隔离。延迟与流式能力取决于具体传输、实现和工具链，不能写成固定数字。</p>
 <p><b>vs A2A 的关系：</b>MCP 管 Agent↔工具（垂直集成），A2A 管 Agent↔Agent（水平协作）。一个完整的多 Agent 系统两者都需要。</p>`,
-          refs:[{t:"MCP Specification",u:"https://modelcontextprotocol.io/"},{t:"Google A2A Protocol",u:"https://github.com/google/A2A"}]
+          refs:[{t:"MCP Specification",u:"https://modelcontextprotocol.io/"},{t:"A2A Protocol Specification",u:"https://a2a-protocol.org/latest/specification/"}]
         },
         {
           title:"A2A 协议：把独立 Agent 的协作变成可追踪任务",
@@ -623,6 +629,7 @@ Round 4: Think "任务完成" → 输出最终回复</pre>
 
 const EVAL = {
   qa: [
+    {q:"我现在不想打分，只想把一个陌生 Agent 的代码和流程看明白，可以用这个框架吗？",a:"可以。先用<b>陌生 Agent 解析</b>还原任务、模块、后端状态、Agent 控制流、工具边界和恢复路径；这时交付的是<b>结构分析</b>，不需要虚构运行问题或评分。"},
     {q:"没有任务和运行轨迹，能直接说某个 Agent 有什么问题吗？",a:"不能。只有 README、代码或 Git 时，最多做<b>结构审查</b>；拿到任务、Trace 和最终状态，才能说发现了哪一阶段的运行问题；有固定基线和对照后，才能说改动是否有效。"},
     {q:"一条能执行的改进建议，必须写清什么？",a:"按<b>发生阶段 → 原始现象 → 本次判断 → 改什么 → 怎样验 → 何时停止</b>写。缺少原始现象时，只能列为待核实假设，不能直接要求“加 RAG、反思或多 Agent”。"},
     {q:"论文、案例和工具项目在评估中有什么作用？",a:"它们只能说明某种机制在什么条件下值得尝试。它们不能证明当前 Agent 已经有同样的问题，也不能代替本地任务上的前后对照。"},
@@ -847,27 +854,51 @@ function comparisonBoard(){return `<section class="comparison-board evaluation-l
 
 // ==================== RENDER ====================
 let currentTab = 'knowledge';
+let currentKnowledgeView = 'overview';
+let currentEvalView = 'parse';
 
 function buildNav(tab = currentTab) {
   const tree = document.getElementById('navTree');
   const title = document.getElementById('navTitle');
-  let html = '';
+  let html = `<div class="workspace-nav"><div class="nav-item${tab === 'knowledge' ? ' active' : ''}" onclick="switchTab('knowledge')">知识体系</div><div class="nav-item${tab === 'eval' ? ' active' : ''}" onclick="switchTab('eval')">评估框架</div></div>`;
 
   if(tab === 'knowledge') {
-    title.textContent = 'AI Agent 开发知识体系';
+    title.textContent = 'AI Agent 工作台';
+    const overviewViews = [
+      ['overview', '总览与学习路径'],
+      ['practice', '实践与诊断'],
+      ['sources', '研究与资料'],
+    ];
+    html += `<div class="nav-group"><div class="nav-group-label${overviewViews.some(([id]) => id === currentKnowledgeView) ? ' active' : ''}">知识工作区</div><div class="nav-children show">`;
+    overviewViews.forEach(([id, label]) => {
+      html += `<div class="nav-item${currentKnowledgeView === id ? ' active' : ''}" onclick="switchKnowledgeView('${id}')">${label}</div>`;
+    });
+    html += `</div></div>`;
     KNOWLEDGE.categories.forEach(cat => {
-      html += `<div class="nav-group"><div class="nav-group-label" onclick="toggleNav(this)"><span class="arrow open">▶</span>${cat.icon} ${cat.name}</div><div class="nav-children show">`;
+      const isActive = currentKnowledgeView === cat.id;
+      html += `<div class="nav-group"><div class="nav-group-label${isActive ? ' active' : ''}" onclick="switchKnowledgeView('${cat.id}')">${cat.icon} ${cat.name}</div><div class="nav-children${isActive ? ' show' : ''}">`;
       cat.items.forEach((item,i) => {
         const itemTitle = item.title.length > 20 ? item.title.substring(0,20)+'...' : item.title;
-        html += `<div class="nav-item" onclick="scrollToSection('${cat.id}-${i}',this)">${itemTitle}</div>`;
+        html += `<div class="nav-item" onclick="switchKnowledgeItem('${cat.id}',${i})">${itemTitle}</div>`;
       });
       html += `</div></div>`;
     });
   } else {
-    title.textContent = 'Agent 系统评估框架';
-    html = `<div class="nav-group"><div class="nav-group-label"><span class="arrow open">▶</span>🔍 七项核心评估</div><div class="nav-children show">`;
-    AGENT_EVALUATION_DIMS.forEach(dim => {
-      html += `<div class="nav-item" onclick="scrollToSection('eval-${dim.num}',this)">${dim.num}. ${dim.title}</div>`;
+    title.textContent = '评估框架';
+    const views = [
+      ['parse', 'Agent 解析'],
+      ['scope', '评估范围'],
+      ['profile', '项目画像与现状'],
+      ['evidence', '证据与判断'],
+      ['playbook', '执行规范'],
+      ['quality', '质量与控制'],
+      ['operations', '安全与运营'],
+      ['recommendations', '建议依据'],
+      ['references', '参考项目'],
+    ];
+    html += `<div class="nav-group"><div class="nav-group-label"><span class="arrow open">▶</span>评估工作区</div><div class="nav-children show">`;
+    views.forEach(([id, label]) => {
+      html += `<div class="nav-item eval-route${currentEvalView === id ? ' active' : ''}" onclick="switchEvalView('${id}')">${label}</div>`;
     });
     html += `</div></div>`;
   }
@@ -897,10 +928,10 @@ function setMobileNav(open) {
 
 function renderQA(tab) {
   const banner = document.getElementById('qaBanner');
-  const qa = tab==='knowledge' ? KNOWLEDGE.qa : EVAL.qa;
-  const questions = tab === 'knowledge' ? [qa[2], qa[0], qa[1]] : qa;
+  if(tab === 'eval' || currentKnowledgeView !== 'overview') { banner.hidden = true; return; }
+  const questions = [KNOWLEDGE.qa[2], KNOWLEDGE.qa[0], KNOWLEDGE.qa[1]];
   banner.hidden = false;
-  const heading = tab === 'knowledge' ? '先用这三个问题把知识学成可用判断' : '先用这三个问题审查改进建议的可信度';
+  const heading = '先用这三个问题把知识学成可用判断';
   let html = `<h3>${heading}</h3><div class="qa-focus-grid">`;
   questions.forEach(item => { html += `<div class="qa-focus-item"><b>${item.q}</b><span>${item.a}</span></div>`; });
   banner.innerHTML = html + `</div>`;
@@ -972,24 +1003,41 @@ function knowledgeGlossary(){return `<section class="evidence-map"><div class="k
 function knowledgeApplicationTerms(){return `<section class="evidence"><b>应用层两个常被跳过的概念：</b><a href="#application-2">模型路由</a> 是按子任务、风险和门槛决定程序、小模型、大模型或人工确认分别放在哪里；<a href="#application-3">价值反馈闭环</a> 是将完成、放弃、人工接管、失败 Trace 与用户纠错转成优先级、改动假设和回归集。它们分别解释“怎么组合能力”和“为什么持续改进”。</section>`}
 function knowledgeUsageGuide(){return `<section class="workbench knowledge-guide"><h2>先判断知识是否仍然适用，再决定学什么、怎么用</h2><p>AI 的框架、模型和接口更新很快，但并非所有知识都会一起过时。这里不把新名词按热度排列：先分清它是稳定原则、正在演进的规范、特定场景的方法，还是必须由本地数据验证的假设。</p><div class="knowledge-guide-grid"><div><b>稳定原则</b><span>任务终态、权限、幂等、恢复、证据和评估不会因换一个框架而失效。所有人先掌握这一层。</span></div><div><b>活跃规范</b><span>MCP、A2A、模型 API 和 SDK 以原始规范、具体版本和核对日期为准；卡片中的“活跃规范”不是永久结论。</span></div><div><b>场景方法</b><span>ReAct、RAG、重排、多 Agent 等解释“在什么失效下可以尝试”，不等于默认应该上生产。</span></div><div><b>本地验证</b><span>真正采用前，用代表任务同时检查完成、安全、成本和延迟；外部论文或案例只能提供候选机制。</span></div></div><div class="evidence"><b>按角色进入：</b>初学者先读“应用设计与迭代”，理解任务、规则、工作流与 Agent 的边界；实现者再读推理、工具、状态和检索；负责上线的人重点看协作、工程与评估。每张卡都标注内容状态和最后核对日期；需要更新时先回到卡片中的原始来源。</div></section>`}
 function knowledgeUsageGuide(){return `<section class="workbench knowledge-guide"><h2>先判断知识是否仍然适用</h2><p>不要按新名词的热度学习。先辨别知识属于哪一类，再决定应该长期掌握、查原始规范，还是放进任务里验证。</p><div class="knowledge-guide-grid"><div><b>稳定原则</b><span><b>终态、权限、幂等、恢复、证据、评估</b>不随框架更换而失效。</span></div><div><b>活跃规范</b><span><b>MCP、A2A、模型 API、SDK</b>以原始来源、版本和日期为准。</span></div><div><b>场景方法</b><span><b>ReAct、RAG、重排、多 Agent</b>只说明何时可尝试，不是默认方案。</span></div><div><b>本地验证</b><span>采用前同时检查<b>完成、安全、成本、延迟</b>；论文和案例只是候选证据。</span></div></div></section>`}
-function renderKnowledge() {
-  let html = knowledgeUsageGuide() + knowledgeCompass() + learningWorkbench() + applicationCanvas() + systemMap() + knowledgeResearchPatterns() + knowledgeSources();
-  KNOWLEDGE.categories.forEach((cat, categoryIndex) => {
-    html += `<section class="section knowledge-domain"><div class="domain-heading"><span class="domain-number">${String(categoryIndex + 1).padStart(2, "0")}</span><div><h2 class="section-title">${cat.icon} ${cat.name}</h2><p class="section-desc">${cat.desc}</p></div></div><div class="knowledge-item-stack">`;
-    cat.items.forEach((item,i) => {
-      html += `<div class="kp" id="${cat.id}-${i}"><h4>${item.title}</h4>`;
-      if(item.tags) html += `<div class="tags">${item.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
-      html += knowledgeCardMeta(item, cat);
-      html += `<div class="body">${CARD_BODY_OVERRIDES[item.title] || item.body}</div>`;
-      const refs = item.refs && item.refs.length ? item.refs : CARD_EXTRA_REFS[item.title];
-      if(refs && refs.length) {
-        html += `<div class="refs">引用：${refs.map(r=>`<a href="${r.u}" target="_blank" rel="noopener">📄 ${r.t}</a>`).join('')}<span>内容最后核对：2026-07-27</span></div>`;
-      }
-      html += `</div>`;
-    });
-    html += `</div></section>`;
+function knowledgePageHeader(title, description, hint) {
+  return `<header class="eval-page-header knowledge-page-header"><span class="eyebrow">知识体系</span><h1>${title}</h1><p>${description}</p><span class="page-hint">${hint}</span></header>`;
+}
+
+function renderKnowledgeDomain(cat, categoryIndex) {
+  let html = `<section class="section knowledge-domain"><div class="domain-heading"><span class="domain-number">${String(categoryIndex + 1).padStart(2, "0")}</span><div><h2 class="section-title">${cat.icon} ${cat.name}</h2><p class="section-desc">${cat.desc}</p></div></div><div class="knowledge-item-stack">`;
+  cat.items.forEach((item,i) => {
+    html += `<div class="kp" id="${cat.id}-${i}"><h4>${item.title}</h4>`;
+    if(item.tags) html += `<div class="tags">${item.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
+    html += knowledgeCardMeta(item, cat);
+    html += `<div class="body">${CARD_BODY_OVERRIDES[item.title] || item.body}</div>`;
+    const refs = item.refs && item.refs.length ? item.refs : CARD_EXTRA_REFS[item.title];
+    if(refs && refs.length) html += `<div class="refs">引用：${refs.map(r=>`<a href="${r.u}" target="_blank" rel="noopener">📄 ${r.t}</a>`).join('')}<span>内容最后核对：2026-07-27</span></div>`;
+    html += `</div>`;
   });
-  return html;
+  return html + `</div></section>`;
+}
+
+function renderKnowledge() {
+  if(currentKnowledgeView === 'overview') {
+    return knowledgePageHeader('知识体系总览', '按稳定原则、活跃规范、场景方法和本地验证组织 Agent 知识。先确认任务与风险，再进入需要的能力域。', '先判断要解决的问题，再选择知识域') + knowledgeUsageGuide() + knowledgeCompass();
+  }
+  if(currentKnowledgeView === 'practice') {
+    return knowledgePageHeader('实践与诊断', '把知识转成任务契约、运行定位和可验证改进。这里回答一个系统为何失效，以及下一步该查哪一层。', '从交付目标到运行诊断') + learningWorkbench() + applicationCanvas() + systemMap();
+  }
+  if(currentKnowledgeView === 'sources') {
+    return knowledgePageHeader('研究与资料', '区分跨框架的稳定对象、活跃规范与外部参考。来源用于理解机制和边界，不替代本地任务验证。', '从可迁移原则到原始来源') + knowledgeResearchPatterns() + knowledgeSources();
+  }
+  const categoryIndex = KNOWLEDGE.categories.findIndex(cat => cat.id === currentKnowledgeView);
+  const category = KNOWLEDGE.categories[categoryIndex];
+  if(!category) {
+    currentKnowledgeView = 'overview';
+    return renderKnowledge();
+  }
+  return knowledgePageHeader(category.name, category.desc, '阅读当前知识域的概念、边界与工程取舍') + renderKnowledgeDomain(category, categoryIndex);
 }
 
 function evaluationEvidenceContract(){return `<section class="workbench evaluation-contract"><div class="kicker">真实 Agent 评估的输出契约</div><h2>没有阶段与事实，不能给改进建议</h2><p>评估不是根据框架名猜问题。先固定一个任务，再从运行记录找出具体异常；改动建议只能解释这条异常，不应替代事实。</p><div class="evaluation-scope"><div><b>只有代码和 README</b><span>可以说明职责、接口和潜在风险，结论标为<b>结构审查</b>。</span></div><div><b>任务 + Trace + 最终状态</b><span>可以说明<b>哪个阶段发生了什么</b>，并判断问题落在输入、工具、状态、证据还是验收。</span></div><div><b>固定基线 + 前后对照</b><span>才可以说明改动是否改善<b>完成、安全、成本或延迟</b>。</span></div></div><div class="evaluation-path"><b>任务与验收</b><i>→</i><b>运行阶段</b><i>→</i><b>原始现象</b><i>→</i><b>问题判断</b><i>→</i><b>改动与验证</b></div><div class="evaluation-output"><div><b>1. 发生阶段</b><span>例如：工具参数校验、检索召回、结果展示、验收或恢复。</span></div><div><b>2. 原始现象</b><span>引用 Trace、测试、外部终态或可复现样本；写出预期与实际差异。</span></div><div><b>3. 本次判断</b><span>说明为什么这条现象支持某个问题，也写清仍不知道什么。</span></div><div><b>4. 改动与验收</b><span>改哪个机制、预期影响什么、用哪组任务验证；同时写出停止或回滚条件。</span></div><div class="theory"><b>5. 理论依据与边界</b><span>关联本页知识点、原始论文或活跃规范，并写清它支持的机制、适用条件、反例和来源日期。研究只说明<b>为什么值得试</b>，本地对照才说明<b>是否有效</b>。</span></div></div><div class="evidence"><b>拒绝输出：</b>没有阶段和原始记录时，不写“模型推理差”“记忆无效”或“应加多 Agent”；没有基线和对照时，不写“该方案已提升效果”。没有机制依据与适用边界时，也不把“最新研究”包装成默认方案。这三类内容只能列为待核实假设。</div></section>`}
@@ -1002,43 +1050,131 @@ function evaluationPlaybook(){return `<section class="evaluation-playbook"><div 
 function recommendationJudgement(){return `<section class="workbench recommendation-discipline"><div class="kicker">改进建议的判断纪律</div><h2>每条建议都要说明：我凭什么这样判断，什么会推翻它</h2><p><b>置信度不是模型自评，也不是一个装饰分数。</b>它表示当前论证链是否完整：是否有目标任务中的事实，是否能解释作用机制，是否排查了更简单的解释，以及是否定义了会改变结论的证据。</p><div class="confidence-grid"><div><b>高置信：可进入最小验证</b>当前任务有直接现象，机制与来源相符，替代解释已检查，并写明验收和回滚。仍不等于已经有效。</div><div><b>中置信：值得补证据</b>有部分现象或外部同机制证据，但关键 Trace、反例或任务吻合度还不足。先补样本或做小对照。</div><div><b>低置信：只作待核实假设</b>只有代码印象、二手案例或方法名；不能排进改动计划，更不能描述为问题根因。</div></div><div class="reflection-list"><b>每条建议必须留下的真实反思</b><ol><li><b>竞争解释：</b>除当前判断外，还可能是什么造成了这个现象？为什么暂时不优先它？</li><li><b>证据缺口：</b>哪些 Trace、测试、外部状态或版本信息仍然缺失？缺失会怎样限制结论？</li><li><b>推翻条件：</b>出现什么结果后，这条建议要降级、停止或换成其他方案？</li><li><b>置信度理由：</b>高、中、低分别由哪些已知事实、机制吻合和未解决不确定性决定，不能只写标签。</li></ol></div><div class="evidence"><b>输出规则：</b>“建议加 RAG / 反思 / 多 Agent”而没有上述四项，只能称为灵感；只有写出反思、置信度理由和可推翻条件，才是一条可审查的改进建议。</div></section>`}
 
 function evaluationEvidenceContractV2(){return `<section class="workbench evaluation-contract"><div class="kicker">评估先回答的范围</div><h2>这份评估能说什么，不能说什么？</h2><p>评估先区分三件事：历史版本出现过的现象、当前版本仍可复现的故障、尚待验证的改进假设。三者不能混写。</p><div class="evaluation-scope"><div><b>只有代码和 README</b><span>只能说明职责、接口和潜在风险，结论标为<b>结构审查</b>；不能声称运行时根因。</span></div><div><b>任务 + Trace + 最终状态</b><span>可以说明<b>当时哪个阶段发生了什么</b>，并定位到输入、决策、工具、状态、展示、验收或恢复。</span></div><div><b>当前版本可复现</b><span>才能列为<b>当前故障</b>；历史样本在后续代码、配置或协议改变后，只能作为回归线索。</span></div><div><b>固定基线 + 前后对照</b><span>才可以说明改动是否改善<b>完成、安全、成本或延迟</b>；没有对照只能说“值得验证”。</span></div></div><div class="evaluation-path"><b>任务与验收</b><i>→</i><b>运行阶段</b><i>→</i><b>原始现象</b><i>→</i><b>时间与影响范围</b><i>→</i><b>问题判断</b><i>→</i><b>改动与验证</b></div><div class="evaluation-output"><div><b>1. 发生阶段</b><span>用业务阶段命名，例如“生成候选”“工具执行”“结果展示”“验收”“回退”。框架内部节点名只能作为补充，不能替代解释。</span></div><div><b>2. 原始证据</b><span>引用 Trace、测试、外部终态或可复现样本，写清预期、实际、时间、版本和完整上下文。不能只摘一行报错。</span></div><div><b>3. 时间与影响范围</b><span>标为<b>当前故障 / 已修复历史问题 / 未验证假设</b>；再说明它影响任务结果、可读性、观测、成本还是实验解释，避免把后置展示错误写成前置执行失败。</span></div><div><b>4. 本次判断与竞争解释</b><span>说明证据支持什么，不支持什么；列出至少一个更简单或并列的解释，并写明如何区分。</span></div><div><b>5. 改动、验证与停止</b><span>改哪个机制、预期影响什么、用哪组任务验证；同时写出回归、降级或停止条件。未确认当前故障时，动作只能是“补证据/做回归”。</span></div><div class="theory"><b>6. 理论依据与边界</b><span>关联本页知识点、原始论文或活跃规范，并写清它支持的机制、适用条件、反例和来源日期。研究只说明<b>为什么值得试</b>，本地对照才说明<b>是否有效</b>。</span></div></div><div class="evidence"><b>拒绝输出：</b>历史日志不能直接写成当前待修问题；单个后置节点异常不能自动解释前置节点失败；没有基线和对照时，不写“该方案已提升效果”。这些内容必须标为历史线索或待核实假设。</div></section>`}
+function agentParsingCapability(){return `<section class="workbench agent-parser" id="agent-parser"><div class="kicker">评估框架的子能力 01 · 先解析，再评估</div><h2>陌生 Agent 解析：把一个仓库还原成可解释的系统</h2><p>这不是评估前的“资料整理”，也不要求先有问题。它负责把 README、代码、配置、测试、运行轨迹与 Git 演进连接起来，回答系统在做什么、如何运行、哪些职责由后端承担、哪些选择交给 Agent，以及现有设计的优势、边界和未知项。只有这一步完成，后面的质量、安全、成本和改进建议才有对象可评。</p><div class="parser-role-grid"><section><b>它负责产出什么</b><p>任务边界、仓库地图、组件职责、数据/控制流、Agent 运行时流程、证据状态和初步优缺点。</p><small>目标：理解，而非打分</small></section><section><b>它不负责断言什么</b><p>没有任务轨迹、外部终态和可复现结果时，不宣称真实失败率、根因、性能或改动收益。</p><small>结论：结构审查，不是运行时评估</small></section><section><b>它怎样服务后续评估</b><p>将每个评估维度挂到具体模块和证据缺口，避免泛泛地说“推理差”“应上 RAG”或“多 Agent 更好”。</p><small>结果：可追溯的评估入口</small></section></div><div class="parser-boundary"><b>适用场景：</b>用户要评估一个 Agent、要了解一个陌生 Agent、要接手仓库、要画流程图、要做代码审查，均先走解析。评估只是它的一个下游动作；即使用户只想理解架构，也应完整交付下面的系统视图。</div><div class="parser-flow" id="agent-parser-flow"><div><b>01 建立事实基线</b><span>读取 README、入口、依赖、配置、目录与提交；冻结版本和材料范围。</span><small>输出：材料清单与可信度</small></div><div><b>02 画仓库地图</b><span>从入口反向追踪模块、协议、接口、测试、部署和外部依赖。</span><small>输出：组件与职责表</small></div><div><b>03 分开后端与 Agent</b><span>识别程序控制的授权、状态、执行、存储、恢复，与模型负责的理解、规划、选择、生成。</span><small>输出：职责边界图</small></div><div><b>04 还原运行时</b><span>沿一次任务走输入、上下文、决策、工具、外部状态、终态、日志与恢复。</span><small>输出：主流程和异常流程图</small></div><div><b>05 逐层审查</b><span>从任务、控制流、状态/数据、工具权限、可靠性、观测、测试与演进逐层找事实和缺口。</span><small>输出：优势、风险、未知项</small></div><div><b>06 接入评估</b><span>将发现映射到任务契约、运行证据、七项维度和最小验证，必要时才提出改动。</span><small>输出：评估范围与优先级</small></div></div><div class="parser-lens-grid" id="agent-parser-lenses"><section><b>任务与产品面</b><p>用户是谁、要完成什么、何时完成/拒绝/转人工、非目标和失败代价。</p><small>防止从框架名猜价值</small></section><section><b>Agent 控制面</b><p>规划/路由、上下文选择、循环、停止、模型调用、工具选择和多 Agent 交接。</p><small>区分模型建议与系统决定</small></section><section><b>后端与状态面</b><p>API/worker、队列、数据库、缓存、检索、会话、记忆、checkpoint、并发和外部系统。</p><small>回答状态归谁、如何恢复</small></section><section><b>安全与运行面</b><p>授权、参数校验、敏感数据、审计、超时、重试、幂等、降级、Trace、测试和发布。</p><small>回答能否安全长期运行</small></section></div><div class="parser-output-grid" id="agent-parser-output"><section><b>01 项目画像</b><p>任务、用户、终态、差异化机制、版本与材料覆盖。</p></section><section><b>02 代码结构图</b><p>入口、模块、接口、依赖方向和关键文件定位。</p></section><section><b>03 运行时流程图</b><p>主路径、异常/恢复路径、状态与外部后果。</p></section><section><b>04 结构分析报告</b><p>已证实的优势、设计风险、未知项及其证据等级。</p></section><section><b>05 评估连接表</b><p>哪些任务、Trace、测试和指标能验证每条判断。</p></section></div><div class="parser-artifact"><h3>每个结论的最小表达格式</h3><ul><li><b>它是什么：</b>用业务语言说模块/流程对用户或系统的作用。</li><li><b>代码依据：</b>文件、类/函数、配置或测试；文档与代码不一致时明确标出。</li><li><b>运行时位置：</b>它接收什么、输出什么、读写什么状态、失败后由谁接管。</li><li><b>判断边界：</b>已由代码证实的结构事实、由测试证实的行为事实、以及仍需 Trace 验证的假设必须分开。</li></ul></div><div class="evidence"><b>页面职责：</b>这里提供解析顺序、观察维度和标准交付物；面对具体仓库时，必须实际阅读代码与测试、画出该项目自己的流程图，并把每个判断定位到证据。没有输入仓库时，本页只解释方法，不虚构项目结论。</div></section>`}
 function evidenceRecordTemplate(){return `<section class="workbench evidence-record-template"><div class="kicker">每条结论的完整证据块</div><h2>何时、何处、发生了什么，为什么会得出这个判断</h2><p>日志关键词、提交标题或论文链接都不能单独构成证据。可审查的结论要让读者复查阶段、顺序、版本和影响范围。</p><div class="evidence-record-grid"><section><b>先标注结论状态</b><dl><dt>当前故障</dt><dd>当前版本、同类任务仍可复现；可进入修复优先级。</dd><dt>已修复历史问题</dt><dd>历史证据真实，但有修复与当前回归；保留为演进记录或回归用例。</dd><dt>未验证假设</dt><dd>有线索或外部机制，尚无当前项目充分证据；只能安排最小验证。</dd></dl></section><section><b>证据必须覆盖的链条</b><div class="evidence-chain"><span>任务与验收</span><i>→</i><span>阶段与顺序</span><i>→</i><span>原始片段</span><i>→</i><span>版本与时间线</span><i>→</i><span>影响范围</span></div><p>缺任一项，结论降级；不跳到“根因”或“大改架构”。</p></section></div><h3>标准证据块</h3><pre class="output-schema">OBS-01  &lt;读者能懂的现象标题&gt;\n结论状态：当前故障 / 已修复历史问题 / 未验证假设\n任务与验收：&lt;任务、成功终态、预期行为&gt;\n发生阶段：&lt;业务阶段&gt;（内部节点：&lt;可选节点名&gt;）\n时间与版本：&lt;运行时间、提交/镜像/配置/协议版本&gt;\n原始证据：\n  &lt;Trace 或测试的连续片段，保留前后关键事件和最终状态&gt;\n  &lt;代码或配置的精确位置、提交及修复说明&gt;\n事实：&lt;这段证据直接证明的内容&gt;\n影响范围：&lt;任务终态 / 安全 / 展示可读性 / 观测 / 成本 / 实验解释&gt;\n不能推出：&lt;证据不能证明的因果或效果&gt;\n竞争解释：&lt;另一种可能原因 + 如何区分&gt;\n下一步：&lt;当前回归、补充样本或最小对照&gt;\n停止条件：&lt;什么结果出现后不再推进这条建议&gt;</pre><div class="evidence"><b>强制约束：</b>引用代码要给文件、函数/节点和提交或版本；引用运行要给连续事件、最终状态和时间。只给“某处报错”“某提交修过”“某论文有效”的建议一律退回补证据。</div></section>`}
 function evaluationStageMap(){return `<section class="workbench evaluation-stage-map"><div class="kicker">通用运行阶段图</div><h2>先把现象挂到阶段，再判断影响范围</h2><p>这里不是要求所有 Agent 都有同样的实现节点，而是提供跨框架都能映射的业务阶段。任何系统的内部节点都必须先解释它位于哪一段、输入输出是什么、是否影响终态。</p><div class="stage-map-grid"><section><b>01 输入与约束</b><span>任务、授权、数据、版本、验收规则。</span><small>典型问题：目标歧义、越权、测试夹具不一致。</small></section><section><b>02 决策与状态</b><span>规划、路由、上下文、预算、停止条件。</span><small>典型问题：目标漂移、循环、状态丢失。</small></section><section><b>03 候选与工具</b><span>生成动作、参数校验、调用外部系统。</span><small>典型问题：候选为空、参数错误、超时。</small></section><section><b>04 外部后果与验收</b><span>状态变化、验证、评分、接受、回退。</span><small>典型问题：假成功、重复副作用、恢复失败。</small></section><section><b>05 展示与观测</b><span>结果呈现、日志、Trace、指标、审计投影。</span><small>典型问题：读不到结果、记录不完整、指标误读。</small></section><section><b>06 异步学习与演进</b><span>复盘、经验、离线分析、版本发布。</span><small>典型问题：经验污染、错误归因、未做对照。</small></section></div><div class="evidence"><b>映射规则：</b>组合执行、批处理或并行节点都不是通用阶段名。先问它实际完成了哪些动作：若它把外部状态变更、验证或评分合在一起，就属于第 04 段；若它只整理展示内容，就属于第 05 段。记忆在被读取时通常映射到第 02 段，在写入与复盘时映射到第 06 段。名称相同不代表作用相同，必须以实际输入、输出和事件顺序为准。</div></section>`}
 function recommendationJudgementV2(){return `<section class="workbench recommendation-discipline"><div class="kicker">改进建议的判断纪律</div><h2>建议必须先说清：它针对当前故障，还是历史线索</h2><p><b>置信度不是模型自评，也不是装饰分数。</b>它表示论证链是否完整：当前证据是否仍适用，阶段与影响范围是否对应，竞争解释是否被检查，是否定义了会改变结论的结果。</p><div class="confidence-grid"><div><b>高：当前故障，可进入最小修复</b>当前版本可复现；阶段、影响和机制相符；替代解释、回归与停止条件齐全。仍不等于改动已经有效。</div><div><b>中：历史线索，先做当前回归</b>历史 Trace 或代码支持现象，但版本、配置、协议或任务已变化；先验证是否仍存在，不能直接排为 P0。</div><div><b>低：未验证假设，只能补证据</b>只有代码印象、二手案例或方法名；不能写成根因，也不能要求加 RAG、反思或多 Agent。</div></div><div class="reflection-list"><b>每条建议必须留下的真实反思</b><ol><li><b>时间线：</b>证据何时产生？之后哪些提交、配置、协议或依赖已变化？它描述当前还是过去？</li><li><b>影响范围：</b>它影响任务终态、安全、展示可读性、观测、成本还是实验解释？不能把后置异常反推为前置根因。</li><li><b>竞争解释：</b>还可能是什么造成现象？用哪条 Trace、测试或外部状态区分？</li><li><b>推翻条件：</b>出现什么当前回归或对照结果后，建议应降级、停止或换方向？</li><li><b>置信度理由：</b>高、中、低分别由哪些事实、机制吻合和未解决不确定性决定，不能只写标签。</li></ol></div><div class="evidence"><b>输出规则：</b>历史错误可以成为回归用例，不能自动成为当前架构改造；外部研究可以成为机制候选，不能自动成为项目方案。缺少上述反思的内容，只能称为待核实想法。</div></section>`}
 
-function renderEval() {
-  const references=evaluationReferences().replace('<section class="evidence-map">','<section class="evidence-map reference-projects">').replace('当前参考项目 · 2026-07-26 核对','参考项目 · 2026-07-26 核对').replace('参考项目分别解决哪一环？','参考项目').replace('它们不是同一种“建议生成器”：本页把任务标准、过程证据、失败定位和稳定性验证作为输入，结合具体 Agent 的设计，给出改进点、可改动作、作用机制、边界与置信度。','按实际作用分为任务标准、过程证据、失败定位与稳定性验证；它们为当前 Agent 的现状分析和定向改进提供机制参考，不替代项目自身证据。');
-  let html = evaluationEvidenceContractV2() + evaluationStageMap() + evidenceRecordTemplate() + recommendationJudgementV2() + evaluationReadingGuide() + targetAgentProfile() + evaluationReport() + evaluationPlaybook() + references + evalWorkbench() + comparisonBoardV2() + evaluationContractMap() + toolEvaluationLayers() + evidenceLadder() + evidenceClaimsV2() + evaluationSources();
-  html += `<section class="eval-dimensions" aria-label="七项核心评估维度">`;
-  AGENT_EVALUATION_DIMS.forEach(dim => {
+function renderEvalDimensions(dimensions = AGENT_EVALUATION_DIMS) {
+  let html = `<section class="eval-dimensions" aria-label="七项核心评估维度">`;
+  dimensions.forEach(dim => {
     html += `<article class="eval-dim" id="eval-${dim.num}"><h4><span class="num">${dim.num}.</span><span>${dim.title}</span></h4>`;
     html += `<div class="why">为什么评估这个：${dim.why}</div>`;
     html += `<div class="check-list">${dim.checks}</div>`;
-    if(dim.good && dim.bad) {
-      html += `<div class="good-bad"><div class="good">${dim.good}</div><div class="bad">${dim.bad}</div></div>`;
-    }
+    if(dim.good && dim.bad) html += `<div class="good-bad"><div class="good">${dim.good}</div><div class="bad">${dim.bad}</div></div>`;
     if(dim.improve) html += `<div class="improve">💡 ${dim.improve}</div>`;
     if(dim.link) html += `<div class="link">${dim.link}</div>`;
-    html += `<div class="evidence"><b>需要收集的证据：</b>${EVIDENCE[dim.num]}</div>`;
-    html += `</article>`;
+    html += `<div class="evidence"><b>需要收集的证据：</b>${EVIDENCE[dim.num]}</div></article>`;
   });
-  html += `</section>`;
-  return html;
+  return html + `</section>`;
+}
+
+function evaluationPageHeader(title, description, hint) {
+  return `<header class="eval-page-header"><span class="eyebrow">评估框架</span><h1>${title}</h1><p>${description}</p><span class="page-hint">${hint}</span></header>`;
+}
+
+function renderEval() {
+  const references = evaluationReferences().replace('<section class="evidence-map">', '<section class="evidence-map reference-projects">').replace('参考项目分别解决哪一环？', '参考项目');
+  const views = {
+    parse: [
+      'Agent 解析',
+      '先把陌生 Agent 还原成可解释的系统。这里适用于正式评估前的准备，也适用于只想了解仓库、画流程图、识别后端职责与 Agent 控制边界的场景。',
+      '从仓库事实到系统视图',
+      agentParsingCapability() + evaluationReadingGuide(),
+    ],
+    scope: [
+      '评估范围',
+      '明确这次评估能说明什么、不能说明什么，并把所有运行现象映射到输入、决策、工具、外部后果、观测和演进等阶段。',
+      '从证据边界到运行阶段',
+      evaluationEvidenceContractV2() + evaluationStageMap(),
+    ],
+    profile: [
+      '项目画像与现状',
+      '识别目标用户、核心任务、差异化价值和当前设计，再把优势、风险与未知项分开呈现。没有运行证据时，结论保持为结构审查。',
+      '回答：它现在是什么、为何这样设计',
+      targetAgentProfile() + evaluationReport(),
+    ],
+    evidence: [
+      '证据与判断',
+      '把代码、测试、轨迹、外部终态和版本时间线组织成可复查证据，并限制建议只能覆盖已经明确的事实或待验证假设。',
+      '回答：这条判断凭什么成立',
+      evidenceRecordTemplate() + recommendationJudgementV2(),
+    ],
+    playbook: [
+      '执行规范',
+      '定义一次完整评估需要的输入、分析顺序、图表和标准交付物，使现状报告、改进计划与后续验证能一一对应。',
+      '回答：一次评估如何从材料走到决策',
+      evaluationPlaybook() + evalWorkbench(),
+    ],
+    quality: [
+      '质量与控制',
+      '从任务完成、工具执行、知识与上下文三个维度检查 Agent 是否在正确地完成目标。这里优先看行为、约束和外部结果，而不是模型是否“看起来聪明”。',
+      '回答：任务过程是否正确、受控',
+      evaluationContractMap() + toolEvaluationLayers() + renderEvalDimensions(AGENT_EVALUATION_DIMS.slice(0, 3)),
+    ],
+    operations: [
+      '安全与运营',
+      '从权限与可信边界、恢复能力、成本与可观测性检查系统能否在真实环境中长期运行。这里的结论必须落到服务端控制和可回放证据。',
+      '回答：是否安全、可恢复、可运营',
+      renderEvalDimensions(AGENT_EVALUATION_DIMS.slice(3)),
+    ],
+    recommendations: [
+      '建议依据',
+      '外部研究只能说明某种机制在相近条件下值得尝试。这里把失败模式、机制、反例和本地验证要求连接起来，避免把方法名当成方案。',
+      '回答：为什么这条建议值得进入验证',
+      evalWorkbench() + comparisonBoardV2() + evidenceLadder() + evidenceClaimsV2(),
+    ],
+    references: [
+      '参考项目',
+      '参考项目和评估工具分别覆盖任务标准、过程证据、失败定位和稳定性验证。它们帮助选择方法，但不替代当前系统的任务与运行证据。',
+      '回答：可借鉴什么，不能借鉴什么',
+      references + evaluationSources(),
+    ],
+  };
+  const [title, description, hint, content] = views[currentEvalView] || views.parse;
+  return evaluationPageHeader(title, description, hint) + content;
+}
+
+function switchKnowledgeView(view) {
+  const overviewViews = ['overview', 'practice', 'sources'];
+  currentKnowledgeView = overviewViews.includes(view) || KNOWLEDGE.categories.some(category => category.id === view) ? view : 'overview';
+  switchTab('knowledge');
+}
+
+function switchKnowledgeItem(categoryId, itemIndex) {
+  currentKnowledgeView = categoryId;
+  switchTab('knowledge');
+  requestAnimationFrame(() => {
+    const item = document.getElementById(`${categoryId}-${itemIndex}`);
+    if(item) item.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+}
+
+function switchEvalView(view) {
+  currentEvalView = ['parse', 'scope', 'profile', 'evidence', 'playbook', 'quality', 'operations', 'recommendations', 'references'].includes(view) ? view : 'parse';
+  switchTab('eval');
+}
+
+function updateRoute() {
+  const url = new URL(window.location.href);
+  url.searchParams.set('tab', currentTab);
+  url.searchParams.set('view', currentTab === 'eval' ? currentEvalView : currentKnowledgeView);
+  window.history.replaceState({}, '', url);
 }
 
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));
   document.querySelector(`.top-tab[data-tab="${tab}"]`).classList.add('active');
-  
   document.querySelector('.sidebar').style.display = 'block';
   renderQA(tab);
   const content = document.getElementById('content');
   content.className = `content ${tab}-view`;
-  if(tab==='knowledge') content.innerHTML = renderKnowledge();
-  else content.innerHTML = renderEval();
+  content.innerHTML = tab === 'knowledge' ? renderKnowledge() : renderEval();
   buildNav(tab);
   setMobileNav(false);
+  updateRoute();
+  window.scrollTo({top:0, behavior:'auto'});
 }
 
 // Init
@@ -1048,8 +1184,16 @@ document.getElementById('navToggle').addEventListener('click', () => {
   const sidebar = document.querySelector('.sidebar');
   setMobileNav(!sidebar.classList.contains('mobile-open'));
 });
-buildNav();
-const requestedTab = new URLSearchParams(window.location.search).get('tab');
+const requestedParams = new URLSearchParams(window.location.search);
+const requestedTab = requestedParams.get('tab');
+const requestedView = requestedParams.get('view');
+  if(requestedTab === 'knowledge' && (['overview', 'practice', 'sources'].includes(requestedView) || KNOWLEDGE.categories.some(category => category.id === requestedView))) currentKnowledgeView = requestedView;
+if(requestedTab === 'eval') {
+  if(requestedView === 'overview') currentEvalView = 'parse';
+  else if(requestedView === 'dimensions') currentEvalView = 'quality';
+  else if(requestedView === 'research') currentEvalView = 'recommendations';
+  else if(['parse', 'scope', 'profile', 'evidence', 'playbook', 'quality', 'operations', 'recommendations', 'references'].includes(requestedView)) currentEvalView = requestedView;
+}
 switchTab(['knowledge','eval'].includes(requestedTab) ? requestedTab : 'knowledge');
 </script>
 </body>
