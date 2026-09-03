@@ -10,7 +10,6 @@ import http.server
 import json
 import os
 import signal
-import socket
 import socketserver
 import subprocess
 import sys
@@ -19,24 +18,11 @@ import webbrowser
 from pathlib import Path
 
 PORT = 8080
+PUBLIC_HOST = os.getenv("TECHNICAL_KNOWLEDGE_PUBLIC_HOST", "localhost")
 DIRECTORY = Path(__file__).parent.resolve()
 ENTRY = "index.html"
 PID_FILE = DIRECTORY / ".technical-knowledge.pid"
 LOG_FILE = DIRECTORY / ".technical-knowledge.log"
-
-
-def get_lan_ip():
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    try:
-        sock.connect(("8.8.8.8", 80))
-        return sock.getsockname()[0]
-    except OSError:
-        try:
-            return socket.gethostbyname(socket.gethostname())
-        except OSError:
-            return "127.0.0.1"
-    finally:
-        sock.close()
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -138,17 +124,15 @@ def start_daemon(args):
         )
     PID_FILE.write_text(str(process.pid), encoding="utf-8")
     print(f"守护进程已启动 (PID {process.pid})。")
-    print(f"局域网地址: http://{get_lan_ip()}:{args.port}/{ENTRY}")
+    print(f"访问地址: http://{PUBLIC_HOST}:{args.port}/{ENTRY}")
     print(f"日志: {LOG_FILE}")
 
 
 def serve(args):
     os.chdir(DIRECTORY)
-    lan_ip = get_lan_ip()
-    url = f"http://{lan_ip}:{args.port}/{ENTRY}"
+    url = f"http://{PUBLIC_HOST}:{args.port}/{ENTRY}"
     with ThreadingServer((args.host, args.port), Handler) as server:
         print(f"服务已启动: {url}", flush=True)
-        print(f"本机备用地址: http://127.0.0.1:{args.port}/{ENTRY}", flush=True)
         if not args.no_browser:
             webbrowser.open(url)
         try:
