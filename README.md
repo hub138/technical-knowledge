@@ -37,12 +37,12 @@ cd technical-knowledge
 python3 app.py
 ```
 
-打开终端输出的地址，或访问 `http://127.0.0.1:8080/index.html`。远程机器需要确保 `8080/tcp` 可访问。
+访问 `http://localhost:8080/index.html`。远程机器需要确保 `8080/tcp` 可访问；如需变更对外地址，可设置 `TECHNICAL_KNOWLEDGE_PUBLIC_HOST`。
 
 ## 参考依据
 
 - [MCP 2025-11 Specification](https://modelcontextprotocol.io/specification/2025-11-25/basic/transports)
-- [A2A 1.0 Specification](https://github.com/a2aproject/A2A/blob/main/docs/specification.md)
+- [A2A Protocol Specification (latest)](https://a2a-protocol.org/latest/specification/)
 - [AgentRx: trajectory-based failure diagnosis](https://github.com/microsoft/AgentRx)
 - [AdaRubric: task-adaptive trajectory evaluation](https://github.com/alphadl/AdaRubrics)
 - [Agent-as-a-Judge](https://github.com/metauto-ai/agent-as-a-judge)
