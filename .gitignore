@@ -3,3 +3,6 @@ local-notes.md
 .technical-knowledge.pid
 __pycache__/
 *.py[cod]
+.pytest_cache/
+*.tar.gz
+.gstack/
