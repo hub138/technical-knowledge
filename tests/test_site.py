@@ -5,6 +5,8 @@ import importlib.util
 import json
 import threading
 import unittest
+import re
+from collections import Counter
 from pathlib import Path
 from urllib.parse import quote
 
@@ -375,6 +377,41 @@ class KnowledgeGraphTests(unittest.TestCase):
                 if not self.vault.resolve_note(target, relative):
                     unresolved.append(f"{relative} -> {target}")
         self.assertEqual(unresolved, [])
+
+    def test_no_note_repeats_a_heading_or_lead(self) -> None:
+        """Editing a page by adding a section has twice left the old section in
+        place, producing a page that repeats itself. The shape test only checks
+        that the required headings exist, so it passes while the prose is
+        duplicated. This catches the duplication directly."""
+        for relative, note in self.vault.notes.items():
+            body = str(note["body"])
+            # Subsections legitimately reuse names under different parents
+            # ("三种解法" appears once per failure mode), so only compare
+            # headings against siblings at the same level.
+            repeated: list[str] = []
+            current_parent: tuple[int, str] | None = None
+            seen: set[str] = set()
+            for level, heading in re.findall(r"^(#{2,3}) (.+)$", body, re.M):
+                depth = len(level)
+                if depth == 2:
+                    current_parent, seen = heading, set()
+                elif current_parent is not None:
+                    if heading in seen:
+                        repeated.append(f"{current_parent} > {heading}")
+                    seen.add(heading)
+            self.assertEqual(
+                repeated, [], f"{relative} repeats headings: {repeated}"
+            )
+            # The lead paragraph should not also appear under a heading.
+            lead = next(
+                (p.strip() for p in re.split(r"\n\n", body) if p.strip()), ""
+            )
+            if len(lead) > 80:
+                self.assertEqual(
+                    body.count(lead[:80]),
+                    1,
+                    f"{relative} repeats its opening paragraph",
+                )
 
     def test_skill_tracks_follow_the_shared_page_shape(self) -> None:
         """Mastery pages state the problem, the solution, the cost, and how to
