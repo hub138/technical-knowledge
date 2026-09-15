@@ -16,6 +16,13 @@
       title: "把主题练成能力",
       description: "用课堂、追问、练习和迁移检验是否真的会用。",
     },
+    classrooms: {
+      label: "我的课堂",
+      href: "/learn/history",
+      icon: "☰",
+      title: "回到生成过的课堂",
+      description: "列出本机生成过的互动课堂，点开即学。",
+    },
     projects: {
       label: "项目与工具",
       href: "/projects",
@@ -35,6 +42,7 @@
   const nav = [
     pages.knowledge,
     pages.learning,
+    pages.classrooms,
     pages.projects,
     pages.evaluation,
   ];

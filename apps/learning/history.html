@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>我的课堂 · technical-knowledge</title>
     <link rel="stylesheet" href="/static/workbench.css" />
-    <script src="/static/workbench.js" data-page="learning" defer></script>
+    <script src="/static/workbench.js" data-page="classrooms" defer></script>
     <style>
       :root {
         --bg: #f5f7f6;
@@ -219,22 +219,48 @@
       .job {
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
-        gap: 12px;
+        gap: 16px;
         align-items: center;
-        padding: 12px 13px;
+        padding: 17px 19px;
         border: 1px solid var(--line);
+        border-radius: 6px;
         background: #fff;
+        transition:
+          border-color 0.14s ease,
+          box-shadow 0.14s ease;
+      }
+      .job:hover {
+        border-color: #b7d9cf;
+        box-shadow: 0 4px 14px #23302b10;
+      }
+      .job-clickable {
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+      }
+      .job-clickable:hover {
+        text-decoration: none;
+      }
+      .job-clickable .job-title {
+        color: var(--accent);
       }
       .job-title {
         margin: 0;
-        font-size: 13px;
-        font-weight: 760;
+        font-size: 16px;
+        font-weight: 700;
+        line-height: 1.4;
+        color: var(--ink);
       }
       .job-meta {
-        margin: 3px 0 0;
+        margin: 5px 0 0;
         color: var(--muted);
-        font-size: 11px;
-        line-height: 1.55;
+        font-size: 12.5px;
+        line-height: 1.6;
+      }
+      .job-meta .job-id {
+        color: #4d5a55;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 12px;
       }
       .job-state {
         display: inline-flex;
@@ -264,11 +290,13 @@
         background: var(--blue-soft);
         color: var(--blue);
       }
-      .job-link {
+      .job-link,
+      .job-cta {
         display: inline-block;
-        margin-top: 4px;
-        font-size: 11px;
+        margin-top: 6px;
+        font-size: 12px;
         font-weight: 750;
+        color: var(--accent);
       }
       .job-empty {
         padding: 13px;
@@ -442,13 +470,16 @@
             const detail = job.status === "failed"
               ? `生成未完成 · ${esc(job.error || "未记录具体原因")}`
               : job.classroomId
-                ? `${esc(meta)} · 任务 ${esc(job.id)}`
-                : esc(meta || `任务 ${esc(job.id)}`);
-            const link = job.classroomId
-              ? `<a class="job-link" href="/launch/openmaic?next=${encodeURIComponent(`/classroom/${job.classroomId}`)}" target="_blank" rel="noopener noreferrer">打开课堂 ↗</a>`
-              : "";
+                ? `${esc(meta)} · 任务 <span class="job-id">${esc(job.id)}</span>`
+                : esc(meta || `任务 ${job.id}`);
             const stateClass = job.status === "succeeded" ? "ok" : job.status === "failed" ? "fail" : "running";
-            return `<article class="job"><div><p class="job-title">${esc(title)}</p><p class="job-meta">${detail}</p>${link}</div><span class="job-state ${stateClass}">${statusText(job)}</span></article>`;
+            // A nested <a> inside the card link is invalid HTML and makes the
+            // browser drop the card's children, so the hint is plain text and
+            // the whole card carries the navigation.
+            const inner = `<div><p class="job-title">${esc(title)}</p><p class="job-meta">${detail}</p>${job.classroomId ? '<span class="job-cta">打开课堂 ↗</span>' : ""}</div><span class="job-state ${stateClass}">${statusText(job)}</span>`;
+            return job.classroomId
+              ? `<a class="job job-clickable" href="/launch/openmaic?next=${encodeURIComponent(`/classroom/${job.classroomId}`)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+              : `<article class="job">${inner}</article>`;
           }).join("");
         };
         const load = async () => {

@@ -507,9 +507,13 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("生成未完成", self.history)
         self.assertIn("job.title", self.history)
         self.assertNotIn("已保存的课堂", self.history)
-        for page in (self.intuition, self.transfer, self.history):
+        for page in (self.intuition, self.transfer):
             self.assertIn('/static/workbench.css', page)
             self.assertIn('data-page="learning"', page)
+        # The classroom page is its own sidebar destination, so it highlights
+        # 我的课堂 rather than 学习中心.
+        self.assertIn('/static/workbench.css', self.history)
+        self.assertIn('data-page="classrooms"', self.history)
         self.assertIn("形成直觉", self.intuition)
         self.assertIn("迁移验证", self.transfer)
 
@@ -544,10 +548,27 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("dataset.page", shared_script)
         self.assertIn('target="_blank" rel="noopener noreferrer"', shared_script)
         self.assertIn("item !== current && item !== pages.knowledge", shared_script)
-        for page, name in ((self.learning, "learning"), (self.projects, "projects"), (self.evaluation, "evaluation"), (self.intuition, "learning"), (self.transfer, "learning"), (self.history, "learning")):
+        for page, name in ((self.learning, "learning"), (self.projects, "projects"), (self.evaluation, "evaluation"), (self.intuition, "learning"), (self.transfer, "learning"), (self.history, "classrooms")):
             self.assertIn('/static/workbench.css', page)
             self.assertIn(f'data-page="{name}"', page)
             self.assertIn('class="purpose"', page)
+
+    def test_my_classrooms_is_reachable_from_the_sidebar(self) -> None:
+        """Returning to a generated classroom must not require knowing its URL.
+
+        It used to be reachable only through a small link in the learning
+        centre's body copy, so it could not be found at all. It is now a nav
+        entry rendered on every companion page.
+        """
+        shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
+        self.assertIn("我的课堂", shared_script)
+        self.assertIn("/learn/history", shared_script)
+        # It must be listed in the rendered nav array, not merely defined.
+        nav_block = shared_script.split("const nav = [", 1)[1].split("]", 1)[0]
+        self.assertIn("pages.classrooms", nav_block)
+        # ...and every sidebar page can therefore offer it.
+        for page in (self.learning, self.projects, self.evaluation, self.history):
+            self.assertIn('data-page=', page)
 
     def test_legacy_workbench_route_is_not_used_by_launch_contract(self) -> None:
         self.assertNotIn("/workbench/new", self.learning)
