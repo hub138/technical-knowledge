@@ -10,6 +10,20 @@
   --wb-shadow: 0 10px 28px rgba(20, 42, 35, .07);
 }
 
+/* Dark theme. Applied by workbench.js from the saved preference, or from the
+   OS setting when the visitor has never chosen. Kept as a variable swap so
+   every page that loads this stylesheet follows along. */
+:root[data-theme="dark"] {
+  --wb-bg: #131a18;
+  --wb-paper: #1a2320;
+  --wb-ink: #e6ede9;
+  --wb-muted: #93a29c;
+  --wb-line: #2b3733;
+  --wb-accent: #5fbfa6;
+  --wb-accent-soft: #1e3630;
+  --wb-shadow: 0 10px 28px rgba(0, 0, 0, .35);
+}
+
 body.wb-host {
   min-height: 100vh;
   padding-left: 248px;
@@ -92,6 +106,47 @@ body.wb-host {
   text-align: center;
 }
 
+/* Knowledge-domain tree. Only rendered on pages that opt in via
+   data-domain-tree; it owns the sidebar's scrollable middle so the nav and the
+   context block stay put. */
+.wb-domains {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--wb-line);
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.wb-domains .nav-section { padding: 6px 0; }
+.wb-domains .nav-section + .nav-section { border-top: 1px solid var(--wb-line); }
+.wb-domains .nav-section h3 {
+  margin: 0 0 5px;
+  padding-left: 10px;
+  color: var(--wb-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.wb-domains .nav-section button {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--wb-ink);
+  font: 600 12.5px/1.4 inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.wb-domains .nav-section button:hover,
+.wb-domains .nav-section button.active { background: var(--wb-accent-soft); color: var(--wb-accent); }
+.wb-domains .nav-section .count { color: var(--wb-muted); font-size: 11px; }
+
 .wb-context {
   margin-top: auto;
   padding: 14px 10px 0;
@@ -111,13 +166,15 @@ body.wb-host {
 .wb-context p { margin: 0; color: var(--wb-muted); font-size: 12px; line-height: 1.65; }
 
 .wb-sidebar-footer {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  gap: 9px;
   margin-top: 17px;
   padding: 0 10px;
-  color: #84918b;
+  color: var(--wb-muted);
   font-size: 11px;
 }
+
+.wb-sidebar-links { display: flex; gap: 10px; }
 
 .wb-sidebar-footer a { color: inherit; text-decoration: none; }
 .wb-sidebar-footer a:hover { color: var(--wb-accent); }
@@ -143,6 +200,63 @@ body.wb-host .topbar { position: relative; }
 .purpose strong { flex: 0 0 auto; color: var(--wb-ink); font-size: 13px; }
 .purpose span { min-width: 0; }
 
+/* Sub-section under 项目与工具: learning pages are tools you reach for, so they
+   nest under that destination rather than competing with it in the main nav. */
+.wb-subnav {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+  padding-left: 10px;
+  border-left: 2px solid var(--wb-line);
+}
+
+.wb-subnav-label {
+  margin: 0 0 3px;
+  padding-left: 10px;
+  color: var(--wb-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.wb-subnav a {
+  display: block;
+  padding: 6px 10px;
+  border-radius: 6px;
+  color: var(--wb-muted);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.wb-subnav a:hover,
+.wb-subnav a[aria-current="page"] {
+  background: var(--wb-accent-soft);
+  color: var(--wb-accent);
+}
+
+/* Theme toggle. Lives in the sidebar footer so every page gets it. */
+.wb-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 7px 10px;
+  border: 1px solid var(--wb-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--wb-muted);
+  font: 600 12px/1 inherit;
+  cursor: pointer;
+}
+
+.wb-theme-toggle:hover {
+  border-color: var(--wb-accent);
+  color: var(--wb-accent);
+}
+
 @media (max-width: 900px) {
   body.wb-host { padding-left: 0; }
   .wb-sidebar {
@@ -165,6 +279,9 @@ body.wb-host .topbar { position: relative; }
   }
   .wb-nav::-webkit-scrollbar { display: none; }
   .wb-nav a { flex: 0 0 auto; min-height: 34px; padding: 7px 9px; font-size: 12px; }
+  .wb-subnav { display: flex; gap: 4px; padding-left: 0; border-left: 0; margin-top: 4px; }
+  .wb-subnav-label { display: none; }
+  .wb-subnav a { flex: 0 0 auto; padding: 5px 8px; font-size: 12px; }
   .wb-context, .wb-sidebar-footer { display: none; }
   body.wb-host .shell { max-width: none; }
 }

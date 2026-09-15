@@ -477,7 +477,16 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn('window.open(url, "_blank")', self.learning)
         self.assertNotIn('window.location.href = url', self.learning)
         self.assertNotIn("location.href='/learn'", self.home)
-        self.assertIn("if(tab)tab.opener=null;else alertUser", self.home)
+        # The homepage renders the same three destinations as every companion
+        # page (知识库 / 项目与工具 / Agent 评估) with 关系图谱 nested under
+        # 知识库, instead of its own four flat buttons.
+        self.assertIn('id="shared-nav"', self.home)
+        self.assertIn("renderSharedNav", self.home)
+        self.assertIn("关系图谱", self.home)
+        self.assertNotIn('id="home-button"', self.home)
+        self.assertNotIn('id="graph-button"', self.home)
+        # The knowledge tree and Clippings must survive the nav change.
+        self.assertIn('id="domains"', self.home)
         self.assertIn(
             'href="/learn" target="_blank" rel="noopener noreferrer" style=', self.home
         )
@@ -556,17 +565,21 @@ class NavigationContractTests(unittest.TestCase):
     def test_my_classrooms_is_reachable_from_the_sidebar(self) -> None:
         """Returning to a generated classroom must not require knowing its URL.
 
-        It used to be reachable only through a small link in the learning
-        centre's body copy, so it could not be found at all. It is now a nav
-        entry rendered on every companion page.
+        Learning pages nest under 项目与工具 rather than sitting in the main nav,
+        because a classroom is a tool you reach for, not a second way to browse
+        knowledge. They still have to be one click from that section.
         """
         shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
         self.assertIn("我的课堂", shared_script)
         self.assertIn("/learn/history", shared_script)
-        # It must be listed in the rendered nav array, not merely defined.
+        # It is rendered by the sub-nav, which appears inside 项目与工具.
+        self.assertIn("subNav", shared_script)
+        self.assertIn("pages.classrooms", shared_script)
+        self.assertIn('parent: "projects"', shared_script)
+        # The main nav stays short: 知识库 / 项目与工具 / Agent 评估.
         nav_block = shared_script.split("const nav = [", 1)[1].split("]", 1)[0]
-        self.assertIn("pages.classrooms", nav_block)
-        # ...and every sidebar page can therefore offer it.
+        self.assertNotIn("pages.learning", nav_block)
+        self.assertNotIn("pages.classrooms", nav_block)
         for page in (self.learning, self.projects, self.evaluation, self.history):
             self.assertIn('data-page=', page)
 
