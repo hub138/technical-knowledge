@@ -53,6 +53,7 @@ OPENMAIC_ACCESS_SERVICE = "knowledge-tools-model-access"
 OPENMAIC_JOBS_ROOT = Path(
     os.environ.get("OPENMAIC_HOME") or Path.home() / "Developer" / "knowledge-tools" / "OpenMAIC"
 ) / "data" / "classroom-jobs"
+OPENMAIC_CLASSROOMS_ROOT = OPENMAIC_JOBS_ROOT.parent / "classrooms"
 DEEPTUTOR_HOME = Path(
     os.environ.get("DEEPTUTOR_HOME") or Path.home() / "Developer" / "knowledge-tools" / "DeepTutor"
 )
@@ -249,6 +250,48 @@ def learning_services_status() -> dict[str, object]:
     }
 
 
+def openmaic_classroom_title(classroom_id: str) -> str:
+    """Read the course title OpenMAIC stored for a generated classroom.
+
+    The job record only keeps a preview of the raw request, so the human-facing
+    title has to come from the classroom itself (`stage.name`, e.g.
+    "RAG重排与混合检索").
+    """
+    if not classroom_id:
+        return ""
+    path = OPENMAIC_CLASSROOMS_ROOT / f"{classroom_id}.json"
+    data = _read_json(path)
+    stage = data.get("stage") if isinstance(data.get("stage"), dict) else {}
+    name = stage.get("name") if isinstance(stage, dict) else None
+    return str(name).strip() if name else ""
+
+
+def openmaic_job_topic(data: dict[str, object]) -> str:
+    """Recover a short human-readable topic from the request preview.
+
+    Fallback for jobs that produced no classroom, so a failed run still says
+    what it was trying to build instead of showing only an opaque error.
+    """
+    summary = data.get("inputSummary")
+    if not isinstance(summary, dict):
+        return ""
+    preview = str(summary.get("requirementPreview") or "").strip()
+    if not preview:
+        return ""
+    # Requests are long and templated. Look for an explicit topic first, then
+    # for the title that commonly follows "课堂：" ("...互动课堂：RAG 的演进...").
+    for pattern in (
+        r"主题[是为：:”\"']*\s*([^。；;\n]+)",
+        r"课堂[：:]\s*([^。；;\n]+)",
+    ):
+        match = re.search(pattern, preview)
+        if match:
+            topic = match.group(1).strip(" “”\"'‘’、,")
+            if topic:
+                return topic[:60]
+    return preview[:60]
+
+
 def openmaic_generation_jobs(limit: int = 12) -> list[dict[str, object]]:
     """Expose redacted local generation state for the learning history page."""
     if not OPENMAIC_JOBS_ROOT.is_dir():
@@ -269,6 +312,8 @@ def openmaic_generation_jobs(limit: int = 12) -> list[dict[str, object]]:
         result = data.get("result") if isinstance(data.get("result"), dict) else {}
         job_id = str(data.get("id") or file.stem)
         classroom_id = result.get("classroomId") if isinstance(result, dict) else None
+        classroom_id = str(classroom_id) if classroom_id else ""
+        title = openmaic_classroom_title(classroom_id) or openmaic_job_topic(data)
         try:
             updated_at = int(file.stat().st_mtime)
         except OSError:
@@ -276,13 +321,14 @@ def openmaic_generation_jobs(limit: int = 12) -> list[dict[str, object]]:
         jobs.append(
             {
                 "id": job_id,
+                "title": title,
                 "status": str(data.get("status") or "unknown"),
                 "step": str(data.get("step") or ""),
                 "progress": data.get("progress"),
                 "scenesGenerated": data.get("scenesGenerated"),
                 "totalScenes": data.get("totalScenes"),
                 "error": str(data.get("error") or ""),
-                "classroomId": str(classroom_id) if classroom_id else "",
+                "classroomId": classroom_id,
                 "updatedAt": updated_at,
             }
         )
@@ -1325,7 +1371,10 @@ class Handler(BaseHTTPRequestHandler):
                 return
             destination = safe_return_path(
                 query.get("next", ["/"])[0],
-                ("/", "/classroom", "/generation-preview"),
+                # Keep this in step with OpenMAIC's top-level pages. An
+                # unlisted path silently falls back to the tool homepage, so a
+                # working page would appear to vanish instead of erroring.
+                ("/", "/classroom", "/generation-preview", "/workbench", "/workspace", "/eval"),
             )
             access_code = read_keychain_secret(OPENMAIC_ACCESS_SERVICE)
             if not access_code:

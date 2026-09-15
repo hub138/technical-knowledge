@@ -381,18 +381,24 @@
             return;
           }
           root.innerHTML = jobs.map((job) => {
-            const progress = Number.isFinite(Number(job.progress)) ? ` · ${job.progress}%` : "";
+            const progress = Number.isFinite(Number(job.progress)) ? `${job.progress}%` : "";
             const scenes = job.totalScenes
-              ? ` · 场景 ${job.scenesGenerated ?? 0}/${job.totalScenes}`
+              ? `场景 ${job.scenesGenerated ?? 0}/${job.totalScenes}`
               : "";
+            const meta = [progress, scenes].filter(Boolean).join(" · ");
+            // Prefer the classroom's own course title; jobs that produced
+            // nothing fall back to the topic parsed out of the request.
+            const title = (job.title || "").trim() || "未命名的生成任务";
             const detail = job.status === "failed"
-              ? `错误：${esc(job.error || "未记录具体原因")}`
-              : `任务 ${esc(job.id)}${progress}${scenes}`;
+              ? `生成未完成 · ${esc(job.error || "未记录具体原因")}`
+              : job.classroomId
+                ? `${esc(meta)} · 任务 ${esc(job.id)}`
+                : esc(meta || `任务 ${esc(job.id)}`);
             const link = job.classroomId
               ? `<a class="job-link" href="/launch/openmaic?next=${encodeURIComponent(`/classroom/${job.classroomId}`)}" target="_blank" rel="noopener noreferrer">打开课堂 ↗</a>`
               : "";
             const stateClass = job.status === "succeeded" ? "ok" : job.status === "failed" ? "fail" : "running";
-            return `<article class="job"><div><p class="job-title">${job.status === "succeeded" ? "已保存的课堂" : "OpenMAIC 生成任务"}</p><p class="job-meta">${detail}</p>${link}</div><span class="job-state ${stateClass}">${statusText(job)}</span></article>`;
+            return `<article class="job"><div><p class="job-title">${esc(title)}</p><p class="job-meta">${detail}</p>${link}</div><span class="job-state ${stateClass}">${statusText(job)}</span></article>`;
           }).join("");
         };
         const load = async () => {

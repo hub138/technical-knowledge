@@ -298,6 +298,35 @@ class AuthenticationTests(unittest.TestCase):
             self.assertNotIn("apiKey", job)
             self.assertIn("status", job)
 
+    def test_openmaic_job_titles_come_from_the_classroom_not_a_placeholder(self) -> None:
+        """The history page used to label every success "已保存的课堂", so a
+        reader could not tell two classrooms apart. Titles are now read from the
+        classroom's own stage.name, with a topic fallback for failed jobs."""
+        response = self.request("GET", "/api/learning/openmaic-jobs")
+        self.assertEqual(response[0], 200)
+        jobs = json.loads(response[2])["jobs"]
+        for job in jobs:
+            self.assertIn("title", job)
+            self.assertNotIn(job["title"], {"已保存的课堂", "OpenMAIC 生成任务"})
+            # A generated classroom must surface its real course title.
+            if job.get("classroomId"):
+                self.assertTrue(job["title"].strip())
+                self.assertNotIn(job["title"], {"未命名的生成任务"})
+
+    def test_classroom_title_reader_handles_missing_files(self) -> None:
+        self.assertEqual(SERVER_MODULE.openmaic_classroom_title(""), "")
+        self.assertEqual(SERVER_MODULE.openmaic_classroom_title("no-such-id"), "")
+
+    def test_job_topic_fallback_is_short_and_prefers_the_declared_topic(self) -> None:
+        topic = SERVER_MODULE.openmaic_job_topic(
+            {"inputSummary": {"requirementPreview": "请生成一堂课堂，主题是“缓存失效的三个原因”。还要别的内容。"}}
+        )
+        self.assertEqual(topic, "缓存失效的三个原因")
+        self.assertLessEqual(len(topic), 60)
+        # No declared topic: fall back to a truncated preview rather than "".
+        self.assertTrue(SERVER_MODULE.openmaic_job_topic({"inputSummary": {"requirementPreview": "随便写点什么"}}))
+        self.assertEqual(SERVER_MODULE.openmaic_job_topic({}), "")
+
     def test_tool_redirect_encodes_unicode_return_path(self) -> None:
         original_local = SERVER_MODULE.is_local_client
         original_secret = SERVER_MODULE.read_keychain_secret
@@ -465,7 +494,11 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("课堂历史与知识收录", self.history)
         self.assertIn("复核后收录", self.history)
         self.assertIn("/api/learning/openmaic-jobs", self.history)
-        self.assertIn("错误：", self.history)
+        # Failed jobs explain themselves; the card title is the classroom's own
+        # course name rather than a fixed placeholder.
+        self.assertIn("生成未完成", self.history)
+        self.assertIn("job.title", self.history)
+        self.assertNotIn("已保存的课堂", self.history)
         for page in (self.intuition, self.transfer, self.history):
             self.assertIn('/static/workbench.css', page)
             self.assertIn('data-page="learning"', page)
