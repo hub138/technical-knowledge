@@ -79,6 +79,7 @@ body.wb-host {
 }
 
 .wb-nav a {
+  color: var(--wb-muted);
   display: flex;
   align-items: center;
   gap: 9px;
@@ -86,7 +87,7 @@ body.wb-host {
   padding: 8px 10px;
   border: 1px solid transparent;
   border-radius: 6px;
-  color: #55635d;
+  color: var(--wb-muted);
   font-size: 13px;
   font-weight: 650;
   text-decoration: none;
@@ -294,3 +295,15 @@ body.wb-host .topbar { position: relative; }
   .purpose { display: block; margin-top: 18px; padding: 12px 13px; }
   .purpose strong { display: block; margin-bottom: 3px; }
 }
+
+/* Dark theme: the brand chip and nav used hard-coded light-theme colours, and
+   primary buttons kept white text on a now-lighter accent. */
+:root[data-theme="dark"] .wb-mark {
+  color: var(--wb-ink);
+  background: var(--wb-accent-soft);
+  border-color: var(--wb-accent);
+}
+:root[data-theme="dark"] .wb-nav a,
+:root[data-theme="dark"] .wb-subnav a,
+:root[data-theme="dark"] .wb-sidebar-footer { color: var(--wb-muted); }
+:root[data-theme="dark"] .wb-nav-icon { color: inherit; }
