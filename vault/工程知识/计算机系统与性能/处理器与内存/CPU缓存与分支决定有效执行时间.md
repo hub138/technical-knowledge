@@ -1,0 +1,44 @@
+---
+title: CPU 缓存与分支决定有效执行时间
+type: concept
+status: active
+updated: 2026-09-03
+review_after: 2027-09-03
+change_rate: stable
+confidence: high
+tags:
+  - performance/cpu
+  - hardware
+  - memory
+sources:
+  - "https://perf.wiki.kernel.org/index.php/Main_Page"
+  - "https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html"
+  - "https://developer.arm.com/documentation"
+---
+
+# CPU 缓存与分支决定有效执行时间
+
+优化时先把数据布局、访问局部性和分支可预测性变成可观测假设，再用计数器和业务延迟验证；只改编译选项或绑核通常不能解释收益。缓存命中和预测准确率改善的是等待与流水线利用率，但可能增加内存占用、代码体积或功耗。
+
+CPU 性能取决于指令是否能持续供给和数据是否及时到达。寄存器、L1/L2/L3、内存和远端 NUMA 的延迟/带宽差异，分支预测、指令窗口、向量化和线程调度共同决定每条指令的实际代价。
+
+## 最小局部性实验
+
+用同一批数据对照顺序数组遍历、随机指针访问和可预测/不可预测分支，固定编译器、频率和线程数；记录 cycles、instructions、cache/branch miss、内存带宽和 p99。只有计数器变化与业务耗时同向，才能把优化归因于局部性或预测，而不是缓存预热或调度噪声。
+
+## 看懂瓶颈
+
+- cache miss 让核心等待数据；顺序访问、局部性和数据布局往往比微小算术优化更重要。
+- 分支预测失败清空部分流水线；数据相关或不可预测分支会限制吞吐。
+- 多线程可能提升吞吐，也可能因共享缓存、锁、带宽和上下文切换互相干扰。
+- NUMA 远端访问、CPU 亲和性和频率/热限制会改变同一程序的结果。
+
+## 测量边界
+
+CPU 利用率高不等于有效执行高；可能是在 cache miss、锁或自旋上浪费周期。`perf stat` 计数器、采样 profile、off-CPU trace 和业务 latency 要互相对照，计数器名称和含义随架构变化。
+
+## 验证
+
+固定 CPU 频率/电源、亲和性、数据集、预热和并发，比较 cache miss、branch miss、cycles/instructions、带宽、上下文切换、p95 和成本。一次只改变数据布局、批量、线程数或算法，确认收益没有转移到内存或尾延迟。
+
+关系：[[工程知识/计算机系统与性能/处理器与内存/CPU性能来自有效执行与数据供给]] · [[工程知识/计算机系统与性能/观测与诊断/性能剖析与火焰图]]

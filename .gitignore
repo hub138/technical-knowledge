@@ -37,9 +37,25 @@ projects/archify/archify.zip
 !/projects/index.html
 !/projects/README.md
 
-# The Obsidian vault is authored content, not code, and changes constantly.
-# It is kept on disk and served by site/server.py rather than versioned here.
-/vault/
+# The vault is the actual knowledge asset, so it is versioned: notes get
+# rewritten and the history of why is worth keeping.
+# Obsidian's own workspace state is noise, as is anything it caches.
+/vault/.obsidian/
+/vault/.trash/
+.vault/
 
 # Vendored browser libraries pulled in by install scripts, not written here.
 /site/mermaid.min.js
+
+# Large media and exports that do not belong in history.
+*.mov
+*.mp4
+*.zip
+*.dmg
+
+# Clipped screenshots are attachments, not knowledge: 30MB of PNG would be
+# stored in full on every edit. They stay on disk and are referenced by notes.
+/vault/**/*.png
+/vault/**/*.jpg
+/vault/**/*.jpeg
+/vault/**/*.pdf
