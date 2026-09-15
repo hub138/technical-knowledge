@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>迁移验证 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/workbench.css" />
+    <script src="/static/workbench.js" data-page="learning" defer></script>
+    <style>
+      :root {
+        --bg: #f5f7f6;
+        --paper: #fff;
+        --ink: #18231f;
+        --muted: #65716c;
+        --line: #dce3df;
+        --accent: #087663;
+        --soft: #e8f3ef;
+        --blue: #3f70a8;
+        --blue-soft: #edf4fb;
+        --warm: #a85f2d;
+        --warm-soft: #fff3e9;
+        --shadow: 0 10px 28px rgba(20, 42, 35, 0.07);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          15px/1.75 -apple-system,
+          BlinkMacSystemFont,
+          "SF Pro Text",
+          "PingFang SC",
+          sans-serif;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .shell {
+        max-width: 1160px;
+        margin: auto;
+        padding: 0 30px 70px;
+      }
+      .topbar {
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+      .hero {
+        padding: 46px 0 31px;
+        border-bottom: 1px solid var(--line);
+      }
+      .eyebrow {
+        color: var(--blue);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+      }
+      .hero h1 {
+        font-size: 36px;
+        line-height: 1.25;
+        margin: 8px 0 10px;
+      }
+      .hero p {
+        max-width: 790px;
+        color: var(--muted);
+        font-size: 16px;
+        margin: 0;
+      }
+      .purpose {
+        margin-top: 22px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 14px;
+        margin-top: 23px;
+      }
+      .panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 21px;
+        box-shadow: var(--shadow);
+      }
+      .panel h2 {
+        margin: 0 0 7px;
+        font-size: 21px;
+      }
+      .panel > p {
+        margin: 0 0 16px;
+        color: var(--muted);
+      }
+      .checks {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        border: 1px solid var(--line);
+        background: var(--line);
+        gap: 1px;
+      }
+      .check {
+        background: #fff;
+        padding: 17px;
+        min-height: 142px;
+      }
+      .check b {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .check p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .check small {
+        display: block;
+        margin-top: 10px;
+        color: var(--blue);
+        font-weight: 700;
+      }
+      .callout {
+        padding: 14px 16px;
+        background: var(--warm-soft);
+        border-left: 3px solid var(--warm);
+        color: #6b4b30;
+      }
+      .callout b {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .links {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+      .button {
+        display: inline-block;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 7px 10px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .button.primary {
+        border-color: #c8daed;
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      @media (max-width: 900px) {
+        .shell {
+          padding: 0 15px 52px;
+        }
+        .hero {
+          padding: 32px 0 25px;
+        }
+        .hero h1 {
+          font-size: 29px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 600px) {
+        .checks {
+          grid-template-columns: 1fr;
+        }
+        .check {
+          min-height: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="eyebrow">LEARNING ACTION · TRANSFER</div>
+        <h1>迁移验证</h1>
+        <p>
+          把“我看懂了”变成在不同场景中仍能做出正确选择。这个页面先说明验证方式，再把你带到导师或复盘工作区。
+        </p>
+      </section>
+      <div class="purpose">
+        <strong>适合什么时候用</strong
+        ><span
+          >当你能复述一个方案，却不确定换数据、权限、规模或故障后是否仍然成立时，用迁移任务验证真正的掌握。</span
+        >
+      </div>
+      <div class="grid">
+        <section class="panel">
+          <h2>验证看什么</h2>
+          <p>迁移不是再做一遍同题，而是有意改变决定方案的关键变量。</p>
+          <div class="checks">
+            <div class="check">
+              <b>换场景</b>
+              <p>
+                客服知识库、代码仓库、长报告或实时事件，检查方案是否依赖特定案例。
+              </p>
+              <small>适用边界</small>
+            </div>
+            <div class="check">
+              <b>换约束</b>
+              <p>改变时延、成本、权限、数据新鲜度或可用资源，重新排序取舍。</p>
+              <small>工程取舍</small>
+            </div>
+            <div class="check">
+              <b>给反例</b>
+              <p>
+                引入召回为空、引用冲突、下游超时或工具失败，检查是否知道如何拒答和恢复。
+              </p>
+              <small>失败处理</small>
+            </div>
+            <div class="check">
+              <b>说证据</b>
+              <p>
+                每个判断都要指出可观察指标、实验或产物，避免凭感觉宣布成功。
+              </p>
+              <small>可验证性</small>
+            </div>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>开始前知道</h2>
+          <div class="callout">
+            <b>会消耗什么</b
+            >打开导师只建立会话，不自动发送；点击发送问题、研究或生成练习后才调用模型。复杂研究会产生更多请求。
+          </div>
+          <p style="margin-top: 15px">
+            导师的回答和复习记录属于 DeepTutor
+            工作区。确认稳定结论后，再把它整理成知识库页面；不要把一次回答直接当成事实来源。
+          </p>
+          <div class="links">
+            <a
+              class="button primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="/launch/deeptutor?next=%2Fchat"
+              >打开 DeepTutor</a
+            ><a class="button" href="/learn">返回学习中心</a
+            ><a class="button" href="/projects">查看项目说明</a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>

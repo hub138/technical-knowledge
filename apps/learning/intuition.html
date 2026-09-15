@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>形成直觉 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/workbench.css" />
+    <script src="/static/workbench.js" data-page="learning" defer></script>
+    <style>
+      :root {
+        --bg: #f5f7f6;
+        --paper: #fff;
+        --ink: #18231f;
+        --muted: #65716c;
+        --line: #dce3df;
+        --accent: #087663;
+        --soft: #e8f3ef;
+        --warm: #a85f2d;
+        --warm-soft: #fff3e9;
+        --shadow: 0 10px 28px rgba(20, 42, 35, 0.07);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          15px/1.75 -apple-system,
+          BlinkMacSystemFont,
+          "SF Pro Text",
+          "PingFang SC",
+          sans-serif;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .shell {
+        max-width: 1160px;
+        margin: auto;
+        padding: 0 30px 70px;
+      }
+      .topbar {
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+      .hero {
+        padding: 46px 0 31px;
+        border-bottom: 1px solid var(--line);
+      }
+      .eyebrow {
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+      }
+      .hero h1 {
+        font-size: 36px;
+        line-height: 1.25;
+        margin: 8px 0 10px;
+      }
+      .hero p {
+        max-width: 790px;
+        color: var(--muted);
+        font-size: 16px;
+        margin: 0;
+      }
+      .purpose {
+        margin-top: 22px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 14px;
+        margin-top: 23px;
+      }
+      .panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 21px;
+        box-shadow: var(--shadow);
+      }
+      .panel h2 {
+        margin: 0 0 7px;
+        font-size: 21px;
+      }
+      .panel > p {
+        margin: 0 0 16px;
+        color: var(--muted);
+      }
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        border: 1px solid var(--line);
+        background: var(--line);
+        gap: 1px;
+      }
+      .step {
+        background: #fff;
+        padding: 17px;
+        min-height: 150px;
+      }
+      .step b {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .step p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .step small {
+        display: block;
+        margin-top: 10px;
+        color: var(--accent);
+        font-weight: 700;
+      }
+      .callout {
+        padding: 14px 16px;
+        background: var(--warm-soft);
+        border-left: 3px solid var(--warm);
+        color: #6b4b30;
+      }
+      .callout b {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .links {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        margin-top: 18px;
+      }
+      .button {
+        display: inline-block;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 7px 10px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .button.primary {
+        border-color: #b7d9cf;
+        background: var(--soft);
+      }
+      @media (max-width: 900px) {
+        .shell {
+          padding: 0 15px 52px;
+        }
+        .hero {
+          padding: 32px 0 25px;
+        }
+        .hero h1 {
+          font-size: 29px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 600px) {
+        .steps {
+          grid-template-columns: 1fr;
+        }
+        .step {
+          min-height: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="eyebrow">LEARNING ACTION · INTUITION</div>
+        <h1>形成直觉</h1>
+        <p>
+          把一个抽象机制变成可以预测、比较和解释的心智模型。这个页面是入口说明，真正的课堂会在新标签中打开。
+        </p>
+      </section>
+      <div class="purpose">
+        <strong>适合什么时候用</strong
+        ><span
+          >当你已经读过概念，但面对新数据、新约束或失败案例还不能预测结果时，先用互动课堂建立直觉。</span
+        >
+      </div>
+      <div class="grid">
+        <section class="panel">
+          <h2>课堂会做什么</h2>
+          <p>OpenMAIC 会把主题组织成连续的学习动作，而不是只给一段摘要。</p>
+          <div class="steps">
+            <div class="step">
+              <b>先给模型</b>
+              <p>用一个最小例子说明变量、目标和约束，先让你说出预期。</p>
+              <small>预测</small>
+            </div>
+            <div class="step">
+              <b>再改条件</b>
+              <p>
+                改变数据规模、查询、权限、负载或故障，观察原判断在哪一步失效。
+              </p>
+              <small>对比</small>
+            </div>
+            <div class="step">
+              <b>即时反馈</b>
+              <p>教师和助教把结果连接回机制、边界和工程取舍。</p>
+              <small>解释</small>
+            </div>
+            <div class="step">
+              <b>迁移任务</b>
+              <p>换一个真实场景重新选择方案，确认直觉不是只记住案例。</p>
+              <small>迁移</small>
+            </div>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>开始前知道</h2>
+          <div class="callout">
+            <b>会消耗什么</b
+            >打开课堂不会调用模型；点击生成课堂后才会产生模型请求。主题会预填，提交前可以修改。
+          </div>
+          <p style="margin-top: 15px">
+            生成后的课堂由 OpenMAIC
+            自己保存到它的课堂库/浏览器存储。它不会自动写入本知识库
+            Markdown；需要正式收录时，应把经过核对的稳定结论整理成知识页，并保留课堂作为来源。
+          </p>
+          <div class="links">
+            <a
+              class="button primary"
+              target="_blank"
+              rel="noopener noreferrer"
+              href="/launch/openmaic?next=%2F"
+              >打开 OpenMAIC</a
+            ><a class="button" href="/learn">返回学习中心</a
+            ><a class="button" href="/projects">查看项目说明</a>
+          </div>
+        </section>
+      </div>
+    </div>
+  </body>
+</html>

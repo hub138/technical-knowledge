@@ -1,1200 +1,351 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>AI Agent 开发知识体系</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>technical-knowledge · 工程知识库</title>
 <style>
-:root{--bg:#f8f9fb;--surface:#fff;--border:#e5e7eb;--text:#1f2937;--muted:#6b7280;--dim:#9ca3af;--blue:#2563eb;--blue-bg:#eff6ff;--purple:#7c3aed;--purple-bg:#f5f3ff;--green:#059669;--green-bg:#ecfdf5;--amber:#d97706;--amber-bg:#fffbeb;--red:#dc2626;--red-bg:#fef2f2;--radius:8px;--font:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.82;font-size:16px}
-button{font:inherit}
-.app{display:flex;min-height:100vh}
-
-/* Sidebar */
-.sidebar{width:300px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);position:sticky;top:0;height:100vh;overflow-y:auto;z-index:10}
-.sidebar-title{padding:18px 20px 14px;border-bottom:1px solid var(--border);font-size:18px;font-weight:700;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.nav-toggle{display:none;border:1px solid var(--border);background:var(--surface);color:var(--text);border-radius:6px;padding:5px 10px;font-size:13px;line-height:1.4;cursor:pointer}
-.nav-tree{padding:8px 0}
-.nav-group{margin-bottom:2px}
-.nav-group-label{display:flex;align-items:center;gap:7px;padding:10px 16px;font-size:15px;font-weight:600;cursor:pointer;color:var(--text);user-select:none}
-.nav-group-label:hover{background:var(--bg)}
-.nav-group-label .arrow{font-size:11px;color:var(--dim);transition:transform .2s;width:13px}
-.nav-group-label .arrow.open{transform:rotate(90deg)}
-.nav-children{display:none}
-.nav-children.show{display:block}
-.nav-item{padding:7px 16px 7px 38px;font-size:14px;line-height:1.55;color:var(--muted);cursor:pointer;border-left:2px solid transparent}
-.nav-item:hover{background:var(--bg);color:var(--text)}
-.nav-item.active{color:var(--blue);border-left-color:var(--blue);background:var(--blue-bg);font-weight:600}
-
-/* Main */
-.main{flex:1;min-width:0}
-.top-tabs{display:none}
-.top-tab{padding:16px 26px;font-size:16px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
-.top-tab:hover{color:var(--text)}
-.top-tab.active{color:var(--blue);border-bottom-color:var(--blue)}
-
-/* Q&A Banner */
-.qa-banner{background:var(--surface);border-bottom:1px solid var(--border);padding:24px 32px}
-.qa-banner h3{font-size:18px;font-weight:700;margin-bottom:12px;color:var(--amber)}
-.qa-item{margin-bottom:11px;font-size:16px;line-height:1.82}
-.qa-item .q{font-weight:600;color:var(--text)}
-.qa-item .q::before{content:"Q: ";color:var(--blue);font-weight:700}
-.qa-item .a{color:var(--muted);margin-left:0}
-.qa-item .a::before{content:"A: ";color:var(--green);font-weight:700}
-.qa-focus-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.qa-focus-item{padding:14px 16px;border-top:2px solid var(--blue);background:#f8fbff}.qa-focus-item:nth-child(2){border-top-color:var(--green);background:#f3fbf7}.qa-focus-item:nth-child(3){border-top-color:var(--amber);background:#fffaf0}.qa-focus-item:nth-child(4){border-top-color:var(--purple);background:var(--purple-bg)}.qa-focus-item>b{display:block;font-size:16px;line-height:1.55;margin-bottom:6px}.qa-focus-item span{display:block;font-size:15px;line-height:1.72;color:var(--muted)}.qa-focus-item span b{display:inline;font-size:inherit;line-height:inherit;margin:0;color:var(--text)}
-
-/* Content */
-.content{padding:30px 32px;width:100%;max-width:none}
-.content.knowledge-view{max-width:1680px}
-.content.eval-view{display:block;max-width:1680px}
-.content.eval-view .section{margin-bottom:28px}
-.section{margin-bottom:40px}
-.section-title{font-size:22px;font-weight:700;margin-bottom:7px;display:flex;align-items:center;gap:9px}
-.section-title .icon{font-size:24px}
-.section-desc{font-size:16px;color:var(--muted);margin-bottom:22px}
-.kp{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:18px;transition:border-color .15s}
-.kp:hover{border-color:var(--blue)}
-.kp h4{font-size:18px;font-weight:600;margin-bottom:9px}
-.kp .tags{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.kp .tag{font-size:12px;padding:3px 8px;border-radius:4px;background:var(--bg);color:var(--dim)}
-.kp .meta{display:flex;gap:7px;flex-wrap:wrap;margin:-2px 0 12px;font-size:12px;color:var(--muted)}.kp .meta span{padding:3px 8px;border:1px solid var(--border);border-radius:4px;background:#fafbfc}.kp .meta .priority{color:var(--blue);font-weight:700}.kp .meta .reviewed{color:var(--green)}
-.concept-index{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:16px}.concept-index section{border:1px solid var(--border);border-radius:6px;padding:14px 16px;background:var(--surface)}.concept-index h3{font-size:14px;margin:0 0 8px}.concept-index dl{margin:0}.concept-index dt{font-size:12px;font-weight:700;margin-top:8px}.concept-index dt:first-child{margin-top:0}.concept-index dd{margin:2px 0 0;font-size:12px;line-height:1.65;color:var(--muted)}.concept-index a{color:var(--blue);text-decoration:none}.concept-index a:hover{text-decoration:underline}
-.kp .body{font-size:17px;line-height:1.88;color:var(--text)}
-.kp .body b{color:var(--text);font-weight:700}
-.kp .body p{margin-bottom:10px}
-.kp .body ul{margin:6px 0 10px 18px}
-.kp .body li{margin-bottom:4px}
-.step-list{display:grid;gap:9px;margin:14px 0}.step-list .step{display:grid;grid-template-columns:27px minmax(0,1fr);gap:10px;align-items:start;padding:11px 12px;border:1px solid var(--border);border-radius:5px;background:#fafbfc}.step-list .step>span{display:flex;width:27px;height:27px;align-items:center;justify-content:center;border-radius:4px;background:var(--blue-bg);color:var(--blue);font-size:12px;font-weight:700}.step-list .step p{margin:0;line-height:1.75}
-.kp pre{overflow-x:auto;max-width:100%;padding:14px 16px;border:1px solid var(--border);border-radius:6px;background:#f7f9fc;font-size:14px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere}
-.kp .refs{margin-top:12px;padding-top:10px;border-top:1px solid var(--border)}
-.kp .refs a{font-size:13px;color:var(--blue);text-decoration:none;margin-right:14px}
-.kp .refs a:hover{text-decoration:underline}
-
-/* Eval dimensions */
-.eval-dim{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px 28px;margin-bottom:18px}
-.eval-dim h4{font-size:18px;font-weight:600;margin-bottom:7px;display:flex;align-items:center;gap:9px}
-.eval-dim h4 .num{color:var(--purple);font-size:16px;font-weight:800;line-height:1.4;flex:none}
-.eval-dim .why{font-size:14px;color:var(--amber);margin-bottom:11px;font-style:italic}
-.eval-dim .check-list{font-size:17px;color:var(--text);line-height:1.88}
-.eval-dim .check-list b{color:var(--text)}
-.eval-dim .good-bad{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0}
-.eval-dim .good{background:var(--green-bg);border-radius:var(--radius);padding:12px 15px;font-size:14px}
-.eval-dim .bad{background:var(--red-bg);border-radius:var(--radius);padding:12px 15px;font-size:14px}
-.eval-dim .good b{color:var(--green)}
-.eval-dim .bad b{color:var(--red)}
-.eval-dim .link{font-size:13px;color:var(--blue);margin-top:9px}
-.eval-dim .improve{font-size:14px;background:var(--amber-bg);border-radius:var(--radius);padding:10px 13px;margin-top:9px;color:var(--amber)}
-.workbench,.system-map,.scenario-matrix,.comparison-board{margin:0 0 30px;padding:26px 28px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
-.evaluation-contract{border-top:3px solid var(--blue)}.evaluation-contract>p{max-width:980px}.evaluation-scope{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:20px 0 16px;border:1px solid var(--border);background:var(--surface)}.evaluation-scope>div{padding:16px 18px;border-right:1px solid var(--border)}.evaluation-scope>div:last-child{border-right:0}.evaluation-scope>div>b,.evaluation-scope>div>span{display:block}.evaluation-scope>div>b{margin-bottom:6px;font-size:16px}.evaluation-scope>div>span{font-size:15px;line-height:1.72;color:var(--muted)}.evaluation-path{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:13px 15px;border:1px solid var(--border);background:#f7fafc;font-size:15px;line-height:1.55}.evaluation-path b{padding:3px 7px;background:var(--surface);border:1px solid #cdd9ef}.evaluation-path i{font-style:normal;color:var(--blue);font-weight:700}.evaluation-output{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;margin-top:16px;border-top:1px solid var(--border);border-left:1px solid var(--border)}.evaluation-output>div{padding:15px 17px;border-right:1px solid var(--border);border-bottom:1px solid var(--border)}.evaluation-output>div>b,.evaluation-output>div>span{display:block}.evaluation-output>div>b{margin-bottom:5px;font-size:16px}.evaluation-output>div>span{font-size:15px;line-height:1.72;color:var(--muted)}.evaluation-output>div.theory{grid-column:1/-1;background:#f8fbff}.evaluation-output>div.theory>b{color:var(--blue)}
-.knowledge-guide{margin-bottom:32px}.knowledge-guide h2{font-size:22px;line-height:1.45;margin-bottom:7px}.knowledge-guide>p{font-size:16px;line-height:1.78;color:var(--muted);margin-bottom:18px}.knowledge-guide-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--border);border-bottom:1px solid var(--border)}.knowledge-guide-grid>div{padding:16px 18px;border-right:1px solid var(--border)}.knowledge-guide-grid>div:last-child{border-right:0}.knowledge-guide-grid b{display:block;margin-bottom:6px;font-size:16px}.knowledge-guide-grid span{display:block;color:var(--muted);font-size:15px;line-height:1.72}.knowledge-guide .evidence{margin-bottom:0}
-.knowledge-compass{margin:0 0 28px;padding:22px 24px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}.compass-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:0;border:1px solid var(--border);border-radius:7px;overflow:hidden}.compass-step{padding:15px 16px;border-right:1px solid var(--border);background:#fff}.compass-step:last-child{border-right:0}.compass-step h3{font-size:14px;line-height:1.45;margin-bottom:6px}.compass-step p{font-size:12px;line-height:1.65;color:var(--muted)}.compass-step b{display:block;margin-top:8px;font-size:11px;color:var(--green)}
-.kicker{font-size:14px;color:var(--blue);font-weight:700;margin-bottom:6px}.workbench h2,.system-map h2,.scenario-matrix h2,.comparison-board h2{font-size:22px;line-height:1.45;margin-bottom:7px}.workbench>p,.system-map>p,.scenario-matrix>p,.comparison-board>p{font-size:16px;color:var(--muted);margin-bottom:19px}
-.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--border);border-radius:7px;overflow:hidden}.flow>div{min-height:144px;padding:16px 17px;border-right:1px solid var(--border)}.flow>div:last-child{border:0}.flow b{display:block;font-size:15px;margin-bottom:6px}.flow span,.flow small{display:block;font-size:14px;color:var(--muted);line-height:1.68}.flow small{color:var(--green);font-weight:700;margin-top:8px}
-.question-grid,.scenario-grid,.diagnostic-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:17px}.question-grid>div,.scenario-grid>article,.diagnostic-grid>div{padding:16px;border:1px solid var(--border);background:#fff}.question-grid b,.scenario-grid h3,.diagnostic-grid h3{display:block;font-size:15px;margin-bottom:7px}.question-grid span,.scenario-grid p,.scenario-grid li,.diagnostic-grid p{font-size:14px;color:var(--muted);line-height:1.7}.scenario-grid ul{margin:6px 0 0 17px}.scenario-grid small{display:block;color:var(--green);font-size:12px;font-weight:700;margin-top:9px}
-.map-row{display:grid;grid-template-columns:150px repeat(4,minmax(0,1fr));border:1px solid var(--border);border-bottom:0}.map-row:last-of-type{border-bottom:1px solid var(--border)}.map-row>div{padding:15px;border-left:1px solid var(--border);font-size:14px;line-height:1.68}.map-row>div:first-child{border-left:0;background:#f7f9fc;font-weight:700;display:flex;align-items:center}.map-row b{display:block;font-size:15px;margin-bottom:6px}.map-row span{display:block;color:var(--amber);font-size:12px;margin-top:7px}.map-row small{display:block;color:var(--green);font-size:12px}
-.compare{display:grid;grid-template-columns:1fr 52px 1fr;gap:14px;align-items:stretch}.compare>section{padding:18px;border:1px solid var(--border);border-radius:7px}.compare>section:first-child{background:#fffafa}.compare>section:last-child{background:#f4fbf7}.compare h3{font-size:17px;margin-bottom:8px}.compare li{font-size:14px;line-height:1.7}.compare ul{margin-left:18px}.compare>div{display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--blue)}
-.evaluation-lab{border-color:#c8d7f1}.experiment-context{display:flex;flex-wrap:wrap;gap:7px;margin:15px 0 12px}.experiment-context span{padding:4px 8px;border-radius:4px;background:#f1f5fb;color:#385073;font-size:11px;font-weight:700}.experiment-tracks{display:grid;grid-template-columns:1fr 1fr;gap:14px}.experiment-track{padding:15px;border:1px solid var(--border);border-radius:7px}.experiment-track.baseline{background:#fffafa;border-color:#efcaca}.experiment-track.supported{background:#f4fbf7;border-color:#bfe1ce}.track-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}.track-header h3{font-size:14px}.track-status{font-size:11px;font-weight:700;padding:3px 7px;border-radius:999px}.baseline .track-status{background:#fee2e2;color:#a33}.supported .track-status{background:#dcfce7;color:#087a4b}.trace-line{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.trace-node{position:relative;min-height:92px;padding:10px 9px;border:1px solid var(--border);background:#fff}.trace-node:not(:last-child)::after{content:"→";position:absolute;right:-12px;top:34px;z-index:2;color:var(--dim);font-size:16px}.trace-node b{display:block;font-size:12px;line-height:1.45;margin-bottom:4px}.trace-node span{display:block;font-size:11px;line-height:1.55;color:var(--muted)}.trace-node.fault{border-color:#eea7a7;background:#fff5f5}.trace-node.fault b{color:#b42318}.trace-node.fix{border-color:#95cfad;background:#f3fbf6}.trace-node.fix b{color:#087a4b}.track-result{margin:11px 0 0;padding-top:10px;border-top:1px solid rgba(15,23,42,.1);font-size:12px;line-height:1.65}.baseline .track-result b{color:#b42318}.supported .track-result b{color:#087a4b}.intervention-bridge{display:grid;grid-template-columns:1fr 32px 1fr 32px 1fr;gap:8px;align-items:center;margin:14px 0;padding:12px;border:1px dashed #a9bde0;background:#f7faff}.intervention-bridge>div{padding:9px 10px;background:#fff;border-top:2px solid var(--blue);font-size:12px;line-height:1.55}.intervention-bridge>div:nth-of-type(2){border-top-color:var(--amber)}.intervention-bridge>div:nth-of-type(3){border-top-color:var(--green)}.intervention-bridge b{display:block;font-size:12px;margin-bottom:3px}.intervention-arrow{text-align:center;color:var(--blue);font-size:19px;font-weight:700}.decision-gate{display:grid;grid-template-columns:1fr 34px 1.1fr;gap:10px;align-items:stretch;margin-top:14px}.gate-checks,.gate-outcome{padding:12px 13px;border:1px solid var(--border);font-size:12px;line-height:1.65}.gate-checks{background:#f8fbff}.gate-checks b,.gate-outcome b{display:block;font-size:13px;margin-bottom:4px}.gate-arrow{display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:22px}.gate-outcome{background:#f4fbf7;border-color:#bfe1ce}.gate-outcome em{display:block;margin-top:5px;color:#9b5b00;font-style:normal}
-.matrix{width:100%;margin-top:16px;border-collapse:collapse;font-size:14px}.matrix th,.matrix td{padding:11px 12px;text-align:left;border-bottom:1px solid var(--border)}.matrix th{background:#f7f9fc}.matrix td:last-child{color:var(--green);font-weight:700}.evidence{margin-top:16px;padding:14px 16px;border-left:4px solid var(--blue);background:#f5f8ff;font-size:15px;line-height:1.75}.evidence b{color:var(--text)}
-.evidence-map{margin:0 0 30px;padding:26px 28px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}.evidence-map h2{font-size:22px;line-height:1.45;margin-bottom:7px}.evidence-map>p{font-size:16px;color:var(--muted);margin-bottom:19px}.confidence-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}.confidence-grid>div{padding:14px 16px;background:#f8fbff;border-top:2px solid var(--blue);font-size:14px;line-height:1.7}.confidence-grid>div:nth-child(2){border-top-color:var(--amber);background:#fffaf0}.confidence-grid>div:nth-child(3){border-top-color:var(--purple);background:var(--purple-bg)}.confidence-grid b{display:block;font-size:15px;margin-bottom:5px}.claim-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.claim-grid article{padding:18px;border:1px solid var(--border);border-radius:7px;background:#fff}.claim-grid h3{font-size:17px;line-height:1.5;margin:5px 0 8px}.claim-grid p{font-size:15px;line-height:1.72;color:var(--muted);margin-bottom:9px}.claim-grid b{color:var(--text)}.claim-grid a{color:var(--blue);text-decoration:none}.claim-tag{display:inline-block;padding:3px 8px;border-radius:999px;background:var(--blue-bg);color:var(--blue);font-size:12px;font-weight:700;margin-right:5px}.claim-tag.caution{background:var(--amber-bg);color:var(--amber)}.workbench> .question-grid:first-of-type{display:none}
-
-.local-notice{background:var(--amber-bg);border:1px solid #fde68a;border-radius:var(--radius);padding:18px 22px;margin-bottom:22px;font-size:15px;color:var(--amber)}
-.local-notice b{color:#92400e}
-.evidence-panel{margin:0 0 30px;padding:26px 28px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
-.evidence-panel h2{font-size:22px;line-height:1.45;margin-bottom:7px}.evidence-panel>p{font-size:16px;line-height:1.78;color:var(--muted);margin-bottom:18px}
-.evaluation-source-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.evaluation-source-list article{padding:18px;border:1px solid var(--border);border-radius:7px;background:#fff}.evaluation-source-list h3{font-size:17px;line-height:1.45;margin-bottom:8px}.evaluation-source-list p{font-size:15px;line-height:1.72;color:var(--muted)}
-.evidence-strip{margin-top:16px;padding:14px 16px;border-left:4px solid var(--blue);background:#f5f8ff;font-size:15px;line-height:1.75}.evidence-strip a{color:var(--blue);text-decoration:none}.evidence-strip a:hover{text-decoration:underline}
-.eval-dimensions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;margin-bottom:30px}.eval-dimensions .eval-dim{height:100%;margin:0}.eval-dimensions .good-bad{grid-template-columns:1fr}
-.qa-details{margin-top:6px}
-.qa-details summary{cursor:pointer;color:var(--blue);font-weight:600;list-style-position:inside}
-.qa-details[open] summary{margin-bottom:10px}
-.section,.kp,.eval-dim{scroll-margin-top:118px}
-@media(max-width:1100px){.flow{grid-template-columns:repeat(3,minmax(0,1fr))}.question-grid,.scenario-grid,.diagnostic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:760px){
-  body{font-size:16px;line-height:1.76}
-  .app{display:block}
-  .top-tabs{display:none}
-  .sidebar{width:100%;height:auto;position:fixed;top:0;left:0;overflow:visible;border-right:none;border-bottom:1px solid var(--border);z-index:19}
-  .main{padding-top:58px}
-  .sidebar-title{padding:11px 16px;font-size:16px}
-  .nav-toggle{display:inline-flex;align-items:center;justify-content:center}
-  .nav-tree{display:none;max-height:52vh;overflow-y:auto;padding:6px 0;background:var(--surface);border-top:1px solid var(--border)}
-  .sidebar.mobile-open .nav-tree{display:block}
-  .nav-group-label{padding:10px 16px;font-size:14px}
-  .nav-item{padding:8px 16px 8px 36px;font-size:14px}
-  .qa-banner{margin-top:0;padding:18px 16px}
-  .qa-banner h3{font-size:17px;margin-bottom:7px}
-  .qa-item{font-size:16px;line-height:1.76;margin-bottom:9px}
-  .qa-focus-grid{grid-template-columns:1fr}
-  .content{padding:22px 16px}
-  .section{margin-bottom:28px}
-  .section-title{font-size:21px;line-height:1.45}
-  .section-desc{line-height:1.7;margin-bottom:14px}
-  .kp,.eval-dim{padding:20px 18px;margin-bottom:14px}
-  .kp h4,.eval-dim h4{font-size:18px;line-height:1.55}
-  .concept-index{grid-template-columns:1fr}
-  .kp .body,.eval-dim .check-list{font-size:17px;line-height:1.84}
-  .kp pre{font-size:13px;padding:12px}
-  .eval-dim .good-bad{grid-template-columns:1fr;gap:8px}
-  .section,.kp,.eval-dim{scroll-margin-top:150px}
-  .workbench,.knowledge-compass,.system-map,.scenario-matrix,.comparison-board,.evidence-map,.evidence-panel{padding:21px 18px}.knowledge-guide-grid,.flow,.question-grid,.scenario-grid,.diagnostic-grid,.compass-grid,.confidence-grid,.claim-grid,.experiment-tracks,.evaluation-source-list,.eval-dimensions,.evaluation-scope,.evaluation-output{grid-template-columns:1fr}.knowledge-guide-grid>div,.flow>div,.compass-step,.evaluation-scope>div{min-height:auto;border-right:0;border-bottom:1px solid var(--border)}.knowledge-guide-grid>div:last-child,.flow>div:last-child,.compass-step:last-child,.evaluation-scope>div:last-child{border-bottom:0}.evaluation-output>div{padding:14px 15px}.evaluation-path{align-items:flex-start}.map-row{display:block;border-bottom:1px solid var(--border)}.map-row>div{border-left:0;border-top:1px solid var(--border)}.map-row>div:first-child{border-top:0}.compare{grid-template-columns:1fr}.compare>div{height:25px;transform:rotate(90deg)}.trace-line{grid-template-columns:1fr;gap:18px}.trace-node{min-height:0}.trace-node:not(:last-child)::after{content:"↓";right:auto;left:calc(50% - 5px);top:auto;bottom:-20px}.intervention-bridge{grid-template-columns:1fr;gap:6px}.intervention-arrow{transform:rotate(90deg);height:18px}.decision-gate{grid-template-columns:1fr}.gate-arrow{height:20px;transform:rotate(90deg)}.matrix{display:block;overflow-x:auto;min-width:560px}
-}
+:root{--bg:#f4f6f5;--panel:#fff;--ink:#1f2a27;--muted:#68746f;--line:#dbe2de;--accent:#147766;--accent-soft:#e4f1ed;--warm:#a45b2a;--shadow:0 12px 32px rgba(23,45,39,.08)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}button,input{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:286px minmax(0,1fr);min-height:100vh}.sidebar{background:#fbfcfb;border-right:1px solid var(--line);padding:21px 15px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 21px;border-bottom:1px solid var(--line)}.mark{width:34px;height:34px;border:1px solid var(--accent);border-radius:9px;display:grid;place-items:center;color:var(--accent);font-weight:800}.brand strong{display:block;font-size:15px}.brand small{display:block;color:var(--muted);font-size:11px}.nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px 0}.nav-actions button,.nav-section button{border:1px solid transparent;background:transparent;color:var(--muted);text-align:left;border-radius:6px;padding:8px 10px}.nav-actions button:hover,.nav-actions button.active,.nav-section button:hover,.nav-section button.active{background:var(--accent-soft);border-color:#c5e0d8;color:var(--accent)}.nav-section{border-top:1px solid var(--line);padding:12px 0}.nav-section h3{font-size:11px;color:var(--muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;justify-content:space-between;width:100%;font-size:13px}.count{font-size:11px;color:var(--muted)}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;padding:20px 30px;background:rgba(244,246,245,.94);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3;backdrop-filter:blur(10px)}.topbar h1{font-size:19px;margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--line);border-radius:7px;padding:10px 13px 10px 35px;background:#fff;outline:0}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #1477661a}.search span{position:absolute;left:13px;top:8px;color:var(--muted)}.content{padding:32px;max-width:1500px}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:32px;line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--muted);margin:0}.hero-meta{color:var(--muted);font-size:12px;white-space:nowrap}.section{margin-top:28px}.section h2{font-size:21px;line-height:1.3;margin:0 0 7px}.section>p{color:var(--muted);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.domain-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;min-height:150px;cursor:pointer;transition:.15s}.domain-card:hover{border-color:#8bc2b4;box-shadow:var(--shadow);transform:translateY(-1px)}.domain-card h3{font-size:16px;margin:0 0 8px}.domain-card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 12px}.domain-card b{color:var(--accent);font-size:12px}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.entry h3{font-size:15px;margin:0 0 6px}.entry p{color:var(--muted);font-size:13px;margin:0 0 12px}.entry a{display:inline-block;color:var(--accent);font-size:12px;margin-right:11px}.notice{background:#fff9ee;border:1px solid #efd9b3;border-radius:8px;padding:15px 17px;color:#80501e;font-size:13px}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px}.directory-head h2{font-size:26px;line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--muted);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:5px;padding:5px 9px;font-size:12px}.sort button.active,.sort button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:17px;margin:0 0 8px;display:flex;gap:8px;align-items:center}.topic-title small{font-size:11px;font-weight:400;color:var(--muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:#fff;border:1px solid var(--line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--line);border-radius:0 0 7px 7px}.note-row:hover{background:#f8fbfa}.note-row h3{font-size:14px;margin:0 0 3px}.note-row .path{font-size:11px;color:var(--accent)}.note-row p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.reader{display:none}.reader.open{display:block}.reader-head{border-bottom:1px solid var(--line);padding-bottom:17px;margin-bottom:19px}.reader-context{color:var(--accent);font-size:12px;margin-bottom:8px}.reader h2{font-size:29px;line-height:1.3;margin:0}.reader-sources{margin:8px 0 0;color:var(--muted);font-size:12px}.reader-sources a{color:var(--accent);margin-right:9px}.reader-body{max-width:960px;font-size:16px;line-height:1.85}.reader-body h1{font-size:28px}.reader-body h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:5px;margin-top:31px}.reader-body h3{font-size:18px;margin-top:25px}.reader-body p{margin:14px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:5px 0}.reader-body blockquote{border-left:3px solid var(--accent);padding:4px 15px;color:var(--muted);background:#f5f8f6}.reader-body a{color:var(--accent)}.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--line);border-radius:6px}.reader-body code{background:#edf3f0;color:#0d6656;border:1px solid #d9e9e3;border-radius:4px;padding:1px 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}.reader-body .code-block,.reader-body pre.mermaid{background:#1d2825;color:#edf4f1;border-radius:7px;padding:15px;overflow:auto;font-size:13px}.reader-body table{border-collapse:collapse;width:100%;margin:17px 0}.reader-body th,.reader-body td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.reader-body th{background:#eef4f1}.reader-body .callout{padding:11px 14px;border-left:3px solid var(--warm);background:#fff9ee;color:#6f4c27}.graph{display:none}.graph.open{display:block}.graph-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}.graph-head h2{font-size:26px;margin:0 0 3px}.graph-head p{color:var(--muted);margin:0}.visual-tabs{display:flex;flex-wrap:wrap;gap:6px}.visual-tabs button{border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:5px;padding:6px 10px;font-size:12px}.visual-tabs button.active,.visual-tabs button:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}.graph-panel{background:#fff;border:1px solid var(--line);border-radius:8px;padding:10px}.graph-panel svg{display:block;width:100%;height:min(70vh,700px);background:#fbfcfb;border-radius:6px}.graph-legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;padding:10px 3px 0}.graph-legend span{display:inline-flex;gap:6px;align-items:center}.graph-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.edge{stroke:#cdd8d3;stroke-width:1.1}.edge.focused{stroke:var(--warm);stroke-width:2.6}.topic-link{stroke:#dce6e1;stroke-width:1}.domain-label{font-size:14px;fill:#53655f;font-weight:700}.node circle{stroke:#fff;stroke-width:1.5;cursor:pointer}.node text,.topic-node text{font-size:10px;fill:#53655f;pointer-events:none}.topic-node circle{fill:#fff;stroke-width:2;cursor:pointer}.diagram-edge{stroke:#9db8ad;stroke-width:2;marker-end:url(#graph-arrow)}.diagram-edge.dashed{stroke-dasharray:6 5}.diagram-box{fill:#fff;stroke:#8bb6a9;stroke-width:1.5}.diagram-box.primary{fill:#e5f2ee;stroke:#147766}.diagram-box.secondary{fill:#fff2e7;stroke:#bd7950}.diagram-label{font-size:15px;text-anchor:middle;dominant-baseline:middle;fill:#23332e;font-weight:700}.diagram-small{font-size:11px;text-anchor:middle;fill:#63736d}.diagram-group{cursor:pointer}.graph-note{font-size:12px;fill:#68746f}.axis-line{stroke:#9db8ad;stroke-width:1.5}.axis-label{font-size:13px;fill:#68746f}.quadrant-fill{fill:#f1f7f4}.quadrant-fill.alt{fill:#fbf5ef}.quadrant-title{font-size:14px;fill:#56665f;font-weight:700}.point{stroke:#fff;stroke-width:2}.point-label{font-size:13px;fill:#3f504a}.empty{background:#fff;border:1px dashed var(--line);padding:30px;text-align:center;color:var(--muted);border-radius:7px}.mobile-menu{display:none}@media(max-width:1100px){.domain-grid{grid-template-columns:repeat(3,1fr)}.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.app{display:block}.sidebar{position:fixed;z-index:8;width:100%;height:auto;padding:10px 13px}.sidebar.collapsed .nav-actions,.sidebar.collapsed .nav-section{display:none}.brand{padding:0;border:0}.mobile-menu{display:block;margin-left:auto;border:1px solid var(--line);background:#fff;border-radius:6px;padding:6px 9px;color:var(--accent)}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.content{padding:21px 15px}.hero{display:block}.hero h2{font-size:26px}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:23px}}
 </style>
 <style>
-.reader-guide{grid-column:1/-1;margin:0 0 28px;padding:22px 24px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}.reader-guide h2{font-size:18px;line-height:1.45;margin-bottom:6px}.reader-guide>p{max-width:840px;margin-bottom:16px;font-size:13px;line-height:1.72;color:var(--muted)}.reader-path{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--border);border-radius:7px;overflow:hidden}.reader-step{padding:14px 15px;border-right:1px solid var(--border);background:#fff}.reader-step:last-child{border-right:0}.reader-step:nth-child(2){background:#f3fbf7}.reader-step:nth-child(3){background:#fffaf0}.reader-step:nth-child(4){background:var(--purple-bg)}.reader-step b{display:block;font-size:14px;line-height:1.45;margin-bottom:5px}.reader-step p{margin:0;font-size:12px;line-height:1.65;color:var(--muted)}.reader-step small{display:block;margin-top:8px;font-size:11px;line-height:1.55;font-weight:700;color:var(--blue)}.reader-step:nth-child(2) small{color:var(--green)}.reader-step:nth-child(3) small{color:var(--amber)}.reader-step:nth-child(4) small{color:var(--purple)}.reader-contract{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}.reader-contract>div{padding:12px 13px;border:1px solid var(--border);background:#fff}.reader-contract b{display:block;font-size:13px;margin-bottom:4px}.reader-contract p{margin:0;font-size:12px;line-height:1.65;color:var(--muted)}.reader-contract code{padding:1px 4px;border-radius:3px;background:var(--blue-bg);color:var(--blue);font-size:11px}@media(max-width:760px){.reader-guide{padding:17px 16px}.reader-path,.reader-contract{grid-template-columns:1fr}.reader-step{border-right:0;border-bottom:1px solid var(--border)}.reader-step:last-child{border-bottom:0}}
+:root{--bg:#f5f7f6;--panel:#fff;--ink:#18231f;--muted:#65716c;--line:#dce3df;--accent:#087663;--accent-soft:#e8f3ef;--warm:#a85f2d;--blue:#3f70a8;--purple:#75599a;--shadow:0 10px 28px rgba(20,42,35,.07)}
+body{background:var(--bg);font-size:15px;line-height:1.7}
+.app{grid-template-columns:260px minmax(0,1fr)}
+.sidebar{background:#fff;padding:24px 16px}
+.brand{padding:0 7px 22px;gap:12px}
+.mark{width:36px;height:36px;border-radius:7px;background:var(--accent);color:#fff;border:0}
+.brand strong{font-size:14px}.brand small{font-size:11px;color:#7b8681}
+.nav-actions{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:14px 0 16px}
+.nav-actions button{padding:8px 4px;text-align:center;font-size:12px;border:1px solid var(--line);background:#fff;color:#596760}
+.nav-actions button:hover,.nav-actions button.active{background:var(--accent-soft);border-color:#b9d9cf;color:var(--accent)}
+.nav-section{border:0;padding:2px 0}
+.nav-section button{align-items:center;border:1px solid transparent;padding:9px 10px;border-radius:6px;color:#4f5d57}
+.nav-section button:hover,.nav-section button.active{background:#f0f5f2;border-color:#dbe7e2;color:#075f51}
+.nav-section .topic-button{margin-left:13px;width:calc(100% - 13px);padding:7px 10px;font-size:12px;color:#718079}
+.count{font-variant-numeric:tabular-nums;color:#8a9691}
+.topbar{padding:18px 38px;background:rgba(245,247,246,.92);gap:22px}
+.topbar h1{font-size:17px;color:#33413b}
+.search{max-width:880px}
+.search input{height:44px;border-radius:7px;padding-left:38px;box-shadow:0 1px 2px rgba(20,42,35,.02)}
+.search span{top:9px;font-size:17px}
+.content{padding:42px 40px 68px;max-width:1320px;margin:0 auto;width:100%}
+.hero{align-items:flex-end;margin:0 0 28px;padding:0 0 28px;border-bottom:1px solid var(--line)}
+.hero h2{font-size:36px;line-height:1.22;margin-bottom:9px}
+.hero p{font-size:15px;max-width:700px}
+.hero-meta{padding:5px 9px;background:#edf2ef;border-radius:4px;color:#53615b}
+.notice{background:#fff;border-color:var(--line);border-left:3px solid var(--warm);color:#67472f;padding:13px 16px}
+.section{margin-top:34px}.section h2{font-size:20px}.section>p{margin-bottom:17px}
+.domain-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.domain-card{position:relative;min-height:164px;padding:19px;border-radius:7px;box-shadow:0 1px 2px rgba(20,42,35,.02);overflow:hidden}
+.domain-card:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:var(--accent)}
+.domain-card:nth-child(2):before{background:var(--blue)}.domain-card:nth-child(3):before{background:var(--warm)}.domain-card:nth-child(4):before{background:#567b42}.domain-card:nth-child(5):before{background:var(--purple)}
+.domain-card:hover{transform:translateY(-2px);border-color:#a9c8bf}
+.domain-card h3{font-size:17px}.domain-card p{max-width:34ch}.domain-card b{position:absolute;left:19px;bottom:16px}
+.entry-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.entry{position:relative;min-height:148px;padding:18px 19px;border-radius:7px;border-top:2px solid #b9d9cf}
+.entry:nth-child(2){border-top-color:#c8b3dc}.entry:nth-child(3){border-top-color:#b7cae1}.entry:nth-child(4){border-top-color:#ddbd9f}
+.entry h3{font-size:16px}.entry p{max-width:56ch}.entry a{font-size:13px;font-weight:650}
+.work-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.work-card{background:#fff;border:1px solid var(--line);border-radius:7px;padding:20px;min-height:264px;box-shadow:0 1px 2px rgba(20,42,35,.02)}
+.work-card.primary{border-top:3px solid var(--accent)}.work-card.research{border-top-color:var(--blue)}
+.work-head{display:flex;justify-content:space-between;gap:16px;align-items:flex-start;margin-bottom:13px}
+.work-head h3{font-size:19px;line-height:1.35;margin:0 0 4px}.work-head p{font-size:12px;color:var(--muted);margin:0}
+.status{flex:none;padding:3px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:750}.status.login{background:#edf3fa;color:var(--blue)}.status.design{background:#fff2e7;color:var(--warm)}.status.local{background:#f0edf6;color:var(--purple)}
+.io-grid{display:grid;gap:7px;margin:14px 0}.io-row{display:grid;grid-template-columns:46px minmax(0,1fr);gap:9px;padding-top:7px;border-top:1px solid #edf1ef;font-size:12px}.io-row b{color:#33423c}.io-row span{color:var(--muted)}
+.work-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.work-actions a{display:inline-block;padding:6px 9px;border:1px solid var(--line);border-radius:5px;background:#fff;color:var(--accent);font-size:12px;font-weight:700}.work-actions a:first-child{background:var(--accent-soft);border-color:#b7d9cf}.work-actions a:hover{border-color:var(--accent)}
+.secondary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.secondary-card{background:#fff;border:1px solid var(--line);border-radius:7px;padding:18px;min-height:210px}.secondary-card h3{font-size:17px;margin:0 0 4px}.secondary-card>p{font-size:13px;color:var(--muted);margin:0 0 12px}.secondary-card .io-grid{margin:8px 0}
+.aux-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}.aux-card{background:#fff;border:1px solid var(--line);border-radius:7px;padding:17px 18px}.aux-card h3{font-size:15px;margin:0 0 5px}.aux-card p{font-size:13px;color:var(--muted);margin:0 0 10px}.aux-card a{font-size:12px;font-weight:700;color:var(--accent);margin-right:12px}
+.sidebar-support{margin-top:17px;padding-top:14px;border-top:1px solid var(--line)}.sidebar-support p{margin:0 9px 5px;color:#8a9691;font-size:10px;font-weight:750;text-transform:uppercase}.sidebar-support button{display:flex;width:100%;justify-content:space-between;border:1px solid transparent;background:transparent;padding:8px 10px;border-radius:6px;color:#738079;font-size:12px}.sidebar-support button:hover,.sidebar-support button.active{background:#f5f7f6;border-color:var(--line);color:#53615b}
+.directory-head{padding-bottom:20px;margin-bottom:27px}.directory-head h2{font-size:30px}.directory-head p{font-size:13px}
+.sort button{padding:6px 10px;border-radius:5px}
+.topic-section{display:grid;gap:8px;margin-bottom:31px}.topic-title{font-size:16px;margin:0 0 3px;padding:0 2px}.topic-title small{padding:1px 6px;background:#e9efec;border-radius:4px}
+.note-row{border:1px solid var(--line);border-radius:6px!important;padding:14px 16px;background:#fff;box-shadow:0 1px 2px rgba(20,42,35,.02)}
+.note-row:hover{background:#fbfdfc;border-color:#a8c8be;transform:translateX(2px)}
+.note-row h3{font-size:15px}.note-row .path{color:#708078}.note-row p{font-size:13px}
+.reader{max-width:900px;margin:0 auto}.reader-head{padding-bottom:22px;margin-bottom:25px}.reader-context{font-weight:650}.reader h2{font-size:34px}.reader-body{max-width:820px;font-size:16px;line-height:1.9;color:#26342e}.reader-body h2{font-size:23px;margin-top:38px}.reader-body h3{font-size:18px}.reader-body blockquote{background:#edf4f1;border-left-color:var(--accent)}.reader-body .code-block,.reader-body pre.mermaid{background:#17221f}.reader-body th{background:#f0f5f2}
+.graph-head{padding-bottom:17px;border-bottom:1px solid var(--line)}.graph-head h2{font-size:30px}.graph-panel{padding:13px;border-radius:7px;box-shadow:0 1px 3px rgba(20,42,35,.03)}
+.visual-tabs button{padding:7px 11px}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:1120px){.domain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding-left:28px;padding-right:28px}}
+@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}.sidebar.collapsed .sidebar-support{display:none}.brand{padding:0;border:0}.mark{width:32px;height:32px}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:rgba(245,247,246,.97)}.content{padding:26px 15px 48px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:28px}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.domain-card{min-height:148px}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:27px}.reader-body{font-size:15px}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}}
 </style>
 <style>
-.sidebar{background:var(--bg)}
-.content.knowledge-view{max-width:1200px;margin-inline:auto}
-.knowledge-domain{margin-bottom:48px;scroll-margin-top:82px}
-.domain-heading{display:grid;grid-template-columns:38px minmax(0,1fr);column-gap:12px;align-items:start;margin:0 0 14px;padding:0 0 12px;border-bottom:1px solid var(--border)}
-.domain-number{display:grid;place-items:center;width:30px;height:30px;border-radius:4px;background:var(--blue-bg);color:var(--blue);font-size:12px;font-weight:800;line-height:1}
-.domain-heading .section-title{margin:0 0 3px;font-size:18px;line-height:1.4}
-.domain-heading .section-desc{margin:0;max-width:820px}
-.knowledge-item-stack{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
-.knowledge-item-stack .kp{margin:0;padding:20px 22px}
-.knowledge-item-stack .kp .body{max-width:88ch}
-.content.knowledge-view .claim-grid{grid-template-columns:minmax(0,1fr);gap:10px}
-.content.knowledge-view .claim-grid article{min-height:0}
-@media(max-width:760px){.top-tab{min-width:0;padding:12px 4px;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.content.knowledge-view{padding-left:14px;padding-right:14px}.knowledge-domain{margin-bottom:34px}.domain-heading{grid-template-columns:32px minmax(0,1fr);column-gap:9px;margin-bottom:11px;padding-bottom:10px}.domain-number{width:27px;height:27px}.domain-heading .section-title{font-size:16px}.knowledge-item-stack{gap:10px}.knowledge-item-stack .kp{padding:16px}.knowledge-item-stack .kp .body{max-width:none}.content.knowledge-view .claim-card{padding:14px}}
+/* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
+.app-alert{position:fixed;right:22px;bottom:22px;z-index:20;max-width:min(420px,calc(100vw - 30px));padding:11px 14px;border:1px solid #e8c6a8;border-left:3px solid var(--warm);border-radius:7px;background:#fff9f2;color:#704823;box-shadow:0 12px 30px rgba(35,45,40,.14);font-size:13px;display:none}
+.app-alert.open{display:block}
+.reader-tools{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:10px}
+.reader-back{border:1px solid var(--line);background:#fff;border-radius:5px;color:var(--muted);padding:6px 10px;font-size:12px}
+.reader-back:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.reader-study{position:relative;border:1px solid #b7d9cf;background:var(--accent-soft);border-radius:5px;color:var(--accent);padding:6px 10px;font-size:12px;font-weight:700;text-decoration:none!important}
+.reader-study:hover,.reader-study:focus-visible{border-color:var(--accent);background:#d9eee8;text-decoration:none!important}
+.reader-study::after{content:attr(title);position:absolute;z-index:5;right:0;top:calc(100% + 8px);width:min(300px,calc(100vw - 42px));padding:9px 11px;border:1px solid var(--line);border-radius:6px;background:#18231f;color:#fff;font-size:11px;font-weight:500;line-height:1.6;opacity:0;pointer-events:none;transform:translateY(-3px);transition:opacity .15s ease,transform .15s ease}
+.reader-study:hover::after,.reader-study:focus-visible::after{opacity:1;transform:translateY(0)}
+.graph-panel{overflow:hidden}
+#graph{touch-action:none}
+.node text{display:none}
+.node:hover text,.node:focus text,.node:focus-within text{display:block}
+.node:focus{outline:none}
+.home:empty::before{content:'正在加载知识库...';display:block;padding:48px 0;color:var(--muted);font-size:14px}
+.domain-card:focus-visible,.note-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+@media(max-width:760px){.app-alert{right:15px;bottom:15px}.reader-tools{justify-content:flex-start;flex-wrap:wrap}.reader-back,.reader-study{flex:1 1 150px;text-align:center}}
 </style>
 <style>
-.evaluation-playbook{margin:0 0 28px;padding:22px 24px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}.evaluation-playbook h2{font-size:18px;line-height:1.45;margin-bottom:6px}.evaluation-playbook>p{font-size:13px;line-height:1.7;color:var(--muted);margin-bottom:16px}.spec-rail{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));border:1px solid var(--border);border-radius:7px;overflow:hidden;margin:16px 0}.spec-step{padding:13px 14px;border-right:1px solid var(--border);background:#fff}.spec-step:last-child{border-right:0}.spec-step b{display:block;font-size:13px;margin-bottom:5px}.spec-step span{display:block;font-size:12px;line-height:1.6;color:var(--muted)}.spec-step small{display:block;margin-top:7px;font-size:11px;font-weight:700;color:var(--green)}.spec-step:nth-child(4) small,.spec-step:nth-child(5) small{color:var(--amber)}.playbook-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:18px 0}.playbook-block{padding:15px 16px;border:1px solid var(--border);border-radius:7px;background:#fff}.playbook-block h3{font-size:14px;margin:0 0 8px}.playbook-block ol,.playbook-block ul{margin:0;padding-left:18px}.playbook-block li{font-size:12px;line-height:1.72;color:var(--muted);margin-bottom:4px}.artifact-table,.confidence-table{width:100%;border-collapse:collapse;font-size:12px;margin:12px 0 18px}.artifact-table th,.artifact-table td,.confidence-table th,.confidence-table td{padding:10px 11px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border);line-height:1.65}.artifact-table th,.confidence-table th{background:#f7f9fc;font-size:11px}.artifact-table td:first-child{font-weight:700;white-space:nowrap}.artifact-table td:last-child{color:var(--muted)}.visualization-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}.visualization-grid>div{padding:12px 13px;background:#f8fbff;border-top:2px solid var(--blue)}.visualization-grid>div:nth-child(2){border-top-color:var(--green);background:#f3fbf7}.visualization-grid>div:nth-child(3){border-top-color:var(--amber);background:#fffaf0}.visualization-grid>div:nth-child(4){border-top-color:var(--purple);background:var(--purple-bg)}.visualization-grid b{display:block;font-size:13px;margin-bottom:4px}.visualization-grid p{margin:0;font-size:12px;line-height:1.65;color:var(--muted)}.mermaid-template,.output-schema{overflow:auto;margin:12px 0 18px;padding:14px 16px;border-radius:7px;background:#17212b;color:#e6edf3;font:12px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}.legend-row{display:flex;flex-wrap:wrap;gap:7px;margin:10px 0 14px}.legend-row span{padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700}.legend-row .confirmed{background:var(--blue-bg);color:var(--blue)}.legend-row .strength{background:var(--green-bg);color:var(--green)}.legend-row .risk{background:var(--amber-bg);color:var(--amber)}.legend-row .failure{background:#fdeeee;color:#b42318}.legend-row .proposal{background:var(--purple-bg);color:var(--purple)}.confidence-table td:first-child{font-weight:700;white-space:nowrap}.reference-projects .claim-grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}.reference-projects .claim-card{min-height:0}@media(max-width:1100px){.spec-rail{grid-template-columns:repeat(3,minmax(0,1fr))}.spec-step:nth-child(3){border-right:0}.spec-step:nth-child(-n+3){border-bottom:1px solid var(--border)}.visualization-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:760px){.evaluation-playbook{padding:17px 16px}.spec-rail,.playbook-grid,.visualization-grid{grid-template-columns:1fr}.spec-step{border-right:0;border-bottom:1px solid var(--border)}.spec-step:last-child{border-bottom:0}.artifact-table,.confidence-table{min-width:680px}.evaluation-playbook{overflow:hidden}}
-</style>
-<style>
-.analysis-report{display:grid;grid-template-columns:minmax(0,3fr) minmax(280px,2fr);gap:14px;margin:18px 0}.report-lane{border:1px solid var(--border);border-radius:7px;background:#fff;overflow:hidden}.report-lane.current{border-top:3px solid var(--blue)}.report-lane.improve{border-top:3px solid var(--amber)}.report-lane-head{display:flex;align-items:baseline;gap:9px;padding:14px 15px 10px;border-bottom:1px solid var(--border)}.report-lane-head span{font-size:20px;font-weight:800;color:var(--blue)}.report-lane.improve .report-lane-head span{color:var(--amber)}.report-lane-head h3{font-size:15px;margin:0}.report-lane-head small{margin-left:auto;font-size:11px;color:var(--muted)}.report-item{padding:12px 15px;border-bottom:1px solid var(--border)}.report-item:last-child{border-bottom:0}.report-item b{display:block;font-size:13px;margin-bottom:4px}.report-item p{margin:0;font-size:12px;line-height:1.65;color:var(--muted)}.report-item em{display:inline-block;margin-top:6px;font-size:11px;font-style:normal;font-weight:700;color:var(--green)}.report-lane.improve .report-item em{color:var(--amber)}@media(max-width:760px){.analysis-report{grid-template-columns:1fr}.report-lane-head small{display:none}}
-</style>
-<style>
-.recommendation-discipline{border-top:3px solid var(--amber)}.recommendation-discipline .confidence-grid{margin:18px 0}.recommendation-discipline .evidence{margin-bottom:0}.recommendation-discipline .reflection-list{margin:14px 0 0;padding:15px 18px;border:1px solid var(--border);background:#fffaf0}.reflection-list b{display:block;margin-bottom:7px}.reflection-list ol{margin:0;padding-left:20px}.reflection-list li{margin:4px 0;color:var(--muted);font-size:15px;line-height:1.72}
-.evaluation-contract .evaluation-scope{grid-template-columns:repeat(4,minmax(0,1fr))}.evaluation-contract .evaluation-scope>div:nth-child(2){border-right:1px solid var(--border)}.evaluation-contract .evaluation-scope>div:last-child{border-right:0}.evaluation-stage-map{border-top:3px solid var(--green)}.evaluation-stage-map>p,.evidence-record-template>p{max-width:900px}.stage-map-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;margin:18px 0;border:1px solid var(--border);background:var(--border)}.stage-map-grid section{min-width:0;padding:14px 15px;background:#fff}.stage-map-grid b,.stage-map-grid span,.stage-map-grid small{display:block}.stage-map-grid b{font-size:14px;line-height:1.45}.stage-map-grid span{margin-top:5px;font-size:13px;line-height:1.62;color:var(--muted)}.stage-map-grid small{margin-top:8px;font-size:12px;line-height:1.55;color:var(--amber)}.evidence-record-template{border-top:3px solid var(--purple)}.evidence-record-grid{display:grid;grid-template-columns:minmax(260px,2fr) minmax(0,3fr);gap:14px;margin:18px 0}.evidence-record-grid>section{min-width:0;padding:15px 16px;border:1px solid var(--border);background:#fff}.evidence-record-grid>section>b{display:block;margin-bottom:9px;font-size:14px}.evidence-record-grid dl{margin:0}.evidence-record-grid dt{margin-top:8px;font-size:13px;font-weight:750;color:var(--purple)}.evidence-record-grid dd{margin:2px 0 0;font-size:13px;line-height:1.62;color:var(--muted)}.evidence-chain{display:flex;flex-wrap:wrap;align-items:center;gap:6px;padding:10px 0}.evidence-chain span{padding:3px 6px;border:1px solid #d7c8f5;background:var(--purple-bg);color:var(--purple);font-size:12px;font-weight:700}.evidence-chain i{font-style:normal;color:var(--purple);font-weight:800}.evidence-record-grid p{margin:2px 0 0;font-size:13px;line-height:1.65;color:var(--muted)}@media(max-width:1100px){.evaluation-contract .evaluation-scope{grid-template-columns:repeat(2,minmax(0,1fr))}.evaluation-contract .evaluation-scope>div:nth-child(2){border-right:0}.evaluation-contract .evaluation-scope>div:nth-child(-n+2){border-bottom:1px solid var(--border)}}@media(max-width:760px){.evaluation-contract .evaluation-scope,.stage-map-grid,.evidence-record-grid{grid-template-columns:1fr}.evaluation-contract .evaluation-scope>div,.evaluation-contract .evaluation-scope>div:nth-child(2){border-right:0}.evaluation-contract .evaluation-scope>div:nth-child(-n+2){border-bottom:1px solid var(--border)}.stage-map-grid{gap:1px}.evidence-record-template .output-schema{font-size:11px;padding:12px}.evidence-chain{align-items:flex-start}.evidence-chain i{transform:rotate(90deg);margin:2px 5px}}
-</style>
-<style>
-.agent-parser{border-top:3px solid var(--purple)}.agent-parser>p{max-width:960px}.parser-role-grid,.parser-lens-grid,.parser-output-grid{display:grid;gap:1px;margin:18px 0;border:1px solid var(--border);background:var(--border)}.parser-role-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.parser-lens-grid{grid-template-columns:repeat(4,minmax(0,1fr))}.parser-output-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.parser-role-grid>section,.parser-lens-grid>section,.parser-output-grid>section{min-width:0;padding:15px 16px;background:var(--surface)}.parser-role-grid b,.parser-lens-grid b,.parser-output-grid b{display:block;font-size:14px;line-height:1.45;margin-bottom:6px}.parser-role-grid p,.parser-lens-grid p,.parser-output-grid p{margin:0;font-size:13px;line-height:1.65;color:var(--muted)}.parser-role-grid small,.parser-lens-grid small,.parser-output-grid small{display:block;margin-top:8px;font-size:11px;line-height:1.55;color:var(--green);font-weight:700}.parser-flow{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));margin:18px 0;border:1px solid var(--border);overflow:hidden}.parser-flow>div{position:relative;min-height:130px;padding:15px;border-right:1px solid var(--border);background:#fff}.parser-flow>div:last-child{border-right:0}.parser-flow b,.parser-flow span,.parser-flow small{display:block}.parser-flow b{font-size:14px;margin-bottom:6px}.parser-flow span{font-size:12px;line-height:1.65;color:var(--muted)}.parser-flow small{margin-top:8px;font-size:11px;line-height:1.45;color:var(--purple);font-weight:700}.parser-flow>div:not(:last-child)::after{content:"→";position:absolute;right:-10px;top:48px;z-index:2;color:var(--purple);font-size:18px;font-weight:700}.parser-boundary{margin:16px 0;padding:14px 16px;border-left:3px solid var(--purple);background:var(--purple-bg);font-size:14px;line-height:1.72}.parser-boundary b{color:var(--purple)}.parser-artifact{margin-top:18px;padding:15px 16px;border:1px solid var(--border);background:#f7f9fc}.parser-artifact h3{font-size:14px;margin:0 0 8px}.parser-artifact ul{margin:0;padding-left:18px}.parser-artifact li{margin:4px 0;font-size:13px;line-height:1.65;color:var(--muted)}@media(max-width:1100px){.parser-flow{grid-template-columns:repeat(3,minmax(0,1fr))}.parser-flow>div:nth-child(3){border-right:0}.parser-flow>div:nth-child(-n+3){border-bottom:1px solid var(--border)}.parser-lens-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.parser-output-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:760px){.parser-role-grid,.parser-lens-grid,.parser-output-grid,.parser-flow{grid-template-columns:1fr}.parser-role-grid>section,.parser-lens-grid>section,.parser-output-grid>section,.parser-flow>div{border-right:0;border-bottom:1px solid var(--border)}.parser-role-grid>section:last-child,.parser-lens-grid>section:last-child,.parser-output-grid>section:last-child,.parser-flow>div:last-child{border-bottom:0}.parser-flow>div{min-height:0}.parser-flow>div:not(:last-child)::after{content:"↓";right:auto;left:calc(50% - 5px);top:auto;bottom:-21px}.parser-flow{overflow:visible;margin-bottom:32px}}
-</style>
-<style>
-.kicker{font-size:12px;color:#64748b;font-weight:700;line-height:1.5;margin-bottom:7px}.workspace-nav{padding:8px 0 10px;border-bottom:1px solid var(--border);margin-bottom:7px}.workspace-nav .nav-item{padding-left:20px;font-weight:600}.nav-group-label.active{color:var(--blue);background:var(--blue-bg);box-shadow:inset 2px 0 0 var(--blue)}.eval-route{padding-left:38px}.eval-page-header{margin:2px 0 28px;padding-bottom:19px;border-bottom:1px solid var(--border)}.eval-page-header h1{font-size:28px;line-height:1.32;font-weight:750;margin:0 0 7px}.eval-page-header p{max-width:780px;margin:0;color:var(--muted);font-size:16px;line-height:1.75}.eval-page-header .eyebrow{display:block;margin-bottom:7px;color:#64748b;font-size:12px;font-weight:700}.eval-page-header .page-hint{display:inline-block;margin-top:10px;color:#475569;font-size:13px;font-weight:600}.content.eval-view{max-width:1320px}.content.eval-view .workbench,.content.eval-view .system-map,.content.eval-view .scenario-matrix,.content.eval-view .comparison-board{margin-bottom:24px}.parser-role-grid p,.parser-lens-grid p,.parser-output-grid p{font-size:14px}.parser-role-grid small,.parser-lens-grid small,.parser-output-grid small{font-size:12px}.parser-flow span{font-size:13px}.parser-flow small{font-size:12px}.parser-boundary{border:1px solid #ddd6fe;background:#faf9ff}.parser-boundary b{color:#5b3a9b}@media(max-width:760px){.sidebar{width:100%}.eval-page-header{margin-bottom:20px;padding-bottom:15px}.eval-page-header h1{font-size:23px}.eval-page-header p{font-size:15px}.workspace-nav .nav-item,.eval-route{padding-left:18px}.parser-role-grid p,.parser-lens-grid p,.parser-output-grid p{font-size:14px}}
+@media(max-width:760px){.mobile-menu{display:block!important;flex:0 0 auto;min-width:52px;margin-left:auto;visibility:visible}.brand{width:100%;min-width:0}.brand>div:nth-child(2){min-width:0}.brand strong,.brand small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
 </style>
 </head>
 <body>
 <div class="app">
-
-<aside class="sidebar">
-  <div class="sidebar-title"><span id="navTitle">AI Agent 开发知识体系</span><button class="nav-toggle" id="navToggle" type="button" aria-expanded="false" title="展开目录">目录</button></div>
-  <div class="nav-tree" id="navTree"></div>
-</aside>
-
-<div class="main">
-<div class="top-tabs">
-  <button class="top-tab active" data-tab="knowledge">📚 知识体系</button>
-  <button class="top-tab" data-tab="eval">🔍 评估框架</button>
+<aside class="sidebar" id="sidebar"><div class="brand"><div class="mark">TK</div><div><strong>technical-knowledge</strong><small>工程知识库</small></div><button type="button" class="mobile-menu" id="mobile-menu" aria-label="打开目录">目录</button></div><nav class="nav-actions"><button type="button" id="home-button" class="active" title="回到知识库首页">⌂ 首页</button><button type="button" id="learn-button" title="在新标签打开学习中心" aria-label="在新标签打开学习中心">▷ 学习</button><button type="button" id="graph-button" title="打开知识图谱">⌘ 图谱</button><button type="button" id="projects-button" title="在新标签打开项目与工具">▣ 项目</button></nav><div id="domains"></div></aside>
+<main class="main"><header class="topbar"><h1>工程知识库</h1><label class="search"><span>⌕</span><input id="search" placeholder="搜索知识、机制、项目或来源" autocomplete="off"></label></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><div class="reader-tools"><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" title="把当前笔记标题带入学习中心，不会自动发送" hidden>用这个主题学习</a></div><div id="reader-context" class="reader-context"></div><h2 id="reader-title"></h2><div id="reader-sources" class="reader-sources"></div></div><article id="reader-body" class="reader-body"></article></section><section id="graph-view" class="graph"><div class="graph-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div><div class="visual-tabs" role="tablist"><button type="button" data-visual="network" role="tab" aria-selected="true" class="active">关系网络</button><button type="button" data-visual="flow" role="tab" aria-selected="false">知识流通</button><button type="button" data-visual="learning" role="tab" aria-selected="false">学习循环</button><button type="button" data-visual="architecture" role="tab" aria-selected="false">AI 系统架构</button><button type="button" data-visual="quadrant" role="tab" aria-selected="false">选型象限</button></div></div><div class="graph-panel"><svg id="graph" aria-label="知识图谱"></svg><div id="legend" class="graph-legend"></div></div></section></div></main>
 </div>
-
-<div class="qa-banner" id="qaBanner"><h3>页面正在加载</h3><div class="qa-item"><div class="a">正在初始化知识体系内容。</div></div></div>
-<div class="content" id="content"><div class="local-notice">如果此提示长时间不消失，说明页面脚本加载失败，请强制刷新或检查控制台错误。</div></div>
-
-</div>
-</div>
-
 <script>
-window.addEventListener("error", function(event) {
-  const banner = document.getElementById("qaBanner");
-  const content = document.getElementById("content");
-  if (banner) banner.innerHTML = '<div class="qa-banner"><h3>页面加载失败</h3></div>';
-  if (content) content.innerHTML = '<div class="local-notice"><b>页面脚本执行失败：</b>' + String(event.message || "未知错误") + '</div>';
-});
+const $=s=>document.querySelector(s),state={notes:[],edges:[],domain:'all',topic:'all',query:'',sort:'title',selected:null,graphMode:'network',zoom:1,pan:{x:0,y:0},view:'home'};const order=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'],topicOrder={'AI系统':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端与分布式系统':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'计算机系统与性能':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建与质量':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付']},colors=['#147766','#3f70a8','#a45b2a','#7862a3','#567b42','#9b4660','#697772'];const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const ordered=a=>[...a].sort((x,y)=>(order.indexOf(x)<0?99:order.indexOf(x))-(order.indexOf(y)<0?99:order.indexOf(y))||x.localeCompare(y,'zh-CN'));const orderedTopics=(domain,a)=>[...a].sort((x,y)=>{const ranks=topicOrder[domain]||[];const rx=ranks.indexOf(x),ry=ranks.indexOf(y);return (rx<0?999:rx)-(ry<0?999:ry)||x.localeCompare(y,'zh-CN')});
+async function json(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
+function alertUser(message){const box=$('#app-alert');box.textContent=message;box.classList.add('open');clearTimeout(alertUser.timer);alertUser.timer=setTimeout(()=>box.classList.remove('open'),5200)}
+function show(view){state.view=view;$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');document.querySelectorAll('.nav-actions button').forEach(b=>b.classList.toggle('active',(b.id==='home-button'&&view==='home')||(b.id==='graph-button'&&view==='graph')))}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
+function renderDomains(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),clippingCount=state.notes.filter(n=>n.category==='Clippings').length;$('#domains').innerHTML=domains.map(d=>{const topics=orderedTopics(d,new Set(state.notes.filter(n=>n.category===d).map(n=>n.topic)));const open=state.domain===d;return `<section class="nav-section"><button class="domain-button ${open?'active':''}" data-domain="${esc(d)}"><span>${esc(d)}</span><span class="count">${state.notes.filter(n=>n.category===d).length}</span></button>${open?topics.map(t=>`<button class="topic-button ${state.topic===t?'active':''}" data-domain="${esc(d)}" data-topic="${esc(t)}"><span>${esc(t)}</span><span class="count">${state.notes.filter(n=>n.category===d&&n.topic===t).length}</span></button>`).join(''):''}</section>`}).join('')+(clippingCount?`<div class="sidebar-support"><p>保留资料</p><button class="domain-button ${state.domain==='Clippings'?'active':''}" data-domain="Clippings"><span>Clippings</span><span class="count">${clippingCount}</span></button></div>`:'');document.querySelectorAll('.domain-button').forEach(b=>b.onclick=()=>select(b.dataset.domain,'all'));document.querySelectorAll('.topic-button').forEach(b=>b.onclick=()=>select(b.dataset.domain,b.dataset.topic))}
+function renderDirectory(){
+  const list=noteList(),groups=new Map();
+  for(const n of list){const k=state.domain==='all'?n.category:n.topic;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
+  const groupRank=g=>state.domain==='all'?(order.indexOf(g)<0?999:order.indexOf(g)):(topicOrder[state.domain]||[]).indexOf(g)<0?999:(topicOrder[state.domain]||[]).indexOf(g);
+  const sections=[...groups].sort(([a],[b])=>groupRank(a)-groupRank(b)||a.localeCompare(b,'zh-CN')).map(([g,items])=>{
+    const rows=items.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h3>${esc(n.title)}</h3><div class="path">${esc(n.topic)} · ${esc(n.change_rate||'')}</div></div><p>${esc(n.excerpt||'')}</p></article>`).join('');
+    return `<section class="topic-section"><h3 class="topic-title"><span>${esc(g==='总览'?'入口':g)}</span><small>${items.length}</small></h3>${rows}</section>`;
+  }).join('');
+  const empty=groups.size?'':'<div class="empty">没有匹配内容</div>';
+  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${list.length} 篇 · 主题按知识对象归属</p></div><div class="sort"><button data-sort="title" class="${state.sort==='title'?'active':''}">按标题</button><button data-sort="updated" class="${state.sort==='updated'?'active':''}">按更新</button></div></div>${sections}${empty}`;
+  document.querySelectorAll('.note-row').forEach(row=>{row.setAttribute('tabindex','0');row.setAttribute('role','button');row.setAttribute('aria-label',row.querySelector('h3')?.textContent||'打开笔记');row.onclick=()=>openNote(row.dataset.path);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(row.dataset.path)}}});
+  document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;renderDirectory()});
+}
+function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length,host=location.hostname;const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero"><div><h2>工程知识，从原理到验证</h2><p>围绕真实技术问题组织基础概念、系统机制、工程实现、边界和证据。</p></div><div class="hero-meta">${knowledgeCount} 篇技术笔记</div></section><div class="notice">先从知识领域建立心智模型；需要形成能力时进入学习工具，需要判断系统是否真的有效时进入自研 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>稳定知识按技术对象归位，不按课程、项目或时间线堆放。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><b>${state.notes.filter(n=>n.category===d).length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>这两个入口优先：一个把主题变成课堂，一个把资料变成可追问、可复习的学习工作区。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">3100 · 可用</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}">创建课堂</a><a href="/?path=${encodeURIComponent('知识库管理/来源/论文与项目/OpenMAIC互动课堂与Agent技能.md')}">实现与边界</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">3782 · 已安装</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}">进入学习工作区</a><a href="/?path=${encodeURIComponent('知识库管理/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自研评估项目与外部工程 Skills 分开：前者定义事实边界，后者提供可复用工作流。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md">查看 Skills</a><a href="/?path=${encodeURIComponent('知识库管理/来源/论文与项目/Matt Skills工程协作技能.md')}">融合记录</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和项目源码用于理解关系与回溯证据，不占据主要学习路径。</p><div class="aux-grid"><article class="aux-card"><h3>知识关系与系统图</h3><p>内置图谱展示知识连接、学习循环、AI 系统分层和选型象限；Archify 用于需要确定性校验的架构图。</p><a href="/?view=graph" id="home-graph">查看知识图谱 →</a><a href="/?path=${encodeURIComponent('知识库管理/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects">打开项目入口 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(c=>c.onclick=()=>select(c.dataset.domain,'all'));$('#home-graph').onclick=e=>{e.preventDefault();showGraph()}}
+function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}state.domain=domain;state.topic=topic;state.selected=null;show('directory');renderDomains();renderDirectory();if(matchMedia('(max-width:760px)').matches)$('#sidebar').classList.add('collapsed');if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch{return s}}function renderSources(s){if(!s?.length)return'';return '<b>来源：</b>'+s.map(x=>{x=String(x);if(/^https?:\/\//.test(x))return `<a href="${esc(x)}" target="_blank" rel="noreferrer">${esc(sourceLabel(x))}</a>`;if(x.startsWith('[[')){const t=x.slice(2,-2).split('|')[0];return `<a href="/?path=${encodeURIComponent(t)}">${esc(t.split('/').pop())}</a>`}return esc(x)}).join(' · ')}
+async function openNote(path,push=true){if(path==='知识库首页.md'||path==='知识库首页'){loadHome(push);return}try{const n=await json('/api/note?path='+encodeURIComponent(path));state.selected=n.path;show('reader');$('#reader-context').textContent=n.category+' / '+n.topic;$('#reader-title').textContent=n.title;$('#reader-sources').innerHTML=renderSources(n.sources);$('#reader-body').innerHTML=n.html;document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});if(window.renderMermaid)window.renderMermaid().catch(()=>alertUser('图表渲染失败，但正文仍然可读'));if(push)history.pushState({},'', '/?path='+encodeURIComponent(n.path));window.scrollTo({top:0})}catch(e){console.error(e);alertUser('这篇笔记暂时无法打开，请稍后重试')}}
+function graphCanvas(){const svg=$('#graph'),mobile=matchMedia('(max-width:900px)').matches,W=mobile?720:1200,H=mobile?920:690;svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto'});marker.append(svgEl('path',{d:'M0 0L10 5L0 10z',fill:'#9db8ad'}));defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);return{svg,world,W,H,mobile}}function svgEl(n,a={},text=''){const e=document.createElementNS('http://www.w3.org/2000/svg',n);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));if(text)e.textContent=text;return e}function addBox(w,x,y,ww,h,label,kind='',small='',target=''){const g=svgEl('g',{class:'diagram-group'});g.append(svgEl('rect',{x,y,width:ww,height:h,rx:7,class:`diagram-box ${kind}`}),svgEl('text',{x:x+ww/2,y:y+h/2-(small?8:0),class:'diagram-label'},label));if(small)g.append(svgEl('text',{x:x+ww/2,y:y+h/2+14,class:'diagram-small'},small));if(target)g.onclick=()=>openNote(target);w.append(g)}function arrow(w,x1,y1,x2,y2){w.append(svgEl('line',{x1,y1,x2,y2,class:'diagram-edge'}))}
+function renderNetwork(){const{world,W,H}=graphCanvas(),notes=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings'),domains=ordered(new Set(notes.map(n=>n.category))),positions=new Map(),topics=new Map(),cols=3,cw=W/cols,rh=H/Math.ceil(domains.length/cols);domains.forEach((d,di)=>{const cx=cw*(di%cols+.5),cy=rh*(Math.floor(di/cols)+.5),group=notes.filter(n=>n.category===d),ts=orderedTopics(d,new Set(group.map(n=>n.topic)));ts.forEach((t,ti)=>{const r=Math.min(cw,rh)*.27,a=-Math.PI/2+ti*2*Math.PI/Math.max(ts.length,1),tx=cx+Math.cos(a)*r,ty=cy+Math.sin(a)*r;topics.set(`${d}/${t}`,{x:tx,y:ty,d,t});const ns=group.filter(n=>n.topic===t),nr=ns.length===1?0:Math.min(28,12+ns.length*2);ns.forEach((n,ni)=>{const na=-Math.PI/2+ni*2*Math.PI/Math.max(ns.length,1);positions.set(n.path,{x:tx+Math.cos(na)*nr,y:ty+Math.sin(na)*nr})})});world.append(svgEl('text',{x:cx,y:cy-rh*.38,class:'domain-label','text-anchor':'middle'},`${d} · ${group.length}`))});for(const e of state.edges){const a=positions.get(e.source),b=positions.get(e.target);if(!a||!b)continue;const line=svgEl('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'edge'});line.dataset.source=e.source;line.dataset.target=e.target;world.append(line)}topics.forEach(t=>{const ns=notes.filter(n=>n.category===t.d&&n.topic===t.t);ns.forEach(n=>{const p=positions.get(n.path);world.append(svgEl('line',{x1:t.x,y1:t.y,x2:p.x,y2:p.y,class:'topic-link'}))});const g=svgEl('g',{class:'topic-node',transform:`translate(${t.x},${t.y})`,tabindex:'0',role:'button','aria-label':`${t.d} / ${t.t}`});g.onclick=()=>select(t.d,t.t);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(t.d,t.t)}};g.append(svgEl('circle',{r:7,stroke:colors[domains.indexOf(t.d)%colors.length]}),svgEl('text',{y:-11,'text-anchor':'middle'},t.t));world.append(g)});notes.forEach(n=>{const p=positions.get(n.path);if(!p)return;const g=svgEl('g',{class:'node',transform:`translate(${p.x},${p.y})`,tabindex:'0',role:'button','aria-label':n.title});g.onclick=()=>openNote(n.path);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(n.path)}};g.onmouseenter=()=>document.querySelectorAll('.edge').forEach(e=>{if(e.dataset.source===n.path||e.dataset.target===n.path)e.classList.add('focused')});g.onmouseleave=()=>document.querySelectorAll('.edge.focused').forEach(e=>e.classList.remove('focused'));g.append(svgEl('circle',{r:5,fill:colors[domains.indexOf(n.category)%colors.length]}),svgEl('text',{y:-10,'text-anchor':'middle'},n.title.length>20?n.title.slice(0,19)+'…':n.title));world.append(g)});$('#legend').innerHTML=domains.map((d,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(d)}</span>`).join('')}
+function renderFlow(){const{world,W,H,mobile}=graphCanvas(),steps=[['问题','目标与约束','知识库首页.md'],['理解','机制与关系','工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md'],['召回','倒排 / 向量 / 图','工程知识/AI系统/知识与检索/RAG前沿：重排、自动优化与开放索引.md'],['验证','证据与权限','工程知识/AI系统/质量与运营/可靠生成需要结构、证据、拒答与回归.md'],['行动','模型与工具','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['结果','答案或状态','工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md'],['反馈','评测与回归','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?92:132,bh=70;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===2?'primary':i===4?'secondary':'',small,target));$('#legend').innerHTML='<span><i style="background:#147766"></i>证据获取</span><span><i style="background:#a45b2a"></i>模型与行动</span>'}
+function renderLearning(){const{world,W,H,mobile}=graphCanvas(),steps=[['目标','要解决什么','知识库首页.md'],['理解','机制、边界、关系','工程知识/AI系统/Agent与工作流/Agent学习工具把资料变成可验证学习循环.md'],['预测','先说出判断','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md'],['练习','最小实验','知识库管理/维护/学习与复习方法.md'],['反馈','错误与证据','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md'],['迁移','换场景使用','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?98:142,bh=72;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===0?'secondary':i===4?'primary':'',small,target));$('#legend').innerHTML='<span><i style="background:#a45b2a"></i>目标与迁移</span><span><i style="background:#147766"></i>证据与反馈</span>'}
+function renderArchitecture(){const{world,W,H,mobile}=graphCanvas(),layers=[['能力层','模型、Embedding、多模态','工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md'],['知识层','RAG、记忆、结构化数据','工程知识/AI系统/知识与检索/RAG前沿：重排、自动优化与开放索引.md'],['编排层','工作流、Agent、状态','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['工具层','API、MCP、A2A、业务系统','工程知识/AI系统/生态与选型/MCP连接能力，A2A委托任务.md'],['运行层','推理服务、队列、存储','工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md'],['治理层','评测、追踪、安全、发布','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],x=mobile?80:180,w=mobile?560:840,top=55,gap=mobile?128:94,h=70;layers.forEach(([label,small,target],i)=>{const y=top+i*gap;if(i<layers.length-1)arrow(world,W/2,y+h,W/2,y+gap);addBox(world,x,y,w,h,label,i===2?'primary':i===5?'secondary':'',small,target)});$('#legend').innerHTML='<span><i style="background:#147766"></i>决策编排</span><span><i style="background:#a45b2a"></i>治理</span>'}
+function renderQuadrant(){const{world,W,H,mobile}=graphCanvas(),x=mobile?92:188,y=88,pw=mobile?536:824,ph=mobile?650:470,mx=x+pw/2,my=y+ph/2;world.append(svgEl('rect',{x,y,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('rect',{x:mx,y,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x,y:my,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x:mx,y:my,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('line',{x1:x,y1:my,x2:x+pw,y2:my,class:'axis-line'}),svgEl('line',{x1:mx,y1:y+ph,x2:mx,y2:y,class:'axis-line'}));[['显式路径 / 本地',x+18,y+25],['显式协作 / 跨系统',mx+18,y+25],['自适应决策 / 本地',x+18,my+25],['自适应协作 / 跨系统',mx+18,my+25]].forEach(([t,tx,ty])=>world.append(svgEl('text',{x:tx,y:ty,class:'quadrant-title'},t)));[['工作流',.18,.18,'#147766'],['单 Agent',.62,.26,'#3f70a8'],['人工审批',.35,.58,'#a45b2a'],['MCP',.72,.55,'#7862a3'],['A2A',.86,.82,'#9b4660']].forEach(([t,px,py,c])=>{const cx=x+pw*px,cy=y+ph*(1-py),g=svgEl('g',{class:'point-group'});g.append(svgEl('circle',{cx,cy,r:10,class:'point',fill:c}),svgEl('text',{x:cx+14,y:cy+5,class:'point-label'},t));world.append(g)});$('#legend').innerHTML='<span><i style="background:#147766"></i>工作流</span><span><i style="background:#3f70a8"></i>Agent</span><span><i style="background:#7862a3"></i>协议</span><span><i style="background:#9b4660"></i>跨系统协作</span>'}
+function renderGraph(){const meta={network:['知识关系','领域、主题与笔记之间的关联'],flow:['知识流通','从问题到证据、行动与反馈的路径'],learning:['学习循环','从目标、理解到练习、反馈与迁移'],architecture:['AI 系统架构','能力、知识、编排、工具、运行与治理的分层'],quadrant:['技术选型象限','用控制方式与协作范围理解组件位置']};const [t,s]=meta[state.graphMode];$('#graph-title').textContent=t;$('#graph-subtitle').textContent=s;document.querySelectorAll('[data-visual]').forEach(b=>b.classList.toggle('active',b.dataset.visual===state.graphMode));({network:renderNetwork,flow:renderFlow,learning:renderLearning,architecture:renderArchitecture,quadrant:renderQuadrant}[state.graphMode]||renderNetwork)()}
+function bindGraph(){const svg=$('#graph');let drag=null;svg.onwheel=e=>{e.preventDefault();state.zoom=Math.max(.55,Math.min(2.5,state.zoom*(e.deltaY<0?1.1:.9)));applyTransform()};svg.onpointerdown=e=>{if(e.target.closest('.node,.topic-node,.diagram-group,.point-group'))return;drag={x:e.clientX,y:e.clientY,px:state.pan.x,py:state.pan.y};svg.setPointerCapture(e.pointerId)};svg.onpointermove=e=>{if(drag)state.pan={x:drag.px+e.clientX-drag.x,y:drag.py+e.clientY-drag.y},applyTransform()};svg.onpointerup=()=>drag=null;document.querySelectorAll('[data-visual]').forEach(b=>b.onclick=()=>{state.graphMode=b.dataset.visual;state.zoom=1;state.pan={x:0,y:0};renderGraph()})}function applyTransform(){const w=$('#graph-world');if(w)w.setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`)}
+const renderHomeBase=renderHome;renderHome=function(){renderHomeBase();const cards=[...document.querySelectorAll('.work-card')],classroom=cards.find(card=>card.querySelector('h3')?.textContent==='OpenMAIC'),tutor=cards.find(card=>card.querySelector('h3')?.textContent==='DeepTutor');if(classroom){const link=classroom.querySelector('.work-actions a');link.href='/launch/openmaic?next='+encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'));link.target='_blank';link.rel='noopener noreferrer';link.textContent='创建课堂';classroom.querySelector('.status').textContent='已安装'}if(tutor){const link=tutor.querySelector('.work-actions a');link.href='/launch/deeptutor?next='+encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'));link.target='_blank';link.rel='noopener noreferrer';link.textContent='进入学习导师';tutor.querySelector('.status').textContent='已安装'}const heading=[...document.querySelectorAll('#home .section h2')].find(node=>node.textContent==='学习与实践');if(heading){const paragraph=heading.nextElementSibling;paragraph.innerHTML='从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。'}json('/api/learning/status').then(status=>{if(classroom)classroom.querySelector('.status').textContent=status.openmaic?.online&&status.openmaic?.llm?'互动课堂可用':status.openmaic?.online?'服务运行中':'未启动';if(tutor)tutor.querySelector('.status').textContent=status.deeptutor?.online&&status.deeptutor?.llm?'导师可用':'配置不完整'}).catch(()=>{if(classroom)classroom.querySelector('.status').textContent='状态未知';if(tutor)tutor.querySelector('.status').textContent='状态未知';alertUser('学习工具状态暂时不可用，入口仍然可以打开')})}
+function loadHome(push=false){state.domain='all';state.topic='all';state.selected=null;renderDomains();renderHome();show('home');if(push)history.pushState({},'','/')}function selectFromUrl(){const p=new URLSearchParams(location.search),path=p.get('path'),domain=p.get('domain'),topic=p.get('topic');if(path==='知识库首页.md'||path==='知识库首页'||domain==='总览'||topic==='首页'){history.replaceState({},'','/');loadHome(false)}else if(path)openNote(path,false);else if(p.get('view')==='graph')showGraph(false);else if(domain)select(domain,topic||'all',false);else loadHome(false)}function showGraph(push=true){state.view='graph';show('graph');renderGraph();if(push)history.pushState({},'', '/?view=graph')}$('#home-button').onclick=()=>{state.query='';$('#search').value='';loadHome(true)};$('#learn-button').onclick=()=>{const tab=window.open('/learn','_blank');if(tab)tab.opener=null;else alertUser('浏览器拦截了新标签，请允许弹出窗口后重试')};$('#graph-button').onclick=()=>showGraph();$('#projects-button').onclick=()=>{location.href='/projects'};$('#search').oninput=e=>{state.query=e.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};$('#mobile-menu').onclick=()=>$('#sidebar').classList.toggle('collapsed');if(matchMedia('(max-width:760px)').matches)$('#sidebar').classList.add('collapsed');window.onpopstate=selectFromUrl;bindGraph();json('/api/notes').then(data=>{state.notes=data.notes;state.edges=data.edges;renderDomains();selectFromUrl()}).catch(console.error);setInterval(async()=>{try{const data=await json('/api/notes');state.notes=data.notes;state.edges=data.edges;renderDomains();if(state.view==='home')renderHome();if(state.view==='directory')renderDirectory();if(state.view==='graph')renderGraph()}catch(e){console.error(e)}},10000);
 </script>
-
 <script>
-// ==================== DATA ====================
-const KNOWLEDGE = {
-  qa:   [
-    {
-      "q": "面对一个真实任务，我现在该补哪一层知识？",
-      "a": "先看 <b>任务边界、运行机制、状态与知识、协作治理、工程可靠性</b>；不要从框架名倒推需求。"
-    },
-    {
-      "q": "这些知识点怎样连成一次完整的 Agent 工作？",
-      "a": "从 <b>任务与约束</b> 出发，经由 <b>推理、工具、记忆、检索</b> 完成动作，再用 <b>安全、观测、恢复</b> 保证长期运行。"
-    },
-    {
-      "q": "一个知识点何时该优先学、仍然有效，并且能用于当前任务？",
-      "a": "<b>先按风险，后看时效。</b>终态、权限、幂等、恢复、评估优先；稳定原则长期掌握，协议/API 看原始来源和日期，具体方法必须用本地任务验证。"
-    }
-  ],
-  categories: [
-    {
-      id:"reasoning", icon:"🧠", name:"推理与决策",
-      desc:"Agent 如何思考、规划、做出决策。这是 Agent 区别于 Chatbot 的核心——不只是生成文本，而是闭环决策。",
-      items: [
-                {
-          "title": "ReAct 范式：推理+行动交替循环",
-          "tags": [
-            "ReAct",
-            "核心",
-            "必会"
-          ],
-          "body": "<p><b>ReAct = Reasoning + Acting</b>（Google 2022）。核心思想：让 LLM 在生成中交替进行<b>推理(Thought)和行动(Action)</b>，并接收外部工具返回的<b>观察(Observation)</b>，把推理锚定在真实数据上。</p>\n<p><b>标准循环：</b></p>\n<ul>\n<li><b>Thought</b>：LLM 分析当前状态，决定下一步做什么</li>\n<li><b>Action</b>：调用工具（Function Call），如 search_order(order_id=\"123\")</li>\n<li><b>Observation</b>：工具返回结果，如 {\"status\":\"已发货\",\"items\":[...]}</li>\n<li>回到 Thought，基于 Observation 决定下一步，直到输出 Final Answer</li>\n</ul>\n<p><b>为什么 ReAct 比 CoT 好：</b>CoT 纯靠模型内部知识推理，容易\"空想\"——比如模型不知道今天天气，只能猜。ReAct 调天气 API 获取真实数据，推理基于事实。</p>\n<p><b>消息格式设计：</b>Observation 用 <b>tool 角色而非 assistant 角色</b>回传。因为 Observation 是外部系统返回的内容，不是模型生成的。如果放 assistant 角色，模型会以为自己说了这些话，后续推理会混乱。</p>\n<p><b>消息格式示例：</b></p>\n<pre>system: 你是客服Agent，可用工具：search_order\nuser: 帮我查订单123的状态\nassistant: Thought: 用户要查订单状态，调用search_order\n        Action: search_order(order_id=\"123\")\ntool: {\"status\":\"已发货\",\"carrier\":\"顺丰\"}\nassistant: Thought: 订单已发货，用顺丰。用户可能想查物流\n        Final Answer: 您的订单123已通过顺丰发货。</pre>\n<p><b>终止条件设计：</b>①最大步数硬限制（通常 10 步）；②LLM 主动输出 finish_reason=stop；③连续 2 步调用相同工具且参数相同→疑似死循环→强制停止。</p>\n<p><b>生产代价：</b>ReAct 每一步都要携带状态、工具定义和观察结果，成本取决于轨迹长度、输出与工具模式。简单任务优先直接响应或确定性流程；只有路径依赖外部观察时才启用循环。</p>",
-          "refs": [
-            {
-              "t": "ReAct: Synergizing Reasoning and Acting (Google 2022)",
-              "u": "https://arxiv.org/abs/2210.03629"
-            }
-          ]
-        },
-                {
-          "title": "CoT / Plan-Execute / ToT / Reflection 对比与选型",
-          "tags": [
-            "CoT",
-            "Plan-Execute",
-            "ToT",
-            "Reflection",
-            "选型"
-          ],
-          "body": "<p><b>四种推理范式核心区别：</b></p>\n<ul>\n<li><b>CoT (Chain of Thought)</b>：纯脑内推理，一步步想，不调工具。适合数学题、逻辑推理等不需要外部数据的任务。<b>缺点：</b>知识截止日期前的内容可能过时或幻觉。</li>\n<li><b>ReAct</b>：推理+行动交替。每步 Thought→Action→Observation。<b>适合</b>需要查资料、调 API 的任务。<b>代价</b>：每轮都要保留状态并调用工具，成本与延迟应按代表任务测量。</li>\n<li><b>Plan-and-Execute</b>：先制定完整计划，再逐步执行。<b>省 Token</b>（一次规划）、可控性强，但灵活度低——中间步骤发现错误时调整成本高。</li>\n<li><b>Tree of Thoughts (ToT)</b>：每步探索多条推理路径，用 BFS/DFS+评估函数选最优。<b>效果好但 Token 消耗是 CoT 的 3 倍</b>，只适合需要探索多路径的复杂推理。</li>\n<li><b>Reflection / Reflexion</b>：让 Agent 自我审查输出质量，决定是否重试或修正。Reflexion 在反馈与阶段性记忆下总结失败经验。它只在能获得测试、工具结果或明确评分反馈时才值得尝试，不能把自我复述当成可靠修复。</li>\n</ul>\n<p><b>选型决策树：</b></p>\n<ul>\n<li>任务路径不确定，需要观察中间结果 → <b>ReAct</b></li>\n<li>步骤明确可预判 → <b>Plan-Execute</b>（省 Token 可控）</li>\n<li>需要探索多种可能解 → <b>ToT</b>（贵但准）</li>\n<li>长链路任务容易出错 → <b>Reflection</b>（加倍 Token 但提升成功率）</li>\n<li>生产级系统 → <b>混合</b>：大步骤 Plan-Execute 规划，子步骤 ReAct 灵活执行，关键节点 Reflection 自检</li>\n</ul>\n<p><b>必须说出的 trade-off：</b>\"我们项目 CoT→ReAct 准确率提升 15%，但 Token 消耗多了 3 倍。所以简单查询走 CoT，复杂多步推理才用 ReAct。\"</p>",
-          "refs": [
-            {
-              "t": "Tree of Thoughts (Yao et al. 2023)",
-              "u": "https://arxiv.org/abs/2305.10601"
-            },
-            {
-              "t": "Reflexion: Language Agents with Verbal RL (Shinn et al. 2023)",
-              "u": "https://arxiv.org/abs/2303.11366"
-            }
-          ]
-        },
-        {
-          title:"Agent Loop 设计与终止策略",
-          tags:["Agent Loop","终止条件","死循环"],
-          body:`<p><b>Agent Loop 是 Agent 的核心工作引擎</b>——Think → Act → Observe 的循环，直到任务完成。</p>
-<p><b>完整循环示例（退换货场景）：</b></p>
-<pre>Round 1: Think "需要查订单" → Act search_order(123) → Observe {status:"已发货"}
-Round 2: Think "已发货不能直接退，需查退货政策" → Act check_policy(category="book") → Observe {returnable:true}
-Round 3: Think "符合退货条件" → Act create_return(order_id=123) → Observe {return_id:"R456"}
-Round 4: Think "任务完成" → 输出最终回复</pre>
-<p><b>防死循环三层设计：</b></p>
-<ul>
-<li><b>第一层：硬限制</b>——max_steps=10，到了强制停止。在 System Prompt 里动态更新"你已经执行了 X/N 步"，模型会自觉收敛。</li>
-<li><b>第二层：循环检测</b>——连续 2 步调用相同工具且参数相同 → 疑似死循环 → 强制跳出并告知用户"我可能需要更多信息"。</li>
-<li><b>第三层：Token 预算</b>——设单次任务最大 Token 消耗，超限自动停止。</li>
-</ul>
-<p><b>错误处理设计：</b>工具调用失败时，把错误信息包装为 Observation 回传 LLM，让它自主决定重试/换工具/降级。不要在代码层静默吞掉错误——LLM 看不到错误就不知道要调整策略。</p>`,
-          refs:[]
-        },
-      ]
-    },
-    {
-      id:"tools", icon:"🔧", name:"工具与协议",
-      desc:"Agent 如何与外部世界交互。从 Function Calling 到 MCP/A2A 标准协议。",
-      items: [
-        {
-          title:"Function Calling 完整实现",
-          tags:["FC","核心","必会"],
-          body:`<p><b>三步走流程：</b></p>
-<ul>
-<li><b>定义阶段</b>：在 API 的 tools 参数或 System Prompt 中定义 Tool Schema——name、description（给 LLM 看的，要说清何时用）、parameters（JSON Schema，含 type/enum/required）。</li>
-<li><b>调用阶段</b>：LLM 判断需要调工具，输出 function_call JSON（function.name + function.arguments）。</li>
-<li><b>执行阶段</b>：代码层解析 JSON → Pydantic 校验参数 → 执行实际函数 → 将结果包装为 tool 角色消息回传 LLM。</li>
-</ul>
-<p><b>Schema 设计原则（踩过的坑）：</b></p>
-<ul>
-<li><b>候选值是封闭集合</b>时才用 <b>enum</b>，例如支付方式；备注、搜索词等开放输入不应被伪装成 enum。它减少歧义，但不替代业务校验。</li>
-<li><b>类型服务业务语义</b>：数量通常用 integer；货币不要依赖二进制浮点比较，可用最小货币单位的 integer 或 decimal/string 表示。重点是后端的一致性，不是“模型会搞混”。</li>
-<li>description 要写<b>使用场景</b>而非定义——"当用户提供订单号时调用此工具查询订单详情"而非"查询订单"。</li>
-<li><b>required</b> 只表达调用契约；可选值的 default 必须由服务端安全地填充。权限、库存、金额范围和资源归属仍需在执行层验证。</li>
-</ul>
-<p><b>稳定性保障三层：</b></p>
-<ul>
-<li><b>校验层</b>：用 JSON Schema/Pydantic 验证结构和业务前置条件；可恢复的参数错误才回传给模型修正，次数由成本与风险预算决定。</li>
-<li><b>执行层</b>：按工具语义设超时、退避和重试。临时网络故障可重试；非幂等写操作必须先有幂等键或状态查询。</li>
-<li><b>权限层</b>：所有工具调用经网关——敏感操作（支付/删除/外发）需 Human-in-the-loop 审批。</li>
-</ul>
-<p><b>安全关键原则</b>：LLM 永远不直接执行任何操作——tool_calls 只是建议，代码层有最终决定权。</p>`,
-          refs:[{t:"OpenAI Function Calling Guide",u:"https://platform.openai.com/docs/guides/function-calling"}]
-        },
-        {
-          title:"MCP 协议：架构、实现与局限",
-          tags:["MCP","标准化","2026热点"],
-          body:`<p><b>MCP (Model Context Protocol)</b> 是 Agent/客户端与外部工具、资源交互的协议。它统一消息与能力声明，不替代工具的授权、输入校验或业务验收。</p>
-<p><b>三层架构：</b></p>
-<ul>
-<li><b>Host</b>：LLM 应用（你的 Agent 系统）</li>
-<li><b>Client</b>：协议客户端，1:1 连接一个 Server</li>
-<li><b>Server</b>：暴露三种能力——Tools（模型可调用的函数）、Resources（应用可控的数据）、Prompts（预定义提示模板）</li>
-</ul>
-<p><b>传输层（2025-11）</b>：stdio（本地进程通信）或 Streamable HTTP；后者取代旧版 HTTP+SSE 传输。远程部署还要校验 Origin、认证与暴露范围。</p>
-<p><b>核心价值——一次开发，多模型复用：</b></p>
-<ul>
-<li>原来开发一个"查数据库慢 SQL"工具，要分别适配 OpenAI/Claude/通义千问的 Function Calling 格式</li>
-<li>用 MCP 写一次，任何支持 MCP 的模型都能调用</li>
-</ul>
-<p><b>vs Function Calling 的关系：</b>FC 是各模型厂商的 API 能力（格式略有差异）；MCP 是工具层的标准协议。<b>打个比方</b>——FC 像各自厂商的拨号盘，MCP 像定义了全球统一的电话号码格式。</p>
-<p><b>vs Skill 的关系：</b>Skill 是能力单元（"查天气"），FC 是调用方式，MCP 是通信协议。三者层次不同。</p>
-<p><b>边界（必须知道）：</b>协议互通不等于工具可信或已获授权；远程服务要做来源校验、身份认证、最小权限和工具输出隔离。延迟与流式能力取决于具体传输、实现和工具链，不能写成固定数字。</p>
-<p><b>vs A2A 的关系：</b>MCP 管 Agent↔工具（垂直集成），A2A 管 Agent↔Agent（水平协作）。一个完整的多 Agent 系统两者都需要。</p>`,
-          refs:[{t:"MCP Specification",u:"https://modelcontextprotocol.io/"},{t:"A2A Protocol Specification",u:"https://a2a-protocol.org/latest/specification/"}]
-        },
-        {
-          title:"A2A 协议：把独立 Agent 的协作变成可追踪任务",
-          tags:["A2A","活跃规范","多 Agent"],
-          body:`<p><b>A2A (Agent2Agent)</b> 解决的是独立 Agent 之间的发现、委托和任务生命周期，不是一次普通函数调用。它适合跨服务、跨团队或需要异步产物与进度的协作。</p>
-<p><b>先理解三个对象：</b></p>
-<ul>
-<li><b>Agent Card</b>：声明 Agent 的能力、接口与安全要求，供调用方发现和选择协作者。</li>
-<li><b>Task</b>：有 ID、状态、消息和产物；调用方可提交、查询、订阅更新或取消。</li>
-<li><b>Artifact</b>：协作者交付的结果。调用方仍要验证其来源、权限和是否满足自己的任务契约。</li>
-</ul>
-<p><b>与 MCP 的边界：</b>MCP 连接模型应用与工具/上下文服务；A2A 连接相互协作的 Agent。一个 Agent 可以通过 MCP 使用工具，再通过 A2A 交付任务，但小型同进程函数不需要引入 A2A。</p>
-<p><b>落地 gap：</b>协议只规定互操作，不替你完成职责划分、共享状态所有权、跨 Agent 授权、失败隔离或最终验收。先定义谁拥有任务状态、谁能调用高风险工具、超时后谁接管，再决定是否接入。</p>`,
-          refs:[{t:"A2A Protocol Specification · 核对 2026-07-27",u:"https://a2a-protocol.org/latest/specification/"}]
-        },
-        {
-          title:"工具设计模式：错误处理与安全控制",
-          tags:["错误处理","安全","权限"],
-          body:`<p><b>工具调用失败的三层处理：</b></p>
-<ul>
-<li><b>参数校验失败</b>：LLM 输出的 JSON 格式不对（多了字段/类型错误/缺必填）→ 用 Pydantic 校验 → 错误信息回传 LLM 让它重生成（"参数 amount 应为 number，你传了 string"）→ 最多 2 次，2 次失败降级返回提示。</li>
-<li><b>执行失败</b>：网络超时/临时故障 → 自动重试（指数退避：1s/2s/4s，最多 3 次）→ 3 次都失败 → 降级（告知用户当前无法完成+建议替代方案或转人工）。</li>
-<li><b>业务拒绝</b>：如余额不足/权限不够 → 不重试，直接告知用户原因+建议操作。</li>
-</ul>
-<p><b>安全控制四层（从外到内）：</b></p>
-<ul>
-<li><b>输入过滤</b>：检测恶意模式（"忽略指令"/异常长度/特殊分隔符）</li>
-<li><b>权限白名单</b>：Agent 只能调用预定义的工具集合，不能调用未注册的</li>
-<li><b>参数范围校验</b>：金额不能为负/数量不能超库存/操作目标必须在白名单内</li>
-<li><b>敏感操作审批</b>：支付/删除/对外发送 → 必须经过 Human-in-the-loop 确认</li>
-</ul>
-<p><b>审计日志</b>：每次工具调用记录完整信息——时间/工具名/入参/出参/耗时/成功失败/操作人（LLM还是人工）。出问题可回溯。</p>`,
-          refs:[]
-        },
-      ]
-    },
-    {
-      id:"memory", icon:"💾", name:"记忆系统",
-      desc:"Agent 的记忆架构、存储方案、压缩策略和上下文工程。",
-      items: [
-        {
-          title:"运行状态、会话上下文与长期记忆",
-          tags:["核心","必会","架构"],
-          body:`<p><b>按生命周期和责任划分，而不是背一套“标准层数”：</b></p>
-<ul>
-<li><b>工作记忆 (Working Memory)</b>：当前任务轨迹和中间结果。存 Redis/内存，生命周期=单任务。存的是"刚才查了订单123，状态=已发货"这类中间结果。任务结束即清。</li>
-<li><b>短期记忆 (Short-term)</b>：当前会话最近 N 轮摘要。存 Redis+TTL(30min)，生命周期=单会话。每次对话结束做 summarize。</li>
-<li><b>长期记忆 (Long-term)</b>：用户画像/偏好/关键事实。存<b>向量库</b>(语义检索)+<b>关系库</b>(精确查询)，持久化。</li>
-</ul>
-<p><b>三层的关系不是简单的时长划分，而是用途不同：</b></p>
-<ul>
-<li>工作记忆解决"当前任务进行中需要什么"</li>
-<li>短期记忆解决"本次对话的上下文连贯性"</li>
-<li>长期记忆解决"跨会话的个性化"</li>
-</ul>
-<p><b>写入原则（防污染）：①</b>区分"事实"与"推断"——用户说"少糖"是事实，推断"用户喜欢健康饮品"是推断。推断带置信度。<b>②</b>带时间戳——三个月前的偏好可能已不适用。<b>③</b>命名空间隔离——不同 Agent/任务不共享记忆空间。</p>
-<p><b>存储选型：①</b>工作记忆——Python dict(单机)或 Redis Hash(分布式)；<b>②</b>短期记忆——Redis String(TTL 30min)；<b>③</b>长期记忆——Milvus/Qdrant(向量)+PostgreSQL(结构化)。</p>`,
-          refs:[{t:"MemGPT: Towards LLMs as Operating Systems",u:"https://arxiv.org/abs/2310.08560"}]
-        },
-        {
-          title:"上下文工程与压缩策略",
-          tags:["上下文","压缩","Token"],
-          body:`<p><b>上下文工程的本质</b>不是"塞得下"，而是<b>"塞对的"</b>。核心挑战是<b>注意力竞争</b>——上下文越长，模型对关键信息的注意力越稀释（Lost in the Middle 现象）。</p>
-<p><b>Token 预算管理器：</b></p>
-<pre>总窗口 8192 tokens
-- System Prompt: 500
-- 工具定义: 800  
-- 留给对话: 6892
-→ 超过 5000(75%) 时自动触发压缩</pre>
-<p><b>四种压缩策略：</b></p>
-<ul>
-<li><b>关键实体抽取</b>：保留人名/日期/金额/订单号等不可丢失的实体</li>
-<li><b>结构化摘要</b>：用轻量模型对旧对话做 summarize，保留 5 维度——用户意图/已提取实体/待完成操作/当前进度/异常情况</li>
-<li><b>滑动窗口</b>：最近 5 轮完整保留，更早的只留摘要</li>
-<li><b>选择性遗忘</b>：基于重要性评分丢弃无关内容</li>
-</ul>
-<p><b>关键原则——优先压缩模型输出，而非用户输入。</b>因为 LLM 的输出有很多填充词和客套话，信息密度低；用户的原始输入每句话都有价值。</p>
-<p><b>踩过的坑：</b>长日志不能直接丢给 LLM 总结——100 页日志一次性塞进去，LLM 只看头尾忽略中间。要<b>分段处理</b>，每两段之间留 20% 重叠防止关键信息在分段边界丢失。</p>`,
-          refs:[]
-        },
-      ]
-    },
-    {
-      id:"rag", icon:"🔍", name:"检索增强 (RAG)",
-      desc:"检索增强生成的完整链路：从文档处理到答案生成。",
-      items: [
-        {
-          title:"RAG 全链路：从证据到可验证答案",
-          tags:["RAG","核心","必会"],
-          body:`<p><b>7 步全链路，每步都有优化空间：</b></p>
-<p><b>① Query 预处理</b>——用户说"咋退"→改写为标准查询"如何申请退货退款"。技术：Query Rewriting（补全简写/纠正错别字）、Query Expansion（生成多个同义查询增加召回）。</p>
-<p><b>② Embedding 向量化</b>——用经过代表问题集验证的 Embedding 模型将 query 转为稠密向量；优先比较语言覆盖、召回、更新成本与权限边界，不绑定已过时的型号。</p>
-<p><b>③ 双路召回</b>——按语料特征组合稠密与稀疏召回；候选数量由 Recall、延迟和噪声共同决定，不设通用 TopK。</p>
-<p><b>④ 混合融合</b>——RRF (Reciprocal Rank Fusion) 或加权求和合并两个排序列表。RRF 公式：score=Σ 1/(k+rank_i)，k=60。加权求和需要 A/B 测试确定权重。</p>
-<p><b>⑤ Rerank 重排序</b>——当候选集噪声会挤占上下文时，用 reranker 对候选精排；是否值得增加这一层，要同时看检索质量、延迟和成本。</p>
-<p><b>⑥ TopK 截断</b>——把最终上下文控制在任务能消化的证据量；K、片段大小与排序必须由代表问题集上的召回、忠实性和上下文干扰共同确定。</p>
-<p><b>⑦ 注入 LLM</b>——按相关性排序+标注来源+注入 System Prompt，LLM 基于检索内容生成答案，强制要求引用来源。</p>
-<p><b>参数需要证据</b>：先用离线问题集检查召回、引用正确与忠实性，再根据流量、成本和风险决定是否做线上对照；不要把某次比例或 TopK 当作通用答案。</p>`,
-          refs:[{t:"RAG (Lewis et al. 2020)",u:"https://arxiv.org/abs/2005.11401"}]
-        },
-        {
-          title:"混合检索 / Rerank / Agentic RAG / GraphRAG",
-          tags:["混合检索","Rerank","Agentic RAG","GraphRAG"],
-          body:`<p><b>为什么需要混合检索：</b>向量检索擅长语义匹配（"退款"="退货"）但弱于精确关键词（订单号 ORD-12345 会被泛化）。BM25 擅长精确匹配但不懂语义。<b>两者互补</b>——向量抓"软匹配"，BM25 抓"硬匹配"。</p>
-<p><b>融合比例不是标准答案</b>——取决于文档类型。FAQ 类（语义模糊）向量权重高；规则手册类（关键词重要）BM25 权重高。需要 A/B 测试。</p>
-<p><b>Rerank 价值：</b>向量与稀疏检索负责扩大候选覆盖，reranker 负责在有限候选中识别更相关的证据。它可能改善排序，也会增加延迟和成本；是否采用必须在目标语料与问题集上验证。</p>
-<p><b>Agentic RAG：</b>传统 RAG 可一次检索后生成；检索型 Agent 则会根据证据充分性继续检索、改写或调用其他工具。它适合路径确实依赖新证据的任务；循环次数、预算和停止条件必须受控。</p>
-<p><b>GraphRAG：</b>在 RAG 基础上引入知识图谱——从文档中抽取实体和关系构建图结构。检索时沿图边做多跳遍历。适合理解实体间复杂关系的查询（供应链分析/组织架构）。代价：图谱构建和维护成本高。</p>`,
-          refs:[{t:"GraphRAG (2024)",u:"https://arxiv.org/abs/2404.16130"}]
-        },
-      ,
-        {
-          "title": "文档切分、版本与检索评测",
-          "tags": [
-            "Chunking",
-            "索引版本",
-            "Recall@K",
-            "必会"
-          ],
-          "body": "<p><b>RAG 的问题往往在生成前就发生。</b>先按标题、段落、表格和代码块等文档结构切分，再用少量 overlap 保住跨段语义；不要给所有语料套同一个固定长度。</p>\n<ul>\n<li><b>切分：</b>记录 document_id、section、更新时间和权限；小块负责匹配，大块负责回传上下文。</li>\n<li><b>更新：</b>文档、chunk、embedding 和索引都要有版本。新索引完成评测后原子切换，缓存键也带知识版本。</li>\n<li><b>评测：</b>先看 Recall@K、MRR/NDCG 判断证据有没有被找回，再看引用正确性和 Faithfulness 判断答案有没有忠于证据。</li>\n</ul>\n<p><b>排障顺序：</b>答案错时先检查候选里是否有正确证据；有证据却答错才查重排、上下文组织和生成提示。</p>",
-          "refs": []
-        }]
-    },
-    {
-      id:"multi-agent", icon:"🤖", name:"多 Agent 协作",
-      desc:"多 Agent 系统的架构模式、通信机制、编排框架和状态管理。",
-      items: [
-        {
-          title:"多 Agent 协作模式与选型",
-          tags:["Multi-Agent","协作","编排"],
-          body:`<p><b>四种协作模式：</b></p>
-<ul>
-<li><b>主从模式 (Orchestrator+Worker)</b>：中央编排器分配任务，Worker 执行并返回。适合确定性流程（如代码 Review Pipeline）。优势——可控性强；劣势——单点故障。</li>
-<li><b>对等模式 (消息总线)</b>：Agent 间平等通信，无中心节点。适合开放协作（如 AutoGen 的 group chat）。优势——无单点故障；劣势——协调复杂。</li>
-<li><b>层级模式 (Manager→Specialist)</b>：Manager 接收请求后分发给专业 Agent。适合专业分工（如软件工程团队——PM Agent→架构师Agent→开发Agent→QA Agent）。</li>
-<li><b>辩论模式</b>：多个 Agent 生成竞争性回答，通过辩论或投票选出最优。提高准确率但 Token 成本翻倍。</li>
-</ul>
-<p><b>核心原则：能用单 Agent 不拆多。</b>拆的原因必须是——任务可分解+独立+可并行。不是"看起来高级"就上多 Agent。</p>
-<p><b>多 Agent 的三大风险：①</b>通信开销（Agent 间传递信息消耗 Token）；<b>②</b>状态一致性（一个 Agent 修改了共享状态，另一个不知道）；<b>③</b>上下文污染（一个 Agent 的错误输出污染另一个的推理）。</p>
-<p><b>防污染设计：①</b>上下文隔离——每个子 Agent 有独立的 context window，只通过结构化消息通信；<b>②</b>消息协议——Agent 间通信用固定 JSON 格而非自然语言；<b>③</b>计划控制——子 Agent 只返回"计划增量"，经编排器检查后才合并。</p>
-<p><b>框架对比：AutoGen</b>（Microsoft，对话式，最灵活）；<b>CrewAI</b>（角色+任务，最易上手）；<b>LangGraph</b>（状态图，最可控）；<b>MetaGPT</b>（SOPs，适合软件开发）。</p>`,
-          refs:[{t:"AutoGen (Microsoft 2023)",u:"https://arxiv.org/abs/2308.08155"},{t:"MetaGPT (2023)",u:"https://arxiv.org/abs/2308.00352"}]
-        },
-      ,
-        {
-          "title": "多 Agent 状态、幂等与故障隔离",
-          "tags": [
-            "状态机",
-            "Checkpoint",
-            "幂等",
-            "可靠性"
-          ],
-          "body": "<p><b>协作难点不在“让多个模型说话”，而在状态和副作用可控。</b>编排器应成为共享状态的唯一写入者，子 Agent 只返回带版本号的结构化增量。</p>\n<ul>\n<li><b>一致性：</b>对共享状态使用版本号或乐观锁；冲突时重新读取或仲裁，不能无条件后写覆盖。</li>\n<li><b>副作用：</b>支付、发信、删除等操作必须使用幂等键，并在 checkpoint 中记录已完成结果，恢复时先查状态再执行。</li>\n<li><b>隔离：</b>每个子任务设置独立超时、重试预算和熔断；可选任务失败可返回部分结果，必要任务失败应停在可恢复节点。</li>\n</ul>\n<p><b>原则：</b>先用状态机解决确定性流程，只有确有独立专业分工和并行收益时才拆 Agent。</p>",
-          "refs": []
-        }]
-    },
-    {
-      id:"application", icon:"🎯", name:"应用设计与迭代",
-      desc:"从真实用户任务出发，决定是否需要 Agent、怎样选择模型与流程，并把反馈转成可验证的下一轮改进。",
-      items: [
-                {
-          "title": "任务边界：先定义用户要完成什么",
-          "tags": [
-            "任务设计",
-            "边界",
-            "验收"
-          ],
-          "body": "<p><b>先写任务卡，再讨论模型或框架。</b>一张可用的任务卡至少包含：用户是谁、触发条件、输入与可用数据、最终动作/答案、不能做什么、成功如何判定、失败交给谁。</p>\n<ul><li><b>目标要可验收：</b>“帮助用户处理售后”太宽；“在已授权订单上判断退货资格，缺证据时转人工”才有可判定边界。</li><li><b>约束优先于能力：</b>权限、时效、不可逆操作、数据质量和人工兜底决定系统形态。</li><li><b>输出必须可落地：</b>是结构化字段、待审批计划、还是给用户的解释；不同输出对应不同校验方式。</li></ul>\n<p><b>产物：</b>任务卡、验收规则、风险分级和失败后的交接路径。这四项是后续设计与评估的共同输入。</p>",
-          "refs": []
-        },
-                {
-          "title": "方案取舍：规则、工作流还是 Agent",
-          "tags": [
-            "方案选型",
-            "Workflow",
-            "自主性"
-          ],
-          "body": "<p><b>不要把 Agent 当默认答案。</b>路径可枚举、结果可由规则校验的任务优先用规则或工作流；只有目标开放、工具选择依赖中间观察且人工编排成本过高时，才提高自主性。</p>\n<ul><li><b>规则：</b>最快、最稳定，适合固定判断和强约束动作。</li><li><b>工作流：</b>步骤可预定义但需要状态、分支、审批和恢复。</li><li><b>Agent：</b>需要在工具、证据和路径之间动态决策；必须同时承担不确定性、成本和治理代价。</li></ul>\n<p><b>决策依据：</b>不是“效果看起来聪明”，而是任务路径的不确定性、失败代价、可观测程度和长期维护成本。</p>",
-          "refs": []
-        },
-                {
-          "title": "模型与系统策略：把能力放在合适的位置",
-          "tags": [
-            "模型选型",
-            "路由",
-            "成本"
-          ],
-          "body": "<p><b>模型选型不是单选题。</b>把一次任务拆成识别、检索、规划、执行和生成，分别决定是用规则、小模型、大模型还是人工确认。</p>\n<ul><li>简单分类、格式校验和确定性计算优先程序；高风险操作由服务端权限与审批控制。</li><li>按任务难度和风险路由模型，保留降级路径；缓存必须带权限和数据版本。</li><li>选择模型前先定义质量、延迟、成本和稳定性门槛，避免只按单次回答印象判断。</li></ul>\n<p><b>产物：</b>任务分流表、模型/工具职责表、预算与降级策略。</p>",
-          "refs": []
-        },
-                {
-          "title": "价值闭环：把反馈变成下一轮可验证改进",
-          "tags": [
-            "用户价值",
-            "反馈",
-            "迭代"
-          ],
-          "body": "<p><b>上线不等于任务完成。</b>需要同时观察用户是否真正完成目标、系统是否稳定执行、以及哪些失败最值得修。</p>\n<ul><li><b>体验信号：</b>任务完成、放弃、重复请求、人工接管与纠错反馈。</li><li><b>系统信号：</b>Trace 中的失败类型、工具错误、耗时、成本和安全拦截。</li><li><b>迭代规则：</b>按影响范围、出现频率、可检测性和可修复性排序；每次修复沉淀失败样本与相邻边界样本。</li></ul>\n<p><b>产物：</b>问题优先级、改动假设、前后对照与回归集。这样用户反馈才会真正进入产品与工程闭环。</p>",
-          "refs": []
-        }
-      ]
-    },
-    {
-      id:"engineering", icon:"⚙️", name:"工程落地",
-      desc:"把 Agent 从 Demo 变成生产系统——架构、安全、性能、评估、可观测、部署。",
-      items: [
-        {
-          title:"Agent 系统架构设计（五层）",
-          tags:["架构","系统设计","必会"],
-          body:`<p><b>生产级 Agent 五层架构：</b></p>
-<ul>
-<li><b>接入层</b>：多渠道对接（Web/App/公众号/企微），统一消息格式</li>
-<li><b>对话管理层</b>：意图识别+多轮状态跟踪+上下文管理。关键——80% 简单问题走 FAQ 匹配，不进 Agent 核心层（省 Token）</li>
-<li><b>Agent 核心层</b>：规划(Planning)+工具调用+反思(Reflection)+记忆(Memory)。状态机设计——每步有 Checkpoint，失败可回滚</li>
-<li><b>工具层</b>：知识库检索/工单系统/用户信息/外部 API。工具注册与发现</li>
-<li><b>输出管控层</b>：敏感词过滤+内容审核+话术规范+格式校验。不管 LLM 说了什么，最后必须过这道防线</li>
-</ul>
-<p><b>稳定性保障四级兜底：</b>超时→重试→降级（LLM 挂了走规则引擎）→人工介入。每一步的成功率和延迟实时监控大盘。</p>
-<p><b>Human-in-the-loop 断点设计：</b>只在不可逆操作前设断点（资金/外发/敏感数据）。审批异步不阻塞主流程，30s 超时自动降级。完整审计日志。</p>`,
-          refs:[]
-        },
-        {
-          title:"安全防护：幻觉控制 + Prompt 注入防御",
-          tags:["安全","幻觉","注入","必会"],
-          body:`<p><b>幻觉多层防御（生产级 Agent 对幻觉零容忍）：</b></p>
-<ul>
-<li><b>RAG 约束</b>：所有回答必须基于检索到的文档，强制要求引用来源</li>
-<li><b>置信度校验</b>：让 LLM 自评回答把握度（0-10 分），低于 7 分触发人工审核</li>
-<li><b>事实核查</b>：用 NLI 模型比对输出与原文（entailment/contradiction/neutral），不一致打回重生成</li>
-<li><b>外挂白名单/规则引擎</b>：如 SKU 白名单硬拦截——模型不能推荐菜单外的商品。蜜雪冰城"茅台柠檬水"幻觉不是靠 prompt 解决，是靠外挂白名单解决</li>
-<li><b>关键场景人工复核</b>：金融/医疗等高风险领域必须过人工</li>
-</ul>
-<p><b>Prompt Injection 防御三层：</b></p>
-<ul>
-<li><b>输入过滤</b>：检测"忽略""覆盖""你现在的角色是"等指令性语言+异常长度+特殊分隔符</li>
-<li><b>运行时防御</b>：安全规则不只在 System Prompt 开头写一次，而是<b>每次 LLM 调用的 messages 末尾追加</b>——因为 LLM 更关注最近的文本（recency bias）</li>
-<li><b>权限硬限制</b>：即使注入成功，Agent 也只是换了个回答文案——工具白名单里根本没有"修改支付金额"的工具</li>
-</ul>
-<p><b>不要靠 Prompt 防注入，要工程硬限制。</b></p>`,
-          refs:[{t:"Universal Adversarial Attacks on Aligned LMs",u:"https://arxiv.org/abs/2307.15043"}]
-        },
-        {
-          title:"性能与成本优化",
-          tags:["性能","成本","Token","延迟"],
-          body:`<p><b>Token 成本优化三层：</b></p>
-<ul>
-<li><b>入口分流</b>：80% 简单问题走 FAQ/规则引擎，不进 Agent LLM 调用——从源头省钱</li>
-<li><b>模型分级</b>：简单步骤用小模型（GPT-4o-mini/Qwen-Turbo），复杂推理才用大模型</li>
-<li><b>缓存复用</b>：相同/相似 query 的 Embedding/检索结果/摘要都缓存。命中率通常 20-30%</li>
-</ul>
-<p><b>实际效果：分层+缓存组合可降低 50-70% Token 成本。</b></p>
-<p><b>延迟优化：</b></p>
-<ul>
-<li><b>并行工具调用</b>：无依赖的工具同时调（asyncio.gather）。查订单和查库存没有依赖关系，同时发</li>
-<li><b>流式输出</b>：SSE 逐 token 推送，用户感知延迟降低 50%+</li>
-<li><b>预计算</b>：高频 Tool 结果预加载/热门知识预缓存</li>
-<li><b>分模型策略</b>：意图识别用轻量模型（100ms），确认需要核心推理后才换大模型</li>
-</ul>
-<p><b>关键——先诊断再用药。</b>加全链路 tracing，定位瓶颈是检索慢还是 LLM 推理慢，不同瓶颈不同优化。</p>`,
-          refs:[]
-        },
-        {
-          title:"可观测性 + 评估体系",
-          tags:["可观测","评估","LangSmith"],
-          body:`<p><b>可观测性三支柱：</b></p>
-<ul>
-<li><b>Logs</b>：每步 LLM 调用的输入/输出/耗时/Token 数，每个 Tool 调用的参数/结果/耗时/成功失败</li>
-<li><b>Traces</b>：全链路追踪——一次 Agent 任务从开始到结束的完整调用链（可视化 DAG）</li>
-<li><b>Metrics</b>：各维度聚合——成功率/幻觉率/P50-P99 延迟/Token 消耗趋势/工具调用失败率</li>
-</ul>
-<p><b>工具选型：</b>LangSmith（LangChain 官方/Agent trace+回放+评测）、LangFuse（开源/自托管）、Arize Phoenix（开源/可观测+评估）。</p>
-<p><b>核心价值</b>——出问题时 5 分钟定位到具体步骤，而非猜测。</p>
-<p><b>评估体系：</b></p>
-<ul>
-<li><b>离线评估</b>：构建分层评测集（简单30%+复杂40%+对抗30%），每个 case 标注 gold trajectory。指标——任务完成率/步数效率/工具调用准确率/幻觉率</li>
-<li><b>在线评估</b>：用户追问率/点踩率/转人工率/任务完成时间。A/B 实验对比新旧版本</li>
-<li><b>非确定性处理</b>：同一 case 跑 5 次取中位数+方差</li>
-</ul>`,
-          refs:[{t:"AgentBench: Evaluating LLMs as Agents",u:"https://arxiv.org/abs/2308.03688"}]
-        },
-      ,
-        {
-          "title": "上线发布、SLO 与故障恢复",
-          "tags": [
-            "SLO",
-            "灰度发布",
-            "回滚",
-            "可靠性"
-          ],
-          "body": "<p><b>生产发布要把模型、Prompt、工具 Schema 和知识索引都当成可回滚的版本。</b>先用固定评测集验证质量与安全，再按小流量灰度，观察护栏指标后才放量。</p>\n<ul>\n<li><b>SLO：</b>至少定义任务完成率、工具错误率、P95 延迟、单任务 Token 和高风险拒绝率；每个指标有告警阈值与责任人。</li>\n<li><b>灰度：</b>为新版本标识 version，按用户或流量分桶；质量、成本或风险指标越线立即暂停，而不是等用户投诉。</li>\n<li><b>恢复：</b>模型不可用时降级为检索/规则/人工；副作用节点保存 checkpoint 和幂等键，恢复时先查询外部状态再决定是否重放。</li>\n</ul>\n<p><b>复盘产物：</b>时间线、根因、受影响范围、短期修复、长期预防和新增回归用例。没有回归用例的复盘不算闭环。</p>",
-          "refs": []
-        }]
-    },
-  ]
-};
-
-const EVAL = {
-  qa: [
-    {q:"我现在不想打分，只想把一个陌生 Agent 的代码和流程看明白，可以用这个框架吗？",a:"可以。先用<b>陌生 Agent 解析</b>还原任务、模块、后端状态、Agent 控制流、工具边界和恢复路径；这时交付的是<b>结构分析</b>，不需要虚构运行问题或评分。"},
-    {q:"没有任务和运行轨迹，能直接说某个 Agent 有什么问题吗？",a:"不能。只有 README、代码或 Git 时，最多做<b>结构审查</b>；拿到任务、Trace 和最终状态，才能说发现了哪一阶段的运行问题；有固定基线和对照后，才能说改动是否有效。"},
-    {q:"一条能执行的改进建议，必须写清什么？",a:"按<b>发生阶段 → 原始现象 → 本次判断 → 改什么 → 怎样验 → 何时停止</b>写。缺少原始现象时，只能列为待核实假设，不能直接要求“加 RAG、反思或多 Agent”。"},
-    {q:"论文、案例和工具项目在评估中有什么作用？",a:"它们只能说明某种机制在什么条件下值得尝试。它们不能证明当前 Agent 已经有同样的问题，也不能代替本地任务上的前后对照。"},
-  ],
-  dims: [
-    {
-      title:"架构合理性", num:1,
-      why:"架构是地基——架构不好，后面所有优化都是在沙地上盖楼。",
-      checks:`<p><b>检查点：</b></p>
-<ul>
-<li>组件职责是否单一明确？每个模块能否用一句话描述职责而不需要"和/或"？</li>
-<li>组件间耦合度如何？替换记忆模块(从 Redis 换 PostgreSQL)是否需要改规划模块？</li>
-<li>是否有清晰的错误传播路径？工具失败后，错误信息如何传到 LLM？</li>
-<li>扩展新工具的成本？加一个新工具需要改几处代码？</li>
-</ul>`,
-      good:`<b>好的：</b>Agent A 的 Planning 模块只接收 intent 和 context，输出 plan JSON，不直接调用任何工具。替换记忆层只需实现接口。`,
-      bad:`<b>不好的：</b>Planning 模块在生成计划的同时直接调用了 search_order——职责混淆。规划代码中直接 import 了 Redis 客户端类——高耦合。`,
-      improve:`改进：定义 Memory 接口(get/set/delete)，规划层通过接口调用，底层可替换。加 Tool Registry 自动发现新工具。`,
-      link:"→ 关联知识：工具与协议 → 工具设计模式"
-    },
-    {
-      title:"推理质量", num:2,
-      why:"Agent 的核心价值在于推理决策——推理质量直接决定任务完成率。",
-      checks:`<p><b>检查点：</b></p>
-<ul>
-<li>平均几步完成任务？过多说明推理效率低</li>
-<li>推理过程中是否出现"目标漂移"——走着走着偏离原始目标</li>
-<li>面对模糊指令时，Agent 是合理推断还是胡猜</li>
-<li>Reflection 是否被有效使用——错误后能否自我修正</li>
-</ul>`,
-      good:`<b>好的：</b>Agent A 处理退货任务平均 4 步完成，每步 Thought 清晰展示推理逻辑，遇到"已发货不能退"时自动查退货政策并调整方案。`,
-      bad:`<b>不好的：</b>Agent A 处理退货任务跑了 12 步——查了订单后顺手查了用户历史订单"了解一下"，结果跑偏了。`,
-      improve:`改进：每步加"目标对齐检查"——在 Thought 中要求模型评估"当前操作是否服务于原始目标"。设 max_steps=10 硬限制。`,
-      link:"→ 关联知识：推理与决策 → ReAct / Plan-Execute / Reflection"
-    },
-    {
-      title:"工具使用", num:3,
-      why:"工具是 Agent 的手脚——工具调用质量决定 Agent 能否真正完成任务。",
-      checks:`<p><b>检查点：</b></p>
-<ul>
-<li>是否调用了正确的工具？参数是否正确？</li>
-<li>工具调用失败后的处理策略——重试/换工具/降级</li>
-<li>多工具调用的顺序是否合理——有依赖的是否串行，无依赖的是否并行</li>
-<li>LLM 生成的 tool_call JSON 格式错误率</li>
-</ul>`,
-      good:`<b>好的：</b>JSON 格式错误率 < 2%，Pydantic 校验失败后自动重生成，工具失败后 LLM 看到 Observation 中的错误信息并自主决定换策略。`,
-      bad:`<b>不好的：</b>JSON 格式错误率 15%，错误被代码层静默吞掉，LLM 不知道工具失败继续推理导致幻觉。`,
-      improve:`改进：①优化 Tool Schema description（更精确的"何时使用"说明）；②加 Pydantic 校验层+错误回传；③用 enum 替代 free text 减少随机性。`,
-      link:"→ 关联知识：工具与协议 → Function Calling / 工具设计模式"
-    },
-    {
-      title:"记忆有效性", num:4,
-      why:"记忆决定 Agent 能否跨轮次保持上下文连贯——记忆不好，Agent 就会失忆。",
-      checks:`<p><b>检查点：</b></p>
-<ul>
-<li>多轮对话后是否记得用户之前说的关键信息</li>
-<li>长期记忆是否有效——用户画像是否准确</li>
-<li>记忆检索的主键设计是否合理——会不会跨任务污染</li>
-<li>上下文压缩后信息丢失率——摘要是否保留了关键信息</li>
-</ul>`,
-      good:`<b>好的：</b>Agent A 记得用户 5 轮前说"少冰"，第 8 轮点新饮品时自动沿用偏好。长期记忆检索带时间衰减因子。`,
-      bad:`<b>不好的：</b>Agent A 第 3 轮就忘了用户说过"不要珍珠"，第 5 轮又推荐了含珍珠的饮品。上下文压缩时把"用户过敏花生"这个关键信息摘要丢了。`,
-      improve:`改进：①关键实体(过敏/偏好)不压缩，始终保留在上下文；②长期记忆加访问频率淘汰机制；③工作记忆用 task_id 隔离防跨任务污染。`,
-      link:"→ 关联知识：记忆系统 → 三层架构 / 上下文工程"
-    },
-    {
-      title:"检索质量", num:5,
-      why:"RAG 是 Agent 获取外部知识的核心——检索不准，回答就是错的。",
-      checks:`<p><b>检查点：</b></p>
-<ul>
-<li>检索准确率——召回的文档是否真正相关</li>
-<li>TopK 截断是否合理——会不会漏掉关键信息或引入过多噪声</li>
-<li>混合检索比例是否经过 A/B 验证</li>
-<li>Rerank 后准确率提升多少——有没有量化数据</li>
-</ul>`,
-      good:`<b>好的：</b>Agent A 的 RAG 链路：向量+BM25 混合检索(0.3:0.7)，Rerank 后 Top5 准确率 95%+。每个参数都有 A/B 测试数据支撑。`,
-      bad:`<b>不好的：</b>纯向量检索，TopK=10（太多噪声导致模型被带偏产生幻觉），没有 Rerank，参数全是"经验值"。`,
-      improve:`改进：①加 BM25 做混合检索；②加 Rerank 精排（BGE-Reranker-v2）；③A/B 测试确定最优 TopK（通常 K=5）。`,
-      link:"→ 关联知识：检索增强(RAG) → 全链路 / 混合检索 / Rerank"
-    },
-    {
-      title:"安全性", num:6,
-      why:"安全不是功能，是基础属性——一个不安全的 Agent 不应该上线。",
-      checks:`<p><b>检查点：</b></p>
-<ul>
-<li>LLM 能否直接执行有副作用的操作？答案必须是不能</li>
-<li>Prompt Injection 防御——输入"忽略之前指令"Agent 会照做吗</li>
-<li>幻觉对用户的影响有多大——风险等级决定防护投入</li>
-<li>是否有完整审计日志——每次操作可回溯</li>
-</ul>`,
-      good:`<b>好的：</b>Agent A 的支付工具在执行前必须经 Human-in-the-loop 审批。三层注入防御（输入过滤+运行时规则追加+权限白名单）。`,
-      bad:`<b>不好的：</b>Agent A 可以直接调用退款接口——LLM 说了"退款 100 元"代码就执行了。没有注入防御。没有审计日志。`,
-      improve:`改进：①所有副作用操作加 Human-in-the-loop；②三层注入防御；③加外挂白名单/规则引擎；④完整审计日志。`,
-      link:"→ 关联知识：工程落地 → 安全防护 / Human-in-the-loop"
-    },
-    {
-      title:"性能与成本", num:7,
-      why:"性能影响用户体验，成本决定 Agent 能否规模化部署。",
-      checks:`<table><tr><th>指标</th><th>目标</th></tr>
-<tr><td>P50 延迟</td><td>&lt;5s(简单)/&lt;15s(复杂)</td></tr>
-<tr><td>平均步数</td><td>&lt;5步(简单)/&lt;10步(复杂)</td></tr>
-<tr><td>Token消耗/任务</td><td>&lt;5000(简单)/&lt;20000(复杂)</td></tr>
-<tr><td>首Token延迟</td><td>&lt;1s</td></tr></table>`,
-      good:`<b>好的：</b>简单问题走 FAQ 匹配(200ms)，Agent 只处理 20% 复杂问题。Token 成本通过模型分级+缓存降低 60%。`,
-      bad:`<b>不好的：</b>所有问题都走 Agent 全流程(平均 8 步/20000 Token)，简单"你好"也要烧 5000 Token。`,
-      improve:`改进：①入口分流(80% 走 FAQ)；②模型分级(意图用轻量，推理用大)；③缓存高频结果；④并行无依赖工具调用。`,
-      link:"→ 关联知识：工程落地 → 性能与成本优化"
-    },
-    {
-      title:"可维护性", num:8,
-      why:"可维护性决定长期成本——好维护的 Agent 迭代快，难维护的改一行怕三天。",
-      checks:`<p><b>检查点：</b></p>
-<ul>
-<li>Prompt 是否有版本管理？修改后如何回滚/对比效果？</li>
-<li>工具接口是否向后兼容？改参数后旧 Agent 是否需要全部更新？</li>
-<li>可观测性——出问题能否 5 分钟定位到具体步骤？</li>
-<li>文档——新人接手需要多久？</li>
-</ul>`,
-      good:`<b>好的：</b>Agent A 的 Prompt 用 YAML 管理+版本号+AB测试框架。全链路 Trace 接了 LangSmith。改 Prompt 后自动跑评测集对比。`,
-      bad:`<b>不好的：</b>Prompt 硬编码在 Python 源码里。没有 Trace。出问题全靠猜。`,
-      improve:`改进：①Prompt 抽到配置文件+版本管理；②接 LangSmith/LangFuse 做全链路 Trace；③写故障处理手册。`,
-      link:"→ 关联知识：工程落地 → 可观测性 / 部署"
-    },
-    {
-      title:"Git 演进分析", num:9,
-      why:"通过 Git 历史理解项目演进路径——技术决策、架构变更、问题修复。评估项目成熟度。",
-      checks:`<p><b>5 步分析法（输入本地仓库目录路径）：</b></p>
-<ul>
-<li><b>Step 1</b>：git log --oneline --graph --all 画版本总览</li>
-<li><b>Step 2</b>：git tag -l 列版本标签，git diff v1.0..v2.0 --stat 分析变更规模</li>
-<li><b>Step 3</b>：git log --diff-filter=R -M 追踪文件重命名/移动，识别模块拆分合并</li>
-<li><b>Step 4</b>：搜索 commit message 关键词("refactor"/"breaking"/"fix critical")标记重大变更</li>
-<li><b>Step 5</b>：总结演进模式——从单体→微服务？每次重大变更因为什么触发？</li>
-</ul>
-<p><b>量化指标：</b>fix commit 占比(&lt;30%为健康)、平均 commit 间隔、contributor 活跃度。</p>`,
-      good:`<b>好的：</b>Agent A 的 Git 历史显示——随着迭代，核心模块逐渐稳定(commits 集中在功能扩展)，fix 占比 18%，架构从单 Agent 逐步演进到多 Agent。`,
-      bad:`<b>不好的：</b>Agent A 频繁大规模重构(反复推翻设计)，fix commit 占比 60%，核心 commit 缺少说明。`,
-      improve:`改进：①每次重大变更写 ADR(Architecture Decision Record)；②降低 fix 占比(先写测试再改代码)；③commit message 规范化(Conventional Commits)。`,
-      link:"→ 关联知识：工程落地 → 架构设计 / 部署"
-    },
-  ]
-};
-
-// Core quality dimensions measure observed Agent behavior, not repository history.
-const AGENT_EVALUATION_DIMS = [
-  {
-    title:"任务完成与推理", num:1,
-    why:"Agent 的价值首先是正确、完整地完成用户目标，而不是展示冗长过程。",
-    checks:`<ul><li>任务完成率、关键约束满足率和澄清问题质量。</li><li>规划是否围绕原始目标，是否有目标漂移和无效步骤。</li><li>完成、失败或信息不足时是否在正确时机终止。</li></ul>`,
-    good:`<b>好的：</b>多步任务有清晰计划，观察到新事实后能调整；证据不足时主动请求必要信息。`,
-    bad:`<b>不好的：</b>为“多做一些”调用无关工具，或在信息不足时强行给出确定答案。`,
-    improve:`改进：用真实任务构建评测集；增加目标对齐、最大步数和完成条件检查。`,
-    link:"→ 关联知识：推理与决策 → ReAct / Plan-Execute / 终止策略"
-  },
-  {
-    title:"工具执行与工作流控制", num:2,
-    why:"正确选择工具、传递合法参数并控制副作用，决定 Agent 能不能真正做事。",
-    checks:`<ul><li>工具选择、参数合法性、调用顺序和结果使用是否正确。</li><li>失败后是否区分重试、换工具、降级与向用户说明。</li><li>不可逆操作是否具备审批、审计与幂等保护。</li></ul>`,
-    good:`<b>好的：</b>服务端校验参数，工具错误作为 Observation 回传；无依赖调用并行，有副作用调用可审计。`,
-    bad:`<b>不好的：</b>模型输出什么 JSON 就执行什么；失败被静默吞掉，重试还会重复创建外部记录。`,
-    improve:`改进：收紧 Tool Schema；增加参数校验、超时、幂等键和审批节点。`,
-    link:"→ 关联知识：工具与协议 → Function Calling / 工具安全控制"
-  },
-  {
-    title:"知识与上下文质量", num:3,
-    why:"检索、会话上下文和记忆共同决定答案是否基于正确、相关、最新的事实。",
-    checks:`<ul><li>正确证据是否被召回，答案是否忠于证据并提供可核验引用。</li><li>上下文是否保留用户约束、时间和权限，而不被无关历史污染。</li><li>知识更新后索引、缓存和答案版本是否一致。</li></ul>`,
-    good:`<b>好的：</b>先评估 Recall@K，再评估引用正确性；记忆按任务和用户隔离，过期事实可以更新。`,
-    bad:`<b>不好的：</b>只看最终文案；检索没有权限过滤，或摘要丢失关键约束。`,
-    improve:`改进：建立带标准证据的评测集；记录文档版本、权限和记忆写入来源。`,
-    link:"→ 关联知识：记忆系统 / 检索增强 RAG"
-  },
-  {
-    title:"安全、权限与可信边界", num:4,
-    why:"Agent 会接触不可信输入和真实业务系统，安全边界必须由代码与权限系统保证。",
-    checks:`<ul><li>是否覆盖注入攻击、越权调用和敏感数据外泄等对抗测试。</li><li>工具是否最小权限，敏感操作是否要求确认或人工审批。</li><li>检索、缓存、日志和 Trace 是否按用户或租户隔离并脱敏。</li></ul>`,
-    good:`<b>好的：</b>模型只能提出调用建议；服务端负责授权、范围校验、审批和审计。`,
-    bad:`<b>不好的：</b>把密钥或高权限接口交给模型；仅靠 Prompt 声明“不要泄露数据”。`,
-    improve:`改进：工具白名单和服务端授权；建立注入、数据越权和副作用攻击回归集。`,
-    link:"→ 关联知识：工程落地 → 安全防护 / Human-in-the-loop"
-  },
-  {
-    title:"可靠性与恢复能力", num:5,
-    why:"线上 Agent 必须能面对模型波动、依赖超时和中断恢复，而不是一次失败就丢失任务。",
-    checks:`<ul><li>模型、检索和工具异常时是否有超时、重试预算、熔断和明确降级。</li><li>任务能否从 checkpoint 恢复，外部副作用是否幂等、可查询和可重放。</li><li>复杂任务的成功率、重复调用率和部分失败处理是否可量化。</li></ul>`,
-    good:`<b>好的：</b>必要步骤失败停在可恢复点，可选步骤失败返回部分结果；恢复前先确认外部状态。`,
-    bad:`<b>不好的：</b>无限重试，或服务重启后忘记已经发过消息、扣过款。`,
-    improve:`改进：给节点定义超时、重试和降级；保存 checkpoint 与幂等键，并做故障演练。`,
-    link:"→ 关联知识：工程落地 → 上线与故障恢复"
-  },
-  {
-    title:"效率与成本", num:6,
-    why:"质量相同的前提下，更快、更省且可预测的 Agent 才能稳定规模化使用。",
-    checks:`<ul><li>端到端 P50/P95 延迟、首 Token 时间、平均步数和单任务成本。</li><li>是否为简单请求分流，为复杂推理使用合适模型和上下文预算。</li><li>并行、缓存、摘要和重排优化是否同时验证质量没有下降。</li></ul>`,
-    good:`<b>好的：</b>简单请求不进入复杂 Agent；无依赖工具并行，缓存键包含权限和知识版本。`,
-    bad:`<b>不好的：</b>所有输入都走最大模型和完整链路，优化后只看成本不看完成率。`,
-    improve:`改进：按 Trace 定位瓶颈；建立质量、延迟和成本三者共同的发布护栏。`,
-    link:"→ 关联知识：工程落地 → 性能与成本优化"
-  },
-  {
-    title:"可观测性与持续评估", num:7,
-    why:"没有可回放轨迹和稳定评测集，团队无法证明改动变好，也无法快速定位退化。",
-    checks:`<ul><li>是否能从最终答案回溯到模型、检索、工具、版本和关键输入摘要。</li><li>是否同时评估结果质量、轨迹质量、安全风险、延迟和成本。</li><li>变更是否经过版本化回归、灰度和回滚。</li></ul>`,
-    good:`<b>好的：</b>每次任务有 trace_id；变更先跑回归集再灰度，并对异常指标自动暂停。`,
-    bad:`<b>不好的：</b>只用几条 Demo 判断效果，线上问题只能靠零散日志猜测。`,
-    improve:`改进：建立真实、边界和对抗样本；记录版本与阈值，定期人工校准评审。`,
-    link:"→ 关联知识：工程落地 → 可观测性 + 评估体系"
-  }
-];
-
-const EVIDENCE = {1:'任务集、成功规则、失败轨迹与重复运行。',2:'工具选择/参数正确率、调用日志与最终状态。',3:'问题-证据标注集、Recall@K、引用正确性与权限过滤。',4:'对抗集、审批记录、脱敏日志与权限审计。',5:'故障注入、恢复记录、重复副作用与降级比例。',6:'P50/P95、步骤数、Token/费用及质量护栏。',7:'可回放 Trace、版本、回归报告与人工复核。'};
-
-function knowledgeCompass(){return `<section class="knowledge-compass"><div class="kicker">先回答用户最需要知道的事</div><h2>一个完整的 Agent 知识闭环，应该帮你做出哪些判断？</h2><p>这里不是技术名词目录。带着一个真实需求进入时，先把下面四个问题答清，再进入对应知识域。</p><div class="compass-grid"><section class="compass-step"><h3>1. 这个问题值得用 Agent 吗？</h3><p>用户目标是什么？路径是否开放？规则或工作流能否更稳定地完成？</p><b>先读：应用设计与迭代</b></section><section class="compass-step"><h3>2. 它如何完成一次任务？</h3><p>如何理解目标、选择工具、使用状态与知识、控制循环，并在不确定处停下来？</p><b>再读：推理、工具、记忆、RAG</b></section><section class="compass-step"><h3>3. 它如何长期可用？</h3><p>如何控制权限、副作用、故障恢复、版本、成本和可观测性？</p><b>再读：协作与工程落地</b></section><section class="compass-step"><h3>4. 它如何持续变好？</h3><p>从真实运行中找失败，提出单一改动假设，用固定任务与护栏决定保留还是回退。</p><b>衔接：评估框架</b></section></div></section>`}
-function learningWorkbench(){return `<section class="workbench"><div class="kicker">从知识到可验证改进</div><h2>先定义交付，再讨论 Agent 能力</h2><p>没有基线、判定规则与对照运行，任何“优化了”都只是印象。每次改动都应留下可复查的证据。</p><div class="flow"><div><b>1. 定义任务</b><span>目标、约束、成功和失败。</span><small>任务卡与验收规则</small></div><div><b>2. 记录基线</b><span>冻结模型、提示、工具和数据版本。</span><small>基线报告与 Trace</small></div><div><b>3. 定位失败</b><span>按推理、证据、工具、安全、恢复归因。</span><small>失败分类表</small></div><div><b>4. 提出改动</b><span>一次验证一个主要假设，写出代价。</span><small>改动假设</small></div><div><b>5. 验证沉淀</b><span>重复运行、盲评、抽检，达标再灰度。</span><small>决策与回归用例</small></div></div></section>`}
-function applicationCanvas(){return `<section class="workbench"><div class="kicker">应用层 Agent 的落点</div><h2>不同应用，先定义不同的可验收结果</h2><p>用户不会因为系统使用了 Agent 获益，而是因为一个具体任务被可靠完成。下面四类应用需要的输入、风险控制和产物不同，不能用同一套“效果不错”来描述。</p><div class="scenario-grid"><article><h3>功能交付</h3><p>把需求转为可运行功能，范围可控且可回归。</p><ul><li>测试与验收断言</li><li>改动范围与回归</li></ul><small>变更、测试与验收记录</small></article><article><h3>缺陷修复</h3><p>先稳定复现，再定位根因并验证最小修复。</p><ul><li>复现用例转绿</li><li>邻近回归集通过</li></ul><small>根因、补丁与回归用例</small></article><article><h3>代码演进</h3><p>行为保持，同时改善结构、性能或安全。</p><ul><li>兼容/性能/安全检查</li><li>迁移与回滚计划</li></ul><small>计划、差异与回滚方案</small></article><article><h3>业务操作</h3><p>在授权边界内完成真实动作，并保留审计与恢复能力。</p><ul><li>状态、权限与幂等断言</li><li>高风险审批</li></ul><small>结构化结果、审计与恢复点</small></article></div></section>`}
-function systemMap(){return `<section class="system-map"><div class="kicker">系统地图：症状该落在哪一层</div><h2>输入、决策、执行与治理的可观测位置</h2><p>遇到“结果不好”时先定位节点，再选择改动杠杆，避免把所有问题都归咎于模型或 Prompt。</p><div class="map-row"><div>请求与状态</div><div><b>用户目标</b>范围与成功条件。<span>信号：意图歧义</span><small>杠杆：澄清策略</small></div><div><b>输入边界</b>权限与不可信内容。<span>信号：拦截率</span><small>杠杆：授权校验</small></div><div><b>上下文</b>记忆与检索证据。<span>信号：召回率</span><small>杠杆：切分排序</small></div><div><b>任务状态</b>步骤、预算与版本。<span>信号：冲突率</span><small>杠杆：checkpoint</small></div></div><div class="map-row"><div>决策与执行</div><div><b>规划器</b>拆步骤与终止。<span>信号：漂移/步数</span><small>杠杆：计划约束</small></div><div><b>工具网关</b>选择、校验、执行。<span>信号：成功率</span><small>杠杆：Schema/重试</small></div><div><b>外部系统</b>检索、API、数据库。<span>信号：超时/错误</span><small>杠杆：降级/缓存</small></div><div><b>结果编排</b>合并证据与动作。<span>信号：引用正确</span><small>杠杆：输出校验</small></div></div><div class="diagnostic-grid"><div><h3>回答错但自信</h3><p>先查证据是否召回、引用是否支持答案，再查生成。</p></div><div><h3>任务反复绕圈</h3><p>查目标状态、Observation、步骤和 Token 预算。</p></div><div><h3>一次好一次坏</h3><p>查随机性、输入分层、依赖与评审一致性。</p></div></div></section>`}
-function evalWorkbench(){return `<section class="workbench"><div class="kicker">建议审查框架</div><h2>把“哪里有问题”转成有依据的改进建议</h2><p>每个建议都写明失效、可改动作、作用机制、来源支持、反例与置信度；外部证据不能被写成当前系统已经提升。</p><div class="flow"><div><b>1. 失败模式</b><span>建议必须先指出哪类失效。</span><small>没有失败对象，不列建议</small></div><div><b>2. 作用机制</b><span>解释改动会影响哪一层行为。</span><small>机制不对应，降低置信</small></div><div><b>3. 外部来源</b><span>优先原始论文或可复现材料。</span><small>来源不替代本地结论</small></div><div><b>4. 反例与代价</b><span>写明无效条件与复杂度损失。</span><small>没有反例，不给高置信</small></div><div><b>5. 建议状态</b><span>强候选、待补充或不建议。</span><small>这是页面的最终输出</small></div></div><div class="evidence"><b>审查准则：</b>来源质量、机制匹配和边界完整度决定建议的可信度；本页不把外部结果翻译成任何具体系统的效果承诺。</div></section>`}
-function evidenceClaims(){return `<section class="evidence-map"><div class="kicker">先筛掉没有根据的改动</div><h2>不是“有哪些方法”，而是“哪一个主张值得在当前 Agent 上尝试”</h2><p>以下来自原始论文或公开可复现基准。它们只能证明特定研究任务中的机制，不承诺当前系统一定收益；卡片同时给出适用信号和足以否决它的反例。</p><div class="confidence-grid"><div><b>A 级：本地已证实</b>代表任务、版本与护栏上重复成立，才能支持实际采用。</div><div><b>B 级：外部同机制证据</b>论文或公开基准验证过相近机制，值得成为候选，但不等于本地收益。</div><div><b>C 级：探索假设</b>只有直觉或零散案例；未进入评估包前不应包装成建议。</div></div><div class="claim-grid"><article><span class="claim-tag">B 级</span><span class="claim-tag caution">路径依赖观察</span><h3>外部观察会改变下一步时，交替推理与行动才值得尝试</h3><p><b>信号：</b>Trace 显示正确路径要由工具或环境返回决定，初始计划常被新事实推翻。</p><p><b>证据：</b><a href="https://arxiv.org/abs/2210.03629" target="_blank">ReAct</a> 在问答、事实核查和交互任务报告提升，机制是 Observation 更新计划。</p><p><b>否决：</b>路径可枚举、工具错误才是主因，或动态步骤只增加成本时，优先工作流和工具校验。</p></article><article><span class="claim-tag">B 级</span><span class="claim-tag caution">只解决证据缺失</span><h3>回答缺少可用事实证据时，检索增强是候选而非通用修复</h3><p><b>信号：</b>正确外部知识不在当前上下文，或输出无法提供可核验来源。</p><p><b>证据：</b><a href="https://arxiv.org/abs/2005.11401" target="_blank">RAG</a> 在知识密集型任务验证了检索记忆的价值，也保留了溯源和更新问题。</p><p><b>否决：</b>正确证据已在 Trace 中却被误用，或语料没有答案时，先修上下文组织、生成约束或数据源。</p></article><article><span class="claim-tag">B 级</span><span class="claim-tag caution">不是上下文越长越好</span><h3>关键约束落在长上下文中间时，应优先选择与结构化状态</h3><p><b>信号：</b>同一事实的位置变化会改变结果，或摘要后丢失未完成动作、时间和权限。</p><p><b>证据：</b><a href="https://arxiv.org/abs/2307.03172" target="_blank">Lost in the Middle</a> 用位置扰动发现长上下文模型对中间信息的使用会退化。</p><p><b>否决：</b>上下文短且证据始终被正确读取时，问题更可能在检索、工具或任务定义。</p></article><article><span class="claim-tag">B 级</span><span class="claim-tag caution">必须有外部反馈</span><h3>反思只在获得测试或工具反馈后才值得尝试</h3><p><b>信号：</b>失败能被测试、工具结果或明确评分指出，而不是让模型自行说“写得更好”。</p><p><b>证据：</b><a href="https://arxiv.org/abs/2303.11366" target="_blank">Reflexion</a> 在编码等任务中通过反馈与阶段性记忆获得提升。</p><p><b>否决：</b>没有可验证反馈、反思不改变后续行动，或额外轮次超过收益时，不应保留。</p></article><article><span class="claim-tag">B 级</span><span class="claim-tag caution">复杂自主性必须有对照</span><h3>稳定的软件任务应先与简单、可解释的流程比较</h3><p><b>信号：</b>复杂 Agent 的成本来自无效循环、调度或不可解释长轨迹，而任务能拆为定位、修改和验证。</p><p><b>证据：</b><a href="https://arxiv.org/abs/2407.01489" target="_blank">Agentless</a> 在 SWE-bench Lite 报告简单三阶段方法达到 32% 修复率，说明复杂自主性不是默认更优。</p><p><b>否决：</b>任务确实需要连续外部观察后的动态重规划，简单流程无法覆盖高价值失败时，再提高自主性。</p></article><article><span class="claim-tag">B 级</span><span class="claim-tag caution">评审分不能独立定案</span><h3>开放质量可用模型评审扩展，但必须暴露偏差与分歧</h3><p><b>信号：</b>结果不能由规则完全判定，但需要比较候选输出质量。</p><p><b>证据：</b><a href="https://arxiv.org/abs/2306.05685" target="_blank">MT-Bench</a> 报告强评审模型可接近人工偏好，同时验证了位置、长度和自偏好偏差。</p><p><b>否决：</b>权限、金额、删除等确定事实或高风险动作必须由程序断言与人工责任链决定。</p></article></div></section>`}
-function scenarioMatrix(){return `<section class="scenario-matrix"><div class="kicker">应用层验收矩阵</div><h2>不同功能，必须用不同的“好”来衡量</h2><p>通用基准只说明能力边界；去留决定来自业务任务夹具、护栏和失败样本。</p><table class="matrix"><thead><tr><th>应用</th><th>自动证据</th><th>人工复核</th><th>改动验证</th></tr></thead><tbody><tr><td>功能交付</td><td>构建、测试、验收断言</td><td>需求与范围</td><td>同任务集比较通过率与回归数</td></tr><tr><td>缺陷修复</td><td>稳定复现与修复断言</td><td>根因与补丁最小性</td><td>比较定位时间、复发率与邻近回归</td></tr><tr><td>代码演进</td><td>兼容、性能与安全检查</td><td>架构与迁移计划</td><td>比较质量门槛、迁移失败与回滚</td></tr><tr><td>业务操作</td><td>状态机、权限与幂等断言</td><td>高风险审批</td><td>比较动作正确率、越权和恢复成功率</td></tr></tbody></table><div class="evidence"><b>优先级：</b>先处理影响大、出现频繁、可稳定检测且有明确修复杠杆的问题。没有可验收结果时，先用确定性工作流或人工节点。</div></section>`}
-function evidenceClaimsV2(){return evidenceClaims().replace("哪一个主张值得在当前 Agent 上尝试", "哪一个主张值得被列为候选").replace("A 级：本地已证实</b>代表任务、版本与护栏上重复成立，才能支持实际采用。", "强候选：论证链完整</b>失败模式、作用机制、原始来源和否决条件均明确；仍然只是高质量建议，不是任何系统效果结论。").replace("B 级：外部同机制证据</b>论文或公开基准验证过相近机制，值得成为候选，但不等于本地收益。", "待补充：外部同机制证据</b>论文或公开基准验证过相近机制，值得研究，但失败模式或边界还不能完全对上。").replace("C 级：探索假设</b>只有直觉或零散案例；未进入评估包前不应包装成建议。", "不建议：探索假设</b>只有直觉、二手总结或零散案例；不应包装成有依据的改进建议。 ")}
-function comparisonBoard(){return `<section class="comparison-board evaluation-lab"><div class="kicker">建议可信度可视化</div><h2>一个建议从“听起来合理”到“值得研究”，中间缺什么？</h2><p>这张图审查建议的论证链，不呈现任何系统效果数据。左右不是改动前后的性能，而是低质量建议与可解释候选的差别。</p><div class="experiment-context"><span>不代表真实效果</span><span>不替代项目验证</span><span>每一格都必须能追溯</span></div><div class="experiment-tracks"><section class="experiment-track baseline"><div class="track-header"><h3>低质量建议</h3><span class="track-status">不应采用</span></div><div class="trace-line"><div class="trace-node"><b>方法名</b><span>先说“加 RAG / 反思 / 多 Agent”。</span></div><div class="trace-node fault"><b>失败对象缺失</b><span>没有说明它要解决哪种失效。</span></div><div class="trace-node fault"><b>证据跳跃</b><span>用一篇论文直接承诺当前场景有效。</span></div><div class="trace-node fault"><b>没有反例</b><span>忽略复杂度、成本和不适用条件。</span></div></div><p class="track-result"><b>结论：</b>这只是灵感，不是可负责任的改进建议。</p></section><section class="experiment-track supported"><div class="track-header"><h3>可解释候选</h3><span class="track-status">按置信度列出</span></div><div class="trace-line"><div class="trace-node fix"><b>失败模式</b><span>先描述可观察的失效类型。</span></div><div class="trace-node fix"><b>改动机制</b><span>说明改动会影响哪一层行为。</span></div><div class="trace-node fix"><b>外部支撑</b><span>来源只支持相近机制与范围。</span></div><div class="trace-node fix"><b>否决条件</b><span>写出反例、代价和替代方案。</span></div></div><p class="track-result"><b>结论：</b>可标记为强候选、待补充或不建议，绝不写成已有效。</p></section></div><div class="intervention-bridge"><div><b>问题</b>是否先定义了明确失败模式？</div><div class="intervention-arrow">→</div><div><b>质疑</b>来源证明的是同一机制，还是只是一段相似叙述？</div><div class="intervention-arrow">→</div><div><b>输出</b>按边界完整度给出置信度，而非效果承诺。</div></div><div class="decision-gate"><div class="gate-checks"><b>高置信建议的最低构成</b>失败模式明确；改动机制可解释；来源质量可追溯；适用边界和否决条件完整。</div><div class="gate-arrow">→</div><div class="gate-outcome"><b>页面可以给出的唯一结论</b>强候选：论证链完整。待补充：缺少机制匹配或边界。<em>不建议：只有方法名、直觉或无关来源。</em></div></div></section>`}
-
-// ==================== RENDER ====================
-let currentTab = 'knowledge';
-let currentKnowledgeView = 'overview';
-let currentEvalView = 'parse';
-
-function buildNav(tab = currentTab) {
-  const tree = document.getElementById('navTree');
-  const title = document.getElementById('navTitle');
-  let html = `<div class="workspace-nav"><div class="nav-item${tab === 'knowledge' ? ' active' : ''}" onclick="switchTab('knowledge')">知识体系</div><div class="nav-item${tab === 'eval' ? ' active' : ''}" onclick="switchTab('eval')">评估框架</div></div>`;
-
-  if(tab === 'knowledge') {
-    title.textContent = 'AI Agent 工作台';
-    const overviewViews = [
-      ['overview', '总览与学习路径'],
-      ['practice', '实践与诊断'],
-      ['sources', '研究与资料'],
-    ];
-    html += `<div class="nav-group"><div class="nav-group-label${overviewViews.some(([id]) => id === currentKnowledgeView) ? ' active' : ''}">知识工作区</div><div class="nav-children show">`;
-    overviewViews.forEach(([id, label]) => {
-      html += `<div class="nav-item${currentKnowledgeView === id ? ' active' : ''}" onclick="switchKnowledgeView('${id}')">${label}</div>`;
-    });
-    html += `</div></div>`;
-    KNOWLEDGE.categories.forEach(cat => {
-      const isActive = currentKnowledgeView === cat.id;
-      html += `<div class="nav-group"><div class="nav-group-label${isActive ? ' active' : ''}" onclick="switchKnowledgeView('${cat.id}')">${cat.icon} ${cat.name}</div><div class="nav-children${isActive ? ' show' : ''}">`;
-      cat.items.forEach((item,i) => {
-        const itemTitle = item.title.length > 20 ? item.title.substring(0,20)+'...' : item.title;
-        html += `<div class="nav-item" onclick="switchKnowledgeItem('${cat.id}',${i})">${itemTitle}</div>`;
-      });
-      html += `</div></div>`;
-    });
-  } else {
-    title.textContent = '评估框架';
-    const views = [
-      ['parse', 'Agent 解析'],
-      ['scope', '评估范围'],
-      ['profile', '项目画像与现状'],
-      ['evidence', '证据与判断'],
-      ['playbook', '执行规范'],
-      ['quality', '质量与控制'],
-      ['operations', '安全与运营'],
-      ['recommendations', '建议依据'],
-      ['references', '参考项目'],
-    ];
-    html += `<div class="nav-group"><div class="nav-group-label"><span class="arrow open">▶</span>评估工作区</div><div class="nav-children show">`;
-    views.forEach(([id, label]) => {
-      html += `<div class="nav-item eval-route${currentEvalView === id ? ' active' : ''}" onclick="switchEvalView('${id}')">${label}</div>`;
-    });
-    html += `</div></div>`;
-  }
-  tree.innerHTML = html;
-}
-
-function toggleNav(el) {
-  el.querySelector('.arrow').classList.toggle('open');
-  el.nextElementSibling.classList.toggle('show');
-}
-
-function scrollToSection(id, navItem) {
-  document.querySelectorAll('.nav-item').forEach(i=>i.classList.remove('active'));
-  if(navItem) navItem.classList.add('active');
-  const el = document.getElementById(id);
-  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
-  if(window.matchMedia('(max-width: 760px)').matches) setMobileNav(false);
-}
-
-function setMobileNav(open) {
-  const sidebar = document.querySelector('.sidebar');
-  const toggle = document.getElementById('navToggle');
-  sidebar.classList.toggle('mobile-open', open);
-  toggle.setAttribute('aria-expanded', String(open));
-  toggle.textContent = open ? '收起目录' : '目录';
-}
-
-function renderQA(tab) {
-  const banner = document.getElementById('qaBanner');
-  if(tab === 'eval' || currentKnowledgeView !== 'overview') { banner.hidden = true; return; }
-  const questions = [KNOWLEDGE.qa[2], KNOWLEDGE.qa[0], KNOWLEDGE.qa[1]];
-  banner.hidden = false;
-  const heading = '先用这三个问题把知识学成可用判断';
-  let html = `<h3>${heading}</h3><div class="qa-focus-grid">`;
-  questions.forEach(item => { html += `<div class="qa-focus-item"><b>${item.q}</b><span>${item.a}</span></div>`; });
-  banner.innerHTML = html + `</div>`;
-}
-
-function knowledgeSources(){return `<section class="evidence-panel"><h3>知识体系的来源与取舍</h3><p>本页按能力闭环组织，而非按单一框架的 API 目录组织：任务设计、推理与工具、上下文与检索、协作、治理分别回答不同问题。每个具体结论仍应回到卡片中的原始论文或规范。</p><div class="evidence-strip"><b>结构参考：</b><a href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank" rel="noopener"><a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/transports" target="_blank" rel="noopener">MCP 2025-11 规范</a>、<a href="https://github.com/a2aproject/A2A/blob/main/docs/specification.md" target="_blank" rel="noopener">A2A 1.0 规范</a>、<a href="https://github.com/microsoft/AgentRx" target="_blank" rel="noopener">AgentRx</a> 的轨迹诊断与 <a href="https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP Agent Security</a> 校验闭环中的协议、状态、诊断与权限边界。它们提供当前机制依据，不替代任务本身的验收标准。</div></section>`}
-function evaluationSources(){return `<section class="evidence-panel"><div class="kicker">评估工具的能力边界</div><h2>不同工具分别能检查什么？</h2><p>评估工具不是一套通用“分数机”。先确定要检查的是输出、工具参数、行动轨迹，还是多轮会话；同一项目的不同层级不能混成一个结论。</p><div class="evaluation-source-list"><article><h3>LangChain AgentEvals</h3><p><b>适合检查：</b>行动轨迹是否符合预设路径或约束，以及用评审器审阅轨迹。它回答的是过程是否合理。</p></article><article><h3>agentevals</h3><p><b>适合检查：</b>基于 OpenTelemetry Trace 离线重复评分。项目仍在快速迭代，采用时要锁定版本和评分规则。</p></article><article><h3>Strands Evals</h3><p><b>适合检查：</b>输出、工具选择、工具参数、轨迹、会话和多轮模拟。它帮助把不同层级拆开评估。</p></article><article><h3>Inspect</h3><p><b>适合检查：</b>组合工具调用、多轮交互和模型评审组件。它提供组件能力，不替代你的任务验收标准。</p></article></div><div class="evidence-strip"><b>使用边界：</b>这些项目只说明各自能支持哪一类检查；它们不能证明某个改进建议对你的 Agent 一定有效。实际结论仍要回到代表任务、版本和可复查证据。</div></section>`}
-function comparisonBoardV2(){return comparisonBoard().replace("先说“加 RAG / 反思 / 多 Agent”。", "只报一个方法名，没有问题定义。")}
-function knowledgeResearchPatterns(){return `<section class="evidence-map"><div class="kicker">从当前实现中提炼的知识点</div><h2>理解 Agent，先抓住四个不会随框架变化的对象</h2><p>框架和 SDK 会换，下面五个对象不会：任务契约、能力与授权、运行状态、外部终态与可观测证据。它们把“会调用模型”变成可设计、可追溯的系统。</p><div class="claim-grid"><article><h3>任务契约不是一句用户输入</h3><p><b>应写清：</b>目标、不可违反的约束、可用动作、需要保留的状态和何时算结束。没有终态或拒绝条件，循环只能靠模型猜何时停。</p><p><b>不能推出：</b>任务写得详细，不代表路径必须固定；开放任务仍可允许多条合法轨迹。</p></article><article><h3>协议规定连接，不替代能力与授权</h3><p><b>应区分：</b>Function Calling 是一次调用契约，MCP 是 Agent 到工具/资源的连接协议，A2A 是 Agent 间协作协议。三者都不负责判断动作是否该做。</p><p><b>不能推出：</b>接入标准协议，不等于工具可信、参数正确或具备执行权限。</p></article><article><h3>状态不是聊天记录的别名</h3><p><b>运行状态</b>保存任务进度、预算、未完成动作与恢复点；<b>知识</b>提供可引用事实；<b>记忆</b>保存跨任务信息。三者混写会让恢复、权限和更新不可解释。</p><p><b>不能推出：</b>保存更多历史会提高质量；关键约束必须经过选择与结构化，而不是无限追加上下文。</p></article><article><h3>终态要看外部世界，不只看最终文案</h3><p><b>终态</b>可以是答案忠于证据、目标状态已变化、动作被拒绝并说明原因，或安全地转人工。工具返回 200、模型说“完成”都不是充分条件。</p><p><b>不能推出：</b>一次状态正确，就说明流程可靠；超时、重试和重复副作用仍需独立设计。</p></article><article><h3>可观测证据是运行的一部分</h3><p><b>应记录：</b>任务与版本、状态转换、工具选择和结果、授权/拦截决定、重试与人工接管，并让它们能关联到同一条轨迹。没有这些证据，就无法区分模型、工具、策略还是外部系统导致失败。</p><p><b>不能推出：</b>记录得多不等于可评估；敏感输入、工具参数和输出必须按最小必要原则脱敏、访问控制与保留。</p></article></div><div class="evidence"><b>来源：</b><a href="https://github.com/microsoft/ai-agents-for-beginners" target="_blank" rel="noopener"><a href="https://modelcontextprotocol.io/specification/2025-11-25/basic/transports" target="_blank" rel="noopener">MCP 2025-11</a>、<a href="https://github.com/a2aproject/A2A/blob/main/docs/specification.md" target="_blank" rel="noopener">A2A 1.0</a>、<a href="https://github.com/microsoft/AgentRx" target="_blank" rel="noopener">AgentRx 2026</a> 与 <a href="https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP Agent Security</a>。页面据此归纳稳定对象，不把任一框架 API 当作通用原理。</div></section>`}
-function evaluationContractMap(){return `<section class="evidence-map"><div class="kicker">从当前评估器提炼的判定契约</div><h2>先定义“什么算对”，再讨论任何改进建议</h2><p>轨迹不是天然只有一个正确答案。评估建议若没有说明需要约束顺序、覆盖、参数、终态中的哪一种，引用再多论文也无法证明它对准了问题。</p><div class="claim-grid"><article><h3>顺序正确</h3><p><b>适用：</b>前一步决定后一步的权限、审批或依赖。证据应说明关键动作为什么必须按序发生。</p><p><b>不要误用：</b>把所有探索任务都按严格序列判，会把等价路径误判为失败。</p></article><article><h3>覆盖正确</h3><p><b>适用：</b>必须获得的事实或必经动作明确，但获取顺序可以变化。证据应检查关键集合是否齐全。</p><p><b>不要误用：</b>“都调用过”不能证明参数、引用或最终状态正确。</p></article><article><h3>边界正确</h3><p><b>适用：</b>允许额外探索但必须包含关键动作，或必须禁止多余/高风险动作。参数可按字段定义精确或宽松匹配。</p><p><b>不要误用：</b>宽松匹配不等于放弃安全约束；不可逆动作仍要明确禁止条件。</p></article><article><h3>终态正确</h3><p><b>适用：</b>任务价值取决于外部状态、会话目标或可核验结果。此时需要状态断言，而不是只评最终文字。</p><p><b>不要误用：</b>开放质量无法用状态断言穷尽时，模型评审只能按预写 rubric 提供辅助意见。</p></article></div><div class="evidence"><b>为什么这会改变建议可信度：</b>任何“加入规划、检索或反思”的主张，都应先说明会改变哪一种判定契约；若来源只展示了输出更流畅，却没有覆盖同一契约，它不能作为强支撑。</div><div class="evidence"><b>内部依据：</b><a href="https://github.com/langchain-ai/agentevals" target="_blank" rel="noopener">LangChain AgentEvals</a> 明确区分严格、任意顺序、包含与排除的轨迹匹配，并允许按工具定义参数匹配；<a href="https://github.com/strands-agents/evals" target="_blank" rel="noopener">Strands Evals</a> 将工具选择、工具参数与环境状态拆开处理。</div></section>`}
-function toolEvaluationLayers(){return `<section class="evidence-panel"><h3>工具调用至少有三层，不能只看“调用成功”</h3><div class="claim-grid"><article><h3>1. 选择</h3><p>在该时点是否该用这个工具？这是意图、上下文和可用能力的匹配问题。</p></article><article><h3>2. 参数</h3><p>参数是否忠于此前上下文，并且满足业务语义？JSON 合法只是最低门槛。</p></article><article><h3>3. 后果</h3><p>调用后的外部状态是否符合预期、权限和幂等要求？接口成功不代表业务状态正确。</p></article><article><h3>4. 叙述</h3><p>最终回答是否如实使用工具返回，而没有掩盖失败、过度承诺或遗漏限制？</p></article></div><div class="evidence-strip"><b>使用方式：</b>当某项改进声称“优化工具使用”时，必须标出它改善的是哪一层。否则“工具正确率提升”没有可解释含义。Strands 的工具级评估分别处理选择和参数，环境状态断言则单独验证后果。</div></section>`}
-function evidenceLadder(){return `<section class="evidence-map"><div class="kicker">证据链的最低门槛</div><h2>先写出能推翻主张的约束，再谈“来源支持”</h2><p>一篇论文、一次公开演示或一个项目 README 都只能提供材料。页面要审查的是：材料能否支撑一个可反驳的机制主张，而不是材料本身是否有名。</p><div class="flow"><div><b>1. 主张</b><span>改动声称缓解哪种失效？</span><small>只有方法名，不成立</small></div><div><b>2. 约束</b><span>若主张正确，哪条行为必须成立？</span><small>写成可观察的不变量</small></div><div><b>3. 支持</b><span>来源是否展示同一机制与条件？</span><small>任务名相似不够</small></div><div><b>4. 反证</b><span>什么结果会直接削弱这个主张？</span><small>没有反证，置信度受限</small></div><div><b>5. 表达</b><span>只报告论证完整度与边界。</span><small>不承诺任何系统效果</small></div></div><div class="evidence"><b>来自当前诊断框架的可借鉴点：</b><a href="https://github.com/microsoft/AgentRx" target="_blank" rel="noopener">AgentRx</a> 将原始轨迹归一化，先生成静态与逐步约束、检查违例，再使用模型归因。这里借鉴其证据顺序，而不假装本页已有某个系统的轨迹或检查结果。</div></section>`}
-
-function evaluationReferences(){return `<section class="evidence-map"><div class="kicker">当前参考项目 · 2026-07-26 核对</div><h2>参考项目分别解决哪一环？</h2><p>它们不是同一种“建议生成器”：本页把任务标准、过程证据、失败定位和稳定性验证作为输入，结合具体 Agent 的设计，给出改进点、可改动作、作用机制、边界与置信度。</p><div class="claim-grid"><article><span class="claim-tag">2026-05 · 345 星</span><h3><a href="https://github.com/alphadl/AdaRubrics" target="_blank" rel="noopener">AdaRubric</a>：定义任务专属标准</h3><p><b>可取：</b>从任务契约生成专属子标准，逐步给出分数与置信度；它能显示哪一维未达标，避免平均分掩盖致命失败。</p><p><b>边界：</b>它不替你选择策略：低分维度还要映射成可改的提示、工具、状态或约束；而且仍是很新的研究实现，rubric 生成本身也可能偏差。</p></article><article><span class="claim-tag">ICML 2025 · 801 星</span><h3><a href="https://github.com/metauto-ai/agent-as-a-judge" target="_blank" rel="noopener">Agent-as-a-Judge</a>：收集执行证据</h3><p><b>可取：</b>沿任务过程收集能支持或推翻结论的证据，把“为什么判断这里有问题”变成可复查依据。</p><p><b>边界：</b>评估与逐步反馈只是建议的证据输入，还要映射到可改动作；公开验证主要是 DevAI 代码任务，仍须保留可核验要求与人工复核入口。</p></article><article><span class="claim-tag">2026-02 · 132 星</span><h3><a href="https://github.com/microsoft/AgentRx" target="_blank" rel="noopener">AgentRx</a>：定位失败步骤</h3><p><b>可取：</b>把轨迹归一化，先检查静态与逐步不变量，再定位关键失败环节；它为改进假设提供“问题在哪”的起点。</p><p><b>边界：</b>失败步骤与类型指出方案该对准哪里，之后仍需选择相应的修复动作；没有轨迹、工具契约和任务规则时，不能假装能定位根因。</p></article><article><span class="claim-tag">2026-03 · 735 星</span><h3><a href="https://github.com/claw-eval/claw-eval" target="_blank" rel="noopener">Claw-Eval</a>：验证完成与稳定性</h3><p><b>可取：</b>将完成、安全、稳定性分开；连续多次通过才视为可靠，用来判断问题是否只是偶发失败。</p><p><b>边界：</b>它验证某个改动是否稳定，而不解释根因；建议本身仍要来自前面的任务分析。它是通用基准，不能替代具体系统的分析。</p></article></div><div class="evidence"><b>从发现到建议：</b>任务标准回答“该看什么”；过程证据回答“发生了什么”；失败定位回答“问题在哪”；再给出可改动作及其作用机制，才形成一条可审查的改进建议。</div><div class="claim-grid"><article><h3>功能交付 Agent</h3><p>正确性、范围控制、回归处理、验证完整性。</p></article><article><h3>缺陷修复 Agent</h3><p>复现、根因、最小修改、邻近回归。</p></article><article><h3>业务操作 Agent</h3><p>目标状态、授权、工具参数、幂等与恢复。</p></article><article><h3>检索型 Agent</h3><p>证据召回、忠实性、引用、上下文选择。</p></article><article><h3>多 Agent 协作</h3><p>职责边界、交接质量、共享状态、隔离与降级。</p></article></div><div class="evidence"><b>结论边界：</b>没有目标 Agent 的真实任务和轨迹时，只能审查建议是否匹配任务、机制与外部证据，不能断言实际效果。</div></section>`}
-
-const KNOWLEDGE_CARD_META = {
-  "ReAct 范式：推理+行动交替循环": ["研究基线", "论文来源", "2026-07-27"],
-  "CoT / Plan-Execute / ToT / Reflection 对比与选型": ["研究基线", "按任务对照", "2026-07-27"],
-  "MCP 协议：架构、实现与局限": ["活跃规范", "原始规范优先", "2026-07-27"],
-  "A2A 协议：把独立 Agent 的协作变成可追踪任务": ["活跃规范", "原始规范优先", "2026-07-27"],
-  "Function Calling 完整实现": ["接口实践", "平台文档优先", "2026-07-27"],
-  "混合检索 / Rerank / Agentic RAG / GraphRAG": ["场景方法", "本地检索评测", "2026-07-27"],
-  "多 Agent 协作模式与选型": ["场景方法", "职责边界优先", "2026-07-27"]
-};
-function knowledgeSources(){return `<section class="evidence-panel"><h3>知识体系的来源、日期与取舍</h3><p>本页按能力闭环组织，不按某个框架的 API 目录组织。每张卡片的“最后核对”表示本页编辑审校日期；活跃规范以原始规范为准，研究结论以论文与适用条件为准，工程原则必须回到本地任务验证。</p><div class="evidence-strip"><b>活跃规范：</b><a href="https://modelcontextprotocol.io/specification/2025-11-25" target="_blank" rel="noopener">MCP 2025-11 规范</a>（核对 2026-07-27）、<a href="https://a2a-protocol.org/latest/specification/" target="_blank" rel="noopener">A2A 规范</a>（核对 2026-07-27）。<b>安全边界：</b><a href="https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP AI Agent Security</a>（核对 2026-07-27）。<b>研究基线：</b>各卡片引用的原始论文只支持其研究条件，不承诺当前项目效果。</div></section>`}
-const CARD_BODY_OVERRIDES = {
-  "ReAct 范式：推理+行动交替循环": `<p><b>ReAct 指模型在“选择行动”和“读取外部观察”之间循环。</b>它解决的是下一步依赖真实工具结果或环境状态的任务，不是比 CoT 更高级的默认方案。</p><ul><li><b>Action</b>：模型提出受限的工具调用或下一步。</li><li><b>Observation</b>：应用返回经过边界处理的工具结果、错误或状态变化。</li><li><b>State</b>：应用保存任务进度、预算、已执行动作和外部终态；这部分不应只存在于模型消息里。</li><li><b>Termination</b>：由可验证终态、预算、重复无进展、授权需求或人工接管触发。</li></ul><p><b>何时用：</b>外部观察会改变后续路径，例如排障、检索后决策或跨系统协调。<b>何时不用：</b>步骤已知、无外部动作或可用确定性工作流完成时。</p><p><b>实现边界：</b>不同模型 API 对 tool message 的字段和角色定义不同，应遵循该平台的消息契约；不要把展示给用户的内部推理当作可靠的审计记录。</p>`,
-  "CoT / Plan-Execute / ToT / Reflection 对比与选型": `<p><b>这些是控制循环的设计选项，不是从“低级”到“高级”的固定阶梯。</b>先判断下一步是否真的依赖外部观察、是否存在可验证反馈，再选择最小足够的控制方式。</p><ul><li><b>CoT / 直接生成</b>：路径短、无需外部事实或动作时使用；它不保证事实正确。</li><li><b>ReAct</b>：工具或环境返回会改变下一步时使用；成本取决于真实轨迹、工具延迟和上下文，不存在通用倍数。</li><li><b>Plan-and-Execute</b>：高层步骤可预判时先形成计划，在关键观察点重规划；它不天然更省 Token。</li><li><b>ToT / 搜索</b>：候选有限、可比较、错误代价高时才值得探索多路径；需要可靠评估函数。</li><li><b>Reflection</b>：只有测试、工具结果或明确的<b>评分标准（rubric）</b>能指出错误时才有价值；模型自我复述不能作为修复证据。</li></ul><p><b>当前常见做法：</b>用确定性工作流包住模型，把复杂选择限制在少数节点；用同一批代表任务比较完成率、工具错误、P95 延迟、成本和安全拒绝率。<b>不要写“默认提升 X%”或“固定多 Y 倍成本”</b>，这类数字没有离开原实验和本地对照就没有意义。</p>`,
-  "Agent Loop 设计与终止策略": `<p><b>Agent Loop 是“读取状态 → 选择受限动作 → 执行 → 记录观察 → 检查终态”的循环。</b>模型可以提议下一步，但任务状态、权限和停止条件应由应用维护。</p><p><b>最低限度的停止与恢复设计：</b></p><ul><li><b>终态</b>：外部状态已达成、答案已被证据支持、明确拒绝，或安全地交给人工。</li><li><b>预算</b>：步骤、时长、工具次数和费用均有任务级上限；具体数值由风险和任务分布决定，不存在“通常 10 步”。</li><li><b>重复检测</b>：根据工具、规范化参数和状态是否没有变化判断；不要只用“连续两次相同”当成普适规则。</li><li><b>失败分类</b>：参数错误可让模型修正；可重试的临时故障按工具语义退避；业务拒绝、权限不足和非幂等写入不应盲目重试。</li><li><b>恢复</b>：副作用动作保存幂等键或 checkpoint；重启后先查询外部状态，再决定继续、补偿或转人工。</li></ul><p><b>落地 gap：</b>一段 Thought/Action 提示词不是运行时。生产代码还需要状态持久化、策略网关、审计事件和可复现的任务夹具。</p>`,
-  "MCP 协议：架构、实现与局限": `<p><b>MCP 是模型应用与外部工具/上下文服务之间的开放协议。</b>它定义 Host、Client、Server 的连接、能力协商和消息交互；Server 可提供 Tools、Resources 与 Prompts。</p><p><b>何时采用：</b>当同一套工具或数据能力需要被多个兼容 Host 使用，或者需要标准化能力发现和接入方式时。<b>不应采用：</b>同一进程内的简单确定性函数，只会增加部署与治理成本。</p><p><b>与 Function Calling / A2A 的关系：</b>Function Calling 是某个模型 API 中的调用契约；MCP 是应用到工具/上下文服务的协议；A2A 是独立 Agent 间的任务协作协议。三者可组合，也可以各自独立。</p><p><b>落地 gap：</b>协议互通不等于授权、信任、业务校验或验收。远程 Server 仍要处理来源/身份验证、最小权限、用户同意、工具输出隔离、超时和审计。版本与传输细节以链接中的原始规范为准，页面核对日期为 2026-07-27。</p>`,
-  "运行状态、会话上下文与长期记忆": `<p><b>不要按“固定三层”背架构，按责任划分信息。</b></p><ul><li><b>运行状态</b>：任务进度、预算、待处理动作、幂等键和恢复点；丢失后任务无法安全继续。</li><li><b>会话上下文</b>：本轮模型调用选择的近期信息；它不是数据库，也不应承担恢复责任。</li><li><b>长期记忆</b>：跨任务仍有价值且获得授权的用户事实、偏好或历史决策；必须带来源、时间、置信度、作用域和删除策略。</li><li><b>知识库</b>：可检索、可更新、可引用的文档或数据；与用户记忆分开管理。</li></ul><p><b>当前常见做法：</b>先用产品已有数据库和任务状态存储解决结构化事实与恢复，再按确有需要增加向量检索。Redis、TTL 30 分钟、某个向量库或“向量库 + 关系库”都不是通用标准。</p><p><b>安全边界：</b>外部输入写入长期记忆前要验证与隔离；用户应能查看、更正或删除自己的记忆。</p>`,
-  "上下文工程与压缩策略": `<p><b>上下文工程的目标是为当前决策选择足够、可信、被授权的信息，不是把窗口填满。</b></p><ul><li><b>保留结构化状态</b>：目标、约束、已完成动作、未决问题、关键实体和异常比逐句聊天记录更容易恢复和审计。</li><li><b>按需装载</b>：历史、工具定义、文档、示例都应根据当前任务选择；原始证据留在系统记录中，摘要只服务当前决策。</li><li><b>压缩前评估</b>：用代表任务测试摘要是否丢失权限、时间、未完成动作或关键事实；不要默认“压缩模型输出优先”。</li><li><b>长文档处理</b>：切分、重叠、排序和摘要策略取决于文档结构、问题类型与召回评测，没有固定窗口、阈值或重叠比例。</li></ul><p><b>落地 gap：</b>上下文变长时，问题可能来自检索错误、状态丢失、权限混入或生成约束，而不是单纯 Token 不够。先定位失败层，再调压缩参数。</p>`
-  ,"工具设计模式：错误处理与安全控制": `<p><b>工具调用要把“模型建议”与“系统执行”分开。</b>错误处理和安全控制都应按信任边界与业务后果设计，而不是只靠提示词或关键词过滤。</p><ul><li><b>参数/语义错误</b>：结构校验和业务前置条件失败时，返回可理解的错误；只有可恢复的问题才让模型重试或改参。</li><li><b>临时执行错误</b>：网络、限流或依赖故障可在幂等前提下按退避策略处理；把失败类型、重试和最终结果写入事件。</li><li><b>业务拒绝</b>：余额不足、资源状态冲突、权限不足等不是重试对象，应反馈原因和安全下一步。</li><li><b>授权与审批</b>：按用户、会话、工具、资源和动作范围授权。支付、删除、外发、权限变更等高影响动作需要独立策略校验和明确确认。</li><li><b>不可信输入</b>：用户消息、网页、检索文档、邮件和工具返回都可能含注入指令；区分数据与指令，限制工具能力并隔离输出。</li></ul><p><b>审计最小集：</b>任务/会话 ID、版本、调用主体、工具和规范化参数、授权决定、结果、耗时、重试与外部状态。敏感参数按最小必要原则脱敏和保留。</p>`
-  ,"多 Agent 协作模式与选型": `<p><b>多 Agent 的价值来自独立职责、权限边界或可并行的子任务，不来自角色数量。</b>先把任务拆成可交付、可验证、可失败隔离的单元，再决定是否需要多个 Agent。</p><ul><li><b>编排式</b>：一个控制器持有任务状态并委托子任务；适合需要统一验收、审批和恢复的流程。</li><li><b>事件/消息式</b>：独立服务通过消息协作；适合异步、跨团队边界，但必须定义幂等、版本与死信处理。</li><li><b>专长式</b>：不同 Agent 拥有不同工具或数据权限；交接必须包含目标、证据、产物格式、状态和完成条件。</li><li><b>交叉评审</b>：只有存在明确 rubric 或外部测试时才有意义；投票本身不保证正确。</li></ul><p><b>何时不拆：</b>同一模型、同一权限、同一上下文内的顺序步骤，通常应先保留为单 Agent 或工作流。<b>常见 gap：</b>共享状态所有权、权限传播、超时、重试、部分失败与外部副作用，比“如何让 Agent 对话”更难。</p>`
-  ,"Agent 系统架构设计（五层）": `<p><b>不存在适用于所有产品的“生产级五层架构”。</b>应按责任边界组织，而不是按框图数量组织。</p><ul><li><b>接入与任务契约</b>：身份、输入、目标、权限和成功终态。</li><li><b>编排与状态</b>：工作流、预算、checkpoint、恢复和人工接管。</li><li><b>模型决策</b>：只在需要理解、选择或生成的受限节点调用模型。</li><li><b>能力网关</b>：工具、检索、外部 API 的验证、授权、幂等和超时。</li><li><b>治理与证据</b>：输出校验、审计、指标、评估集、版本和回退。</li></ul><p><b>当前常见做法：</b>确定性问题优先在模型外解决；高影响动作由独立策略和审批组件判定；每个外部副作用都能恢复或说明不可恢复。具体渠道、FAQ 分流比例、审批超时和组件数量都应由任务数据决定。</p>`
-  ,"安全防护：幻觉控制 + Prompt 注入防御": `<p><b>“零幻觉”不是可实现承诺；安全目标是让错误不越过业务边界，并让不确定性可见、可拒绝、可追溯。</b></p><ul><li><b>事实与引用</b>：需要外部事实时检索可授权来源，并分别评估召回、引用正确和答案忠实性；模型自评置信度不能单独当安全控制。</li><li><b>工具与权限</b>：工具按最小权限、资源范围和动作风险授权；高影响动作由独立策略验证并绑定到具体参数和确认记录。</li><li><b>提示注入</b>：用户、网页、文档、邮件和工具输出都按不可信数据处理。关键词过滤可作为弱信号，不能作为主要防线；关键防线是数据/指令分离、能力限制、输出隔离和服务端校验。</li><li><b>验证与演练</b>：把越权、数据泄露、间接注入、重复副作用和拒绝路径放进测试集与发布门禁。</li></ul><p><b>适用边界：</b>医疗、金融、权限和外发等高风险场景还需要领域合规、人工责任链和专门的程序断言。</p>`
-  ,"性能与成本优化": `<p><b>性能优化从任务分解和测量开始，不从“换小模型”开始。</b>先在代表流量中拆出模型等待、工具等待、检索、重试、上下文和输出的成本。</p><ul><li><b>减少不必要调用</b>：对确定性计算、格式校验和已知答案使用程序或缓存；缓存键必须包含权限、输入和知识版本。</li><li><b>路由</b>：按质量、风险、延迟和成本门槛为不同子任务选择模型或降级路径，而不是把所有请求送入同一 Agent。</li><li><b>并发与批处理</b>：仅并发无依赖且不会放大外部风险的调用；对限流和取消保持可见。</li><li><b>优化验收</b>：同时比较任务完成、P50/P95 延迟、单任务成本、工具错误和安全拒绝；成本下降但成功率下降不算优化。</li></ul><p><b>不要承诺固定节省比例或缓存命中率。</b>这些数值高度依赖任务分布、模型价格、上下文和数据新鲜度。</p>`
-  ,"RAG 全链路：7 步完整流程": `<p><b>RAG 是从“找证据”到“基于证据作答”的可测链路，不是固定七步配方。</b></p><ol><li><b>证据标准</b>：定义可授权、可引用的正确证据，以及无证据时如何拒答或转人工。</li><li><b>解析与切分</b>：保留文档结构、版本、更新时间与权限；策略由语料和问题集验证。</li><li><b>建索引</b>：让文档、chunk、embedding 和索引版本可追溯。</li><li><b>召回与融合</b>：先以 Recall@K 等指标确认正确证据进入候选。RRF 的 <code>k=60</code> 只是常见初始参数，权重和候选数必须调测。</li><li><b>重排与选择</b>：候选噪声会影响模型时再考虑 reranker；上下文要保留来源和必要语境。</li><li><b>受约束生成</b>：答案区分证据、推断和未知项，引用绑定到实际使用的片段。</li><li><b>评测</b>：分别检查召回、排序、引用正确、忠实性、完成率、延迟、成本和拒答质量。</li></ol><p><b>排障顺序：</b>先问正确证据是否被召回；再看排序和上下文；最后才看生成。没有答案的语料不能靠更长 Prompt 修复。</p>`
-  ,"混合检索 / Rerank / Agentic RAG / GraphRAG": `<p><b>这些解决不同检索失效，不是从低到高的升级路线。</b></p><ul><li><b>混合检索</b>：稀疏检索擅长字面匹配，稠密检索擅长语义相近；当问题同时需要术语、编号与语义时，比较二者及融合。</li><li><b>Rerank</b>：在已有候选中细排；只在正确证据已入候选但排序不佳时才可能有效，并会增加延迟与成本。</li><li><b>Agentic RAG</b>：依据证据缺口继续检索、改写或调用数据源。它需要停止条件、预算、来源范围和可审计轨迹；不适合稳定的一次检索任务。</li><li><b>GraphRAG</b>：将实体、关系和证据片段组织为图，适合多跳关系、全局主题或实体消歧。图谱抽取错误、更新成本、访问控制和回链原文都要单独验证。</li></ul><p><b>选型方法：</b>从失败样本开始：编号查不到先检查稀疏召回；候选有答案却排不前先测 rerank；跨源、多步证据再评估 Agentic RAG；确有关系推理与维护能力时再考虑图结构。</p>`
-  ,"可观测性 + 评估体系": `<p><b>可观测性回答“发生了什么”，评估回答“是否达成任务”。两者都应围绕任务契约，不应围绕某个观测平台。</b></p><ul><li><b>最小 Trace</b>：任务/会话 ID、版本、状态转换、模型与工具调用、授权/拦截、重试、耗时、成本和最终外部状态；敏感内容最小化、脱敏。</li><li><b>指标</b>：任务完成、关键安全拒绝、工具错误、延迟分位数、单任务成本和人工接管。“幻觉率”必须先定义判定规则和样本范围。</li><li><b>离线评测</b>：从真实失败、关键路径、边界和对抗样本建集；按任务选最终答案、工具参数、轨迹或外部终态作为 oracle。</li><li><b>在线验证</b>：灰度比较版本，观察完成、失败类型、成本和安全事件；非确定性任务重复运行并报告分布，次数取决于风险与置信度需求。</li></ul><p><b>工具选择：</b>LangSmith、Langfuse、Phoenix 等只是实现选项。选择时看数据驻留、采样、脱敏、导出、成本和是否支持你的 Trace/评测对象。</p>`
-};
-const CARD_EXTRA_REFS = {
-  "RAG 全链路：从证据到可验证答案": [{t:"RAG (Lewis et al. 2020)",u:"https://arxiv.org/abs/2005.11401"}],
-  "混合检索 / Rerank / Agentic RAG / GraphRAG": [{t:"GraphRAG (2024)",u:"https://arxiv.org/abs/2404.16130"}],
-  "安全防护：幻觉控制 + Prompt 注入防御": [{t:"OWASP AI Agent Security Cheat Sheet",u:"https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html"}],
-  "工具设计模式：错误处理与安全控制": [{t:"OWASP AI Agent Security Cheat Sheet",u:"https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html"}]
-};
-CARD_BODY_OVERRIDES["RAG 全链路：从证据到可验证答案"] = `<p><b>RAG 的目标不是凑齐固定步骤，而是让答案能回到已授权、可核验的证据。</b></p><div class="step-list"><div class="step"><span>1</span><p><b>定义证据标准：</b>先确定哪些来源可用、何时必须引用、没有证据时是<b>拒答</b>还是<b>转人工</b>。</p></div><div class="step"><span>2</span><p><b>解析与切分：</b>保留标题、表格、版本、更新时间和权限；切分方式由语料结构与问题集验证。</p></div><div class="step"><span>3</span><p><b>建立可追溯索引：</b>文档、chunk、embedding 和索引都要能对应版本，更新时知道答案来自哪一批知识。</p></div><div class="step"><span>4</span><p><b>召回与融合：</b>先用 <b>Recall@K</b> 确认正确证据是否进入候选。RRF 的 <code>k=60</code> 只是常见起点，<b>权重、候选数和延迟</b>都要调测。</p></div><div class="step"><span>5</span><p><b>重排与上下文选择：</b>候选噪声影响模型时才增加 reranker；回传片段保留来源和必要的相邻语境。</p></div><div class="step"><span>6</span><p><b>受约束生成：</b>答案明确区分<b>证据、推断和未知项</b>，引用绑定到实际使用的片段。</p></div><div class="step"><span>7</span><p><b>分层评测：</b>分别检查<b>召回、排序、引用正确、忠实性、完成率、延迟、成本和拒答质量</b>。</p></div></div><p><b>排障顺序：</b>先看正确证据是否被召回，再看排序和上下文，最后才看生成。<b>语料中没有答案</b>，不能靠更长 Prompt 修复。</p>`;
-CARD_BODY_OVERRIDES["混合检索 / Rerank / Agentic RAG / GraphRAG"] = `<p><b>它们解决的是不同失效，不是从低到高的升级路线。</b>选型从失败样本开始，而不是先叠技术名词。</p><ul><li><b>混合检索：</b><b>稀疏检索</b>擅长术语、编号和原词匹配，<b>稠密检索</b>擅长语义相近。当问题同时需要“订单号 + 含义相近的描述”时，比较两路结果及融合，而不是预设比例。</li><li><b>Rerank：</b>在<b>已有候选</b>中做细排；只有正确证据已经进入候选、但排序靠后时才可能有效。代价是<b>额外延迟与成本</b>。</li><li><b>Agentic RAG：</b>依据<b>证据缺口</b>继续检索、改写或调用数据源。必须定义<b>停止条件、预算、来源范围和可审计轨迹</b>；稳定的一次检索任务不需要它。</li><li><b>GraphRAG：</b>把<b>实体、关系和证据片段</b>组织成图，适合多跳关系、全局主题或实体消歧。图谱抽取错误、更新成本、访问控制和回链原文都要单独验证。</li></ul><p><b>选型顺序：</b>编号查不到先检查稀疏召回；候选有答案却排不前先测 rerank；需要跨源、多步证据再评估 Agentic RAG；确有关系推理需求与维护能力时才考虑图结构。</p>`;
-CARD_BODY_OVERRIDES["Function Calling 完整实现"] = `<p><b>Function Calling 是模型用结构化格式“提出调用工具的请求”。</b>它不是模型直接执行代码：模型只给出工具名和参数，<b>你的服务端</b>决定这次请求是否能真的执行。</p><ul><li><b>定义工具：</b>写清工具做什么、<b>何时该用</b>、要哪些参数。例如“用户给出订单号且已登录时，查询本人订单”。<b>Schema</b> 就是参数的结构说明：字段名、类型、允许值和必填项。</li><li><b>模型提议调用：</b>模型返回结构化参数。它可能缺字段、填错类型或试图调用不该用的工具，因此结果只能算<b>建议</b>。</li><li><b>服务端校验并执行：</b>程序检查格式、当前用户权限、资源归属、金额范围和业务状态；通过后才调用真实接口，并把结果作为外部信息返回模型。</li></ul><p><b>初学者要记住：</b><b>Schema 约束“怎么说”，服务端规则决定“能不能做”。</b>支付、删除、外发等操作还要有最小权限、幂等键和必要的人工确认。</p>`;
-CARD_BODY_OVERRIDES["文档切分、版本与检索评测"] = `<p><b>RAG 的错误常在模型回答前就发生：正确内容没有被拆好、没有被找回，或找回后丢了上下文。</b></p><ul><li><b>切分（chunking）：</b>把长文档按标题、段落、表格或代码块拆成可检索的<b>文档片段</b>。必要时保留相邻的一小段重复内容，避免一句话刚好被切在边界；没有适用于所有文档的固定长度。</li><li><b>版本：</b>给原文、文档片段、向量表示和索引都标版本。这样知识更新后，才能追查某个回答用了哪一批资料，并安全切换或回退。</li><li><b>评测：</b><b>Recall@K</b> 看正确证据是否出现在前 K 个候选中；<b>MRR/NDCG</b> 看它是否排得靠前；<b>引用正确</b>看引用是否真支持答案；<b>忠实性（Faithfulness）</b>看答案有没有超出证据编造。</li></ul><p><b>排障顺序：</b>答案错时，先查候选里有没有正确证据；有证据却答错，才查排序、上下文组织和生成约束。</p>`;
-CARD_BODY_OVERRIDES["多 Agent 状态、幂等与故障隔离"] = `<p><b>多个 Agent 协作的难点不是通信，而是“谁保存状态、重复执行会不会出事、失败后如何恢复”。</b></p><ul><li><b>状态所有权：</b>指定一个编排服务负责写共享任务状态；子 Agent 只交回结构化结果。<b>版本号或乐观锁</b>的意思是：写入前先确认状态没有被别人改过，避免后来的写入覆盖前面的正确结果。</li><li><b>幂等：</b>同一个请求即使因超时或重试执行两次，也只产生一次业务效果。支付、发信、删除等动作要携带唯一请求号，并先查询是否已经完成。</li><li><b>Checkpoint（恢复点）：</b>在关键步骤保存“已经做到哪里、外部动作是否完成”。进程重启后先从外部系统核对，再决定继续、补偿还是转人工。</li><li><b>故障隔离：</b>每个子任务有独立超时和重试预算；非关键任务可返回部分结果，关键任务失败则停在可恢复位置。</li></ul><p><b>原则：</b>流程确定时先用状态机或工作流。只有确实需要独立专长、权限边界或并行收益时，才拆成多个 Agent。</p>`;
-CARD_BODY_OVERRIDES["任务边界：先定义用户要完成什么"] = `<p><b>任务边界是把“做个 Agent”变成一个可验收问题。</b>它先回答用户究竟要完成哪件事，而不是先讨论模型或框架。</p><ul><li><b>任务卡：</b>写清用户是谁、什么情况触发、输入和可用数据、允许的最终动作、不能做什么、成功如何判断、失败交给谁。</li><li><b>把目标写具体：</b>“处理售后”太宽；“在已授权订单上判断退货资格，证据不足时转人工”才知道要查什么、何时停。</li><li><b>先写约束：</b>权限、时效、不可逆操作、数据质量和人工兜底决定系统应该是规则、工作流还是 Agent。</li></ul><p><b>结果：</b>一张任务卡同时成为设计、测试和上线验收的共同依据。</p>`;
-CARD_BODY_OVERRIDES["方案取舍：规则、工作流还是 Agent"] = `<p><b>三者不是替代关系，而是处理不同程度的不确定性。</b></p><ul><li><b>规则：</b>输入和判断条件固定，例如金额范围校验；快、可预测、容易验证。</li><li><b>工作流：</b>步骤大体确定，但需要状态、分支、审批和恢复，例如售后审核流程。</li><li><b>Agent：</b>下一步要根据新证据选择工具或路径，例如调查跨系统异常；它带来灵活性，也带来成本和治理责任。</li></ul><p><b>选择顺序：</b>先问任务路径能不能枚举、结果能不能程序校验、失败代价有多大。能稳定用规则或工作流完成的任务，不应为了“更智能”改成 Agent。</p>`;
-CARD_BODY_OVERRIDES["模型与系统策略：把能力放在合适的位置"] = `<p><b>模型路由</b>是把一个任务拆开，决定每一步由程序、小模型、大模型还是人工确认完成；不是为所有请求挑一个“最强模型”。</p><ul><li><b>交给程序：</b>格式校验、确定性计算、权限检查和不可逆动作的最终放行。</li><li><b>交给模型：</b>理解模糊语言、归纳证据、在受限工具中做选择、生成面向用户的说明。</li><li><b>交给人工：</b>证据不足、高风险、责任必须由人承担，或系统无法安全恢复的情况。</li></ul><p><b>落地方式：</b>为每类子任务定义质量、延迟、成本和风险门槛，保留降级路径；缓存还要带用户权限和知识版本，避免把错误或越权结果复用。</p>`;
-CARD_BODY_OVERRIDES["价值闭环：把反馈变成下一轮可验证改进"] = `<p><b>反馈闭环不是收集一句“好用/不好用”，而是把真实使用转成下次能验证的改动。</b></p><ul><li><b>用户信号：</b>任务是否完成、是否放弃或重复提问、是否转人工、怎样纠正系统。</li><li><b>系统信号：</b>一次任务的执行轨迹（Trace）、工具错误、耗时、成本、安全拦截和最终外部状态。</li><li><b>改进方式：</b>按影响范围、出现频率、能否稳定检测和是否有明确修复方法排优先级；一次只验证一个主要改动，并保留失败样本和相邻边界样本。</li></ul><p><b>结果：</b>得到问题优先级、改动假设、前后对照和回归集，而不是靠 Demo 印象判断“变好了”。</p>`;
-CARD_BODY_OVERRIDES["上线发布、SLO 与故障恢复"] = `<p><b>上线不是把新模型或 Prompt 直接推给所有用户，而是让每个版本可观察、可暂停、可恢复。</b></p><ul><li><b>SLO（服务目标）：</b>提前约定哪些指标必须达标，例如任务完成率、工具错误率、响应时间和高风险操作的拒绝是否正确；每项都有阈值和负责人。</li><li><b>灰度发布：</b>先让一小部分用户或流量使用新版本，对比质量、成本和安全事件；指标越线就停止扩大范围。</li><li><b>回滚与恢复：</b>模型、提示、工具参数和知识索引都带版本。外部副作用保存幂等键和恢复点，故障后先查外部状态，再决定重试、补偿或转人工。</li></ul><p><b>复盘要留下：</b>时间线、根因、影响范围、短期修复、长期预防和新增回归用例；没有回归用例，问题很容易再次出现。</p>`;
-CARD_BODY_OVERRIDES["ReAct 范式：推理+行动交替循环"] = CARD_BODY_OVERRIDES["ReAct 范式：推理+行动交替循环"].replace("<b>Action</b>", "<b>动作（Action）</b>").replace("<b>Observation</b>", "<b>观察（Observation）</b>").replace("<b>State</b>", "<b>任务状态（State）</b>").replace("<b>Termination</b>", "<b>结束条件（Termination）</b>");
-CARD_BODY_OVERRIDES["安全防护：幻觉控制 + Prompt 注入防御"] = CARD_BODY_OVERRIDES["安全防护：幻觉控制 + Prompt 注入防御"].replace("<b>提示注入</b>", "<b>提示注入（Prompt Injection）</b>").replace("<b>事实与引用</b>", "<b>幻觉控制：事实与引用</b>");
-CARD_BODY_OVERRIDES["Agent 系统架构设计（五层）"] = CARD_BODY_OVERRIDES["Agent 系统架构设计（五层）"].replace("checkpoint、恢复", "恢复点（checkpoint）、恢复");
-function knowledgeCardMeta(item, category) {
-  const meta = KNOWLEDGE_CARD_META[item.title] || (category.id === "application" || category.id === "engineering" ? ["稳定工程原则", "本页综合", "2026-07-27"] : ["概念 / 场景方法", "本页综合", "2026-07-27"]);
-  return `<div class="meta"><span class="priority">${meta[0]}</span><span>${meta[1]}</span><span class="reviewed">最后核对 ${meta[2]}</span></div>`;
-}
-function knowledgeFreshness(){return `<section class="workbench"><div class="kicker">先判断内容是否值得投入</div><h2>AI 变化很快：知识体系先回答“现在还对吗、谁该学、落地差在哪”</h2><p>概念不能删，因为它解释方案为什么成立；但概念不能直接变成实施清单。页面将稳定原则、活跃规范、通行做法和研究基线分开，并在每张卡片标注内容状态与最后核对日期。</p><div class="flow"><div><b>1. 风险优先</b><span>终态、权限、幂等、恢复和评估优先于框架或模型热度。</span><small>所有角色先读</small></div><div><b>2. 活跃规范</b><span>MCP、A2A、模型 API 和 SDK 必须回到原始来源、版本与日期。</span><small>平台/集成重点</small></div><div><b>3. 通行做法</b><span>受控工作流、工具网关、检索、Trace 与发布护栏是常见组合，不是通用答案。</span><small>开发者按任务裁剪</small></div><div><b>4. 研究基线</b><span>ReAct、ToT、Reflection 用于理解机制与设计对照，不因流行直接上生产。</span><small>优化者做实验</small></div><div><b>5. 本地验证</b><span>用代表任务、成本和安全护栏验证收益；外部来源不能替代你的验收。</span><small>评估页负责验证</small></div></div><div class="evidence"><b>常见落地 gap：</b>生产系统通常由代码持有任务状态、权限、超时和回退，模型只在受限节点做理解、选择或生成；工具输出和检索内容按不可信数据处理。此处是工程归纳，安全边界可参考 <a href="https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP AI Agent Security（核对 2026-07-27）</a>。</div></section>`}
-function knowledgeResearchPatterns(){return `<section class="evidence-map"><div class="kicker">跨框架仍然成立的对象</div><h2>理解 Agent，先抓住任务、能力、状态、终态与证据</h2><p>框架和 SDK 会更换；这五个对象用于解释系统为什么能运行、在哪里会失效、如何验证，而不是替代具体产品设计。</p><div class="claim-grid"><article><h3>任务契约</h3><p><b>写清：</b>目标、约束、可用动作、所需状态、拒绝条件和成功终态。详细任务不意味着只能有一条执行路径。</p></article><article><h3>能力与授权</h3><p><b>区分：</b>Function Calling 是调用契约，MCP 是工具/上下文连接协议，A2A 是 Agent 协作协议。协议不替代权限和业务校验。</p></article><article><h3>运行状态</h3><p><b>分开管理：</b>任务进度与恢复点、给模型的会话上下文、跨任务记忆、可引用知识。存得更多不等于更可靠。</p></article><article><h3>外部终态</h3><p><b>以外部事实验收：</b>答案忠于证据、目标状态已变化、动作被安全拒绝或已转人工。模型说“完成”和 HTTP 200 都不是充分条件。</p></article><article><h3>可观测证据</h3><p><b>关联记录：</b>版本、状态转换、工具结果、授权决定、重试和接管。记录还必须有脱敏、访问控制和保留策略。</p></article></div><div class="evidence"><b>来源与核对：</b><a href="https://modelcontextprotocol.io/specification/2025-11-25" target="_blank" rel="noopener">MCP 2025-11-25</a>、<a href="https://a2a-protocol.org/latest/specification/" target="_blank" rel="noopener">A2A Specification</a>、<a href="https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html" target="_blank" rel="noopener">OWASP AI Agent Security</a>。本页据此归纳对象，最后核对：2026-07-27。</div></section>`}
-function evaluationReferences(){return `<section class="evidence-map"><div class="kicker">当前参考项目 · 2026-07-27 核对</div><h2>参考项目分别解决哪一环？</h2><p>这些项目是能力边界的参考，不是评分依据，也不代表当前 Agent 已得到相同结果。采用前仍需核对版本、任务条件和本地证据。</p><div class="claim-grid"><article><span class="claim-tag">任务标准</span><h3><a href="https://github.com/alphadl/AdaRubrics" target="_blank" rel="noopener">AdaRubric</a></h3><p>用于理解如何将任务契约拆成可审查的子标准；rubric 本身也要验证偏差。</p></article><article><span class="claim-tag">执行证据</span><h3><a href="https://github.com/metauto-ai/agent-as-a-judge" target="_blank" rel="noopener">Agent-as-a-Judge</a></h3><p>用于理解沿执行过程收集证据；公开验证范围不自动迁移到你的任务。</p></article><article><span class="claim-tag">失败定位</span><h3><a href="https://github.com/microsoft/AgentRx" target="_blank" rel="noopener">AgentRx</a></h3><p>用于理解轨迹、约束与失败定位的顺序；没有任务规则和轨迹不能声称定位根因。</p></article><article><span class="claim-tag">稳定性验证</span><h3><a href="https://github.com/claw-eval/claw-eval" target="_blank" rel="noopener">Claw-Eval</a></h3><p>用于区分完成、安全和重复稳定性；它不能替代具体系统的验收标准。</p></article></div><div class="evidence"><b>取舍：</b>任务标准回答“该看什么”；过程证据回答“发生了什么”；失败定位回答“问题在哪”；代表任务上的前后对照才回答“改动是否有效”。</div></section>`}
-function knowledgeGlossary(){return `<section class="evidence-map"><div class="kicker">概念先导 · 先总览，再进入单点</div><h2>这页出现的核心术语，分别在说什么？</h2><p>每个深入卡片都对应下面一个或多个术语。先读这里的最小定义，再按链接展开机制、边界与落地条件；这样不需要先离开页面查概念。</p><div class="concept-index"><section><h3>任务与决策</h3><dl><dt><a href="#application-0">任务契约</a></dt><dd>把目标、输入、约束、成功终态和失败交接写成可验收边界。</dd><dt><a href="#application-1">规则 / 工作流 / Agent</a></dt><dd>规则处理固定判断，工作流处理预定义分支与恢复，Agent 才在受限范围内动态选路径。</dd><dt><a href="#reasoning-0">ReAct</a></dt><dd>模型根据工具或环境观察决定下一步的循环，不等于展示内部思考。</dd><dt><a href="#reasoning-1">CoT、Plan-Execute、ToT、Reflection</a></dt><dd>分别是直接推理、先计划后执行、搜索多条候选路径、利用外部反馈修正的控制方式。</dd><dt><a href="#reasoning-2">Agent Loop</a></dt><dd>读取状态、提议动作、执行、记录观察、检查终态的受控循环。</dd></dl></section><section><h3>工具、协议与协作</h3><dl><dt><a href="#tools-0">Function Calling / Schema</a></dt><dd>模型按结构化契约提出工具调用；Schema 描述参数，不替代执行层校验与授权。</dd><dt><a href="#tools-1">MCP</a></dt><dd>模型应用与工具、资源、提示服务之间的连接协议。</dd><dt><a href="#tools-2">A2A</a></dt><dd>独立 Agent 之间发现能力、委托任务、追踪状态和交付产物的协作协议。</dd><dt><a href="#tools-3">工具网关</a></dt><dd>在真正执行前负责业务校验、权限、幂等、审计和错误分类的系统边界。</dd><dt><a href="#multi-agent-0">多 Agent</a></dt><dd>为独立职责、权限边界或并行子任务拆分协作者，不是让多个模型随意对话。</dd><dt><a href="#multi-agent-1">幂等 / Checkpoint</a></dt><dd>幂等让重复请求不重复产生副作用；checkpoint 保存安全恢复点。</dd></dl></section><section><h3>状态、知识与检索</h3><dl><dt><a href="#memory-0">运行状态 / 上下文 / 记忆</a></dt><dd>状态用于恢复任务，上下文供当前调用决策，记忆保存跨任务且获授权的信息。</dd><dt><a href="#memory-1">上下文工程</a></dt><dd>按任务选择足够、可信、被授权的信息，而非尽量填满模型窗口。</dd><dt><a href="#rag-0">RAG</a></dt><dd>先检索可引用证据，再让模型基于证据作答并暴露未知项。</dd><dt><a href="#rag-1">混合检索 / Rerank</a></dt><dd>混合检索结合字面与语义召回；rerank 在候选已有证据时再做精细排序。</dd><dt><a href="#rag-1">Agentic RAG / GraphRAG</a></dt><dd>前者按证据缺口多步检索，后者用实体关系图支持关系查询；两者都需要额外评测和治理。</dd><dt><a href="#rag-2">Recall@K、MRR、NDCG、Faithfulness</a></dt><dd>分别衡量证据是否找回、排序位置和答案是否忠于证据。</dd></dl></section><section><h3>工程、治理与验证</h3><dl><dt><a href="#engineering-0">系统架构</a></dt><dd>按任务、状态、模型决策、能力网关和治理证据划分责任，而非套固定层数。</dd><dt><a href="#engineering-1">幻觉 / Prompt Injection</a></dt><dd>前者是无证据或错误输出，后者是不可信内容试图改变指令或越权；两者都不能只靠 Prompt 防护。</dd><dt><a href="#engineering-2">性能与成本</a></dt><dd>比较完成率、延迟、成本、工具错误和安全拒绝，再决定路由、缓存或并发。</dd><dt><a href="#engineering-3">Logs、Traces、Metrics、评测</a></dt><dd>日志记录事件，Trace 串起一次任务，指标看聚合趋势，评测依据任务契约判断结果。</dd><dt><a href="#engineering-4">SLO、灰度、回滚</a></dt><dd>SLO 定义可靠性目标；灰度小范围验证版本；回滚与恢复避免故障扩大。</dd></dl></section></div></section>`}
-function knowledgeApplicationTerms(){return `<section class="evidence"><b>应用层两个常被跳过的概念：</b><a href="#application-2">模型路由</a> 是按子任务、风险和门槛决定程序、小模型、大模型或人工确认分别放在哪里；<a href="#application-3">价值反馈闭环</a> 是将完成、放弃、人工接管、失败 Trace 与用户纠错转成优先级、改动假设和回归集。它们分别解释“怎么组合能力”和“为什么持续改进”。</section>`}
-function knowledgeUsageGuide(){return `<section class="workbench knowledge-guide"><h2>先判断知识是否仍然适用，再决定学什么、怎么用</h2><p>AI 的框架、模型和接口更新很快，但并非所有知识都会一起过时。这里不把新名词按热度排列：先分清它是稳定原则、正在演进的规范、特定场景的方法，还是必须由本地数据验证的假设。</p><div class="knowledge-guide-grid"><div><b>稳定原则</b><span>任务终态、权限、幂等、恢复、证据和评估不会因换一个框架而失效。所有人先掌握这一层。</span></div><div><b>活跃规范</b><span>MCP、A2A、模型 API 和 SDK 以原始规范、具体版本和核对日期为准；卡片中的“活跃规范”不是永久结论。</span></div><div><b>场景方法</b><span>ReAct、RAG、重排、多 Agent 等解释“在什么失效下可以尝试”，不等于默认应该上生产。</span></div><div><b>本地验证</b><span>真正采用前，用代表任务同时检查完成、安全、成本和延迟；外部论文或案例只能提供候选机制。</span></div></div><div class="evidence"><b>按角色进入：</b>初学者先读“应用设计与迭代”，理解任务、规则、工作流与 Agent 的边界；实现者再读推理、工具、状态和检索；负责上线的人重点看协作、工程与评估。每张卡都标注内容状态和最后核对日期；需要更新时先回到卡片中的原始来源。</div></section>`}
-function knowledgeUsageGuide(){return `<section class="workbench knowledge-guide"><h2>先判断知识是否仍然适用</h2><p>不要按新名词的热度学习。先辨别知识属于哪一类，再决定应该长期掌握、查原始规范，还是放进任务里验证。</p><div class="knowledge-guide-grid"><div><b>稳定原则</b><span><b>终态、权限、幂等、恢复、证据、评估</b>不随框架更换而失效。</span></div><div><b>活跃规范</b><span><b>MCP、A2A、模型 API、SDK</b>以原始来源、版本和日期为准。</span></div><div><b>场景方法</b><span><b>ReAct、RAG、重排、多 Agent</b>只说明何时可尝试，不是默认方案。</span></div><div><b>本地验证</b><span>采用前同时检查<b>完成、安全、成本、延迟</b>；论文和案例只是候选证据。</span></div></div></section>`}
-function knowledgePageHeader(title, description, hint) {
-  return `<header class="eval-page-header knowledge-page-header"><span class="eyebrow">知识体系</span><h1>${title}</h1><p>${description}</p><span class="page-hint">${hint}</span></header>`;
-}
-
-function renderKnowledgeDomain(cat, categoryIndex) {
-  let html = `<section class="section knowledge-domain"><div class="domain-heading"><span class="domain-number">${String(categoryIndex + 1).padStart(2, "0")}</span><div><h2 class="section-title">${cat.icon} ${cat.name}</h2><p class="section-desc">${cat.desc}</p></div></div><div class="knowledge-item-stack">`;
-  cat.items.forEach((item,i) => {
-    html += `<div class="kp" id="${cat.id}-${i}"><h4>${item.title}</h4>`;
-    if(item.tags) html += `<div class="tags">${item.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
-    html += knowledgeCardMeta(item, cat);
-    html += `<div class="body">${CARD_BODY_OVERRIDES[item.title] || item.body}</div>`;
-    const refs = item.refs && item.refs.length ? item.refs : CARD_EXTRA_REFS[item.title];
-    if(refs && refs.length) html += `<div class="refs">引用：${refs.map(r=>`<a href="${r.u}" target="_blank" rel="noopener">📄 ${r.t}</a>`).join('')}<span>内容最后核对：2026-07-27</span></div>`;
-    html += `</div>`;
-  });
-  return html + `</div></section>`;
-}
-
-function renderKnowledge() {
-  if(currentKnowledgeView === 'overview') {
-    return knowledgePageHeader('知识体系总览', '按稳定原则、活跃规范、场景方法和本地验证组织 Agent 知识。先确认任务与风险，再进入需要的能力域。', '先判断要解决的问题，再选择知识域') + knowledgeUsageGuide() + knowledgeCompass();
-  }
-  if(currentKnowledgeView === 'practice') {
-    return knowledgePageHeader('实践与诊断', '把知识转成任务契约、运行定位和可验证改进。这里回答一个系统为何失效，以及下一步该查哪一层。', '从交付目标到运行诊断') + learningWorkbench() + applicationCanvas() + systemMap();
-  }
-  if(currentKnowledgeView === 'sources') {
-    return knowledgePageHeader('研究与资料', '区分跨框架的稳定对象、活跃规范与外部参考。来源用于理解机制和边界，不替代本地任务验证。', '从可迁移原则到原始来源') + knowledgeResearchPatterns() + knowledgeSources();
-  }
-  const categoryIndex = KNOWLEDGE.categories.findIndex(cat => cat.id === currentKnowledgeView);
-  const category = KNOWLEDGE.categories[categoryIndex];
-  if(!category) {
-    currentKnowledgeView = 'overview';
-    return renderKnowledge();
-  }
-  return knowledgePageHeader(category.name, category.desc, '阅读当前知识域的概念、边界与工程取舍') + renderKnowledgeDomain(category, categoryIndex);
-}
-
-function evaluationEvidenceContract(){return `<section class="workbench evaluation-contract"><div class="kicker">真实 Agent 评估的输出契约</div><h2>没有阶段与事实，不能给改进建议</h2><p>评估不是根据框架名猜问题。先固定一个任务，再从运行记录找出具体异常；改动建议只能解释这条异常，不应替代事实。</p><div class="evaluation-scope"><div><b>只有代码和 README</b><span>可以说明职责、接口和潜在风险，结论标为<b>结构审查</b>。</span></div><div><b>任务 + Trace + 最终状态</b><span>可以说明<b>哪个阶段发生了什么</b>，并判断问题落在输入、工具、状态、证据还是验收。</span></div><div><b>固定基线 + 前后对照</b><span>才可以说明改动是否改善<b>完成、安全、成本或延迟</b>。</span></div></div><div class="evaluation-path"><b>任务与验收</b><i>→</i><b>运行阶段</b><i>→</i><b>原始现象</b><i>→</i><b>问题判断</b><i>→</i><b>改动与验证</b></div><div class="evaluation-output"><div><b>1. 发生阶段</b><span>例如：工具参数校验、检索召回、结果展示、验收或恢复。</span></div><div><b>2. 原始现象</b><span>引用 Trace、测试、外部终态或可复现样本；写出预期与实际差异。</span></div><div><b>3. 本次判断</b><span>说明为什么这条现象支持某个问题，也写清仍不知道什么。</span></div><div><b>4. 改动与验收</b><span>改哪个机制、预期影响什么、用哪组任务验证；同时写出停止或回滚条件。</span></div><div class="theory"><b>5. 理论依据与边界</b><span>关联本页知识点、原始论文或活跃规范，并写清它支持的机制、适用条件、反例和来源日期。研究只说明<b>为什么值得试</b>，本地对照才说明<b>是否有效</b>。</span></div></div><div class="evidence"><b>拒绝输出：</b>没有阶段和原始记录时，不写“模型推理差”“记忆无效”或“应加多 Agent”；没有基线和对照时，不写“该方案已提升效果”。没有机制依据与适用边界时，也不把“最新研究”包装成默认方案。这三类内容只能列为待核实假设。</div></section>`}
-
-function targetAgentProfile(){return `<section class="workbench"><div class="kicker">被评测 Agent 画像</div><h2>先识别被评测 Agent 的任务侧重点与差异化价值</h2><p>评估对象可以是任何 Agent。先判断它服务的高价值任务、差异化机制和关键约束，再选择评测维度；不能用同一套权重审查所有 Agent。</p><div class="flow"><div><b>1. README 与文档</b><span>提取目标用户、关键任务、承诺结果与明确不做什么。</span><small>得到声明的价值定位</small></div><div><b>2. 代码与配置</b><span>核对真实任务循环、工具/数据依赖、状态边界和护栏，不只相信介绍文案。</span><small>得到实际实现机制</small></div><div><b>3. 演进记录</b><span>从提交、变更说明和问题修复中识别投入方向、反复故障与被放弃的取舍。</span><small>得到演进证据，不等于质量证明</small></div><div><b>4. 测试与轨迹</b><span>用任务夹具、运行轨迹和重复结果确认它实际完成了什么，以及在哪失效。</span><small>得到可验证的行为证据</small></div></div><div class="evidence"><b>先定评测侧重点：</b>功能交付看正确性与回归；缺陷修复看复现与根因；业务操作看授权与恢复；检索看证据与忠实性。任务不同，维度权重必须不同。</div><div class="evidence"><b>识别差异化价值：</b>把“高价值任务 + 差异化机制/数据/集成 + 可验证终态”连在一起；只列功能名、框架名或提交数量都不能构成竞争力。</div><div class="evidence"><b>定向改进：</b>每项改进都要回答它保护或放大哪项竞争力，改变哪段机制，凭什么预期有效，又会牺牲什么。README 与历史和代码不一致时，先标为待核实，不把任何一方当结论。</div><div class="evidence"><b>分析原则：</b>被评测 Agent 的侧重点决定“评什么”；结果以可视化方式呈现优点、风险、定向方案和置信度。</div></section>`}
-function evaluationOutputContract(){return `<section class="workbench"><div class="kicker">评估交付物</div><h2>一次 Agent 评估，最后应交付什么？</h2><p>不是一个总分，而是一条能追溯到任务与证据的判断链。</p><div class="flow"><div><b>1. 已有优势</b><span>当前设计已经覆盖了哪些任务风险，例如授权、状态恢复或证据引用。</span><small>说明优势为何成立</small></div><div><b>2. 问题与风险</b><span>指出发生在任务、工具、状态或终态的具体缺口，并标明它是事实还是待核实假设。</span><small>定位到失效环节</small></div><div><b>3. 改进方案</b><span>写清改什么、为何可能缓解问题、会带来什么成本或副作用，以及何时不该用。</span><small>给出可执行动作</small></div><div><b>4. 证据与置信度</b><span>说明外部来源支持的机制和范围，列出反例后给出强候选、待补充或不建议。</span><small>不把引用当效果结论</small></div><div><b>5. 评估图</b><span>把任务契约、执行证据、优势与风险、改进方案连成一条可追溯路径。</span><small>任务 → 证据 → 判断 → 建议</small></div></div><div class="evidence"><b>资料决定深度：</b>任务 + 当前设计，可做架构审查；再加执行轨迹，可定位失败步骤与状态偏移；再加重复结果，才可比较稳定表现与实际差异。</div><div class="evidence"><b>输出边界：</b>没有目标 Agent 的任务、设计或轨迹时，本页只给基于公开证据的静态候选；不能把它写成该 Agent 已有优点、已有缺陷或已经提升。</div></section>`}
-function evaluationReport(){return `<section class="workbench"><div class="kicker">评估报告主视图</div><h2>先把 Agent 的现状说清，再讨论改什么</h2><p>报告以现状分析为主：先形成可追溯的当前画像，再把改进方案限定为服务于该画像的下一步。</p><div class="analysis-report"><section class="report-lane current"><div class="report-lane-head"><span>60%</span><h3>现状分析</h3><small>先回答：它现在是什么状态？</small></div><div class="report-item"><b>任务与差异化价值</b><p>目标用户、关键任务、成功终态、非目标，以及真正构成差异的机制、数据或集成。</p><em>输出：项目侧重点与核心价值假设</em></div><div class="report-item"><b>当前设计与运行路径</b><p>任务循环、工具与数据依赖、状态、权限、人工接管和恢复路径；用系统图和轨迹串起来。</p><em>输出：架构/行为可视化</em></div><div class="report-item"><b>优点、短板与风险</b><p>已有控制实际覆盖了什么风险；缺口在哪个任务环节；区分已证实问题、设计推断和尚无证据的未知项。</p><em>输出：优势、风险与证据状态</em></div><div class="report-item"><b>证据覆盖与可信度</b><p>README、代码、演进记录、测试与轨迹是否互相支持；不一致处列为待核实，而不是强行下结论。</p><em>输出：可追溯事实与待补证据清单</em></div></section><section class="report-lane improve"><div class="report-lane-head"><span>40%</span><h3>定向改进</h3><small>再回答：什么值得改？</small></div><div class="report-item"><b>改进优先级</b><p>只处理会保护或放大核心价值的瓶颈；不因“更自主”或“更复杂”本身而加方案。</p><em>输出：与现状风险相连的优先级</em></div><div class="report-item"><b>改动与作用机制</b><p>明确改什么，作用于任务、工具、状态、检索还是控制层，以及为什么可能缓解该问题。</p><em>输出：可执行的改动假设</em></div><div class="report-item"><b>落地条件与代价</b><p>需要哪些代码、数据、流程或权限变化；会损失什么速度、成本、可读性、稳定性或信任。</p><em>输出：实施边界与取舍</em></div><div class="report-item"><b>建议状态</b><p>结合外部研究、公开项目机制与反例，标记强候选、待补充或不建议，不伪造效果结论。</p><em>输出：置信度与下一步证据</em></div></section></div><div class="evidence"><b>报告逻辑：</b>项目资料 → 现状可视化 → 优点/风险/未知项 → 定向改进 → 证据与落地判断。资料不足时，现状中的“未知项”比泛化建议更重要。</div></section>`}
-function evaluationReadingGuide(){return `<section class="reader-guide"><div class="kicker">如何阅读一份评估</div><h2>先读结论，再按需要进入证据和代码</h2><p>不需要预先理解 Agent，也能判断一个项目在做什么、哪里可靠、哪里值得改。需要落地时，每个判断都保留对应的任务、轨迹、代码或测试入口。</p><div class="reader-path"><section class="reader-step"><b>它在完成什么事？</b><p>先看目标用户、要完成的任务和什么结果才算完成。</p><small>技术定位：任务契约、终态、版本</small></section><section class="reader-step"><b>它现在做得怎么样？</b><p>看已经可靠的部分、明显风险和暂时没有证据的地方。</p><small>技术定位：流程图、状态、工具、轨迹</small></section><section class="reader-step"><b>为什么建议改这里？</b><p>看这项改动保护哪种用户价值，避免什么失败或返工。</p><small>技术定位：失效环节、作用机制、依赖</small></section><section class="reader-step"><b>这条建议可信到什么程度？</b><p>看项目证据、相近研究、适用条件、成本和反例，而非只看一个分数。</p><small>技术定位：T/P/D/U、吻合度、回滚</small></section></div><div class="reader-contract"><div><b>每条结论固定三层</b><p><b>意义：</b>对用户或项目意味着什么。<b>依据：</b>来自哪份资料或运行现象。<b>定位：</b>落到任务、工具、状态、数据或代码位置。</p></div><div><b>五个产物按阅读顺序衔接</b><p><code>项目画像</code> 说明对象，<code>现状报告</code> 呈现优缺点，<code>证据登记</code> 供复查，<code>改进计划</code> 给动作，<code>决策摘要</code> 帮助取舍。</p></div></div><div class="evidence"><b>表达规则：</b>标题先说结论，不只抛术语；第一次出现的专业词同时说明它观察什么；代码、配置、Trace、Mermaid 图和来源保留为可展开的技术证据。通俗表达不替代技术判断，技术细节也不应藏起结论。</div></section>`}
-function evaluationPlaybook(){return `<section class="evaluation-playbook"><div class="kicker">评估执行规范</div><h2>输入、分析、产物要一一对应</h2><p>先定义目标 Agent 的任务与证据，再输出现状报告和定向方案。每个结论回指资料来源，每个建议回指现状问题。</p><div class="spec-rail"><div class="spec-step"><b>01 项目基线</b><span>版本、提交、目标用户与任务范围。</span><small>AssessmentInput</small></div><div class="spec-step"><b>02 任务契约</b><span>终态、约束、非目标、权限与可接受路径。</span><small>TaskContract</small></div><div class="spec-step"><b>03 证据采集</b><span>文档、代码、配置、历史、测试、轨迹分开登记。</span><small>EvidenceRegister</small></div><div class="spec-step"><b>04 现状建模</b><span>任务、决策、工具、状态、外部系统和人工节点。</span><small>CurrentStateMap</small></div><div class="spec-step"><b>05 发现与建议</b><span>优点、风险、未知项与改动一一关联。</span><small>Findings + Plan</small></div><div class="spec-step"><b>06 决策摘要</b><span>现在做什么、先补什么证据、哪些不做。</span><small>DecisionSummary</small></div></div><div class="playbook-grid"><section class="playbook-block"><h3>输入最低要求</h3><ul><li><b>目标定义：</b>任务、用户、成功终态、非目标、风险等级。</li><li><b>实现材料：</b>README/文档、架构、工具 schema、配置、数据与权限边界。</li><li><b>行为材料：</b>测试夹具、运行轨迹、工具输入输出、失败样本与重复结果。</li><li><b>演进材料：</b>关键提交、变更原因、回退、重复修复与未解决问题。</li></ul></section><section class="playbook-block"><h3>分析顺序</h3><ol><li>建立任务契约和项目差异化价值。</li><li>画当前全流程与关键状态/数据流。</li><li>以证据为单位列优点、风险和未知项。</li><li>只针对影响核心价值的风险提出改动。</li><li>评估机制吻合、来源、落地条件、代价与反例。</li><li>把建议归入现在做、先补证据或不建议。</li></ol></section></div><h3>标准产物</h3><table class="artifact-table"><thead><tr><th>产物</th><th>必须字段</th><th>推荐可视化</th><th>结论边界</th></tr></thead><tbody><tr><td>01 ProjectProfile</td><td>任务、用户、终态、差异化价值、版本、材料覆盖</td><td>任务边界图</td><td>README 只证明声明</td></tr><tr><td>02 CurrentStateReport</td><td>架构路径、工具/状态/数据流、优点、风险、未知项</td><td>全流程 Mermaid 图</td><td>无轨迹时行为只能标为推断</td></tr><tr><td>03 EvidenceRegister</td><td>主张、来源、证据类型、观察、矛盾、缺口</td><td>证据覆盖表</td><td>历史与文档不能替代运行证据</td></tr><tr><td>04 ImprovementPlan</td><td>问题、改动、机制、理论依据、来源、代价、落地条件、反例、置信度</td><td>问题到改动关联图</td><td>外部研究不承诺项目效果</td></tr><tr><td>05 DecisionSummary</td><td>现在做、先补证据、不建议、依赖、下一步验证</td><td>优先级清单</td><td>重复结果后才报告实际差异</td></tr></tbody></table><h3>可视化协议</h3><div class="visualization-grid"><div><b>全流程图</b><p>默认用 Mermaid <code>flowchart LR</code>，展示任务、决策、工具、状态、外部系统和终态。</p></div><div><b>细节时序图</b><p>工具失败、授权、重试或人工接管用 <code>sequenceDiagram</code>，只展开问题链路。</p></div><div><b>状态与恢复图</b><p>长任务、异步任务、幂等与恢复用 <code>stateDiagram-v2</code>。</p></div><div><b>数据与权限图</b><p>敏感数据、检索证据、权限传播用带标签的 <code>flowchart</code>。</p></div></div><div class="legend-row"><span class="confirmed">蓝：已确认组件/数据流</span><span class="strength">绿：已验证优势或控制</span><span class="risk">黄：风险或待核实假设</span><span class="failure">红：已观察违例</span><span class="proposal">紫：建议改动</span></div><pre class="mermaid-template">flowchart LR&#10;  U[任务与约束] --&gt; A[Agent 决策] --&gt; T[工具调用]&#10;  T --&gt; S[(状态 / 外部系统)] --&gt; A&#10;  A --&gt; O[可验证终态]&#10;  R[观察到的风险] -.影响.-&gt; T&#10;  P[建议改动] -.保护.-&gt; A&#10;  classDef confirmed fill:#e8f1ff,stroke:#2f6fed,color:#12345b&#10;  classDef risk fill:#fff2cf,stroke:#b97900,color:#5f3c00&#10;  classDef proposal fill:#f1ebff,stroke:#7a4ac7,color:#37205f&#10;  class U,A,T,S,O confirmed&#10;  class R risk&#10;  class P proposal</pre><h3>建议置信度与理论依据</h3><table class="confidence-table"><thead><tr><th>字段</th><th>必须写什么</th><th>判定规则</th></tr></thead><tbody><tr><td>理论依据</td><td>改动影响哪一层机制，为什么能缓解当前风险</td><td>不能只写方法名</td></tr><tr><td>来源等级</td><td>T：目标项目测试/轨迹/代码；P：原始论文或可复现基准；D：项目文档/历史；U：未知</td><td>T 最接近事实，P 支持相近机制，D 只提供线索</td></tr><tr><td>目标吻合</td><td>任务、约束、工具环境与失败模式是否可解释地相近</td><td>任务名相似不等于机制吻合</td></tr><tr><td>落地可行</td><td>代码、数据、权限、流程、成本、用户体验与回滚条件</td><td>会伤害核心路径就不能列为强候选</td></tr><tr><td>建议状态</td><td>强候选 / 待补证据 / 不建议</td><td>强候选需机制、来源、目标吻合与落地条件完整，且无未解释反例</td></tr></tbody></table><h3>标准建议格式</h3><pre class="output-schema">REC-01  &lt;短标题&gt;&#10;目标问题：&lt;风险/未知项 ID&gt;&#10;保护的项目价值：&lt;任务侧重点或差异化价值&gt;&#10;建议改动：&lt;代码、配置、数据或流程动作&gt;&#10;作用机制：&lt;改变哪一层，为什么可能有效&gt;&#10;理论依据与来源：&lt;T/P/D/U + 链接或项目材料&gt;&#10;目标吻合：&lt;高/中/低 + 原因&gt;&#10;落地条件：&lt;依赖、权限、数据、回滚方式&gt;&#10;代价与反例：&lt;成本、可读性、稳定性、何时不适用&gt;&#10;置信度与状态：&lt;强候选/待补证据/不建议&gt;&#10;下一步：&lt;需要补的证据或最小验证动作&gt;</pre><div class="evidence"><b>执行要求：</b>任何 AI 先输出 01-03 的现状产物，再输出 04 的改进计划；找不到来源、轨迹或测试支撑的主张，必须放入未知项/待补证据。</div></section>`}
-function recommendationJudgement(){return `<section class="workbench recommendation-discipline"><div class="kicker">改进建议的判断纪律</div><h2>每条建议都要说明：我凭什么这样判断，什么会推翻它</h2><p><b>置信度不是模型自评，也不是一个装饰分数。</b>它表示当前论证链是否完整：是否有目标任务中的事实，是否能解释作用机制，是否排查了更简单的解释，以及是否定义了会改变结论的证据。</p><div class="confidence-grid"><div><b>高置信：可进入最小验证</b>当前任务有直接现象，机制与来源相符，替代解释已检查，并写明验收和回滚。仍不等于已经有效。</div><div><b>中置信：值得补证据</b>有部分现象或外部同机制证据，但关键 Trace、反例或任务吻合度还不足。先补样本或做小对照。</div><div><b>低置信：只作待核实假设</b>只有代码印象、二手案例或方法名；不能排进改动计划，更不能描述为问题根因。</div></div><div class="reflection-list"><b>每条建议必须留下的真实反思</b><ol><li><b>竞争解释：</b>除当前判断外，还可能是什么造成了这个现象？为什么暂时不优先它？</li><li><b>证据缺口：</b>哪些 Trace、测试、外部状态或版本信息仍然缺失？缺失会怎样限制结论？</li><li><b>推翻条件：</b>出现什么结果后，这条建议要降级、停止或换成其他方案？</li><li><b>置信度理由：</b>高、中、低分别由哪些已知事实、机制吻合和未解决不确定性决定，不能只写标签。</li></ol></div><div class="evidence"><b>输出规则：</b>“建议加 RAG / 反思 / 多 Agent”而没有上述四项，只能称为灵感；只有写出反思、置信度理由和可推翻条件，才是一条可审查的改进建议。</div></section>`}
-
-function evaluationEvidenceContractV2(){return `<section class="workbench evaluation-contract"><div class="kicker">评估先回答的范围</div><h2>这份评估能说什么，不能说什么？</h2><p>评估先区分三件事：历史版本出现过的现象、当前版本仍可复现的故障、尚待验证的改进假设。三者不能混写。</p><div class="evaluation-scope"><div><b>只有代码和 README</b><span>只能说明职责、接口和潜在风险，结论标为<b>结构审查</b>；不能声称运行时根因。</span></div><div><b>任务 + Trace + 最终状态</b><span>可以说明<b>当时哪个阶段发生了什么</b>，并定位到输入、决策、工具、状态、展示、验收或恢复。</span></div><div><b>当前版本可复现</b><span>才能列为<b>当前故障</b>；历史样本在后续代码、配置或协议改变后，只能作为回归线索。</span></div><div><b>固定基线 + 前后对照</b><span>才可以说明改动是否改善<b>完成、安全、成本或延迟</b>；没有对照只能说“值得验证”。</span></div></div><div class="evaluation-path"><b>任务与验收</b><i>→</i><b>运行阶段</b><i>→</i><b>原始现象</b><i>→</i><b>时间与影响范围</b><i>→</i><b>问题判断</b><i>→</i><b>改动与验证</b></div><div class="evaluation-output"><div><b>1. 发生阶段</b><span>用业务阶段命名，例如“生成候选”“工具执行”“结果展示”“验收”“回退”。框架内部节点名只能作为补充，不能替代解释。</span></div><div><b>2. 原始证据</b><span>引用 Trace、测试、外部终态或可复现样本，写清预期、实际、时间、版本和完整上下文。不能只摘一行报错。</span></div><div><b>3. 时间与影响范围</b><span>标为<b>当前故障 / 已修复历史问题 / 未验证假设</b>；再说明它影响任务结果、可读性、观测、成本还是实验解释，避免把后置展示错误写成前置执行失败。</span></div><div><b>4. 本次判断与竞争解释</b><span>说明证据支持什么，不支持什么；列出至少一个更简单或并列的解释，并写明如何区分。</span></div><div><b>5. 改动、验证与停止</b><span>改哪个机制、预期影响什么、用哪组任务验证；同时写出回归、降级或停止条件。未确认当前故障时，动作只能是“补证据/做回归”。</span></div><div class="theory"><b>6. 理论依据与边界</b><span>关联本页知识点、原始论文或活跃规范，并写清它支持的机制、适用条件、反例和来源日期。研究只说明<b>为什么值得试</b>，本地对照才说明<b>是否有效</b>。</span></div></div><div class="evidence"><b>拒绝输出：</b>历史日志不能直接写成当前待修问题；单个后置节点异常不能自动解释前置节点失败；没有基线和对照时，不写“该方案已提升效果”。这些内容必须标为历史线索或待核实假设。</div></section>`}
-function agentParsingCapability(){return `<section class="workbench agent-parser" id="agent-parser"><div class="kicker">评估框架的子能力 01 · 先解析，再评估</div><h2>陌生 Agent 解析：把一个仓库还原成可解释的系统</h2><p>这不是评估前的“资料整理”，也不要求先有问题。它负责把 README、代码、配置、测试、运行轨迹与 Git 演进连接起来，回答系统在做什么、如何运行、哪些职责由后端承担、哪些选择交给 Agent，以及现有设计的优势、边界和未知项。只有这一步完成，后面的质量、安全、成本和改进建议才有对象可评。</p><div class="parser-role-grid"><section><b>它负责产出什么</b><p>任务边界、仓库地图、组件职责、数据/控制流、Agent 运行时流程、证据状态和初步优缺点。</p><small>目标：理解，而非打分</small></section><section><b>它不负责断言什么</b><p>没有任务轨迹、外部终态和可复现结果时，不宣称真实失败率、根因、性能或改动收益。</p><small>结论：结构审查，不是运行时评估</small></section><section><b>它怎样服务后续评估</b><p>将每个评估维度挂到具体模块和证据缺口，避免泛泛地说“推理差”“应上 RAG”或“多 Agent 更好”。</p><small>结果：可追溯的评估入口</small></section></div><div class="parser-boundary"><b>适用场景：</b>用户要评估一个 Agent、要了解一个陌生 Agent、要接手仓库、要画流程图、要做代码审查，均先走解析。评估只是它的一个下游动作；即使用户只想理解架构，也应完整交付下面的系统视图。</div><div class="parser-flow" id="agent-parser-flow"><div><b>01 建立事实基线</b><span>读取 README、入口、依赖、配置、目录与提交；冻结版本和材料范围。</span><small>输出：材料清单与可信度</small></div><div><b>02 画仓库地图</b><span>从入口反向追踪模块、协议、接口、测试、部署和外部依赖。</span><small>输出：组件与职责表</small></div><div><b>03 分开后端与 Agent</b><span>识别程序控制的授权、状态、执行、存储、恢复，与模型负责的理解、规划、选择、生成。</span><small>输出：职责边界图</small></div><div><b>04 还原运行时</b><span>沿一次任务走输入、上下文、决策、工具、外部状态、终态、日志与恢复。</span><small>输出：主流程和异常流程图</small></div><div><b>05 逐层审查</b><span>从任务、控制流、状态/数据、工具权限、可靠性、观测、测试与演进逐层找事实和缺口。</span><small>输出：优势、风险、未知项</small></div><div><b>06 接入评估</b><span>将发现映射到任务契约、运行证据、七项维度和最小验证，必要时才提出改动。</span><small>输出：评估范围与优先级</small></div></div><div class="parser-lens-grid" id="agent-parser-lenses"><section><b>任务与产品面</b><p>用户是谁、要完成什么、何时完成/拒绝/转人工、非目标和失败代价。</p><small>防止从框架名猜价值</small></section><section><b>Agent 控制面</b><p>规划/路由、上下文选择、循环、停止、模型调用、工具选择和多 Agent 交接。</p><small>区分模型建议与系统决定</small></section><section><b>后端与状态面</b><p>API/worker、队列、数据库、缓存、检索、会话、记忆、checkpoint、并发和外部系统。</p><small>回答状态归谁、如何恢复</small></section><section><b>安全与运行面</b><p>授权、参数校验、敏感数据、审计、超时、重试、幂等、降级、Trace、测试和发布。</p><small>回答能否安全长期运行</small></section></div><div class="parser-output-grid" id="agent-parser-output"><section><b>01 项目画像</b><p>任务、用户、终态、差异化机制、版本与材料覆盖。</p></section><section><b>02 代码结构图</b><p>入口、模块、接口、依赖方向和关键文件定位。</p></section><section><b>03 运行时流程图</b><p>主路径、异常/恢复路径、状态与外部后果。</p></section><section><b>04 结构分析报告</b><p>已证实的优势、设计风险、未知项及其证据等级。</p></section><section><b>05 评估连接表</b><p>哪些任务、Trace、测试和指标能验证每条判断。</p></section></div><div class="parser-artifact"><h3>每个结论的最小表达格式</h3><ul><li><b>它是什么：</b>用业务语言说模块/流程对用户或系统的作用。</li><li><b>代码依据：</b>文件、类/函数、配置或测试；文档与代码不一致时明确标出。</li><li><b>运行时位置：</b>它接收什么、输出什么、读写什么状态、失败后由谁接管。</li><li><b>判断边界：</b>已由代码证实的结构事实、由测试证实的行为事实、以及仍需 Trace 验证的假设必须分开。</li></ul></div><div class="evidence"><b>页面职责：</b>这里提供解析顺序、观察维度和标准交付物；面对具体仓库时，必须实际阅读代码与测试、画出该项目自己的流程图，并把每个判断定位到证据。没有输入仓库时，本页只解释方法，不虚构项目结论。</div></section>`}
-function evidenceRecordTemplate(){return `<section class="workbench evidence-record-template"><div class="kicker">每条结论的完整证据块</div><h2>何时、何处、发生了什么，为什么会得出这个判断</h2><p>日志关键词、提交标题或论文链接都不能单独构成证据。可审查的结论要让读者复查阶段、顺序、版本和影响范围。</p><div class="evidence-record-grid"><section><b>先标注结论状态</b><dl><dt>当前故障</dt><dd>当前版本、同类任务仍可复现；可进入修复优先级。</dd><dt>已修复历史问题</dt><dd>历史证据真实，但有修复与当前回归；保留为演进记录或回归用例。</dd><dt>未验证假设</dt><dd>有线索或外部机制，尚无当前项目充分证据；只能安排最小验证。</dd></dl></section><section><b>证据必须覆盖的链条</b><div class="evidence-chain"><span>任务与验收</span><i>→</i><span>阶段与顺序</span><i>→</i><span>原始片段</span><i>→</i><span>版本与时间线</span><i>→</i><span>影响范围</span></div><p>缺任一项，结论降级；不跳到“根因”或“大改架构”。</p></section></div><h3>标准证据块</h3><pre class="output-schema">OBS-01  &lt;读者能懂的现象标题&gt;\n结论状态：当前故障 / 已修复历史问题 / 未验证假设\n任务与验收：&lt;任务、成功终态、预期行为&gt;\n发生阶段：&lt;业务阶段&gt;（内部节点：&lt;可选节点名&gt;）\n时间与版本：&lt;运行时间、提交/镜像/配置/协议版本&gt;\n原始证据：\n  &lt;Trace 或测试的连续片段，保留前后关键事件和最终状态&gt;\n  &lt;代码或配置的精确位置、提交及修复说明&gt;\n事实：&lt;这段证据直接证明的内容&gt;\n影响范围：&lt;任务终态 / 安全 / 展示可读性 / 观测 / 成本 / 实验解释&gt;\n不能推出：&lt;证据不能证明的因果或效果&gt;\n竞争解释：&lt;另一种可能原因 + 如何区分&gt;\n下一步：&lt;当前回归、补充样本或最小对照&gt;\n停止条件：&lt;什么结果出现后不再推进这条建议&gt;</pre><div class="evidence"><b>强制约束：</b>引用代码要给文件、函数/节点和提交或版本；引用运行要给连续事件、最终状态和时间。只给“某处报错”“某提交修过”“某论文有效”的建议一律退回补证据。</div></section>`}
-function evaluationStageMap(){return `<section class="workbench evaluation-stage-map"><div class="kicker">通用运行阶段图</div><h2>先把现象挂到阶段，再判断影响范围</h2><p>这里不是要求所有 Agent 都有同样的实现节点，而是提供跨框架都能映射的业务阶段。任何系统的内部节点都必须先解释它位于哪一段、输入输出是什么、是否影响终态。</p><div class="stage-map-grid"><section><b>01 输入与约束</b><span>任务、授权、数据、版本、验收规则。</span><small>典型问题：目标歧义、越权、测试夹具不一致。</small></section><section><b>02 决策与状态</b><span>规划、路由、上下文、预算、停止条件。</span><small>典型问题：目标漂移、循环、状态丢失。</small></section><section><b>03 候选与工具</b><span>生成动作、参数校验、调用外部系统。</span><small>典型问题：候选为空、参数错误、超时。</small></section><section><b>04 外部后果与验收</b><span>状态变化、验证、评分、接受、回退。</span><small>典型问题：假成功、重复副作用、恢复失败。</small></section><section><b>05 展示与观测</b><span>结果呈现、日志、Trace、指标、审计投影。</span><small>典型问题：读不到结果、记录不完整、指标误读。</small></section><section><b>06 异步学习与演进</b><span>复盘、经验、离线分析、版本发布。</span><small>典型问题：经验污染、错误归因、未做对照。</small></section></div><div class="evidence"><b>映射规则：</b>组合执行、批处理或并行节点都不是通用阶段名。先问它实际完成了哪些动作：若它把外部状态变更、验证或评分合在一起，就属于第 04 段；若它只整理展示内容，就属于第 05 段。记忆在被读取时通常映射到第 02 段，在写入与复盘时映射到第 06 段。名称相同不代表作用相同，必须以实际输入、输出和事件顺序为准。</div></section>`}
-function recommendationJudgementV2(){return `<section class="workbench recommendation-discipline"><div class="kicker">改进建议的判断纪律</div><h2>建议必须先说清：它针对当前故障，还是历史线索</h2><p><b>置信度不是模型自评，也不是装饰分数。</b>它表示论证链是否完整：当前证据是否仍适用，阶段与影响范围是否对应，竞争解释是否被检查，是否定义了会改变结论的结果。</p><div class="confidence-grid"><div><b>高：当前故障，可进入最小修复</b>当前版本可复现；阶段、影响和机制相符；替代解释、回归与停止条件齐全。仍不等于改动已经有效。</div><div><b>中：历史线索，先做当前回归</b>历史 Trace 或代码支持现象，但版本、配置、协议或任务已变化；先验证是否仍存在，不能直接排为 P0。</div><div><b>低：未验证假设，只能补证据</b>只有代码印象、二手案例或方法名；不能写成根因，也不能要求加 RAG、反思或多 Agent。</div></div><div class="reflection-list"><b>每条建议必须留下的真实反思</b><ol><li><b>时间线：</b>证据何时产生？之后哪些提交、配置、协议或依赖已变化？它描述当前还是过去？</li><li><b>影响范围：</b>它影响任务终态、安全、展示可读性、观测、成本还是实验解释？不能把后置异常反推为前置根因。</li><li><b>竞争解释：</b>还可能是什么造成现象？用哪条 Trace、测试或外部状态区分？</li><li><b>推翻条件：</b>出现什么当前回归或对照结果后，建议应降级、停止或换方向？</li><li><b>置信度理由：</b>高、中、低分别由哪些事实、机制吻合和未解决不确定性决定，不能只写标签。</li></ol></div><div class="evidence"><b>输出规则：</b>历史错误可以成为回归用例，不能自动成为当前架构改造；外部研究可以成为机制候选，不能自动成为项目方案。缺少上述反思的内容，只能称为待核实想法。</div></section>`}
-
-function renderEvalDimensions(dimensions = AGENT_EVALUATION_DIMS) {
-  let html = `<section class="eval-dimensions" aria-label="七项核心评估维度">`;
-  dimensions.forEach(dim => {
-    html += `<article class="eval-dim" id="eval-${dim.num}"><h4><span class="num">${dim.num}.</span><span>${dim.title}</span></h4>`;
-    html += `<div class="why">为什么评估这个：${dim.why}</div>`;
-    html += `<div class="check-list">${dim.checks}</div>`;
-    if(dim.good && dim.bad) html += `<div class="good-bad"><div class="good">${dim.good}</div><div class="bad">${dim.bad}</div></div>`;
-    if(dim.improve) html += `<div class="improve">💡 ${dim.improve}</div>`;
-    if(dim.link) html += `<div class="link">${dim.link}</div>`;
-    html += `<div class="evidence"><b>需要收集的证据：</b>${EVIDENCE[dim.num]}</div></article>`;
-  });
-  return html + `</section>`;
-}
-
-function evaluationPageHeader(title, description, hint) {
-  return `<header class="eval-page-header"><span class="eyebrow">评估框架</span><h1>${title}</h1><p>${description}</p><span class="page-hint">${hint}</span></header>`;
-}
-
-function renderEval() {
-  const references = evaluationReferences().replace('<section class="evidence-map">', '<section class="evidence-map reference-projects">').replace('参考项目分别解决哪一环？', '参考项目');
-  const views = {
-    parse: [
-      'Agent 解析',
-      '先把陌生 Agent 还原成可解释的系统。这里适用于正式评估前的准备，也适用于只想了解仓库、画流程图、识别后端职责与 Agent 控制边界的场景。',
-      '从仓库事实到系统视图',
-      agentParsingCapability() + evaluationReadingGuide(),
-    ],
-    scope: [
-      '评估范围',
-      '明确这次评估能说明什么、不能说明什么，并把所有运行现象映射到输入、决策、工具、外部后果、观测和演进等阶段。',
-      '从证据边界到运行阶段',
-      evaluationEvidenceContractV2() + evaluationStageMap(),
-    ],
-    profile: [
-      '项目画像与现状',
-      '识别目标用户、核心任务、差异化价值和当前设计，再把优势、风险与未知项分开呈现。没有运行证据时，结论保持为结构审查。',
-      '回答：它现在是什么、为何这样设计',
-      targetAgentProfile() + evaluationReport(),
-    ],
-    evidence: [
-      '证据与判断',
-      '把代码、测试、轨迹、外部终态和版本时间线组织成可复查证据，并限制建议只能覆盖已经明确的事实或待验证假设。',
-      '回答：这条判断凭什么成立',
-      evidenceRecordTemplate() + recommendationJudgementV2(),
-    ],
-    playbook: [
-      '执行规范',
-      '定义一次完整评估需要的输入、分析顺序、图表和标准交付物，使现状报告、改进计划与后续验证能一一对应。',
-      '回答：一次评估如何从材料走到决策',
-      evaluationPlaybook() + evalWorkbench(),
-    ],
-    quality: [
-      '质量与控制',
-      '从任务完成、工具执行、知识与上下文三个维度检查 Agent 是否在正确地完成目标。这里优先看行为、约束和外部结果，而不是模型是否“看起来聪明”。',
-      '回答：任务过程是否正确、受控',
-      evaluationContractMap() + toolEvaluationLayers() + renderEvalDimensions(AGENT_EVALUATION_DIMS.slice(0, 3)),
-    ],
-    operations: [
-      '安全与运营',
-      '从权限与可信边界、恢复能力、成本与可观测性检查系统能否在真实环境中长期运行。这里的结论必须落到服务端控制和可回放证据。',
-      '回答：是否安全、可恢复、可运营',
-      renderEvalDimensions(AGENT_EVALUATION_DIMS.slice(3)),
-    ],
-    recommendations: [
-      '建议依据',
-      '外部研究只能说明某种机制在相近条件下值得尝试。这里把失败模式、机制、反例和本地验证要求连接起来，避免把方法名当成方案。',
-      '回答：为什么这条建议值得进入验证',
-      evalWorkbench() + comparisonBoardV2() + evidenceLadder() + evidenceClaimsV2(),
-    ],
-    references: [
-      '参考项目',
-      '参考项目和评估工具分别覆盖任务标准、过程证据、失败定位和稳定性验证。它们帮助选择方法，但不替代当前系统的任务与运行证据。',
-      '回答：可借鉴什么，不能借鉴什么',
-      references + evaluationSources(),
-    ],
+(()=>{
+  const baseShow=show;
+  show=view=>{
+    baseShow(view);
+    const homeButton=$('#home-button');
+    if(homeButton)homeButton.classList.toggle('active',view==='home');
   };
-  const [title, description, hint, content] = views[currentEvalView] || views.parse;
-  return evaluationPageHeader(title, description, hint) + content;
-}
-
-function switchKnowledgeView(view) {
-  const overviewViews = ['overview', 'practice', 'sources'];
-  currentKnowledgeView = overviewViews.includes(view) || KNOWLEDGE.categories.some(category => category.id === view) ? view : 'overview';
-  switchTab('knowledge');
-}
-
-function switchKnowledgeItem(categoryId, itemIndex) {
-  currentKnowledgeView = categoryId;
-  switchTab('knowledge');
-  requestAnimationFrame(() => {
-    const item = document.getElementById(`${categoryId}-${itemIndex}`);
-    if(item) item.scrollIntoView({behavior:'smooth', block:'start'});
+  const back=$('#reader-back');
+  const mobileMenu=$('#mobile-menu');
+  if(mobileMenu){
+    const collapsed=$('#sidebar').classList.contains('collapsed');
+    mobileMenu.setAttribute('aria-expanded',String(!collapsed));
+    mobileMenu.setAttribute('aria-label',collapsed?'打开目录':'收起目录');
+    mobileMenu.onclick=()=>{const nextCollapsed=$('#sidebar').classList.toggle('collapsed');mobileMenu.setAttribute('aria-expanded',String(!nextCollapsed));mobileMenu.setAttribute('aria-label',nextCollapsed?'打开目录':'收起目录')};
+  }
+  if(back)back.onclick=()=>{
+    if(state.domain!=='all')select(state.domain,state.topic);
+    else if(state.query.trim()){$('#search').focus();show('directory');renderDirectory()}
+    else loadHome(true);
+  };
+  document.querySelectorAll('[data-visual]').forEach(button=>button.addEventListener('click',()=>{
+    document.querySelectorAll('[data-visual]').forEach(item=>item.setAttribute('aria-selected',item===button?'true':'false'));
+  }));
+  const decorate=()=>{
+    document.querySelectorAll('.domain-card,.note-row').forEach(item=>{
+      if(item.getAttribute('tabindex')!=='0')item.setAttribute('tabindex','0');
+      if(item.getAttribute('role')!=='button')item.setAttribute('role','button');
+      if(!item.getAttribute('aria-label'))item.setAttribute('aria-label',item.querySelector('h3')?.textContent||'打开笔记');
+    });
+  };
+  decorate();
+  new MutationObserver(decorate).observe($('#home'),{childList:true,subtree:true});
+  new MutationObserver(decorate).observe($('#directory'),{childList:true,subtree:true});
+  document.addEventListener('keydown',event=>{
+    if(!['Enter',' '].includes(event.key))return;
+    const item=event.target.closest('.domain-card,.note-row');
+    if(!item)return;
+    event.preventDefault();
+    if(item.classList.contains('domain-card'))select(item.dataset.domain,'all');
+    else openNote(item.dataset.path);
   });
-}
-
-function switchEvalView(view) {
-  currentEvalView = ['parse', 'scope', 'profile', 'evidence', 'playbook', 'quality', 'operations', 'recommendations', 'references'].includes(view) ? view : 'parse';
-  switchTab('eval');
-}
-
-function updateRoute() {
-  const url = new URL(window.location.href);
-  url.searchParams.set('tab', currentTab);
-  url.searchParams.set('view', currentTab === 'eval' ? currentEvalView : currentKnowledgeView);
-  window.history.replaceState({}, '', url);
-}
-
-function switchTab(tab) {
-  currentTab = tab;
-  document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelector(`.top-tab[data-tab="${tab}"]`).classList.add('active');
-  document.querySelector('.sidebar').style.display = 'block';
-  renderQA(tab);
-  const content = document.getElementById('content');
-  content.className = `content ${tab}-view`;
-  content.innerHTML = tab === 'knowledge' ? renderKnowledge() : renderEval();
-  buildNav(tab);
-  setMobileNav(false);
-  updateRoute();
-  window.scrollTo({top:0, behavior:'auto'});
-}
-
-// Init
-buildTab();
-function buildTab(){document.querySelectorAll('.top-tab').forEach(tab=>{tab.addEventListener('click',function(){switchTab(this.dataset.tab)})})}
-document.getElementById('navToggle').addEventListener('click', () => {
-  const sidebar = document.querySelector('.sidebar');
-  setMobileNav(!sidebar.classList.contains('mobile-open'));
-});
-const requestedParams = new URLSearchParams(window.location.search);
-const requestedTab = requestedParams.get('tab');
-const requestedView = requestedParams.get('view');
-  if(requestedTab === 'knowledge' && (['overview', 'practice', 'sources'].includes(requestedView) || KNOWLEDGE.categories.some(category => category.id === requestedView))) currentKnowledgeView = requestedView;
-if(requestedTab === 'eval') {
-  if(requestedView === 'overview') currentEvalView = 'parse';
-  else if(requestedView === 'dimensions') currentEvalView = 'quality';
-  else if(requestedView === 'research') currentEvalView = 'recommendations';
-  else if(['parse', 'scope', 'profile', 'evidence', 'playbook', 'quality', 'operations', 'recommendations', 'references'].includes(requestedView)) currentEvalView = requestedView;
-}
-switchTab(['knowledge','eval'].includes(requestedTab) ? requestedTab : 'knowledge');
+  setTimeout(()=>{if(!state.notes.length)alertUser('知识内容暂时加载失败，请刷新重试')},6000);
+  fetch('/api/learning/status',{cache:'no-store'}).catch(()=>alertUser('学习工具状态暂时不可用，入口仍然可以打开'));
+})();
 </script>
-</body>
-</html>
+<script>
+// Keep the reader and learning center connected without changing the reader's default behavior.
+(()=>{
+  const study=document.querySelector('#reader-study');
+  const updateStudy=()=>{
+    const title=document.querySelector('#reader-title')?.textContent?.trim();
+    const reader=document.querySelector('#reader');
+    if(!study)return;
+    study.title='进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型。';
+    if(title&&reader?.classList.contains('open')){study.hidden=false;study.href='/learn?topic='+encodeURIComponent(title);study.target='_blank';study.rel='noopener noreferrer'}
+    else{study.hidden=true;study.href='/learn';study.target='_blank';study.rel='noopener noreferrer'}
+  };
+  const reader=document.querySelector('#reader');
+  const title=document.querySelector('#reader-title');
+  if(reader)new MutationObserver(updateStudy).observe(reader,{attributes:true,attributeFilter:['class']});
+  if(title)new MutationObserver(updateStudy).observe(title,{childList:true,subtree:true,characterData:true});
+  updateStudy();
+  const originalOpenNote=window.openNote;
+  if(typeof originalOpenNote==='function')window.openNote=async function(...args){const result=await originalOpenNote(...args);updateStudy();return result};
+  const originalLoadHome=window.loadHome;
+  if(typeof originalLoadHome==='function')window.loadHome=function(...args){if(study){study.hidden=true;study.href='/learn'}return originalLoadHome(...args)};
+})();
+</script>
+<script>
+// Keep learning aids discoverable from the home view.
+(() => {
+  const addHistoryEntry = () => {
+    const grid = document.querySelector('#home .aux-grid');
+    if (!grid || grid.querySelector('#home-history')) return;
+    const card = document.createElement('article');
+    card.className = 'aux-card';
+    card.id = 'home-history';
+    card.innerHTML = '<h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a>';
+    grid.append(card);
+  };
+  const home = document.querySelector('#home');
+  if (home) new MutationObserver(addHistoryEntry).observe(home, { childList: true });
+  addHistoryEntry();
+})();
+</script>
+<script>
+// Keep navigation state stable while the vault is polled for changes.
+(() => {
+  const originalSelect = window.select;
+  const originalShowGraph = window.showGraph;
+  const originalLoadHome = window.loadHome;
+  if (typeof originalSelect === 'function') {
+    window.select = (domain = 'all', topic = 'all', push = true) => {
+      state.query = '';
+      const search = document.querySelector('#search');
+      if (search) search.value = '';
+      return originalSelect(domain, topic, push);
+    };
+  }
+  if (typeof originalShowGraph === 'function') {
+    window.showGraph = (push = true) => {
+      state.query = '';
+      const search = document.querySelector('#search');
+      if (search) search.value = '';
+      return originalShowGraph(push);
+    };
+  }
+  if (typeof originalLoadHome === 'function') {
+    window.loadHome = (...args) => {
+      const result = originalLoadHome(...args);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return result;
+    };
+  }
+
+  const originalRenderDomains = window.renderDomains;
+  const originalRenderDirectory = window.renderDirectory;
+  const originalRenderHome = window.renderHome;
+  const originalRenderGraph = window.renderGraph;
+  let lastNotesRef = null;
+  let lastNotesKey = '';
+  const notesKey = () => {
+    if (state.notes !== lastNotesRef) {
+      lastNotesRef = state.notes;
+      lastNotesKey = state.notes
+        .map((note) => [note.path, note.updated, note.title, note.search_text].join('\u0000'))
+        .join('\u0001') + '\u0002' + JSON.stringify(state.edges);
+    }
+    return lastNotesKey;
+  };
+  const renderKey = (...parts) => `${notesKey()}\u0003${parts.join('\u0000')}`;
+  let domainsKey = '';
+  let directoryKey = '';
+  let homeKey = '';
+  let graphKey = '';
+  const decorateProjectLinks = () => {
+    document.querySelectorAll('#home a[href^="/projects"], #home a[href^="/apps/agent-evaluation"]').forEach((link) => {
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+    });
+    const classroom = [...document.querySelectorAll('#home .work-card')].find((card) => card.querySelector('h3')?.textContent === 'OpenMAIC');
+    const actions = classroom?.querySelector('.work-actions');
+    if (actions && !actions.querySelector('a[href="/learn/openmaic"]')) {
+      const guide = document.createElement('a');
+      guide.href = '/learn/openmaic';
+      guide.target = '_blank';
+      guide.rel = 'noopener noreferrer';
+      guide.textContent = '完整使用指南';
+      actions.insertBefore(guide, actions.lastElementChild);
+    }
+  };
+  window.renderDomains = () => {
+    const key = renderKey(state.domain, state.topic);
+    if (key === domainsKey) return;
+    domainsKey = key;
+    originalRenderDomains();
+  };
+  window.renderDirectory = () => {
+    const key = renderKey(state.domain, state.topic, state.query, state.sort);
+    if (key === directoryKey) return;
+    directoryKey = key;
+    originalRenderDirectory();
+  };
+  window.renderHome = () => {
+    const key = renderKey('home');
+    if (key === homeKey) return;
+    homeKey = key;
+    originalRenderHome();
+    decorateProjectLinks();
+  };
+  window.renderGraph = () => {
+    const key = renderKey(state.graphMode, state.selected);
+    if (key === graphKey) return;
+    graphKey = key;
+    originalRenderGraph();
+  };
+
+  const refreshHomeStatus = () => {
+    if (state.view !== 'home') return;
+    json('/api/learning/status').then((status) => {
+      const cards = [...document.querySelectorAll('#home .work-card')];
+      const classroom = cards.find((card) => card.querySelector('h3')?.textContent === 'OpenMAIC');
+      const tutor = cards.find((card) => card.querySelector('h3')?.textContent === 'DeepTutor');
+      if (classroom) {
+        classroom.querySelector('.status').textContent = status.openmaic?.online && status.openmaic?.llm
+          ? '互动课堂可用'
+          : status.openmaic?.online ? '服务运行中' : '未启动';
+      }
+      if (tutor) {
+        tutor.querySelector('.status').textContent = status.deeptutor?.online && status.deeptutor?.llm
+          ? '导师可用' : '配置不完整';
+      }
+    }).catch(() => {});
+  };
+  window.setInterval(refreshHomeStatus, 10000);
+  const projectButton = document.querySelector('#projects-button');
+  if (projectButton) {
+    projectButton.onclick = () => {
+      const tab = window.open('/projects', '_blank');
+      if (tab) tab.opener = null;
+      else alertUser('浏览器拦截了新标签，请允许弹出窗口后重试');
+    };
+  }
+})();
+</script>
+<script src="/static/mermaid.min.js"></script>
+<script>
+if(window.mermaid){
+  window.mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'neutral'});
+  window.renderMermaid=async function(){
+    const nodes=[...document.querySelectorAll('pre.mermaid')];
+    if(!nodes.length)return;
+    nodes.forEach((node,index)=>{node.dataset.mermaidSource=node.textContent||'';node.id=node.id||`mermaid-${index}-${Date.now()}`});
+    await window.mermaid.run({nodes});
+  };
+}
+</script>
+</body></html>

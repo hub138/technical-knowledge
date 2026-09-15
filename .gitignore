@@ -1,8 +1,45 @@
-local-notes.md
+# Local runtime state.
 .technical-knowledge.log
 .technical-knowledge.pid
+local-notes.md
 __pycache__/
 *.py[cod]
 .pytest_cache/
-*.tar.gz
-.gstack/
+
+# Dependency caches and build output from bundled projects.
+**/.next/
+**/.next-*/
+**/node_modules/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/data/user/
+**/data/usage/
+**/data/knowledge_bases/
+**/.codegraph/
+**/.turbo/
+**/.cache/
+**/dist/
+**/build/
+**/*.log
+**/*.pid
+projects/archify/archify.zip
+
+# The package is kept under packages/agent-foundation.
+/agent_foundation/
+
+# Third-party source checkouts used by the learning tools. They are upstream
+# clones (OpenMAIC, DeepTutor, archify, mattpocock-skills), not this project's
+# source, and they are far too large to track. Re-create them by cloning.
+# projects/index.html and projects/README.md are authored here, so they are
+# re-included below.
+/projects/*
+!/projects/index.html
+!/projects/README.md
+
+# The Obsidian vault is authored content, not code, and changes constantly.
+# It is kept on disk and served by site/server.py rather than versioned here.
+/vault/
+
+# Vendored browser libraries pulled in by install scripts, not written here.
+/site/mermaid.min.js

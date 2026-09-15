@@ -1,0 +1,11 @@
+.git
+.obsidian
+.secrets
+**/node_modules
+**/.next
+**/.venv
+**/data/user
+**/data/usage
+**/data/knowledge_bases
+**/*.log
+**/*.pid

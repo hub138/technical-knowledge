@@ -1,0 +1,853 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>学习中心 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/workbench.css" />
+    <script src="/static/workbench.js" data-page="learning" defer></script>
+    <style>
+      :root {
+        --bg: #f5f7f6;
+        --paper: #fff;
+        --ink: #18231f;
+        --muted: #65716c;
+        --line: #dce3df;
+        --green: #087663;
+        --green-soft: #e8f3ef;
+        --blue: #3f70a8;
+        --blue-soft: #edf4fb;
+        --warm: #a85f2d;
+        --warm-soft: #fff3e9;
+        --red: #a04654;
+        --shadow: 0 10px 28px rgba(20, 42, 35, 0.07);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          15px/1.72 -apple-system,
+          BlinkMacSystemFont,
+          "SF Pro Text",
+          "PingFang SC",
+          sans-serif;
+      }
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      .shell {
+        max-width: 1260px;
+        margin: auto;
+        padding: 0 28px 72px;
+      }
+      .topbar {
+        height: 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+      .brand {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-weight: 760;
+      }
+      .mark {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 7px;
+        background: var(--green);
+        color: #fff;
+      }
+      .nav {
+        display: flex;
+        gap: 6px;
+      }
+      .nav a {
+        padding: 7px 10px;
+        border-radius: 5px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .nav a:hover,
+      .nav a.active {
+        background: var(--green-soft);
+        color: var(--green);
+      }
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.25fr) minmax(310px, 0.75fr);
+        gap: 36px;
+        padding: 46px 0 33px;
+        border-bottom: 1px solid var(--line);
+      }
+      .eyebrow {
+        color: var(--green);
+        font-weight: 760;
+        font-size: 11px;
+      }
+      .hero h1 {
+        font-size: 38px;
+        line-height: 1.2;
+        margin: 7px 0 12px;
+      }
+      .hero p {
+        color: var(--muted);
+        font-size: 16px;
+        max-width: 720px;
+        margin: 0;
+      }
+      .topic-box {
+        align-self: end;
+        background: #fff;
+        border: 1px solid var(--line);
+        padding: 16px;
+        border-radius: 7px;
+        box-shadow: var(--shadow);
+      }
+      .topic-box label {
+        display: block;
+        font-size: 12px;
+        font-weight: 720;
+        margin-bottom: 7px;
+      }
+      .topic-row {
+        display: flex;
+        gap: 7px;
+      }
+      .topic-row input {
+        min-width: 0;
+        flex: 1;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 9px 10px;
+        outline: 0;
+      }
+      .topic-row input:focus {
+        border-color: var(--green);
+        box-shadow: 0 0 0 3px #08766316;
+      }
+      .topic-row button {
+        border: 0;
+        border-radius: 5px;
+        background: var(--green);
+        color: #fff;
+        padding: 9px 13px;
+        cursor: pointer;
+      }
+      .section {
+        margin-top: 34px;
+      }
+      .section-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: end;
+        margin-bottom: 14px;
+      }
+      .section h2 {
+        font-size: 22px;
+        margin: 0;
+        line-height: 1.35;
+      }
+      .section-head p {
+        color: var(--muted);
+        margin: 3px 0 0;
+        font-size: 13px;
+      }
+      .service-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 13px;
+      }
+      .service {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--green);
+        border-radius: 7px;
+        padding: 19px;
+        box-shadow: 0 1px 2px rgba(20, 42, 35, 0.03);
+      }
+      .service.tutor {
+        border-top-color: var(--blue);
+      }
+      .service-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+      }
+      .service h3 {
+        font-size: 19px;
+        margin: 0 0 3px;
+      }
+      .service-head p {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .state {
+        white-space: nowrap;
+        height: max-content;
+        padding: 3px 7px;
+        border-radius: 4px;
+        background: var(--green-soft);
+        color: var(--green);
+        font-size: 11px;
+        font-weight: 740;
+      }
+      .state.warn {
+        background: var(--warm-soft);
+        color: var(--warm);
+      }
+      .facts {
+        display: grid;
+        gap: 7px;
+        margin: 15px 0;
+      }
+      .fact {
+        display: grid;
+        grid-template-columns: 65px 1fr;
+        gap: 8px;
+        border-top: 1px solid #edf1ef;
+        padding-top: 7px;
+        font-size: 12px;
+      }
+      .fact b {
+        color: #37463f;
+      }
+      .fact span {
+        color: var(--muted);
+      }
+      .actions {
+        display: flex;
+        gap: 7px;
+        flex-wrap: wrap;
+      }
+      .button {
+        display: inline-block;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 5px;
+        padding: 7px 10px;
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .button.primary {
+        background: var(--green-soft);
+        border-color: #b7d9cf;
+      }
+      .button.blue {
+        background: var(--blue-soft);
+        border-color: #c8daed;
+        color: var(--blue);
+      }
+      .paths {
+        display: grid;
+        gap: 11px;
+      }
+      .path {
+        display: grid;
+        grid-template-columns: 240px minmax(0, 1fr);
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        overflow: hidden;
+      }
+      .path-intro {
+        padding: 20px;
+        border-right: 1px solid var(--line);
+      }
+      .path-intro small {
+        color: var(--green);
+        font-weight: 750;
+      }
+      .path-intro h3 {
+        font-size: 18px;
+        line-height: 1.35;
+        margin: 5px 0 7px;
+      }
+      .path-intro p {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .steps {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+      .step {
+        padding: 17px;
+        position: relative;
+      }
+      .step:not(:last-child) {
+        border-right: 1px solid var(--line);
+      }
+      .step b {
+        display: block;
+        font-size: 13px;
+        margin-bottom: 5px;
+      }
+      .step p {
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.6;
+        margin: 0 0 10px;
+      }
+      .step a {
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .step .tool {
+        display: block;
+        color: var(--blue);
+        margin-top: 5px;
+      }
+      .guide {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        border: 1px solid var(--line);
+        background: var(--line);
+        gap: 1px;
+      }
+      .guide article {
+        background: #fff;
+        padding: 17px;
+        min-height: 134px;
+      }
+      .guide strong {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .guide p {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .guide code {
+        font-size: 11px;
+        color: var(--green);
+        background: var(--green-soft);
+        padding: 2px 4px;
+        border-radius: 3px;
+      }
+      .cost {
+        padding: 15px 17px;
+        background: var(--warm-soft);
+        border-left: 3px solid var(--warm);
+        font-size: 13px;
+        color: #68462e;
+      }
+      .error {
+        color: var(--red);
+      }
+      .history-link {
+        margin: 11px 0 0;
+        font-size: 12px;
+      }
+      @media (max-width: 900px) {
+        .hero {
+          grid-template-columns: 1fr;
+        }
+        .service-grid {
+          grid-template-columns: 1fr;
+        }
+        .path {
+          grid-template-columns: 1fr;
+        }
+        .path-intro {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+        .steps {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .step:nth-child(2) {
+          border-right: 0;
+        }
+        .step:nth-child(-n + 2) {
+          border-bottom: 1px solid var(--line);
+        }
+        .guide {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 620px) {
+        .shell {
+          padding: 0 15px 50px;
+        }
+        .topbar {
+          height: 62px;
+        }
+        .nav a:nth-child(3) {
+          display: none;
+        }
+        .hero {
+          padding: 31px 0 25px;
+          gap: 23px;
+        }
+        .hero h1 {
+          font-size: 29px;
+        }
+        .topic-row {
+          display: grid;
+        }
+        .steps {
+          grid-template-columns: 1fr;
+        }
+        .step {
+          border-right: 0 !important;
+          border-bottom: 1px solid var(--line);
+        }
+        .step:last-child {
+          border-bottom: 0;
+        }
+        .section-head {
+          display: block;
+        }
+      }
+    </style>
+    <style>
+      @media (max-width: 620px) {
+        .topbar {
+          gap: 8px;
+        }
+        .nav {
+          gap: 3px;
+          flex: 0 0 auto;
+        }
+        .nav a {
+          padding: 6px 8px;
+          font-size: 12px;
+        }
+        .nav a:nth-child(4) {
+          display: none;
+        }
+        .brand {
+          min-width: 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div>
+          <div class="eyebrow">LEARN · PRACTICE · TRANSFER</div>
+          <h1>从知识点走到真正会用</h1>
+          <p>
+            先用知识库建立结构，再用课堂形成直觉，用导师追问和复习，最后通过变更约束完成迁移。生成前始终由你确认，不会打开页面就消耗模型额度。
+          </p>
+        </div>
+        <form class="topic-box" id="topic-form">
+          <label for="topic">我现在想学</label>
+          <div class="topic-row">
+            <input
+              id="topic"
+              value="RAG 的演进、本质与生产边界"
+              autocomplete="off"
+            /><button type="submit">开始</button>
+          </div>
+        </form>
+      </section>
+      <div class="purpose">
+        <strong>这里解决什么问题</strong
+        ><span
+          >知识库负责“有哪些知识、它们如何关联”；学习中心负责“选一个主题，用什么动作把它变成理解、操作和迁移能力”。不想练习时，直接回到知识库阅读即可。</span
+        >
+      </div>
+      <p class="history-link">
+        <a href="/learn/history">查看课堂历史与知识收录说明</a>
+      </p>
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>学习工具</h2>
+            <p>已经安装并随系统启动。状态来自当前服务和实际配置。</p>
+          </div>
+        </div>
+        <div class="service-grid">
+          <article class="service">
+            <div class="service-head">
+              <div>
+                <h3>OpenMAIC 互动课堂</h3>
+                <p>适合理解机制、互动练习、测验、模拟和项目任务</p>
+              </div>
+              <span class="state" id="maic-state">检查中</span>
+            </div>
+            <div class="facts">
+              <div class="fact">
+                <b>已完成</b
+                ><span>源码、依赖、LLM 与图像能力、后台服务和访问保护</span>
+              </div>
+              <div class="fact">
+                <b>怎么用</b
+                ><span>输入主题后打开；内容会预填，由你检查后再点击生成</span>
+              </div>
+              <div class="fact">
+                <b>会消耗</b
+                ><span
+                  >只有点击生成课堂后才调用模型；复杂互动课堂通常调用多轮</span
+                >
+              </div>
+            </div>
+            <div class="actions">
+              <a
+                class="button primary"
+                id="open-classroom"
+                href="/launch/openmaic?next=%2F"
+                target="_blank"
+                rel="noopener noreferrer"
+                >用当前主题创建课堂</a
+              ><a
+                class="button"
+                href="/launch/openmaic?next=%2Fclassroom%2FxzijlWOptW"
+                target="_blank"
+                rel="noopener noreferrer"
+                >打开已生成示例</a
+              ><a class="button" href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a
+              ><a class="button" href="/projects#openmaic">查看能力与边界</a>
+            </div>
+          </article>
+          <article class="service tutor">
+            <div class="service-head">
+              <div>
+                <h3>DeepTutor 学习导师</h3>
+                <p>适合追问、研究、笔记、掌握路径和长期记忆</p>
+              </div>
+              <span class="state" id="tutor-state">检查中</span>
+            </div>
+            <div class="facts">
+              <div class="fact">
+                <b>已完成</b
+                ><span
+                  >源码、依赖、中文界面、LLM、后台服务、无感登录，并已连接当前
+                  Obsidian 知识库</span
+                >
+              </div>
+              <div class="fact">
+                <b>怎么用</b
+                ><span>进入 Chat 后问题已预填；确认问题，再发送给导师</span>
+              </div>
+              <div class="fact">
+                <b>当前边界</b
+                ><span id="tutor-limit">检查知识库检索配置中</span>
+              </div>
+            </div>
+            <div class="actions">
+              <a
+                class="button blue"
+                id="open-tutor"
+                href="/launch/deeptutor?next=%2Fchat"
+                target="_blank"
+                rel="noopener noreferrer"
+                >用当前主题开始追问</a
+              ><a class="button" href="/projects#deeptutor">查看能力与边界</a>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>预置学习路径</h2>
+            <p>每一步都有明确产出，不以“看完”为完成。</p>
+          </div>
+        </div>
+        <div class="paths">
+          <article class="path">
+            <div class="path-intro">
+              <small>AI 知识系统</small>
+              <h3>RAG：从一次检索到有状态证据系统</h3>
+              <p>
+                目标：能解释每次演进解决的瓶颈，并为真实场景选择检索、重排、图或
+                Agentic 路径。
+              </p>
+            </div>
+            <div class="steps">
+              <div class="step">
+                <b>理解本质</b>
+                <p>证据选择为什么比“接一个向量库”更接近 RAG 的核心。</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2F%E7%9F%A5%E8%AF%86%E4%B8%8E%E6%A3%80%E7%B4%A2%2FRAG%E7%9A%84%E6%A0%B8%E5%BF%83%E6%98%AF%E9%80%89%E6%8B%A9%E5%8F%AF%E5%BC%95%E7%94%A8%E8%AF%81%E6%8D%AE.md"
+                  >读核心机制</a
+                >
+              </div>
+              <div class="step">
+                <b>解释演进</b>
+                <p>查询改写、混合检索、重排和状态循环分别暴露了什么旧瓶颈。</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2F%E7%9F%A5%E8%AF%86%E4%B8%8E%E6%A3%80%E7%B4%A2%2FRAG%E5%89%8D%E6%B2%BF%EF%BC%9A%E9%87%8D%E6%8E%92%E3%80%81%E8%87%AA%E5%8A%A8%E4%BC%98%E5%8C%96%E4%B8%8E%E5%BC%80%E6%94%BE%E7%B4%A2%E5%BC%95.md"
+                  >读演进关系</a
+                >
+              </div>
+              <div class="step">
+                <b>形成直觉</b>
+                <p>让课堂用失败案例、对比和互动题检验你的判断。</p>
+                <a
+                  class="tool launch-maic"
+                  data-topic="RAG 为什么从单次向量检索演进到混合检索、重排和有状态证据获取"
+                  href="/launch/openmaic?next=%2F"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >打开互动课堂</a
+                >
+              </div>
+              <div class="step">
+                <b>迁移验证</b>
+                <p>
+                  给出客服、代码库和长报告三个场景，逐一决定检索架构与评测指标。
+                </p>
+                <a
+                  class="tool launch-tutor"
+                  data-topic="请用客服知识库、代码仓库和长报告三个场景考察我如何选择 RAG 架构，并追问每个选择的证据和失败边界"
+                  href="/launch/deeptutor?next=%2Fchat"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >让导师考我</a
+                >
+              </div>
+            </div>
+          </article>
+          <article class="path">
+            <div class="path-intro">
+              <small>AI 应用工程</small>
+              <h3>可靠 Agent：决策、执行与事实边界</h3>
+              <p>
+                目标：能设计 Agent
+                的状态、工具、权限、证据和评估闭环，而不是只会套框架。
+              </p>
+            </div>
+            <div class="steps">
+              <div class="step">
+                <b>划清职责</b>
+                <p>模型负责语义决策，运行时负责执行语义、隔离和可恢复状态。</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2FAgent%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%2F%E6%A8%A1%E5%9E%8B%E8%B4%9F%E8%B4%A3%E5%88%A4%E6%96%AD%EF%BC%8C%E8%BF%90%E8%A1%8C%E6%97%B6%E8%B4%9F%E8%B4%A3%E6%89%A7%E8%A1%8C%E8%AF%AD%E4%B9%89.md"
+                  >读责任边界</a
+                >
+              </div>
+              <div class="step">
+                <b>组织系统</b>
+                <p>状态机、工具契约、记忆、人工审批与故障恢复如何组合。</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2FAgent%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%2F%E6%9E%84%E5%BB%BA%E5%8F%AF%E9%9D%A0Agent%E5%BA%94%E7%94%A8.md"
+                  >读系统设计</a
+                >
+              </div>
+              <div class="step">
+                <b>案例推演</b>
+                <p>以代码 Agent 为例，从任务接收到执行证据完整走一遍。</p>
+                <a
+                  class="tool launch-maic"
+                  data-topic="设计一个可靠代码 Agent：重点讲状态、工具权限、隔离执行、失败恢复和证据投影"
+                  href="/launch/openmaic?next=%2F"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >打开案例课堂</a
+                >
+              </div>
+              <div class="step">
+                <b>审查方案</b>
+                <p>
+                  你提交架构，导师只追问无法证明、无法恢复或权限过宽的地方。
+                </p>
+                <a
+                  class="tool launch-tutor"
+                  data-topic="请扮演 Agent 系统架构审查者，逐步让我设计一个代码 Agent，并重点挑战执行证据、隔离、权限、恢复和评测闭环"
+                  href="/launch/deeptutor?next=%2Fchat"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >开始架构审查</a
+                >
+              </div>
+            </div>
+          </article>
+          <article class="path">
+            <div class="path-intro">
+              <small>系统工程</small>
+              <h3>后端与性能：从请求路径到瓶颈证据</h3>
+              <p>
+                目标：能把延迟和可靠性问题沿请求、队列、存储、运行时和资源边界拆开验证。
+              </p>
+            </div>
+            <div class="steps">
+              <div class="step">
+                <b>请求路径</b>
+                <p>浏览器、网络、入口、服务和存储如何共同决定一次响应。</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2F%E5%90%8E%E7%AB%AF%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%2F%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1%2FHTTP%E8%AF%B7%E6%B1%82%E7%A9%BF%E8%BF%87%E6%B5%8F%E8%A7%88%E5%99%A8%E3%80%81%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%9C%8D%E5%8A%A1%E7%AB%AF%E8%BE%B9%E7%95%8C.md"
+                  >读请求边界</a
+                >
+              </div>
+              <div class="step">
+                <b>瓶颈模型</b>
+                <p>等待、排队、CPU、内存、I/O 与锁竞争如何形成尾延迟。</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2F%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E4%B8%8E%E6%80%A7%E8%83%BD%2F%E6%80%A7%E8%83%BD%E5%B7%A5%E7%A8%8B%EF%BC%9A%E4%BB%8E%E7%94%A8%E6%88%B7%E7%AD%89%E5%BE%85%E5%88%B0%E8%B5%84%E6%BA%90%E7%93%B6%E9%A2%88.md"
+                  >读性能模型</a
+                >
+              </div>
+              <div class="step">
+                <b>故障演练</b>
+                <p>对一次 P99 抖动构造假设树和最小观测计划。</p>
+                <a
+                  class="tool launch-maic"
+                  data-topic="用一个后端服务 P99 延迟突增案例，讲清排队、CPU、GC、IO、锁和下游依赖的诊断顺序"
+                  href="/launch/openmaic?next=%2F"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >打开诊断课堂</a
+                >
+              </div>
+              <div class="step">
+                <b>证据答辩</b>
+                <p>每提出一个根因，都必须给出能证伪它的指标或实验。</p>
+                <a
+                  class="tool launch-tutor"
+                  data-topic="给我一个逐步披露证据的后端 P99 延迟故障案例，让我提出假设、选择指标和实验，并在每一步纠正我"
+                  href="/launch/deeptutor?next=%2Fchat"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >开始故障推演</a
+                >
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+      <section class="section">
+        <div class="section-head">
+          <div>
+            <h2>第一次使用</h2>
+            <p>无需再找安装命令或猜页面入口。</p>
+          </div>
+        </div>
+        <div class="guide">
+          <article>
+            <strong>1. 选主题</strong>
+            <p>
+              使用上方主题框或预置路径。主题写成一个真实问题，比只写“RAG”更容易获得有效教学。
+            </p>
+          </article>
+          <article>
+            <strong>2. 选择学习动作</strong>
+            <p>
+              <code>课堂</code> 用于形成直觉和互动练习；<code>导师</code>
+              用于追问、研究和复习。两者不是重复功能。
+            </p>
+          </article>
+          <article>
+            <strong>3. 确认后生成</strong>
+            <p>
+              入口只预填内容，不自动发送。检查目标和范围后再提交，模型额度由你的明确操作触发。
+            </p>
+          </article>
+        </div>
+        <p class="cost">
+          额度说明：阅读知识库不消耗模型
+          Token；打开工具不消耗；发送问题或生成课堂才消耗。互动课堂通常比单轮问答调用更多，长材料、深度研究和多轮追问也会显著增加消耗。
+        </p>
+      </section>
+    </div>
+    <script>
+      const topic = document.querySelector("#topic");
+      const encoded = (value) => encodeURIComponent(value.trim());
+      const maicUrl = (value) =>
+        `/launch/openmaic?next=${encodeURIComponent("/?topic=" + encoded(value))}`;
+      const tutorUrl = (value) =>
+        `/launch/deeptutor?next=${encodeURIComponent("/chat?prompt=" + encoded(value))}`;
+      function bindLaunch(link, kind, value) {
+        link.href = kind === "maic" ? maicUrl(value) : tutorUrl(value);
+      }
+      function bindActionLaunch(link, kind) {
+        const value = link.dataset.topic || topic.value;
+        link.href = kind === "maic" ? maicUrl(value) : tutorUrl(value);
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
+      function openTool(url) {
+        const tab = window.open(url, "_blank");
+        if (tab) {
+          tab.opener = null;
+        } else {
+          const error = document.createElement("p");
+          error.className = "error";
+          error.textContent = "浏览器拦截了新标签，请允许弹出窗口后重试。";
+          document.querySelector(".topic-box")?.append(error);
+        }
+      }
+      function updateTopicLinks() {
+        bindLaunch(
+          document.querySelector("#open-classroom"),
+          "maic",
+          topic.value,
+        );
+        bindLaunch(document.querySelector("#open-tutor"), "tutor", topic.value);
+        document
+          .querySelectorAll("#open-classroom,#open-tutor")
+          .forEach((link) => {
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+          });
+      }
+      const requestedTopic = new URLSearchParams(location.search).get("topic");
+      if (requestedTopic?.trim()) topic.value = requestedTopic.trim();
+      topic.addEventListener("input", updateTopicLinks);
+      document
+        .querySelector("#topic-form")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          openTool(maicUrl(topic.value));
+        });
+      document
+        .querySelectorAll(".launch-maic")
+        .forEach((link) => bindActionLaunch(link, "maic"));
+      document
+        .querySelectorAll(".launch-tutor")
+        .forEach((link) => bindActionLaunch(link, "tutor"));
+      updateTopicLinks();
+      fetch("/api/learning/status", { cache: "no-store" })
+        .then((response) => response.json())
+        .then((status) => {
+          const maic = document.querySelector("#maic-state"),
+            tutor = document.querySelector("#tutor-state"),
+            limit = document.querySelector("#tutor-limit");
+          maic.textContent = status.openmaic?.online ? "运行中" : "未启动";
+          maic.classList.toggle("warn", !status.openmaic?.online);
+          tutor.textContent =
+            status.deeptutor?.online && status.deeptutor?.llm
+              ? "导师可用"
+              : "配置不完整";
+          tutor.classList.toggle(
+            "warn",
+            !(status.deeptutor?.online && status.deeptutor?.llm),
+          );
+          limit.textContent = status.deeptutor?.embedding
+            ? `知识库检索已配置 · ${status.deeptutor.knowledge_bases || 0} 个知识库`
+            : "Chat、研究与学习路径可用；资料 RAG 暂缺 Embedding，页面不会伪装为已就绪";
+          limit.classList.toggle("error", !status.deeptutor?.embedding);
+        })
+        .catch(() => {
+          document.querySelector("#maic-state").textContent = "状态未知";
+          document.querySelector("#tutor-state").textContent = "状态未知";
+        });
+    </script>
+  </body>
+</html>

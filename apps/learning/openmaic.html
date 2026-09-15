@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>OpenMAIC 课堂指南 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/workbench.css" />
+    <script src="/static/workbench.js" data-page="learning" defer></script>
+    <style>
+      :root {
+        --bg: #f4f7f5;
+        --paper: #fff;
+        --ink: #18231f;
+        --muted: #65716c;
+        --line: #dce4df;
+        --green: #087663;
+        --green-soft: #e8f3ef;
+        --blue: #3f70a8;
+        --blue-soft: #edf4fb;
+        --warm: #a85f2d;
+        --warm-soft: #fff3e9;
+        --shadow: 0 10px 28px rgba(20, 42, 35, 0.07);
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 15px/1.75 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+      }
+      a { color: var(--green); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      button, input, textarea { font: inherit; }
+      .shell { max-width: 1240px; margin: auto; padding: 0 30px 76px; }
+      .topbar {
+        min-height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+      .breadcrumb { color: var(--muted); font-size: 12px; }
+      .breadcrumb a { font-weight: 700; }
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
+        gap: 34px;
+        padding: 47px 0 33px;
+        border-bottom: 1px solid var(--line);
+      }
+      .eyebrow { color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .1em; }
+      h1 { margin: 7px 0 11px; font-size: 39px; line-height: 1.2; letter-spacing: 0; }
+      .hero-copy { max-width: 760px; color: var(--muted); font-size: 16px; margin: 0; }
+      .hero > * { min-width: 0; }
+      .hero-copy strong { color: var(--ink); }
+      .hero-action {
+        align-self: end;
+        padding: 19px;
+        border: 1px solid #b9d9cf;
+        border-radius: 7px;
+        background: var(--green-soft);
+        box-shadow: var(--shadow);
+      }
+      .hero-action label { display: block; margin-bottom: 7px; font-weight: 800; font-size: 13px; }
+      .topic-row { display: flex; gap: 8px; }
+      .topic-row input {
+        min-width: 0;
+        flex: 1;
+        padding: 9px 10px;
+        border: 1px solid #b9d9cf;
+        border-radius: 5px;
+        background: #fff;
+        color: var(--ink);
+        outline: 0;
+      }
+      .topic-row input:focus { border-color: var(--green); box-shadow: 0 0 0 3px #08766318; }
+      .button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        padding: 7px 13px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: #fff;
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 760;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .button:hover { border-color: var(--green); color: var(--green); text-decoration: none; }
+      .button.primary { border-color: var(--green); background: var(--green); color: #fff; }
+      .button.primary:hover { background: #075e50; color: #fff; }
+      .button.blue { border-color: #bcd1e8; background: var(--blue-soft); color: #2d5e90; }
+      .hero-action small { display: block; margin-top: 8px; color: #4f6d64; font-size: 11px; line-height: 1.55; }
+      .purpose { margin-top: 22px; }
+      .status-strip {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 15px;
+      }
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: var(--paper);
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .status-chip b { color: var(--ink); }
+      .dot { width: 7px; height: 7px; border-radius: 50%; background: #98a59f; }
+      .dot.ok { background: var(--green); }
+      .dot.warn { background: var(--warm); }
+      .section { margin-top: 34px; }
+      .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: 15px; margin-bottom: 13px; }
+      h2 { margin: 0; font-size: 23px; line-height: 1.35; }
+      .section-head p { margin: 0; color: var(--muted); font-size: 13px; }
+      .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+      .panel {
+        min-width: 0;
+        padding: 19px;
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        background: var(--paper);
+        box-shadow: var(--shadow);
+      }
+      .panel h3 { margin: 0 0 6px; font-size: 16px; line-height: 1.4; }
+      .panel p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.7; }
+      .step-no { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-bottom: 12px; border-radius: 50%; background: var(--green-soft); color: var(--green); font-size: 12px; font-weight: 800; }
+      .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+      .callout { padding: 15px 17px; border: 1px solid #b9d9cf; border-left: 3px solid var(--green); border-radius: 6px; background: var(--green-soft); }
+      .callout.warm { border-color: #e6c8ad; border-left-color: var(--warm); background: var(--warm-soft); }
+      .callout strong { display: block; margin-bottom: 4px; }
+      .callout p { margin: 0; color: #53625c; font-size: 13px; }
+      .preset-list { display: grid; gap: 8px; margin-top: 12px; }
+      .preset {
+        width: 100%;
+        padding: 10px 11px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        background: #fff;
+        color: var(--ink);
+        text-align: left;
+        cursor: pointer;
+      }
+      .preset:hover { border-color: var(--green); background: #f7fbf9; }
+      .preset b { display: block; font-size: 13px; }
+      .preset span { display: block; margin-top: 2px; color: var(--muted); font-size: 11px; }
+      .matrix { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+      table { width: 100%; border-collapse: collapse; min-width: 650px; }
+      th, td { padding: 11px 13px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
+      th { background: #f1f6f3; color: #31443e; font-size: 12px; }
+      tr:last-child td { border-bottom: 0; }
+      td:first-child { width: 22%; color: var(--ink); font-weight: 750; }
+      td { color: var(--muted); }
+      .checklist { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; }
+      .check { padding: 13px 14px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+      .check b { display: block; margin-bottom: 3px; font-size: 13px; }
+      .check span { color: var(--muted); font-size: 12px; line-height: 1.6; }
+      details { border-top: 1px solid var(--line); padding: 12px 0; }
+      details:first-child { border-top: 0; }
+      summary { cursor: pointer; color: var(--ink); font-weight: 760; }
+      details p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+      code { padding: 1px 4px; border: 1px solid #d8e5e0; border-radius: 3px; background: #edf3f0; color: #0e6657; font-family: "SF Mono", monospace; font-size: .9em; }
+      .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+      .links a { padding: 7px 10px; border: 1px solid var(--line); border-radius: 5px; background: #fff; font-size: 12px; font-weight: 700; }
+      .links a:hover { border-color: var(--green); text-decoration: none; }
+      .fine-print { margin-top: 16px; color: var(--muted); font-size: 11px; }
+      @media (max-width: 980px) {
+        .shell { padding: 0 20px 58px; }
+        .hero { grid-template-columns: 1fr; gap: 22px; padding-top: 34px; }
+        .hero-action { max-width: 650px; }
+        .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .checklist { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (max-width: 620px) {
+        .shell { padding: 0 14px 48px; }
+        .topbar { min-height: 58px; flex-wrap: wrap; gap: 5px 12px; padding: 9px 0; }
+        .breadcrumb { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .topbar > a { margin-left: auto; white-space: nowrap; font-size: 11px; }
+        h1 { font-size: 30px; }
+        .hero-copy { font-size: 15px; overflow-wrap: anywhere; }
+        .topic-row { flex-direction: column; }
+        .topic-row .button { width: 100%; }
+        .grid, .split, .checklist { grid-template-columns: 1fr; }
+        .status-strip { display: grid; grid-template-columns: 1fr; }
+        .status-chip { min-width: 0; }
+        .section { margin-top: 27px; }
+        .section-head { display: block; }
+        .section-head p { margin-top: 4px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div class="breadcrumb"><a href="/learn">学习中心</a> / OpenMAIC 互动课堂</div>
+        <a href="/projects#openmaic">查看项目与源码 →</a>
+      </header>
+
+      <section class="hero">
+        <div>
+          <div class="eyebrow">OPENMAIC · INTERACTIVE CLASSROOM</div>
+          <h1>把一个主题，学到能解释、能操作、能迁移</h1>
+          <p class="hero-copy">
+            OpenMAIC 是已经安装在本机的多智能体互动课堂。它适合把知识库里的一个主题变成讲解、对比、测验、模拟或项目任务；<strong>不会因为打开这个页面就调用模型</strong>，只有你确认并在课堂中生成或提问时才使用额度。
+          </p>
+        </div>
+        <div class="hero-action">
+          <label for="topic">先写下你要掌握的主题</label>
+          <div class="topic-row">
+            <input id="topic" value="RAG 的演进、本质与生产边界" autocomplete="off" />
+            <a id="launch-classroom" class="button primary" href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">开始课堂 ↗</a>
+          </div>
+          <small>会在新标签打开受保护入口。不要直接输入 3100，否则可能看到“请输入访问码”或空页面。</small>
+        </div>
+      </section>
+
+      <div class="purpose">
+        <strong>这页解决什么问题</strong>
+        <span>知识库告诉你应该知道什么；这页告诉你如何把一个主题交给课堂、如何检查课堂质量，以及出现明显错误时从哪里恢复。</span>
+      </div>
+      <div class="status-strip" aria-live="polite">
+        <span class="status-chip"><i id="service-dot" class="dot"></i><b id="service-status">课堂服务检查中</b></span>
+        <span class="status-chip">入口 <b>受保护启动</b></span>
+        <span class="status-chip">凭据 <b>服务端已配置，不需要粘贴 Key</b></span>
+      </div>
+
+      <section class="section">
+        <div class="section-head">
+          <div><h2>一条完整的使用路径</h2><p>每一步都有明确产出，避免只生成一段看似完整的摘要。</p></div>
+        </div>
+        <div class="grid">
+          <article class="panel"><span class="step-no">1</span><h3>提出一个可学习的问题</h3><p>写主题、目标和背景，例如“我要比较 Hybrid Search 与 Reranker 在长文档 RAG 中的收益”。越具体，课堂越容易围绕判断展开。</p></article>
+          <article class="panel"><span class="step-no">2</span><h3>检查生成前的大纲</h3><p>先看它是否覆盖问题、本质、机制、边界和示例。发现范围过大或过旧时，先改主题，不要直接生成。</p></article>
+          <article class="panel"><span class="step-no">3</span><h3>在课堂里做出判断</h3><p>回答预测题、比较方案、观察模拟或完成小任务。教师与助教的价值在于解释“为什么”，不是替你报答案。</p></article>
+          <article class="panel"><span class="step-no">4</span><h3>用新约束完成迁移</h3><p>换数据规模、延迟预算、权限或故障条件重新选择方案。能解释取舍，才说明知识已经变成工程能力。</p></article>
+        </div>
+      </section>
+
+      <section class="section split">
+        <div class="panel">
+          <h2>适合直接尝试的主题</h2>
+          <p>点击一个预设会填入上方输入框；你仍然可以修改后再启动。</p>
+          <div class="preset-list">
+            <button class="preset" type="button" data-topic="RAG 的演进：从倒排索引、向量召回到混合检索、重排与 Agentic RAG"><b>RAG 前沿路线</b><span>讲清演变原因、收益、代价和生产边界</span></button>
+            <button class="preset" type="button" data-topic="如何设计一个可靠的 Agent：工具调用、状态、权限、证据与失败恢复"><b>可靠 Agent 架构</b><span>从一次调用走到可观测、可验证的系统</span></button>
+            <button class="preset" type="button" data-topic="用一个真实后端场景理解缓存、并发控制、超时、重试与一致性的关系"><b>后端性能与一致性</b><span>通过约束变化建立系统直觉，再做迁移</span></button>
+            <button class="preset" type="button" data-topic="读懂一个开源 AI 项目：先建立架构地图，再用最小实验验证关键路径"><b>开源项目拆解</b><span>适合配合仓库、代码和架构图做项目式学习</span></button>
+          </div>
+        </div>
+        <div class="panel">
+          <h2>怎样提出高质量课堂请求</h2>
+          <p>可以直接复制这段思路，再替换主题和约束：</p>
+          <div class="callout" style="margin-top:12px">
+            <strong>请求模板</strong>
+            <p>请围绕【主题】设计一堂面向【我的基础】的互动课。先说明它解决什么问题、核心机制和演变原因，再用一个最小例子讲清楚；加入方案对比、失败案例、互动题和即时反馈；最后给出一个带【约束】的迁移任务，并列出需要查证的来源。</p>
+          </div>
+          <p class="fine-print">如果主题依赖最新版本、论文或项目动态，请在请求中写明“以当前资料为准并标出来源”；课堂用于学习和练习，关键事实仍回到知识库来源页核对。</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div><h2>生成后，你应该看到什么</h2><p>下面是可验收的教学结果，不是固定页面布局；不同主题会选择不同课堂组件。</p></div>
+        </div>
+        <div class="matrix">
+          <table>
+            <thead><tr><th>教学对象</th><th>最低应回答的问题</th><th>可接受的产出</th></tr></thead>
+            <tbody>
+              <tr><td>问题与目的</td><td>它解决了什么真实痛点？不解决什么？</td><td>问题场景、目标指标、适用边界</td></tr>
+              <tr><td>本质与机制</td><td>关键状态、数据流和因果关系是什么？</td><td>分层讲解、流程图、最小例子或模拟</td></tr>
+              <tr><td>取舍与演变</td><td>为什么从旧方案演进到现在？新增了什么代价？</td><td>版本/方案对比、选择条件、失败案例</td></tr>
+              <tr><td>练习与反馈</td><td>我能否先预测结果，再用证据解释偏差？</td><td>互动题、代码或配置练习、逐步反馈</td></tr>
+              <tr><td>迁移与验证</td><td>换约束后，原结论还成立吗？</td><td>真实场景任务、验收标准、复盘问题</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head">
+          <div><h2>已生成的真实课堂</h2><p>这是用本机 OpenMAIC 实际生成并验收过的可播放课程，不是静态示意页。</p></div>
+        </div>
+        <div class="panel" style="display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap">
+          <div style="min-width:0;flex:1">
+            <h3 style="margin:0 0 5px;font-size:18px">缓存有效性与失效边界</h3>
+            <p>五个场景：问题与目标、缓存命中机制、最小 Python/Redis 例子、失效与一致性失败案例、带约束的迁移练习。课堂内容已由模型生成并保存在 OpenMAIC 的课堂存储中。</p>
+          </div>
+          <a class="button primary" href="/launch/openmaic?next=%2Fclassroom%2FxzijlWOptW" target="_blank" rel="noopener noreferrer">打开真实课堂 ↗</a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div><h2>课堂质量检查</h2><p>生成后花一分钟扫一遍；缺项就回到大纲或主题继续编辑。</p></div></div>
+        <div class="checklist">
+          <div class="check"><b>□ 不是步骤堆砌</b><span>每个做法都解释了要解决的约束、机制和收益。</span></div>
+          <div class="check"><b>□ 有边界和代价</b><span>明确何时不适用、成本在哪里、替代方案是什么。</span></div>
+          <div class="check"><b>□ 有证据入口</b><span>版本、论文、项目或实验数据可以继续追溯。</span></div>
+          <div class="check"><b>□ 有互动反馈</b><span>你需要先做判断，系统再解释答案和错误原因。</span></div>
+          <div class="check"><b>□ 有最小实践</b><span>能用一段代码、一个配置或一个小数据集复现核心现象。</span></div>
+          <div class="check"><b>□ 有迁移任务</b><span>改变输入、规模或失败条件后仍然能重新做决策。</span></div>
+        </div>
+      </section>
+
+      <section class="section split">
+        <div class="panel">
+          <h2>遇到错误时怎么恢复</h2>
+          <details open><summary>看到“请输入访问码”</summary><p>这通常是直接打开了 <code>3100</code>，绕过了本知识库的启动入口。关闭该标签，回到本页点击“开始课堂”；入口会先完成授权，再把主题带入课堂。</p></details>
+          <details><summary>打开后是 404、白框或没有主题</summary><p>不要使用旧的 <code>/workbench/new</code> 路径。回到本页确认“课堂服务”状态，再重新点击启动；若服务刚重启，刷新本页后再试。</p></details>
+          <details><summary>模型不可用或生成失败</summary><p>页面本身不会要求你输入 Key。先缩小主题、减少附件并重试；如果仍失败，查看课堂服务状态和错误提示，不要把“生成失败”当成知识结论。</p></details>
+          <details><summary>其他机器访问</summary><p>知识库页面可以直接阅读；启动会使用模型凭据，因此远程设备会先要求知识库密码。本机浏览器通过受信来源自动放行，密码不会出现在 URL 或页面源码中。</p></details>
+        </div>
+        <div class="panel">
+          <h2>和知识库如何配合</h2>
+          <p>课堂不是第二套分类。先从稳定知识页建立背景，再用课堂把一个主题练成能力；课堂结束后，把经过核对的结论整理回 Markdown。</p>
+          <div class="links">
+            <a href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2F%E7%9F%A5%E8%AF%86%E4%B8%8E%E6%A3%80%E7%B4%A2%2FRAG%E5%89%8D%E6%B2%BF%EF%BC%9A%E9%87%8D%E6%8E%92%E3%80%81%E8%87%AA%E5%8A%A8%E4%BC%98%E5%8C%96%E4%B8%8E%E5%BC%80%E6%94%BE%E7%B4%A2%E5%BC%95.md">RAG 前沿知识</a>
+            <a href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2FAgent%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%2F%E6%9E%84%E5%BB%BA%E5%8F%AF%E9%9D%A0Agent%E5%BA%94%E7%94%A8.md">可靠 Agent</a>
+            <a href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2FAgent%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%2FAgent%E5%AD%A6%E4%B9%A0%E5%B7%A5%E5%85%B7%E6%8A%8A%E8%B5%84%E6%96%99%E5%8F%98%E6%88%90%E5%8F%AF%E9%AA%8C%E8%AF%81%E5%AD%A6%E4%B9%A0%E5%BE%AA%E7%8E%AF.md">学习循环</a>
+            <a href="/?path=%E7%9F%A5%E8%AF%86%E5%BA%93%E7%AE%A1%E7%90%86%2F%E6%9D%A5%E6%BA%90%2F%E8%AE%BA%E6%96%87%E4%B8%8E%E9%A1%B9%E7%9B%AE%2FOpenMAIC%E4%BA%92%E5%8A%A8%E8%AF%BE%E5%A0%82%E4%B8%8EAgent%E6%8A%80%E8%83%BD.md">OpenMAIC 融合记录</a>
+          </div>
+          <p class="fine-print">推荐顺序：读概览 → 选择一个具体问题 → 启动课堂 → 通过迁移题 → 将经过来源核对的结论收录。</p>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="callout warm">
+          <strong>入口原则</strong>
+          <p>本页是 OpenMAIC 的教学入口；项目页是源码、版本和能力索引；知识库是长期事实来源。三者职责不同，但都从本页的安全启动链接进入课堂。</p>
+          <div class="links"><a href="/projects/OpenMAIC/README-zh" target="_blank" rel="noopener noreferrer">阅读本地中文项目说明 ↗</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noopener noreferrer">官方 GitHub ↗</a></div>
+        </div>
+      </section>
+    </div>
+    <script>
+      (() => {
+        const topic = document.querySelector('#topic');
+        const launch = document.querySelector('#launch-classroom');
+        const serviceStatus = document.querySelector('#service-status');
+        const serviceDot = document.querySelector('#service-dot');
+        const buildLaunch = (value) => `/launch/openmaic?next=${encodeURIComponent('/?topic=' + encodeURIComponent(value.trim() || '请围绕一个工程主题生成互动课堂'))}`;
+        const syncLaunch = () => { launch.href = buildLaunch(topic.value); };
+        topic.addEventListener('input', syncLaunch);
+        document.querySelectorAll('[data-topic]').forEach((button) => button.addEventListener('click', () => {
+          topic.value = button.dataset.topic || '';
+          syncLaunch();
+          topic.focus();
+        }));
+        syncLaunch();
+        fetch('/api/learning/status', { cache: 'no-store' }).then((response) => response.json()).then((status) => {
+          const online = Boolean(status.openmaic?.online);
+          serviceStatus.textContent = online ? '课堂服务可用' : '课堂服务未启动';
+          serviceDot.classList.toggle('ok', online);
+          serviceDot.classList.toggle('warn', !online);
+        }).catch(() => {
+          serviceStatus.textContent = '课堂服务状态未知';
+          serviceDot.classList.add('warn');
+        });
+      })();
+    </script>
+  </body>
+</html>

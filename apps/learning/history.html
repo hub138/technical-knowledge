@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>课堂历史与收录 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/workbench.css" />
+    <script src="/static/workbench.js" data-page="learning" defer></script>
+    <style>
+      :root {
+        --bg: #f5f7f6;
+        --paper: #fff;
+        --ink: #18231f;
+        --muted: #65716c;
+        --line: #dce3df;
+        --accent: #087663;
+        --soft: #e8f3ef;
+        --blue: #3f70a8;
+        --blue-soft: #edf4fb;
+        --warm: #a85f2d;
+        --warm-soft: #fff3e9;
+        --shadow: 0 10px 28px rgba(20, 42, 35, 0.07);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          15px/1.75 -apple-system,
+          BlinkMacSystemFont,
+          "SF Pro Text",
+          "PingFang SC",
+          sans-serif;
+      }
+      a {
+        color: var(--accent);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .shell {
+        max-width: 1160px;
+        margin: auto;
+        padding: 0 30px 70px;
+      }
+      .topbar {
+        height: 76px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--line);
+      }
+      .hero {
+        padding: 46px 0 31px;
+        border-bottom: 1px solid var(--line);
+      }
+      .eyebrow {
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.1em;
+      }
+      .hero h1 {
+        font-size: 36px;
+        line-height: 1.25;
+        margin: 8px 0 10px;
+      }
+      .hero p {
+        max-width: 790px;
+        color: var(--muted);
+        font-size: 16px;
+        margin: 0;
+      }
+      .purpose {
+        margin-top: 22px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-top: 23px;
+      }
+      .panel {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 7px;
+        padding: 21px;
+        box-shadow: var(--shadow);
+      }
+      .panel h2 {
+        margin: 0 0 7px;
+        font-size: 21px;
+      }
+      .panel > p {
+        margin: 0 0 16px;
+        color: var(--muted);
+      }
+      .timeline {
+        display: grid;
+        gap: 0;
+        border: 1px solid var(--line);
+      }
+      .stage {
+        display: grid;
+        grid-template-columns: 112px 1fr;
+        gap: 14px;
+        padding: 15px;
+        background: #fff;
+      }
+      .stage + .stage {
+        border-top: 1px solid var(--line);
+      }
+      .stage strong {
+        color: var(--accent);
+        font-size: 13px;
+      }
+      .stage p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .callout {
+        margin-top: 14px;
+        padding: 14px 16px;
+        background: var(--warm-soft);
+        border-left: 3px solid var(--warm);
+        color: #6b4b30;
+      }
+      .callout b {
+        display: block;
+        margin-bottom: 4px;
+      }
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 18px;
+      }
+      .button {
+        display: inline-block;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 7px 10px;
+        background: #fff;
+        font-size: 12px;
+        font-weight: 700;
+      }
+      .button.primary {
+        border-color: #b7d9cf;
+        background: var(--soft);
+      }
+      .button.blue {
+        border-color: #c8daed;
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      .rules {
+        display: grid;
+        gap: 9px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .rules li {
+        padding: 11px 12px;
+        border: 1px solid var(--line);
+        background: #fff;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .rules b {
+        color: var(--ink);
+      }
+      .jobs {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+      }
+      .job {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 13px;
+        border: 1px solid var(--line);
+        background: #fff;
+      }
+      .job-title {
+        margin: 0;
+        font-size: 13px;
+        font-weight: 760;
+      }
+      .job-meta {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 11px;
+        line-height: 1.55;
+      }
+      .job-state {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 74px;
+        padding: 4px 7px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 750;
+        white-space: nowrap;
+      }
+      .job-state.ok {
+        border-color: #b7d9cf;
+        background: var(--soft);
+        color: var(--accent);
+      }
+      .job-state.fail {
+        border-color: #e6c8ad;
+        background: var(--warm-soft);
+        color: var(--warm);
+      }
+      .job-state.running {
+        border-color: #c8daed;
+        background: var(--blue-soft);
+        color: var(--blue);
+      }
+      .job-link {
+        display: inline-block;
+        margin-top: 4px;
+        font-size: 11px;
+        font-weight: 750;
+      }
+      .job-empty {
+        padding: 13px;
+        border: 1px dashed var(--line);
+        color: var(--muted);
+        font-size: 12px;
+      }
+      @media (max-width: 560px) {
+        .job {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+        .job-state {
+          justify-self: start;
+        }
+      }
+      @media (max-width: 900px) {
+        .shell {
+          padding: 0 15px 52px;
+        }
+        .hero {
+          padding: 32px 0 25px;
+        }
+        .hero h1 {
+          font-size: 29px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        .stage {
+          grid-template-columns: 1fr;
+          gap: 2px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="eyebrow">LEARNING ARTIFACTS · HISTORY</div>
+        <h1>课堂历史与知识收录</h1>
+        <p>
+          生成课堂是学习产物，主题笔记是长期知识。这里说明它们如何衔接，避免把一次生成结果误当成已经核验的结论。
+        </p>
+      </section>
+      <div class="purpose">
+        <strong>先记住一件事</strong
+        ><span
+          >知识库主页只展示经过整理的 Markdown 主题；OpenMAIC
+          首页保存你生成和继续编辑的课堂。两者通过“复核后收录”连接，而不是静默互相覆盖。</span
+        >
+      </div>
+      <div class="grid">
+        <section class="panel">
+          <h2>一次学习的去向</h2>
+          <p>从生成到沉淀，按下面的顺序操作即可。</p>
+          <div class="timeline">
+            <div class="stage">
+              <strong>生成</strong>
+              <p>在 OpenMAIC 中确认主题、范围和模型调用，再生成互动课堂。</p>
+            </div>
+            <div class="stage">
+              <strong>回看</strong>
+              <p>
+                在 OpenMAIC 首页的课堂列表中重新打开，继续编辑、练习或复用。
+              </p>
+            </div>
+            <div class="stage">
+              <strong>复核</strong>
+              <p>
+                检查事实、来源、适用边界和练习是否真的覆盖目标；模型生成的解释不能替代核验。
+              </p>
+            </div>
+            <div class="stage">
+              <strong>收录</strong>
+              <p>
+                把稳定结论整理到对应领域的 Markdown
+                主题页，保留来源、版本和待复核项。
+              </p>
+            </div>
+          </div>
+          <div class="actions">
+            <a
+              class="button primary"
+              href="/launch/openmaic?next=%2F"
+              target="_blank"
+              rel="noopener noreferrer"
+              >打开课堂历史</a
+            ><a class="button" href="/learn">回到学习中心</a>
+          </div>
+        </section>
+        <section class="panel">
+          <h2>为什么不自动同步</h2>
+          <p>
+            当前 OpenMAIC
+            的课堂列表主要由它自己的浏览器存储管理，知识库服务无法安全读取另一个端口的
+            IndexedDB，也不应该绕过你的确认把生成内容写进长期知识。
+          </p>
+          <ul class="rules">
+            <li><b>课堂历史：</b>在 OpenMAIC 首页查看、编辑和继续学习。</li>
+            <li>
+              <b>正式知识：</b>在本知识库按技术对象阅读，来源与更新时间可追踪。
+            </li>
+            <li>
+              <b>推荐收录：</b
+              >复制课堂中已核验的机制、反例和实验结果，合并到现有主题，而不是整页搬运。
+            </li>
+            <li>
+              <b>尚未收录：</b
+              >新概念、未核验断言和一次性练习留在课堂，等待下一轮事实检查。
+            </li>
+          </ul>
+          <div class="callout">
+            <b>生成记录</b
+            ><span
+              >这里读取 OpenMAIC 本地任务记录。只有生成成功且经过复核的内容，才适合整理进正式知识页；失败任务会保留原因，避免把“模型超时”误当成知识结论。</span
+            >
+            <div id="generation-jobs" class="jobs" aria-live="polite"><div class="job-empty">正在读取本地生成记录…</div></div>
+          </div>
+        </section>
+      </div>
+    </div>
+    <script>
+      (() => {
+        const root = document.getElementById("generation-jobs");
+        if (!root) return;
+        const esc = (value) =>
+          String(value ?? "").replace(/[&<>"']/g, (char) => ({
+            "&": "&amp;",
+            "<": "&lt;",
+            ">": "&gt;",
+            '"': "&quot;",
+            "'": "&#39;",
+          }[char]));
+        const statusText = (job) => {
+          if (job.status === "succeeded") return "已生成";
+          if (job.status === "failed") return "失败";
+          if (job.status === "running" || job.status === "pending") return "进行中";
+          return "未知状态";
+        };
+        const render = (jobs) => {
+          if (!jobs.length) {
+            root.innerHTML = '<div class="job-empty">还没有可显示的生成任务。</div>';
+            return;
+          }
+          root.innerHTML = jobs.map((job) => {
+            const progress = Number.isFinite(Number(job.progress)) ? ` · ${job.progress}%` : "";
+            const scenes = job.totalScenes
+              ? ` · 场景 ${job.scenesGenerated ?? 0}/${job.totalScenes}`
+              : "";
+            const detail = job.status === "failed"
+              ? `错误：${esc(job.error || "未记录具体原因")}`
+              : `任务 ${esc(job.id)}${progress}${scenes}`;
+            const link = job.classroomId
+              ? `<a class="job-link" href="/launch/openmaic?next=${encodeURIComponent(`/classroom/${job.classroomId}`)}" target="_blank" rel="noopener noreferrer">打开课堂 ↗</a>`
+              : "";
+            const stateClass = job.status === "succeeded" ? "ok" : job.status === "failed" ? "fail" : "running";
+            return `<article class="job"><div><p class="job-title">${job.status === "succeeded" ? "已保存的课堂" : "OpenMAIC 生成任务"}</p><p class="job-meta">${detail}</p>${link}</div><span class="job-state ${stateClass}">${statusText(job)}</span></article>`;
+          }).join("");
+        };
+        const load = async () => {
+          try {
+            const response = await fetch("/api/learning/openmaic-jobs", { cache: "no-store" });
+            if (!response.ok) throw new Error("job status unavailable");
+            const data = await response.json();
+            render(Array.isArray(data.jobs) ? data.jobs : []);
+          } catch {
+            root.innerHTML = '<div class="job-empty">暂时无法读取生成记录；OpenMAIC 课堂本身仍可从上方入口打开。</div>';
+          }
+        };
+        load();
+        window.setInterval(load, 5000);
+      })();
+    </script>
+  </body>
+</html>
