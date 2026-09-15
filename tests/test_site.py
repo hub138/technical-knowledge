@@ -491,9 +491,17 @@ class NavigationContractTests(unittest.TestCase):
         self.assertNotIn("http://${host}:3100", self.home)
         self.assertNotIn("http://${host}:3782", self.home)
         self.assertIn("/learn/history", self.learning)
-        self.assertIn("课堂历史与知识收录", self.history)
+        # The page leads with the classroom list; the explanation is secondary.
+        self.assertIn("我的课堂", self.history)
+        self.assertIn("生成过的课堂", self.history)
         self.assertIn("复核后收录", self.history)
         self.assertIn("/api/learning/openmaic-jobs", self.history)
+        # Returning learners must be able to find their classrooms from the
+        # learning centre without hunting: the link sits in the hero next to
+        # the topic form, not buried in body copy.
+        self.assertIn("打开我的课堂", self.learning)
+        self.assertIn('class="topic-secondary"', self.learning)
+        self.assertNotIn("history-link", self.learning)
         # Failed jobs explain themselves; the card title is the classroom's own
         # course name rather than a fixed placeholder.
         self.assertIn("生成未完成", self.history)

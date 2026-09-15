@@ -354,9 +354,15 @@
       .error {
         color: var(--red);
       }
-      .history-link {
-        margin: 11px 0 0;
+      /* Sits under the topic input so returning learners reach their own
+         classrooms from the same place they start a new one. */
+      .topic-secondary {
+        margin: 10px 0 0;
         font-size: 12px;
+        color: var(--muted);
+      }
+      .topic-secondary a {
+        font-weight: 700;
       }
       @media (max-width: 900px) {
         .hero {
@@ -464,6 +470,9 @@
               autocomplete="off"
             /><button type="submit">开始</button>
           </div>
+          <p class="topic-secondary">
+            已经生成过课堂？<a href="/learn/history">打开我的课堂 →</a>
+          </p>
         </form>
       </section>
       <div class="purpose">
@@ -472,9 +481,6 @@
           >知识库负责“有哪些知识、它们如何关联”；学习中心负责“选一个主题，用什么动作把它变成理解、操作和迁移能力”。不想练习时，直接回到知识库阅读即可。</span
         >
       </div>
-      <p class="history-link">
-        <a href="/learn/history">查看课堂历史与知识收录说明</a>
-      </p>
       <section class="section">
         <div class="section-head">
           <div>

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>课堂历史与收录 · technical-knowledge</title>
+    <title>我的课堂 · technical-knowledge</title>
     <link rel="stylesheet" href="/static/workbench.css" />
     <script src="/static/workbench.js" data-page="learning" defer></script>
     <style>
@@ -95,6 +95,31 @@
         margin: 0 0 7px;
         font-size: 21px;
       }
+      /* The classroom list is the reason to visit this page, so it leads and
+         gets its own header row with the primary action. */
+      .panel-primary {
+        margin-top: 23px;
+        border-color: #b7d9cf;
+      }
+      .panel-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      .panel-head h2 {
+        margin: 0 0 4px;
+        font-size: 23px;
+      }
+      .panel-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .panel-head .button {
+        flex: none;
+      }
       .panel > p {
         margin: 0 0 16px;
         color: var(--muted);
@@ -179,6 +204,17 @@
         display: grid;
         gap: 8px;
         margin-top: 14px;
+      }
+      .panel-primary .jobs {
+        margin-top: 0;
+      }
+      /* On narrow screens the header action wraps under the title instead of
+         squeezing it. */
+      @media (max-width: 560px) {
+        .panel-head {
+          flex-direction: column;
+          gap: 10px;
+        }
       }
       .job {
         display: grid;
@@ -274,19 +310,39 @@
   <body>
     <div class="shell">
       <section class="hero">
-        <div class="eyebrow">LEARNING ARTIFACTS · HISTORY</div>
-        <h1>课堂历史与知识收录</h1>
+        <div class="eyebrow">LEARNING ARTIFACTS · CLASSROOMS</div>
+        <h1>我的课堂</h1>
         <p>
-          生成课堂是学习产物，主题笔记是长期知识。这里说明它们如何衔接，避免把一次生成结果误当成已经核验的结论。
+          这里列出你在本机生成过的互动课堂，点“打开课堂”直接进入学习。下面是生成与收录的衔接说明。
         </p>
       </section>
+
+      <section class="panel panel-primary">
+        <div class="panel-head">
+          <div>
+            <h2>生成过的课堂</h2>
+            <p>按时间倒序，每 5 秒自动刷新。生成中的任务会实时显示进度。</p>
+          </div>
+          <a
+            class="button primary"
+            href="/launch/openmaic?next=%2F"
+            target="_blank"
+            rel="noopener noreferrer"
+            >新建课堂 ↗</a
+          >
+        </div>
+        <div id="generation-jobs" class="jobs" aria-live="polite">
+          <div class="job-empty">正在读取本地生成记录…</div>
+        </div>
+      </section>
+
       <div class="purpose">
-        <strong>先记住一件事</strong
+        <strong>为什么这里能看到</strong
         ><span
-          >知识库主页只展示经过整理的 Markdown 主题；OpenMAIC
-          首页保存你生成和继续编辑的课堂。两者通过“复核后收录”连接，而不是静默互相覆盖。</span
+          >每个课堂生成时，OpenMAIC 会把课程名和任务进度写到本机数据目录；本页直接读取这些记录，所以你不用记住课堂 ID 或端口。课堂本身仍由 OpenMAIC 保存和编辑，两者通过“复核后收录”衔接，而不是静默互相覆盖。</span
         >
       </div>
+
       <div class="grid">
         <section class="panel">
           <h2>一次学习的去向</h2>
@@ -299,7 +355,7 @@
             <div class="stage">
               <strong>回看</strong>
               <p>
-                在 OpenMAIC 首页的课堂列表中重新打开，继续编辑、练习或复用。
+                在上面的列表里重新打开，继续编辑、练习或复用。
               </p>
             </div>
             <div class="stage">
@@ -317,13 +373,8 @@
             </div>
           </div>
           <div class="actions">
-            <a
-              class="button primary"
-              href="/launch/openmaic?next=%2F"
-              target="_blank"
-              rel="noopener noreferrer"
-              >打开课堂历史</a
-            ><a class="button" href="/learn">回到学习中心</a>
+            <a class="button" href="/learn">回到学习中心</a
+            ><a class="button" href="/projects">查看项目与工具</a>
           </div>
         </section>
         <section class="panel">
@@ -334,7 +385,7 @@
             IndexedDB，也不应该绕过你的确认把生成内容写进长期知识。
           </p>
           <ul class="rules">
-            <li><b>课堂历史：</b>在 OpenMAIC 首页查看、编辑和继续学习。</li>
+            <li><b>课堂历史：</b>在上面直接打开，或到 OpenMAIC 首页查看、编辑和继续学习。</li>
             <li>
               <b>正式知识：</b>在本知识库按技术对象阅读，来源与更新时间可追踪。
             </li>
@@ -348,11 +399,10 @@
             </li>
           </ul>
           <div class="callout">
-            <b>生成记录</b
+            <b>关于失败任务</b
             ><span
-              >这里读取 OpenMAIC 本地任务记录。只有生成成功且经过复核的内容，才适合整理进正式知识页；失败任务会保留原因，避免把“模型超时”误当成知识结论。</span
+              >失败任务会保留原因，避免把“模型超时”误当成知识结论。多数超时是模型链路抖动，重跑通常即可恢复。</span
             >
-            <div id="generation-jobs" class="jobs" aria-live="polite"><div class="job-empty">正在读取本地生成记录…</div></div>
           </div>
         </section>
       </div>
