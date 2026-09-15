@@ -54,6 +54,9 @@ OPENMAIC_JOBS_ROOT = Path(
     os.environ.get("OPENMAIC_HOME") or Path.home() / "Developer" / "knowledge-tools" / "OpenMAIC"
 ) / "data" / "classroom-jobs"
 OPENMAIC_CLASSROOMS_ROOT = OPENMAIC_JOBS_ROOT.parent / "classrooms"
+# Mastery tracks: organised by what a practitioner must be able to do,
+# rather than by the technical object being described.
+SKILL_TRACKS = ("后端技能", "Agent技能")
 DEEPTUTOR_HOME = Path(
     os.environ.get("DEEPTUTOR_HOME") or Path.home() / "Developer" / "knowledge-tools" / "DeepTutor"
 )
@@ -528,6 +531,9 @@ class Vault:
             if parts[0] == "工程知识" and len(parts) > 2:
                 category = parts[1]
                 topic = parts[2] if len(parts) > 3 else "概览"
+            elif parts[0] in SKILL_TRACKS:
+                category = parts[0]
+                topic = parts[1] if len(parts) > 2 else "概览"
             elif parts[0] == "知识库管理":
                 category = "知识库管理"
                 topic = parts[1] if len(parts) > 2 else "概览"
@@ -557,7 +563,7 @@ class Vault:
                 "body": body,
                 "mtime": mtime_ns,
                 "words": len(re.findall(r"\S+", body)),
-                "listed": parts[0] in {"工程知识", "Clippings"} or rel == "知识库首页.md",
+                "listed": parts[0] in {"工程知识", "Clippings", *SKILL_TRACKS} or rel == "知识库首页.md",
             }
         self.notes = notes
         self.by_stem = {}
@@ -879,7 +885,7 @@ const $=s=>document.querySelector(s);
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 async function getJSON(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json();}
 function filtered(){let a=state.notes.filter(n=>(state.category==='all'||n.category===state.category)&&(!state.query||[n.title,n.path,n.type,n.status,(n.tags||[]).join(' '),(n.sources||[]).join(' '),n.search_text||''].join(' ').toLowerCase().includes(state.query.toLowerCase())));a.sort((x,y)=>state.sort==='title'?x.title.localeCompare(y.title,'zh-CN'):(y.updated||'').localeCompare(x.updated||''));return a;}
-function orderedCategories(values){const order=['总览','人工智能','软件工程','数据系统','计算机系统与性能','分布式系统','编程语言','质量工程','Clippings'];return [...values].sort((a,b)=>(order.indexOf(a)<0?999:order.indexOf(a))-(order.indexOf(b)<0?999:order.indexOf(b))||a.localeCompare(b,'zh-CN'));}
+function orderedCategories(values){const order=['总览','后端技能','Agent技能','人工智能','软件工程','数据系统','计算机系统与性能','分布式系统','编程语言','质量工程','Clippings'];return [...values].sort((a,b)=>(order.indexOf(a)<0?999:order.indexOf(a))-(order.indexOf(b)<0?999:order.indexOf(b))||a.localeCompare(b,'zh-CN'));}
 function renderCategories(){const counts={};state.notes.forEach(n=>counts[n.category]=(counts[n.category]||0)+1);const cats=orderedCategories(Object.keys(counts));$('#categories').innerHTML=cats.map(c=>`<div class="side-item ${state.category===c?'active':''}" data-category="${esc(c)}"><span>${esc(c)}</span><span class="count">${counts[c]}</span></div>`).join('');$('#all-count').textContent=state.notes.length;document.querySelectorAll('[data-category]').forEach(e=>e.onclick=()=>showListing(e.dataset.category));}
 function renderNotes(){const list=filtered();$('#listing-title').textContent=state.category==='all'?'全部知识':state.category;$('#notes').innerHTML=list.length?list.map(n=>`<article class="note-card" data-path="${esc(n.path)}"><h4>${esc(n.title)}</h4><p>${esc(n.excerpt||'')}</p>${n.updated?`<div class="meta"><span>${esc(n.updated)}</span></div>`:''}</article>`).join(''):`<div class="empty">没有匹配内容</div>`;document.querySelectorAll('.note-card').forEach(e=>e.onclick=()=>openNote(e.dataset.path));}
 function renderSources(sources){if(!sources||!sources.length)return '';return '<span class="source-label">来源</span> '+sources.map(s=>{const value=String(s);if(value.startsWith('http://')||value.startsWith('https://'))return `<a href="${esc(value)}" target="_blank" rel="noreferrer">${esc(value)}</a>`;const match=value.match(/^\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]$/);if(match){const target=match[1],label=match[2]||target;return `<a data-note="${esc(target)}" href="/?path=${encodeURIComponent(target)}">${esc(label)}</a>`;}return esc(value);}).join('<span class="source-sep"> · </span>');}
