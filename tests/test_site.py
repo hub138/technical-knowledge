@@ -531,7 +531,7 @@ class NavigationContractTests(unittest.TestCase):
         self.assertNotIn("location.href='/learn'", self.home)
         # The homepage renders the same three destinations as every companion
         # page (知识库 / 项目与工具 / Agent 评估) with 关系图谱 nested under
-        # 知识库, instead of its own four flat buttons.
+        # 知识库. These are navigation links, so they stay in the current tab.
         self.assertIn('id="shared-nav"', self.home)
         self.assertIn("renderSharedNav", self.home)
         self.assertIn("关系图谱", self.home)
@@ -546,7 +546,7 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("if (key === homeKey) return;", self.home)
         self.assertIn("refreshHomeStatus", self.home)
         self.assertIn("decorateProjectLinks", self.home)
-        self.assertIn("window.open('/projects', '_blank')", self.home)
+        self.assertNotIn("window.open('/projects', '_blank')", self.home)
         self.assertIn("/launch/openmaic", self.home)
         self.assertIn("/launch/deeptutor", self.home)
         self.assertNotIn("http://${host}:3100", self.home)
@@ -607,12 +607,27 @@ class NavigationContractTests(unittest.TestCase):
         shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
         self.assertIn(".wb-sidebar", shared)
         self.assertIn("dataset.page", shared_script)
-        self.assertIn('target="_blank" rel="noopener noreferrer"', shared_script)
-        self.assertIn("item !== current && item !== pages.knowledge", shared_script)
+        self.assertIn("const nav = [pages.knowledge, pages.projects, pages.evaluation];", shared_script)
+        self.assertNotIn('target="_blank" rel="noopener noreferrer"', shared_script)
+        self.assertNotIn("item !== current && item !== pages.knowledge", shared_script)
         for page, name in ((self.learning, "learning"), (self.projects, "projects"), (self.evaluation, "evaluation"), (self.intuition, "learning"), (self.transfer, "learning"), (self.history, "classrooms")):
             self.assertIn('/static/workbench.css', page)
             self.assertIn(f'data-page="{name}"', page)
             self.assertIn('class="purpose"', page)
+
+    def test_navigation_stays_in_current_tab_and_links_have_no_default_underlines(self) -> None:
+        home_nav = self.home.split("function renderSharedNav(){", 1)[1].split("/* Theme toggle", 1)[0]
+        self.assertIn("{label:'项目与工具'", home_nav)
+        self.assertIn("{label:'Agent 评估'", home_nav)
+        self.assertNotIn('target="_blank"', home_nav)
+        self.assertIn('id="link-polish"', self.home)
+        self.assertIn("a { text-decoration: none; }", self.home)
+
+        workbench_nav = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
+        self.assertNotIn('target="_blank"', workbench_nav)
+        self.assertIn("body.wb-host a:hover { text-decoration: none; }", (ROOT / "site" / "workbench.css").read_text(encoding="utf-8"))
+        for page in (self.projects, self.evaluation, self.history, self.intuition, self.transfer, self.openmaic):
+            self.assertNotIn("text-decoration: underline;", page)
 
     def test_my_classrooms_is_reachable_from_the_sidebar(self) -> None:
         """Returning to a generated classroom must not require knowing its URL.

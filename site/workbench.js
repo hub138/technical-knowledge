@@ -70,11 +70,11 @@
       <span class="wb-brand-text"><strong>technical-knowledge</strong><small>工程知识工作台</small></span>
     </a>
     <nav class="wb-nav">
-      ${nav.map((item) => `<a href="${item.href}" ${item === current ? 'aria-current="page"' : ""} ${item !== current && item !== pages.knowledge ? 'target="_blank" rel="noopener noreferrer"' : ""} title="${item.title}：${item.description}"><span class="wb-nav-icon" aria-hidden="true">${item.icon}</span><span>${item.label}</span></a>`).join("")}
+      ${nav.map((item) => `<a href="${item.href}" ${item === current ? 'aria-current="page"' : ""} title="${item.title}：${item.description}"><span class="wb-nav-icon" aria-hidden="true">${item.icon}</span><span>${item.label}</span></a>`).join("")}
     </nav>
     ${subNav.length ? `<nav class="wb-subnav" aria-label="学习工具">
       <p class="wb-subnav-label">学习</p>
-      ${subNav.map((item) => `<a href="${item.href}" ${item === current ? 'aria-current="page"' : ""} ${item !== current ? 'target="_blank" rel="noopener noreferrer"' : ""} title="${item.title}：${item.description}"><span>${item.label}</span></a>`).join("")}
+      ${subNav.map((item) => `<a href="${item.href}" ${item === current ? 'aria-current="page"' : ""} title="${item.title}：${item.description}"><span>${item.label}</span></a>`).join("")}
     </nav>` : ""}
     ${script?.dataset.domainTree != null ? '<nav class="wb-domains" id="domains" aria-label="知识领域"></nav>' : ""}
     <div class="wb-context">

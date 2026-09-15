@@ -109,6 +109,14 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 :root[data-theme="dark"] .topic-link{stroke:#38453f!important}
 :root[data-theme="dark"] .diagram-edge{stroke:#6f8a80!important}
 </style>
+<style id="link-polish">
+/* App navigation and action links stay quiet; article links retain a clear
+   hover cue when the reader is deliberately inspecting a source. */
+a { text-decoration: none; }
+a:hover { text-decoration: none; }
+.reader-body a:hover,
+.reader-sources a:hover { text-decoration: underline; }
+</style>
 </head>
 <body>
 <div class="app">
@@ -148,7 +156,7 @@ function renderSharedNav(){
     {label:'Agent 评估',href:'/apps/agent-evaluation/index.html',icon:'◎'},
   ];
   const sub=[{label:'关系图谱',href:'/?view=graph'}];
-  mount.innerHTML='<nav class="wb-nav-like">'+items.map(i=>`<a href="${i.href}"${i.current?' aria-current="page"':''}${i.current?'':' target="_blank" rel="noopener noreferrer"'}>${'<span class="sn-icon" aria-hidden="true">'+i.icon+'</span>'}<span>${i.label}</span></a>`).join('')
+  mount.innerHTML='<nav class="wb-nav-like">'+items.map(i=>`<a href="${i.href}"${i.current?' aria-current="page"':''}>${'<span class="sn-icon" aria-hidden="true">'+i.icon+'</span>'}<span>${i.label}</span></a>`).join('')
     +'<div class="sn-sub">'+sub.map(i=>`<a href="${i.href}">${i.label}</a>`).join('')+'</div></nav>';
   // 图谱 is an in-page view, so intercept it instead of reloading.
   mount.querySelector('a[href="/?view=graph"]').onclick=e=>{e.preventDefault();showGraph()};
@@ -398,14 +406,6 @@ function loadHome(push=false){state.domain='all';state.topic='all';state.selecte
     }).catch(() => {});
   };
   window.setInterval(refreshHomeStatus, 10000);
-  const projectButton = document.querySelector('#projects-button');
-  if (projectButton) {
-    projectButton.onclick = () => {
-      const tab = window.open('/projects', '_blank');
-      if (tab) tab.opener = null;
-      else alertUser('浏览器拦截了新标签，请允许弹出窗口后重试');
-    };
-  }
 })();
 </script>
 <script src="/static/mermaid.min.js"></script>
