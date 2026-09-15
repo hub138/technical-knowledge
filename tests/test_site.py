@@ -376,6 +376,21 @@ class KnowledgeGraphTests(unittest.TestCase):
                     unresolved.append(f"{relative} -> {target}")
         self.assertEqual(unresolved, [])
 
+    def test_skill_tracks_follow_the_shared_page_shape(self) -> None:
+        """Mastery pages state the problem, the solution, the cost, and how to
+        apply it — in that order. The shape is what makes the track readable as
+        a course rather than as a pile of notes."""
+        required = ("## 背景", "## 方案", "## 从什么地方做")
+        tracks = [n for n in self.vault.notes.values() if str(n["path"]).split("/")[0] in ("后端技能", "Agent技能")]
+        self.assertTrue(tracks, "skill tracks are missing")
+        for note in tracks:
+            body = str(note["body"])
+            path = str(note["path"])
+            for heading in required:
+                self.assertIn(heading, body, f"{path} is missing {heading}")
+            # Cost must be stated, not just the benefits.
+            self.assertTrue("代价" in body, f"{path} does not state its cost")
+
     def test_every_core_note_has_an_incoming_link(self) -> None:
         linked = {edge["target"] for edge in self.vault.edges()}
         orphans = [
