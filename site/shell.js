@@ -331,7 +331,10 @@
    *   title   () => string recorded with the submission
    */
   const feedback = (opts = {}) => {
-    const where = opts.where || (() => "当前在首页，没有具体文章");
+    /* The default context line is injected as HTML by the panel, so the i18n
+       DOM walk never sees it — it has to go through t() here. */
+    const tr = (x) => (window.TKI18N ? window.TKI18N.t(x) : x);
+    const where = opts.where || (() => tr("当前在首页，没有具体文章"));
     const title = opts.title || (() => document.title);
 
     const fab = document.createElement("button");

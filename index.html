@@ -589,9 +589,11 @@ function currentArticle(){
 let feedbackUi=null;
 function bindFeedback(){
   feedbackUi=TKShell.feedback({
+    /* 面板把这段当 HTML 注入，i18n 的文本节点遍历碰不到，所以在这里过一遍 t()。 */
     where:()=>{
       const article=currentArticle();
-      return article.title?`正在读：<b>${esc(article.title)}</b>`:'当前在首页，没有具体文章';
+      const tr=(x)=>window.TKI18N?window.TKI18N.t(x):x;
+      return article.title?`${tr('正在读：')}<b>${esc(article.title)}</b>`:tr('当前在首页，没有具体文章');
     },
     title:()=>currentArticle().title||document.title,
   });
