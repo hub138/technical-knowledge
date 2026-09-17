@@ -374,9 +374,19 @@ class KnowledgeGraphTests(unittest.TestCase):
         self.assertEqual(failures, [])
 
     def test_wikilinks_resolve(self) -> None:
+        """Every wikilink a reader can click must resolve.
+
+        Fenced code blocks are excluded on purpose: they hold templates and
+        worked examples (`[[相关页面1]]`, a hypothetical `[[KV缓存原理]]`), and
+        those are meant to be illustrative rather than navigable. Counting them
+        made this test fail for 60 links that were genuinely broken plus 9 that
+        were never links at all, which hid the real breakage.
+        """
+        fence_re = re.compile(r"```.*?```|~~~.*?~~~", re.DOTALL)
         unresolved: list[str] = []
         for relative, note in self.vault.notes.items():
-            for target, _label in SERVER_MODULE.WIKILINK_RE.findall(str(note["body"])):
+            prose = fence_re.sub("", str(note["body"]))
+            for target, _label in SERVER_MODULE.WIKILINK_RE.findall(prose):
                 if not self.vault.resolve_note(target, relative):
                     unresolved.append(f"{relative} -> {target}")
         self.assertEqual(unresolved, [])

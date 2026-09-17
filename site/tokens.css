@@ -1,0 +1,344 @@
+/* Design tokens — the single source of truth for every page in this site.
+ *
+ * Why this file exists: there used to be four separate :root blocks
+ * (index.html, workbench.css, brand.css, insights.html) carrying two parallel
+ * naming schemes (--accent vs --wb-accent). They drifted — #f4f6f5 vs #f4f7f5,
+ * #147766 vs #087663 — and brand.css had to guess with a three-level fallback
+ * (var(--wb-line, var(--line, #dce4df))). Pages therefore never quite looked
+ * like one product.
+ *
+ * Rules for future edits:
+ *   1. Every colour, space, radius, shadow and duration comes from here.
+ *      Do not write a raw hex or px value in a page stylesheet.
+ *   2. Add a token instead of inventing a one-off value.
+ *   3. The legacy aliases at the bottom exist to migrate safely. Once no file
+ *      references --wb-* or the old short names, delete the alias block.
+ *
+ * No build step, no dependencies: plain CSS custom properties.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* ── Surfaces, from furthest back to closest to the reader ──────────── */
+  --color-bg: #f4f6f5;
+  --color-surface: #eef3f0; /* inset areas: graph canvas, table headers */
+  --color-panel: #ffffff; /* cards, sidebar, panels */
+  --color-raised: #ffffff; /* panels that also carry a shadow */
+  --color-overlay: rgba(19, 28, 25, 0.42);
+
+  /* ── Text, by descending emphasis ───────────────────────────────────── */
+  --color-ink: #1f2a27; /* headings, primary content */
+  --color-ink-soft: #3d4a45; /* body text inside dense tables */
+  /* #68746f read at 4.34:1 on --color-surface, just under the 4.5:1 WCAG AA
+   * floor for body text, and the contrast audit flagged it. Darkened along the
+   * same hue so it passes on every surface we actually use. */
+  --color-muted: #616d68; /* secondary text, labels */
+  --color-faint: #7c8883; /* timestamps, counts, placeholders */
+
+  /* ── Borders ────────────────────────────────────────────────────────── */
+  --color-line: #dbe2de; /* default hairline */
+  --color-line-strong: #c5d0cb; /* hover / emphasis borders */
+
+  /* ── Accent: the product's own colour ───────────────────────────────── */
+  --color-accent: #147766;
+  --color-accent-hover: #0f6154;
+  --color-accent-soft: #e4f1ed; /* tinted background */
+  --color-accent-line: #b7d9cf; /* tinted border */
+  --color-accent-ink: #0d5f52; /* accent-coloured text on light bg */
+  --color-on-accent: #ffffff; /* text on top of --color-accent */
+
+  /* ── Secondary hues, each with a soft background pairing ────────────── */
+  --color-warm: #a45b2a; /* freshness, warnings, radar */
+  --color-warm-soft: #fff5e9;
+  --color-warm-line: #efd9b3;
+  --color-warm-ink: #704823;
+  --color-info: #3f70a8;
+  --color-info-soft: #edf4fb;
+  --color-violet: #75599a;
+  --color-violet-soft: #f3effa;
+
+  /* ── Status. Used by insights and feedback. ─────────────────────────── */
+  --color-ok: #147766;
+  --color-ok-soft: #e4f1ed;
+  --color-warn: #a45b2a;
+  --color-warn-soft: #fff5e9;
+  --color-danger: #9b4660;
+  --color-danger-soft: #fdf0f3;
+  --color-star: #8a6d1f; /* star-count badges */
+  --color-star-soft: #fdf8e8;
+  --color-star-line: #e2d3a8;
+
+  /* ── Space. 4px base; pick the nearest step, never a raw value. ─────── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Radius ─────────────────────────────────────────────────────────── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-full: 999px;
+
+  /* ── Type scale. Fluid where the size is layout-dependent. ──────────── */
+  --text-xs: 11px;
+  --text-sm: 12.5px;
+  --text-base: 13.5px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 20px;
+  --text-2xl: clamp(22px, 2vw, 26px);
+  --text-3xl: clamp(26px, 2.6vw, 32px);
+  --text-4xl: clamp(30px, 3.4vw, 38px);
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.85; /* long-form reading */
+
+  /* ── Weights ────────────────────────────────────────────────────────── */
+  --weight-normal: 400;
+  --weight-medium: 550;
+  --weight-semibold: 650;
+  --weight-bold: 750;
+
+  /* ── Elevation. Dark mode needs its own set (see below). ────────────── */
+  --shadow-xs: 0 1px 2px rgba(20, 42, 35, 0.04);
+  --shadow-sm: 0 2px 8px rgba(20, 42, 35, 0.06);
+  --shadow-md: 0 10px 28px rgba(20, 42, 35, 0.07);
+  --shadow-lg: 0 24px 60px rgba(20, 42, 35, 0.28);
+  --shadow-ring: 0 0 0 3px rgba(20, 119, 102, 0.18);
+
+  /* ── Motion. Every transition must use a duration + an easing token. ── */
+  --duration-fast: 0.12s;
+  --duration-base: 0.18s;
+  --duration-slow: 0.28s;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* ── Stacking. Named so overlaps are decided once, not per component. ─ */
+  --z-sticky: 3;
+  --z-sidebar: 10;
+  --z-fab: 21;
+  --z-overlay: 30;
+  --z-toast: 40;
+
+  /* ── Typefaces ──────────────────────────────────────────────────────── */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif,
+    "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols 2";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --font-feature-numeric: "tnum" 1, "cv01" 1;
+}
+
+/* Dark theme. Shadows are re-declared rather than reused: a light shadow on a
+ * dark surface reads as a smudge, so these lean on deeper alpha instead. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-bg: #131a18;
+  --color-surface: #182220;
+  --color-panel: #1a2320;
+  --color-raised: #1f2a26;
+  --color-overlay: rgba(6, 10, 9, 0.62);
+
+  --color-ink: #e6ede9;
+  --color-ink-soft: #cdd9d4;
+  --color-muted: #93a29c;
+  --color-faint: #7b8a84;
+
+  --color-line: #2b3733;
+  --color-line-strong: #3d4d47;
+
+  --color-accent: #5fbfa6;
+  --color-accent-hover: #7ed0ba;
+  --color-accent-soft: #1e3630;
+  --color-accent-line: #315a50;
+  --color-accent-ink: #8fd4c0;
+  --color-on-accent: #0d1b17;
+
+  --color-warm: #c98a5c;
+  --color-warm-soft: #3a2c1a;
+  --color-warm-line: #574126;
+  --color-warm-ink: #e0b48b;
+  /* 暗色下 soft 底 + 同色系前景容易掉到 3:1 以下，所以前景取更亮的一档，
+     底取更深的一档，保证 11px 小字也能达标。 */
+  --color-info: #a8c8ea;
+  --color-info-soft: #16243a;
+  --color-violet: #c4aee4;
+  --color-violet-soft: #241d33;
+
+  --color-ok: #5fbfa6;
+  --color-ok-soft: #1e3630;
+  --color-warn: #c98a5c;
+  --color-warn-soft: #3a2c1a;
+  --color-danger: #d98aa4;
+  --color-danger-soft: #3a2130;
+  --color-star: #d9c069;
+  --color-star-soft: #2a2413;
+  --color-star-line: #4a3f1c;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.55);
+  --shadow-ring: 0 0 0 3px rgba(95, 191, 166, 0.24);
+}
+
+/* ── Base ────────────────────────────────────────────────────────────── */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* daisyUI sets the font stack on html/body with its own list, which drops the
+ * CJK faces and the symbol faces the sidebar icons rely on (⌂ ⌘ ▣ ◎) —
+ * those rendered as Thai/box glyphs. Declaring it here, after daisyUI, keeps
+ * one stack for both Latin and Chinese, and keeps the icons intact. */
+html,
+body {
+  font-family: var(--font-sans);
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Symbol glyphs used as icons must not be re-styled by a component font. */
+.wb-nav-icon,
+.radar-icon,
+.brand-mark,
+.tk-brand-mark,
+.fb-fab span[aria-hidden] {
+  font-family: var(--font-sans);
+  font-variant-emoji: text;
+}
+
+/* Numbers in tables, counters and timestamps must not jitter as they change. */
+[data-numeric],
+.count,
+.num,
+time,
+.tile b {
+  font-variant-numeric: tabular-nums;
+}
+
+/* One focus treatment for the whole site. Components should not invent their
+ * own outline. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+::selection {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-ink);
+}
+
+/* Thin scrollbars that pick up the theme, rather than the OS default. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-line-strong);
+  border-radius: var(--radius-full);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-muted);
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Respect the OS setting. Components keep their hover states; only motion
+ * is removed. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Legacy aliases ──────────────────────────────────────────────────────
+ * These map the two older naming schemes onto the tokens above so the token
+ * layer can land before every stylesheet is migrated. Delete this block once
+ * `grep -rn '\-\-wb-\|\-\-accent-soft\|\-\-warm-soft' site/ index.html`
+ * returns nothing outside this file.
+ */
+
+:root {
+  /* workbench.css (--wb-*) */
+  --wb-bg: var(--color-bg);
+  --wb-paper: var(--color-panel);
+  --wb-ink: var(--color-ink);
+  --wb-muted: var(--color-muted);
+  --wb-line: var(--color-line);
+  --wb-line-strong: var(--color-line-strong);
+  --wb-accent: var(--color-accent);
+  --wb-accent-soft: var(--color-accent-soft);
+  --wb-shadow: var(--shadow-md);
+
+  /* index.html / insights.html short names */
+  --bg: var(--color-bg);
+  --surface: var(--color-surface);
+  --panel: var(--color-panel);
+  --paper: var(--color-panel);
+  --soft: var(--color-accent-soft);
+  --ink: var(--color-ink);
+  --muted: var(--color-muted);
+  --line: var(--color-line);
+  --accent: var(--color-accent);
+  --accent-soft: var(--color-accent-soft);
+  --accent-line: var(--color-accent-line);
+  --on-accent: var(--color-on-accent);
+  --warm: var(--color-warm);
+  --warm-soft: var(--color-warm-soft);
+  --blue: var(--color-info);
+  --blue-soft: var(--color-info-soft);
+  --purple: var(--color-violet);
+  --purple-soft: var(--color-violet-soft);
+  --green: var(--color-ok);
+  --green-soft: var(--color-ok-soft);
+  --red: var(--color-danger);
+  --ok: var(--color-ok);
+  --ok-soft: var(--color-ok-soft);
+  --warn: var(--color-warn);
+  --warn-soft: var(--color-warn-soft);
+  --danger: var(--color-danger);
+  --danger-soft: var(--color-danger-soft);
+  --shadow: var(--shadow-md);
+}

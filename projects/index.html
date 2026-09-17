@@ -4,24 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>项目与教学 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/workbench.css" />
     <script src="/static/workbench.js" data-page="projects" defer></script>
     <style>
-      :root {
-        --bg: #f4f6f5;
-        --paper: #fff;
-        --ink: #1f2a27;
-        --muted: #68746f;
-        --line: #dbe2de;
-        --accent: #147766;
-        --soft: #e4f1ed;
-        --warm: #a45b2a;
-        --warm-soft: #fff5e9;
-        --blue: #3f70a8;
-        --blue-soft: #edf4fb;
-        --purple: #7862a3;
-        --shadow: 0 12px 32px rgba(23, 45, 39, 0.08);
-      }
+      
       * {
         box-sizing: border-box;
       }
@@ -472,7 +459,7 @@
         }
       }
     </style>
-  <style>:root[data-theme="dark"]{--bg:#131a18;--paper:#1a2320;--ink:#e6ede9;--muted:#adbdb7;--line:#2b3733;--accent:#5fbfa6;--accent-soft:#1e3630;--soft:#1e3630;--green:#5fbfa6;--green-soft:#1e3630;--blue:#7fb4e8;--blue-soft:#1b2b3a;--warm:#c98a5c;--warm-soft:#3a2c1a;--red:#e28b95;--shadow:0 10px 28px rgba(0,0,0,.35)}:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
+  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
 <style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--paper)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--ink)!important}</style>
 <style>:root[data-theme="dark"] .project-links a,:root[data-theme="dark"] .links a,:root[data-theme="dark"] .project a,:root[data-theme="dark"] .entry a{background:var(--paper)!important}:root[data-theme="dark"] a.primary{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] .note{color:var(--ink)!important}</style>
 <style>:root[data-theme="dark"] a{background-color:transparent}:root[data-theme="dark"] .entry a,:root[data-theme="dark"] .panel a{background:var(--paper)!important}</style>
@@ -660,7 +647,7 @@
               </div>
               <span class="status">已同步技能</span>
             </div>
-            <p class="facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-key" style="border-color:#dbe7e2;background:#fff;color:var(--muted)">无需 API Key</span><span>2026-09-17 核验</span></p>
+            <p class="facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-key" style="border-color:var(--line);background:var(--color-panel);color:var(--muted)">无需 API Key</span><span>2026-09-17 核验</span></p>
             <p>
               把 Agent
               的工程工作拆成可复用流程：先理解边界，再形成规格，按小步反馈实施，最后用测试和审查确认结果。
@@ -690,7 +677,7 @@
               </div>
               <span class="status">辅助 CLI</span>
             </div>
-            <p class="facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-key" style="border-color:#dbe7e2;background:#fff;color:var(--muted)">无需 API Key</span><span>2026-09-17 核验</span></p>
+            <p class="facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-key" style="border-color:var(--line);background:var(--color-panel);color:var(--muted)">无需 API Key</span><span>2026-09-17 核验</span></p>
             <p>
               把系统描述或仓库证据变成类型化图描述，再经过确定性校验生成可交互
               HTML/SVG。它负责让关系可追踪，不负责替人编造业务事实。

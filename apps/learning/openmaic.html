@@ -4,23 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>OpenMAIC 课堂指南 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/workbench.css" />
     <script src="/static/workbench.js" data-page="learning" defer></script>
     <style>
-      :root {
-        --bg: #f4f7f5;
-        --paper: #fff;
-        --ink: #18231f;
-        --muted: #65716c;
-        --line: #dce4df;
-        --green: #087663;
-        --green-soft: #e8f3ef;
-        --blue: #3f70a8;
-        --blue-soft: #edf4fb;
-        --warm: #a85f2d;
-        --warm-soft: #fff3e9;
-        --shadow: 0 10px 28px rgba(20, 42, 35, 0.07);
-      }
+      
       * { box-sizing: border-box; }
       body {
         margin: 0;
@@ -43,14 +31,14 @@
       .breadcrumb a { font-weight: 700; }
       .hero {
         display: grid;
-        grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
-        gap: 34px;
+        grid-template-columns: minmax(0, 1.35fr) minmax(320px, .65fr);
+        gap: 28px;
         padding: 47px 0 33px;
         border-bottom: 1px solid var(--line);
       }
       .eyebrow { color: var(--green); font-size: 11px; font-weight: 800; letter-spacing: .1em; }
-      h1 { margin: 7px 0 11px; font-size: 39px; line-height: 1.2; letter-spacing: 0; }
-      .hero-copy { max-width: 760px; color: var(--muted); font-size: 16px; margin: 0; }
+      h1 { margin: 7px 0 11px; max-width: 800px; font-size: 35px; line-height: 1.2; letter-spacing: 0; }
+      .hero-copy { max-width: 820px; color: var(--muted); font-size: 16px; margin: 0; }
       .hero > * { min-width: 0; }
       .hero-copy strong { color: var(--ink); }
       .hero-action {
@@ -195,7 +183,7 @@
         .section-head p { margin-top: 4px; }
       }
     </style>
-  <style>:root[data-theme="dark"]{--bg:#131a18;--paper:#1a2320;--ink:#e6ede9;--muted:#adbdb7;--line:#2b3733;--accent:#5fbfa6;--accent-soft:#1e3630;--soft:#1e3630;--green:#5fbfa6;--green-soft:#1e3630;--blue:#7fb4e8;--blue-soft:#1b2b3a;--warm:#c98a5c;--warm-soft:#3a2c1a;--red:#e28b95;--shadow:0 10px 28px rgba(0,0,0,.35)}:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
+  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
 <style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--paper)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--ink)!important}</style>
 </head>
   <body>
@@ -208,9 +196,9 @@
       <section class="hero">
         <div>
           <div class="eyebrow">OPENMAIC · INTERACTIVE CLASSROOM</div>
-          <h1>把一个主题，学到能解释、能操作、能迁移</h1>
+          <h1>把一个主题学到能解释、能操作、能迁移</h1>
           <p class="hero-copy">
-            OpenMAIC 是已经安装在本机的多智能体互动课堂。它适合把知识库里的一个主题变成讲解、对比、测验、模拟或项目任务；<strong>不会因为打开这个页面就调用模型</strong>，只有你确认并在课堂中生成或提问时才使用额度。
+            把知识库里的主题变成讲解、对比、测验、模拟或项目任务。页面打开不会调用模型；只有你在课堂中生成或提问时才使用额度。
           </p>
         </div>
         <div class="hero-action">
@@ -219,23 +207,23 @@
             <input id="topic" value="RAG 的演进、本质与生产边界" autocomplete="off" />
             <a id="launch-classroom" class="button primary" href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">开始课堂 ↗</a>
           </div>
-          <small>会在新标签打开受保护入口。不要直接输入 3100，否则可能看到“请输入访问码”或空页面。</small>
+          <small>通过这个入口会自动带上授权；手动访问端口可能停在授权页或空白页。</small>
         </div>
       </section>
 
       <div class="purpose">
         <strong>这页解决什么问题</strong>
-        <span>知识库告诉你应该知道什么；这页告诉你如何把一个主题交给课堂、如何检查课堂质量，以及出现明显错误时从哪里恢复。</span>
+        <span>知识库告诉你要学什么；这页帮你把主题交给课堂、检查产出质量，并在结果不对时知道从哪里恢复。</span>
       </div>
       <div class="status-strip" aria-live="polite">
         <span class="status-chip"><i id="service-dot" class="dot"></i><b id="service-status">课堂服务检查中</b></span>
-        <span class="status-chip">入口 <b>受保护启动</b></span>
-        <span class="status-chip">凭据 <b>服务端已配置，不需要粘贴 Key</b></span>
+        <span class="status-chip">启动 <b>受保护入口</b></span>
+        <span class="status-chip">凭据 <b>服务端托管</b></span>
       </div>
 
       <section class="section">
         <div class="section-head">
-          <div><h2>一条完整的使用路径</h2><p>每一步都有明确产出，避免只生成一段看似完整的摘要。</p></div>
+          <div><h2>推荐学习路径</h2><p>每一步都要留下判断或产出，不以摘要为完成。</p></div>
         </div>
         <div class="grid">
           <article class="panel"><span class="step-no">1</span><h3>提出一个可学习的问题</h3><p>写主题、目标和背景，例如“我要比较 Hybrid Search 与 Reranker 在长文档 RAG 中的收益”。越具体，课堂越容易围绕判断展开。</p></article>

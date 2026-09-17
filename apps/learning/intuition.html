@@ -4,21 +4,11 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>形成直觉 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/workbench.css" />
     <script src="/static/workbench.js" data-page="learning" defer></script>
     <style>
-      :root {
-        --bg: #f5f7f6;
-        --paper: #fff;
-        --ink: #18231f;
-        --muted: #65716c;
-        --line: #dce3df;
-        --accent: #087663;
-        --soft: #e8f3ef;
-        --warm: #a85f2d;
-        --warm-soft: #fff3e9;
-        --shadow: 0 10px 28px rgba(20, 42, 35, 0.07);
-      }
+      
       * {
         box-sizing: border-box;
       }
@@ -53,8 +43,15 @@
         border-bottom: 1px solid var(--line);
       }
       .hero {
-        padding: 46px 0 31px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+        gap: 28px;
+        align-items: end;
+        padding: 42px 0 28px;
         border-bottom: 1px solid var(--line);
+      }
+      .hero > * {
+        min-width: 0;
       }
       .eyebrow {
         color: var(--accent);
@@ -67,11 +64,32 @@
         line-height: 1.25;
         margin: 8px 0 10px;
       }
-      .hero p {
+      .hero-text p {
         max-width: 790px;
         color: var(--muted);
         font-size: 16px;
         margin: 0;
+      }
+      .hero-card {
+        padding: 17px;
+        border: 1px solid #b7d9cf;
+        border-radius: 7px;
+        background: var(--soft);
+        box-shadow: var(--shadow);
+      }
+      .hero-card strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 13px;
+      }
+      .hero-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.65;
+      }
+      .hero-card .links {
+        margin-top: 12px;
       }
       .purpose {
         margin-top: 22px;
@@ -153,17 +171,43 @@
         border-color: #b7d9cf;
         background: var(--soft);
       }
+      .examples {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .example {
+        padding: 13px 14px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--paper);
+      }
+      .example b {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 13px;
+      }
+      .example span {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.6;
+      }
       @media (max-width: 900px) {
         .shell {
           padding: 0 15px 52px;
         }
         .hero {
+          grid-template-columns: 1fr;
           padding: 32px 0 25px;
         }
         .hero h1 {
           font-size: 29px;
         }
         .grid {
+          grid-template-columns: 1fr;
+        }
+        .examples {
           grid-template-columns: 1fr;
         }
       }
@@ -176,22 +220,31 @@
         }
       }
     </style>
-  <style>:root[data-theme="dark"]{--bg:#131a18;--paper:#1a2320;--ink:#e6ede9;--muted:#adbdb7;--line:#2b3733;--accent:#5fbfa6;--accent-soft:#1e3630;--soft:#1e3630;--green:#5fbfa6;--green-soft:#1e3630;--blue:#7fb4e8;--blue-soft:#1b2b3a;--warm:#c98a5c;--warm-soft:#3a2c1a;--red:#e28b95;--shadow:0 10px 28px rgba(0,0,0,.35)}:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
+  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
 <style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--paper)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--ink)!important}</style>
 </head>
   <body>
     <div class="shell">
       <section class="hero">
-        <div class="eyebrow">LEARNING ACTION · INTUITION</div>
-        <h1>形成直觉</h1>
-        <p>
-          把一个抽象机制变成可以预测、比较和解释的心智模型。这个页面是入口说明，真正的课堂会在新标签中打开。
-        </p>
+        <div class="hero-text">
+          <div class="eyebrow">LEARNING ACTION · INTUITION</div>
+          <h1>形成直觉</h1>
+          <p>
+            用预测、对比、反馈和迁移，把抽象机制变成可判断的心智模型。适合 RAG、缓存、一致性、Agent 状态这类“读懂了但还不会用”的主题。
+          </p>
+        </div>
+        <aside class="hero-card" aria-label="形成直觉的产出">
+          <strong>这次练习要产出什么</strong>
+          <p>不是多看一遍解释，而是能先预测结果，再说清变量变化为什么改变结论。</p>
+          <div class="links">
+            <a class="button primary" target="_blank" rel="noopener noreferrer" href="/launch/openmaic?next=%2F">打开课堂 ↗</a>
+          </div>
+        </aside>
       </section>
       <div class="purpose">
         <strong>适合什么时候用</strong
         ><span
-          >当你已经读过概念，但面对新数据、新约束或失败案例还不能预测结果时，先用互动课堂建立直觉。</span
+          >当你已经读过概念，但面对新数据、新约束或失败案例还不能预测结果时，先用互动课堂把判断过程练出来。</span
         >
       </div>
       <div class="grid">
@@ -245,6 +298,11 @@
             ><a class="button" href="/projects">查看项目说明</a>
           </div>
         </section>
+      </div>
+      <div class="examples" aria-label="适合形成直觉的主题示例">
+        <div class="example"><b>RAG 召回</b><span>先预测查询改写、混合检索和重排分别会改变什么结果。</span></div>
+        <div class="example"><b>缓存失效</b><span>换 TTL、写入路径和并发条件，观察一致性问题从哪里出现。</span></div>
+        <div class="example"><b>Agent 状态</b><span>改变工具失败、预算和人工审批，判断循环是否还能安全结束。</span></div>
       </div>
     </div>
   </body>
