@@ -34,7 +34,9 @@
    * floor for body text, and the contrast audit flagged it. Darkened along the
    * same hue so it passes on every surface we actually use. */
   --color-muted: #616d68; /* secondary text, labels */
-  --color-faint: #7c8883; /* timestamps, counts, placeholders */
+  /* 只用于非文字（图标、分隔线、装饰）。它按设计比 --color-muted 低一档，
+   * 小字用它会掉到 WCAG AA 以下 —— 时间戳、计数请用 --color-muted。 */
+  --color-faint: #7c8883;
 
   /* ── Borders ────────────────────────────────────────────────────────── */
   --color-line: #dbe2de; /* default hairline */
@@ -93,15 +95,18 @@
   --radius-full: 999px;
 
   /* ── Type scale. Fluid where the size is layout-dependent. ──────────── */
-  --text-xs: 11px;
-  --text-sm: 12.5px;
-  --text-base: 13.5px;
-  --text-md: 15px;
-  --text-lg: 17px;
-  --text-xl: 20px;
-  --text-2xl: clamp(22px, 2vw, 26px);
-  --text-3xl: clamp(26px, 2.6vw, 32px);
-  --text-4xl: clamp(30px, 3.4vw, 38px);
+  /* 一档只有一个用途。改字号先问"它是什么角色"，再选档，
+     不要就地写 px —— 之前 17/19/23/34 混用就是这么来的。 */
+  --text-2xs: 10px;   /* 角标、chevron */
+  --text-xs: 11px;    /* 徽标、计数、时间戳 */
+  --text-sm: 12.5px;  /* 辅助说明、次级元信息 */
+  --text-base: 13.5px;/* 导航、紧凑控件 */
+  --text-md: 15px;    /* 正文基准 */
+  --text-lg: 17px;    /* 卡片标题、小标题 */
+  --text-xl: 20px;    /* 区块标题 */
+  --text-2xl: clamp(22px, 2vw, 26px);   /* 页面标题 */
+  --text-3xl: clamp(26px, 2.6vw, 32px); /* 文章主标题 */
+  --text-4xl: clamp(30px, 3.4vw, 38px); /* 首页 hero */
 
   --leading-tight: 1.25;
   --leading-normal: 1.6;
@@ -157,7 +162,8 @@
   --color-ink: #e6ede9;
   --color-ink-soft: #cdd9d4;
   --color-muted: #93a29c;
-  --color-faint: #7b8a84;
+  /* 同浅色：非文字专用。 */
+  --color-faint: #8b9993;
 
   --color-line: #2b3733;
   --color-line-strong: #3d4d47;

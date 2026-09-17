@@ -211,7 +211,6 @@
           path: "",
           title: PAGE_LABELS[page] || document.title,
           name: nameBox.value.trim(),
-          contact: nameBox.value.trim(),
           page: location.pathname,
           screen: `${screen.width}x${screen.height}`,
         }),
