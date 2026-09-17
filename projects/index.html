@@ -85,7 +85,7 @@
         font-size: 12px;
       }
       .hero-links a.primary {
-        border-color: #afd2c8;
+        border-color: var(--color-accent-line);
         background: var(--color-accent-soft);
       }
       .section {
@@ -161,7 +161,7 @@
         font-size: 11px;
         color: var(--color-muted);
         padding: 9px 11px;
-        background: #f8faf9;
+        background: var(--color-surface);
         border: 1px solid var(--color-line);
         overflow-wrap: anywhere;
       }
@@ -182,7 +182,7 @@
         padding: 3px 8px;
         border: 1px solid var(--color-line);
         border-radius: 4px;
-        background: #f8faf9;
+        background: var(--color-surface);
         color: var(--color-muted);
         font-size: 11px;
         font-weight: 650;
@@ -195,25 +195,25 @@
         font-size: var(--text-xs);
       }
       .facts .fact-stars {
-        border-color: #e2d3a8;
-        background: #fdf8e8;
-        color: #8a6d1f;
+        border-color: var(--color-star-line);
+        background: var(--color-star-soft);
+        color: var(--color-star);
       }
       .facts .fact-open,
       .facts .fact-live {
-        border-color: #b7d9cf;
+        border-color: var(--color-accent-line);
         background: var(--color-accent-soft);
         color: var(--color-accent);
       }
       .facts .fact-key {
-        border-color: #efd9b3;
+        border-color: var(--color-warm-line);
         background: var(--color-warm-soft);
         color: var(--color-warm);
       }
       :root[data-theme="dark"] .facts .fact-stars {
-        border-color: #4a3f1c;
-        background: #2a2413;
-        color: #d9c069;
+        border-color: var(--color-star-line);
+        background: var(--color-star-soft);
+        color: var(--color-star);
       }
       :root[data-theme="dark"] .facts span {
         background: #182220;
@@ -229,10 +229,10 @@
         border-radius: 5px;
         padding: 6px 9px;
         font-size: 12px;
-        background: #fff;
+        background: var(--color-panel);
       }
       .actions a.primary {
-        border-color: #afd2c8;
+        border-color: var(--color-accent-line);
         background: var(--color-accent-soft);
       }
       .fusion {
@@ -474,11 +474,11 @@
       }
     </style>
   <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}</style>
-<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
-<style>:root[data-theme="dark"] .project-links a,:root[data-theme="dark"] .links a,:root[data-theme="dark"] .project a,:root[data-theme="dark"] .entry a{background:var(--color-panel)!important}:root[data-theme="dark"] a.primary{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] .note{color:var(--color-ink)!important}</style>
+<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style>:root[data-theme="dark"] .project-links a,:root[data-theme="dark"] .links a,:root[data-theme="dark"] .project a,:root[data-theme="dark"] .entry a{background:var(--color-panel)!important}:root[data-theme="dark"] a.primary{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] .note{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] a{background-color:transparent}:root[data-theme="dark"] .entry a,:root[data-theme="dark"] .panel a{background:var(--color-panel)!important}</style>
 <style>:root[data-theme="dark"] .entry a:not(.primary),:root[data-theme="dark"] .panel a:not(.primary),:root[data-theme="dark"] .actions a:not(.primary){color:#7fd4bb!important}</style>
-<style>:root[data-theme="dark"] .panel a.primary,:root[data-theme="dark"] .entry a.primary,:root[data-theme="dark"] .actions a.primary{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}</style>
+<style>:root[data-theme="dark"] .panel a.primary,:root[data-theme="dark"] .entry a.primary,:root[data-theme="dark"] .actions a.primary{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}</style>
 </head>
   <body class="tk-host">
     <aside class="tk-sidebar" id="tk-sidebar"></aside>

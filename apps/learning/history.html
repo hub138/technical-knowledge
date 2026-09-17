@@ -104,7 +104,7 @@
          gets its own header row with the primary action. */
       .panel-primary {
         margin-top: 23px;
-        border-color: #b7d9cf;
+        border-color: var(--color-accent-line);
       }
       .panel-head {
         display: flex;
@@ -139,7 +139,7 @@
         grid-template-columns: minmax(72px, max-content) 1fr;
         gap: 14px;
         padding: 15px;
-        background: #fff;
+        background: var(--color-panel);
       }
       .stage + .stage {
         border-top: 1px solid var(--color-line);
@@ -158,7 +158,7 @@
         padding: 14px 16px;
         background: var(--color-warm-soft);
         border-left: 3px solid var(--color-warm);
-        color: #6b4b30;
+        color: var(--color-warm-ink);
       }
       .callout b {
         display: block;
@@ -175,16 +175,16 @@
         border: 1px solid var(--color-line);
         border-radius: 5px;
         padding: 7px 10px;
-        background: #fff;
+        background: var(--color-panel);
         font-size: 12px;
         font-weight: 700;
       }
       .button.primary {
-        border-color: #b7d9cf;
+        border-color: var(--color-accent-line);
         background: var(--color-accent-soft);
       }
       .button.blue {
-        border-color: #c8daed;
+        border-color: var(--color-info-soft);
         background: var(--color-info-soft);
         color: var(--color-info);
       }
@@ -198,7 +198,7 @@
       .rules li {
         padding: 11px 12px;
         border: 1px solid var(--color-line);
-        background: #fff;
+        background: var(--color-panel);
         color: var(--color-muted);
         font-size: 13px;
       }
@@ -229,13 +229,13 @@
         padding: 17px 19px;
         border: 1px solid var(--color-line);
         border-radius: 6px;
-        background: #fff;
+        background: var(--color-panel);
         transition:
           border-color 0.14s ease,
           box-shadow 0.14s ease;
       }
       .job:hover {
-        border-color: #b7d9cf;
+        border-color: var(--color-accent-line);
         box-shadow: 0 4px 14px #23302b10;
       }
       .job-clickable {
@@ -281,17 +281,17 @@
         white-space: nowrap;
       }
       .job-state.ok {
-        border-color: #b7d9cf;
+        border-color: var(--color-accent-line);
         background: var(--color-accent-soft);
         color: var(--color-accent);
       }
       .job-state.fail {
-        border-color: #e6c8ad;
+        border-color: var(--color-warm-line);
         background: var(--color-warm-soft);
         color: var(--color-warm);
       }
       .job-state.running {
-        border-color: #c8daed;
+        border-color: var(--color-info-soft);
         background: var(--color-info-soft);
         color: var(--color-info);
       }
@@ -339,10 +339,10 @@
       }
     </style>
   <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}</style>
-<style>:root[data-theme="dark"] .job-state.fail{color:#8a4a17!important;color:#8a4a17;background:var(--color-warm-soft)!important;color:#f0c39a!important;border-color:#5c4a2e!important}:root[data-theme="dark"] .job-state.ok{background:var(--color-accent-soft)!important;color:var(--color-accent)!important}</style>
-<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style>:root[data-theme="dark"] .job-state.fail{color:var(--color-warm-ink)!important;color:var(--color-warm-ink);background:var(--color-warm-soft)!important;color:#f0c39a!important;border-color:var(--color-warm-ink)!important}:root[data-theme="dark"] .job-state.ok{background:var(--color-accent-soft)!important;color:var(--color-accent)!important}</style>
+<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] .callout{color:var(--color-ink)!important}:root[data-theme="dark"] .callout b{color:var(--color-ink)!important}</style>
-<style>.job-state.fail{color:#8a4a17!important}</style>
+<style>.job-state.fail{color:var(--color-warm-ink)!important}</style>
 </head>
   <body class="tk-host">
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
