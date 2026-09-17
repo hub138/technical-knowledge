@@ -1033,6 +1033,31 @@ class Handler(BaseHTTPRequestHandler):
             )
             self.end_headers()
             return
+        # ── 中台：只认本机，且必须在 require_access 之前判断 ─────────────
+        # 它列出访客 IP 和谁说了什么，是运营者界面，不是知识库的一部分。
+        # 关键：不能只依赖 require_access —— 那个判断把"持有站点密码的局域网
+        # 用户"也算已认证，于是任何拿到密码的人都能读到中台的 403/401 之前
+        # 就被放行。这里按来源地址直接拒绝，密码不再能解锁。
+        if path == "/insights" or path.startswith("/api/insights/"):
+            if not is_local_client(self.client_address[0]):
+                self.send_json(
+                    {"error": "insights is only available from this machine"}, 403
+                )
+                return
+
+        # 这个接口必须在鉴权之前：导航栏要据此决定"要不要显示中台入口"。
+        # 未登录的访客以前会拿到 401，于是前端拿不到 local_client，
+        # 中台入口的显示就变成了"碰巧不显示"而不是明确判断。
+        # 它只回一个布尔，不泄露内容。
+        if path == "/api/access":
+            self.send_json(
+                {
+                    "local_client": is_local_client(self.client_address[0]),
+                    "knowledge_public": True,
+                    "tool_launch_requires_auth": not self.is_authenticated(),
+                }
+            )
+            return
         if not self.require_access():
             return
         if path in {"/", "/index.html"}:
@@ -1116,28 +1141,6 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/learning/openmaic-jobs":
             self.send_json({"jobs": openmaic_generation_jobs()})
             return
-        if path == "/api/access":
-            self.send_json(
-                {
-                    "local_client": is_local_client(self.client_address[0]),
-                    "knowledge_public": True,
-                    "tool_launch_requires_auth": not self.is_authenticated(),
-                }
-            )
-            return
-        # ── 中台数据 ───────────────────────────────────────────────────────
-        # 这是运营者自己的界面，不是知识库的一部分：它列出访客 IP 和谁说了
-        # 什么。之前只走 require_access()，而那个判断把"持有站点密码的局域网
-        # 用户"也算已认证 —— 等于把所有人的访问记录和反馈暴露给任何拿到密码
-        # 的人。现在只认本机回环/本机网卡，密码不再能解锁它。
-        # 聚合只在访问时计算。数据量是"一个人读知识库"的量级，
-        # 预先建索引或缓存反而是多余的复杂度。
-        if path == "/insights" or path.startswith("/api/insights/"):
-            if not is_local_client(self.client_address[0]):
-                self.send_json(
-                    {"error": "insights is only available from this machine"}, 403
-                )
-                return
         if path == "/insights":
             try:
                 payload = PUBLIC_INSIGHTS.read_bytes()

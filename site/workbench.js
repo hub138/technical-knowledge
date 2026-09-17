@@ -23,6 +23,16 @@
       title: "把判断绑定到证据",
       description: "自研评估项目的设计与后续实现入口。",
     },
+    /* 中台只对本机开放。它的入口不在 MAIN_NAV 里，而是按访问来源动态加入：
+       别人的浏览器上看不到，本机打开就有。 */
+    insights: {
+      label: "访问与反馈",
+      href: "/insights",
+      icon: "◔",
+      title: "谁读过、提了什么",
+      description: "本机访问记录与读者反馈，只在这台机器上可见。",
+      localOnly: true,
+    },
     /* Learning lives under 项目与教学 rather than in the main nav: a classroom
        is a tool you reach for, not a second way to browse knowledge. The
        sub-links keep both pages reachable once you are inside that section. */
@@ -91,6 +101,30 @@
   `;
   document.body.classList.add("wb-host");
   document.body.insertBefore(aside, document.body.firstChild);
+
+  /* 中台入口只在本机出现。/api/access 由服务端按来源判断，
+     别人的浏览器拿到 local_client:false，链接就不会被加进来。
+     这样运营界面不会出现在访客的导航里，而在这台机器上一直在。 */
+  fetch("/api/access", { cache: "no-store" })
+    .then((response) => (response.ok ? response.json() : {}))
+    .then((access) => {
+      if (!access || !access.local_client) return;
+      const items = aside.querySelectorAll(".wb-nav a");
+      const last = items[items.length - 1];
+      if (!last) return;
+      const item = pages.insights;
+      const link = document.createElement("a");
+      link.href = item.href;
+      link.title = `${item.title}：${item.description}`;
+      if (current === item) link.setAttribute("aria-current", "page");
+      link.innerHTML =
+        `<span class="wb-nav-icon" aria-hidden="true">${item.icon}</span>` +
+        `<span>${item.label}</span>`;
+      last.insertAdjacentElement("afterend", link);
+    })
+    .catch(() => {
+      /* 取不到就不显示，宁可少一个入口也不要给访客看运营页面 */
+    });
 
   /* The theme toggle is pinned to the top-right of the viewport rather than
      living in the sidebar footer, so it sits in the same place on every page
