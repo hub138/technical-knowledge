@@ -268,7 +268,7 @@
       <div class="tk-sidebar-footer">
         ${opts.auth ? '<div class="tk-sidebar-links"><a href="/auth/logout">退出</a></div>' : ""}
         <button type="button" class="tk-lang-toggle" data-tk-lang-toggle>
-          <span aria-hidden="true">⌘</span><span data-tk-lang-label>中文</span>
+          <span class="tk-lang-globe" aria-hidden="true">◐</span><span data-tk-lang-label>中文</span>
         </button>
       </div>
     `;

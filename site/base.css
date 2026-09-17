@@ -118,10 +118,34 @@ body.tk-host::before {
     color var(--duration-fast) var(--ease-out);
 }
 
+/* The current page gets a tinted pill and a left marker. The marker is what
+   makes it legible without relying on colour alone, which matters for anyone
+   who does not separate this green from the surrounding greys. */
 .tk-nav a:hover,
 .tk-nav a[aria-current="page"] {
   border-color: var(--color-accent-line);
   background: var(--color-accent-soft);
+  color: var(--color-accent-ink);
+}
+
+.tk-nav a[aria-current="page"] {
+  position: relative;
+  font-weight: var(--weight-semibold);
+}
+
+.tk-nav a[aria-current="page"]::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 3px;
+  height: 17px;
+  transform: translateY(-50%);
+  border-radius: 0 2px 2px 0;
+  background: var(--color-accent);
+}
+
+.tk-nav a[aria-current="page"] .tk-nav-icon {
   color: var(--color-accent);
 }
 
@@ -256,9 +280,10 @@ body.tk-host::before {
   color: var(--color-accent);
 }
 
-.tk-lang-toggle > span[aria-hidden] {
-  font-size: 11px;
-  opacity: 0.7;
+.tk-lang-globe {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.65;
 }
 
 .tk-sidebar-footer a { color: inherit; text-decoration: none; }
