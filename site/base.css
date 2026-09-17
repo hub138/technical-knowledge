@@ -70,7 +70,7 @@ body.tk-host::before {
 .tk-sidebar {
   position: fixed;
   inset: 0 auto 0 0;
-  z-index: 10;
+  z-index: var(--z-sidebar);
   width: var(--sidebar-width);
   padding: 21px 15px 20px;
   display: flex;
@@ -478,7 +478,7 @@ body.tk-host button {
   position: fixed;
   top: 18px;
   right: 22px;
-  z-index: 20;
+  z-index: var(--z-fab);
   padding: 8px 13px;
   background: var(--color-panel);
 }
@@ -491,7 +491,7 @@ body.tk-host button {
   position: fixed;
   right: 22px;
   bottom: 22px;
-  z-index: 21;
+  z-index: var(--z-fab);
   width: 52px;
   height: 52px;
   border-radius: 50%;
