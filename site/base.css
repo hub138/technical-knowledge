@@ -31,7 +31,40 @@
 body.tk-host {
   min-height: 100vh;
   padding-left: var(--sidebar-width);
-  background: var(--color-bg);
+  /* The colour is the base and the wash sits on top of it. Using the gradient
+     alone leaves background-color transparent, which breaks anything that asks
+     what colour a given pixel is — the contrast audit walks up the tree looking
+     for an opaque ancestor and finds none. */
+  background-color: var(--color-bg);
+  background-image: var(--wash-page);
+  background-attachment: fixed;
+}
+
+/* Grain. An SVG turbulence tile at very low opacity, laid over the page wash.
+   A large flat fill looks digital; a little noise removes that without being
+   visible as texture. Kept out of the content layer so it never sits between
+   the reader and the text. */
+body.tk-host::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Everything that carries content sits above the grain. */
+.tk-sidebar,
+.tk-shell,
+.content,
+.main { position: relative; z-index: 1; }
+
+/* The sidebar is its own surface — it gets the panel wash, not the page wash. */
+.tk-sidebar {
+  background-color: var(--color-panel);
+  background-image: var(--wash-panel);
+  position: fixed;
 }
 
 .tk-sidebar {
@@ -303,8 +336,28 @@ body.tk-host a:hover { text-decoration: none; }
 .analysis-card {
   border-color: var(--color-line);
   border-radius: var(--radius-sm);
-  box-shadow: var(--shadow-xs);
-  background: var(--color-panel);
+  /* Two shadows, not one: the outer shadow lifts the card off the page, the
+     inset hairline catches light along the top edge. One shadow alone leaves
+     the card looking like a rectangle someone drew. */
+  box-shadow: var(--hairline-top), var(--shadow-xs);
+  background-color: var(--color-panel);
+  background-image: var(--wash-panel);
+  transition:
+    border-color var(--duration-base) var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out),
+    transform var(--duration-base) var(--ease-out);
+}
+
+/* Cards that are links or clickable surfaces acknowledge the pointer. Only
+   those — a static card that lifts on hover promises an interaction that is
+   not there. */
+a.card:hover,
+.project:hover,
+.service:hover,
+.analysis-card:hover {
+  border-color: var(--color-line-strong);
+  box-shadow: var(--hairline-top), var(--shadow-md);
+  transform: translateY(-2px);
 }
 
 /* Striped/inline layouts read as a single block, so they carry no radius. */

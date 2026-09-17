@@ -17,7 +17,7 @@
 .claim-list{display:grid;gap:6px;margin:0;padding-left:18px;color:var(--color-ink-soft);font-size:var(--text-small);line-height:1.7}
 .claim-list b{color:var(--color-ink)}
 .claim-links{display:flex;flex-wrap:wrap;gap:16px;margin:2px 0 0;font-size:var(--text-small);font-weight:var(--weight-semibold)}
-.domain-card:hover{border-color:var(--color-accent-line);box-shadow:var(--shadow-sm)}
+.domain-card{transition:border-color var(--duration-base) var(--ease-out),box-shadow var(--duration-base) var(--ease-out),transform var(--duration-base) var(--ease-out)}.domain-card:hover{border-color:var(--color-accent-line);box-shadow:var(--hairline-top),var(--shadow-md);transform:translateY(-2px)}
 .domain-card h3{margin:0;font-size:var(--text-lg);font-weight:var(--weight-bold);color:var(--color-ink)}
 .domain-card p{margin:0;color:var(--color-muted);font-size:var(--text-sm);line-height:var(--leading-normal);max-width:38ch}
 /* 计数不是装饰：它给出"这个领域有多少东西"这一唯一事实，
