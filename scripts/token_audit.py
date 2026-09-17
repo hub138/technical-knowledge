@@ -63,12 +63,22 @@ def main() -> None:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args()
 
-    tokens_file = ROOT / "site" / "tokens.css"
-    defined: set[str] = set()
-    for rel in ("site/tokens.css", "site/base.css"):
-        path = ROOT / rel
-        if path.is_file():
-            defined |= set(DEFINE.findall(path.read_text(encoding="utf-8")))
+    # Defined per theme, because a token that exists only in the dark block
+    # leaves the light theme silently broken — and the union of the two looks
+    # complete, which is how a check like this gives a false pass. Colours are
+    # the tokens that must be declared in both.
+    tokens_css = (ROOT / "site" / "tokens.css").read_text(encoding="utf-8")
+    dark_at = tokens_css.find(':root[data-theme="dark"]')
+    light_block = tokens_css[:dark_at] if dark_at > 0 else tokens_css
+    dark_block = tokens_css[dark_at:] if dark_at > 0 else ""
+
+    defined_light = set(DEFINE.findall(light_block))
+    defined_dark = set(DEFINE.findall(dark_block))
+    # base.css carries structural tokens (spacing, type) that are theme-neutral.
+    base_css = (ROOT / "site" / "base.css").read_text(encoding="utf-8")
+    defined_shared = set(DEFINE.findall(base_css))
+
+    defined = defined_light | defined_dark | defined_shared
 
     used: dict[str, list[str]] = {}
     for rel in SOURCES:
@@ -85,6 +95,15 @@ def main() -> None:
         if name not in defined and name not in BUILT_IN
     }
 
+    # Colour tokens must be declared in both themes. Structural ones (spacing,
+    # type scale, z-index) live in one place and are excluded.
+    colour_tokens = {n for n in used if n.startswith("--color-")}
+    one_sided = {
+        name: ("light" if name in defined_light else "dark")
+        for name in sorted(colour_tokens)
+        if name not in defined_light or name not in defined_dark
+    }
+
     # A token defined but never referenced is dead weight rather than a bug, so
     # it is reported separately and does not fail the run.
     unused = sorted(n for n in defined if n not in used and n not in BUILT_IN)
@@ -94,6 +113,7 @@ def main() -> None:
             "defined": len(defined),
             "referenced": len(used),
             "undefined": missing,
+            "one_sided": one_sided,
             "unused": unused,
         }, ensure_ascii=False, indent=2))
         return
@@ -116,7 +136,17 @@ def main() -> None:
         print("  transparent / initial rather than failing loudly.")
         sys.exit(1)
 
-    print("  every referenced custom property is defined")
+    if one_sided:
+        print(f"  {len(one_sided)} colour token(s) declared in only one theme:")
+        print()
+        for name, where in one_sided.items():
+            print(f"    {name}  (only in {where})")
+        print()
+        print("  A colour defined for one theme leaves the other rendering with a")
+        print("  dropped declaration, which no error surfaces.")
+        sys.exit(1)
+
+    print("  every referenced custom property is defined, in both themes")
     if unused:
         print()
         print(f"  {len(unused)} defined but never referenced (not a failure):")
