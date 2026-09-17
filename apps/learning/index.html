@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/workbench.css" />
     <script src="/static/workbench.js" data-page="learning" defer></script>
+    <script>
+      /* 首帧前定好主题。workbench.js 是 defer，等它执行时页面已经用浅色画过一遍，
+         暗色偏好下会闪一下白，对比度审计也会抓到那一帧。 */
+      (function () {
+        var t = "light";
+        try {
+          t = localStorage.getItem("tk-theme") ||
+            (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        } catch (e) {}
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
     <style>
       
       * {
@@ -14,8 +26,8 @@
       }
       body {
         margin: 0;
-        background: var(--bg);
-        color: var(--ink);
+        background: var(--color-bg);
+        color: var(--color-ink);
         font:
           15px/1.72 -apple-system,
           BlinkMacSystemFont,
@@ -41,7 +53,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid var(--color-line);
       }
       .brand {
         display: flex;
@@ -55,7 +67,7 @@
         width: 34px;
         height: 34px;
         border-radius: 7px;
-        background: var(--green);
+        background: var(--color-ok);
         color: #fff;
       }
       .nav {
@@ -65,23 +77,23 @@
       .nav a {
         padding: 7px 10px;
         border-radius: 5px;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 13px;
       }
       .nav a:hover,
       .nav a.active {
-        background: var(--green-soft);
-        color: var(--green);
+        background: var(--color-ok-soft);
+        color: var(--color-ok);
       }
       .hero {
         display: grid;
         grid-template-columns: minmax(0, 1.25fr) minmax(310px, 0.75fr);
         gap: 36px;
         padding: 46px 0 33px;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid var(--color-line);
       }
       .eyebrow {
-        color: var(--green);
+        color: var(--color-ok);
         font-weight: 760;
         font-size: 11px;
       }
@@ -91,7 +103,7 @@
         margin: 7px 0 12px;
       }
       .hero p {
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 16px;
         max-width: 720px;
         margin: 0;
@@ -99,10 +111,10 @@
       .topic-box {
         align-self: end;
         background: #fff;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         padding: 16px;
         border-radius: 7px;
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-md);
       }
       .topic-box label {
         display: block;
@@ -117,19 +129,19 @@
       .topic-row input {
         min-width: 0;
         flex: 1;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 5px;
         padding: 9px 10px;
         outline: 0;
       }
       .topic-row input:focus {
-        border-color: var(--green);
+        border-color: var(--color-ok);
         box-shadow: 0 0 0 3px #08766316;
       }
       .topic-row button {
         border: 0;
         border-radius: 5px;
-        background: var(--green);
+        background: var(--color-ok);
         color: #fff;
         padding: 9px 13px;
         cursor: pointer;
@@ -150,7 +162,7 @@
         line-height: 1.35;
       }
       .section-head p {
-        color: var(--muted);
+        color: var(--color-muted);
         margin: 3px 0 0;
         font-size: 13px;
       }
@@ -161,14 +173,14 @@
       }
       .service {
         background: #fff;
-        border: 1px solid var(--line);
-        border-top: 3px solid var(--green);
+        border: 1px solid var(--color-line);
+        border-top: 3px solid var(--color-ok);
         border-radius: 7px;
         padding: 19px;
         box-shadow: 0 1px 2px rgba(20, 42, 35, 0.03);
       }
       .service.tutor {
-        border-top-color: var(--blue);
+        border-top-color: var(--color-info);
       }
       .service-head {
         display: flex;
@@ -181,7 +193,7 @@
       }
       .service-head p {
         font-size: 12px;
-        color: var(--muted);
+        color: var(--color-muted);
         margin: 0;
       }
       .state {
@@ -189,14 +201,14 @@
         height: max-content;
         padding: 3px 7px;
         border-radius: 4px;
-        background: var(--green-soft);
-        color: var(--green);
+        background: var(--color-ok-soft);
+        color: var(--color-ok);
         font-size: 11px;
         font-weight: 740;
       }
       .state.warn {
-        background: var(--warm-soft);
-        color: var(--warm);
+        background: var(--color-warm-soft);
+        color: var(--color-warm);
       }
       .facts {
         display: grid;
@@ -215,7 +227,7 @@
         color: #37463f;
       }
       .fact span {
-        color: var(--muted);
+        color: var(--color-muted);
       }
       .actions {
         display: flex;
@@ -224,22 +236,22 @@
       }
       .button {
         display: inline-block;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         background: #fff;
         border-radius: 5px;
         padding: 7px 10px;
-        color: var(--green);
+        color: var(--color-ok);
         font-size: 12px;
         font-weight: 700;
       }
       .button.primary {
-        background: var(--green-soft);
+        background: var(--color-ok-soft);
         border-color: #b7d9cf;
       }
       .button.blue {
-        background: var(--blue-soft);
+        background: var(--color-info-soft);
         border-color: #c8daed;
-        color: var(--blue);
+        color: var(--color-info);
       }
       .paths {
         display: grid;
@@ -249,16 +261,16 @@
         display: grid;
         grid-template-columns: 240px minmax(0, 1fr);
         background: #fff;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 7px;
         overflow: hidden;
       }
       .path-intro {
         padding: 20px;
-        border-right: 1px solid var(--line);
+        border-right: 1px solid var(--color-line);
       }
       .path-intro small {
-        color: var(--green);
+        color: var(--color-ok);
         font-weight: 750;
       }
       .path-intro h3 {
@@ -268,7 +280,7 @@
       }
       .path-intro p {
         font-size: 12px;
-        color: var(--muted);
+        color: var(--color-muted);
         margin: 0;
       }
       .steps {
@@ -280,7 +292,7 @@
         position: relative;
       }
       .step:not(:last-child) {
-        border-right: 1px solid var(--line);
+        border-right: 1px solid var(--color-line);
       }
       .step b {
         display: block;
@@ -289,25 +301,25 @@
       }
       .step p {
         font-size: 12px;
-        color: var(--muted);
+        color: var(--color-muted);
         line-height: 1.6;
         margin: 0 0 10px;
       }
       .step a {
-        color: var(--green);
+        color: var(--color-ok);
         font-size: 12px;
         font-weight: 700;
       }
       .step .tool {
         display: block;
-        color: var(--blue);
+        color: var(--color-info);
         margin-top: 5px;
       }
       .guide {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
-        border: 1px solid var(--line);
-        background: var(--line);
+        border: 1px solid var(--color-line);
+        background: var(--color-line);
         gap: 1px;
       }
       .guide article {
@@ -321,32 +333,32 @@
       }
       .guide p {
         font-size: 12px;
-        color: var(--muted);
+        color: var(--color-muted);
         margin: 0;
       }
       .guide code {
         font-size: 11px;
-        color: var(--green);
-        background: var(--green-soft);
+        color: var(--color-ok);
+        background: var(--color-ok-soft);
         padding: 2px 4px;
         border-radius: 3px;
       }
       .cost {
         padding: 15px 17px;
-        background: var(--warm-soft);
-        border-left: 3px solid var(--warm);
+        background: var(--color-warm-soft);
+        border-left: 3px solid var(--color-warm);
         font-size: 13px;
         color: #68462e;
       }
       .error {
-        color: var(--red);
+        color: var(--color-danger);
       }
       /* Sits under the topic input so returning learners reach their own
          classrooms from the same place they start a new one. */
       .topic-secondary {
         margin: 10px 0 0;
         font-size: 12px;
-        color: var(--muted);
+        color: var(--color-muted);
       }
       .topic-secondary a {
         font-weight: 700;
@@ -363,7 +375,7 @@
         }
         .path-intro {
           border-right: 0;
-          border-bottom: 1px solid var(--line);
+          border-bottom: 1px solid var(--color-line);
         }
         .steps {
           grid-template-columns: repeat(2, 1fr);
@@ -372,7 +384,7 @@
           border-right: 0;
         }
         .step:nth-child(-n + 2) {
-          border-bottom: 1px solid var(--line);
+          border-bottom: 1px solid var(--color-line);
         }
         .guide {
           grid-template-columns: 1fr;
@@ -403,7 +415,7 @@
         }
         .step {
           border-right: 0 !important;
-          border-bottom: 1px solid var(--line);
+          border-bottom: 1px solid var(--color-line);
         }
         .step:last-child {
           border-bottom: 0;
@@ -437,9 +449,9 @@
         }
       }
     </style>
-  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card{background:var(--paper)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] button.primary,:root[data-theme="dark"] .primary{color:#0e1a16!important}
+  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card{background:var(--color-panel)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] button.primary,:root[data-theme="dark"] .primary{color:#0e1a16!important}
 </style>
-<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--paper)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--ink)!important}</style>
+<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] .cost{color:#e8cba4!important}</style>
 </head>
   <body>

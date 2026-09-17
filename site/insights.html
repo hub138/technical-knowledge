@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/workbench.css" />
     <script src="/static/workbench.js" data-page="insights" defer></script>
+    <script>
+      /* 首帧前定好主题。workbench.js 是 defer，等它执行时页面已经用浅色画过一遍，
+         暗色偏好下会闪一下白，对比度审计也会抓到那一帧。 */
+      (function () {
+        var t = "light";
+        try {
+          t = localStorage.getItem("tk-theme") ||
+            (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        } catch (e) {}
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
     <style>
       /* 这一页是运营界面，只对本机开放。版式沿用全站 token：
          信息密度比阅读页高，但层级靠字号与留白表达，不靠更多颜色。 */

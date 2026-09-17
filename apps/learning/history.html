@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/workbench.css" />
     <script src="/static/workbench.js" data-page="classrooms" defer></script>
+    <script>
+      /* 首帧前定好主题。workbench.js 是 defer，等它执行时页面已经用浅色画过一遍，
+         暗色偏好下会闪一下白，对比度审计也会抓到那一帧。 */
+      (function () {
+        var t = "light";
+        try {
+          t = localStorage.getItem("tk-theme") ||
+            (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        } catch (e) {}
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
     <style>
       
       * {
@@ -14,8 +26,8 @@
       }
       body {
         margin: 0;
-        background: var(--bg);
-        color: var(--ink);
+        background: var(--color-bg);
+        color: var(--color-ink);
         font:
           15px/1.75 -apple-system,
           BlinkMacSystemFont,
@@ -24,7 +36,7 @@
           sans-serif;
       }
       a {
-        color: var(--accent);
+        color: var(--color-accent);
         text-decoration: none;
       }
       a:hover {
@@ -40,14 +52,14 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid var(--color-line);
       }
       .hero {
         padding: 46px 0 31px;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid var(--color-line);
       }
       .eyebrow {
-        color: var(--accent);
+        color: var(--color-accent);
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 0.1em;
@@ -59,7 +71,7 @@
       }
       .hero p {
         max-width: 790px;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 16px;
         margin: 0;
       }
@@ -73,11 +85,11 @@
         margin-top: 23px;
       }
       .panel {
-        background: var(--paper);
-        border: 1px solid var(--line);
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
         border-radius: 7px;
         padding: 21px;
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-md);
       }
       .panel h2 {
         margin: 0 0 7px;
@@ -102,7 +114,7 @@
       }
       .panel-head p {
         margin: 0;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 13px;
       }
       .panel-head .button {
@@ -110,12 +122,12 @@
       }
       .panel > p {
         margin: 0 0 16px;
-        color: var(--muted);
+        color: var(--color-muted);
       }
       .timeline {
         display: grid;
         gap: 0;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
       }
       .stage {
         display: grid;
@@ -125,22 +137,22 @@
         background: #fff;
       }
       .stage + .stage {
-        border-top: 1px solid var(--line);
+        border-top: 1px solid var(--color-line);
       }
       .stage strong {
-        color: var(--accent);
+        color: var(--color-accent);
         font-size: 13px;
       }
       .stage p {
         margin: 0;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 13px;
       }
       .callout {
         margin-top: 14px;
         padding: 14px 16px;
-        background: var(--warm-soft);
-        border-left: 3px solid var(--warm);
+        background: var(--color-warm-soft);
+        border-left: 3px solid var(--color-warm);
         color: #6b4b30;
       }
       .callout b {
@@ -155,7 +167,7 @@
       }
       .button {
         display: inline-block;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 5px;
         padding: 7px 10px;
         background: #fff;
@@ -164,12 +176,12 @@
       }
       .button.primary {
         border-color: #b7d9cf;
-        background: var(--soft);
+        background: var(--color-accent-soft);
       }
       .button.blue {
         border-color: #c8daed;
-        background: var(--blue-soft);
-        color: var(--blue);
+        background: var(--color-info-soft);
+        color: var(--color-info);
       }
       .rules {
         display: grid;
@@ -180,13 +192,13 @@
       }
       .rules li {
         padding: 11px 12px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         background: #fff;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 13px;
       }
       .rules b {
-        color: var(--ink);
+        color: var(--color-ink);
       }
       .jobs {
         display: grid;
@@ -210,7 +222,7 @@
         gap: 16px;
         align-items: center;
         padding: 17px 19px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 6px;
         background: #fff;
         transition:
@@ -230,23 +242,23 @@
         text-decoration: none;
       }
       .job-clickable .job-title {
-        color: var(--accent);
+        color: var(--color-accent);
       }
       .job-title {
         margin: 0;
         font-size: 16px;
         font-weight: 700;
         line-height: 1.4;
-        color: var(--ink);
+        color: var(--color-ink);
       }
       .job-meta {
         margin: 5px 0 0;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 12.5px;
         line-height: 1.6;
       }
       .job-meta .job-id {
-        color: var(--muted);
+        color: var(--color-muted);
         font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
         font-size: 12px;
       }
@@ -256,27 +268,27 @@
         justify-content: center;
         min-width: 74px;
         padding: 4px 7px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 4px;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 11px;
         font-weight: 750;
         white-space: nowrap;
       }
       .job-state.ok {
         border-color: #b7d9cf;
-        background: var(--soft);
-        color: var(--accent);
+        background: var(--color-accent-soft);
+        color: var(--color-accent);
       }
       .job-state.fail {
         border-color: #e6c8ad;
-        background: var(--warm-soft);
-        color: var(--warm);
+        background: var(--color-warm-soft);
+        color: var(--color-warm);
       }
       .job-state.running {
         border-color: #c8daed;
-        background: var(--blue-soft);
-        color: var(--blue);
+        background: var(--color-info-soft);
+        color: var(--color-info);
       }
       .job-link,
       .job-cta {
@@ -284,12 +296,12 @@
         margin-top: 6px;
         font-size: 12px;
         font-weight: 750;
-        color: var(--accent);
+        color: var(--color-accent);
       }
       .job-empty {
         padding: 13px;
-        border: 1px dashed var(--line);
-        color: var(--muted);
+        border: 1px dashed var(--color-line);
+        color: var(--color-muted);
         font-size: 12px;
       }
       @media (max-width: 560px) {
@@ -322,10 +334,10 @@
         }
       }
     </style>
-  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
-<style>:root[data-theme="dark"] .job-state.fail{color:#8a4a17!important;color:#8a4a17;background:var(--warm-soft)!important;color:#f0c39a!important;border-color:#5c4a2e!important}:root[data-theme="dark"] .job-state.ok{background:var(--accent-soft)!important;color:var(--accent)!important}</style>
-<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--paper)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--ink)!important}</style>
-<style>:root[data-theme="dark"] .callout{color:var(--ink)!important}:root[data-theme="dark"] .callout b{color:var(--ink)!important}</style>
+  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}</style>
+<style>:root[data-theme="dark"] .job-state.fail{color:#8a4a17!important;color:#8a4a17;background:var(--color-warm-soft)!important;color:#f0c39a!important;border-color:#5c4a2e!important}:root[data-theme="dark"] .job-state.ok{background:var(--color-accent-soft)!important;color:var(--color-accent)!important}</style>
+<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style>:root[data-theme="dark"] .callout{color:var(--color-ink)!important}:root[data-theme="dark"] .callout b{color:var(--color-ink)!important}</style>
 <style>.job-state.fail{color:#8a4a17!important}</style>
 </head>
   <body>

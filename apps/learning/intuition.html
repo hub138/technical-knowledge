@@ -7,6 +7,18 @@
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/workbench.css" />
     <script src="/static/workbench.js" data-page="learning" defer></script>
+    <script>
+      /* 首帧前定好主题。workbench.js 是 defer，等它执行时页面已经用浅色画过一遍，
+         暗色偏好下会闪一下白，对比度审计也会抓到那一帧。 */
+      (function () {
+        var t = "light";
+        try {
+          t = localStorage.getItem("tk-theme") ||
+            (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        } catch (e) {}
+        document.documentElement.dataset.theme = t;
+      })();
+    </script>
     <style>
       
       * {
@@ -14,8 +26,8 @@
       }
       body {
         margin: 0;
-        background: var(--bg);
-        color: var(--ink);
+        background: var(--color-bg);
+        color: var(--color-ink);
         font:
           15px/1.75 -apple-system,
           BlinkMacSystemFont,
@@ -24,7 +36,7 @@
           sans-serif;
       }
       a {
-        color: var(--accent);
+        color: var(--color-accent);
         text-decoration: none;
       }
       a:hover {
@@ -40,7 +52,7 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid var(--color-line);
       }
       .hero {
         display: grid;
@@ -48,13 +60,13 @@
         gap: 28px;
         align-items: end;
         padding: 42px 0 28px;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid var(--color-line);
       }
       .hero > * {
         min-width: 0;
       }
       .eyebrow {
-        color: var(--accent);
+        color: var(--color-accent);
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 0.1em;
@@ -66,7 +78,7 @@
       }
       .hero-text p {
         max-width: 790px;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 16px;
         margin: 0;
       }
@@ -74,8 +86,8 @@
         padding: 17px;
         border: 1px solid #b7d9cf;
         border-radius: 7px;
-        background: var(--soft);
-        box-shadow: var(--shadow);
+        background: var(--color-accent-soft);
+        box-shadow: var(--shadow-md);
       }
       .hero-card strong {
         display: block;
@@ -84,7 +96,7 @@
       }
       .hero-card p {
         margin: 0;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 12px;
         line-height: 1.65;
       }
@@ -101,11 +113,11 @@
         margin-top: 23px;
       }
       .panel {
-        background: var(--paper);
-        border: 1px solid var(--line);
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
         border-radius: 7px;
         padding: 21px;
-        box-shadow: var(--shadow);
+        box-shadow: var(--shadow-md);
       }
       .panel h2 {
         margin: 0 0 7px;
@@ -113,13 +125,13 @@
       }
       .panel > p {
         margin: 0 0 16px;
-        color: var(--muted);
+        color: var(--color-muted);
       }
       .steps {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
-        border: 1px solid var(--line);
-        background: var(--line);
+        border: 1px solid var(--color-line);
+        background: var(--color-line);
         gap: 1px;
       }
       .step {
@@ -133,19 +145,19 @@
       }
       .step p {
         margin: 0;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 13px;
       }
       .step small {
         display: block;
         margin-top: 10px;
-        color: var(--accent);
+        color: var(--color-accent);
         font-weight: 700;
       }
       .callout {
         padding: 14px 16px;
-        background: var(--warm-soft);
-        border-left: 3px solid var(--warm);
+        background: var(--color-warm-soft);
+        border-left: 3px solid var(--color-warm);
         color: #6b4b30;
       }
       .callout b {
@@ -160,7 +172,7 @@
       }
       .button {
         display: inline-block;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 5px;
         padding: 7px 10px;
         background: #fff;
@@ -169,7 +181,7 @@
       }
       .button.primary {
         border-color: #b7d9cf;
-        background: var(--soft);
+        background: var(--color-accent-soft);
       }
       .examples {
         display: grid;
@@ -179,9 +191,9 @@
       }
       .example {
         padding: 13px 14px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 6px;
-        background: var(--paper);
+        background: var(--color-panel);
       }
       .example b {
         display: block;
@@ -189,7 +201,7 @@
         font-size: 13px;
       }
       .example span {
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 12px;
         line-height: 1.6;
       }
@@ -220,8 +232,8 @@
         }
       }
     </style>
-  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
-<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--paper)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--ink)!important}</style>
+  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}</style>
+<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 </head>
   <body>
     <div class="shell">

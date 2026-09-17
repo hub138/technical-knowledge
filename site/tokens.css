@@ -258,6 +258,19 @@ time,
   border-radius: var(--radius-xs);
 }
 
+/* 基础链接样式。之前没有任何全局规则，凡是没被组件单独覆盖的 <a>
+ * 都会退回浏览器默认蓝 (rgb(0,0,238))，在深色底上几乎看不清。 */
+a {
+  color: var(--color-accent);
+  text-decoration-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+  text-decoration-color: currentColor;
+}
+
 ::selection {
   background: var(--color-accent-soft);
   color: var(--color-accent-ink);
