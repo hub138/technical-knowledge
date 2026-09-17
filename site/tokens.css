@@ -29,14 +29,14 @@
 
   /* ── Text, by descending emphasis ───────────────────────────────────── */
   --color-ink: #1f2a27; /* headings, primary content */
-  --color-ink-soft: #3d4a45; /* body text inside dense tables */
+  --color-ink-soft: #2f3a35; /* body text inside dense tables */
   /* #68746f read at 4.34:1 on --color-surface, just under the 4.5:1 WCAG AA
    * floor for body text, and the contrast audit flagged it. Darkened along the
    * same hue so it passes on every surface we actually use. */
-  --color-muted: #616d68; /* secondary text, labels */
+  --color-muted: #4a554f; /* 次要文字。取 6.9-7.8 对比度，不是刚好过 4.5 的及格线 */
   /* 只用于非文字（图标、分隔线、装饰）。它按设计比 --color-muted 低一档，
    * 小字用它会掉到 WCAG AA 以下 —— 时间戳、计数请用 --color-muted。 */
-  --color-faint: #7c8883;
+  --color-faint: #6f7a75;
 
   /* ── Borders ────────────────────────────────────────────────────────── */
   --color-line: #dbe2de; /* default hairline */
@@ -160,10 +160,10 @@
   --color-overlay: rgba(6, 10, 9, 0.62);
 
   --color-ink: #e6ede9;
-  --color-ink-soft: #cdd9d4;
-  --color-muted: #93a29c;
+  --color-ink-soft: #d5e0db;
+  --color-muted: #a3b1ab;  /* 与浅色档对齐：7.2-7.9 */
   /* 同浅色：非文字专用。 */
-  --color-faint: #8b9993;
+  --color-faint: #8a9892;
 
   --color-line: #2b3733;
   --color-line-strong: #3d4d47;
