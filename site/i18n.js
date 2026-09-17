@@ -85,6 +85,14 @@
     // ── Search + shortcuts ──
     "搜索知识、机制、项目或来源": { en: "Search knowledge, mechanisms, projects, sources" },
     "快捷键": { en: "Shortcuts" },
+    "键盘快捷键": { en: "Keyboard shortcuts" },
+    "阅读时不必离开键盘。Esc 随时关闭本面板。": {
+      en: "Read without leaving the keyboard. Esc closes this panel at any time.",
+    },
+    "关闭": { en: "Close" },
+    "然后": { en: "then" },
+    "归档": { en: "Archive" },
+    "保留资料": { en: "Kept for reference" },
     "查看键盘快捷键": { en: "Keyboard shortcuts" },
     "聚焦搜索框": { en: "Focus the search box" },
     "清空搜索，或从文章返回目录": { en: "Clear the search, or leave an article" },

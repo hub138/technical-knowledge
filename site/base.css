@@ -555,7 +555,7 @@ body.tk-host button {
   width: min(520px, 100%);
   max-height: 86vh;
   overflow: auto;
-  background: var(--color-panel);
+  background: var(--color-raised);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
   padding: 22px 24px;
