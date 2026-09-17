@@ -806,12 +806,14 @@ class NavigationContractTests(unittest.TestCase):
         # The nav is now multi-line so 访问与反馈 can join it. Assert the
         # membership rather than the exact formatting.
         self.assertIn("const nav = [", shared_script)
+        # 中台 (/insights) 刻意不在公开导航里：它列出访客 IP 和反馈内容，
+        # 只对本机开放。把它放回导航等于把运营界面给读者看。
+        self.assertNotIn("insights", shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
         for entry in (
             "pages.knowledge",
             "pages.graph",
             "pages.projects",
             "pages.evaluation",
-            "pages.insights",
         ):
             self.assertIn(entry, shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
         self.assertNotIn('target="_blank" rel="noopener noreferrer"', shared_script)
@@ -838,20 +840,24 @@ class NavigationContractTests(unittest.TestCase):
         self.assertNotIn(".wb-brand-text strong", shared)
         # The workbench sidebar and the main site's .app grid must agree, or the
         # nav visibly changes width when you click through to 项目与教学.
-        self.assertIn("padding-left: 286px", shared)
-        self.assertIn("width: 286px", shared)
-        self.assertIn("grid-template-columns:286px", self.home)
+        # 两站必须读同一个宽度变量。之前各写各的（286 与 260），
+        # 点导航时整块侧边栏会跳宽。
+        self.assertIn("padding-left: var(--sidebar-width)", shared)
+        self.assertIn("width: var(--sidebar-width)", shared)
+        self.assertIn("grid-template-columns:var(--sidebar-width)", self.home)
 
         self.assertIn('label: "知识图谱"', shared_script)
         # The nav is now multi-line so 访问与反馈 can join it. Assert the
         # membership rather than the exact formatting.
         self.assertIn("const nav = [", shared_script)
+        # 中台 (/insights) 刻意不在公开导航里：它列出访客 IP 和反馈内容，
+        # 只对本机开放。把它放回导航等于把运营界面给读者看。
+        self.assertNotIn("insights", shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
         for entry in (
             "pages.knowledge",
             "pages.graph",
             "pages.projects",
             "pages.evaluation",
-            "pages.insights",
         ):
             self.assertIn(entry, shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
         self.assertNotIn("knowledge: [pages.graph]", shared_script)

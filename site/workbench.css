@@ -11,7 +11,7 @@ body.wb-host {
   min-height: 100vh;
   /* 与主站的 .app grid 保持一致（286px）。这里是 fixed 侧边栏要自己留位置，
      两处宽度一旦不同，点「项目与教学」时导航栏会突然变窄。 */
-  padding-left: 286px;
+  padding-left: var(--sidebar-width);
   background: var(--wb-bg);
 }
 
@@ -20,7 +20,7 @@ body.wb-host {
   inset: 0 auto 0 0;
   z-index: 10;
   /* 与主站 .app 的 286px 一致，避免跨页导航时宽度跳动 */
-  width: 286px;
+  width: var(--sidebar-width);
   padding: 25px 16px 20px;
   display: flex;
   flex-direction: column;
@@ -60,7 +60,6 @@ body.wb-host {
 .wb-nav-icon {
   width: 18px;
   color: currentColor;
-  font-size: 14px;
   text-align: center;
 }
 

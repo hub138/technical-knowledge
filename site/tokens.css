@@ -70,6 +70,10 @@
   --color-star-line: #e2d3a8;
 
   /* ── Space. 4px base; pick the nearest step, never a raw value. ─────── */
+  /* 唯一的侧边栏宽度。主站和工作台都读它 —— 之前两处各写各的
+     （286px 与 260px），点导航时整块宽度会跳。 */
+  --sidebar-width: 286px;
+
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -291,6 +295,39 @@ time,
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* ── 共享导航组件 ────────────────────────────────────────────────────────
+ * 主站 (.shared-nav) 与工作台 (.wb-nav) 各写了一份同样的数值，但行高和图标
+ * 字号不同，导致同一个导航项在两个页面相差 3.7px —— 点导航时高度会跳。
+ * 图标必须参与行盒计算，所以这里把它压到与文字同高。
+ */
+.nav-item,
+.wb-nav a,
+.shared-nav a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 38px;
+  padding: var(--space-2) 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.nav-item-icon,
+.wb-nav-icon,
+.shared-nav .sn-icon {
+  flex: none;
+  width: 18px;
+  /* 与文字同字号：大一号会把行盒撑高，导航项就跟着变高。 */
+  font-size: 1em;
+  line-height: 1;
+  text-align: center;
+  color: currentColor;
 }
 
 /* ── Legacy aliases ──────────────────────────────────────────────────────

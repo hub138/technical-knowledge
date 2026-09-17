@@ -196,8 +196,13 @@ LOGIN_HTML = r'''<!doctype html>
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}
 main{width:min(420px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 16px 40px #23302b14}h1{font-size:21px;margin:0 0 7px}p{color:var(--muted);margin:0 0 21px}label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:7px;font:inherit;outline:0}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #13776620}button{width:100%;margin-top:16px;padding:11px 13px;border:0;border-radius:7px;background:var(--accent);color:white;font:600 14px inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.error{min-height:24px;color:#ad3e4f;margin:13px 0 0;font-size:13px}
 </style></head><body><main><h1>工程知识库</h1><p>此地址来自其他设备，请输入访问密码。</p><form id="form"><label for="password">访问密码</label><input id="password" type="password" autocomplete="current-password" autofocus required><button id="submit" type="submit">进入知识库</button><div class="error" id="error" role="alert"></div></form></main><script>
-const next=new URLSearchParams(location.search).get('next')||'/';const form=document.querySelector('#form');const input=document.querySelector('#password');const button=document.querySelector('#submit');const error=document.querySelector('#error');
-form.addEventListener('submit',async event=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:input.value})});if(!response.ok)throw new Error('invalid');location.replace(next.startsWith('/')?next:'/')}catch{error.textContent='密码不正确';input.value='';input.focus()}finally{button.disabled=false}});
+const next=new URLSearchParams(location.search).get('next')||'/';
+/* `//evil.com` 以 '/' 开头，但它跳到别的站点。startsWith 挡不住，
+   必须比 origin 与 pathname。 */
+const safeNext=(()=>{try{const target=new URL(next,location.origin);
+return target.origin===location.origin&&target.pathname.startsWith('/')
+?target.pathname+target.search+target.hash:'/'}catch{return '/'}})();const form=document.querySelector('#form');const input=document.querySelector('#password');const button=document.querySelector('#submit');const error=document.querySelector('#error');
+form.addEventListener('submit',async event=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:input.value})});if(!response.ok)throw new Error('invalid');location.replace(safeNext)}catch{error.textContent='密码不正确';input.value='';input.focus()}finally{button.disabled=false}});
 </script></body></html>'''
 
 
@@ -891,392 +896,6 @@ def render_markdown(body: str, vault: Vault, current: str) -> str:
     return "\n".join(out)
 
 
-INDEX_HTML = r'''<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>工程知识库</title>
-<style>
-:root{--bg:#f3f5f2;--panel:#fff;--text:#202826;--muted:#68736f;--line:#d9dfdb;--accent:#137766;--accent2:#a14e32;--warn:#9b6816;--danger:#ad3e4f;--shadow:0 10px 30px rgba(35,48,43,.07)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}.app{max-width:1540px;margin:0 auto;padding:22px 24px 48px}.topbar{display:flex;align-items:center;gap:18px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px;min-width:270px}.mark{width:34px;height:34px;border:1px solid #2d8979;border-radius:8px;display:grid;place-items:center;color:var(--accent);font-weight:800}.brand h1{font-size:18px;letter-spacing:0;margin:0}.search{flex:1;position:relative}.search input{width:100%;background:#fff;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:11px 15px 11px 40px;outline:0}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #13776618}.search span{position:absolute;left:14px;top:8px;color:var(--muted);font-size:18px}.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px}.sidebar,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}.sidebar{padding:17px;height:max-content;position:sticky;top:18px}.side-title{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);margin:4px 0 9px}.side-item{display:flex;align-items:center;justify-content:space-between;color:#43504c;padding:7px 9px;border-radius:6px;cursor:pointer}.side-item:hover,.side-item.active{background:#e3efeb;color:#0e5f51}.count{font-size:11px;color:var(--muted);background:#edf0ed;padding:1px 7px;border-radius:20px}.main{min-width:0}.toolbar{display:flex;align-items:center;justify-content:space-between;margin:0 0 11px}.toolbar h3{margin:0;font-size:16px}.tabs{display:flex;gap:7px}.tab{border:1px solid var(--line);background:#fff;color:#56625e;border-radius:6px;padding:6px 10px;cursor:pointer}.tab.active,.tab:hover{border-color:var(--accent);color:var(--accent);background:#f5fbf9}.note-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:12px}.note-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:15px;cursor:pointer;min-height:138px;transition:.16s}.note-card:hover{transform:translateY(-2px);border-color:#6bab9f;box-shadow:0 10px 25px #2c4a4314}.note-card h4{margin:0 0 7px;font-size:15px;line-height:1.35}.note-card p{color:var(--muted);font-size:12px;line-height:1.55;margin:0 0 13px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.meta{color:#7a8581;font-size:11px;display:flex;flex-wrap:wrap;gap:5px}.reader{display:none}.reader.open{display:block}.reader-head{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px}.reader h2{font-size:27px;line-height:1.3;margin:0}.reader-sources{font-size:12px;line-height:1.7;color:#586964;background:#f5f8f6;border:1px solid var(--line);border-radius:6px;padding:9px 12px;margin:-7px 0 19px;overflow-wrap:anywhere}.reader-sources:empty{display:none}.source-label{color:var(--accent);font-weight:600}.source-sep{color:#a4aca9;padding:0 3px}.reader-body{font-size:15px;line-height:1.85}.reader-body h1{font-size:29px}.reader-body h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:5px}.reader-body h3{font-size:18px}.reader-body p{margin:13px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:4px 0}.reader-body blockquote{border-left:3px solid var(--accent2);padding:4px 15px;color:#59635f;background:#f7f3f1;margin:16px 0}.reader-body img{max-width:100%;max-height:520px;border:1px solid var(--line);border-radius:6px;margin:7px 0}.reader-body code{background:#edf3f0;color:#0e6657;border:1px solid #d8e5e0;border-radius:4px;padding:1px 5px;font-family:"SF Mono",monospace;font-size:.88em}.reader-body .code-block{background:#202724;border:1px solid #303a36;border-radius:6px;padding:15px;overflow:auto;color:#e6ece9;line-height:1.6}.reader-body .code-block code{background:none;border:0;padding:0;color:inherit}.table-wrap{overflow:auto;margin:15px 0}.reader-body table{border-collapse:collapse;width:100%;min-width:480px}.reader-body th,.reader-body td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}.reader-body th{color:#31443e;background:#edf3f0}.reader-body td{color:#36423e}.callout{padding:11px 15px;border:1px solid #b9d5cd;border-radius:6px;background:#eff7f4;margin:16px 0;display:flex;gap:10px}.callout.warning{border-color:#dcc995;background:#faf6e8}.callout.danger{border-color:#e2b7bf;background:#fbf0f2}.callout strong{color:var(--accent);font-size:11px;text-transform:uppercase}.callout.warning strong{color:var(--warn)}.unresolved{color:var(--danger);border-bottom:1px dashed var(--danger)}.graph-panel{margin-top:20px;padding:17px}.graph-head h3{margin:0}#graph{width:100%;height:590px;background:#fafbf9;border-radius:6px;margin-top:12px;border:1px solid var(--line);cursor:grab}#graph:active{cursor:grabbing}.edge{stroke:#8b9994;stroke-width:1;opacity:.42}.node circle{stroke:#fff;stroke-width:2}.node text{fill:#44514d;font-size:10px;pointer-events:none}.node:hover circle{stroke:#202826;stroke-width:3}.legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px;color:var(--muted);font-size:11px}.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.empty{color:var(--muted);padding:30px;text-align:center;border:1px dashed var(--line);border-radius:6px}@media(max-width:850px){.app{padding:14px}.layout{grid-template-columns:1fr}.sidebar{position:static;display:flex;gap:8px;overflow:auto;padding:10px}.side-title{display:none}.side-item{white-space:nowrap}.topbar{flex-wrap:wrap;gap:11px}.brand{min-width:0}.search{order:3;flex-basis:100%}#graph{height:450px}}
-</style></head>
-<body><div class="app">
-<header class="topbar"><div class="brand"><div class="mark">⌁</div><div><h1>工程知识库</h1></div></div><div class="search"><span>⌕</span><input id="search" placeholder="搜索知识" autocomplete="off"></div></header>
-<div class="layout"><aside class="sidebar"><div class="side-title">知识主题</div><div id="categories"></div><div class="side-title" style="margin-top:18px">入口</div><div class="side-item" data-view="all">全部内容 <span class="count" id="all-count">—</span></div><div class="side-item" data-view="graph">关系图谱</div></aside>
-<main class="main">
-<section id="listing"><div class="toolbar"><h3 id="listing-title">全部知识</h3><div class="tabs"><button class="tab active" data-sort="updated">最近更新</button><button class="tab" data-sort="title">按标题</button></div></div><div id="notes" class="note-grid"></div></section>
-<section id="reader" class="panel reader" style="padding:25px"><div class="reader-head"><div><h2 id="reader-title"></h2></div></div><div id="reader-sources" class="reader-sources"></div><div id="reader-body" class="reader-body"></div></section>
-<section id="graph-panel" class="panel graph-panel"><div class="graph-head"><h3>知识关系图谱</h3></div><svg id="graph" viewBox="0 0 1200 590" role="img" aria-label="知识关系图谱"></svg><div id="legend" class="legend"></div></section></main></div></div>
-<script>
-const state={notes:[],edges:[],category:'all',query:'',sort:'updated',selected:null,zoom:1,pan:{x:0,y:0}};
-const colors=['#70d6c2','#8ca6ff','#f2bd74','#f28ca7','#b79cff','#67b6e8','#d8e17d','#a8b6cc'];
-const $=s=>document.querySelector(s);
-function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
-async function getJSON(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json();}
-function filtered(){let a=state.notes.filter(n=>(state.category==='all'||n.category===state.category)&&(!state.query||[n.title,n.path,n.type,n.status,(n.tags||[]).join(' '),(n.sources||[]).join(' '),n.search_text||''].join(' ').toLowerCase().includes(state.query.toLowerCase())));a.sort((x,y)=>state.sort==='title'?x.title.localeCompare(y.title,'zh-CN'):(y.updated||'').localeCompare(x.updated||''));return a;}
-function orderedCategories(values){const order=['总览','人工智能','软件工程','数据系统','计算机系统与性能','分布式系统','编程语言','质量工程','Clippings'];return [...values].sort((a,b)=>(order.indexOf(a)<0?999:order.indexOf(a))-(order.indexOf(b)<0?999:order.indexOf(b))||a.localeCompare(b,'zh-CN'));}
-function renderCategories(){const counts={};state.notes.forEach(n=>counts[n.category]=(counts[n.category]||0)+1);const cats=orderedCategories(Object.keys(counts));$('#categories').innerHTML=cats.map(c=>`<div class="side-item ${state.category===c?'active':''}" data-category="${esc(c)}"><span>${esc(c)}</span><span class="count">${counts[c]}</span></div>`).join('');$('#all-count').textContent=state.notes.length;document.querySelectorAll('[data-category]').forEach(e=>e.onclick=()=>showListing(e.dataset.category));}
-function renderNotes(){const list=filtered();$('#listing-title').textContent=state.category==='all'?'全部知识':state.category;$('#notes').innerHTML=list.length?list.map(n=>`<article class="note-card" data-path="${esc(n.path)}"><h4>${esc(n.title)}</h4><p>${esc(n.excerpt||'')}</p>${n.updated?`<div class="meta"><span>${esc(n.updated)}</span></div>`:''}</article>`).join(''):`<div class="empty">没有匹配内容</div>`;document.querySelectorAll('.note-card').forEach(e=>e.onclick=()=>openNote(e.dataset.path));}
-function renderSources(sources){if(!sources||!sources.length)return '';return '<span class="source-label">来源</span> '+sources.map(s=>{const value=String(s);if(value.startsWith('http://')||value.startsWith('https://'))return `<a href="${esc(value)}" target="_blank" rel="noreferrer">${esc(value)}</a>`;const match=value.match(/^\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]$/);if(match){const target=match[1],label=match[2]||target;return `<a data-note="${esc(target)}" href="/?path=${encodeURIComponent(target)}">${esc(label)}</a>`;}return esc(value);}).join('<span class="source-sep"> · </span>');}
-async function openNote(path){try{const n=await getJSON('/api/note?path='+encodeURIComponent(path));state.selected=path;$('#listing').style.display='none';$('#reader').classList.add('open');$('#reader-title').textContent=n.title;$('#reader-sources').innerHTML=renderSources(n.sources);$('#reader-body').innerHTML=n.html;history.replaceState({},'', '/?path='+encodeURIComponent(path));window.scrollTo({top:0,behavior:'smooth'});}catch(e){console.error(e);}}
-function closeReader(){if(!state.selected)return;state.selected=null;$('#listing').style.display='block';$('#reader').classList.remove('open');history.replaceState({},'', '/');}
-function showListing(category){state.category=category;state.selected=null;$('#listing').style.display='block';$('#reader').classList.remove('open');history.replaceState({},'', '/');renderAll();window.scrollTo({top:0,behavior:'smooth'});}
-function renderGraph(){const svg=$('#graph');const W=1200,H=590;svg.innerHTML='';const cats=orderedCategories(new Set(state.notes.map(n=>n.category)));const positions=new Map();const cx=W/2,cy=H/2;cats.forEach((c,ci)=>{const angle=-Math.PI/2+ci*2*Math.PI/cats.length;const anchor={x:cx+Math.cos(angle)*185,y:cy+Math.sin(angle)*145};const group=state.notes.filter(n=>n.category===c);group.forEach((n,ni)=>{const a=ni*2*Math.PI/Math.max(group.length,1);const r=48+Math.min(group.length,25)*2;positions.set(n.path,{x:anchor.x+Math.cos(a)*r,y:anchor.y+Math.sin(a)*r});});});const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.id='graph-world';const edges=document.createElementNS('http://www.w3.org/2000/svg','g');edges.classList.add('edges');state.edges.forEach(e=>{const a=positions.get(e.source),b=positions.get(e.target);if(!a||!b)return;const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.setAttribute('x1',a.x);line.setAttribute('y1',a.y);line.setAttribute('x2',b.x);line.setAttribute('y2',b.y);line.classList.add('edge');edges.append(line);});g.append(edges);state.notes.forEach(n=>{const p=positions.get(n.path);if(!p)return;const node=document.createElementNS('http://www.w3.org/2000/svg','g');node.classList.add('node');node.setAttribute('transform',`translate(${p.x},${p.y})`);node.onclick=()=>openNote(n.path);const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');circle.setAttribute('r',n.path===state.selected?'8':'5');circle.setAttribute('fill',colors[cats.indexOf(n.category)%colors.length]);const titleEl=document.createElementNS('http://www.w3.org/2000/svg','title');titleEl.textContent=n.title;circle.append(titleEl);const label=document.createElementNS('http://www.w3.org/2000/svg','text');label.setAttribute('y','-9');label.setAttribute('text-anchor','middle');label.textContent=n.title.length>18?n.title.slice(0,17)+'…':n.title;node.append(circle,label);g.append(node);});svg.append(g);$('#legend').innerHTML=cats.map((c,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(c)}</span>`).join('');}
-function bindGraph(){const svg=$('#graph');let drag=null;svg.onwheel=e=>{e.preventDefault();state.zoom=Math.max(.45,Math.min(2.5,state.zoom*(e.deltaY<0?1.1:.9)));$('#graph-world').setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`);};svg.onpointerdown=e=>{drag={x:e.clientX,y:e.clientY,px:state.pan.x,py:state.pan.y};svg.setPointerCapture(e.pointerId)};svg.onpointermove=e=>{if(!drag)return;state.pan.x=drag.px+e.clientX-drag.x;state.pan.y=drag.py+e.clientY-drag.y;const w=$('#graph-world');if(w)w.setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`)};svg.onpointerup=()=>drag=null;}
-function renderAll(){renderCategories();renderNotes();renderGraph();}
-async function load(){try{const data=await getJSON('/api/notes');state.notes=data.notes;state.edges=data.edges;renderAll();if(state.selected)openNote(state.selected);}catch(e){console.error(e);}}
-$('#search').oninput=e=>{state.query=e.target.value;state.selected=null;$('#reader').classList.remove('open');$('#listing').style.display='block';history.replaceState({},'', '/');renderNotes();};document.querySelectorAll('[data-sort]').forEach(e=>e.onclick=()=>{state.sort=e.dataset.sort;document.querySelectorAll('[data-sort]').forEach(x=>x.classList.toggle('active',x===e));renderNotes();});document.querySelector('[data-view="all"]').onclick=()=>showListing('all');document.querySelector('[data-view="graph"]').onclick=()=>$('#graph-panel').scrollIntoView({behavior:'smooth'});document.addEventListener('click',e=>{const a=e.target.closest('a[data-note]');if(a){e.preventDefault();openNote(a.dataset.note);}});window.onpopstate=()=>{const p=new URLSearchParams(location.search).get('path');p?p&&openNote(p):closeReader();};bindGraph();const initial=new URLSearchParams(location.search).get('path');load().then(()=>initial&&openNote(initial));setInterval(load,10000);
-</script></body></html>'''
-
-
-MODERN_INDEX_HTML = r'''<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>工程知识库</title>
-<style>
-:root{
-  --canvas:#f7f8f6;--paper:#fff;--ink:#18201d;--muted:#66716c;
-  --line:#dce2de;--line-strong:#c8d1cc;--accent:#0b705e;--accent-soft:#e9f3f0;
-  --code:#202622;--warn:#9b5b23;--max:1480px;
-}
-@media(prefers-color-scheme:dark){
-  :root:not([data-theme="light"]){
-    --canvas:#1a1e1c;--paper:#202422;--ink:#e3e7e5;--muted:#9ba39e;
-    --line:#313633;--line-strong:#3d433f;--accent:#3db89f;--accent-soft:#1a332e;
-    --code:#1a1e1c;--warn:#d48852;
-  }
-}
-:root[data-theme="dark"]{
-  --canvas:#1a1e1c;--paper:#202422;--ink:#e3e7e5;--muted:#9ba39e;
-  --line:#313633;--line-strong:#3d433f;--accent:#3db89f;--accent-soft:#1a332e;
-  --code:#1a1e1c;--warn:#d48852;
-}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Noto Sans CJK SC",sans-serif}
-button,input{font:inherit}
-button{color:inherit}
-a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:underline}
-.shell{max-width:var(--max);margin:auto;min-height:100vh;padding:0 24px 48px}
-.topbar{height:72px;display:grid;grid-template-columns:260px minmax(280px,620px) auto 1fr;gap:24px;align-items:center;border-bottom:1px solid var(--line)}
-.brand{border:0;background:none;padding:0;display:flex;align-items:center;gap:11px;cursor:pointer;text-align:left}
-.brand-mark{width:30px;height:30px;border:1px solid var(--accent);color:var(--accent);display:grid;place-items:center;font:700 14px/1 ui-monospace,monospace;border-radius:6px}
-.brand-name{font-size:17px;font-weight:700}
-.search{position:relative}
-.search input{width:100%;height:40px;border:1px solid var(--line-strong);background:var(--paper);border-radius:6px;padding:0 40px 0 14px;outline:0}
-.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(11,112,94,.09)}
-.search kbd{position:absolute;right:10px;top:9px;border:1px solid var(--line);background:var(--canvas);color:var(--muted);padding:0 6px;border-radius:4px;font-size:11px}
-.top-actions{display:flex;justify-content:flex-end;gap:6px}
-.quiet-button{height:36px;border:1px solid transparent;background:none;border-radius:6px;padding:0 10px;cursor:pointer;color:var(--muted)}
-.quiet-button:hover,.quiet-button.active{background:var(--accent-soft);color:var(--accent)}
-.workspace{display:grid;grid-template-columns:260px minmax(0,1fr);gap:34px;padding-top:26px}
-.sidebar{position:sticky;top:20px;align-self:start;max-height:calc(100vh - 40px);overflow:auto;padding-right:12px}
-.nav-heading{margin:0 0 12px;padding:0 8px;color:#8a948f;font-size:11px;font-weight:700;letter-spacing:.08em}
-.domain{margin-bottom:4px}
-.domain-button,.topic-button{width:100%;border:0;background:none;text-align:left;cursor:pointer;border-radius:5px}
-.domain-button{display:flex;align-items:center;gap:8px;padding:8px;font-weight:650}
-.domain-button:hover,.domain.active>.domain-button{background:var(--accent-soft);color:var(--accent)}
-.chevron{width:12px;color:#8a948f;font-size:10px}
-.topic-list{display:none;padding:2px 0 5px 20px}
-.domain.open .topic-list{display:block}
-.topic-button{padding:5px 9px;color:var(--muted);font-size:13px}
-.topic-button:hover,.topic-button.active{color:var(--accent);background:#f0f5f3}
-.content{min-width:0}
-.directory-head{display:flex;align-items:end;justify-content:space-between;border-bottom:1px solid var(--line);padding:2px 0 16px;margin-bottom:4px}
-.directory-head h1{margin:0;font-size:25px;line-height:1.25;letter-spacing:0}
-.directory-head p{margin:4px 0 0;color:var(--muted)}
-.sorts{display:flex;gap:4px}
-.sort{border:0;background:none;color:var(--muted);padding:5px 8px;border-radius:5px;cursor:pointer}
-.sort.active,.sort:hover{color:var(--accent);background:var(--accent-soft)}
-.topic-section{padding:23px 0 9px;border-bottom:1px solid var(--line)}
-.topic-title{display:flex;align-items:center;gap:10px;margin:0 0 3px;font-size:12px;color:var(--muted);font-weight:700}
-.topic-title::after{content:"";height:1px;background:var(--line);flex:1}
-.topic-title small{font-size:11px;color:#9aa39f;font-weight:500}
-.note-row{display:grid;grid-template-columns:minmax(230px,38%) minmax(0,1fr);gap:26px;padding:13px 8px;border-radius:6px;cursor:pointer}
-.note-row:hover{background:var(--paper)}
-.note-row h2{font-size:15px;line-height:1.45;margin:0;font-weight:650}
-.note-row p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
-.note-row .path{font-size:11px;color:#929b97;margin-top:4px}
-.empty{padding:60px 0;text-align:center;color:var(--muted)}
-.reader{display:none;max-width:930px;margin:0 auto}
-.reader.open{display:block}
-.reader-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
-.back{border:0;background:none;color:var(--muted);padding:4px 0;cursor:pointer}
-.back:hover{color:var(--accent)}
-.reader-context{display:flex;align-items:center;gap:7px;margin-bottom:10px;color:var(--muted);font-size:12px}
-.reader-context .context-domain{color:var(--accent);font-weight:700}
-.reader-context .context-sep{color:#b4bdb8}
-.reader-title{font-size:32px;line-height:1.3;letter-spacing:0;margin:0 0 15px}
-.tool-entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:0 0 28px}
-.tool-entry{border:1px solid var(--line);border-top:3px solid var(--accent);background:var(--paper);padding:15px 16px;min-height:216px;display:flex;flex-direction:column}
-.tool-entry:nth-child(2){border-top-color:#a05b37}.tool-entry:nth-child(3){border-top-color:#3f70a8}.tool-entry:nth-child(4){border-top-color:#7862a3}
-.tool-entry h2{font-size:16px;line-height:1.35;margin:0 0 4px;letter-spacing:0}.tool-entry .tool-entry-kicker{color:var(--muted);font-size:12px;margin:0 0 9px}.tool-entry p{color:#53615c;font-size:12px;line-height:1.65;margin:0 0 11px}.tool-entry-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-top:auto}.tool-entry-primary,.tool-entry-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:32px;padding:0 11px;border-radius:5px;font-size:12px;font-weight:650}.tool-entry-primary{background:var(--accent);color:#fff}.tool-entry-primary:hover{background:#085b4c;text-decoration:none}.tool-entry-secondary{border:1px solid var(--line-strong);color:var(--ink);background:var(--canvas)}.tool-entry-secondary:hover{border-color:var(--accent);color:var(--accent);text-decoration:none}
-.study-launch{border:1px solid var(--line);border-left:3px solid var(--accent);background:var(--accent-soft);padding:13px 15px;margin:0 0 22px;display:flex;gap:18px;align-items:center;justify-content:space-between}
-.study-launch-copy{display:flex;flex-direction:column;gap:2px;min-width:190px}.study-launch-copy strong{font-size:14px}.study-launch-copy span{font-size:12px;color:var(--muted)}
-.study-launch-form{display:flex;gap:7px;flex:1;justify-content:flex-end}.study-launch-form input{min-width:240px;max-width:430px;flex:1;border:1px solid var(--line);border-radius:5px;padding:8px 10px;background:var(--paper);font:inherit;outline:0}.study-launch-form input:focus{border-color:var(--accent)}.study-launch-form button{border:1px solid var(--accent);border-radius:5px;padding:7px 10px;background:var(--paper);color:var(--accent);font:inherit;cursor:pointer;white-space:nowrap}.study-launch-form button:hover{background:var(--accent);color:#fff}
-.sources{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:10px 0;margin-bottom:27px;color:var(--muted);font-size:12px;overflow-wrap:anywhere}
-.sources:empty{display:none}
-.source-label{font-weight:700;color:var(--ink);margin-right:8px}
-.source-sep{color:#b3bbb7;padding:0 5px}
-.article{font-size:15px;line-height:1.9}
-.article h2{font-size:22px;line-height:1.45;margin:38px 0 12px;padding-bottom:7px;border-bottom:1px solid var(--line);letter-spacing:0}
-.article h3{font-size:17px;line-height:1.5;margin:27px 0 8px}
-.article p{margin:13px 0}
-.article ul,.article ol{padding-left:24px}
-.article li{margin:5px 0}
-.article blockquote{margin:20px 0;padding:8px 18px;border-left:3px solid var(--accent);background:#f0f5f3;color:#4f5c57}
-.article img{display:block;max-width:100%;max-height:620px;margin:22px auto;border:1px solid var(--line)}
-.article code{font-family:"SF Mono","Cascadia Code",monospace;background:#edf2ef;border:1px solid var(--line);padding:1px 5px;border-radius:4px;font-size:.88em}
-.article pre.code-block{background:var(--code);color:#edf2ef;overflow:auto;padding:17px 19px;border-radius:6px}
-.article pre.code-block code{background:none;border:0;padding:0;color:inherit}
-.table-wrap{overflow:auto;margin:20px 0}
-.article table{width:100%;border-collapse:collapse;min-width:560px;font-size:13px}
-.article th,.article td{padding:9px 11px;border:1px solid var(--line);text-align:left;vertical-align:top}
-.article th{background:#f0f4f2;font-weight:650}
-.callout{display:flex;gap:12px;margin:20px 0;padding:12px 15px;border-left:3px solid var(--accent);background:var(--accent-soft)}
-.callout strong{font-size:11px;text-transform:uppercase;color:var(--accent)}
-.unresolved{color:#a63c4d;text-decoration:underline dotted}
-.mermaid{margin:22px auto;text-align:center;background:var(--paper);overflow:auto}
-.graph-view{display:none}
-.graph-view.open{display:block}
-.graph-head{display:flex;align-items:end;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:15px}
-.graph-head h1{margin:0;font-size:25px}
-.graph-head p{margin:4px 0 0;color:var(--muted)}
-.graph-tools{display:flex;gap:4px}
-.graph-tool{width:30px;height:30px;border:1px solid var(--line);background:var(--paper);border-radius:5px;color:var(--muted);cursor:pointer;font-size:16px;line-height:1}
-.graph-tool:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-.visual-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
-.visual-tab{border:1px solid var(--line);background:var(--paper);color:var(--muted);border-radius:5px;padding:7px 11px;cursor:pointer;font:inherit}
-.visual-tab:hover,.visual-tab.active{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-#graph{display:block;width:100%;height:690px;margin-top:18px;background:var(--paper);border:1px solid var(--line);cursor:grab}
-#graph:active{cursor:grabbing}
-.domain-label{fill:#26312d;font-size:15px;font-weight:700}
-.topic-link{stroke:#b7c2bc;stroke-width:1;opacity:.38}
-.edge{stroke:#9ca8a2;stroke-width:.65;opacity:.14}
-.edge.focused{stroke:#526b62;stroke-width:1.4;opacity:.72}
-.topic-node{cursor:pointer}
-.topic-node circle{fill:#fff;stroke-width:2}
-.topic-node text{fill:#52605a;font-size:10px;font-weight:650;pointer-events:none}
-.node circle{stroke:#fff;stroke-width:1.5;cursor:pointer}
-.node text{fill:#26312d;font-size:11px;font-weight:600;opacity:0;pointer-events:none;paint-order:stroke;stroke:#fff;stroke-width:4px;stroke-linejoin:round}
-.node:hover circle{stroke:var(--ink);stroke-width:2.5}
-.node:hover text{opacity:1}
-.diagram-group{cursor:pointer}
-.diagram-box{fill:#f7faf8;stroke:#a9bbb3;stroke-width:1.4}
-.diagram-box.primary{fill:#e8f3ef;stroke:#328574}
-.diagram-box.secondary{fill:#f5f1ec;stroke:#bc9d82}
-.diagram-label{fill:#26312d;font-size:15px;font-weight:650;text-anchor:middle;dominant-baseline:middle}
-.diagram-small{fill:#66736d;font-size:11px;text-anchor:middle;dominant-baseline:middle}
-.diagram-edge{stroke:#6b867d;stroke-width:2;fill:none;marker-end:url(#graph-arrow);opacity:.82}
-.diagram-edge.dashed{stroke-dasharray:6 5;opacity:.58}
-.axis-line{stroke:#63746d;stroke-width:1.5;marker-end:url(#graph-arrow)}
-.axis-label{fill:#52605a;font-size:13px;font-weight:600}
-.quadrant-fill{fill:#f4f7f5;stroke:#dbe5df;stroke-width:1}
-.quadrant-fill.alt{fill:#fbf5ef}
-.quadrant-title{fill:#75827c;font-size:12px;font-weight:600}
-.point{stroke:#fff;stroke-width:2;cursor:pointer}
-.point-label{fill:#26312d;font-size:13px;font-weight:650}
-.graph-note{fill:#75827c;font-size:12px}
-.legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-top:10px}
-.legend i{display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:50%}
-@media(max-width:900px){
-  .shell{padding:0 14px 36px}.topbar{height:auto;padding:14px 0;grid-template-columns:1fr auto}.search{grid-column:1;grid-row:2}#theme-toggle{grid-column:2;grid-row:2}.top-actions{grid-column:1/-1;grid-row:3;justify-content:flex-start}.workspace{grid-template-columns:1fr;gap:18px;padding-top:16px}
-  .sidebar{position:static;max-height:none;overflow:auto;padding:0 0 9px}.sidebar #domains{display:flex;gap:7px;width:max-content}.nav-heading,.topic-list{display:none!important}.domain{flex:none;margin:0}.domain-button{white-space:nowrap;border:1px solid var(--line);background:var(--paper)}.chevron{display:none}
-  .note-row{grid-template-columns:1fr;gap:5px;padding:13px 5px}.reader-title{font-size:26px}.article{font-size:14px}.reader-context{margin-top:2px}#graph{height:520px}.visual-tabs{gap:5px}.visual-tab{padding:6px 8px;font-size:13px}.study-launch{display:block}.study-launch-copy{margin-bottom:10px}.study-launch-form{display:grid;grid-template-columns:1fr 1fr}.study-launch-form input{min-width:0;max-width:none;grid-column:1/-1}.study-launch-form button{width:100%}.tool-entry-grid{grid-template-columns:1fr;gap:10px}.tool-entry{min-height:0}.tool-entry p{max-width:58ch}
-}
-</style>
-</head>
-<body>
-<div class="shell">
-  <header class="topbar">
-    <button class="brand" id="home-button"><span class="brand-mark">K</span><span class="brand-name">工程知识库</span></button>
-    <label class="search"><input id="search" placeholder="搜索概念、机制或问题" autocomplete="off"><kbd>/</kbd></label>
-    <button class="quiet-button" id="theme-toggle" title="切换主题" aria-label="切换深色/浅色主题">☀</button>
-    <div class="top-actions"><button class="quiet-button" id="directory-button">目录</button><button class="quiet-button" id="graph-button">关系图</button></div>
-  </header>
-  <div class="workspace">
-    <nav class="sidebar"><p class="nav-heading">知识领域</p><div id="domains"></div></nav>
-    <main class="content">
-      <section id="directory">
-        <header class="directory-head"><div><h1 id="directory-title">全部知识</h1><p id="directory-subtitle"></p></div><div class="sorts"><button class="sort active" data-sort="title">主题</button><button class="sort" data-sort="updated">更新</button></div></header>
-        <div id="note-groups"></div>
-      </section>
-      <article id="reader" class="reader">
-        <div class="reader-top"><button class="back" id="back-button">返回目录</button></div>
-        <div class="reader-context" id="reader-context"></div>
-        <h1 class="reader-title" id="reader-title"></h1>
-        <section id="study-launch" class="study-launch" hidden>
-          <div class="study-launch-copy"><strong>开始学习一个主题</strong><span>把问题带进互动讲解、检索和练习</span></div>
-          <div class="study-launch-form"><input id="study-topic" placeholder="例如：RAG 如何从检索走向可验证系统？" autocomplete="off"><button id="open-classroom">互动课堂</button><button id="open-tutor">学习工作区</button></div>
-        </section>
-        <div class="sources" id="reader-sources"></div>
-        <div class="article" id="reader-body"></div>
-      </article>
-      <section id="graph-view" class="graph-view">
-        <header class="graph-head"><div><h1 id="graph-title">知识关系</h1><p id="graph-subtitle">领域、主题与笔记之间的关联</p></div><div class="graph-tools"><button class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小">−</button><button class="graph-tool" id="graph-reset" title="重置视图" aria-label="重置视图">↺</button><button class="graph-tool" id="graph-zoom-in" title="放大" aria-label="放大">+</button></div></header>
-        <div class="visual-tabs" role="tablist" aria-label="图谱视图"><button class="visual-tab active" data-visual="network" role="tab" aria-selected="true">关系网络</button><button class="visual-tab" data-visual="flow" role="tab" aria-selected="false">知识流通</button><button class="visual-tab" data-visual="learning" role="tab" aria-selected="false">学习循环</button><button class="visual-tab" data-visual="architecture" role="tab" aria-selected="false">AI 架构</button><button class="visual-tab" data-visual="quadrant" role="tab" aria-selected="false">选型象限</button></div>
-        <svg id="graph" viewBox="0 0 1200 690" role="img" aria-label="知识关系"></svg>
-        <div id="legend" class="legend"></div>
-      </section>
-    </main>
-  </div>
-</div>
-<script src="/static/mermaid.min.js"></script>
-<script>
-mermaid.initialize({startOnLoad:false,theme:'neutral',securityLevel:'strict',fontFamily:'-apple-system,BlinkMacSystemFont,PingFang SC,sans-serif'});
-window.renderMermaid=async()=>{const nodes=document.querySelectorAll('.mermaid:not([data-processed])');if(nodes.length)await mermaid.run({nodes});};
-</script>
-<script>
-const state={notes:[],edges:[],domain:'all',topic:'all',query:'',sort:'title',selected:null,view:'directory',graphMode:'network',zoom:1,pan:{x:0,y:0},navigation:0};
-function initTheme(){
-  const stored=localStorage.getItem('theme');
-  const theme=stored||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
-  document.documentElement.setAttribute('data-theme',theme);
-  $('#theme-toggle').textContent=theme==='dark'?'☀':'☾';
-}
-function toggleTheme(){
-  const current=document.documentElement.getAttribute('data-theme')||'light';
-  const next=current==='dark'?'light':'dark';
-  document.documentElement.setAttribute('data-theme',next);
-  localStorage.setItem('theme',next);
-  $('#theme-toggle').textContent=next==='dark'?'☀':'☾';
-}
-initTheme();
-$('#theme-toggle').onclick=toggleTheme;
-const domainOrder=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'];
-const colors=['#0b705e','#3f70a8','#a05b37','#7862a3','#567b42','#9b4660','#697772'];
-const $=s=>document.querySelector(s);
-const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-const ordered=values=>[...values].sort((a,b)=>(domainOrder.indexOf(a)<0?99:domainOrder.indexOf(a))-(domainOrder.indexOf(b)<0?99:domainOrder.indexOf(b))||a.localeCompare(b,'zh-CN'));
-async function json(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json();}
-function shownNotes(){
-  const q=state.query.toLowerCase();
-  const list=state.notes.filter(n=>(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q)));
-  const relevance=n=>{if(!q)return 0;const title=String(n.title||'').toLowerCase(),topic=String(n.topic||'').toLowerCase(),tags=(n.tags||[]).join(' ').toLowerCase(),path=String(n.path||'').toLowerCase();return title.includes(q)?4:topic.includes(q)?3:tags.includes(q)||path.includes(q)?2:1};
-  return list.sort((a,b)=>relevance(b)-relevance(a)||(state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN')));
-}
-function renderDomains(){
-  const domains=ordered(new Set(state.notes.map(n=>n.category)));
-  $('#domains').innerHTML=domains.map(domain=>{
-    const topics=[...new Set(state.notes.filter(n=>n.category===domain).map(n=>n.topic))].sort((a,b)=>a.localeCompare(b,'zh-CN'));
-    const open=state.domain===domain;
-    return `<div class="domain ${open?'active open':''}"><button class="domain-button" data-domain="${esc(domain)}"><span class="chevron">${open?'▼':'▶'}</span><span>${esc(domain==='总览'?'首页':domain)}</span></button><div class="topic-list">${topics.map(topic=>`<button class="topic-button ${open&&state.topic===topic?'active':''}" data-domain="${esc(domain)}" data-topic="${esc(topic)}">${esc(topic)}</button>`).join('')}</div></div>`;
-  }).join('');
-  document.querySelectorAll('.domain-button').forEach(button=>button.onclick=()=>selectDirectory(button.dataset.domain,'all'));
-  document.querySelectorAll('.topic-button').forEach(button=>button.onclick=e=>{e.stopPropagation();selectDirectory(button.dataset.domain,button.dataset.topic)});
-}
-function renderDirectory(){
-  const list=shownNotes(),groups=new Map();
-  for(const note of list){const key=state.domain==='all'?note.category:note.topic;if(!groups.has(key))groups.set(key,[]);groups.get(key).push(note);}
-  $('#directory-title').textContent=state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain;
-  $('#directory-subtitle').textContent=state.query?`“${state.query}” · ${list.length} 篇`:state.domain==='all'?`${list.length} 篇知识`:state.topic==='all'?`${list.length} 篇知识`:'';
-  $('#note-groups').innerHTML=groups.size?[...groups].map(([group,notes])=>`<section class="topic-section"><h2 class="topic-title"><span>${esc(group==='总览'?'首页':group)}</span><small>${notes.length}</small></h2>${notes.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h2>${esc(n.title)}</h2><div class="path">${esc(n.topic)}</div></div><p>${esc(n.excerpt||'')}</p></article>`).join('')}</section>`).join(''):`<div class="empty">没有匹配内容</div>`;
-  document.querySelectorAll('.note-row').forEach(row=>row.onclick=()=>openNote(row.dataset.path));
-}
-function sourceLabel(value){try{const host=new URL(value).hostname;return host.startsWith('www.')?host.slice(4):host}catch{return value}}
-function renderSources(sources){
-  if(!sources||!sources.length)return '';
-  return '<span class="source-label">来源</span>'+sources.map(source=>{
-    const value=String(source);
-    if(value.startsWith('http://')||value.startsWith('https://'))return `<a href="${esc(value)}" target="_blank" rel="noreferrer">${esc(sourceLabel(value))}</a>`;
-    if(value.startsWith('[[')&&value.endsWith(']]')){const parts=value.slice(2,-2).split('|'),target=parts[0].split('#')[0],label=parts[1]||target.split('/').pop();return `<a data-note="${esc(target)}" href="/?path=${encodeURIComponent(target)}">${esc(label)}</a>`}
-    return esc(value)
-  }).join('<span class="source-sep">·</span>');
-}
-function refreshServiceLinks(){const host=location.hostname||'127.0.0.1';document.querySelectorAll('[data-service-port]').forEach(link=>{link.href=`http://${host}:${link.dataset.servicePort}/`})}
-function toolEntryMarkup(){return `<section class="tool-entry-grid" aria-label="学习工具入口">
-  <article class="tool-entry"><h2>Archify · 图谱与架构</h2><p class="tool-entry-kicker">把系统关系变成可验证、可点击的图</p><p>适合架构、工作流、序列、数据流和生命周期图。效果是关系可追踪，节点可以回到对应知识页。</p><div class="tool-entry-actions"><a class="tool-entry-primary" href="/?view=graph">打开关系图</a><a class="tool-entry-secondary" href="https://github.com/tt-a1i/archify" target="_blank" rel="noreferrer">官方 GitHub ↗</a></div></article>
-  <article class="tool-entry"><h2>OpenMAIC · 互动课堂</h2><p class="tool-entry-kicker">把一个主题变成讲解、互动和练习</p><p>输入主题后生成课堂，可加入互动场景、测验、项目任务和反馈。模型调用前需要输入访问码。</p><div class="tool-entry-actions"><a class="tool-entry-primary" data-service-port="3100" data-service-port="3100" href="#" target="_blank" rel="noreferrer">打开互动课堂</a><a class="tool-entry-secondary" href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">官方 GitHub ↗</a></div></article>
-  <article class="tool-entry"><h2>DeepTutor · 检索与学习</h2><p class="tool-entry-kicker">把资料、问答、记忆和复习放进一个工作区</p><p>先登录，再进入 Chat 或 Knowledge Bases。模型调用、检索、记忆和 Agent 接口都受账号保护。</p><div class="tool-entry-actions"><a class="tool-entry-primary" data-service-port="3782" data-service-port="3782" href="#" target="_blank" rel="noreferrer">打开学习工作区</a><a class="tool-entry-secondary" href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">官方 GitHub ↗</a></div></article>
-  <article class="tool-entry"><h2>Matt Skills · 工程协作</h2><p class="tool-entry-kicker">把对齐、设计、实现和验证变成可重复流程</p><p>提供 ask-matt、grill-with-docs、to-spec、TDD、代码审查和架构改进等技能，帮助模型先理解再修改。</p><div class="tool-entry-actions"><a class="tool-entry-primary" href="https://github.com/mattpocock/skills" target="_blank" rel="noreferrer">查看技能仓库 ↗</a><a class="tool-entry-secondary" href="/?path=%E7%9F%A5%E8%AF%86%E5%BA%93%E7%AE%A1%E7%90%86%2F%E7%BB%B4%E6%8A%A4%2F%E5%AD%A6%E4%B9%A0%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E4%B8%8E%E8%B0%83%E7%94%A8%E6%88%90%E6%9C%AC.md">用法与成本</a></div></article>
-</section>`}
-function showView(view){
-  state.view=view;
-  $('#directory').style.display=view==='directory'?'block':'none';
-  $('#reader').classList.toggle('open',view==='reader');
-  $('#graph-view').classList.toggle('open',view==='graph');
-  $('#directory-button').classList.toggle('active',view==='directory');
-  $('#graph-button').classList.toggle('active',view==='graph');
-}
-function selectDirectory(domain='all',topic='all',push=true){
-  state.navigation+=1;
-  state.domain=domain;state.topic=topic;state.selected=null;showView('directory');renderDomains();renderDirectory();
-  if(push)history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'});
-}
-async function openNote(path,push=true){
-  const navigation=++state.navigation;
-  try{
-    const note=await json('/api/note?path='+encodeURIComponent(path));
-    if(navigation!==state.navigation)return;
-    state.selected=note.path;showView('reader');$('#study-launch').hidden=note.path!=='知识库首页.md';
-    $('#reader-context').innerHTML=`<span class="context-domain">${esc(note.category==='总览'?'首页':note.category)}</span><span class="context-sep">/</span><span>${esc(note.topic==='首页'?'入口':note.topic)}</span>`;
-    $('#reader-title').textContent=note.title;$('#reader-sources').innerHTML=renderSources(note.sources);$('#reader-body').innerHTML=(note.path==='知识库首页.md'?toolEntryMarkup():'')+note.html;refreshServiceLinks();
-    document.querySelectorAll('a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});
-    if(window.renderMermaid)window.renderMermaid().catch(console.error);
-    if(push)history.pushState({},'', '/?path='+encodeURIComponent(note.path));window.scrollTo({top:0,behavior:'smooth'});
-  }catch(error){console.error(error)}
-}
-function launchStudy(kind){const topic=$('#study-topic').value.trim();if(!topic){$('#study-topic').focus();return}const encoded=encodeURIComponent(topic);const host=location.hostname||'127.0.0.1';const url=kind==='classroom'?`http://${host}:3100/?topic=${encoded}`:`http://${host}:3782/chat?prompt=${encoded}`;window.open(url,'_blank','noopener,noreferrer')}
-function showGraph(push=true){state.navigation+=1;state.selected=null;state.query='';state.domain='all';state.topic='all';$('#search').value='';renderDomains();showView('graph');renderGraph();if(push)history.pushState({},'','/?view=graph');window.scrollTo({top:0,behavior:'smooth'});}
-function renderNetworkGraph(){
-  const svg=$('#graph'),mobile=window.matchMedia('(max-width:900px)').matches,W=mobile?720:1200,H=mobile?920:690,domains=ordered(new Set(state.notes.map(n=>n.category)));svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
-  const positions=new Map(),topicPositions=new Map(),columns=3,cellW=W/columns,rows=Math.ceil(domains.length/columns),cellH=H/rows;
-  domains.forEach((domain,di)=>{
-    const col=di%columns,row=Math.floor(di/columns),cx=cellW*(col+.5),cy=cellH*(row+.5)+8;
-    const group=state.notes.filter(n=>n.category===domain),topics=[...new Set(group.map(n=>n.topic))].sort((a,b)=>a.localeCompare(b,'zh-CN'));
-    const topicRadius=Math.min(cellW,cellH)*.29;
-    topics.forEach((topic,ti)=>{
-      const angle=-Math.PI/2+ti*2*Math.PI/Math.max(topics.length,1),tx=cx+Math.cos(angle)*topicRadius,ty=cy+Math.sin(angle)*topicRadius;
-      topicPositions.set(`${domain}/${topic}`,{x:tx,y:ty,domain,topic});
-      const notes=group.filter(n=>n.topic===topic),noteRadius=notes.length===1?0:Math.min(30,12+notes.length*2.2);
-      notes.forEach((note,ni)=>{const noteAngle=-Math.PI/2+ni*2*Math.PI/Math.max(notes.length,1);positions.set(note.path,{x:tx+Math.cos(noteAngle)*noteRadius,y:ty+Math.sin(noteAngle)*noteRadius})});
-    });
-    const label=document.createElementNS('http://www.w3.org/2000/svg','text');label.setAttribute('x',cx);label.setAttribute('y',cy-cellH*.39);label.setAttribute('text-anchor','middle');label.classList.add('domain-label');label.textContent=`${domain==='总览'?'首页':domain} · ${group.length}`;svg.append(label);
-  });
-  const world=document.createElementNS('http://www.w3.org/2000/svg','g');world.id='graph-world';
-  for(const edge of state.edges){const a=positions.get(edge.source),b=positions.get(edge.target);if(!a||!b)continue;const line=document.createElementNS('http://www.w3.org/2000/svg','line');for(const [k,v] of Object.entries({x1:a.x,y1:a.y,x2:b.x,y2:b.y}))line.setAttribute(k,v);line.classList.add('edge');line.dataset.source=edge.source;line.dataset.target=edge.target;world.append(line)}
-  topicPositions.forEach(topic=>{const notes=state.notes.filter(n=>n.category===topic.domain&&n.topic===topic.topic);for(const note of notes){const pos=positions.get(note.path);if(!pos)continue;const line=document.createElementNS('http://www.w3.org/2000/svg','line');for(const [k,v] of Object.entries({x1:topic.x,y1:topic.y,x2:pos.x,y2:pos.y}))line.setAttribute(k,v);line.classList.add('topic-link');world.append(line)}const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.classList.add('topic-node');group.setAttribute('transform',`translate(${topic.x},${topic.y})`);group.onclick=()=>selectDirectory(topic.domain,topic.topic);const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');circle.setAttribute('r',mobile?'7':'6');circle.setAttribute('stroke',colors[domains.indexOf(topic.domain)%colors.length]);const title=document.createElementNS('http://www.w3.org/2000/svg','title');title.textContent=`${topic.topic}（${notes.length}篇）`;circle.append(title);const label=document.createElementNS('http://www.w3.org/2000/svg','text');label.setAttribute('y',mobile?'-12':'-10');label.setAttribute('text-anchor','middle');label.textContent=topic.topic;group.append(circle,label);world.append(group)});
-  state.notes.forEach(note=>{const pos=positions.get(note.path);if(!pos)return;const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.classList.add('node');group.setAttribute('transform',`translate(${pos.x},${pos.y})`);group.onclick=()=>openNote(note.path);group.onmouseenter=()=>document.querySelectorAll('.edge').forEach(edge=>{if(edge.dataset.source===note.path||edge.dataset.target===note.path)edge.classList.add('focused')});group.onmouseleave=()=>document.querySelectorAll('.edge.focused').forEach(edge=>edge.classList.remove('focused'));
-    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');circle.setAttribute('r',note.path===state.selected?'8':'5');circle.setAttribute('fill',colors[domains.indexOf(note.category)%colors.length]);const title=document.createElementNS('http://www.w3.org/2000/svg','title');title.textContent=note.title;circle.append(title);
-    const label=document.createElementNS('http://www.w3.org/2000/svg','text');label.setAttribute('y','-10');label.setAttribute('text-anchor','middle');label.textContent=note.title.length>22?note.title.slice(0,21)+'…':note.title;group.append(circle,label);world.append(group)});
-  svg.append(world);applyGraphTransform();$('#legend').innerHTML=domains.map((d,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(d==='总览'?'首页':d)}</span>`).join('');
-}
-function svgEl(name,attrs={},label=''){const element=document.createElementNS('http://www.w3.org/2000/svg',name);Object.entries(attrs).forEach(([key,value])=>element.setAttribute(key,value));if(label)element.textContent=label;return element}
-function graphCanvas(){const svg=$('#graph'),mobile=window.matchMedia('(max-width:900px)').matches,W=mobile?720:1200,H=mobile?920:690;svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto-start-reverse'});marker.append(svgEl('path',{d:'M 0 0 L 10 5 L 0 10 z',fill:'#6b867d'}));defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);return {svg,world,W,H,mobile}}
-function addBox(world,x,y,w,h,label,kind='',small='',target=''){const group=svgEl('g',{class:'diagram-group'});const box=svgEl('rect',{x,y,width:w,height:h,rx:7,class:`diagram-box ${kind}`});group.append(box,svgEl('text',{x:x+w/2,y:y+h/2-(small?8:0),class:'diagram-label'},label));if(small)group.append(svgEl('text',{x:x+w/2,y:y+h/2+14,class:'diagram-small'},small));if(target)group.onclick=()=>openNote(target);world.append(group);return group}
-function addArrow(world,x1,y1,x2,y2,dashed=false){world.append(svgEl('line',{x1,y1,x2,y2,class:`diagram-edge${dashed?' dashed':''}`}))}
-function renderFlowGraph(){const {world,W,H,mobile}=graphCanvas();const steps=[['问题','目标与约束','知识库首页.md'],['理解','查询与路由','工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md'],['召回','倒排 / 向量 / 图','工程知识/AI系统/知识与检索/RAG前沿：重排、自动优化与开放索引.md'],['验证','权限与证据','工程知识/AI系统/质量与运营/可靠生成需要结构、证据、拒答与回归.md'],['行动','模型与工具','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['结果','答案或状态','工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md'],['反馈','评测与回归','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']];const pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?92:132,bh=70;for(let i=0;i<steps.length-1;i++)addArrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([title,sub,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,title,i===2?'primary':i===4?'secondary':'',sub,target));world.append(svgEl('text',{x:W/2,y:H*.7,class:'graph-note','text-anchor':'middle'},'每一步都产出可追踪的状态、证据和失败原因'));$('#legend').innerHTML='<span><i style="background:#328574"></i>证据获取</span><span><i style="background:#bc9d82"></i>模型与行动</span><span><i style="background:#a9bbb3"></i>系统边界</span>'}
-function renderLearningGraph(){const {world,W,H,mobile}=graphCanvas();const steps=[['目标','要解决什么问题','知识库首页.md'],['理解','机制、边界与关系','工程知识/AI系统/Agent与工作流/Agent学习工具把资料变成可验证学习循环.md'],['预测','先说出你的判断','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md'],['练习','最小实验或操作','知识库管理/维护/学习与复习方法.md'],['反馈','错误类型与证据','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md'],['迁移','换场景重新使用','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md']];const pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?98:142,bh=72;for(let i=0;i<steps.length-1;i++)addArrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([title,sub,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,title,i===0?'secondary':i===4?'primary':'',sub,target));world.append(svgEl('text',{x:W/2,y:H*.7,class:'graph-note','text-anchor':'middle'},'学习的终点是能解释、能操作、能迁移，而不是看完一页'));$('#legend').innerHTML='<span><i style="background:#bc9d82"></i>目标与迁移</span><span><i style="background:#328574"></i>证据与反馈</span><span><i style="background:#a9bbb3"></i>理解与练习</span>'}
-function renderArchitectureGraph(){const {world,W,H,mobile}=graphCanvas();const layers=[['能力层','模型、Embedding、多模态','工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md'],['知识层','RAG、记忆、结构化数据','工程知识/AI系统/知识与检索/RAG前沿：重排、自动优化与开放索引.md'],['编排层','工作流、Agent、状态','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['工具层','API、MCP、A2A、业务系统','工程知识/AI系统/生态与选型/MCP连接能力，A2A委托任务.md'],['运行层','推理服务、队列、存储','工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md'],['治理层','评测、追踪、安全、发布','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']];const x=mobile?80:180,w=mobile?560:840,top=62,gap=mobile?128:94,h=70;layers.forEach(([title,sub,target],i)=>{const y=top+i*gap;if(i<layers.length-1)addArrow(world,W/2,y+h,W/2,y+gap);addBox(world,x,y,w,h,title,i===2?'primary':i===5?'secondary':'',sub,target)});world.append(svgEl('text',{x:W/2,y:H-24,class:'graph-note','text-anchor':'middle'},'上层提出能力与决策，下层提供执行、资源和事实约束'));$('#legend').innerHTML='<span><i style="background:#328574"></i>决策编排</span><span><i style="background:#bc9d82"></i>质量与治理</span><span><i style="background:#a9bbb3"></i>能力与基础设施</span>'}
-function renderQuadrantGraph(){const {world,W,H,mobile}=graphCanvas();const x=mobile?92:188,y=88,pw=mobile?536:824,ph=mobile?650:470;const midX=x+pw/2,midY=y+ph/2;world.append(svgEl('rect',{x,y,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('rect',{x:midX,y,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x,y:midY,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x:midX,y:midY,width:pw/2,height:ph/2,class:'quadrant-fill'}));world.append(svgEl('line',{x1:x,y1:midY,x2:x+pw,y2:midY,class:'axis-line'}),svgEl('line',{x1:midX,y1:y+ph,x2:midX,y2:y,class:'axis-line'}));world.append(svgEl('text',{x:x+pw/2,y:y+ph+43,class:'axis-label','text-anchor':'middle'},'单进程 / 显式路径  →  跨系统 / 动态协作'));world.append(svgEl('text',{x:x-52,y:y+ph/2,class:'axis-label','text-anchor':'middle',transform:`rotate(-90 ${x-52} ${y+ph/2})`},'显式状态  →  自适应状态'));[['本地确定性编排',x+18,y+25],['跨系统确定性协作',midX+18,y+25],['本地自适应决策',x+18,midY+25],['跨系统自适应协作',midX+18,midY+25]].forEach(([label,tx,ty])=>world.append(svgEl('text',{x:tx,y:ty,class:'quadrant-title'},label)));const points=[['工作流',.18,.18,'#0b705e'],['单 Agent',.62,.26,'#3f70a8'],['人工审批',.35,.58,'#a05b37'],['MCP',.72,.55,'#7862a3'],['A2A',.86,.82,'#9b4660']];points.forEach(([label,px,py,color])=>{const cx=x+pw*px,cy=y+ph*(1-py),g=svgEl('g',{class:'point-group'});g.append(svgEl('circle',{cx,cy,r:mobile?9:10,class:'point',fill:color}),svgEl('text',{x:cx+14,y:cy+5,class:'point-label'},label));world.append(g)});world.append(svgEl('text',{x:W/2,y:H-24,class:'graph-note','text-anchor':'middle'},'概念定位：用于理解职责边界，不表示性能、质量或成熟度排名'));$('#legend').innerHTML='<span><i style="background:#0b705e"></i>工作流</span><span><i style="background:#3f70a8"></i>Agent</span><span><i style="background:#7862a3"></i>协议</span><span><i style="background:#9b4660"></i>远程协作</span>'}
-function renderGraph(){const meta={network:['知识关系','领域、主题与笔记之间的关联'],flow:['知识流通','从问题到证据、行动与反馈的路径'],learning:['学习循环','从目标、理解到练习、反馈与迁移'],architecture:['AI 系统架构','能力、知识、编排、工具、运行与治理的分层'],quadrant:['技术选型象限','用控制方式与协作范围理解常见组件的位置']};const [title,subtitle]=meta[state.graphMode]||meta.network;$('#graph-title').textContent=title;$('#graph-subtitle').textContent=subtitle;document.querySelectorAll('.visual-tab').forEach(button=>{const active=button.dataset.visual===state.graphMode;button.classList.toggle('active',active);button.setAttribute('aria-selected',String(active))});if(state.graphMode==='flow')renderFlowGraph();else if(state.graphMode==='learning')renderLearningGraph();else if(state.graphMode==='architecture')renderArchitectureGraph();else if(state.graphMode==='quadrant')renderQuadrantGraph();else renderNetworkGraph()}
-function applyGraphTransform(){const world=$('#graph-world');if(world)world.setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`)}
-function bindGraph(){const svg=$('#graph');let drag=null;svg.onwheel=e=>{e.preventDefault();state.zoom=Math.max(.55,Math.min(2.5,state.zoom*(e.deltaY<0?1.1:.9)));applyGraphTransform()};svg.onpointerdown=e=>{if(e.target.closest('.node,.topic-node,.diagram-group,.point-group'))return;drag={x:e.clientX,y:e.clientY,px:state.pan.x,py:state.pan.y};svg.setPointerCapture(e.pointerId)};svg.onpointermove=e=>{if(!drag)return;state.pan={x:drag.px+e.clientX-drag.x,y:drag.py+e.clientY-drag.y};applyGraphTransform()};svg.onpointerup=()=>drag=null;$('#graph-zoom-in').onclick=()=>{state.zoom=Math.min(2.5,state.zoom*1.18);applyGraphTransform()};$('#graph-zoom-out').onclick=()=>{state.zoom=Math.max(.55,state.zoom/1.18);applyGraphTransform()};$('#graph-reset').onclick=()=>{state.zoom=1;state.pan={x:0,y:0};applyGraphTransform()}}
-async function load(){
-  const data=await json('/api/notes');state.notes=data.notes;state.edges=data.edges;renderDomains();renderDirectory();
-  if(state.navigation!==0)return;
-  const params=new URLSearchParams(location.search),path=params.get('path');
-  if(path)await openNote(path,false);else if(params.get('view')==='graph')showGraph(false);else await openNote('知识库首页.md',false);
-}
-$('#home-button').onclick=()=>{state.query='';state.domain='all';state.topic='all';$('#search').value='';renderDomains();openNote('知识库首页.md')};
-$('#directory-button').onclick=()=>selectDirectory(state.domain,state.topic);
-$('#graph-button').onclick=()=>showGraph();
-$('#back-button').onclick=()=>selectDirectory(state.domain,state.topic);
-$('#search').oninput=e=>{state.navigation+=1;state.query=e.target.value;showView('directory');renderDirectory()};
-document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==$('#search')){e.preventDefault();$('#search').focus()}});
-document.querySelectorAll('[data-sort]').forEach(button=>button.onclick=()=>{state.sort=button.dataset.sort;document.querySelectorAll('[data-sort]').forEach(x=>x.classList.toggle('active',x===button));renderDirectory()});
-document.querySelectorAll('.visual-tab').forEach(button=>button.onclick=()=>{state.graphMode=button.dataset.visual;state.zoom=1;state.pan={x:0,y:0};renderGraph()});
-$('#open-classroom').onclick=()=>launchStudy('classroom');$('#open-tutor').onclick=()=>launchStudy('tutor');
-window.onpopstate=()=>{const params=new URLSearchParams(location.search),path=params.get('path');if(path)openNote(path,false);else if(params.get('view')==='graph')showGraph(false);else selectDirectory(state.domain,state.topic,false)};
-bindGraph();load().catch(console.error);document.addEventListener('DOMContentLoaded',refreshServiceLinks);setInterval(async()=>{try{const data=await json('/api/notes');state.notes=data.notes;state.edges=data.edges;renderDomains();if(state.view==='directory')renderDirectory();if(state.view==='reader'&&state.selected)await openNote(state.selected,false);if(state.view==='graph')renderGraph()}catch(error){console.error(error)}},10000);
-</script>
-</body>
-</html>'''
-
-
 class Handler(BaseHTTPRequestHandler):
     server_version = "KnowledgeSite/1.0"
 
@@ -1484,8 +1103,18 @@ class Handler(BaseHTTPRequestHandler):
             )
             return
         # ── 中台数据 ───────────────────────────────────────────────────────
+        # 这是运营者自己的界面，不是知识库的一部分：它列出访客 IP 和谁说了
+        # 什么。之前只走 require_access()，而那个判断把"持有站点密码的局域网
+        # 用户"也算已认证 —— 等于把所有人的访问记录和反馈暴露给任何拿到密码
+        # 的人。现在只认本机回环/本机网卡，密码不再能解锁它。
         # 聚合只在访问时计算。数据量是"一个人读知识库"的量级，
         # 预先建索引或缓存反而是多余的复杂度。
+        if path == "/insights" or path.startswith("/api/insights/"):
+            if not is_local_client(self.client_address[0]):
+                self.send_json(
+                    {"error": "insights is only available from this machine"}, 403
+                )
+                return
         if path == "/insights":
             try:
                 payload = PUBLIC_INSIGHTS.read_bytes()
@@ -1721,6 +1350,12 @@ class Handler(BaseHTTPRequestHandler):
             self.handle_visit()
             return
         if path == "/api/insights/feedback/status":
+            # 改反馈状态也是运营者操作，同样只认本机。
+            if not is_local_client(self.client_address[0]):
+                self.send_json(
+                    {"error": "insights is only available from this machine"}, 403
+                )
+                return
             self.handle_feedback_status()
             return
         self.send_json({"error": "not found"}, 404)

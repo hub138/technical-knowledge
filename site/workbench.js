@@ -23,13 +23,6 @@
       title: "把判断绑定到证据",
       description: "自研评估项目的设计与后续实现入口。",
     },
-    insights: {
-      label: "访问与反馈",
-      href: "/insights",
-      icon: "◔",
-      title: "谁读过、提了什么",
-      description: "本机访问记录与读者反馈，只存在本机 data/ 目录。",
-    },
     /* Learning lives under 项目与教学 rather than in the main nav: a classroom
        is a tool you reach for, not a second way to browse knowledge. The
        sub-links keep both pages reachable once you are inside that section. */
@@ -63,7 +56,6 @@
     pages.graph,
     pages.projects,
     pages.evaluation,
-    pages.insights,
   ];
   const SUBNAV = {
     projects: [pages.learning, pages.classrooms],
@@ -120,7 +112,6 @@
     learning: "学习中心",
     classrooms: "我的课堂",
     evaluation: "Agent 评估",
-    insights: "访问与反馈",
   };
   const fab = document.createElement("button");
   fab.type = "button";
