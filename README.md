@@ -92,6 +92,7 @@ conditions. Claims about the site carry a script:
 | What | How it is checked |
 |---|---|
 | Behaviour | `python3 -m unittest tests/test_site.py` — 50 tests |
+| Layout | `python3 scripts/layout_audit.py` — 27 page-width combinations |
 | Readability | `python3 scripts/contrast_audit.py` — WCAG AA per page × theme |
 | Copy quality | `python3 scripts/copy_audit.py` — mechanical rubric |
 | Translation coverage | `python3 scripts/i18n_audit.py` — untranslated UI strings |
@@ -101,6 +102,7 @@ conditions. Claims about the site carry a script:
 ```bash
 python3 -m unittest tests/test_site.py        # 50/50
 python3 scripts/contrast_audit.py <url>#dark  # 18/18 page-theme combinations
+python3 scripts/layout_audit.py              # 27/27 page-width combinations
 python3 scripts/copy_audit.py                 # score 2 (lower is better)
 python3 scripts/i18n_audit.py                 # untranslated UI strings
 ```

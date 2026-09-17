@@ -86,6 +86,7 @@ HTTP 服务；`site/base.css` 是一份由 93 个设计 token 驱动的样式表
 | 检查什么 | 怎么查 |
 |---|---|
 | 行为 | `python3 -m unittest tests/test_site.py` —— 50 个测试 |
+| 布局 | `python3 scripts/layout_audit.py` —— 27 个页面×宽度组合 |
 | 可读性 | `python3 scripts/contrast_audit.py` —— 逐页逐主题 WCAG AA |
 | 文案质量 | `python3 scripts/copy_audit.py` —— 可数规则 |
 | 翻译覆盖 | `python3 scripts/i18n_audit.py` —— 未翻译的界面字符串 |
@@ -95,6 +96,7 @@ HTTP 服务；`site/base.css` 是一份由 93 个设计 token 驱动的样式表
 ```bash
 python3 -m unittest tests/test_site.py        # 50/50
 python3 scripts/contrast_audit.py <url>#dark  # 18/18 页面×主题组合
+python3 scripts/layout_audit.py              # 27/27 页面×宽度组合
 python3 scripts/copy_audit.py                 # 得分 2（越低越好）
 python3 scripts/i18n_audit.py                 # 未翻译的界面字符串
 ```
