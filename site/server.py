@@ -1065,9 +1065,31 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt: str, *args: object) -> None:
         print(f"[{self.log_date_time_string()}] {fmt % args}", flush=True)
 
+    def stamp_client_scope(self, payload: bytes, content_type: str) -> bytes:
+        """Tell the page, in the HTML itself, whether this client is the owner.
+
+        The navigation has an owner-only entry (/insights, which lists visitor
+        addresses and feedback). It used to be added by a fetch to /api/access
+        after load, so the nav rendered with four entries and then grew a fifth
+        a frame later — measured: four items at t=23ms, five at t=55ms. Anyone
+        clicking through from a page that already showed five sees the bar
+        change shape.
+
+        The server already knows the answer when it writes the response, so it
+        puts it in a meta tag and the sidebar renders complete on the first
+        paint. No round-trip, no race. The value is a boolean about the
+        requester's own address and is already exposed by /api/access.
+        """
+        if "text/html" not in content_type or b"<head>" not in payload:
+            return payload
+        local = "1" if is_local_client(self.client_address[0]) else "0"
+        tag = f'<meta name="tk-local-client" content="{local}">'.encode("utf-8")
+        return payload.replace(b"<head>", b"<head>" + tag, 1)
+
     def send_bytes(
         self, payload: bytes, content_type: str, status: int = 200, download: str = ""
     ) -> None:
+        payload = self.stamp_client_scope(payload, content_type)
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(payload)))

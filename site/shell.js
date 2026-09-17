@@ -145,6 +145,50 @@
     return btn;
   };
 
+  /* ── Owner-only access, resolved before the first paint ──────────────────
+   * The request is kicked off the moment this script parses, and the answer is
+   * cached. sidebar() consults the cache synchronously, so on a warm load the
+   * nav renders with all five entries at once instead of growing a fifth a
+   * frame later. On a cold load the promise path still appends it, which is
+   * the old behaviour and the right fallback.
+   */
+  const stamped = document.querySelector('meta[name="tk-local-client"]');
+  const accessState = {
+    /* The server stamps this into the HTML, so it is readable before any
+       fetch — which is what removes the 4-then-5 flicker. The fetch below
+       remains as the fallback for a page served without the stamp (an old
+       cached copy, or a file opened off disk). */
+    known: stamped !== null,
+    local: stamped ? stamped.getAttribute("content") === "1" : false,
+  };
+  const accessReady = fetch("/api/access", { cache: "no-store" })
+    .then((response) => (response.ok ? response.json() : {}))
+    .then((access) => {
+      accessState.known = true;
+      accessState.local = Boolean(access && access.local_client);
+      return accessState.local;
+    })
+    .catch(() => {
+      /* No answer means no entry. Better to omit a link than to hand a
+         visitor the operations page. */
+      accessState.known = true;
+      return false;
+    });
+
+  const appendLocalEntries = (mount, page, link) => {
+    const nav = mount.querySelector(".tk-nav");
+    if (!nav) return;
+    const local = items().filter((i) => i.localOnly);
+    if (!local.length) return;
+    if (nav.querySelector('[data-tk-local="1"]')) return; // idempotent
+    nav.insertAdjacentHTML(
+      "beforeend",
+      local
+        .map((item) => link(item, page).replace("<a ", '<a data-tk-local="1" '))
+        .join(""),
+    );
+  };
+
   /* ── Sidebar ──────────────────────────────────────────────────────────────
    * opts:
    *   page        nav key that owns this page; inferred from the URL if absent
@@ -243,23 +287,27 @@
        subtree needs it. */
     applyTheme(document.documentElement.dataset.theme || "light");
 
-    /* The owner-only entry. /api/access answers by source address, so a
-       visitor's browser gets local_client:false and the link never appears;
-       on this machine it is always there. */
-    fetch("/api/access", { cache: "no-store" })
-      .then((response) => (response.ok ? response.json() : {}))
-      .then((access) => {
-        if (!access || !access.local_client) return;
-        const nav = mount.querySelector(".tk-nav");
-        if (!nav) return;
-        const local = items().filter((i) => i.localOnly);
-        if (!local.length) return;
-        nav.insertAdjacentHTML("beforeend", local.map((item) => link(item, page)).join(""));
-      })
-      .catch(() => {
-        /* No answer means no entry. Better to omit a link than to hand a
-           visitor the operations page. */
+    /* The owner-only entry.
+     *
+     * /api/access answers by source address, so a visitor's browser gets
+     * local_client:false and the link never appears; on this machine it is
+     * always there.
+     *
+     * This used to be a fetch whose .then() appended the link. The result was
+     * a nav that rendered with four entries and then grew a fifth a frame or
+     * two later — measured at 4 items by t=23ms and 5 by t=55ms, which is
+     * exactly the flicker a reader notices when they click through from a page
+     * that already showed five. The request is started as early as possible
+     * (see the kickoff near the bottom of this file) and cached, so by the time
+     * the sidebar is built the answer is normally already in hand and the nav
+     * renders complete on the first paint. */
+    if (accessState.known) {
+      if (accessState.local) appendLocalEntries(mount, page, link);
+    } else {
+      accessReady.then((local) => {
+        if (local) appendLocalEntries(mount, page, link);
       });
+    }
 
     /* Pages with no top bar of their own still need a way to switch theme. */
     ensureThemeToggle();
