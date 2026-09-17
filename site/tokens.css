@@ -369,6 +369,8 @@ time,
   --accent-line: var(--color-accent-line);
   --on-accent: var(--color-on-accent);
   --warm: var(--color-warm);
+  --warm-line: var(--color-warm-line);
+  --warm-ink: var(--color-warm-ink);
   --warm-soft: var(--color-warm-soft);
   --blue: var(--color-info);
   --blue-soft: var(--color-info-soft);

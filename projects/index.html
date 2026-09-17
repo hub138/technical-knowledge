@@ -14,8 +14,8 @@
       }
       body {
         margin: 0;
-        background: var(--bg);
-        color: var(--ink);
+        background: var(--color-bg);
+        color: var(--color-ink);
         font:
           15px/1.75 -apple-system,
           BlinkMacSystemFont,
@@ -24,7 +24,7 @@
           sans-serif;
       }
       a {
-        color: var(--accent);
+        color: var(--color-accent);
         text-decoration: none;
       }
       a:hover {
@@ -37,10 +37,10 @@
       }
       .hero {
         padding: 45px 0 29px;
-        border-bottom: 1px solid var(--line);
+        border-bottom: 1px solid var(--color-line);
       }
       .eyebrow {
-        color: var(--accent);
+        color: var(--color-accent);
         font-size: 11px;
         font-weight: 800;
         letter-spacing: 0.1em;
@@ -52,7 +52,7 @@
       }
       .hero p {
         max-width: 860px;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 16px;
         margin: 0;
       }
@@ -64,14 +64,14 @@
       }
       .hero-links a {
         padding: 7px 11px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 5px;
-        background: var(--paper);
+        background: var(--color-panel);
         font-size: 12px;
       }
       .hero-links a.primary {
         border-color: #afd2c8;
-        background: var(--soft);
+        background: var(--color-accent-soft);
       }
       .section {
         margin-top: 30px;
@@ -89,8 +89,8 @@
         margin: 0;
       }
       .section-head p {
-        color: var(--muted);
-        font-size: 13px;
+        color: var(--color-muted);
+        font-size: var(--text-sm);
         margin: 3px 0 0;
       }
       .project-grid {
@@ -99,21 +99,13 @@
         gap: 14px;
       }
       .project {
-        background: var(--paper);
-        border: 1px solid var(--line);
-        border-top: 3px solid var(--accent);
-        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-md);
         padding: 20px;
-        box-shadow: var(--shadow);
-      }
-      .project:nth-child(2) {
-        border-top-color: var(--warm);
-      }
-      .project:nth-child(3) {
-        border-top-color: var(--blue);
-      }
-      .project:nth-child(4) {
-        border-top-color: var(--purple);
+        box-shadow: var(--shadow-md);
       }
       .project-head {
         display: flex;
@@ -122,40 +114,40 @@
         align-items: start;
       }
       .project h3 {
-        font-size: 20px;
+        font-size: var(--text-lg);
         line-height: 1.35;
         margin: 0 0 4px;
       }
       .project-kicker {
-        color: var(--muted);
-        font-size: 12px;
+        color: var(--color-muted);
+        font-size: var(--text-sm);
         margin: 0;
       }
       .status {
         white-space: nowrap;
         padding: 3px 7px;
         border-radius: 4px;
-        background: var(--soft);
-        color: var(--accent);
+        background: var(--color-accent-soft);
+        color: var(--color-accent);
         font-size: 11px;
         font-weight: 750;
       }
       .status.auth {
-        background: var(--warm-soft);
-        color: var(--warm);
+        background: var(--color-warm-soft);
+        color: var(--color-warm);
       }
       .project > p {
-        color: var(--muted);
-        font-size: 13px;
+        color: var(--color-muted);
+        font-size: var(--text-sm);
         line-height: 1.7;
         margin: 15px 0;
       }
       .project-meta {
         font-size: 11px;
-        color: var(--muted);
+        color: var(--color-muted);
         padding: 9px 11px;
         background: #f8faf9;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         overflow-wrap: anywhere;
       }
       /* 事实徽标：星数、许可、部署状态、凭据要求。
@@ -163,7 +155,9 @@
       .facts {
         display: flex;
         flex-wrap: wrap;
+        align-items: center;
         gap: 6px;
+        min-height: 26px;
         margin: 0 0 14px;
       }
       .facts span {
@@ -171,13 +165,19 @@
         align-items: center;
         gap: 4px;
         padding: 3px 8px;
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 4px;
         background: #f8faf9;
-        color: var(--muted);
+        color: var(--color-muted);
         font-size: 11px;
         font-weight: 650;
         font-variant-numeric: tabular-nums;
+      }
+      .project-meta .verified {
+        display: block;
+        margin-bottom: 5px;
+        color: var(--color-muted);
+        font-size: var(--text-xs);
       }
       .facts .fact-stars {
         border-color: #e2d3a8;
@@ -187,13 +187,13 @@
       .facts .fact-open,
       .facts .fact-live {
         border-color: #b7d9cf;
-        background: var(--soft);
-        color: var(--accent);
+        background: var(--color-accent-soft);
+        color: var(--color-accent);
       }
       .facts .fact-key {
         border-color: #efd9b3;
-        background: var(--warm-soft);
-        color: var(--warm);
+        background: var(--color-warm-soft);
+        color: var(--color-warm);
       }
       :root[data-theme="dark"] .facts .fact-stars {
         border-color: #4a3f1c;
@@ -210,7 +210,7 @@
         margin-top: 13px;
       }
       .actions a {
-        border: 1px solid var(--line);
+        border: 1px solid var(--color-line);
         border-radius: 5px;
         padding: 6px 9px;
         font-size: 12px;
@@ -218,7 +218,7 @@
       }
       .actions a.primary {
         border-color: #afd2c8;
-        background: var(--soft);
+        background: var(--color-accent-soft);
       }
       .fusion {
         display: grid;
@@ -226,9 +226,9 @@
         gap: 14px;
       }
       .panel {
-        background: var(--paper);
-        border: 1px solid var(--line);
-        border-radius: 8px;
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-md);
         padding: 20px;
       }
       .panel h3 {
@@ -236,8 +236,8 @@
         margin: 0 0 6px;
       }
       .panel > p {
-        color: var(--muted);
-        font-size: 13px;
+        color: var(--color-muted);
+        font-size: var(--text-sm);
         margin: 0 0 15px;
       }
       .fusion-list {
@@ -249,7 +249,7 @@
         grid-template-columns: 125px minmax(0, 1fr);
         gap: 12px;
         padding: 10px 0;
-        border-top: 1px solid var(--line);
+        border-top: 1px solid var(--color-line);
         font-size: 13px;
       }
       .fusion-item:first-child {
@@ -257,10 +257,10 @@
         padding-top: 0;
       }
       .fusion-item strong {
-        color: var(--ink);
+        color: var(--color-ink);
       }
       .fusion-item span {
-        color: var(--muted);
+        color: var(--color-muted);
       }
       .fusion-item a {
         font-size: 12px;
@@ -268,16 +268,16 @@
       .flow {
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        border: 1px solid var(--line);
-        background: var(--line);
+        border: 1px solid var(--color-line);
+        background: var(--color-line);
       }
       .flow-step {
-        background: var(--paper);
+        background: var(--color-panel);
         padding: 15px;
         min-height: 150px;
       }
       .flow-step:not(:last-child) {
-        border-right: 1px solid var(--line);
+        border-right: 1px solid var(--color-line);
       }
       .flow-step b {
         display: block;
@@ -285,14 +285,14 @@
         margin-bottom: 5px;
       }
       .flow-step p {
-        color: var(--muted);
-        font-size: 12px;
+        color: var(--color-muted);
+        font-size: var(--text-sm);
         line-height: 1.65;
         margin: 0;
       }
       .flow-step small {
         display: block;
-        color: var(--accent);
+        color: var(--color-accent);
         font-size: 11px;
         font-weight: 750;
         margin-top: 9px;
@@ -303,17 +303,17 @@
         gap: 12px;
       }
       .analysis-card {
-        background: var(--paper);
-        border: 1px solid var(--line);
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
         padding: 16px;
         min-height: 145px;
       }
       .analysis-card:nth-child(2) {
-        background: var(--blue-soft);
+        background: var(--color-info-soft);
         border-color: #c9d9ea;
       }
       .analysis-card:nth-child(3) {
-        background: var(--warm-soft);
+        background: var(--color-warm-soft);
         border-color: #efd4b8;
       }
       .analysis-card h3 {
@@ -321,8 +321,8 @@
         margin: 0 0 6px;
       }
       .analysis-card p {
-        color: var(--muted);
-        font-size: 13px;
+        color: var(--color-muted);
+        font-size: var(--text-sm);
         line-height: 1.65;
         margin: 0;
       }
@@ -334,14 +334,14 @@
       .note {
         margin-top: 14px;
         padding: 13px 15px;
-        border-left: 3px solid var(--accent);
-        background: var(--soft);
+        border-left: 3px solid var(--color-accent);
+        background: var(--color-accent-soft);
         color: #3b6158;
         font-size: 13px;
       }
       .source-note {
-        color: var(--muted);
-        font-size: 12px;
+        color: var(--color-muted);
+        font-size: var(--text-sm);
         margin-top: 18px;
       }
       .source-note a {
@@ -371,7 +371,7 @@
         .flow-step {
           min-height: 0;
           border-right: 0 !important;
-          border-bottom: 1px solid var(--line);
+          border-bottom: 1px solid var(--color-line);
         }
         .flow-step:last-child {
           border-bottom: 0;
@@ -400,16 +400,16 @@
         margin-top: 14px;
         padding: 12px 15px;
         border: 1px solid #c8dcd5;
-        border-left: 3px solid var(--accent);
+        border-left: 3px solid var(--color-accent);
         border-radius: 6px;
-        background: var(--soft);
+        background: var(--color-accent-soft);
         font-size: 13px;
       }
       .access-banner strong {
         flex: 0 0 auto;
       }
       .access-banner span {
-        color: var(--muted);
+        color: var(--color-muted);
       }
       .access-banner a {
         margin-left: auto;
@@ -420,12 +420,12 @@
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 1px;
-        background: var(--line);
-        border: 1px solid var(--line);
+        background: var(--color-line);
+        border: 1px solid var(--color-line);
       }
       .usage-item {
         padding: 16px;
-        background: var(--paper);
+        background: var(--color-panel);
         min-height: 150px;
       }
       .usage-item h3 {
@@ -435,12 +435,12 @@
       .usage-item p {
         font-size: 13px;
         line-height: 1.7;
-        color: var(--muted);
+        color: var(--color-muted);
         margin: 0 0 8px;
       }
       .usage-item b {
         font-size: 12px;
-        color: var(--accent);
+        color: var(--color-accent);
       }
       @media (max-width: 800px) {
         .access-banner {
@@ -459,12 +459,12 @@
         }
       }
     </style>
-  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--paper)!important}:root[data-theme="dark"] .callout{background:var(--accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--warm-soft)!important}</style>
-<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--paper)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--paper)!important;color:var(--ink)!important;border-color:var(--line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--ink)!important}</style>
-<style>:root[data-theme="dark"] .project-links a,:root[data-theme="dark"] .links a,:root[data-theme="dark"] .project a,:root[data-theme="dark"] .entry a{background:var(--paper)!important}:root[data-theme="dark"] a.primary{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}:root[data-theme="dark"] .note{color:var(--ink)!important}</style>
-<style>:root[data-theme="dark"] a{background-color:transparent}:root[data-theme="dark"] .entry a,:root[data-theme="dark"] .panel a{background:var(--paper)!important}</style>
+  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}</style>
+<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style>:root[data-theme="dark"] .project-links a,:root[data-theme="dark"] .links a,:root[data-theme="dark"] .project a,:root[data-theme="dark"] .entry a{background:var(--color-panel)!important}:root[data-theme="dark"] a.primary{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] .note{color:var(--color-ink)!important}</style>
+<style>:root[data-theme="dark"] a{background-color:transparent}:root[data-theme="dark"] .entry a,:root[data-theme="dark"] .panel a{background:var(--color-panel)!important}</style>
 <style>:root[data-theme="dark"] .entry a:not(.primary),:root[data-theme="dark"] .panel a:not(.primary),:root[data-theme="dark"] .actions a:not(.primary){color:#7fd4bb!important}</style>
-<style>:root[data-theme="dark"] .panel a.primary,:root[data-theme="dark"] .entry a.primary,:root[data-theme="dark"] .actions a.primary{background:var(--accent)!important;color:#0e1a16!important;border-color:var(--accent)!important}</style>
+<style>:root[data-theme="dark"] .panel a.primary,:root[data-theme="dark"] .entry a.primary,:root[data-theme="dark"] .actions a.primary{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}</style>
 </head>
   <body>
     <div class="shell">
@@ -490,61 +490,54 @@
       <div class="purpose">
         <strong>这里解决什么问题</strong
         ><span
-          >这里不是新的知识分类，也不是项目排行榜，而是把已经安装的教学工具、工程
-          Skills、源码和融合记录放在一起，帮助你选择下一步动作。</span
+          >这里放我已经装好的学习工具，以及它们的源码和说明。想看哪个点哪个，不用记端口和路径。</span
         >
       </div>
       <div class="access-banner">
         <strong>访问方式</strong
         ><span id="access-copy"
-          >知识库和说明公开可读；只有启动会使用本机默认模型凭据的教学工具需要授权。</span
+          >知识库和这一页都能直接看。只有启动教学工具时要输一次密码，因为那会用到本机已配置的模型。</span
         ><a href="#how-to-use">先看使用说明 ↓</a>
       </div>
       <section class="section" id="how-to-use">
         <div class="section-head">
           <div>
-            <h2>使用前说明</h2>
-            <p>优先使用本页入口：它会处理授权、回跳和主题预填。</p>
+            <h2>怎么用</h2>
+            <p>从这一页点进去，登录和主题都会自动带上。</p>
           </div>
         </div>
         <div class="usage-grid">
           <article class="usage-item">
-            <h3>打开课堂：OpenMAIC</h3>
+            <h3>互动课堂</h3>
             <p>
-              点击本页“打开课堂”，或在学习中心先填主题。入口会带上主题并完成授权；手动访问
-              3100、旧的 `/workbench/new` 或空链接，可能停在授权页、404 或空页面。
+              想先把一个主题讲明白，用 OpenMAIC。输入主题后它会生成一节课，包含讲解、
+              互动、测验和练习。
             </p>
-            <b
-              >处理方式：回到本页重新点击入口，并确认“互动课堂可用”。</b
-            >
+            <b>从本页点「打开课堂」，主题会带过去。</b>
           </article>
           <article class="usage-item">
-            <h3>打开导师：DeepTutor</h3>
+            <h3>学习导师</h3>
             <p>
-              点击“进入学习导师”，系统会先完成本地账号会话，再进入
-              Chat。手动访问 3782 可能落到原始登录页；如果仍出现登录框，返回本页重试。
+              想就着一个问题反复追问，用 DeepTutor。它可以读你导入的资料，回答时给出出处，
+              也能把薄弱的地方整理成复习路径。
             </p>
-            <b
-              >Embedding
-              或搜索未配置时，只代表对应能力不可用，不代表整个站点坏了。</b
-            >
+            <b>从本页点「进入学习导师」，会直接进对话界面。</b>
           </article>
           <article class="usage-item">
-            <h3>主题、输入与 Token</h3>
+            <h3>什么会花掉额度</h3>
             <p>
-              阅读 Markdown、搜索、看图谱和打开项目说明不消耗模型
-              Token。工具页面只会预填主题，不会自动发送；点击生成、提问、研究或导入资料后，才会使用模型额度。
+              读文章、搜索、看图谱都不花钱。只有让工具生成内容时才会调用模型 ——
+              而这一步永远由你确认，页面不会自动发送。
             </p>
-            <b>先检查主题、材料范围和输出目标，再执行生成。</b>
+            <b>点生成之前，先看一眼主题和材料范围。</b>
           </article>
           <article class="usage-item">
-            <h3>本机与其他设备</h3>
+            <h3>在别的设备上打开</h3>
             <p>
-              Mac 本机通过真实 TCP
-              来源地址自动放行工具启动；其他设备仍可阅读全部知识，但启动工具前需要访问密码。Host、Origin
-              和浏览器参数不能伪造本机来源。
+              手机或同事的电脑也能读这些知识，只是启动教学工具时需要密码。
+              地址用 <code>MacBook-Pro-2.local:8787</code>，比记 IP 稳。
             </p>
-            <b>优先使用 MacBook-Pro-2.local；数字 IP 会随网络变化。</b>
+            <b>读知识不需要密码，用工具才需要。</b>
           </article>
         </div>
       </section>
@@ -566,12 +559,12 @@
               </div>
               <span class="status">3100 运行中</span>
             </div>
-            <p class="facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></p>
+            <p class="facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 3100</span><span class="fact-key">需访问码</span></p>
             <p>
               把一个主题变成可操作的课堂。根据目标选择讲解、互动、测验、PBL
               或可视化页面，适合把知识点从“读懂”推进到“做出来”。
             </p>
-            <div class="project-meta">
+            <div class="project-meta"><span class="verified">星数与许可核验于 2026-09-17</span>
               本地源码：projects/OpenMAIC · 教学入口：本机 3100 端口
             </div>
             <div class="actions">
@@ -600,11 +593,11 @@
               </div>
               <span class="status auth">3782 运行中</span>
             </div>
-            <p class="facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></p>
+            <p class="facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 3782</span><span class="fact-key">需登录本机账号</span></p>
             <p>
               把资料导入知识库后进行带引用问答、深度研究、可视化和掌握路径。它适合处理需要来源、追问和长期复习的主题。
             </p>
-            <div class="project-meta">
+            <div class="project-meta"><span class="verified">星数与许可核验于 2026-09-17</span>
               本地源码：projects/DeepTutor · 教学入口：本机 3782
               端口，自动建立会话
             </div>
@@ -647,12 +640,12 @@
               </div>
               <span class="status">已同步技能</span>
             </div>
-            <p class="facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-key" style="border-color:var(--line);background:var(--color-panel);color:var(--muted)">无需 API Key</span><span>2026-09-17 核验</span></p>
+            <p class="facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-key" style="border-color:var(--color-line);background:var(--color-panel);color:var(--color-muted)">无需 API Key</span></p>
             <p>
               把 Agent
               的工程工作拆成可复用流程：先理解边界，再形成规格，按小步反馈实施，最后用测试和审查确认结果。
             </p>
-            <div class="project-meta">
+            <div class="project-meta"><span class="verified">星数与许可核验于 2026-09-17</span>
               本地源码：projects/mattpocock-skills · 技能已软链接到
               Codex、Cursor、CodeBuddy
             </div>
@@ -677,12 +670,12 @@
               </div>
               <span class="status">辅助 CLI</span>
             </div>
-            <p class="facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-key" style="border-color:var(--line);background:var(--color-panel);color:var(--muted)">无需 API Key</span><span>2026-09-17 核验</span></p>
+            <p class="facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-key" style="border-color:var(--color-line);background:var(--color-panel);color:var(--color-muted)">无需 API Key</span></p>
             <p>
               把系统描述或仓库证据变成类型化图描述，再经过确定性校验生成可交互
               HTML/SVG。它负责让关系可追踪，不负责替人编造业务事实。
             </p>
-            <div class="project-meta">
+            <div class="project-meta"><span class="verified">星数与许可核验于 2026-09-17</span>
               本地源码：projects/archify/archify ·
               适合：架构阅读、知识关系、证据图
             </div>
