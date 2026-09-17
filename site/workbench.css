@@ -368,6 +368,158 @@ body.wb-host .work-actions a:hover {
   }
 }
 
+/* Feedback entry. Pinned bottom-right so it is present on every companion
+   page without taking space from the content, matching the reader. */
+.wb-fab {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 21;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid #b7d9cf;
+  background: var(--wb-accent);
+  color: #fff;
+  font: 700 22px/1 inherit;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(20, 80, 66, .28);
+  transition: transform .14s ease, box-shadow .14s ease;
+}
+.wb-fab:hover { transform: translateY(-2px); box-shadow: 0 10px 26px rgba(20, 80, 66, .34); }
+.wb-fab:focus-visible { outline: 2px solid var(--wb-accent); outline-offset: 3px; }
+.wb-fab > span[aria-hidden] { display: block; font-size: 24px; line-height: 1; }
+.wb-fab .wb-fab-label {
+  position: absolute;
+  right: 62px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 11px;
+  border: 1px solid var(--wb-line);
+  border-radius: 6px;
+  background: var(--wb-paper);
+  color: var(--wb-ink);
+  font: 650 12px/1 inherit;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .14s ease;
+}
+.wb-fab:hover .wb-fab-label,
+.wb-fab:focus-visible .wb-fab-label { opacity: 1; }
+
+.wb-fb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 31;
+  display: none;
+  place-items: center;
+  background: rgba(19, 28, 25, .42);
+  backdrop-filter: blur(2px);
+  padding: 20px;
+}
+.wb-fb-overlay.open { display: grid; }
+.wb-fb-panel {
+  width: min(520px, 100%);
+  max-height: 86vh;
+  overflow: auto;
+  background: var(--wb-paper);
+  border: 1px solid var(--wb-line);
+  border-radius: 10px;
+  padding: 22px 24px;
+  box-shadow: 0 24px 60px rgba(20, 42, 35, .28);
+}
+.wb-fb-panel h2 { margin: 0 0 4px; font-size: 19px; }
+.wb-fb-sub { margin: 0 0 16px; color: var(--wb-muted); font-size: 12.5px; line-height: 1.6; }
+.wb-fb-where {
+  margin: 0 0 15px;
+  padding: 9px 11px;
+  border: 1px solid var(--wb-line);
+  border-radius: 6px;
+  background: var(--wb-bg);
+  color: var(--wb-muted);
+  font-size: 12px;
+}
+.wb-fb-where b { color: var(--wb-ink); }
+.wb-fb-kinds { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 15px; }
+.wb-fb-kinds label {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border: 1px solid var(--wb-line);
+  border-radius: 20px;
+  background: var(--wb-paper);
+  color: var(--wb-muted);
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.wb-fb-kinds input { position: absolute; opacity: 0; pointer-events: none; }
+.wb-fb-kinds label:has(input:checked) {
+  border-color: var(--wb-accent);
+  background: var(--wb-accent-soft);
+  color: var(--wb-accent);
+}
+.wb-fb-kinds label:focus-within { outline: 2px solid var(--wb-accent); outline-offset: 2px; }
+.wb-fb-field { display: block; margin: 0 0 13px; }
+.wb-fb-field > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--wb-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+.wb-fb-field textarea,
+.wb-fb-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--wb-line);
+  border-radius: 6px;
+  background: var(--wb-paper);
+  color: var(--wb-ink);
+  font: inherit;
+  font-size: 13.5px;
+  outline: 0;
+}
+.wb-fb-field textarea { min-height: 110px; resize: vertical; line-height: 1.65; }
+.wb-fb-field textarea:focus,
+.wb-fb-field input:focus {
+  border-color: var(--wb-accent);
+  box-shadow: 0 0 0 3px rgba(8, 118, 99, .12);
+}
+.wb-fb-field small { display: block; text-align: right; color: var(--wb-muted); font-size: 11px; margin-top: 4px; }
+.wb-fb-actions { display: flex; gap: 9px; margin-top: 6px; }
+.wb-fb-actions button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--wb-line);
+  border-radius: 6px;
+  background: var(--wb-bg);
+  color: var(--wb-ink);
+  font: 650 13px inherit;
+  cursor: pointer;
+}
+.wb-fb-actions button:hover { border-color: var(--wb-accent); color: var(--wb-accent); }
+.wb-fb-actions button[type="submit"] {
+  border-color: var(--wb-accent);
+  background: var(--wb-accent);
+  color: #fff;
+}
+.wb-fb-actions button[type="submit"]:hover { background: #0b5f4f; color: #fff; }
+.wb-fb-actions button:disabled { opacity: .6; cursor: wait; }
+.wb-fb-note { margin: 11px 0 0; font-size: 12px; color: var(--wb-muted); }
+.wb-fb-note.err { color: var(--warm, #a45b2a); font-weight: 650; }
+
+@media (max-width: 900px) {
+  .wb-fab { right: 14px; bottom: 16px; width: 48px; height: 48px; }
+  .wb-fab .wb-fab-label { display: none; }
+}
+
+@media print {
+  .wb-sidebar, .wb-fab, .wb-fb-overlay, .wb-theme-toggle { display: none !important; }
+  body.wb-host { padding-left: 0; background: #fff; }
+}
+
 @media (max-width: 900px) {
   body.wb-host { padding-left: 0; }
   .wb-sidebar {

@@ -15,6 +15,7 @@ import re
 import secrets
 import socket
 import subprocess
+import threading
 import time
 from http.cookies import SimpleCookie
 from pathlib import Path
@@ -34,6 +35,12 @@ AUTH_SERVICE = "knowledge-site-access"
 AUTH_MAX_AGE = 60 * 60 * 24 * 14
 AUTH_FAILURE_WINDOW = 5 * 60
 AUTH_FAILURE_LIMIT = 5
+WECOM_SERVICE = "knowledge-site-wecom"
+FEEDBACK_MAX_CHARS = 4000
+FEEDBACK_RATE_WINDOW = 60
+FEEDBACK_RATE_LIMIT = 5
+FEEDBACK_KINDS = ("bug", "confusing", "suggestion", "praise", "other")
+VISIT_RETENTION_DAYS = 180
 REPOSITORY_ROOT = Path(
     os.environ.get("KNOWLEDGE_REPOSITORY_ROOT") or Path(__file__).resolve().parents[1]
 ).resolve()
@@ -42,6 +49,14 @@ PUBLIC_PROJECTS_README = REPOSITORY_ROOT / "projects" / "README.md"
 PUBLIC_PROJECTS_PAGE = REPOSITORY_ROOT / "projects" / "index.html"
 PUBLIC_PROJECTS_ROOT = REPOSITORY_ROOT / "projects"
 PUBLIC_EVALUATION = REPOSITORY_ROOT / "apps" / "agent-evaluation" / "index.html"
+PUBLIC_INSIGHTS = REPOSITORY_ROOT / "site" / "insights.html"
+# 反馈和访问记录落在这里。放在仓库内便于本机查看，但必须 gitignore ——
+# 内容是访客数据，不该进版本库。
+DATA_HOME = Path(
+    os.environ.get("KNOWLEDGE_DATA_HOME") or REPOSITORY_ROOT / "data"
+)
+FEEDBACK_LOG = DATA_HOME / "feedback.jsonl"
+VISIT_LOG = DATA_HOME / "visits.jsonl"
 OPENMAIC_ACCESS_SERVICE = "knowledge-tools-model-access"
 OPENMAIC_JOBS_ROOT = Path(
     os.environ.get("OPENMAIC_HOME") or Path.home() / "Developer" / "knowledge-tools" / "OpenMAIC"
@@ -286,6 +301,141 @@ def _fetch_json(
     except (OSError, HTTPError, URLError, UnicodeError, json.JSONDecodeError):
         return {}
     return value if isinstance(value, dict) else {}
+
+
+# ── 反馈与访问记录 ────────────────────────────────────────────────────────
+# 这是本服务唯一的写盘路径。ThreadingHTTPServer 会并发写同一个文件，
+# 所以所有追加都要过这把锁：拼好完整一行再原子写入，避免读到半行。
+_LOG_LOCK = threading.Lock()
+_LOCAL_NAME_CACHE: dict[str, str] = {}
+
+
+def _ensure_data_home() -> None:
+    try:
+        DATA_HOME.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        pass
+
+
+def _append_jsonl(path: Path, record: dict[str, object]) -> bool:
+    """Append one JSON line. Returns False if the write failed."""
+    _ensure_data_home()
+    line = json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+    try:
+        with _LOG_LOCK:
+            with path.open("a", encoding="utf-8") as handle:
+                handle.write(line)
+    except OSError:
+        return False
+    return True
+
+
+def _read_jsonl(path: Path, limit: int = 2000) -> list[dict[str, object]]:
+    """Read recent records, newest last. Tolerates a truncated final line."""
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError):
+        return []
+    records: list[dict[str, object]] = []
+    for line in raw.splitlines()[-limit:]:
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict):
+            records.append(value)
+    return records
+
+
+def local_git_name() -> str:
+    """The operator's git user.name, read once and cached.
+
+    Browsers cannot read git config, so the only honest way to prefill a name
+    for the person at this machine is to ask git on this machine.
+    """
+    if "name" not in _LOCAL_NAME_CACHE:
+        name = ""
+        try:
+            result = subprocess.run(
+                ["git", "config", "--get", "user.name"],
+                capture_output=True,
+                text=True,
+                timeout=3,
+                check=False,
+                cwd=str(REPOSITORY_ROOT),
+            )
+            if result.returncode == 0:
+                name = result.stdout.strip()
+        except (OSError, subprocess.SubprocessError):
+            name = ""
+        _LOCAL_NAME_CACHE["name"] = name[:60]
+    return _LOCAL_NAME_CACHE["name"]
+
+
+_UA_BROWSER_RE = re.compile(r"(Edg|Chrome|Firefox|Safari|curl|python-requests|Wget)/?([\d.]+)?")
+# 系统版本号在第一个括号里，但格式不统一：Mac/iPhone 用下划线（10_15_7），
+# Windows 用点分（NT 10.0）。直接匹配 token，不要在前面加通配组去抢匹配。
+_UA_OS_RE = re.compile(
+    r"(Windows NT [\d.]+|Mac OS X [\d_.]+|Android [\d.]+|iPhone OS [\d_]+|Linux|X11)"
+)
+_BROWSER_LABELS = {"Edg": "Edge", "Chrome": "Chrome", "Firefox": "Firefox", "Safari": "Safari"}
+
+
+def describe_agent(user_agent: str) -> str:
+    """Turn a User-Agent into something readable for the insights table."""
+    if not user_agent:
+        return "未知"
+    system = _UA_OS_RE.search(user_agent)
+    # Safari 的版本号在 "Version/x.y" 里；UA 里的 "Safari/604" 是 WebKit 版本，
+    # 直接取会把所有 Safari 都显示成 604。
+    browser_name, browser_version = "", ""
+    for pattern in (r"(Edg)/([\d.]+)", r"(Chrome)/([\d.]+)", r"(Firefox)/([\d.]+)"):
+        match = re.search(pattern, user_agent)
+        if match:
+            browser_name, browser_version = match.group(1), match.group(2)
+            break
+    if not browser_name:
+        safari = re.search(r"Version/([\d.]+).*Safari", user_agent)
+        if safari:
+            browser_name, browser_version = "Safari", safari.group(1)
+        else:
+            other = re.search(r"(Safari|curl|python-requests|Wget)/?([\d.]*)", user_agent)
+            if other:
+                browser_name, browser_version = other.group(1), other.group(2)
+    label = _BROWSER_LABELS.get(browser_name, browser_name or "其他")
+    if browser_version:
+        label = f"{label} {browser_version.split('.')[0]}"
+    if system:
+        label += " · " + system.group(1).replace("_", ".")
+    return label[:80]
+
+
+def wecom_webhook_key() -> str:
+    """Read the group-bot key from the Keychain. Never from a committed file."""
+    return read_keychain_secret(WECOM_SERVICE)
+
+
+def notify_wecom(summary: str) -> None:
+    """Push a notification, but never let a failure affect the caller.
+
+    Runs on a background thread from the request handler so a slow or down
+    webhook cannot delay the feedback response.
+    """
+    key = wecom_webhook_key()
+    if not key:
+        return
+    url = f"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={key}"
+    payload = json_bytes({"msgtype": "text", "text": {"content": summary[:1900]}})
+    request = Request(url, data=payload, headers={"Content-Type": "application/json"})
+    try:
+        with urlopen(request, timeout=6) as response:
+            response.read()
+    except (OSError, HTTPError, URLError) as error:
+        # 通知失败不影响已经落盘的反馈，只记录日志。
+        print(f"[wecom] notify failed: {error}", flush=True)
 
 
 def learning_services_status() -> dict[str, object]:
@@ -1137,11 +1287,25 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self, fmt: str, *args: object) -> None:
         print(f"[{self.log_date_time_string()}] {fmt % args}", flush=True)
 
-    def send_bytes(self, payload: bytes, content_type: str, status: int = 200) -> None:
+    def send_bytes(
+        self, payload: bytes, content_type: str, status: int = 200, download: str = ""
+    ) -> None:
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(payload)))
         self.send_header("Cache-Control", "no-store")
+        if download:
+            # 中文文件名不能直接放进头（头是 latin-1），必须用 RFC 5987 的
+            # filename* 形式；同时给一个 ASCII 的 filename 作为旧浏览器回退。
+            # 纯中文标题会退化成只有扩展名，所以给个有意义的兜底名。
+            ascii_name = re.sub(r"[^A-Za-z0-9._-]+", "_", download).strip("_")
+            if ascii_name in {"", ".md"}:
+                ascii_name = "knowledge-note.md"
+            self.send_header(
+                "Content-Disposition",
+                f"attachment; filename=\"{ascii_name}\"; "
+                f"filename*=UTF-8''{quote(download, safe='')}",
+            )
         self.end_headers()
         self.wfile.write(payload)
 
@@ -1319,6 +1483,29 @@ class Handler(BaseHTTPRequestHandler):
                 }
             )
             return
+        # ── 中台数据 ───────────────────────────────────────────────────────
+        # 聚合只在访问时计算。数据量是"一个人读知识库"的量级，
+        # 预先建索引或缓存反而是多余的复杂度。
+        if path == "/insights":
+            try:
+                payload = PUBLIC_INSIGHTS.read_bytes()
+            except OSError:
+                self.send_json({"error": "insights page unavailable"}, 503)
+                return
+            self.send_bytes(payload, "text/html; charset=utf-8")
+            return
+        if path == "/api/insights/summary":
+            self.send_json(insights_summary())
+            return
+        if path == "/api/insights/visitors":
+            self.send_json({"visitors": insights_visitors()})
+            return
+        if path == "/api/insights/pages":
+            self.send_json({"pages": insights_pages()})
+            return
+        if path == "/api/insights/feedback":
+            self.send_json({"feedback": insights_feedback()})
+            return
         if path.startswith("/projects/"):
             # 上游项目的 README 快照，供"查看技能说明""中文说明"这类链接直接读取。
             # 只放行项目目录下的 Markdown，且必须落在 projects/ 内，
@@ -1425,6 +1612,23 @@ class Handler(BaseHTTPRequestHandler):
             ]
             self.send_json({"notes": notes, "edges": edges})
             return
+        # 导出：给 curl/wget 这类没有 JS 的场景用。前端按钮走的是
+        # /api/note 的 raw + Blob，不依赖这个接口，但保留它让链接可分享。
+        if path == "/api/note/export":
+            self.vault.refresh()
+            rel = query.get("path", [""])[0]
+            note = self.vault.note(rel) or (self.vault.note(self.vault.resolve_note(rel) or "") if rel else None)
+            if not note:
+                self.send_json({"error": "note not found"}, 404)
+                return
+            title = str(note["title"])
+            payload = f"<!-- {title} · {note['updated']} -->\n\n".encode("utf-8") + str(note["body"]).encode("utf-8")
+            self.send_bytes(
+                payload,
+                "text/markdown; charset=utf-8",
+                download=f"{title}.md",
+            )
+            return
         if path == "/api/note":
             self.vault.refresh()
             rel = query.get("path", [""])[0]
@@ -1456,17 +1660,75 @@ class Handler(BaseHTTPRequestHandler):
             return
         self.send_json({"error": "not found"}, 404)
 
-    def do_POST(self) -> None:  # noqa: N802
-        if urlsplit(self.path).path != "/auth/login":
-            if not self.require_access():
-                return
-            self.send_json({"error": "not found"}, 404)
-            return
+    def read_json_body(self, limit: int) -> tuple[dict[str, object] | None, int]:
+        """Read a JSON body. Returns (body, 0) or (None, http_status).
+
+        The limit is enforced rather than silently truncating: a truncated body
+        fails to parse and the caller reports a confusing 400 instead of 413.
+        """
         try:
-            length = min(int(self.headers.get("Content-Length", "0")), 16 * 1024)
-            body = json.loads(self.rfile.read(length).decode("utf-8")) if length else {}
+            declared = int(self.headers.get("Content-Length", "0"))
+        except ValueError:
+            return None, 400
+        if declared > limit:
+            return None, 413
+        try:
+            raw = self.rfile.read(declared) if declared else b""
+            value = json.loads(raw.decode("utf-8")) if raw else {}
         except (ValueError, json.JSONDecodeError, UnicodeDecodeError):
-            self.send_json({"error": "invalid request"}, 400)
+            return None, 400
+        if not isinstance(value, dict):
+            return None, 400
+        return value, 0
+
+    def visitor_record(self, body: dict[str, object]) -> dict[str, object]:
+        """Identify who is talking to us, using only what we can actually get.
+
+        The browser cannot read git config, so the local operator's name comes
+        from git on this machine and is only offered as a default when the
+        request is genuinely local. A LAN visitor has to say who they are; we
+        store what they type and never pretend it is verified.
+        """
+        address = self.client_address[0]
+        local = is_local_client(address)
+        agent = describe_agent(self.headers.get("User-Agent", ""))
+        claimed = str(body.get("name") or "").strip()[:60]
+        if claimed:
+            name, source = claimed, "manual"
+        elif local:
+            name, source = local_git_name(), "git"
+        else:
+            name, source = "", "unknown"
+        return {
+            "ip": address,
+            "host_kind": "local" if local else "lan",
+            "agent": agent,
+            "name": name,
+            "name_source": source,
+        }
+
+    def do_POST(self) -> None:  # noqa: N802
+        path = urlsplit(self.path).path
+        if path == "/auth/login":
+            self.handle_login()
+            return
+        if not self.require_access():
+            return
+        if path == "/api/feedback":
+            self.handle_feedback()
+            return
+        if path == "/api/visit":
+            self.handle_visit()
+            return
+        if path == "/api/insights/feedback/status":
+            self.handle_feedback_status()
+            return
+        self.send_json({"error": "not found"}, 404)
+
+    def handle_login(self) -> None:
+        body, error = self.read_json_body(16 * 1024)
+        if body is None:
+            self.send_json({"error": "invalid request"}, error)
             return
         password = str(body.get("password") or "")
         if not password or not hmac.compare_digest(password, self.site_password):
@@ -1479,6 +1741,232 @@ class Handler(BaseHTTPRequestHandler):
         )
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
+
+    def recent_feedback_count(self, address: str) -> int:
+        cutoff = time.time() - FEEDBACK_RATE_WINDOW
+        return sum(
+            1
+            for record in _read_jsonl(FEEDBACK_LOG, limit=200)
+            if record.get("ip") == address and float(record.get("ts") or 0) >= cutoff
+        )
+
+    def handle_feedback(self) -> None:
+        body, error = self.read_json_body((FEEDBACK_MAX_CHARS + 1024) * 4)
+        if body is None:
+            if error == 413:
+                self.send_json(
+                    {"error": f"反馈太长，请控制在 {FEEDBACK_MAX_CHARS} 字以内"}, 413
+                )
+            else:
+                self.send_json({"error": "invalid request"}, error)
+            return
+        message = str(body.get("message") or "").strip()
+        if not message:
+            self.send_json({"error": "请先写下反馈内容"}, 400)
+            return
+        if len(message) > FEEDBACK_MAX_CHARS:
+            self.send_json(
+                {"error": f"反馈太长（{len(message)} 字），请控制在 {FEEDBACK_MAX_CHARS} 字以内"},
+                413,
+            )
+            return
+        kind = str(body.get("kind") or "other")
+        if kind not in FEEDBACK_KINDS:
+            kind = "other"
+        # 只接受真实存在的文章路径，避免伪造或路径穿越写入无意义记录。
+        rel = unquote(str(body.get("path") or "")).strip().lstrip("/")
+        note = self.vault.note(rel) if rel else None
+        if rel and not note:
+            resolved = self.vault.resolve_note(rel)
+            note = self.vault.note(resolved) if resolved else None
+        visitor = self.visitor_record(body)
+        if self.recent_feedback_count(visitor["ip"]) >= FEEDBACK_RATE_LIMIT:
+            self.send_json({"error": "提交太频繁，请稍后再试"}, 429)
+            return
+        record = {
+            "ts": time.time(),
+            "kind": kind,
+            "message": message,
+            "path": str(note["path"]) if note else "",
+            "title": str(note["title"]) if note else str(body.get("title") or "")[:120],
+            "contact": str(body.get("contact") or "").strip()[:120],
+            "status": "open",
+            **visitor,
+        }
+        if not _append_jsonl(FEEDBACK_LOG, record):
+            self.send_json({"error": "反馈保存失败，请稍后重试"}, 500)
+            return
+        kind_labels = {
+            "bug": "内容有错",
+            "confusing": "看不懂",
+            "suggestion": "建议",
+            "praise": "有用",
+            "other": "其他",
+        }
+        summary = (
+            f"【知识库反馈】{kind_labels.get(kind, kind)}"
+            f"{' · ' + record['title'] if record['title'] else ''}\n"
+            f"来自：{record['name'] or record['ip']}（{record['host_kind']}）\n"
+            f"{message[:400]}"
+        )
+        threading.Thread(target=notify_wecom, args=(summary,), daemon=True).start()
+        self.send_json({"ok": True, "message": "收到，谢谢反馈！"})
+
+    def handle_visit(self) -> None:
+        body, error = self.read_json_body(4 * 1024)
+        if body is None:
+            self.send_json({"error": "invalid request"}, error)
+            return
+        rel = unquote(str(body.get("path") or "")).strip().lstrip("/")
+        note = self.vault.note(rel) if rel else None
+        record = {
+            "ts": time.time(),
+            "path": str(note["path"]) if note else "",
+            "title": str(note["title"]) if note else str(body.get("title") or "")[:120],
+            "referrer": str(self.headers.get("Referer") or "")[:200],
+            "screen": str(body.get("screen") or "")[:20],
+            **self.visitor_record(body),
+        }
+        _append_jsonl(VISIT_LOG, record)
+        self.send_json({"ok": True})
+
+    def handle_feedback_status(self) -> None:
+        body, error = self.read_json_body(4 * 1024)
+        if body is None:
+            self.send_json({"error": "invalid request"}, error)
+            return
+        target = str(body.get("ts") or "")
+        status = str(body.get("status") or "")
+        if status not in {"open", "read", "done"}:
+            self.send_json({"error": "invalid status"}, 400)
+            return
+        records = _read_jsonl(FEEDBACK_LOG, limit=100000)
+        changed = 0
+        _ensure_data_home()
+        try:
+            with _LOG_LOCK:
+                with FEEDBACK_LOG.open("w", encoding="utf-8") as handle:
+                    for record in records:
+                        if str(record.get("ts")) == target:
+                            record["status"] = status
+                            changed += 1
+                        handle.write(
+                            json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+                        )
+        except OSError:
+            self.send_json({"error": "更新失败"}, 500)
+            return
+        self.send_json({"ok": True, "changed": changed})
+
+
+# ── 中台聚合 ──────────────────────────────────────────────────────────────
+# 规模是"一个人读知识库"，所以在访问时现算即可。加缓存或索引只会
+# 引入失效逻辑，换不来可感知的速度。
+
+
+def _day_key(ts: float) -> str:
+    return time.strftime("%Y-%m-%d", time.localtime(ts))
+
+
+def _trim_visits(records: list[dict[str, object]]) -> list[dict[str, object]]:
+    """Drop records past the retention window so the log cannot grow forever."""
+    cutoff = time.time() - VISIT_RETENTION_DAYS * 86400
+    return [r for r in records if float(r.get("ts") or 0) >= cutoff]
+
+
+def insights_summary() -> dict[str, object]:
+    visits = _trim_visits(_read_jsonl(VISIT_LOG, limit=100000))
+    feedback = _read_jsonl(FEEDBACK_LOG, limit=100000)
+    today = _day_key(time.time())
+    visitors = {str(v.get("ip") or "?") for v in visits}
+    return {
+        "visits_total": len(visits),
+        "visitors_total": len(visitors),
+        "visits_today": sum(1 for v in visits if _day_key(float(v.get("ts") or 0)) == today),
+        "feedback_total": len(feedback),
+        "feedback_open": sum(1 for f in feedback if f.get("status") == "open"),
+        "local_name": local_git_name(),
+        "retention_days": VISIT_RETENTION_DAYS,
+    }
+
+
+def insights_visitors(limit: int = 60) -> list[dict[str, object]]:
+    visits = _trim_visits(_read_jsonl(VISIT_LOG, limit=100000))
+    grouped: dict[str, dict[str, object]] = {}
+    for record in visits:
+        ip = str(record.get("ip") or "?")
+        entry = grouped.setdefault(
+            ip,
+            {
+                "ip": ip,
+                "host_kind": record.get("host_kind") or "lan",
+                "agent": record.get("agent") or "未知",
+                "name": "",
+                "name_source": "unknown",
+                "visits": 0,
+                "first": float(record.get("ts") or 0),
+                "last": 0.0,
+                "pages": set(),
+            },
+        )
+        entry["visits"] = int(entry["visits"]) + 1
+        entry["last"] = max(float(entry["last"]), float(record.get("ts") or 0))
+        entry["first"] = min(float(entry["first"]), float(record.get("ts") or 0))
+        if record.get("name"):
+            entry["name"] = record["name"]
+            entry["name_source"] = record.get("name_source") or "manual"
+        if record.get("path"):
+            entry["pages"].add(str(record["path"]))
+    result = []
+    for entry in sorted(grouped.values(), key=lambda e: float(e["last"]), reverse=True)[:limit]:
+        entry["pages"] = len(entry["pages"])
+        entry["first"] = _day_key(float(entry["first"])) + " " + time.strftime(
+            "%H:%M", time.localtime(float(entry["first"]))
+        )
+        entry["last"] = _day_key(float(entry["last"])) + " " + time.strftime(
+            "%H:%M", time.localtime(float(entry["last"]))
+        )
+        result.append(entry)
+    return result
+
+
+def insights_pages(limit: int = 25) -> list[dict[str, object]]:
+    visits = _trim_visits(_read_jsonl(VISIT_LOG, limit=100000))
+    counts: dict[str, dict[str, object]] = {}
+    for record in visits:
+        path = str(record.get("path") or "")
+        if not path:
+            continue
+        entry = counts.setdefault(
+            path, {"path": path, "title": record.get("title") or path, "visits": 0}
+        )
+        entry["visits"] = int(entry["visits"]) + 1
+    return sorted(counts.values(), key=lambda e: int(e["visits"]), reverse=True)[:limit]
+
+
+def insights_feedback(limit: int = 200) -> list[dict[str, object]]:
+    records = _read_jsonl(FEEDBACK_LOG, limit=100000)
+    result = []
+    for record in reversed(records[-limit:]):
+        result.append(
+            {
+                "ts": record.get("ts"),
+                "time": _day_key(float(record.get("ts") or 0))
+                + " "
+                + time.strftime("%H:%M", time.localtime(float(record.get("ts") or 0))),
+                "kind": record.get("kind") or "other",
+                "message": record.get("message") or "",
+                "path": record.get("path") or "",
+                "title": record.get("title") or "",
+                "contact": record.get("contact") or "",
+                "status": record.get("status") or "open",
+                "name": record.get("name") or "",
+                "host_kind": record.get("host_kind") or "lan",
+                "ip": record.get("ip") or "",
+                "agent": record.get("agent") or "",
+            }
+        )
+    return result
 
 
 def detect_host() -> str:

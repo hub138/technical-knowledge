@@ -59,3 +59,8 @@ projects/archify/archify.zip
 /vault/**/*.jpg
 /vault/**/*.jpeg
 /vault/**/*.pdf
+
+# Reader feedback and visit logs. This is visitor data collected at runtime,
+# not knowledge: it must never be committed. The directory is created on first
+# write by the server, so a fresh clone simply has no data/.
+/data/

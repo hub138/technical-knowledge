@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>访问与反馈 · 工程知识库</title>
+    <link rel="stylesheet" href="/static/workbench.css" />
+    <script src="/static/workbench.js" data-page="insights" defer></script>
+    <style>
+      :root {
+        --ok: #147766;
+        --ok-soft: #e4f1ed;
+        --warn: #a45b2a;
+        --warn-soft: #fff5e9;
+        --danger: #9b4660;
+        --danger-soft: #fdf0f3;
+      }
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+        margin: 0 0 26px;
+      }
+      .tile {
+        background: var(--wb-paper);
+        border: 1px solid var(--wb-line);
+        border-radius: 8px;
+        padding: 16px 18px;
+      }
+      .tile b {
+        display: block;
+        font-size: 30px;
+        line-height: 1.1;
+        font-variant-numeric: tabular-nums;
+        color: var(--wb-ink);
+      }
+      .tile span {
+        display: block;
+        margin-top: 5px;
+        color: var(--wb-muted);
+        font-size: 12px;
+      }
+      .tile.accent b {
+        color: var(--wb-accent);
+      }
+      .tile.warn b {
+        color: var(--warn);
+      }
+      h2.section-h {
+        font-size: 19px;
+        margin: 30px 0 4px;
+      }
+      h2.section-h + p {
+        color: var(--wb-muted);
+        font-size: 13px;
+        margin: 0 0 13px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: var(--wb-paper);
+        border: 1px solid var(--wb-line);
+        border-radius: 8px;
+        overflow: hidden;
+        font-size: 12.5px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--wb-line);
+        vertical-align: top;
+      }
+      th {
+        background: var(--wb-bg);
+        color: var(--wb-muted);
+        font-weight: 700;
+        font-size: 11px;
+        letter-spacing: 0.04em;
+        white-space: nowrap;
+      }
+      tr:last-child td {
+        border-bottom: 0;
+      }
+      td.num {
+        font-variant-numeric: tabular-nums;
+        text-align: right;
+        white-space: nowrap;
+      }
+      .who {
+        font-weight: 700;
+        color: var(--wb-ink);
+      }
+      .tag {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+      .tag.local {
+        background: var(--ok-soft);
+        color: var(--ok);
+      }
+      .tag.lan {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+      .tag.bug {
+        background: var(--danger-soft);
+        color: var(--danger);
+      }
+      .tag.confusing {
+        background: var(--warn-soft);
+        color: var(--warn);
+      }
+      .tag.suggestion,
+      .tag.other {
+        background: var(--wb-bg);
+        color: var(--wb-muted);
+      }
+      .tag.praise {
+        background: var(--ok-soft);
+        color: var(--ok);
+      }
+      .fb-list {
+        display: grid;
+        gap: 11px;
+      }
+      .fb {
+        background: var(--wb-paper);
+        border: 1px solid var(--wb-line);
+        border-left: 3px solid var(--wb-line-strong);
+        border-radius: 7px;
+        padding: 14px 16px;
+      }
+      .fb[data-status="open"] {
+        border-left-color: var(--warn);
+      }
+      .fb[data-status="read"] {
+        border-left-color: var(--wb-accent);
+      }
+      .fb[data-status="done"] {
+        border-left-color: var(--ok);
+        opacity: 0.72;
+      }
+      .fb-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 9px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .fb-head .when {
+        color: var(--wb-muted);
+        font-size: 11.5px;
+        margin-left: auto;
+      }
+      .fb-where {
+        font-size: 12px;
+        color: var(--wb-muted);
+        margin: 0 0 7px;
+      }
+      .fb-body {
+        margin: 0;
+        white-space: pre-wrap;
+        line-height: 1.7;
+        font-size: 13.5px;
+      }
+      .fb-actions {
+        display: flex;
+        gap: 7px;
+        margin-top: 11px;
+      }
+      .fb-actions button {
+        padding: 5px 11px;
+        border: 1px solid var(--wb-line);
+        border-radius: 5px;
+        background: var(--wb-paper);
+        color: var(--wb-muted);
+        font: 650 11.5px inherit;
+        cursor: pointer;
+      }
+      .fb-actions button:hover {
+        border-color: var(--wb-accent);
+        color: var(--wb-accent);
+      }
+      .fb-actions button[aria-pressed="true"] {
+        border-color: var(--wb-accent);
+        background: var(--wb-accent-soft);
+        color: var(--wb-accent);
+      }
+      .empty-note {
+        background: var(--wb-paper);
+        border: 1px dashed var(--wb-line);
+        border-radius: 8px;
+        padding: 26px;
+        text-align: center;
+        color: var(--wb-muted);
+        font-size: 13px;
+      }
+      .caveat {
+        margin-top: 30px;
+        padding: 13px 15px;
+        border: 1px solid var(--wb-line);
+        border-left: 3px solid var(--warn);
+        border-radius: 6px;
+        background: var(--wb-paper);
+        color: var(--wb-muted);
+        font-size: 12.5px;
+        line-height: 1.7;
+      }
+      .caveat b {
+        color: var(--wb-ink);
+      }
+      @media (max-width: 900px) {
+        table {
+          display: block;
+          overflow-x: auto;
+        }
+        .fb-head .when {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <section class="hero">
+        <div class="eyebrow">INSIGHTS · VISITS · FEEDBACK</div>
+        <h1>访问与反馈</h1>
+        <p>
+          谁读过这个知识库、读了什么、提了什么意见。数据只存在本机
+          <code>data/</code> 目录，不进版本库、不外发。
+        </p>
+        <div class="hero-links">
+          <a class="primary" href="/">回到知识库</a>
+          <a href="/projects">项目与教学</a>
+          <button type="button" id="refresh">刷新</button>
+        </div>
+      </section>
+
+      <section class="tiles" id="tiles" aria-label="概览"></section>
+
+      <h2 class="section-h">待处理反馈</h2>
+      <p>按时间倒序。标记会立刻写回本地日志，刷新后仍然保留。</p>
+      <div class="fb-list" id="feedback"></div>
+
+      <h2 class="section-h">访客</h2>
+      <p>按最近访问排序。名字来自本人填写，或本机 git 配置；不做身份校验。</p>
+      <div id="visitors"></div>
+
+      <h2 class="section-h">热门文章</h2>
+      <p>按阅读次数排序，只统计能对应到具体文章的访问。</p>
+      <div id="pages"></div>
+
+      <div class="caveat">
+        <b>这些数字能说明什么。</b>
+        访问量按 IP 去重，同一台设备换网络会被算作两个人；
+        局域网内 NAT 后的多台设备可能共用一个 IP。
+        它是用来发现"哪些内容有人在看、哪些反馈没人处理"的信号，
+        不是精确的用户统计。
+      </div>
+    </div>
+
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const esc = (v) =>
+        String(v ?? "").replace(
+          /[&<>"']/g,
+          (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[m],
+        );
+      const KIND = {
+        bug: "内容有错",
+        confusing: "看不懂",
+        suggestion: "建议",
+        praise: "有用",
+        other: "其他",
+      };
+      const STATUS = { open: "待处理", read: "已读", done: "已处理" };
+
+      async function api(url, options) {
+        const response = await fetch(url, { cache: "no-store", ...(options || {}) });
+        if (!response.ok) throw new Error(await response.text());
+        return response.json();
+      }
+
+      function tiles(summary) {
+        const items = [
+          { n: summary.visits_total, l: "总访问次数", cls: "" },
+          { n: summary.visitors_total, l: "独立访客（按 IP）", cls: "accent" },
+          { n: summary.visits_today, l: "今日访问", cls: "" },
+          { n: summary.feedback_open, l: "待处理反馈", cls: summary.feedback_open ? "warn" : "" },
+          { n: summary.feedback_total, l: "反馈总数", cls: "" },
+        ];
+        $("#tiles").innerHTML = items
+          .map(
+            (i) =>
+              `<div class="tile ${i.cls}"><b>${i.n}</b><span>${esc(i.l)}</span></div>`,
+          )
+          .join("");
+      }
+
+      function daysAgo(ts) {
+        const secs = Date.now() / 1000 - Number(ts || 0);
+        const days = Math.floor(secs / 86400);
+        if (days <= 0) return "";
+        return ` <span class="tag">${days} 天前</span>`;
+      }
+
+      function renderFeedback(records) {
+        if (!records.length) {
+          $("#feedback").innerHTML =
+            '<div class="empty-note">还没有反馈。知识库里的悬浮按钮可以让读者随手提意见。</div>';
+          return;
+        }
+        $("#feedback").innerHTML = records
+          .map((r) => {
+            const who = r.name ? esc(r.name) : esc(r.ip);
+            const where = r.title
+              ? `<a href="/?path=${encodeURIComponent(r.path)}">${esc(r.title)}</a>`
+              : "（未指定文章）";
+            return `<article class="fb" data-status="${esc(r.status)}" data-ts="${esc(r.ts)}">
+              <div class="fb-head">
+                <span class="tag ${esc(r.kind)}">${esc(KIND[r.kind] || r.kind)}</span>
+                <span class="who">${who}</span>
+                <span class="tag ${esc(r.host_kind)}">${r.host_kind === "local" ? "本机" : "局域网"}</span>
+                ${r.contact ? `<span style="color:var(--wb-muted);font-size:11.5px">${esc(r.contact)}</span>` : ""}
+                <span class="when">${esc(r.time)}${daysAgo(r.ts)}</span>
+              </div>
+              <p class="fb-where">${where} · ${esc(r.agent || "未知")}</p>
+              <p class="fb-body">${esc(r.message)}</p>
+              <div class="fb-actions">
+                ${["open", "read", "done"]
+                  .map(
+                    (s) =>
+                      `<button type="button" data-set="${s}" aria-pressed="${r.status === s}">${esc(STATUS[s])}</button>`,
+                  )
+                  .join("")}
+              </div>
+            </article>`;
+          })
+          .join("");
+        document.querySelectorAll(".fb-actions button").forEach((button) => {
+          button.onclick = async () => {
+            const card = button.closest(".fb");
+            const ts = card.dataset.ts;
+            const status = button.dataset.set;
+            button.disabled = true;
+            try {
+              await api("/api/insights/feedback/status", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ts: Number(ts), status }),
+              });
+              card.dataset.status = status;
+              card
+                .querySelectorAll(".fb-actions button")
+                .forEach((b) => b.setAttribute("aria-pressed", String(b === button)));
+              load();
+            } catch (error) {
+              console.error(error);
+              button.disabled = false;
+            }
+          };
+        });
+      }
+
+      function renderVisitors(records) {
+        if (!records.length) {
+          $("#visitors").innerHTML = '<div class="empty-note">还没有访问记录。</div>';
+          return;
+        }
+        $("#visitors").innerHTML = `<table><thead><tr>
+            <th>访客</th><th>来源</th><th>环境</th><th class="num">访问</th><th class="num">页面</th><th>首次</th><th>最近</th>
+          </tr></thead><tbody>${records
+            .map(
+              (v) => `<tr>
+              <td><span class="who">${v.name ? esc(v.name) : esc(v.ip)}</span>${
+                v.name ? `<br><span style="color:var(--wb-muted);font-size:11px">${esc(v.ip)}</span>` : ""
+              }</td>
+              <td><span class="tag ${esc(v.host_kind)}">${v.host_kind === "local" ? "本机" : "局域网"}</span></td>
+              <td>${esc(v.agent)}</td>
+              <td class="num">${v.visits}</td>
+              <td class="num">${v.pages}</td>
+              <td style="color:var(--wb-muted);white-space:nowrap">${esc(v.first)}</td>
+              <td style="color:var(--wb-muted);white-space:nowrap">${esc(v.last)}</td>
+            </tr>`,
+            )
+            .join("")}</tbody></table>`;
+      }
+
+      function renderPages(records) {
+        if (!records.length) {
+          $("#pages").innerHTML = '<div class="empty-note">还没有按文章的访问记录。</div>';
+          return;
+        }
+        const max = Number(records[0].visits) || 1;
+        $("#pages").innerHTML = `<table><thead><tr>
+            <th>文章</th><th class="num">阅读</th><th style="width:26%">占比</th>
+          </tr></thead><tbody>${records
+            .map(
+              (p) => `<tr>
+              <td><a href="/?path=${encodeURIComponent(p.path)}">${esc(p.title)}</a></td>
+              <td class="num">${p.visits}</td>
+              <td><span style="display:block;height:6px;border-radius:3px;background:var(--wb-accent-soft)"><span style="display:block;height:6px;border-radius:3px;background:var(--wb-accent);width:${Math.round((Number(p.visits) / max) * 100)}%"></span></span></td>
+            </tr>`,
+            )
+            .join("")}</tbody></table>`;
+      }
+
+      async function load() {
+        try {
+          const [summary, feedback, visitors, pages] = await Promise.all([
+            api("/api/insights/summary"),
+            api("/api/insights/feedback"),
+            api("/api/insights/visitors"),
+            api("/api/insights/pages"),
+          ]);
+          tiles(summary);
+          renderFeedback(feedback.feedback || []);
+          renderVisitors(visitors.visitors || []);
+          renderPages(pages.pages || []);
+        } catch (error) {
+          console.error(error);
+          $("#tiles").innerHTML =
+            '<div class="empty-note">读不到中台数据。确认站点服务在运行，然后刷新。</div>';
+        }
+      }
+
+      $("#refresh").onclick = load;
+      load();
+    </script>
+  </body>
+</html>

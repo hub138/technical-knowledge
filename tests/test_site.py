@@ -3,7 +3,10 @@ from __future__ import annotations
 import http.client
 import importlib.util
 import json
+import subprocess
+import tempfile
 import threading
+import time
 import unittest
 import re
 from collections import Counter
@@ -448,6 +451,91 @@ class KnowledgeGraphTests(unittest.TestCase):
         self.assertEqual(leaked, [])
         self.assertGreater(len(edges), 0, "filtering should not remove every edge")
 
+    def test_knowledge_management_split_keeps_methods_out_of_archive(self) -> None:
+        """The category was one grab-bag page mixing structure, update process,
+        quality rules and tool costs. It is now an entry page plus a 方法 folder;
+        the split has to actually be reachable, not just written on disk."""
+        methods = sorted((ROOT / "vault" / "知识库管理" / "方法").glob("*.md"))
+        self.assertEqual(
+            [path.stem for path in methods],
+            sorted(["知识从哪来怎么更新", "一篇知识怎么写"]),
+        )
+        topics = {
+            str(note["topic"])
+            for note in self.vault.notes.values()
+            if str(note["path"]).startswith("知识库管理/方法/")
+        }
+        self.assertEqual(topics, {"方法"}, "方法 目录必须成为一个独立 topic")
+        # 提出来的两篇同样不入图谱（按 category 判定，应自动继承）
+        for note in self.vault.notes.values():
+            if str(note["path"]).startswith("知识库管理/方法/"):
+                self.assertTrue(note["exclude_from_graph"], f"{note['path']} 应排除出图谱")
+
+    def test_feedback_storage_is_gitignored(self) -> None:
+        """Feedback is visitor data, not knowledge. If data/ ever became
+        tracked, every reader's IP and comment would be committed."""
+        ignored = subprocess.run(
+            ["git", "check-ignore", "-q", "data/feedback.jsonl"],
+            cwd=ROOT,
+            capture_output=True,
+        )
+        self.assertEqual(ignored.returncode, 0, "data/ 必须在 .gitignore 中")
+
+    def test_feedback_record_shape_is_safe(self) -> None:
+        """The stored record must not leak the password or contain fields the
+        insights page cannot render."""
+        server = SERVER_MODULE
+        record = {
+            "ts": time.time(),
+            "kind": "bug",
+            "message": "x",
+            "path": "知识库管理/知识库管理.md",
+            "title": "知识库管理",
+            "contact": "",
+            "status": "open",
+            "ip": "127.0.0.1",
+            "host_kind": "local",
+            "agent": "Chrome 142",
+            "name": "tester",
+            "name_source": "manual",
+        }
+        with tempfile.TemporaryDirectory() as tmp:
+            original = server.DATA_HOME
+            server.DATA_HOME = Path(tmp)
+            try:
+                self.assertTrue(server._append_jsonl(Path(tmp) / "f.jsonl", record))
+                back = server._read_jsonl(Path(tmp) / "f.jsonl")
+                self.assertEqual(len(back), 1)
+                self.assertEqual(back[0]["kind"], "bug")
+                self.assertNotIn("password", json.dumps(back[0], ensure_ascii=False))
+            finally:
+                server.DATA_HOME = original
+
+    def test_wecom_key_never_lives_in_tracked_files(self) -> None:
+        """The group-bot key is a credential. It belongs in the Keychain, and
+        nothing that can be committed may contain it."""
+        server_source = (ROOT / "site" / "server.py").read_text(encoding="utf-8")
+        self.assertIn("WECOM_SERVICE", server_source)
+        self.assertIn("read_keychain_secret(WECOM_SERVICE)", server_source)
+        # key=... 不应作为字面量出现在任何会被提交的文件里
+        for relative in ("site/server.py", "index.html", "site/workbench.js", "site/insights.html"):
+            text = (ROOT / relative).read_text(encoding="utf-8")
+            self.assertNotRegex(
+                text,
+                r"webhook/send\?key=[0-9a-f]{8}-",
+                f"{relative} 不应内嵌 webhook key",
+            )
+
+    def test_describe_agent_reads_common_browsers(self) -> None:
+        cases = [
+            ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
+             "(KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36", "Chrome 142"),
+            ("Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 "
+             "(KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1", "Safari 18"),
+        ]
+        for ua, expected in cases:
+            self.assertIn(expected, SERVER_MODULE.describe_agent(ua))
+
     def test_parallel_skill_categories_are_integrated_into_domains(self) -> None:
         categories = {str(note["category"]) for note in self.vault.notes.values()}
         home = (ROOT / "index.html").read_text(encoding="utf-8")
@@ -705,10 +793,17 @@ class NavigationContractTests(unittest.TestCase):
         shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
         self.assertIn(".wb-sidebar", shared)
         self.assertIn("dataset.page", shared_script)
-        self.assertIn(
-            "const nav = [pages.knowledge, pages.graph, pages.projects, pages.evaluation];",
-            shared_script,
-        )
+        # The nav is now multi-line so 访问与反馈 can join it. Assert the
+        # membership rather than the exact formatting.
+        self.assertIn("const nav = [", shared_script)
+        for entry in (
+            "pages.knowledge",
+            "pages.graph",
+            "pages.projects",
+            "pages.evaluation",
+            "pages.insights",
+        ):
+            self.assertIn(entry, shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
         self.assertNotIn('target="_blank" rel="noopener noreferrer"', shared_script)
         self.assertNotIn("item !== current && item !== pages.knowledge", shared_script)
         for page, name in ((self.learning, "learning"), (self.projects, "projects"), (self.evaluation, "evaluation"), (self.intuition, "learning"), (self.transfer, "learning"), (self.history, "classrooms")):
@@ -738,10 +833,17 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("grid-template-columns:286px", self.home)
 
         self.assertIn('label: "知识图谱"', shared_script)
-        self.assertIn(
-            "const nav = [pages.knowledge, pages.graph, pages.projects, pages.evaluation];",
-            shared_script,
-        )
+        # The nav is now multi-line so 访问与反馈 can join it. Assert the
+        # membership rather than the exact formatting.
+        self.assertIn("const nav = [", shared_script)
+        for entry in (
+            "pages.knowledge",
+            "pages.graph",
+            "pages.projects",
+            "pages.evaluation",
+            "pages.insights",
+        ):
+            self.assertIn(entry, shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
         self.assertNotIn("knowledge: [pages.graph]", shared_script)
         self.assertIn("{label:'知识图谱'", home_nav)
         self.assertIn("network:['知识图谱'", self.home)

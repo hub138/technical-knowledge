@@ -23,6 +23,13 @@
       title: "把判断绑定到证据",
       description: "自研评估项目的设计与后续实现入口。",
     },
+    insights: {
+      label: "访问与反馈",
+      href: "/insights",
+      icon: "◔",
+      title: "谁读过、提了什么",
+      description: "本机访问记录与读者反馈，只存在本机 data/ 目录。",
+    },
     /* Learning lives under 项目与教学 rather than in the main nav: a classroom
        is a tool you reach for, not a second way to browse knowledge. The
        sub-links keep both pages reachable once you are inside that section. */
@@ -51,7 +58,13 @@
     },
   };
   const current = pages[page] || pages.knowledge;
-  const nav = [pages.knowledge, pages.graph, pages.projects, pages.evaluation];
+  const nav = [
+    pages.knowledge,
+    pages.graph,
+    pages.projects,
+    pages.evaluation,
+    pages.insights,
+  ];
   const SUBNAV = {
     projects: [pages.learning, pages.classrooms],
   };
@@ -98,6 +111,148 @@
   themeToggle.innerHTML =
     '<span id="wb-theme-icon" aria-hidden="true">☾</span><span id="wb-theme-label">夜晚模式</span>';
   document.body.appendChild(themeToggle);
+
+  /* Feedback entry, matching the knowledge workspace. Companion pages are not
+     the reader, so there is no article to attach; the panel says which page
+     instead. Same endpoint, so everything lands in one inbox. */
+  const PAGE_LABELS = {
+    projects: "项目与教学",
+    learning: "学习中心",
+    classrooms: "我的课堂",
+    evaluation: "Agent 评估",
+    insights: "访问与反馈",
+  };
+  const fab = document.createElement("button");
+  fab.type = "button";
+  fab.className = "wb-fab";
+  fab.id = "wb-fab";
+  fab.title = "提意见 / 报告问题";
+  fab.setAttribute("aria-label", "提意见或报告问题");
+  fab.innerHTML = '<span aria-hidden="true">?</span><span class="wb-fab-label">提意见</span>';
+  document.body.appendChild(fab);
+
+  const overlay = document.createElement("div");
+  overlay.className = "wb-fb-overlay";
+  overlay.id = "wb-fb-overlay";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-labelledby", "wb-fb-title");
+  overlay.hidden = true;
+  overlay.innerHTML = `
+    <form class="wb-fb-panel" id="wb-fb-form">
+      <h2 id="wb-fb-title">提个意见</h2>
+      <p class="wb-fb-sub">这一页哪里说错了、看不懂、或者缺什么，都可以说。反馈只存在本机。</p>
+      <p class="wb-fb-where" id="wb-fb-where"></p>
+      <div class="wb-fb-kinds" role="radiogroup" aria-label="反馈类型">
+        <label><input type="radio" name="wb-kind" value="bug" checked><span>内容有错</span></label>
+        <label><input type="radio" name="wb-kind" value="confusing"><span>看不懂</span></label>
+        <label><input type="radio" name="wb-kind" value="suggestion"><span>想加点什么</span></label>
+        <label><input type="radio" name="wb-kind" value="praise"><span>这页有用</span></label>
+      </div>
+      <label class="wb-fb-field"><span>具体说说</span><textarea id="wb-fb-message" maxlength="4000" required placeholder="例如：这一页的链接点不开；或者：希望补一张流程图。"></textarea><small id="wb-fb-count">0 / 4000</small></label>
+      <label class="wb-fb-field"><span>怎么称呼你（可不填）</span><input id="wb-fb-name" maxlength="60" placeholder="企微中文名或英文名" autocomplete="nickname"></label>
+      <div class="wb-fb-actions">
+        <button type="button" id="wb-fb-cancel">取消</button>
+        <button type="submit" id="wb-fb-submit">发送</button>
+      </div>
+      <p class="wb-fb-note" id="wb-fb-note"></p>
+    </form>`;
+  document.body.appendChild(overlay);
+
+  const FB_NAME_KEY = "tk-feedback-name";
+  const messageBox = overlay.querySelector("#wb-fb-message");
+  const nameBox = overlay.querySelector("#wb-fb-name");
+  const noteBox = overlay.querySelector("#wb-fb-note");
+  const show = (open) => {
+    overlay.hidden = !open;
+    overlay.classList.toggle("open", open);
+    if (open) {
+      overlay.querySelector("#wb-fb-where").innerHTML =
+        `当前页面：<b>${PAGE_LABELS[page] || current.label || page}</b>`;
+      messageBox.focus();
+    } else if (document.activeElement && overlay.contains(document.activeElement)) {
+      fab.focus();
+    }
+  };
+  try {
+    const saved = localStorage.getItem(FB_NAME_KEY);
+    if (saved) nameBox.value = saved;
+  } catch {
+    /* private mode — the name just will not persist */
+  }
+  const count = () => {
+    const box = overlay.querySelector("#wb-fb-count");
+    box.textContent = `${messageBox.value.length} / 4000`;
+  };
+  messageBox.addEventListener("input", count);
+  count();
+  fab.onclick = () => show(true);
+  overlay.querySelector("#wb-fb-cancel").onclick = () => show(false);
+  overlay.onclick = (event) => {
+    if (event.target === overlay) show(false);
+  };
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && overlay.classList.contains("open")) {
+      show(false);
+      event.preventDefault();
+    }
+  });
+  overlay.querySelector("#wb-fb-form").onsubmit = async (event) => {
+    event.preventDefault();
+    const submit = overlay.querySelector("#wb-fb-submit");
+    const text = messageBox.value.trim();
+    if (!text) {
+      noteBox.textContent = "请先写点内容。";
+      noteBox.classList.add("err");
+      messageBox.focus();
+      return;
+    }
+    submit.disabled = true;
+    noteBox.classList.remove("err");
+    noteBox.textContent = "正在发送…";
+    try {
+      const response = await fetch("/api/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          kind: overlay.querySelector('input[name="wb-kind"]:checked')?.value || "other",
+          message: text,
+          path: "",
+          title: PAGE_LABELS[page] || document.title,
+          name: nameBox.value.trim(),
+          contact: nameBox.value.trim(),
+          page: location.pathname,
+          screen: `${screen.width}x${screen.height}`,
+        }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "发送失败");
+      try {
+        localStorage.setItem(FB_NAME_KEY, nameBox.value.trim());
+      } catch {
+        /* ignore */
+      }
+      messageBox.value = "";
+      count();
+      noteBox.textContent = data.message || "收到，谢谢反馈！";
+      setTimeout(() => show(false), 900);
+    } catch (error) {
+      noteBox.textContent = String(error.message || error);
+      noteBox.classList.add("err");
+    } finally {
+      submit.disabled = false;
+    }
+  };
+  /* A visit per workbench page, so /insights can show which tools get used. */
+  fetch("/api/visit", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      path: "",
+      title: PAGE_LABELS[page] || document.title,
+      screen: `${screen.width}x${screen.height}`,
+    }),
+  }).catch(() => {});
 
   // Theme: an explicit choice is remembered; otherwise follow the OS and keep
   // following it until the visitor decides for themselves.
