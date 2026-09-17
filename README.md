@@ -1,72 +1,159 @@
 # technical-knowledge
 
-一个以 Markdown/Obsidian 为知识事实源、同时提供动态阅读站、关系图、学习入口和 Agent 评估工作台的工程知识库。
+**A knowledge base that explains mechanisms, not conclusions — with the site that serves it.**
 
-> **这里记的是机制，不是结论。**
->
-> - 一个技术为什么出现、解决什么问题、代价是什么 —— 这四件事说不清，就还没读懂。
-> - 写性能就得带上测试条件。跑在多大数据、什么版本、什么硬件上，缺一个数字就没意义。
-> - 网上看来的只当线索。要写进正文，得回到官方文档、论文，或者自己跑一遍。
+[![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen)](#validation)
+[![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen)](#validation)
+[![dependencies](https://img.shields.io/badge/runtime%20deps-none-blue)](#design-notes)
+[![python](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
+[![license](https://img.shields.io/badge/license-see%20below-lightgrey)](#license)
 
-每一页都按同一套来写：**它为了解决什么问题出现的（背景）、怎么解决的（方案）、
-实际效果如何（效果）、代价和限制在哪（优缺点）。** 见
-`vault/知识库管理/方法/一篇知识怎么写.md`；来源怎么找、怎么验证、什么时候该更新，见
-`vault/知识库管理/方法/知识从哪来怎么更新.md`。
+<sup>English · [中文](README.zh.md)</sup>
 
-内容按技术本身分成五个领域：AI 系统、后端与分布式系统、数据系统、计算机系统与性能、软件构建与质量。每页尽量把概念、机制、边界、怎么验证、和谁相关、来源都放在一起。变化快的东西单独进「AI 技术动态」，并标上核对日期。
+184 engineering notes on AI systems, backend and distributed systems, data
+systems, computer systems, and software construction — written to a fixed
+structure so a reader can tell what a technology is *for*, not just what it is.
 
-## 项目结构
+Every note answers four questions:
 
-```text
-vault/                         可直接用 Obsidian 打开的知识库
-  工程知识/                    五个技术领域与主题页
-  知识库管理/                  来源、更新、质量和维护规则
-  Clippings/                   原始剪藏，按要求完整保留
-  .obsidian/                   Obsidian 配置和已安装插件
-site/                          依赖最少的动态 Markdown 网站与图谱
-apps/agent-evaluation/         自研 Agent 评估项目：设计原型与后续产品入口
-packages/agent-foundation/     会话、上下文、记忆、恢复和证据基础包
-projects/                      完整上游源码快照与其许可证/测试
-  archify/                     架构、流程和关系图生成器
-  OpenMAIC/                    互动课堂与 Agent 学习运行时
-  DeepTutor/                   检索、记忆和学习工作区
-  mattpocock-skills/           工程协作 Agent Skills
+| | |
+|---|---|
+| **Context** | Why does this exist? What was stuck before it? |
+| **Approach** | How does it work? What is the mechanism? |
+| **Effect** | Which number moved, measured under what conditions? |
+| **Trade-offs** | What does it cost? When is it the wrong choice? |
+
+A performance claim without the data size, version and hardware it was measured
+on is not a fact. Anything read online is a lead, not a source — it goes in only
+after checking the official documentation, a paper, or a local run.
+
+---
+
+## What is in here
+
+```
+vault/                         open directly in Obsidian
+  工程知识/                     five domains, one note per engineering question
+  知识库管理/                   sourcing, updating, quality and maintenance rules
+  Clippings/                   raw clippings, kept verbatim
+site/                          the site: one HTTP server, no runtime dependencies
+apps/agent-evaluation/         in-house Agent evaluation: contract and prototype
+packages/agent-foundation/     sessions, context, memory, recovery, evidence
+projects/                      full upstream source snapshots, licences included
+  archify/                     architecture and flow diagrams
+  OpenMAIC/                    interactive classroom runtime
+  DeepTutor/                   retrieval, memory and study workspace
+  mattpocock-skills/           engineering Agent skills
 ```
 
-## 本地使用
-
-直接打开 `vault/` 作为 Obsidian Vault。网站读取这个目录中的当前 Markdown，修改笔记后无需导出：
+## Quick start
 
 ```bash
-./run-site.sh
+./run-site.sh                  # serves http://localhost:8787
 ```
 
-修改导航、分类或站点服务后运行回归测试：
+Open `vault/` as an Obsidian vault to edit. The site reads the Markdown directly
+— save a note and reload, there is no build step and no export.
+
+## The site
+
+| | |
+|---|---|
+| **Reader** | search, per-domain index, article view with backlinks and a source list |
+| **Graph** | relations between notes, plus diagram views of system layers and trade-off quadrants |
+| **Learning** | guided paths into the classroom and tutor tools, with the topic pre-filled |
+| **Evaluation** | the in-house Agent evaluation project, tracked separately from upstream tools |
+| **Visits & feedback** | a local-only operations view: who read what, and what they said |
+
+The interface is available in **English (default) and Chinese**; switch from the
+sidebar. Knowledge notes stay in the language they were written in — a
+machine-translated explanation of a mechanism reads fluently and is wrong, so a
+note without an English version says so rather than pretending.
+
+## Design notes
+
+Three decisions shape everything else.
+
+**No build step, no runtime dependencies.** `site/server.py` is a single-file
+Python standard-library HTTP server. `site/base.css` is one stylesheet driven by
+93 design tokens. The only third-party asset is Mermaid, vendored. There is no
+npm install, no bundler, and nothing to keep in sync.
+
+**One source per fact.** The navigation is defined once, in `site/nav.js`, and
+rendered once, in `site/shell.js`, for every page. This is deliberate: the site
+previously had two page systems that each rendered their own sidebar from their
+own copy of the navigation, and they drifted — one entry existed on one side and
+not the other, and clicking between them changed the layout. Collapsing them
+removed 63 override rules that existed only to reconcile the two.
+
+**Evidence over assertion.** Claims in the notes carry their measurement
+conditions. Claims about the site carry a script:
+
+| What | How it is checked |
+|---|---|
+| Behaviour | `python3 -m unittest tests/test_site.py` — 50 tests |
+| Readability | `python3 scripts/contrast_audit.py` — WCAG AA per page × theme |
+| Copy quality | `python3 scripts/copy_audit.py` — mechanical rubric |
+| Translation coverage | `python3 scripts/i18n_audit.py` — untranslated UI strings |
+
+## Validation
 
 ```bash
-python3 -m unittest discover -s tests -v
+python3 -m unittest tests/test_site.py        # 50/50
+python3 scripts/contrast_audit.py <url>#dark  # 18/18 page-theme combinations
+python3 scripts/copy_audit.py                 # score 2 (lower is better)
+python3 scripts/i18n_audit.py                 # untranslated UI strings
 ```
 
-首页提供知识检索、关系网络、知识流通、学习循环、AI 系统分层和技术选型象限。图中的节点会回到对应 Markdown 页面。
+The rendered page is the acceptance surface for anything visual — changes are
+verified with full-page screenshots at desktop and mobile widths, not by reading
+the diff.
 
-自研 Agent 评估项目位于 `apps/agent-evaluation/`，独立于 `projects/` 下的第三方开源项目。当前完成的是设计契约、静态原型和 `agent-foundation` 基础包；真实仓库、任务夹具、隔离执行、Trace 和证据投影仍是后续开发范围。只有代码与 README 时只能做结构审查，不能伪装成运行时结论。评估契约已写入 `vault/工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md`。
+## Updating the knowledge
 
-## 更新原则
+Stable principles and fast-moving product facts are stored separately. A new
+model, protocol or paper is registered as a source first, then its impact on
+existing notes is assessed. Version numbers, deprecation dates, prices and
+security guidance are re-checked against official documentation rather than
+second-hand summaries.
 
-稳定原理和快速变化的产品事实分开存。新模型、新协议、新论文先登记来源，再看它影响哪一页。版本号、弃用时间、价格、安全口径这类会变的事实，一定回官方文档核对 —— 别看二手总结。
+A paper can show that a mechanism is worth trying; only a task run locally with a
+before-and-after comparison shows that it works here.
 
-论文能说明「这个机制值得试」，只有本地跑过的任务和前后对比才能说明「它在我这儿有效」。详见 `vault/知识库管理/归档/知识演化机制.md`、`vault/知识库管理/归档/来源注册表.md` 和 `vault/工程知识/AI系统/生态与选型/AI技术动态.md`。
+One engineering question gets one page. When two notes answer the same question,
+the case, mechanism, cost and validation are merged into the survivor and the
+duplicate is removed — not left half-written in both places.
 
-同一个工程问题只留一页。发现重复的，先把案例、机制、代价和验证合并过去，再删掉旧入口 —— 不要两份各写一半。术语见 `CONTEXT.md`，写新内容看 `vault/知识库管理/方法/一篇知识怎么写.md`。
+See `vault/知识库管理/方法/一篇知识怎么写.md` and `CONTEXT.md`.
 
-## 上游项目
+## Deployment
 
-`projects/` 保留四个项目的完整 Git 跟踪源码快照，并保留各自许可证、文档和测试。依赖目录、构建产物、虚拟环境、用户数据、日志和密钥不纳入本仓库；按项目原 README 安装依赖即可重建。
+`DEPLOYMENT.md` and `docker-compose.yml` cover container deployment.
 
-项目入口页面：`/projects`。容器部署说明见 `DEPLOYMENT.md` 和 `docker-compose.yml`。
+On a LAN, prefer `http://<host>.local:8787/`. Knowledge content is publicly
+readable; only launching a tool that mints a model-backed session requires the
+site password. The exact trust boundary — which routes are open, which are
+gated, and why — is documented in `DEPLOYMENT.md` and enforced in
+`site/server.py`.
 
-本机长期运行的访问地址优先使用 `http://MacBook-Pro-2.local:8787/`；知识内容公开可读，只有启动会使用默认模型凭据的教学工具才对其他设备要求密码。本机和局域网地址、认证边界及故障处理见 `DEPLOYMENT.md`。
+## Upstream projects
 
-## 许可证与来源
+`projects/` holds complete Git-tracked source snapshots of four upstream
+projects, each with its own licence, documentation and tests. Dependency
+directories, build output, virtual environments, user data, logs and secrets are
+not tracked; install per each project's own README.
 
-本仓库的知识文字和整合代码按仓库提交记录管理；`projects/` 下的第三方项目继续受各自 LICENSE 和 THIRD_PARTY_NOTICES 约束。不要把本地凭据、内部地址、用户数据或未授权材料写入 Markdown、图谱或提交。
+## Contributing
+
+Read `AGENTS.md` before adding or moving knowledge — it defines the check that
+must pass first (search for an existing page on the same question before writing
+a new one). Run the validation commands above before proposing a change.
+
+## License
+
+Knowledge text and integration code in this repository are governed by the
+commit history. Third-party projects under `projects/` remain under their own
+LICENSE and THIRD_PARTY_NOTICES.
+
+Do not commit credentials, internal addresses, user data or material you are not
+licensed to redistribute into the vault, the graph or a commit.
