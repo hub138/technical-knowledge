@@ -2,7 +2,7 @@
 title: API 契约定义输入输出和演进边界
 type: concept
 status: active
-updated: 2026-09-03
+updated: 2026-09-16
 review_after: 2027-03-03
 change_rate: medium
 confidence: high
@@ -32,6 +32,12 @@ API 是跨进程、跨团队或跨版本的行为契约，不是 URL 加几个�
 | 时间 | deadline、取消、分页快照和数据新鲜度如何表达？ |
 | 兼容 | 新旧客户端如何共存？字段删除和枚举新增如何处理？ |
 | 观测 | request/trace id、版本、租户和审计字段如何传播？ |
+
+## 让接口难以被误用
+
+契约不只是字段齐全，还要尽量让非法状态无法表示。`Transfer(from string, to string, amount int64)` 很容易把两个账户传反，也没有说明金额单位；更清晰的输入使用 `SourceAccountID`、`DestinationAccountID` 和带 currency/最小单位的 `Money`。更新接口还要区分“字段未提供”和“明确设置为零”，不能依赖语言零值猜测调用意图。
+
+写操作把幂等身份放进契约；分页定义稳定排序、游标和快照边界；错误按输入、权限、冲突、限流、依赖和未知提交分类。返回 `200 {"error": ...}` 会破坏监控和重试语义，裸 `map[string, any]` 则把 schema 推回文档和猜测。
 
 ## 兼容演进
 

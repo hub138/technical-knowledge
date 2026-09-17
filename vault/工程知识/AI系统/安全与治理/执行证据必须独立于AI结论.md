@@ -12,7 +12,7 @@ tags:
   - ai/engineering
   - software/testing
 sources:
-  - "[[知识库管理/来源/实践证据/AI研发迭代框架案例]]"
+  - "[[知识库管理/归档/来源/实践证据/AI研发迭代框架案例.md]]"
   - "https://modelcontextprotocol.io/specification/2025-06-18/basic" # historical baseline
   - "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx"
   - "https://opentelemetry.io/docs/concepts/observability-primer/"
@@ -217,4 +217,4 @@ Planner 可以动态生成构建画像、测试入口、依赖准备和回退方
 | 后一次失败覆盖此前复现成功 | attempt 事件不可变，汇总状态单调且保留多维事实 | 本页“结果一致性” |
 | 主进程死亡后状态永远 running | 超时和孤儿检测必须有进程外 observer/lease | [[工程知识/后端与分布式系统/任务与并发/任务生命周期必须覆盖进程、日志、超时与清理]] |
 
-案例细节经去重和脱敏后保存在 [[知识库管理/来源/实践证据/AI研发迭代框架案例]]，主导航只暴露提炼后的机制与验证方法。
+案例细节经去重和脱敏后保存在 [[知识库管理/归档/来源/实践证据/AI研发迭代框架案例.md]]，主导航只暴露提炼后的机制与验证方法。

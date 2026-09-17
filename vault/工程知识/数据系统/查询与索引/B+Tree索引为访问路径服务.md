@@ -2,7 +2,7 @@
 title: B+Tree 索引为访问路径服务
 type: concept
 status: active
-updated: 2026-08-31
+updated: 2026-09-16
 review_after: 2027-02-28
 change_rate: medium
 confidence: high
@@ -36,6 +36,18 @@ InnoDB 是索引组织表：主键索引（聚簇索引）的叶子节点保存�
 主键应尽量短、稳定、单调追加。随机、宽大的业务主键会放大所有二级索引的空间和页分裂成本；是否使用业务字段做主键要结合唯一性、长度、写入顺序和迁移风险判断。
 
 ## 联合索引设计
+
+例如查询：
+
+```sql
+SELECT id, amount, created_at
+FROM orders
+WHERE user_id = ? AND status = 'paid'
+ORDER BY created_at DESC
+LIMIT 20;
+```
+
+分别给 `user_id`、`status`、`created_at` 建三个单列索引，通常仍要扫描、回表和排序大量候选行。更贴合访问路径的是 `(user_id, status, created_at DESC)`；若把返回列也纳入合适的覆盖结构，还能减少回表。规则不是机械的“等值、范围、排序”，而是从真实查询、选择性和执行计划验证这条路径能否少读页、少排序。
 
 - 遵循最左前缀：`(a,b,c)` 可支持 `a`、`a,b`、`a,b,c` 的连续前缀，不能把 `b` 单独当作同等路径。
 - 字段顺序先看查询模式和选择性，再看排序、分组、覆盖和复用能力；不要只按“区分度从高到低”机械排列。

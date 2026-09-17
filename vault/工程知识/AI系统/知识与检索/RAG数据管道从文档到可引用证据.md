@@ -14,6 +14,9 @@ sources:
   - "https://arxiv.org/abs/2005.11401"
   - "https://docs.llamaindex.ai/en/stable/module_guides/loading/"
   - "https://www.elastic.co/guide/en/elasticsearch/reference/current/index-modules-similarity.html"
+  - "https://iceberg.apache.org/"
+  - "https://delta.io/"
+  - "https://hudi.apache.org/"
 ---
 
 # RAG 数据管道从文档到可引用证据
@@ -47,6 +50,8 @@ RAG 的质量上限由“哪些内容被正确地变成可检索、可授权、�
 
 用 `source_updated_at -> indexed_at -> query_visible_at` 描述新鲜度。更新不能只追加新 chunk：旧版本何时不可见、删除/撤权多久传播、embedding 变更是否需要重建，都必须有明确状态。缓存键要包含租户、权限版本、文档版本和必要的时间切片。
 
+来源规模较大时，可以用数据库快照、对象存储清单或 Iceberg/Delta/Hudi 一类开放表格式表达一批文件的 schema、版本和提交边界，再把 `source_version -> index_version -> evidence_id` 写入索引元数据。它们解决来源集合的增量、删除和回溯，不负责 BM25、ANN 或重排；来源快照更新后仍要验证检索索引已经同步。
+
 ## 解析和切分的取舍
 
 - 固定 token 长度简单，但可能切断定义、表格和因果关系。
@@ -58,4 +63,4 @@ RAG 的质量上限由“哪些内容被正确地变成可检索、可授权、�
 
 发布一个索引版本前，用代表性查询检查召回、权限、版本、引用位置、删除传播、重复文档和跨租户隔离；再测生成是否只使用证据、是否正确拒答和是否能解释证据不足。RAG 的索引版本和生成模型版本要一起进入追踪，不能只记录最终回答。
 
-关系：[[工程知识/AI系统/知识与检索/RAG的核心是选择可引用证据]] · [[工程知识/AI系统/知识与检索/混合检索、重排与查询改写各自解决什么问题]]
+关系：[[工程知识/AI系统/知识与检索/RAG的核心是选择可引用证据]] · [[工程知识/AI系统/知识与检索/混合检索、重排与查询改写各自解决什么问题]] · [[工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取]]

@@ -2,7 +2,7 @@
 title: 租约必须配合 Fencing Token 阻止过期持有者
 type: concept
 status: active
-updated: 2026-08-31
+updated: 2026-09-16
 review_after: 2027-02-28
 change_rate: stable
 confidence: high
@@ -13,6 +13,7 @@ tags:
 sources:
   - "https://man7.org/linux/man-pages/man2/flock.2.html"
   - "https://man7.org/linux/man-pages/man2/fcntl.2.html"
+  - "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html"
   - "[[工程知识/后端与分布式系统/分布式可靠性/部分失败决定分布式系统的设计]]"
 ---
 
@@ -33,6 +34,10 @@ sources:
 | 分布式租约 | owner + TTL + renew + fencing token | 跨主机长期任务 | 需处理时钟、网络分区和陈旧持有者 |
 
 ## 正确的锁使用
+
+先判断是否真的需要分布式锁。创建唯一业务对象优先用数据库唯一约束，状态更新优先用版本号/CAS，任务分片优先用稳定 owner；这些机制直接保护业务不变量，通常比“先拿锁再写”更容易验证。只有多个进程必须独占一个无法原子更新的外部资源时，才进入租约设计。
+
+最常见的错误是把“锁还在”当作“旧持有者已经停止”。实例 A 暂停超过 TTL 后，实例 B 会取得新租约；A 恢复时仍可能继续写。因此续租只能降低过期概率，不能阻止旧 owner，最终必须由资源侧检查单调递增的 fencing token。
 
 ```python
 with open(lock_path, "a+") as handle:

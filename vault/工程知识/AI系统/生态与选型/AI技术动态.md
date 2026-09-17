@@ -10,7 +10,7 @@ tags:
   - ai/serving
   - ai/agents
 sources:
-  - "[[知识库管理/来源/论文与项目/Agent应用工程技术核验]]"
+  - "[[知识库管理/归档/来源/论文与项目/Agent应用工程技术核验.md]]"
   - "https://docs.opensearch.org/latest/vector-search/ai-search/hybrid-search/rrf/"
   - "https://marker-inc-korea.github.io/AutoRAG/index.html"
   - "https://huggingface.co/blog/train-reranker"
@@ -45,7 +45,7 @@ sources:
 | Microsoft Agent Framework Python | 官方提供从 AutoGen 迁移的路径，仍在快速迭代 | 新项目先做能力与兼容性评估；旧 AutoGen 先建立迁移回归集 |
 | OpenTelemetry GenAI 约定 | Development | 内部 schema 保持稳定，在适配层映射实验字段 |
 
-版本和状态的逐项一手来源见 [[知识库管理/来源/论文与项目/Agent应用工程技术核验]]。
+版本和状态的逐项一手来源见 [[知识库管理/归档/来源/论文与项目/Agent应用工程技术核验.md]]。
 
 ## 检索与 RAG
 
@@ -58,7 +58,7 @@ sources:
 | GraphRAG | 适合关系链和语料级全局主题；不应成为所有问题的默认路径 | 实体消歧、图更新、原文回指、构图成本和与 hybrid 基线的分桶收益 |
 | 开放表格式（Iceberg/Delta/Hudi） | 为文档/事件摄取提供快照、事务、删除和增量读取；不是检索算法 | `source_version -> index_version -> evidence_id` 绑定、删除传播和多引擎一致性 |
 
-RAG 的前沿不是组件名称堆叠，而是证据选择、索引生命周期与自动实验的组合。详细边界见 [[工程知识/AI系统/知识与检索/RAG前沿：重排、自动优化与开放索引]]。
+RAG 的演进不是组件名称堆叠，而是证据选择、索引生命周期与自动实验的组合。详细边界见 [[工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取]]。
 
 ## 推理后端与分布式服务
 
@@ -113,4 +113,4 @@ RAG 的前沿不是组件名称堆叠，而是证据选择、索引生命周期�
 
 ## 维护方法
 
-每次复查只更新事实行：对象、版本、发布日期、状态、迁移影响和一手链接。影响稳定原理时才修改核心主题页；只影响某个实现时，仅更新本页和对应采用记录。完整来源扫描清单位于 [[知识库管理/来源/来源注册表]]。
+每次复查只更新事实行：对象、版本、发布日期、状态、迁移影响和一手链接。影响稳定原理时才修改核心主题页；只影响某个实现时，仅更新本页和对应采用记录。完整来源扫描清单位于 [[知识库管理/归档/来源注册表.md]]。
