@@ -68,6 +68,19 @@
 @keyframes skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
 @media(prefers-reduced-motion:reduce){.skeleton-bar{animation:none}}
 @media(max-width:760px){.skeleton-row{display:block}.skeleton-bar.w40{margin-bottom:8px}}
+@media(max-width:760px){
+/* 阅读工具在窄屏排成三行太占地方。按钮等宽平铺，去掉"打印"
+   （手机上打印没意义，长按即可分享）。 */
+.reader-tools{flex-wrap:wrap;gap:6px}
+.reader-tool,.reader-back,.reader-study{flex:1 1 auto;text-align:center;padding:7px 8px;font-size:var(--text-sm)}
+#reader-print{display:none}
+/* 宽表格在手机上会把整个页面撑出横向滚动条。让表格自己滚。 */
+.reader-body table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
+.reader-body table thead,.reader-body table tbody{display:table;width:100%;min-width:520px}
+.reader-body table th,.reader-body table td{white-space:nowrap}
+/* 单元格内的长文本仍可换行，避免窄屏下横向滚动过长。 */
+.reader-body table td{white-space:normal;min-width:120px}
+}
 /* 反馈入口：固定右下角的圆形按钮，压在「? 快捷键」上方一格。
    要显眼但不占阅读区域，所以只放一个圆点，细节收进面板里。 */
 .fb-fab{position:fixed;right:22px;bottom:60px;z-index:var(--z-fab);width:52px;height:52px;border-radius:50%;border:1px solid var(--accent-line);background:var(--accent);color:var(--on-accent);font:700 22px/1 inherit;cursor:pointer;box-shadow:0 6px 20px rgba(20,80,66,.28);transition:transform var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
@@ -106,9 +119,11 @@
 /* 阅读进度：长文读到哪了。贴在顶栏下沿的一条细线。 */
 .progress-bar{position:fixed;left:286px;right:0;top:0;height:2px;z-index:22;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);transition:transform var(--duration-fast) var(--ease-out)}
 @media(max-width:760px){.progress-bar{left:0}}
-@media(max-width:760px){.fb-fab{right:15px;bottom:56px;width:48px;height:48px}.fb-fab .fb-fab-label{display:none}}
+@media(max-width:760px){/* 手机上右下角只能放一个悬浮件：键盘提示在触屏上没有意义，隐藏。
+   选择器带 .shell 是为了压过文件后面定义的同名基础规则。 */
+body .kbd-hint{display:none}.fb-fab{right:14px;bottom:18px;width:46px;height:46px;box-shadow:0 4px 14px rgba(20,80,66,.3)}.fb-fab .fb-fab-label{display:none}/* 正文底部留出空间，避免最后一段被悬浮按钮压住。 */.content{padding-bottom:78px}}
 /* 打印：去掉所有悬浮件和导航，只留文章本身 */
-@media print{.sidebar,.topbar,.kbd-hint,.fb-fab,.fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:#fff}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}.mobile-menu{display:none}@media(max-width:1100px){.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.app{display:block}.sidebar{position:fixed;z-index:8;width:100%;height:auto;max-height:100vh;overflow:auto;padding:10px 13px}.sidebar.collapsed .nav-actions,.sidebar.collapsed .shared-nav,.sidebar.collapsed #domains,.sidebar.collapsed .theme-toggle{display:none}.brand{padding:0;border:0}.mobile-menu{display:block;margin-left:auto;border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 9px;color:var(--accent)}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.content{padding:21px 15px}.hero{display:block}.hero h2{font-size:var(--text-2xl)}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:var(--text-2xl)}}
+@media print{.sidebar,.topbar,.kbd-hint,.fb-fab,.fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:#fff}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}.mobile-menu{display:none}@media(max-width:1100px){.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}.sidebar{position:fixed;z-index:8;width:100%;height:auto;max-height:100vh;overflow:auto;padding:10px 13px}.sidebar.collapsed .nav-actions,.sidebar.collapsed .shared-nav,.sidebar.collapsed #domains,.sidebar.collapsed .theme-toggle{display:none}.brand{padding:0;border:0}.mobile-menu{display:block;margin-left:auto;border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 9px;color:var(--accent)}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.content{padding:21px 15px}.hero{display:block}.hero h2{font-size:var(--text-2xl)}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:var(--text-2xl)}}
 
 body{background:var(--bg);font-size:var(--text-md);line-height:var(--leading-normal)}
 .app{grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
