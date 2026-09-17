@@ -90,8 +90,9 @@
   const applyTheme = (theme) => {
     document.documentElement.dataset.theme = theme;
     const dark = theme === "dark";
+    const tr = window.TKI18N ? window.TKI18N.t : (x) => x;
     document.querySelectorAll("[data-tk-theme-label]").forEach((node) => {
-      node.textContent = dark ? "白天模式" : "夜晚模式";
+      node.textContent = tr(dark ? "白天模式" : "夜晚模式");
     });
     document.querySelectorAll("[data-tk-theme-icon]").forEach((node) => {
       node.textContent = dark ? "☀" : "☾";
@@ -264,13 +265,12 @@
       </div>`
           : ""
       }
-      ${
-        opts.auth
-          ? `<div class="tk-sidebar-footer">
-        <div class="tk-sidebar-links"><a href="/auth/logout">退出</a></div>
-      </div>`
-          : ""
-      }
+      <div class="tk-sidebar-footer">
+        ${opts.auth ? '<div class="tk-sidebar-links"><a href="/auth/logout">退出</a></div>' : ""}
+        <button type="button" class="tk-lang-toggle" data-tk-lang-toggle>
+          <span aria-hidden="true">⌘</span><span data-tk-lang-label>中文</span>
+        </button>
+      </div>
     `;
 
     if (opts.onNavClick) {
@@ -311,6 +311,13 @@
 
     /* Pages with no top bar of their own still need a way to switch theme. */
     ensureThemeToggle();
+
+    /* The sidebar is rebuilt on every render, so the new nodes need the
+       current language applied and the switch re-wired. */
+    if (window.TKI18N) {
+      window.TKI18N.translateDOM(mount);
+      window.TKI18N.wireLangToggles(mount);
+    }
 
     return mount;
   };
@@ -460,6 +467,12 @@
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     }).catch(() => {});
+
+  /* JS-owned labels are not text nodes in the original markup, so the i18n
+     DOM walk cannot reach them. Recompute them on every language change. */
+  document.addEventListener("tk:lang", () => {
+    applyTheme(document.documentElement.dataset.theme || "light");
+  });
 
   window.TKShell = {
     sidebar,

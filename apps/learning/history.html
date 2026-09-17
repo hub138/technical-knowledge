@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/base.css" />
     <script src="/static/nav.js"></script>
-    <script src="/static/shell.js"></script>
+    <script src="/static/i18n.js"></script>
+<script src="/static/shell.js"></script>
     <script>
       /* 侧边栏由 shell.js 统一渲染，与主站是同一份代码。挂载点在 body 里，
          所以要等 DOM 就绪；shell.js 是同步加载的，主题已经在首帧前应用。 */
@@ -135,7 +136,7 @@
       }
       .stage {
         display: grid;
-        grid-template-columns: 112px 1fr;
+        grid-template-columns: minmax(72px, max-content) 1fr;
         gap: 14px;
         padding: 15px;
         background: #fff;
