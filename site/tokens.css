@@ -2,17 +2,16 @@
  *
  * Why this file exists: there used to be four separate :root blocks
  * (index.html, workbench.css, brand.css, insights.html) carrying two parallel
- * naming schemes (--accent vs --wb-accent). They drifted — #f4f6f5 vs #f4f7f5,
- * #147766 vs #087663 — and brand.css had to guess with a three-level fallback
- * (var(--wb-line, var(--line, #dce4df))). Pages therefore never quite looked
- * like one product.
+ * naming schemes (--accent vs --wb-accent, both since removed). They drifted —
+ * #147766 vs #087663 — and brand.css had to guess with a three-level fallback.
+ * Pages therefore never quite looked like one product.
  *
  * Rules for future edits:
  *   1. Every colour, space, radius, shadow and duration comes from here.
  *      Do not write a raw hex or px value in a page stylesheet.
  *   2. Add a token instead of inventing a one-off value.
- *   3. The legacy aliases at the bottom exist to migrate safely. Once no file
- *      references --wb-* or the old short names, delete the alias block.
+ *   3. There are no legacy aliases any more. The --wb-* names and the old
+ *      short names are gone from every file; use the canonical tokens only.
  *
  * No build step, no dependencies: plain CSS custom properties.
  */
@@ -72,9 +71,13 @@
   --color-star-line: #e2d3a8;
 
   /* ── Space. 4px base; pick the nearest step, never a raw value. ─────── */
-  /* 唯一的侧边栏宽度。主站和工作台都读它 —— 之前两处各写各的
-     （286px 与 260px），点导航时整块宽度会跳。 */
-  --sidebar-width: 286px;
+  /* 唯一的侧边栏宽度。常见范围 240-280px；取 260 给内容多留 26px，
+     同时仍容得下最长的导航项（推理服务与平台 + 计数）。 */
+  --sidebar-width: 260px;
+  /* 右下角悬浮控件（反馈按钮 52px + 右边距 22px）或右上角主题按钮要占的宽度。
+     内容列右侧留出这条通道，否则浮动按钮会压在正文上 —— 实测压住过状态徽标、
+     小节标题和反馈正文。移动端按钮缩小，用下面的媒体查询覆盖。 */
+  --float-lane: 86px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -94,19 +97,40 @@
   --radius-lg: 10px;
   --radius-full: 999px;
 
-  /* ── Type scale. Fluid where the size is layout-dependent. ──────────── */
-  /* 一档只有一个用途。改字号先问"它是什么角色"，再选档，
-     不要就地写 px —— 之前 17/19/23/34 混用就是这么来的。 */
-  --text-2xs: 10px;   /* 角标、chevron */
-  --text-xs: 11px;    /* 徽标、计数、时间戳 */
-  --text-sm: 12.5px;  /* 辅助说明、次级元信息 */
-  --text-base: 13.5px;/* 导航、紧凑控件 */
-  --text-md: 15px;    /* 正文基准 */
-  --text-lg: 17px;    /* 卡片标题、小标题 */
-  --text-xl: 20px;    /* 区块标题 */
-  --text-2xl: clamp(22px, 2vw, 26px);   /* 页面标题 */
-  --text-3xl: clamp(26px, 2.6vw, 32px); /* 文章主标题 */
-  --text-4xl: clamp(30px, 3.4vw, 38px); /* 首页 hero */
+  /* ── Type scale ───────────────────────────────────────────────────────
+   * 参照的行业基线：正文 16px 起、辅助文字比正文小约 2px、
+   * 整页字号种类控制在 4 种左右（Learn UI 的通用建议）。
+   * 本站是阅读为主的站，取偏大的正文；界面部分（导航/标签）可以更小，
+   * 但每一档必须有唯一职责，否则同一层次会出现两个尺寸。
+   *
+   * 层级（由大到小，用途互斥）：
+   *   hero   首页主张，一屏一个
+   *   h1     文章/页面主标题
+   *   h2     区块标题
+   *   h3     卡片标题、小节标题
+   *   body   正文与说明文字（导航、表单、按钮都用它——控件不该比正文小）
+   *   small  次级信息：计数、时间戳、来源、辅助说明
+   *   micro  仅非文字场景：图形角标、chevron
+   */
+  --text-micro: 11px;   /* 只用于图形/角标，不做文字 */
+  --text-small: 13px;   /* 次级信息：计数、时间戳、来源、辅助说明 */
+  --text-body: 16px;    /* 正文，也是导航与控件的字号 */
+  --text-h3: 18px;      /* 卡片标题、小节标题 */
+  --text-h2: 22px;      /* 区块标题 */
+  --text-h1: clamp(26px, 2.6vw, 32px);  /* 文章/页面主标题 */
+  --text-hero: clamp(30px, 3.2vw, 38px); /* 首页主张 */
+
+  /* 旧名保留为别名，迁移期用；改完可删。 */
+  --text-2xs: var(--text-micro);
+  --text-xs: var(--text-micro);
+  --text-sm: var(--text-small);
+  --text-base: var(--text-body);
+  --text-md: var(--text-body);
+  --text-lg: var(--text-h3);
+  --text-xl: var(--text-h2);
+  --text-2xl: var(--text-h2);
+  --text-3xl: var(--text-h1);
+  --text-4xl: var(--text-hero);
 
   --leading-tight: 1.25;
   --leading-normal: 1.6;
@@ -232,7 +256,7 @@ body {
 }
 
 /* Symbol glyphs used as icons must not be re-styled by a component font. */
-.wb-nav-icon,
+.tk-nav-icon,
 .radar-icon,
 .brand-mark,
 .tk-brand-mark,
@@ -316,14 +340,13 @@ a:hover {
   }
 }
 
-/* ── 共享导航组件 ────────────────────────────────────────────────────────
- * 主站 (.shared-nav) 与工作台 (.wb-nav) 各写了一份同样的数值，但行高和图标
- * 字号不同，导致同一个导航项在两个页面相差 3.7px —— 点导航时高度会跳。
+/* ── 导航项几何 ──────────────────────────────────────────────────────────
+ * 主站和工作台曾经各写一份同样的数值（.shared-nav vs .wb-nav），行高和图标
+ * 字号还不一样，同一个导航项在两个页面相差 3.7px。现在只有一套 .tk-nav。
  * 图标必须参与行盒计算，所以这里把它压到与文字同高。
  */
 .nav-item,
-.wb-nav a,
-.shared-nav a {
+.tk-nav a {
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -338,8 +361,7 @@ a:hover {
 }
 
 .nav-item-icon,
-.wb-nav-icon,
-.shared-nav .sn-icon {
+.tk-nav-icon {
   flex: none;
   width: 18px;
   /* 与文字同字号：大一号会把行盒撑高，导航项就跟着变高。 */
@@ -349,54 +371,3 @@ a:hover {
   color: currentColor;
 }
 
-/* ── Legacy aliases ──────────────────────────────────────────────────────
- * These map the two older naming schemes onto the tokens above so the token
- * layer can land before every stylesheet is migrated. Delete this block once
- * `grep -rn '\-\-wb-\|\-\-accent-soft\|\-\-warm-soft' site/ index.html`
- * returns nothing outside this file.
- */
-
-:root {
-  /* workbench.css (--wb-*) */
-  --wb-bg: var(--color-bg);
-  --wb-paper: var(--color-panel);
-  --wb-ink: var(--color-ink);
-  --wb-muted: var(--color-muted);
-  --wb-line: var(--color-line);
-  --wb-line-strong: var(--color-line-strong);
-  --wb-accent: var(--color-accent);
-  --wb-accent-soft: var(--color-accent-soft);
-  --wb-shadow: var(--shadow-md);
-
-  /* index.html / insights.html short names */
-  --bg: var(--color-bg);
-  --surface: var(--color-surface);
-  --panel: var(--color-panel);
-  --paper: var(--color-panel);
-  --soft: var(--color-accent-soft);
-  --ink: var(--color-ink);
-  --muted: var(--color-muted);
-  --line: var(--color-line);
-  --accent: var(--color-accent);
-  --accent-soft: var(--color-accent-soft);
-  --accent-line: var(--color-accent-line);
-  --on-accent: var(--color-on-accent);
-  --warm: var(--color-warm);
-  --warm-line: var(--color-warm-line);
-  --warm-ink: var(--color-warm-ink);
-  --warm-soft: var(--color-warm-soft);
-  --blue: var(--color-info);
-  --blue-soft: var(--color-info-soft);
-  --purple: var(--color-violet);
-  --purple-soft: var(--color-violet-soft);
-  --green: var(--color-ok);
-  --green-soft: var(--color-ok-soft);
-  --red: var(--color-danger);
-  --ok: var(--color-ok);
-  --ok-soft: var(--color-ok-soft);
-  --warn: var(--color-warn);
-  --warn-soft: var(--color-warn-soft);
-  --danger: var(--color-danger);
-  --danger-soft: var(--color-danger-soft);
-  --shadow: var(--shadow-md);
-}

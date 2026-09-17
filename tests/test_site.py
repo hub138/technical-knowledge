@@ -39,6 +39,36 @@ assert REVIEW_SPEC.loader is not None
 REVIEW_SPEC.loader.exec_module(REVIEW_MODULE)
 
 
+def parse_nav_items() -> list[dict[str, object]]:
+    """Read the navigation data out of site/nav.js.
+
+    The nav used to be a literal array inside whichever file rendered it, so
+    tests pinned the text. It is now one data file with one renderer, so tests
+    should read the data and check properties of it — which entries exist, which
+    are owner-only — instead of looking for a particular string.
+    """
+    source = (ROOT / "site" / "nav.js").read_text(encoding="utf-8")
+    start = source.index("items: [")
+    end = source.index("\n  ],", start)
+    block = source[start:end]
+    items: list[dict[str, object]] = []
+    for entry in re.finditer(r"\{\s*key:\s*\"([^\"]+)\"(.*?)\n    \}", block, re.S):
+        key, body = entry.group(1), entry.group(2)
+        item: dict[str, object] = {"key": key}
+        href = re.search(r'href:\s*"([^"]+)"', body)
+        label = re.search(r'label:\s*"([^"]+)"', body)
+        if href:
+            item["href"] = href.group(1)
+        if label:
+            item["label"] = label.group(1)
+        if re.search(r"localOnly:\s*true", body):
+            item["localOnly"] = True
+        if re.search(r"parent:\s*\"", body):
+            item["parent"] = True
+        items.append(item)
+    return items
+
+
 class QuietHandler(SERVER_MODULE.Handler):
     def log_message(self, _format: str, *_args: object) -> None:
         pass
@@ -195,8 +225,8 @@ class AuthenticationTests(unittest.TestCase):
             "/api/note?path=" + quote(note_path),
             "/projects/archify/README.md",
             "/projects/OpenMAIC/README-zh",
-            "/static/workbench.css",
-            "/static/workbench.js",
+            "/static/base.css",
+            "/static/shell.js",
         ]
         for route in routes:
             with self.subTest(route=route):
@@ -528,7 +558,7 @@ class KnowledgeGraphTests(unittest.TestCase):
         self.assertIn("WECOM_SERVICE", server_source)
         self.assertIn("read_keychain_secret(WECOM_SERVICE)", server_source)
         # key=... 不应作为字面量出现在任何会被提交的文件里
-        for relative in ("site/server.py", "index.html", "site/workbench.js", "site/insights.html"):
+        for relative in ("site/server.py", "index.html", "site/shell.js", "site/insights.html"):
             text = (ROOT / relative).read_text(encoding="utf-8")
             self.assertNotRegex(
                 text,
@@ -601,8 +631,7 @@ class KnowledgeGraphTests(unittest.TestCase):
         self.assertIn('aria-expanded="${open}"', home)
         self.assertIn("state.expandedDomains.delete(domain)", home)
         self.assertIn("state.expandedDomains.add(domain)", home)
-        self.assertIn(".sidebar.collapsed #domains", home)
-        self.assertIn(".sidebar.collapsed .shared-nav", home)
+        self.assertIn("#tk-sidebar.collapsed #domains", home)
 
     def test_every_core_note_has_an_incoming_link(self) -> None:
         linked = {edge["target"] for edge in self.vault.edges()}
@@ -728,13 +757,15 @@ class NavigationContractTests(unittest.TestCase):
         self.assertNotIn("location.href='/learn'", self.home)
         # The homepage renders the same four primary destinations as every
         # companion page. These links stay in the current tab.
-        self.assertIn('id="shared-nav"', self.home)
+        self.assertIn('id="tk-sidebar"', self.home)
         self.assertIn("renderSharedNav", self.home)
         self.assertIn("知识图谱", self.home)
         self.assertNotIn('id="home-button"', self.home)
         self.assertNotIn('id="graph-button"', self.home)
         # The knowledge tree and Clippings must survive the nav change.
-        self.assertIn('id="domains"', self.home)
+        # 域树挂载点由 renderSharedNav() 插进 shell 渲染出的侧边栏里。
+        self.assertIn("domains.id='domains'", self.home)
+        self.assertIn('aside.querySelector(\'.tk-nav\')?.after(domains)', self.home)
         self.assertIn(
             'href="/learn" target="_blank" rel="noopener noreferrer" style=', self.home
         )
@@ -765,17 +796,17 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("job.title", self.history)
         self.assertNotIn("已保存的课堂", self.history)
         for page in (self.intuition, self.transfer):
-            self.assertIn('/static/workbench.css', page)
-            self.assertIn('data-page="learning"', page)
+            self.assertIn('/static/base.css', page)
+            self.assertIn('page: "learning"', page)
         # The classroom page is its own sidebar destination, so it highlights
         # 我的课堂 rather than 学习中心.
-        self.assertIn('/static/workbench.css', self.history)
-        self.assertIn('data-page="classrooms"', self.history)
+        self.assertIn('/static/base.css', self.history)
+        self.assertIn('page: "classrooms"', self.history)
         self.assertIn("形成直觉", self.intuition)
         self.assertIn("迁移验证", self.transfer)
 
     def test_openmaic_teaching_page_has_complete_entry_contract(self) -> None:
-        self.assertIn('data-page="learning"', self.openmaic)
+        self.assertIn('page: "learning"', self.openmaic)
         self.assertIn('/launch/openmaic?next=', self.openmaic)
         self.assertIn('target="_blank" rel="noopener noreferrer"', self.openmaic)
         self.assertIn('id="topic"', self.openmaic)
@@ -799,89 +830,104 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("状态未知", status_asset)
 
     def test_companion_pages_share_workbench_navigation(self) -> None:
-        shared = (ROOT / "site" / "workbench.css").read_text(encoding="utf-8")
-        shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
-        self.assertIn(".wb-sidebar", shared)
-        self.assertIn("dataset.page", shared_script)
-        # The nav is now multi-line so 访问与反馈 can join it. Assert the
-        # membership rather than the exact formatting.
-        self.assertIn("const nav = [", shared_script)
-        # 中台 (/insights) 刻意不在公开导航里：它列出访客 IP 和反馈内容，
-        # 只对本机开放。把它放回导航等于把运营界面给读者看。
-        self.assertNotIn("insights", shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
-        for entry in (
-            "pages.knowledge",
-            "pages.graph",
-            "pages.projects",
-            "pages.evaluation",
-        ):
-            self.assertIn(entry, shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
-        self.assertNotIn('target="_blank" rel="noopener noreferrer"', shared_script)
-        self.assertNotIn("item !== current && item !== pages.knowledge", shared_script)
+        """Every page kind renders its sidebar from the same place.
+
+        This used to assert that workbench.js contained a literal `const nav = [`
+        array. That tested how the code was written rather than what it did, and
+        it broke the moment the array moved to nav.js. Now it reads the data and
+        the one renderer, which is what actually has to hold.
+        """
+        shared = (ROOT / "site" / "base.css").read_text(encoding="utf-8")
+        shell = (ROOT / "site" / "shell.js").read_text(encoding="utf-8")
+        nav_items = parse_nav_items()
+
+        # One renderer, one set of class names.
+        self.assertIn(".tk-sidebar", shared)
+        self.assertIn(".tk-nav a", shared)
+        self.assertIn("sidebar", shell)
+        self.assertNotIn("dataset.page", shell)
+        # No wb-* selectors or class names survive. The bare string appears in a
+        # comment explaining that the prefix was retired, so look for actual uses:
+        # a CSS selector, or a class attribute / className assignment.
+        for text, name in ((shared, "base.css"), (shell, "shell.js")):
+            self.assertNotRegex(text, r"\.wb-[a-z]", f"{name} still has a .wb- selector")
+            self.assertNotRegex(text, r'class="[^"]*\bwb-', f"{name} still has a wb- class")
+            self.assertNotRegex(text, r'wb-host', f"{name} still references wb-host")
+
+        keys = [item["key"] for item in nav_items]
+        # 中台 (/insights) 在数据里，但标了 localOnly：它列出访客 IP 和反馈内容，
+        # 只对本机开放，由 /api/access 决定是否渲染。别人浏览器里不该有。
+        self.assertIn("insights", keys)
+        local_only = {i["key"] for i in nav_items if i.get("localOnly")}
+        self.assertEqual(local_only, {"insights"})
+        for entry in ("knowledge", "graph", "projects", "evaluation"):
+            self.assertIn(entry, keys)
+
+        # The shell must withhold localOnly entries from the public list.
+        self.assertIn("!i.localOnly", shell)
+
+        self.assertNotIn('target="_blank" rel="noopener noreferrer"', shell)
+
         for page, name in ((self.learning, "learning"), (self.projects, "projects"), (self.evaluation, "evaluation"), (self.intuition, "learning"), (self.transfer, "learning"), (self.history, "classrooms")):
-            self.assertIn('/static/workbench.css', page)
-            self.assertIn(f'data-page="{name}"', page)
+            self.assertIn('/static/base.css', page)
+            self.assertIn(f'TKShell.sidebar({{', page)
+            self.assertIn(f'page: "{name}"', page)
             self.assertIn('class="purpose"', page)
 
     def test_brand_and_knowledge_graph_are_shared_navigation(self) -> None:
-        shared = (ROOT / "site" / "workbench.css").read_text(encoding="utf-8")
-        shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
+        shared = (ROOT / "site" / "base.css").read_text(encoding="utf-8")
+        shell = (ROOT / "site" / "shell.js").read_text(encoding="utf-8")
         brand = (ROOT / "site" / "brand.css").read_text(encoding="utf-8")
         home_nav = self.home.split("function renderSharedNav(){", 1)[1].split(
-            "/* Theme toggle", 1
+            "function updateSharedNav", 1
         )[0]
 
         self.assertIn('@import url("/static/brand.css")', shared)
         self.assertIn('href="/static/brand.css"', self.home)
-        self.assertIn('class="tk-brand"', self.home)
-        self.assertIn('class="tk-brand"', shared_script)
+        # The brand block is rendered by the shell on every page, so it is no
+        # longer spelled out in index.html — that duplication was the point.
+        self.assertIn('class="tk-brand"', shell)
+        self.assertNotIn('class="tk-brand"', self.home)
         self.assertIn(".tk-brand-text strong", brand)
         self.assertIn("font-weight: 700", brand)
-        self.assertNotIn(".wb-brand-text strong", shared)
-        # The workbench sidebar and the main site's .app grid must agree, or the
-        # nav visibly changes width when you click through to 项目与教学.
-        # 两站必须读同一个宽度变量。之前各写各的（286 与 260），
-        # 点导航时整块侧边栏会跳宽。
+        self.assertNotIn("wb-brand-text strong", shared)
+        # The sidebar is fixed and the page body reserves its width. The main
+        # site used to do this with a grid column instead, so the two mechanisms
+        # fought and .main rendered underneath the sidebar at x=0.
+        # 只有一套机制：侧边栏 fixed，body 用 padding-left 让位。
         self.assertIn("padding-left: var(--sidebar-width)", shared)
         self.assertIn("width: var(--sidebar-width)", shared)
-        self.assertIn("grid-template-columns:var(--sidebar-width)", self.home)
+        self.assertNotIn("grid-template-columns:var(--sidebar-width)", self.home)
+        self.assertIn('class="tk-host"', self.home)
 
-        self.assertIn('label: "知识图谱"', shared_script)
-        # The nav is now multi-line so 访问与反馈 can join it. Assert the
-        # membership rather than the exact formatting.
-        self.assertIn("const nav = [", shared_script)
-        # 中台 (/insights) 刻意不在公开导航里：它列出访客 IP 和反馈内容，
-        # 只对本机开放。把它放回导航等于把运营界面给读者看。
-        self.assertNotIn("insights", shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
-        for entry in (
-            "pages.knowledge",
-            "pages.graph",
-            "pages.projects",
-            "pages.evaluation",
-        ):
-            self.assertIn(entry, shared_script.split("const nav = [", 1)[1].split("];", 1)[0])
-        self.assertNotIn("knowledge: [pages.graph]", shared_script)
-        self.assertIn("{label:'知识图谱'", home_nav)
+        nav_items = parse_nav_items()
+        self.assertIn("知识图谱", [i.get("label") for i in nav_items])
+        self.assertNotIn("knowledge: [pages.graph]", shell)
+        # 主站的图谱是页内视图，点击要拦截而不是跳转。
         self.assertIn("network:['知识图谱'", self.home)
         self.assertIn('aria-label="文章知识图谱"', self.home)
+        self.assertIn("item.key==='graph'", home_nav)
         self.assertNotIn("sn-sub", home_nav)
         self.assertNotIn("关系图谱", self.projects)
 
-        self.assertIn("Canonical page rhythm", shared)
-        self.assertIn("body.wb-host .shell > .hero:first-child", shared)
-        self.assertIn("body.wb-host .usage-grid .usage-item", shared)
+        # Page rhythm now lives in base.css under the tk- names.
+        self.assertIn("tk-shell", shared)
+        self.assertIn(".tk-shell > .hero:first-child", shared)
+        self.assertIn(".usage-grid .usage-item", shared)
 
     def test_navigation_stays_in_current_tab_and_links_have_no_default_underlines(self) -> None:
-        home_nav = self.home.split("function renderSharedNav(){", 1)[1].split("/* Theme toggle", 1)[0]
-        self.assertIn("{label:'项目与教学'", home_nav)
-        self.assertIn("{label:'Agent 评估'", home_nav)
+        home_nav = self.home.split("function renderSharedNav(){", 1)[1].split("function updateSharedNav", 1)[0]
+        # The nav entries come from TKShell.sidebar() now, so the page names the
+        # nav keys rather than spelling the labels out itself.
+        labels = [i.get("label") for i in parse_nav_items()]
+        self.assertIn("项目与教学", labels)
+        self.assertIn("Agent 评估", labels)
         self.assertNotIn('target="_blank"', home_nav)
-        self.assertIn('id="link-polish"', self.home)
-        self.assertIn("a { text-decoration: none; }", self.home)
 
-        workbench_nav = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
-        self.assertNotIn('target="_blank"', workbench_nav)
-        self.assertIn("body.wb-host a:hover { text-decoration: none; }", (ROOT / "site" / "workbench.css").read_text(encoding="utf-8"))
+        shell = (ROOT / "site" / "shell.js").read_text(encoding="utf-8")
+        self.assertNotIn('target="_blank"', shell)
+        shared = (ROOT / "site" / "base.css").read_text(encoding="utf-8")
+        self.assertIn("body.tk-host a:hover { text-decoration: none; }", shared)
         for page in (self.projects, self.evaluation, self.history, self.intuition, self.transfer, self.openmaic):
             self.assertNotIn("text-decoration: underline;", page)
 
@@ -892,21 +938,25 @@ class NavigationContractTests(unittest.TestCase):
         because a classroom is a tool you reach for, not a second way to browse
         knowledge. They still have to be one click from that section.
         """
-        shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
-        self.assertIn("我的课堂", shared_script)
-        self.assertIn("/learn/history", shared_script)
-        # It is rendered by the sub-nav, which appears inside 项目与工具.
-        self.assertIn("subNav", shared_script)
-        self.assertIn("pages.classrooms", shared_script)
-        self.assertIn('parent: "projects"', shared_script)
-        # Learning pages stay out of the primary nav; 知识图谱 remains a
-        # primary destination available from every page.
-        nav_block = shared_script.split("const nav = [", 1)[1].split("]", 1)[0]
-        self.assertIn("pages.graph", nav_block)
-        self.assertNotIn("pages.learning", nav_block)
-        self.assertNotIn("pages.classrooms", nav_block)
-        for page in (self.learning, self.projects, self.evaluation, self.history):
-            self.assertIn('data-page=', page)
+        items = parse_nav_items()
+        by_key = {i["key"]: i for i in items}
+        self.assertIn("classrooms", by_key)
+        self.assertEqual(by_key["classrooms"]["label"], "我的课堂")
+        self.assertEqual(by_key["classrooms"]["href"], "/learn/history")
+        # 学习入口带 parent，所以只进二级导航，不进主导航。
+        self.assertTrue(by_key["learning"].get("parent"))
+        self.assertTrue(by_key["classrooms"].get("parent"))
+        # 二级导航由 shell 渲染，挂在"项目与教学"下。
+        shell = (ROOT / "site" / "shell.js").read_text(encoding="utf-8")
+        self.assertIn("tk-subnav", shell)
+        # 知识图谱 stays in the primary nav from every page; learning does not.
+        primary = [i["key"] for i in items if not i.get("parent") and not i.get("localOnly")]
+        self.assertIn("graph", primary)
+        self.assertNotIn("learning", primary)
+        self.assertNotIn("classrooms", primary)
+        for page, name in ((self.learning, "learning"), (self.projects, "projects"),
+                           (self.evaluation, "evaluation"), (self.history, "classrooms")):
+            self.assertIn(f'page: "{name}"', page)
 
     def test_legacy_workbench_route_is_not_used_by_launch_contract(self) -> None:
         self.assertNotIn("/workbench/new", self.learning)

@@ -1,0 +1,686 @@
+/* The one stylesheet every page loads.
+ *
+ * Why this file exists: there used to be two page systems. The main site styled
+ * its sidebar inside index.html; the eight companion pages styled an equivalent
+ * sidebar in workbench.css. Same navigation, two sets of class names, two sets
+ * of numbers. They drifted, so the sidebar changed shape when you clicked
+ * through to 项目与教学 — and a nav entry that appeared on one side was missing
+ * on the other.
+ *
+ * Now: one class prefix (tk-), one set of tokens, one breakpoint. The companion
+ * pages' own markup conventions (.shell, .hero, .purpose, .job-*, .dimension)
+ * are adopted here, because eight pages' worth of HTML depends on them; the
+ * main site's SPA-specific classes (.content, .panel, .entry, .domain-card)
+ * stay as they are and are styled alongside.
+ *
+ * Rules for edits:
+ *   1. Every colour, space, radius and duration comes from tokens.css.
+ *   2. `wb-*` is retired. Do not introduce it again.
+ *   3. There is one breakpoint: 760px. Both page kinds fold the sidebar the
+ *      same way at the same width, or navigating between them jumps.
+ */
+
+@import url("/static/tokens.css");
+@import url("/static/brand.css");
+
+/* ── Page shell ─────────────────────────────────────────────────────────
+ * The sidebar is fixed, so the page body carries the offset. The main site's
+ * .app grid reads the same --sidebar-width, which is what keeps the two from
+ * disagreeing about how much room the sidebar takes.
+ */
+body.tk-host {
+  min-height: 100vh;
+  padding-left: var(--sidebar-width);
+  background: var(--color-bg);
+}
+
+.tk-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 10;
+  width: var(--sidebar-width);
+  padding: 21px 15px 20px;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-panel);
+  border-right: 1px solid var(--color-line);
+}
+
+/* The brand block sits above the nav on every page. On the main site it lives
+   inside .tk-brand-row together with the mobile menu button; the companion
+   pages have no menu button (their sidebar becomes a top bar instead), so the
+   row is simply absent there. */
+.tk-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.tk-mobile-menu { display: none; }
+
+/* ── Primary navigation ─────────────────────────────────────────────────── */
+
+.tk-nav {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+}
+
+.tk-nav a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 38px;
+  padding: var(--space-2) 10px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-ink-soft);
+  font-size: var(--text-body);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out);
+}
+
+.tk-nav a:hover,
+.tk-nav a[aria-current="page"] {
+  border-color: var(--color-accent-line);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.tk-nav-icon {
+  flex: none;
+  width: 18px;
+  font-size: 1em;
+  line-height: 1;
+  text-align: center;
+  color: currentColor;
+}
+
+/* Quieter than its parent so the nested entry reads as a child rather than
+   competing with the destination above it. */
+.tk-nav-icon--sub {
+  width: 16px;
+  font-size: 12px;
+  opacity: 0.75;
+}
+
+/* ── Sub-navigation ───────────────────────────────────────────────────────
+ * Learning pages nest under 项目与教学: they are tools you reach for, not a
+ * second way to browse knowledge. The left rail and indent are what make them
+ * read as children; without it the smaller type just looked like shrunken
+ * siblings. The main site deliberately does not render this level.
+ */
+.tk-subnav {
+  display: grid;
+  gap: 2px;
+  margin: 10px 0 0 15px;
+  padding: 8px 0 0 11px;
+  border-top: 1px solid var(--color-line);
+  border-left: 2px solid var(--color-line);
+}
+
+.tk-subnav-label {
+  margin: 0 0 4px;
+  padding-left: 10px;
+  color: var(--color-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.tk-subnav a {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--color-muted);
+  font-size: 13px;
+  font-weight: 650;
+  text-decoration: none;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.tk-subnav a:hover,
+.tk-subnav a[aria-current="page"] {
+  border-color: var(--color-accent-line);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+/* ── Sidebar footer: where am I, and how do I leave ─────────────────────── */
+
+.tk-context {
+  margin-top: auto;
+  padding: 14px 10px 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.tk-context-label {
+  margin: 0 0 5px;
+  color: var(--color-accent);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.tk-context h2 {
+  margin: 0 0 5px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.tk-context p {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.tk-sidebar-footer {
+  display: grid;
+  gap: 9px;
+  margin-top: 17px;
+  padding: 0 10px;
+  color: var(--color-muted);
+  font-size: 11px;
+}
+
+.tk-sidebar-links { display: flex; gap: 10px; }
+
+.tk-sidebar-footer a { color: inherit; text-decoration: none; }
+.tk-sidebar-footer a:hover { color: var(--color-accent); }
+
+/* ── Content column ───────────────────────────────────────────────────────
+ * Companion pages own their content but not their frame: width, first-screen
+ * spacing, card density and mobile behaviour stay put while navigating. The
+ * main site's .content is listed alongside so both resolve to one rhythm.
+ *
+ * The right padding reserves a lane for the floating controls (feedback button,
+ * theme toggle). Without it they sit on top of whatever the reader happens to
+ * be looking at — measured: the feedback button covered a status badge on
+ * /projects, a heading on /apps/learning/history, and a timestamp plus two
+ * lines of feedback text on /insights. Content must not scroll under them.
+ */
+.tk-shell,
+.content {
+  width: 100%;
+  max-width: 1260px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: clamp(18px, 2.4vw, 30px);
+  padding-right: calc(clamp(18px, 2.4vw, 30px) + var(--float-lane));
+  padding-bottom: calc(var(--float-lane) + 40px);
+}
+
+.tk-shell > .hero:first-child {
+  margin: 0;
+  padding: 42px 0 28px;
+  border-bottom: 1px solid var(--color-line);
+}
+
+.tk-pagebar { position: relative; }
+
+/* Links in content carry no underline. The global rule in tokens.css colours
+   them; this only removes the decoration, which the dense layouts do not want. */
+body.tk-host a { text-decoration: none; }
+body.tk-host a:hover { text-decoration: none; }
+
+/* ── Page rhythm: hero, eyebrow, sections ───────────────────────────────── */
+
+.hero h1 {
+  max-width: 880px;
+  letter-spacing: 0;
+}
+
+.hero p {
+  max-width: 880px;
+  color: var(--color-muted);
+}
+
+.eyebrow {
+  color: var(--color-accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+}
+
+.section { margin-top: 28px; }
+.section h2,
+.panel h2 { letter-spacing: 0; }
+
+/* ── Cards ────────────────────────────────────────────────────────────────
+ * One border treatment for every card-like surface the pages define. This
+ * replaces eight groups of per-page overrides: the class names below were
+ * simply not the main site's, so each one needed its own patch.
+ */
+.panel,
+.project,
+.service,
+.card,
+.topic-box,
+.dimension,
+.analysis-card {
+  border-color: var(--color-line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xs);
+  background: var(--color-panel);
+}
+
+/* Striped/inline layouts read as a single block, so they carry no radius. */
+.usage-grid .usage-item,
+.stages .stage,
+.flow .flow-step {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* ── Buttons and link-buttons ─────────────────────────────────────────────── */
+
+.button,
+.links a,
+.actions a,
+.hero-links a,
+.work-actions a,
+.topic-secondary,
+body.tk-host button {
+  border-radius: 5px;
+}
+
+.button,
+.links a,
+.actions a,
+.hero-links a,
+.work-actions a {
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+.button:hover,
+.links a:hover,
+.actions a:hover,
+.hero-links a:hover,
+.work-actions a:hover {
+  transform: translateY(-1px);
+}
+
+/* ── Purpose strip: "what is this page for" ───────────────────────────────── */
+
+.purpose {
+  display: flex;
+  gap: 14px;
+  align-items: baseline;
+  margin-top: 22px;
+  padding: 13px 16px;
+  border: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 6px;
+  background: var(--color-panel);
+  color: var(--color-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.purpose strong {
+  flex: 0 0 auto;
+  color: var(--color-ink);
+  font-size: 13px;
+}
+
+.purpose span { min-width: 0; }
+
+/* ── Theme toggle: fixed top-right on every page ──────────────────────────── */
+
+.tk-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--color-muted);
+  font: 600 12px/1 inherit;
+  cursor: pointer;
+  transition:
+    border-color var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.tk-theme-toggle:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.tk-theme-toggle--fixed {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 20;
+  padding: 8px 13px;
+  background: var(--color-panel);
+}
+
+.tk-theme-toggle--fixed:hover { background: var(--color-accent-soft); }
+
+/* ── Feedback entry ───────────────────────────────────────────────────────── */
+
+.tk-fab {
+  position: fixed;
+  right: 22px;
+  bottom: 22px;
+  z-index: 21;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 1px solid var(--color-accent-line);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+  font: 700 22px/1 inherit;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition:
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.tk-fab:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.tk-fab:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.tk-fab > span[aria-hidden] { display: block; font-size: 24px; line-height: 1; }
+
+.tk-fab-label {
+  position: absolute;
+  right: 62px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 11px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font: 650 12px/1 inherit;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.tk-fab:hover .tk-fab-label,
+.tk-fab:focus-visible .tk-fab-label { opacity: 1; }
+
+.tk-fb-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 31;
+  display: none;
+  place-items: center;
+  background: var(--color-overlay);
+  backdrop-filter: blur(2px);
+  padding: 20px;
+}
+
+.tk-fb-overlay.open { display: grid; }
+
+.tk-fb-panel {
+  width: min(520px, 100%);
+  max-height: 86vh;
+  overflow: auto;
+  background: var(--color-panel);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-lg);
+}
+
+.tk-fb-panel h2 { margin: 0 0 4px; font-size: 19px; }
+
+.tk-fb-sub {
+  margin: 0 0 16px;
+  color: var(--color-muted);
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.tk-fb-where {
+  margin: 0 0 15px;
+  padding: 9px 11px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-muted);
+  font-size: 12px;
+}
+
+.tk-fb-where b { color: var(--color-ink); }
+
+.tk-fb-kinds { display: flex; flex-wrap: wrap; gap: 7px; margin: 0 0 15px; }
+
+.tk-fb-kinds label {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border: 1px solid var(--color-line);
+  border-radius: 20px;
+  background: var(--color-panel);
+  color: var(--color-muted);
+  font-size: 12.5px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.tk-fb-kinds input { position: absolute; opacity: 0; pointer-events: none; }
+
+.tk-fb-kinds label:has(input:checked) {
+  border-color: var(--color-accent);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.tk-fb-kinds label:focus-within {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.tk-fb-field { display: block; margin: 0 0 13px; }
+
+.tk-fb-field > span {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--color-muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.tk-fb-field textarea,
+.tk-fb-field input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font: inherit;
+  font-size: 13.5px;
+  outline: 0;
+}
+
+.tk-fb-field textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.65;
+}
+
+.tk-fb-field textarea:focus,
+.tk-fb-field input:focus {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-ring);
+}
+
+.tk-fb-field small {
+  display: block;
+  text-align: right;
+  color: var(--color-muted);
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.tk-fb-actions { display: flex; gap: 9px; margin-top: 6px; }
+
+.tk-fb-actions button {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid var(--color-line);
+  border-radius: 6px;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font: 650 13px inherit;
+  cursor: pointer;
+}
+
+.tk-fb-actions button:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.tk-fb-actions button[type="submit"] {
+  border-color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.tk-fb-actions button[type="submit"]:hover {
+  background: var(--color-accent-hover);
+  color: var(--color-on-accent);
+}
+
+.tk-fb-actions button:disabled { opacity: 0.6; cursor: wait; }
+
+.tk-fb-note { margin: 11px 0 0; font-size: 12px; color: var(--color-muted); }
+.tk-fb-note.err { color: var(--color-warm-ink); font-weight: 650; }
+
+/* ── Dark theme ───────────────────────────────────────────────────────────
+ * Only what cannot come from a token swap. Tokens.css redefines every colour
+ * for dark; these rules cover the cases where a component's own selector is
+ * more specific than a plain token swap would be.
+ *
+ * The active nav item is the important one: `.tk-nav a[aria-current="page"]`
+ * has the same specificity as this rule, so it has to be repeated here or the
+ * active entry keeps the light accent (#147766) on the dark sidebar — 1.36:1,
+ * effectively unreadable. Measured, not guessed; see scripts/contrast_audit.py.
+ */
+:root[data-theme="dark"] .tk-nav a,
+:root[data-theme="dark"] .tk-subnav a,
+:root[data-theme="dark"] .tk-sidebar-footer { color: var(--color-muted); }
+:root[data-theme="dark"] .tk-nav a[aria-current="page"],
+:root[data-theme="dark"] .tk-nav a:hover,
+:root[data-theme="dark"] .tk-subnav a[aria-current="page"],
+:root[data-theme="dark"] .tk-subnav a:hover { color: var(--color-accent); }
+:root[data-theme="dark"] .tk-nav-icon { color: inherit; }
+
+/* ── One breakpoint ───────────────────────────────────────────────────────
+ * Below 760px the sidebar stops being a left rail and becomes a top bar, on
+ * both page kinds. Keeping this to a single width is the point: it used to be
+ * 900px here and 760px on the main site.
+ */
+@media (max-width: 760px) {
+  body.tk-host { padding-left: 0; }
+
+  .tk-sidebar {
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    padding: 12px 15px 10px;
+    border-right: 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .tk-nav {
+    display: flex;
+    gap: 5px;
+    margin-top: 0;
+    padding-top: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tk-nav::-webkit-scrollbar { display: none; }
+  .tk-nav a { flex: 0 0 auto; min-height: 34px; padding: 7px 9px; font-size: 12px; }
+
+  .tk-subnav {
+    display: flex;
+    gap: 4px;
+    margin-top: 3px;
+    padding-top: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tk-subnav::-webkit-scrollbar { display: none; }
+  .tk-subnav-label { display: none; }
+  .tk-subnav a { flex: 0 0 auto; padding: 5px 8px; font-size: 12px; }
+
+  .tk-context,
+  .tk-sidebar-footer { display: none; }
+
+  .tk-shell,
+  .content {
+    /* The floating buttons shrink on a narrow screen (48px at right:14px), so
+       the lane is smaller here. It still applies: the feedback button overlaps
+       a phone-width column just as readily as a desktop one. */
+    --float-lane: 62px;
+    max-width: none;
+    padding: var(--space-4) calc(var(--space-4) + var(--float-lane)) calc(var(--float-lane) + var(--space-8)) var(--space-4);
+  }
+
+  .tk-shell > .hero:first-child { padding: 30px 0 23px; }
+  .hero h1 { font-size: 29px; line-height: 1.22; }
+  .purpose { margin-top: 18px; }
+
+  .tk-theme-toggle--fixed {
+    top: 12px;
+    right: 14px;
+    padding: 7px 11px;
+  }
+
+  .tk-fab { right: 14px; bottom: 16px; width: 48px; height: 48px; }
+  .tk-fab-label { display: none; }
+}
+
+@media (max-width: 560px) {
+  .tk-sidebar { padding-left: 13px; padding-right: 13px; }
+  .tk-nav a { padding-left: 8px; padding-right: 8px; }
+  .tk-nav-icon { display: none; }
+  .purpose { display: block; margin-top: 18px; padding: 12px 13px; }
+  .purpose strong { display: block; margin-bottom: 3px; }
+}
+
+@media print {
+  .tk-sidebar,
+  .tk-fab,
+  .tk-fb-overlay,
+  .tk-theme-toggle { display: none !important; }
+  body.tk-host { padding-left: 0; background: #fff; }
+}

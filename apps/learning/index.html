@@ -5,20 +5,25 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>学习中心 · technical-knowledge</title>
     <link rel="stylesheet" href="/static/tokens.css" />
-    <link rel="stylesheet" href="/static/workbench.css" />
-    <script src="/static/workbench.js" data-page="learning" defer></script>
+    <link rel="stylesheet" href="/static/base.css" />
+    <script src="/static/nav.js"></script>
+    <script src="/static/shell.js"></script>
     <script>
-      /* 首帧前定好主题。workbench.js 是 defer，等它执行时页面已经用浅色画过一遍，
-         暗色偏好下会闪一下白，对比度审计也会抓到那一帧。 */
-      (function () {
-        var t = "light";
-        try {
-          t = localStorage.getItem("tk-theme") ||
-            (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-        } catch (e) {}
-        document.documentElement.dataset.theme = t;
-      })();
+      /* 侧边栏由 shell.js 统一渲染，与主站是同一份代码。挂载点在 body 里，
+         所以要等 DOM 就绪；shell.js 是同步加载的，主题已经在首帧前应用。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({
+      page: "learning",
+      context: true,
+      subnav: window.TK_NAV.subitems,
+      auth: true,
+      }));
+      /* 反馈入口与主站是同一个组件，收到的意见进同一个收件箱。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
+        where: () => '当前页面：<b>' + (document.querySelector('.tk-context h2')?.textContent.trim() || document.title) + '</b>',
+        title: () => document.querySelector('.tk-context h2')?.textContent.trim() || document.title,
+      }));
     </script>
+    
     <style>
       
       * {
@@ -43,10 +48,9 @@
       input {
         font: inherit;
       }
-      .shell {
+      .tk-shell {
         max-width: 1260px;
         margin: auto;
-        padding: 0 28px 72px;
       }
       .topbar {
         height: 72px;
@@ -395,8 +399,7 @@
         }
       }
       @media (max-width: 620px) {
-        .shell {
-          padding: 0 15px 50px;
+        .tk-shell {
         }
         .topbar {
           height: 62px;
@@ -455,17 +458,18 @@
     </style>
   <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card{background:var(--color-panel)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] button.primary,:root[data-theme="dark"] .primary{color:#0e1a16!important}
 </style>
-<style id="wb-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:#0e1a16!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] .cost{color:#e8cba4!important}</style>
 </head>
-  <body>
-    <div class="shell">
+  <body class="tk-host">
+    <aside class="tk-sidebar" id="tk-sidebar"></aside>
+    <div class="tk-shell">
       <section class="hero">
         <div>
           <div class="eyebrow">LEARN · PRACTICE · TRANSFER</div>
           <h1>从知识点走到真正会用</h1>
           <p>
-            先用知识库建立结构，再用课堂形成直觉，用导师追问和复习，最后通过变更约束完成迁移。生成前始终由你确认，不会打开页面就消耗模型额度。
+            先用知识库建立结构，再用课堂形成直觉，用导师追问和复习，最后改掉一个约束再走一遍，看判断还成不成立。生成前始终由你确认，不会打开页面就消耗模型额度。
           </p>
         </div>
         <form class="topic-box" id="topic-form">
@@ -641,7 +645,7 @@
               <h3>可靠 Agent：决策、执行与事实边界</h3>
               <p>
                 目标：能设计 Agent
-                的状态、工具、权限、证据和评估闭环，而不是只会套框架。
+                的状态、工具、权限、证据和评估方式，而不是只会套框架。
               </p>
             </div>
             <div class="steps">

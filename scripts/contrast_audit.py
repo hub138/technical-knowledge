@@ -84,11 +84,30 @@ PROBE = r"""
 """
 
 
+def seed_probe(html: str, theme: str) -> str:
+    """Inject the probe as the first thing in <head>, not before </body>.
+
+    The theme preference has to be in localStorage before any page script reads
+    it. site/shell.js is loaded synchronously from <head> and applies the stored
+    theme on the spot, so a probe appended at the end of the body would be too
+    late: shell.js would see no preference, fall back to the OS setting, and the
+    measurement would report light-mode colours on a dark page for reasons that
+    have nothing to do with the stylesheet.
+
+    The probe still pins the attribute on DOMContentLoaded/load and at two later
+    timestamps, because the sidebar is inserted after the initial paint.
+    """
+    body = PROBE.replace("__THEME__", theme)
+    marker = "<head>"
+    index = html.find(marker)
+    if index < 0:
+        return html.replace("</body>", body + "</body>")
+    return html[: index + len(marker)] + body + html[index + len(marker) :]
+
+
 def measure(url: str, target: Path, width: int = 1512, theme: str = "light") -> list[dict]:
     original = target.read_text(encoding="utf-8")
-    target.write_text(
-        original.replace("</body>", PROBE.replace("__THEME__", theme) + "</body>"), encoding="utf-8"
-    )
+    target.write_text(seed_probe(original, theme), encoding="utf-8")
     try:
         with tempfile.TemporaryDirectory() as profile:
             proc = subprocess.run(

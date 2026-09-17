@@ -4,9 +4,13 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>工程知识库</title>
 <link rel="stylesheet" href="/static/tokens.css">
+<script src="/static/nav.js"></script>
 <link rel="stylesheet" href="/static/brand.css">
+<link rel="stylesheet" href="/static/base.css">
+<script src="/static/shell.js"></script>
 <style>
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:var(--text-md)/var(--leading-normal) var(--font-sans)}button,input{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:var(--sidebar-width) minmax(0,1fr);min-height:100vh}.sidebar{background:var(--surface);border-right:1px solid var(--line);padding:21px 15px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 21px;border-bottom:1px solid var(--line)}.mark{width:34px;height:34px;border:1px solid var(--accent);border-radius:9px;display:grid;place-items:center;color:var(--accent);font-weight:800}.brand strong{display:block;font-size:var(--text-md)}.brand small{display:block;color:var(--muted);font-size:var(--text-xs)}.nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px 0}.nav-actions button,.nav-section button{border:1px solid transparent;background:transparent;color:var(--muted);text-align:left;border-radius:6px;padding:8px 10px}.nav-actions button:hover,.nav-actions button.active,.nav-section button:hover,.nav-section button.active{background:var(--accent-soft);border-color:#c5e0d8;color:var(--accent)}.shared-nav{display:grid;gap:4px;margin-top:16px}.shared-nav a{display:flex;align-items:center;gap:9px;min-height:38px;padding:8px 10px;border:1px solid transparent;border-radius:6px;color:#55635d;font-size:var(--text-base);font-weight:650;text-decoration:none}.shared-nav a:hover,.shared-nav a[aria-current="page"]{border-color:#b9d9cf;background:var(--accent-soft);color:var(--accent)}.shared-nav .sn-icon{width:18px;color:currentColor}.shared-nav .sn-sub{display:grid;gap:2px;margin:6px 0 0 10px;padding-left:10px;border-left:2px solid var(--line)}.shared-nav .sn-sub a{min-height:30px;padding:5px 9px;font-size:var(--text-sm);font-weight:600;color:var(--muted)}.shared-nav .sn-sub a:hover{background:var(--accent-soft);color:var(--accent)}.theme-toggle{width:100%;margin-top:14px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--muted);font:600 12px/1 inherit;cursor:pointer}.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}.nav-section{border-top:1px solid var(--line);padding:12px 0}.nav-section h3{font-size:var(--text-xs);color:var(--muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;justify-content:space-between;width:100%;font-size:var(--text-base)}.count{font-size:var(--text-xs);color:var(--muted)}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:20px 30px;background:rgba(244,246,245,.94);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3;backdrop-filter:blur(10px)}.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--panel);outline:0}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #1477661a}.search span{position:absolute;left:13px;top:8px;color:var(--muted)}.content{padding:32px;max-width:1500px}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:var(--text-3xl);line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--color-ink-soft);margin:0}.hero-meta{color:var(--muted);font-size:var(--text-sm);white-space:nowrap}.section{margin-top:28px}.section h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 7px}.section>p{color:var(--color-ink-soft);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--space-3);align-items:start}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.entry h3{font-size:var(--text-md);margin:0 0 6px}.entry p{color:var(--color-ink-soft);font-size:var(--text-base);margin:0 0 12px}.entry a{display:inline-block;color:var(--accent);font-size:var(--text-sm);margin-right:11px}.domain-card{position:relative;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:var(--text-md)/var(--leading-normal) var(--font-sans)}button,input{font:inherit}button{cursor:pointer}.app{display:block;min-height:100vh}.sidebar{background:var(--surface);border-right:1px solid var(--line);padding:21px 15px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 21px;border-bottom:1px solid var(--line)}.mark{width:34px;height:34px;border:1px solid var(--accent);border-radius:9px;display:grid;place-items:center;color:var(--accent);font-weight:800}.brand strong{display:block;font-size:var(--text-md)}.brand small{display:block;color:var(--muted);font-size:var(--text-xs)}.nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px 0}.nav-actions button,.nav-section button{border:1px solid transparent;background:transparent;color:var(--color-ink-soft);text-align:left;border-radius:6px;padding:8px 10px}.nav-actions button:hover,.nav-actions button.active,.nav-section button:hover,.nav-section button.active{background:var(--accent-soft);border-color:#c5e0d8;color:var(--accent)}
+.nav-section{border-top:1px solid var(--line);padding:12px 0}.nav-section h3{font-size:var(--text-xs);color:var(--muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;justify-content:space-between;width:100%;font-size:var(--text-body)}.count{font-size:var(--text-xs);color:var(--muted)}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:20px 30px;background:rgba(244,246,245,.94);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3;backdrop-filter:blur(10px)}.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--panel);outline:0}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #1477661a}.search span{position:absolute;left:13px;top:8px;color:var(--muted)}.content{padding:32px;max-width:1500px}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:var(--text-3xl);line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--color-ink-soft);margin:0}.hero-meta{color:var(--muted);font-size:var(--text-sm);white-space:nowrap}.section{margin-top:28px}.section h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 7px}.section>p{color:var(--color-ink-soft);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--space-3);align-items:start}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.entry h3{font-size:var(--text-md);margin:0 0 6px}.entry p{color:var(--color-ink-soft);font-size:var(--text-base);margin:0 0 12px}.entry a{display:inline-block;color:var(--accent);font-size:var(--text-sm);margin-right:11px}.domain-card{position:relative;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
 .domain-card:hover{border-color:var(--color-accent-line);box-shadow:var(--shadow-sm)}
 .domain-card h3{margin:0;font-size:var(--text-lg);font-weight:var(--weight-bold);color:var(--color-ink)}
 .domain-card p{margin:0;color:var(--color-muted);font-size:var(--text-sm);line-height:var(--leading-normal);max-width:38ch}
@@ -23,7 +27,7 @@
 .reader-sources a:hover{text-decoration:underline}
 .source-sep{margin:0 5px;color:var(--color-line-strong)}
 .source-toggle{margin-left:8px;padding:1px 8px;border:1px solid var(--color-line);border-radius:var(--radius-full);background:transparent;color:var(--color-muted);font:inherit;font-size:var(--text-xs);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
-.source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 204px;column-gap:26px;align-items:start}#reader-body{grid-column:1}#reader-toc{grid-column:2}}.reader-siblings{margin:16px 0 0;display:flex;align-items:center;gap:9px;flex-wrap:wrap}.reader-siblings .rail-head{margin:0;padding:0;border:0;flex:0 0 auto;gap:4px;display:flex;align-items:center}.reader-siblings .rail-list{gap:7px}.reader-siblings .rail-head span{font-size:var(--text-xs);color:var(--muted)}.reader-siblings .rail-list{display:flex;flex-wrap:wrap;gap:7px}.reader-siblings .rail-list a{padding:5px 11px;border:1px solid var(--line);border-radius:15px;background:var(--panel);white-space:nowrap}.reader-toc{position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto;font-size:var(--text-sm)}.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px;padding-bottom:7px;border-bottom:1px solid var(--line);color:var(--muted);font-size:var(--text-xs);font-weight:700;letter-spacing:.06em}.rail-toggle{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 2px;font-size:var(--text-base);line-height:1}.rail-toggle:hover{color:var(--accent)}.rail-list{margin:0;padding:0;list-style:none;display:grid;gap:2px}.rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--muted);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--accent-soft);color:var(--accent)}.rail-list a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:var(--text-sm);color:var(--muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:var(--text-sm);color:var(--muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}.reader-body{max-width:960px;font-size:var(--text-lg);line-height:1.85}.reader-body h1{font-size:var(--text-3xl)}.reader-body h2{font-size:var(--text-2xl);border-bottom:1px solid var(--line);padding-bottom:5px;margin-top:31px}.reader-body h3{font-size:var(--text-xl);margin-top:25px}.reader-body p{margin:14px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:5px 0}.reader-body blockquote{border-left:3px solid var(--accent);padding:4px 15px;color:var(--muted);background:var(--surface)}.reader-body a{color:var(--accent)}.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--line);border-radius:6px}.reader-body code{background:#edf3f0;color:#0d6656;border:1px solid #d9e9e3;border-radius:4px;padding:1px 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}.reader-body .code-block,.reader-body pre.mermaid{background:#f6f9f8;border:1px solid var(--line);color:#22322c;border-radius:7px;padding:14px 16px;overflow:auto;font-size:var(--text-base);line-height:1.65}.reader-body .code-block code,.reader-body pre.mermaid code{background:none;border:0;padding:0;color:inherit;font-size:inherit}.reader-body table{border-collapse:collapse;width:100%;margin:var(--space-5) 0;font-size:var(--text-sm)}
+.source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 204px;column-gap:26px;align-items:start}#reader-#reader-toc{grid-column:2}}.reader-siblings{margin:16px 0 0;display:flex;align-items:center;gap:9px;flex-wrap:wrap}.reader-siblings .rail-head{margin:0;padding:0;border:0;flex:0 0 auto;gap:4px;display:flex;align-items:center}.reader-siblings .rail-list{gap:7px}.reader-siblings .rail-head span{font-size:var(--text-xs);color:var(--muted)}.reader-siblings .rail-list{display:flex;flex-wrap:wrap;gap:7px}.reader-siblings .rail-list a{padding:5px 11px;border:1px solid var(--line);border-radius:15px;background:var(--panel);white-space:nowrap}.reader-toc{position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto;font-size:var(--text-sm)}.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px;padding-bottom:7px;border-bottom:1px solid var(--line);color:var(--muted);font-size:var(--text-xs);font-weight:700;letter-spacing:.06em}.rail-toggle{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 2px;font-size:var(--text-base);line-height:1}.rail-toggle:hover{color:var(--accent)}.rail-list{margin:0;padding:0;list-style:none;display:grid;gap:2px}.rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--muted);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--accent-soft);color:var(--accent)}.rail-list a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:var(--text-sm);color:var(--muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:var(--text-sm);color:var(--muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}.reader-body{max-width:960px;font-size:var(--text-lg);line-height:1.85}.reader-body h1{font-size:var(--text-3xl)}.reader-body h2{font-size:var(--text-2xl);border-bottom:1px solid var(--line);padding-bottom:5px;margin-top:31px}.reader-body h3{font-size:var(--text-xl);margin-top:25px}.reader-body p{margin:14px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:5px 0}.reader-body blockquote{border-left:3px solid var(--accent);padding:4px 15px;color:var(--muted);background:var(--surface)}.reader-body a{color:var(--accent)}.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--line);border-radius:6px}.reader-body code{background:#edf3f0;color:#0d6656;border:1px solid #d9e9e3;border-radius:4px;padding:1px 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}.reader-body .code-block,.reader-body pre.mermaid{background:#f6f9f8;border:1px solid var(--line);color:#22322c;border-radius:7px;padding:14px 16px;overflow:auto;font-size:var(--text-base);line-height:1.65}.reader-body .code-block code,.reader-body pre.mermaid code{background:none;border:0;padding:0;color:inherit;font-size:inherit}.reader-body table{border-collapse:collapse;width:100%;margin:var(--space-5) 0;font-size:var(--text-sm)}
 /* 表格是正文的一部分，不是数据报表：行距要够读，
    表头要与正文区分但不用重色。 */
 .reader-body th,.reader-body td{padding:var(--space-3) var(--space-4);border:1px solid var(--color-line);text-align:left;vertical-align:top;line-height:var(--leading-normal)}
@@ -74,61 +78,25 @@
 /* 单元格内的长文本仍可换行，避免窄屏下横向滚动过长。 */
 .reader-body table td{white-space:normal;min-width:120px}
 }
-/* 反馈入口：固定右下角的圆形按钮，压在「? 快捷键」上方一格。
-   要显眼但不占阅读区域，所以只放一个圆点，细节收进面板里。 */
-.fb-fab{position:fixed;right:22px;bottom:60px;z-index:var(--z-fab);width:52px;height:52px;border-radius:50%;border:1px solid var(--accent-line);background:var(--accent);color:var(--on-accent);font:700 22px/1 inherit;cursor:pointer;box-shadow:0 6px 20px rgba(20,80,66,.28);transition:transform var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
-.fb-fab:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(20,80,66,.34)}
-.fb-fab:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
-.fb-fab span{display:block;font-size:var(--text-2xl);line-height:1}
-.fb-fab .fb-fab-label{position:absolute;right:62px;top:50%;transform:translateY(-50%);padding:6px 11px;border-radius:6px;background:var(--panel);border:1px solid var(--line);color:var(--ink);font:650 12px/1 inherit;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity var(--duration-fast) var(--ease-out)}
-.fb-fab:hover .fb-fab-label,.fb-fab:focus-visible .fb-fab-label{opacity:1}
-.fb-overlay{position:fixed;inset:0;z-index:31;display:none;place-items:center;background:rgba(19,28,25,.42);backdrop-filter:blur(2px);padding:20px}
-.fb-overlay.open{display:grid}
-.fb-panel{width:min(520px,100%);max-height:86vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 24px;box-shadow:0 24px 60px rgba(20,42,35,.28)}
-.fb-panel h2{margin:0 0 4px;font-size:var(--text-xl)}
-.fb-panel .fb-sub{margin:0 0 16px;color:var(--muted);font-size:var(--text-sm);line-height:1.6}
-.fb-where{margin:0 0 15px;padding:9px 11px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--color-ink-soft);font-size:var(--text-sm)}
-.fb-where b{color:var(--ink)}
-.fb-kinds{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 15px}
-.fb-kinds label{display:inline-flex;align-items:center;gap:5px;padding:6px 11px;border:1px solid var(--line);border-radius:20px;background:var(--panel);color:var(--muted);font-size:var(--text-sm);font-weight:650;cursor:pointer}
-.fb-kinds input{position:absolute;opacity:0;pointer-events:none}
-.fb-kinds label:has(input:checked){border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}
-.fb-kinds label:focus-within{outline:2px solid var(--accent);outline-offset:2px}
-.fb-field{display:block;margin:0 0 13px}
-.fb-field span{display:block;margin-bottom:5px;color:var(--muted);font-size:var(--text-sm);font-weight:650}
-.fb-field textarea,.fb-field input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);font:inherit;font-size:var(--text-base);outline:0}
-.fb-field textarea{min-height:110px;resize:vertical;line-height:1.65}
-.fb-field textarea:focus,.fb-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #1477661a}
-.fb-count{display:block;text-align:right;color:var(--muted);font-size:var(--text-xs);margin-top:4px}
-.fb-count.over{color:var(--warm);font-weight:700}
-.fb-actions{display:flex;gap:9px;margin-top:6px}
-.fb-actions button{flex:1;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:650 13px inherit;cursor:pointer}
-.fb-actions button:hover{border-color:var(--accent);color:var(--accent)}
-.fb-actions button[type="submit"]{border-color:var(--accent);background:var(--accent);color:#fff}
-.fb-actions button[type="submit"]:hover{background:#0b5f4f;color:#fff}
-.fb-actions button:disabled{opacity:.6;cursor:wait}
-.fb-note{margin:11px 0 0;font-size:var(--text-sm);color:var(--muted)}
-.fb-note.err{color:var(--warm);font-weight:650}
 /* 阅读进度：长文读到哪了。贴在顶栏下沿的一条细线。 */
 .progress-bar{position:fixed;left:286px;right:0;top:0;height:2px;z-index:22;background:var(--accent);transform-origin:0 50%;transform:scaleX(0);transition:transform var(--duration-fast) var(--ease-out)}
 @media(max-width:760px){.progress-bar{left:0}}
 @media(max-width:760px){/* 手机上右下角只能放一个悬浮件：键盘提示在触屏上没有意义，隐藏。
    选择器带 .shell 是为了压过文件后面定义的同名基础规则。 */
-body .kbd-hint{display:none}.fb-fab{right:14px;bottom:18px;width:46px;height:46px;box-shadow:0 4px 14px rgba(20,80,66,.3)}.fb-fab .fb-fab-label{display:none}/* 正文底部留出空间，避免最后一段被悬浮按钮压住。 */.content{padding-bottom:78px}}
+body .kbd-hint{display:none}}
 /* 打印：去掉所有悬浮件和导航，只留文章本身 */
-@media print{.sidebar,.topbar,.kbd-hint,.fb-fab,.fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:#fff}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}.mobile-menu{display:none}@media(max-width:1100px){.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}.sidebar{position:fixed;z-index:8;width:100%;height:auto;max-height:100vh;overflow:auto;padding:10px 13px}.sidebar.collapsed .nav-actions,.sidebar.collapsed .shared-nav,.sidebar.collapsed #domains,.sidebar.collapsed .theme-toggle{display:none}.brand{padding:0;border:0}.mobile-menu{display:block;margin-left:auto;border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 9px;color:var(--accent)}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.content{padding:21px 15px}.hero{display:block}.hero h2{font-size:var(--text-2xl)}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:var(--text-2xl)}}
+@media print{.tk-sidebar,.topbar,.kbd-hint,.tk-fab,.tk-fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:#fff}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}@media(max-width:1100px){.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}/* 侧边栏本身在 base.css 里变成顶部横条。域树在主站是第二层导航，手机上收进「目录」后面，免得把首屏挤满。 */.tk-mobile-menu{display:block;border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 9px;color:var(--accent)}#tk-sidebar.collapsed #domains{display:none}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.content{padding:21px 15px}.hero{display:block}.hero h2{font-size:var(--text-2xl)}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:var(--text-2xl)}}
 
 body{background:var(--bg);font-size:var(--text-md);line-height:var(--leading-normal)}
-.app{grid-template-columns:var(--sidebar-width) minmax(0,1fr)}
+
 .sidebar{background:var(--panel);padding:25px 16px 24px}
-.brand-row{display:flex;align-items:flex-start}.brand-row .tk-brand{flex:1}
 .nav-actions{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:14px 0 16px}
 .nav-actions button{padding:8px 4px;text-align:center;font-size:var(--text-sm);border:1px solid var(--line);background:var(--panel);color:#596760}
 .nav-actions button:hover,.nav-actions button.active{background:var(--accent-soft);border-color:#b9d9cf;color:var(--accent)}
 .nav-section{border:0;padding:2px 0}
 .nav-section button{align-items:center;border:1px solid transparent;padding:9px 10px;border-radius:6px;color:var(--muted)}
 .nav-section button:hover,.nav-section button.active{background:var(--surface);border-color:#dbe7e2;color:#075f51}
-.nav-section .topic-button{margin-left:13px;width:calc(100% - 13px);padding:7px 10px;font-size:var(--text-sm);color:#718079}
+.nav-section .topic-button{margin-left:13px;width:calc(100% - 13px);padding:7px 10px;font-size:var(--text-small);color:var(--color-muted)}
 /* 时效性文章（type: radar）置顶在领域标题下方、主题列表之上。
    橙色边框 + 阴影 + ⚡，让"这份动态有没有更新"在侧边栏就能一眼看到。 */
 .radar-card,.nav-section .radar-card{display:flex;align-items:center;gap:6px;box-sizing:border-box;margin:4px 0 4px 13px;width:calc(100% - 13px);max-width:calc(100% - 13px);padding:7px 10px;min-height:35px;border:1px solid var(--warm-line);border-radius:6px;background:var(--warm-soft);box-shadow:inset 3px 0 0 var(--warm);cursor:pointer;text-align:left;color:var(--warm-ink);font-size:var(--text-sm);line-height:1.4;transition:box-shadow var(--duration-fast) var(--ease-out)}
@@ -136,8 +104,8 @@ body{background:var(--bg);font-size:var(--text-md);line-height:var(--leading-nor
 .radar-card[aria-current="page"]{background:var(--warm);color:#fff}
 .radar-card .radar-icon{flex:none;font-size:var(--text-base);line-height:1}
 .radar-card .radar-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex:1 1 auto}
-.radar-card .radar-text strong{font-size:var(--text-sm);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
-.radar-card .radar-text small{font-size:var(--text-xs);font-weight:600;opacity:.75;white-space:nowrap;flex:0 0 auto}
+.radar-card .radar-text strong{font-size:var(--text-small);font-weight:var(--weight-semibold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0}
+.radar-card .radar-text small{font-size:var(--text-micro);font-weight:600;opacity:.75;white-space:nowrap;flex:0 1 auto;overflow:hidden;min-width:0}
 .radar-card[aria-current="page"] .radar-text small{opacity:.92}
 :root[data-theme="dark"] .radar-card{box-shadow:0 3px 10px rgba(0,0,0,.4)}
 :root[data-theme="dark"] .radar-card:hover{box-shadow:0 5px 14px rgba(0,0,0,.5)}
@@ -201,13 +169,13 @@ body{background:var(--bg);font-size:var(--text-md);line-height:var(--leading-nor
 .visual-tabs button{padding:7px 11px}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}.content{padding-left:28px;padding-right:28px}}
-@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}.sidebar.collapsed .sidebar-support{display:none}.brand-row{align-items:center}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:rgba(245,247,246,.97)}.content{padding:26px 15px 48px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:var(--text-3xl)}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}}
+@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:rgba(245,247,246,.97)}.content{padding:26px 15px 48px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:var(--text-3xl)}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}}
 /* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
 .app-alert{position:fixed;right:22px;bottom:22px;z-index:20;max-width:min(420px,calc(100vw - 30px));padding:11px 14px;border:1px solid #e8c6a8;border-left:3px solid var(--warm);border-radius:7px;background:#fff9f2;color:#704823;box-shadow:0 12px 30px rgba(35,45,40,.14);font-size:var(--text-base);display:none}
 .app-alert.open{display:block}
 /* 键盘快捷键help面板：按 ? 打开。用一个覆盖层说明全部快捷键，
    避免把提示散在界面上干扰阅读。 */
-.kbd-hint{position:fixed;right:22px;bottom:22px;z-index:19;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:20px;background:var(--panel);color:var(--muted);font-size:var(--text-xs);font-weight:650;cursor:pointer;box-shadow:0 2px 8px rgba(20,42,35,.06)}
+.kbd-hint{position:fixed;right:22px;bottom:calc(22px + 52px + 10px);z-index:19;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:20px;background:var(--panel);color:var(--muted);font-size:var(--text-xs);font-weight:650;cursor:pointer;box-shadow:0 2px 8px rgba(20,42,35,.06)}
 .kbd-hint:hover{border-color:var(--accent);color:var(--accent)}
 .kbd-hint kbd{margin:0}
 .kbd-overlay{position:fixed;inset:0;z-index:30;display:none;place-items:center;background:rgba(19,28,25,.42);backdrop-filter:blur(2px);padding:20px}
@@ -240,12 +208,10 @@ kbd{display:inline-block;min-width:20px;padding:2px 6px;border:1px solid var(--l
 .home:empty::before{content:'正在加载知识库...';display:block;padding:48px 0;color:var(--muted);font-size:var(--text-md)}
 .domain-card:focus-visible,.note-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media(max-width:760px){.app-alert{right:15px;bottom:15px}.reader-tools{justify-content:flex-start;flex-wrap:wrap}.reader-back,.reader-study{flex:1 1 150px;text-align:center}}
-@media(max-width:760px){.mobile-menu{display:block!important;flex:0 0 auto;min-width:52px;margin-left:auto;visibility:visible}.brand-row{width:100%;min-width:0}}
-
-:root[data-theme="dark"] .sidebar,:root[data-theme="dark"] .domain-card,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .note-card,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .empty,:root[data-theme="dark"] .notice,:root[data-theme="dark"] .reader-sources,:root[data-theme="dark"] .search input,:root[data-theme="dark"] .visual-tabs button,:root[data-theme="dark"] .sort button,:root[data-theme="dark"] .tab,:root[data-theme="dark"] .mobile-menu,:root[data-theme="dark"] .reader-back,:root[data-theme="dark"] .reader-study,:root[data-theme="dark"] .tooltip,:root[data-theme="dark"] .graph-panel,:root[data-theme="dark"] .rail-list a{background-color:var(--panel)!important}
+@media(max-width:760px){}
 :root[data-theme="dark"] .topbar{background:rgba(19,26,24,.94)!important}
 :root[data-theme="dark"] .reader-body th,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .count,:root[data-theme="dark"] .reader-body .code-block,:root[data-theme="dark"] .reader-body pre.mermaid,:root[data-theme="dark"] .graph-panel svg{background-color:var(--surface)!important}
-:root[data-theme="dark"] .nav-section h3,:root[data-theme="dark"] .side-title,:root[data-theme="dark"] .shared-nav a,:root[data-theme="dark"] .side-item,:root[data-theme="dark"] .search span,:root[data-theme="dark"] .meta,:root[data-theme="dark"] .topbar h1,:root[data-theme="dark"] .count,:root[data-theme="dark"] .nav-actions button{color:var(--muted)!important}
+:root[data-theme="dark"] .nav-section h3,:root[data-theme="dark"] .side-title,:root[data-theme="dark"] .side-item,:root[data-theme="dark"] .search span,:root[data-theme="dark"] .meta,:root[data-theme="dark"] .topbar h1,:root[data-theme="dark"] .count,:root[data-theme="dark"] .nav-actions button{color:var(--muted)!important}
 :root[data-theme="dark"] .notice{color:#e8cba4!important;border-color:#5c4a2e!important}
 :root[data-theme="dark"] .domain-label,:root[data-theme="dark"] .node text,:root[data-theme="dark"] .topic-node text,:root[data-theme="dark"] .diagram-label,:root[data-theme="dark"] .diagram-small,:root[data-theme="dark"] .graph-note,:root[data-theme="dark"] .axis-label,:root[data-theme="dark"] .quadrant-title,:root[data-theme="dark"] .point-label{fill:var(--ink)!important}
 :root[data-theme="dark"] .node circle,:root[data-theme="dark"] .topic-node circle,:root[data-theme="dark"] .point{stroke:var(--panel)!important}
@@ -311,32 +277,11 @@ a:hover { text-decoration: none; }
 @media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}
 </style>
 </head>
-<body>
+<body class="tk-host">
 <div class="app">
-<aside class="sidebar" id="sidebar"><div class="brand-row"><a class="tk-brand" href="/" aria-label="返回工程知识库"><span class="tk-brand-mark" aria-hidden="true">K</span><span class="tk-brand-text"><strong>工程知识库</strong><small>技术知识图谱</small></span></a><button type="button" class="mobile-menu" id="mobile-menu" aria-label="打开目录">目录</button></div><div class="shared-nav" id="shared-nav"></div><div id="domains"></div></aside>
-<main class="main"><header class="topbar"><h1>工程知识库</h1><label class="search"><span>⌕</span><input id="search" placeholder="搜索知识、机制、项目或来源" autocomplete="off"></label><button type="button" class="theme-toggle" id="theme-toggle" aria-live="polite" style="margin-left:auto">☾</button><div class="reader-tools" id="reader-actions" hidden><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><button id="reader-download" class="reader-tool" type="button" title="下载这篇的 Markdown 原文">下载 .md</button><button id="reader-copy" class="reader-tool" type="button" title="复制这篇的链接">复制链接</button><button id="reader-print" class="reader-tool" type="button" title="打印或另存为 PDF">打印</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型。" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div>
+<aside class="tk-sidebar" id="tk-sidebar"></aside>
+<main class="main"><header class="topbar"><h1>工程知识库</h1><label class="search"><span>⌕</span><input id="search" placeholder="搜索知识、机制、项目或来源" autocomplete="off"></label><button type="button" class="tk-theme-toggle" id="theme-toggle" data-tk-theme-toggle aria-live="polite" style="margin-left:auto"><span data-tk-theme-icon aria-hidden="true">☾</span><span data-tk-theme-label>夜晚模式</span></button><div class="reader-tools" id="reader-actions" hidden><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><button id="reader-download" class="reader-tool" type="button" title="下载这篇的 Markdown 原文">下载 .md</button><button id="reader-copy" class="reader-tool" type="button" title="复制这篇的链接">复制链接</button><button id="reader-print" class="reader-tool" type="button" title="打印或另存为 PDF">打印</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型。" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div>
 <div class="progress-bar" id="progress-bar" aria-hidden="true"></div>
-<button type="button" class="fb-fab" id="fb-fab" title="提意见 / 报告问题" aria-label="提意见或报告问题"><span aria-hidden="true">?</span><span class="fb-fab-label">提意见</span></button>
-<div class="fb-overlay" id="fb-overlay" role="dialog" aria-modal="true" aria-labelledby="fb-title" hidden>
-  <form class="fb-panel" id="fb-form">
-    <h2 id="fb-title">提个意见</h2>
-    <p class="fb-sub">读到哪里觉得不对、看不懂、或者想加点什么，都可以说。反馈只存在本机，不会公开。</p>
-    <p class="fb-where" id="fb-where">当前页面：首页</p>
-    <div class="fb-kinds" role="radiogroup" aria-label="反馈类型">
-      <label><input type="radio" name="fb-kind" value="bug" checked><span>内容有错</span></label>
-      <label><input type="radio" name="fb-kind" value="confusing"><span>看不懂</span></label>
-      <label><input type="radio" name="fb-kind" value="suggestion"><span>想加点什么</span></label>
-      <label><input type="radio" name="fb-kind" value="praise"><span>这篇有用</span></label>
-    </div>
-    <label class="fb-field"><span>具体说说</span><textarea id="fb-message" maxlength="4000" placeholder="例如：这一节的结论和上面的例子对不上；或者：希望补一个最小可跑的例子。" required></textarea><small class="fb-count" id="fb-count">0 / 4000</small></label>
-    <label class="fb-field"><span>怎么称呼你（可不填）</span><input id="fb-name" maxlength="60" placeholder="企微中文名或英文名，方便我回复你" autocomplete="nickname"></label>
-    <div class="fb-actions">
-      <button type="button" id="fb-cancel">取消</button>
-      <button type="submit" id="fb-submit">发送</button>
-    </div>
-    <p class="fb-note" id="fb-note">按 <kbd>Esc</kbd> 可随时关闭。</p>
-  </form>
-</div>
 <button type="button" class="kbd-hint" id="kbd-hint" title="查看键盘快捷键"><kbd>?</kbd><span>快捷键</span></button>
 <div class="kbd-overlay" id="kbd-overlay" role="dialog" aria-modal="true" aria-labelledby="kbd-title" hidden>
   <div class="kbd-panel">
@@ -382,7 +327,7 @@ function renderDomains(){
     const current=inDomain.filter(n=>n.topic!=='归档');
     const archived=inDomain.filter(n=>n.topic==='归档');
     const topics=orderedTopics(d,new Set(current.map(n=>n.topic)));
-    const radarCards=radars.map(n=>`<button class="radar-card" data-path="${esc(n.path)}" title="时效性内容，每周更新：${esc(n.title)}"><span class="radar-icon" aria-hidden="true">⚡</span><span class="radar-text"><strong>${esc(n.title)}</strong><small>每周更新${n.updated?' · 最近 '+esc(n.updated.slice(5)):''}</small></span></button>`).join('');
+    const radarCards=radars.map(n=>`<button class="radar-card" data-path="${esc(n.path)}" title="时效性内容，每周更新：${esc(n.title)}"><span class="radar-icon" aria-hidden="true">⚡</span><span class="radar-text"><strong>${esc(n.title)}</strong><small>每周更新</small></span></button>`).join('');
     const archiveRow=archived.length?`<button class="topic-button archived" data-domain="${esc(d)}" data-topic="归档"><span>归档</span><span class="count">${archived.length}</span></button>`:'';
     return `<section class="nav-section"><button class="domain-button ${active?'active':''}" data-domain="${esc(d)}" aria-expanded="${open}"><span class="domain-label"><span class="domain-chevron" aria-hidden="true">${open?'▼':'▶'}</span><span>${esc(d)}</span></span><span class="count">${current.length}</span></button>${open?radarCards+topics.map(t=>`<button class="topic-button ${active&&state.topic===t?'active':''}" data-domain="${esc(d)}" data-topic="${esc(t)}"><span>${esc(t)}</span><span class="count">${current.filter(n=>n.topic===t).length}</span></button>`).join('')+archiveRow:''}</section>`;
   }).join('')+(clippingCount?`<div class="sidebar-support"><p>保留资料</p><button class="domain-button ${state.domain==='Clippings'?'active':''}" data-domain="Clippings"><span>Clippings</span><span class="count">${clippingCount}</span></button></div>`:'');
@@ -418,11 +363,6 @@ function renderDirectory(){
   document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;renderDirectory()});
 }
 function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const sourceCount=state.notes.reduce((n,x)=>n+((x.sources||[]).length),0);const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero"><div><h2>把技术原理读到能上手用</h2><p>${knowledgeCount} 篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。每篇都写清：它为什么出现、怎么运作、边界在哪、结论从哪来。</p></div><div class="hero-meta">${knowledgeCount} 篇 · ${sourceCount} 条来源</div></section><section class="claim"><p class="claim-lead">每篇都按这四件事写</p><ul class="claim-list"><li><b>背景</b> —— 这个技术为什么出现，之前卡在哪</li><li><b>方案</b> —— 它怎么解决的，机制是什么</li><li><b>效果</b> —— 实际改变了哪个指标，在什么条件下测的</li><li><b>优缺点</b> —— 代价是什么，什么情况下不该用</li></ul><p class="claim-links"><a href="/?path=%E7%9F%A5%E8%AF%86%E5%BA%93%E7%AE%A1%E7%90%86%2F%E6%96%B9%E6%B3%95%2F%E4%B8%80%E7%AF%87%E7%9F%A5%E8%AF%86%E6%80%8E%E4%B9%88%E5%86%99.md">写作约定</a><a href="/?path=%E7%9F%A5%E8%AF%86%E5%BA%93%E7%AE%A1%E7%90%86%2F%E6%96%B9%E6%B3%95%2F%E7%9F%A5%E8%AF%86%E4%BB%8E%E5%93%AA%E6%9D%A5%E6%80%8E%E4%B9%88%E6%9B%B4%E6%96%B0.md">来源与更新</a></p></section><div class="notice">想先看懂一个领域，从下面的卡片进去。想动手练，用学习工具。想知道系统到底有没有变好，看 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间顺序堆。Agent 相关的内容放在 AI 系统里，跟上下文、检索、质量放在一起。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="打开 ${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${state.notes.filter(n=>n.category===d&&n.topic!=='归档').length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自己写的评估项目放一边 —— 它回答"到底有没有变好"。别人开源的工程流程放另一边 —— 它提供现成的做法。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和源码是用来查关系的，不是主线。想顺着读就读，不想就跳过。</p><div class="aux-grid"><article class="aux-card"><h3>知识图谱与系统图</h3><p>内置图谱展示知识连接、学习循环、AI 系统分层和选型象限。</p><a href="/?view=graph" id="home-graph">查看知识图谱 →</a></article><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图。</p><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口 →</a></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});applyHomeStatus()}
-
-function applyHomeStatus(){const cards=[...document.querySelectorAll('#home .work-card')],classroom=cards.find(card=>card.querySelector('h3')?.textContent==='OpenMAIC'),tutor=cards.find(card=>card.querySelector('h3')?.textContent==='DeepTutor'),status=state.learningStatus;if(classroom)classroom.querySelector('.status').textContent=status?status.openmaic?.online&&status.openmaic?.llm?'互动课堂可用':status.openmaic?.online?'服务运行中':'未启动':'状态未知';if(tutor)tutor.querySelector('.status').textContent=status?status.deeptutor?.online&&status.deeptutor?.llm?'导师可用':'配置不完整':'状态未知'}
-function clearSearch(){state.query='';$('#search').value=''}
-function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}clearSearch();state.domain=domain;state.topic=topic;state.selected=null;if(domain!=='all'&&domain!=='Clippings')state.expandedDomains.add(domain);show('directory');renderDomains();renderDirectory();if(matchMedia('(max-width:760px)').matches)collapseMobileSidebar();if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}
-function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch{return s}}
 function bindSourceToggle(){
   const btn=document.querySelector('.source-toggle');
   if(!btn)return;
@@ -458,38 +398,30 @@ function applyHomeStatus(){const cards=[...document.querySelectorAll('#home .wor
 function clearSearch(){state.query='';$('#search').value=''}
 function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}clearSearch();state.domain=domain;state.topic=topic;state.selected=null;if(domain!=='all'&&domain!=='Clippings')state.expandedDomains.add(domain);show('directory');renderDomains();renderDirectory();if(matchMedia('(max-width:760px)').matches)collapseMobileSidebar();if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}
 function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch{return s}}
+/* 侧边栏、主题、反馈三件事都由 site/shell.js 提供，工作台页面调的是同一份。
+   这里只负责主站特有的两件事：域树挂在侧边栏里，以及图谱是页内视图要拦下点击。 */
 function renderSharedNav(){
-  const mount=document.getElementById('shared-nav');
-  if(!mount)return;
-  const items=[
-    {label:'知识库',href:'/',icon:'⌂'},
-    {label:'知识图谱',href:'/?view=graph',icon:'⌘'},
-    {label:'项目与教学',href:'/projects',icon:'▣'},
-    {label:'Agent 评估',href:'/apps/agent-evaluation/index.html',icon:'◎'},
-  ];
-  mount.innerHTML='<nav class="wb-nav-like">'+items.map(i=>`<a href="${i.href}">${'<span class="sn-icon" aria-hidden="true">'+i.icon+'</span>'}<span>${i.label}</span></a>`).join('')+'</nav>';
-  // 知识图谱 is an in-page view, so intercept it instead of reloading.
-  mount.querySelector('a[href="/?view=graph"]').onclick=e=>{e.preventDefault();showGraph()};
+  const aside=TKShell.sidebar({
+    page:'knowledge',
+    mobileMenu:true,
+    onNavClick:(event,item)=>{
+      // 知识图谱 is an in-page view, so intercept it instead of reloading.
+      if(item.key==='graph'){event.preventDefault();showGraph()}
+    },
+  });
+  if(!aside)return;
+  /* 域树是主站独有的第二层导航（工作台不显示），由 renderDomains() 填充。
+     shell 负责导航项，这里把域树的挂载点插到导航之后。 */
+  let domains=document.getElementById('domains');
+  if(!domains){
+    domains=document.createElement('div');
+    domains.id='domains';
+    aside.querySelector('.tk-nav')?.after(domains);
+  }
+  renderDomains();
   updateSharedNav(state.view);
 }
-function updateSharedNav(view){const mount=$('#shared-nav');if(!mount)return;mount.querySelectorAll('a').forEach(link=>{const current=link.getAttribute('href')==='/?view=graph'?view==='graph':link.getAttribute('href')==='/'&&view!=='graph';if(current)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')})}
-/* Theme toggle, matching the companion pages: explicit choice wins, otherwise
-   follow the OS until the visitor decides. */
-/* 主题只有一个入口。写 data-theme，本站 token 与所有组件都读它。 */
-function applyTheme(t){
-  document.documentElement.dataset.theme=t;
-  const dark=t==='dark',btn=document.getElementById('theme-toggle');
-  if(btn){btn.textContent=dark?'☀ 白天模式':'☾ 夜晚模式';btn.setAttribute('aria-pressed',String(dark))}
-}
-function initTheme(){
-  const KEY='tk-theme',media=matchMedia('(prefers-color-scheme: dark)');
-  const stored=()=>{try{return localStorage.getItem(KEY)}catch{return null}};
-  applyTheme(stored()||(media.matches?'dark':'light'));
-  media.addEventListener('change',e=>{if(!stored())applyTheme(e.matches?'dark':'light')});
-  const btn=document.getElementById('theme-toggle');
-  if(btn)btn.onclick=()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
-    try{localStorage.setItem(KEY,next)}catch{}applyTheme(next)};
-}
+function updateSharedNav(view){const mount=$('#tk-sidebar');if(!mount)return;mount.querySelectorAll('a').forEach(link=>{const href=link.getAttribute('href');const current=href==='/?view=graph'?view==='graph':href==='/'&&view!=='graph';if(current)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')})}
 function renderRelations(note){
   // 知识库管理记录的是维护方法而不是技术知识，它的页面照常可读，
   // 但不展示入链和延伸：否则维护资料会挂在正文下方，看起来像技术知识的关联。
@@ -565,9 +497,9 @@ function applyTransform(){const world=$('#graph-world');if(world)world.setAttrib
 function loadHome(push=false){clearSearch();state.domain='all';state.topic='all';state.selected=null;renderDomains();renderHome();show('home');if(push)history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'})}
 function selectFromUrl(){const params=new URLSearchParams(location.search),path=params.get('path'),domain=params.get('domain'),topic=params.get('topic');if(path==='知识库首页.md'||path==='知识库首页'||domain==='总览'||topic==='首页'){history.replaceState({},'','/');loadHome(false)}else if(path)openNote(path,false);else if(params.get('view')==='graph')showGraph(false);else if(domain)select(domain,topic||'all',false);else loadHome(false)}
 function showGraph(push=true){clearSearch();state.selected=null;show('graph');renderGraph();if(push)history.pushState({},'', '/?view=graph');window.scrollTo({top:0})}
-function setMobileSidebar(collapsed){const sidebar=$('#sidebar'),button=$('#mobile-menu');sidebar.classList.toggle('collapsed',collapsed);button.setAttribute('aria-expanded',String(!collapsed));button.setAttribute('aria-label',collapsed?'打开目录':'收起目录')}
+function setMobileSidebar(collapsed){const sidebar=$('#tk-sidebar'),button=$('#mobile-menu');if(!sidebar||!button)return;sidebar.classList.toggle('collapsed',collapsed);button.setAttribute('aria-expanded',String(!collapsed));button.setAttribute('aria-label',collapsed?'打开目录':'收起目录')}
 function collapseMobileSidebar(){setMobileSidebar(true)}
-function bindNavigation(){setMobileSidebar(matchMedia('(max-width:760px)').matches);$('#mobile-menu').onclick=()=>setMobileSidebar(!$('#sidebar').classList.contains('collapsed'));$('#reader-back').onclick=()=>{if(state.domain!=='all')select(state.domain,state.topic);else if(state.query.trim()){show('directory');renderDirectory();$('#search').focus()}else loadHome(true)};$('#search').oninput=event=>{state.query=event.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};window.onpopstate=selectFromUrl}
+function bindNavigation(){setMobileSidebar(matchMedia('(max-width:760px)').matches);const menuButton=$('#mobile-menu');if(menuButton)menuButton.onclick=()=>setMobileSidebar(!$('#tk-sidebar').classList.contains('collapsed'));$('#reader-back').onclick=()=>{if(state.domain!=='all')select(state.domain,state.topic);else if(state.query.trim()){show('directory');renderDirectory();$('#search').focus()}else loadHome(true)};$('#search').oninput=event=>{state.query=event.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};window.onpopstate=selectFromUrl}
 /* ── 键盘操作 ──────────────────────────────────────────────────────────
    阅读时手不离键盘：/ 搜索、j/k 移动、Enter 打开、Esc 返回、
    g+字母跳转、t 切主题、? 看帮助。
@@ -591,7 +523,7 @@ function moveSelection(delta){
 function toggleThemeFromKeyboard(){
   const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
   try{localStorage.setItem('tk-theme',next)}catch{}
-  applyTheme(next);
+  TKShell.applyTheme(next);
 }
 function bindKeyboard(){
   let gPending=0;
@@ -629,68 +561,21 @@ function bindKeyboard(){
   $('#kbd-overlay').onclick=event=>{if(event.target.id==='kbd-overlay')kbdOverlay(false)};
 }
 /* ── 反馈 ──────────────────────────────────────────────────────────────
-   面板里带上"正在读哪一篇"，这样收到的意见不用再问是哪一页。
-   名字存 localStorage：同一个人不用每次都填。 */
-const FB_NAME_KEY='tk-feedback-name';
+   面板由 site/shell.js 统一渲染，工作台页面用的是同一份。
+   这里只提供主站才知道的两件事：正在读哪一篇，以及这一篇的标题。 */
 function currentArticle(){
   if(state.view!=='reader'||!state.selected)return {path:'',title:''};
   return {path:state.selected,title:($('#reader-title')?.textContent||'').trim()};
 }
-function fbPanel(open){
-  const el=$('#fb-overlay');
-  if(!el)return;
-  el.hidden=!open;
-  el.classList.toggle('open',open);
-  if(open){
-    const article=currentArticle();
-    const label=article.title?`正在读：<b>${esc(article.title)}</b>`:'当前在首页，没有具体文章';
-    $('#fb-where').innerHTML=label;
-    $('#fb-message').focus();
-  }else if(document.activeElement&&el.contains(document.activeElement)){
-    $('#fb-fab')?.focus();
-  }
-}
+let feedbackUi=null;
 function bindFeedback(){
-  const fab=$('#fb-fab'),form=$('#fb-form'),message=$('#fb-message'),name=$('#fb-name');
-  if(!fab||!form)return;
-  try{const saved=localStorage.getItem(FB_NAME_KEY);if(saved)name.value=saved}catch{}
-  const updateCount=()=>{
-    const n=message.value.length,box=$('#fb-count');
-    box.textContent=`${n} / 4000`;
-    box.classList.toggle('over',n>4000);
-  };
-  message.oninput=updateCount;updateCount();
-  fab.onclick=()=>fbPanel(true);
-  $('#fb-cancel').onclick=()=>fbPanel(false);
-  $('#fb-overlay').onclick=event=>{if(event.target.id==='fb-overlay')fbPanel(false)};
-  document.addEventListener('keydown',event=>{
-    if(event.key==='Escape'&&$('#fb-overlay')?.classList.contains('open')){fbPanel(false);event.preventDefault()}
+  feedbackUi=TKShell.feedback({
+    where:()=>{
+      const article=currentArticle();
+      return article.title?`正在读：<b>${esc(article.title)}</b>`:'当前在首页，没有具体文章';
+    },
+    title:()=>currentArticle().title||document.title,
   });
-  form.onsubmit=async event=>{
-    event.preventDefault();
-    const note=$('#fb-note'),submit=$('#fb-submit');
-    const text=message.value.trim();
-    if(!text){note.textContent='请先写点内容。';note.classList.add('err');message.focus();return}
-    const article=currentArticle();
-    submit.disabled=true;note.classList.remove('err');note.textContent='正在发送…';
-    try{
-      const data=await postJson('/api/feedback',{
-        kind:form.querySelector('input[name="fb-kind"]:checked')?.value||'other',
-        message:text,path:article.path,title:article.title,
-        name:name.value.trim(),
-        page:location.pathname+location.search,screen:`${screen.width}x${screen.height}`,
-      });
-      try{localStorage.setItem(FB_NAME_KEY,name.value.trim())}catch{}
-      message.value='';updateCount();
-      note.textContent=data.message||'收到，谢谢反馈！';
-      setTimeout(()=>fbPanel(false),900);
-    }catch(error){
-      note.textContent=String(error.message||error);
-      note.classList.add('err');
-    }finally{
-      submit.disabled=false;
-    }
-  };
 }
 /* 访问记录：只在阅读文章时上报，避免给每次首页刷新都写一行。 */
 let lastVisitPath=null;
@@ -698,11 +583,11 @@ function reportVisit(){
   const article=currentArticle();
   if(!article.path||article.path===lastVisitPath)return;
   lastVisitPath=article.path;
-  postJson('/api/visit',{
+  TKShell.visit({
     path:article.path,title:article.title,
-    name:($('#fb-name')?.value||'').trim(),
+    name:feedbackUi?.name()||'',
     screen:`${screen.width}x${screen.height}`,
-  }).catch(()=>{});
+  });
 }
 function bindProgress(){
   const bar=$('#progress-bar');
@@ -767,7 +652,11 @@ function dataSignature(data){return data.notes.map(note=>[note.path,note.updated
 async function refreshNotes(initial=false){const data=await json('/api/notes'),signature=dataSignature(data);if(signature===state.notesSignature)return;state.notes=data.notes;state.edges=data.edges;state.notesSignature=signature;renderDomains();if(initial){selectFromUrl();return}if(state.view==='home')renderHome();else if(state.view==='directory')renderDirectory();else if(state.view==='graph')renderGraph()}
 async function refreshLearningStatus(notify=false){try{state.learningStatus=await json('/api/learning/status');if(state.view==='home')applyHomeStatus()}catch(error){console.error(error);if(!state.learningStatus&&state.view==='home')applyHomeStatus();if(notify)alertUser('学习工具状态暂时不可用，入口仍然可以打开')}}
 async function initialize(){
-  bindGraph();bindNavigation();bindKeyboard();bindFeedback();bindProgress();bindReaderTools();renderSharedNav();initTheme();
+  /* 主题由 shell.js 在加载时就应用并接管按钮，这里不需要再初始化。
+     顺序要紧：renderSharedNav() 会重建整个侧边栏（替换 innerHTML 和 className），
+     所以「手机上先收起」必须在它之后设置，否则收起状态会被这次重建抹掉 ——
+     现象就是手机首屏被 390px 高的域树占满，而折叠按钮看起来没反应。 */
+  bindGraph();bindKeyboard();bindFeedback();bindProgress();bindReaderTools();renderSharedNav();bindNavigation();
   // 先给出骨架，避免首屏是一片空白让人以为坏了。
   showLoading();
   const loadingWarning=setTimeout(()=>{if(!state.notes.length)alertUser('知识内容加载较慢，仍在重试…')},6000);

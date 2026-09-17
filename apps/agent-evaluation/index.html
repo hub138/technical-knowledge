@@ -5,20 +5,23 @@
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>自研 Agent 评估 · technical-knowledge</title>
     <link rel="stylesheet" href="/static/tokens.css" />
-    <link rel="stylesheet" href="/static/workbench.css" />
-    <script src="/static/workbench.js" data-page="evaluation" defer></script>
+    <link rel="stylesheet" href="/static/base.css" />
+    <script src="/static/nav.js"></script>
+    <script src="/static/shell.js"></script>
     <script>
-      /* 首帧前定好主题。workbench.js 是 defer，等它执行时页面已经用浅色画过一遍，
-         暗色偏好下会闪一下白，对比度审计也会抓到那一帧。 */
-      (function () {
-        var t = "light";
-        try {
-          t = localStorage.getItem("tk-theme") ||
-            (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
-        } catch (e) {}
-        document.documentElement.dataset.theme = t;
-      })();
+      /* 侧边栏由 shell.js 统一渲染，与主站是同一份代码。挂载点在 body 里，
+         所以要等 DOM 就绪；shell.js 是同步加载的，主题已经在首帧前应用。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({
+      page: "evaluation",
+      auth: true,
+      }));
+      /* 反馈入口与主站是同一个组件，收到的意见进同一个收件箱。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
+        where: () => '当前页面：<b>' + (document.querySelector('.tk-context h2')?.textContent.trim() || document.title) + '</b>',
+        title: () => document.querySelector('.tk-context h2')?.textContent.trim() || document.title,
+      }));
     </script>
+    
     <style>
       
       * {
@@ -42,10 +45,9 @@
       a:hover {
         text-decoration: none;
       }
-      .shell {
+      .tk-shell {
         max-width: 1440px;
         margin: 0 auto;
-        padding: 0 30px 58px;
       }
       .topbar {
         height: 76px;
@@ -147,7 +149,7 @@
         margin: 18px 0 0;
       }
       .stage {
-        background: #fff;
+        background: var(--color-panel);
         padding: 15px 14px;
         min-height: 133px;
       }
@@ -183,7 +185,7 @@
         padding: 6px 9px;
         border: 1px solid #edd4bc;
         background: var(--color-warm-soft);
-        color: #86532b;
+        color: var(--color-warm-ink);
         font-size: 12px;
         font-weight: 700;
         border-radius: 5px;
@@ -214,7 +216,7 @@
       .dimension {
         padding: 15px;
         border: 1px solid var(--color-line);
-        background: #fff;
+        background: var(--color-panel);
         min-height: 144px;
       }
       .dimension h3 {
@@ -253,7 +255,7 @@
       .artifact-table th {
         font-size: 11px;
         color: var(--color-muted);
-        background: #f8faf9;
+        background: var(--color-surface);
       }
       .artifact-table td:first-child {
         font-weight: 700;
@@ -274,7 +276,7 @@
       }
       .next p {
         margin: 0;
-        color: #3b6158;
+        color: var(--color-ink-soft);
         font-size: 13px;
       }
       .links {
@@ -287,7 +289,7 @@
         border: 1px solid var(--color-line);
         padding: 7px 10px;
         border-radius: 5px;
-        background: #fff;
+        background: var(--color-panel);
         font-size: 12px;
       }
       .links a:hover {
@@ -295,8 +297,7 @@
         text-decoration: none;
       }
       @media (max-width: 900px) {
-        .shell {
-          padding: 0 15px 40px;
+        .tk-shell {
         }
         .topbar {
           height: 62px;
@@ -355,7 +356,7 @@
         padding: 5px 8px;
         border: 1px solid var(--color-line);
         border-radius: 4px;
-        background: #fff;
+        background: var(--color-panel);
         color: var(--color-muted);
         font-size: 11px;
         font-weight: 700;
@@ -367,8 +368,9 @@
       }
     </style>
   </head>
-  <body>
-    <div class="shell">
+  <body class="tk-host">
+    <aside class="tk-sidebar" id="tk-sidebar"></aside>
+    <div class="tk-shell">
       <section class="hero">
         <div class="eyebrow">SELF-BUILT · DESIGN PROTOTYPE</div>
         <h1>把 Agent 的判断变成可验证证据</h1>
