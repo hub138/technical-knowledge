@@ -171,13 +171,13 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 13px;
       }
-      .service {
-        background: #fff;
+            .service {
+        display: flex;
+        flex-direction: column;
+        background: var(--color-panel);
         border: 1px solid var(--color-line);
-        border-top: 3px solid var(--color-ok);
-        border-radius: 7px;
-        padding: 19px;
-        box-shadow: 0 1px 2px rgba(20, 42, 35, 0.03);
+        border-radius: var(--radius-md);
+        padding: var(--space-5);
       }
       .service.tutor {
         border-top-color: var(--color-info);
@@ -212,8 +212,10 @@
       }
       .facts {
         display: grid;
-        gap: 7px;
-        margin: 15px 0;
+        gap: var(--space-2);
+        margin: var(--space-4) 0;
+        /* 撑开剩余空间，让两张卡的操作按钮落在同一水平线上 */
+        flex: 1 1 auto;
       }
       .fact {
         display: grid;
@@ -233,6 +235,8 @@
         display: flex;
         gap: 7px;
         flex-wrap: wrap;
+        /* 固定在卡片底部，两卡对齐 */
+        margin-top: auto;
       }
       .button {
         display: inline-block;
@@ -479,16 +483,16 @@
         </form>
       </section>
       <div class="purpose">
-        <strong>这里解决什么问题</strong
+        <strong>知识库和这里的区别</strong
         ><span
-          >知识库负责“有哪些知识、它们如何关联”；学习中心负责“选一个主题，用什么动作把它变成理解、操作和迁移能力”。不想练习时，直接回到知识库阅读即可。</span
+          >知识库回答“有哪些知识、它们怎么关联”。这里回答“选一个主题，做点什么才能真的会用”。只想读，回知识库就行。</span
         >
       </div>
       <section class="section">
         <div class="section-head">
           <div>
             <h2>学习工具</h2>
-            <p>已经安装并随系统启动。状态来自当前服务和实际配置。</p>
+            <p>两个工具都已经装好并在运行。右边的小绿标是它们此刻的真实状态。</p>
           </div>
         </div>
         <div class="service-grid">
@@ -503,11 +507,11 @@
             <div class="facts">
               <div class="fact">
                 <b>已完成</b
-                ><span>源码、依赖、LLM 与图像能力、后台服务和访问保护</span>
+                ><span>装好就能用，不用再配环境</span>
               </div>
               <div class="fact">
                 <b>怎么用</b
-                ><span>输入主题后打开；内容会预填，由你检查后再点击生成</span>
+                ><span>输入一个主题，检查预填内容后点生成</span>
               </div>
               <div class="fact">
                 <b>会消耗</b
@@ -545,14 +549,11 @@
             <div class="facts">
               <div class="fact">
                 <b>已完成</b
-                ><span
-                  >源码、依赖、中文界面、LLM、后台服务、无感登录，并已连接当前
-                  Obsidian 知识库</span
-                >
+>装好就能用，已连上这个知识库</span>
               </div>
               <div class="fact">
                 <b>怎么用</b
-                ><span>进入 Chat 后问题已预填；确认问题，再发送给导师</span>
+                ><span>描述你的问题，它会带出处回答</span>
               </div>
               <div class="fact">
                 <b>当前边界</b
@@ -850,7 +851,7 @@
           );
           limit.textContent = status.deeptutor?.embedding
             ? `知识库检索已配置 · ${status.deeptutor.knowledge_bases || 0} 个知识库`
-            : "Chat、研究与学习路径可用；资料 RAG 暂缺 Embedding，页面不会伪装为已就绪";
+            : "对话、研究、学习路径都能用；读资料提问暂时不行（缺 Embedding），页面上会如实标出来";
           limit.classList.toggle("error", !status.deeptutor?.embedding);
         })
         .catch(() => {
