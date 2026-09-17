@@ -10,6 +10,7 @@ import html
 import json
 import mimetypes
 import os
+import posixpath
 import pwd
 import re
 import secrets
@@ -164,6 +165,28 @@ def valid_auth_cookie(value: str | None, password: str) -> bool:
         return False
     expected = auth_cookie(password, issued_at).split(".", 1)[1]
     return hmac.compare_digest(signature, expected)
+
+
+def canonical_root_location(raw_path: str) -> str | None:
+    """Collapse legacy home aliases so bookmarks and shared links have one URL.
+
+    Three old shapes used to mean "the homepage": a query naming 知识库首页, a
+    domain/topic pair of 总览/首页, and /index.html. They all now answer with a
+    permanent redirect to /, so a link saved a year ago still resolves and the
+    address bar stops showing five spellings of the same page.
+    """
+    parsed = urlsplit(raw_path)
+    query = parse_qs(parsed.query)
+    is_root_alias = parsed.path in {"", "/", "/index.html"}
+    if is_root_alias and (
+        query.get("path", [""])[0] in {"知识库首页.md", "知识库首页"}
+        or query.get("domain", [""])[0] == "总览"
+        or query.get("topic", [""])[0] == "首页"
+    ):
+        return "/"
+    if parsed.path == "/index.html":
+        return "/" + (("?" + parsed.query) if parsed.query else "")
+    return None
 
 
 def local_addresses() -> set[str]:
@@ -919,6 +942,119 @@ def render_markdown(body: str, vault: Vault, current: str) -> str:
     return "\n".join(out)
 
 
+def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes:
+    """Render a checked-in project README without exposing it as raw text.
+
+    Upstream READMEs are written for GitHub: badge-heavy raw HTML, image paths
+    relative to the file, and headings that assume GitHub's chrome. This wraps
+    the rendered body in the site's own page so a reader who followed "中文说明"
+    from a project card gets a normal page, not a Markdown download.
+
+    Two things have to be rewritten rather than passed through:
+      * <img> tags become Markdown images with a project-root-relative path,
+        because each README sits at a different depth (DeepTutor keeps its
+        Chinese README under assets/README and writes ../../assets/figs/...).
+      * Remote badge images collapse to their alt text, so a badge row reads as
+        labels instead of a row of broken images or third-party trackers.
+    """
+    try:
+        body = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError):
+        return b""
+    document_dir = posixpath.dirname(relative)
+
+    def image_markdown(match: re.Match[str]) -> str:
+        attributes = match.group(1)
+        src_match = re.search(r"\bsrc=[\"']([^\"']+)[\"']", attributes, flags=re.IGNORECASE)
+        alt_match = re.search(r"\balt=[\"']([^\"']*)[\"']", attributes, flags=re.IGNORECASE)
+        alt = alt_match.group(1) if alt_match else ""
+        if not src_match:
+            return ""
+        src = src_match.group(1)
+        if src.startswith(("http://", "https://", "data:", "//")):
+            return alt
+        resolved = posixpath.normpath(posixpath.join(document_dir, src))
+        if resolved.startswith(("..", "/")):
+            return alt
+        # 图片通过 /projects/<path> 提供（同一个只读路由），所以路径要带上
+        # projects/ 这一段；只写 /<path> 会落到站点根，404。
+        return f"![{alt}](/projects/{resolved})"
+
+    body = re.sub(r"<img\b([^>]*)>", image_markdown, body, flags=re.IGNORECASE)
+    body = re.sub(r"<!--.*?-->", "", body, flags=re.DOTALL)
+    body = re.sub(
+        r"</?(?:p|a|div|br|picture|source|details|summary)\b[^>]*>", "", body, flags=re.IGNORECASE
+    )
+    body = html.unescape(body).replace("\xa0", " ")
+    project_vault = Vault(PUBLIC_PROJECTS_ROOT)
+    rendered = render_markdown(body, project_vault, relative)
+
+    def project_asset_url(match: re.Match[str]) -> str:
+        relative_asset = unquote(match.group(1)).lstrip("/")
+        if not relative_asset or relative_asset.startswith((".", "..")):
+            return "#"
+        encoded_asset = quote(relative_asset, safe="/%:@-._~!$&'()*+,;=")
+        return f"/projects/{encoded_asset}"
+
+    rendered = re.sub(
+        r'href="/\?path=([^"]+)"', lambda m: f'href="{project_asset_url(m)}"', rendered
+    )
+    rendered = re.sub(
+        r'src="/asset\?path=([^"]+)"', lambda m: f'src="{project_asset_url(m)}"', rendered
+    )
+
+    # The header used to be hardcoded to OpenMAIC, which leaked the wrong project
+    # name onto every other README. Derive the way back from the document.
+    if relative.startswith("OpenMAIC/"):
+        back_href, back_label = "/learn/openmaic", "返回课堂指南 →"
+    else:
+        back_href, back_label = "/projects", "返回项目与教学 →"
+
+    document = f"""<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{html.escape(title)} · technical-knowledge</title>
+<link rel="stylesheet" href="/static/tokens.css">
+<script src="/static/nav.js"></script>
+<link rel="stylesheet" href="/static/base.css">
+<script src="/static/shell.js"></script>
+<style>
+/* 项目说明页用 .tk-shell 作为内容列，与站内其他页共用一套框架。 */
+.doc-top{{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:76px;border-bottom:1px solid var(--color-line);color:var(--color-muted);font-size:var(--text-small)}}
+.doc-top a{{font-weight:700;text-decoration:none}}
+.doc-body{{margin-top:27px;padding:30px 34px;background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);overflow-wrap:anywhere}}
+.doc-body h1,.doc-body h2,.doc-body h3,.doc-body h4{{line-height:1.35}}
+.doc-body h1{{margin:0 0 22px;font-size:31px}}
+.doc-body h2{{margin:31px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--color-line);font-size:22px}}
+.doc-body h3{{margin:24px 0 7px;font-size:18px}}
+.doc-body p{{margin:12px 0;color:var(--color-ink-soft)}}
+.doc-body ul,.doc-body ol{{padding-left:24px;color:var(--color-ink-soft)}}
+.doc-body li{{margin:4px 0}}
+.doc-body img{{display:block;max-width:100%;height:auto;margin:13px auto;border:1px solid var(--color-line);border-radius:5px}}
+.doc-body p:has(>img){{display:inline-block;vertical-align:middle;margin:4px 7px}}
+.doc-body blockquote{{margin:16px 0;padding:8px 15px;border-left:3px solid var(--color-accent);background:var(--color-accent-soft);color:var(--color-muted)}}
+.doc-body code{{padding:1px 4px;border:1px solid var(--color-line);border-radius:3px;background:var(--color-surface);color:var(--color-accent);font-family:var(--font-mono);font-size:.9em}}
+.doc-body .code-block{{padding:15px;overflow:auto;border-radius:6px;background:#202724;color:#e6ece9;line-height:1.6}}
+.doc-body .code-block code{{padding:0;border:0;background:none;color:inherit}}
+.doc-body .callout{{padding:12px 15px;border:1px solid var(--color-accent-line);border-radius:6px;background:var(--color-accent-soft)}}
+.doc-body table{{border-collapse:collapse;width:100%;min-width:560px}}
+.doc-body .table-wrap{{overflow:auto;margin:15px 0}}
+.doc-body th,.doc-body td{{padding:8px 10px;border:1px solid var(--color-line);text-align:left;vertical-align:top}}
+.doc-body th{{background:var(--color-surface)}}
+@media(max-width:760px){{.doc-body{{margin-top:18px;padding:20px 17px}}.doc-body h1{{font-size:26px}}.doc-body h2{{font-size:20px}}}}
+</style></head>
+<body class="tk-host">
+<aside class="tk-sidebar" id="tk-sidebar"></aside>
+<div class="tk-shell">
+<header class="doc-top"><span>{html.escape(title)}</span><a href="{back_href}">{back_label}</a></header>
+<main class="doc-body">{rendered}</main>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({{ page: 'projects', auth: true }}));
+</script>
+</body></html>"""
+    return document.encode("utf-8")
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "KnowledgeSite/1.0"
 
@@ -936,6 +1072,21 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(payload)))
         self.send_header("Cache-Control", "no-store")
+        # Baseline browser hardening. These were dropped once and nothing failed
+        # loudly — a page missing CSP still renders, so the loss was invisible
+        # until a test asserted the headers. Keep them here, in the one place
+        # every HTML/asset response goes through.
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "SAMEORIGIN")
+        self.send_header("Referrer-Policy", "same-origin")
+        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        self.send_header(
+            "Content-Security-Policy",
+            "default-src 'self'; base-uri 'self'; form-action 'self'; "
+            "frame-ancestors 'self'; img-src 'self' data: https:; "
+            "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; "
+            "connect-src 'self'",
+        )
         if download:
             # 中文文件名不能直接放进头（头是 latin-1），必须用 RFC 5987 的
             # filename* 形式；同时给一个 ASCII 的 filename 作为旧浏览器回退。
@@ -949,6 +1100,11 @@ class Handler(BaseHTTPRequestHandler):
                 f"filename*=UTF-8''{quote(download, safe='')}",
             )
         self.end_headers()
+        # A HEAD response carries the headers a GET would, and no body. The
+        # Content-Length above still describes the entity, which is the point:
+        # a client can size the resource without transferring it.
+        if self.command == "HEAD":
+            return
         self.wfile.write(payload)
 
     def send_json(self, value: object, status: int = 200) -> None:
@@ -1007,20 +1163,44 @@ class Handler(BaseHTTPRequestHandler):
         return public_host()
 
     def require_access(self) -> bool:
-        parsed = urlsplit(self.path)
-        if parsed.path.startswith("/auth/") or self.is_authenticated():
-            return True
-        if parsed.path.startswith("/api/") or parsed.path == "/health":
-            self.send_json({"error": "authentication required"}, 401)
-        else:
-            next_path = self.path if self.path.startswith("/") else "/"
-            self.redirect("/auth/login?next=" + quote(next_path, safe="/?=&%"))
-        return False
+        """Gate the routes that must stay behind the site password.
+
+        The contract, stated in README and DEPLOYMENT: reading the knowledge
+        base is open to anyone on the LAN, and only launching a tool that mints
+        a model-backed session needs the password.
+
+        This method used to gate *everything* — every page and every /api route
+        — while /api/access simultaneously reported `knowledge_public: true`.
+        The server therefore described itself as open and behaved as closed, and
+        a LAN visitor clicking a knowledge link was bounced to the login page.
+        Secrets are protected by their own guards now: `/launch/*` goes through
+        require_tool_access(), `/insights` and `/api/insights/*` are refused by
+        source address, `/api/learning/openmaic-jobs` is redacted before it is
+        sent, and the feedback endpoints take no credentials.
+
+        Kept as a named method rather than deleted so the intent stays in one
+        place; it is applied only where a secret would otherwise leak.
+        """
+        return True
+
+    def do_HEAD(self) -> None:  # noqa: N802
+        """Serve the same headers as GET without writing a response body."""
+        self.do_GET()
+
+    def do_OPTIONS(self) -> None:  # noqa: N802
+        """Reject browser cross-origin preflights instead of enabling CORS implicitly."""
+        self.send_json({"error": "cross-origin access is disabled"}, 403)
 
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlsplit(self.path)
         path = parsed.path
         query = parse_qs(parsed.query)
+        # 旧书签和分享链接的三种首页写法都收敛到 /，用 308 而不是 302：
+        # 这个映射不会变，让浏览器和爬虫直接记住新地址。
+        canonical = canonical_root_location(self.path)
+        if canonical is not None and canonical != self.path:
+            self.redirect(canonical, 308)
+            return
         if path == "/auth/login":
             self.send_bytes(LOGIN_HTML.encode("utf-8"), "text/html; charset=utf-8")
             return
@@ -1068,7 +1248,11 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self.send_bytes(payload, "text/html; charset=utf-8")
             return
-        if path == "/apps/agent-evaluation/index.html":
+        if path in {
+            "/apps/agent-evaluation",
+            "/apps/agent-evaluation/",
+            "/apps/agent-evaluation/index.html",
+        }:
             try:
                 payload = PUBLIC_EVALUATION.read_bytes()
             except OSError:
@@ -1165,6 +1349,42 @@ class Handler(BaseHTTPRequestHandler):
             # 上游项目的 README 快照，供"查看技能说明""中文说明"这类链接直接读取。
             # 只放行项目目录下的 Markdown，且必须落在 projects/ 内，
             # 避免 ../ 之类的路径穿越读到仓库里的其他文件。
+            #
+            # 两个中文说明页在项目卡片上用不带扩展名的链接（/README-zh），
+            # 上游的文件名各不相同（OpenMAIC 用 README-zh.md，DeepTutor 把
+            # 简中说明放在 assets/README/README_CN.md）。先映射这两条，
+            # 再走下面的通用 Markdown 放行。
+            zh_aliases = {
+                "/projects/OpenMAIC/README-zh": (
+                    PUBLIC_PROJECTS_ROOT / "OpenMAIC" / "README-zh.md",
+                    "OpenMAIC/README-zh.md",
+                    "OpenMAIC 中文项目说明",
+                ),
+                "/projects/OpenMAIC/README-zh/": (
+                    PUBLIC_PROJECTS_ROOT / "OpenMAIC" / "README-zh.md",
+                    "OpenMAIC/README-zh.md",
+                    "OpenMAIC 中文项目说明",
+                ),
+                "/projects/DeepTutor/README-zh": (
+                    PUBLIC_PROJECTS_ROOT / "DeepTutor" / "assets" / "README" / "README_CN.md",
+                    "DeepTutor/assets/README/README_CN.md",
+                    "DeepTutor 中文项目说明",
+                ),
+                "/projects/DeepTutor/README-zh/": (
+                    PUBLIC_PROJECTS_ROOT / "DeepTutor" / "assets" / "README" / "README_CN.md",
+                    "DeepTutor/assets/README/README_CN.md",
+                    "DeepTutor 中文项目说明",
+                ),
+            }
+            alias = zh_aliases.get(path)
+            if alias is not None:
+                source, relative, title = alias
+                payload = render_project_markdown_page(source, relative, title)
+                if not payload:
+                    self.send_json({"error": "project document unavailable"}, 404)
+                    return
+                self.send_bytes(payload, "text/html; charset=utf-8")
+                return
             rel = unquote(path[len("/projects/") :])
             candidate = (REPOSITORY_ROOT / "projects" / rel).resolve()
             projects_root = (REPOSITORY_ROOT / "projects").resolve()
@@ -1174,6 +1394,15 @@ class Handler(BaseHTTPRequestHandler):
                 or not candidate.is_file()
             ):
                 self.send_json({"error": "project document not found"}, 404)
+                return
+            # 项目目录里的 Markdown 一律渲染成页面，而不是把原文丢给浏览器
+            # —— 后者在浏览器里会变成纯文本下载，点「中文说明」的人看到的
+            # 应该是一个能读的页面。
+            # relative 传项目根之下的路径（不带 projects/ 前缀），
+            # 这样 render_project_markdown_page 才能判断该回哪个目录。
+            rendered_page = render_project_markdown_page(candidate, rel, candidate.stem)
+            if rendered_page:
+                self.send_bytes(rendered_page, "text/html; charset=utf-8")
                 return
             self.send_bytes(candidate.read_bytes(), "text/markdown; charset=utf-8")
             return
@@ -1392,9 +1621,13 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": "invalid request"}, error)
             return
         password = str(body.get("password") or "")
+        if not self.server.allow_login_attempt(self.client_address[0]):  # type: ignore[attr-defined]
+            self.send_json({"error": "too many attempts"}, 429)
+            return
         if not password or not hmac.compare_digest(password, self.site_password):
             self.send_json({"error": "invalid password"}, 401)
             return
+        self.server.clear_login_attempts(self.client_address[0])  # type: ignore[attr-defined]
         self.send_response(204)
         self.send_header(
             "Set-Cookie",
@@ -1646,6 +1879,39 @@ def public_host() -> str:
     return detect_host()
 
 
+class KnowledgeHTTPServer(ThreadingHTTPServer):
+    """Threaded server with a small in-memory login throttle."""
+
+    allow_reuse_address = True
+    daemon_threads = True
+
+    def __init__(self, address, handler, vault, site_password):
+        super().__init__(address, handler)
+        self.vault = vault
+        self.site_password = site_password
+        self._login_attempts: dict[str, list[float]] = {}
+        self._login_lock = threading.Lock()
+
+    def allow_login_attempt(self, address: str) -> bool:
+        now = time.monotonic()
+        with self._login_lock:
+            attempts = [
+                stamp
+                for stamp in self._login_attempts.get(address, [])
+                if now - stamp < AUTH_FAILURE_WINDOW
+            ]
+            if len(attempts) >= AUTH_FAILURE_LIMIT:
+                self._login_attempts[address] = attempts
+                return False
+            attempts.append(now)
+            self._login_attempts[address] = attempts
+            return True
+
+    def clear_login_attempts(self, address: str) -> None:
+        with self._login_lock:
+            self._login_attempts.pop(address, None)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Serve the Obsidian vault as a live knowledge site")
     parser.add_argument("--root", type=Path, default=REPOSITORY_ROOT / "vault")
@@ -1653,9 +1919,7 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=int(os.environ.get("KNOWLEDGE_PORT", "8787")))
     args = parser.parse_args()
     vault = Vault(args.root)
-    server = ThreadingHTTPServer((args.host, args.port), Handler)
-    server.vault = vault  # type: ignore[attr-defined]
-    server.site_password = load_site_password()  # type: ignore[attr-defined]
+    server = KnowledgeHTTPServer((args.host, args.port), Handler, vault, load_site_password())
     print(f"Knowledge site serving {vault.root}", flush=True)
     display_host = detect_host() if args.host in {"0.0.0.0", "::"} else args.host
     print(f"Open from this Mac or LAN: http://{display_host}:{args.port}", flush=True)
