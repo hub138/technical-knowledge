@@ -10,13 +10,11 @@ import html
 import json
 import mimetypes
 import os
-import posixpath
 import pwd
 import re
 import secrets
 import socket
 import subprocess
-import threading
 import time
 from http.cookies import SimpleCookie
 from pathlib import Path
@@ -41,25 +39,27 @@ REPOSITORY_ROOT = Path(
 ).resolve()
 PUBLIC_SITE = REPOSITORY_ROOT / "index.html"
 PUBLIC_PROJECTS_README = REPOSITORY_ROOT / "projects" / "README.md"
-PUBLIC_PROJECTS_INDEX = REPOSITORY_ROOT / "projects" / "index.html"
+PUBLIC_PROJECTS_PAGE = REPOSITORY_ROOT / "projects" / "index.html"
 PUBLIC_PROJECTS_ROOT = REPOSITORY_ROOT / "projects"
 PUBLIC_EVALUATION = REPOSITORY_ROOT / "apps" / "agent-evaluation" / "index.html"
-PUBLIC_LEARNING = REPOSITORY_ROOT / "apps" / "learning" / "index.html"
-PUBLIC_OPENMAIC_LEARNING = REPOSITORY_ROOT / "apps" / "learning" / "openmaic.html"
-PUBLIC_INTUITION = REPOSITORY_ROOT / "apps" / "learning" / "intuition.html"
-PUBLIC_TRANSFER = REPOSITORY_ROOT / "apps" / "learning" / "transfer.html"
-PUBLIC_HISTORY = REPOSITORY_ROOT / "apps" / "learning" / "history.html"
 OPENMAIC_ACCESS_SERVICE = "knowledge-tools-model-access"
 OPENMAIC_JOBS_ROOT = Path(
     os.environ.get("OPENMAIC_HOME") or Path.home() / "Developer" / "knowledge-tools" / "OpenMAIC"
 ) / "data" / "classroom-jobs"
 OPENMAIC_CLASSROOMS_ROOT = OPENMAIC_JOBS_ROOT.parent / "classrooms"
-# Mastery tracks: organised by what a practitioner must be able to do,
-# rather than by the technical object being described.
-SKILL_TRACKS = ("后端技能", "Agent技能")
 DEEPTUTOR_HOME = Path(
     os.environ.get("DEEPTUTOR_HOME") or Path.home() / "Developer" / "knowledge-tools" / "DeepTutor"
 )
+
+# 学习中心的页面：多个 URL 指向同一份 HTML，方便旧链接和站内导航都能用。
+# 集中成一张表，避免再加页面时只改一处、漏掉另一处（/learn 曾经整组丢失）。
+LEARNING_PAGES: dict[str, Path] = {
+    "/learn": REPOSITORY_ROOT / "apps" / "learning" / "index.html",
+    "/learn/openmaic": REPOSITORY_ROOT / "apps" / "learning" / "openmaic.html",
+    "/learn/intuition": REPOSITORY_ROOT / "apps" / "learning" / "intuition.html",
+    "/learn/transfer": REPOSITORY_ROOT / "apps" / "learning" / "transfer.html",
+    "/learn/history": REPOSITORY_ROOT / "apps" / "learning" / "history.html",
+}
 
 
 def json_bytes(value: object) -> bytes:
@@ -97,46 +97,36 @@ def read_keychain_secret(service: str) -> str:
 
 
 def load_site_password() -> str:
-    """Read the login password from an explicit secret source or macOS Keychain."""
-    configured = os.environ.get("KNOWLEDGE_SITE_PASSWORD", "").strip()
-    if configured:
-        return configured
-    password_file = os.environ.get("KNOWLEDGE_SITE_PASSWORD_FILE", "").strip()
-    if password_file:
-        try:
-            configured = Path(password_file).read_text(encoding="utf-8").strip()
-        except (OSError, UnicodeError) as exc:
-            raise RuntimeError(f"Unable to read KNOWLEDGE_SITE_PASSWORD_FILE: {password_file}") from exc
-        if configured:
-            return configured
+    """Read or create the shared LAN login password without putting it on disk."""
     account = _keychain_account()
-    password = read_keychain_secret(AUTH_SERVICE)
+    query = subprocess.run(
+        ["/usr/bin/security", "find-generic-password", "-a", account, "-s", AUTH_SERVICE, "-w"],
+        capture_output=True,
+        text=True,
+        timeout=4,
+        check=False,
+    )
+    password = query.stdout.strip() if query.returncode == 0 else ""
     if password:
         return password
     password = secrets.token_urlsafe(18)
-    try:
-        stored = subprocess.run(
-            [
-                "/usr/bin/security",
-                "add-generic-password",
-                "-a",
-                account,
-                "-s",
-                AUTH_SERVICE,
-                "-w",
-                password,
-                "-U",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=4,
-            check=False,
-        )
-    except (OSError, subprocess.SubprocessError) as exc:
-        raise RuntimeError(
-            "Unable to initialize the macOS Keychain password. Set KNOWLEDGE_SITE_PASSWORD "
-            "or KNOWLEDGE_SITE_PASSWORD_FILE."
-        ) from exc
+    stored = subprocess.run(
+        [
+            "/usr/bin/security",
+            "add-generic-password",
+            "-a",
+            account,
+            "-s",
+            AUTH_SERVICE,
+            "-w",
+            password,
+            "-U",
+        ],
+        capture_output=True,
+        text=True,
+        timeout=4,
+        check=False,
+    )
     if stored.returncode != 0:
         raise RuntimeError("Unable to initialize the knowledge-site password in macOS Keychain")
     return password
@@ -159,6 +149,113 @@ def valid_auth_cookie(value: str | None, password: str) -> bool:
         return False
     expected = auth_cookie(password, issued_at).split(".", 1)[1]
     return hmac.compare_digest(signature, expected)
+
+
+def local_addresses() -> set[str]:
+    addresses = {"127.0.0.1", "::1"}
+    for interface in ("en0", "en1", "bridge0", "bridge100"):
+        try:
+            output = subprocess.run(
+                ["/sbin/ifconfig", interface], capture_output=True, text=True, timeout=2, check=False
+            ).stdout
+        except (OSError, subprocess.SubprocessError):
+            continue
+        addresses.update(re.findall(r"\binet6?\s+([0-9a-fA-F:.]+)", output))
+    addresses.add(detect_host())
+    return {
+        address
+        for address in addresses
+        if address and (not address.startswith("127.0.0.") or address in {"127.0.0.1", "::1"})
+    }
+
+
+def is_local_client(address: str) -> bool:
+    normalized = address[7:] if address.startswith("::ffff:") else address
+    return normalized in local_addresses()
+
+
+LOGIN_HTML = r'''<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>工程知识库 · 登录</title><style>
+:root{color-scheme:light;--bg:#f3f5f2;--panel:#fff;--ink:#202826;--muted:#68736f;--line:#d9dfdb;--accent:#137766}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}
+main{width:min(420px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 16px 40px #23302b14}h1{font-size:21px;margin:0 0 7px}p{color:var(--muted);margin:0 0 21px}label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:7px;font:inherit;outline:0}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #13776620}button{width:100%;margin-top:16px;padding:11px 13px;border:0;border-radius:7px;background:var(--accent);color:white;font:600 14px inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.error{min-height:24px;color:#ad3e4f;margin:13px 0 0;font-size:13px}
+</style></head><body><main><h1>工程知识库</h1><p>此地址来自其他设备，请输入访问密码。</p><form id="form"><label for="password">访问密码</label><input id="password" type="password" autocomplete="current-password" autofocus required><button id="submit" type="submit">进入知识库</button><div class="error" id="error" role="alert"></div></form></main><script>
+const next=new URLSearchParams(location.search).get('next')||'/';const form=document.querySelector('#form');const input=document.querySelector('#password');const button=document.querySelector('#submit');const error=document.querySelector('#error');
+form.addEventListener('submit',async event=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:input.value})});if(!response.ok)throw new Error('invalid');location.replace(next.startsWith('/')?next:'/')}catch{error.textContent='密码不正确';input.value='';input.focus()}finally{button.disabled=false}});
+</script></body></html>'''
+
+
+def parse_frontmatter(text: str) -> tuple[dict[str, object], str]:
+    if not text.startswith("---\n"):
+        return {}, text
+    marker = text.find("\n---\n", 4)
+    if marker < 0:
+        return {}, text
+    raw = text[4:marker]
+    data: dict[str, object] = {}
+    active_list: str | None = None
+    for line in raw.splitlines():
+        if re.match(r"^\s+-\s+", line) and active_list:
+            item = re.sub(r"^\s+-\s+", "", line).strip().strip('"\'')
+            data.setdefault(active_list, [])
+            if isinstance(data[active_list], list):
+                data[active_list].append(item)
+            continue
+        match = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", line)
+        if not match:
+            continue
+        key, value = match.groups()
+        value = value.strip()
+        active_list = None
+        if not value:
+            data[key] = []
+            active_list = key
+        elif value.startswith("[") and value.endswith("]"):
+            items = [x.strip().strip('"\'') for x in value[1:-1].split(",") if x.strip()]
+            data[key] = items
+        elif value.lower() in {"true", "false"}:
+            data[key] = value.lower() == "true"
+        else:
+            data[key] = value.strip('"\'')
+    return data, text[marker + 5 :]
+
+
+def scalar(value: object, default: str = "") -> str:
+    if value is None:
+        return default
+    if isinstance(value, list):
+        return ", ".join(str(x) for x in value)
+    return str(value)
+
+
+def truthy(value: object) -> bool:
+    """Read a frontmatter flag. YAML already gives us real booleans; tolerate
+    the quoted string forms too, since hand-written frontmatter is common."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str):
+        return value.strip().lower() in {"true", "yes", "on", "1"}
+    return bool(value)
+
+
+def excerpt(body: str, title: str) -> str:
+    in_fence = False
+    for raw in body.splitlines():
+        line = raw.strip()
+        if FENCE_RE.match(line):
+            in_fence = not in_fence
+            continue
+        if in_fence or not line or line.startswith(("#", "|", "![", "> [!")):
+            continue
+        line = re.sub(r"^[-*+]\s+", "", line)
+        line = re.sub(r"^\d+[.)]\s+", "", line)
+        line = WIKILINK_RE.sub(lambda m: m.group(2) or Path(m.group(1)).stem, line)
+        line = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", line)
+        line = re.sub(r"[*_`>]", "", line).strip()
+        if line and line != title:
+            return line[:190]
+    return ""
 
 
 def openmaic_auth_cookie(access_code: str, issued_at_ms: int | None = None) -> str:
@@ -192,7 +289,11 @@ def _fetch_json(
 
 
 def learning_services_status() -> dict[str, object]:
-    """Return capability state without exposing provider credentials."""
+    """Return capability state without exposing provider credentials.
+
+    The home page and the learning pages show a status chip per tool; a missing
+    or unconfigured provider downgrades that chip instead of failing the page.
+    """
     openmaic = _fetch_json("http://127.0.0.1:3100/api/health")
     openmaic_providers: dict[str, object] = {}
     access_code = read_keychain_secret(OPENMAIC_ACCESS_SERVICE)
@@ -375,153 +476,19 @@ def safe_return_path(value: str, allowed_roots: tuple[str, ...]) -> str:
     return encoded_path + (("?" + encoded_query) if parsed.query else "")
 
 
-def canonical_root_location(raw_path: str) -> str | None:
-    """Collapse legacy home aliases so bookmarks and shared links have one URL."""
-    parsed = urlsplit(raw_path)
-    query = parse_qs(parsed.query)
-    is_root_alias = parsed.path in {"", "/", "/index.html"}
-    if is_root_alias and (
-        query.get("path", [""])[0] in {"知识库首页.md", "知识库首页"}
-        or query.get("domain", [""])[0] == "总览"
-        or query.get("topic", [""])[0] == "首页"
-    ):
-        return "/"
-    if parsed.path == "/index.html":
-        return "/" + (("?" + parsed.query) if parsed.query else "")
-    return None
-
-
-def local_addresses() -> set[str]:
-    addresses = {"127.0.0.1", "::1"}
-    interfaces = ["en0", "en1", "bridge0", "bridge100"]
-    try:
-        output = subprocess.run(
-            ["/sbin/ifconfig"], capture_output=True, text=True, timeout=2, check=False
-        ).stdout
-        interfaces.extend(re.findall(r"^([A-Za-z0-9]+):", output, re.MULTILINE))
-    except (OSError, subprocess.SubprocessError):
-        pass
-    for interface in dict.fromkeys(interfaces):
-        try:
-            output = subprocess.run(
-                ["/sbin/ifconfig", interface], capture_output=True, text=True, timeout=2, check=False
-            ).stdout
-        except (OSError, subprocess.SubprocessError):
-            continue
-        addresses.update(re.findall(r"\binet6?\s+([0-9a-fA-F:.]+)", output))
-    addresses.add(detect_host())
-    return {
-        address
-        for address in addresses
-        if address and (not address.startswith("127.0.0.") or address in {"127.0.0.1", "::1"})
-    }
-
-
-def is_local_client(address: str) -> bool:
-    normalized = address[7:] if address.startswith("::ffff:") else address
-    return normalized in local_addresses()
-
-
-LOGIN_HTML = r'''<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>工程知识库 · 工具授权</title><style>
-:root{color-scheme:light;--bg:#f3f5f2;--panel:#fff;--ink:#202826;--muted:#68736f;--line:#d9dfdb;--accent:#137766}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}
-main{width:min(420px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 16px 40px #23302b14}h1{font-size:21px;margin:0 0 7px}p{color:var(--muted);margin:0 0 21px}label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:7px;font:inherit;outline:0}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #13776620}button{width:100%;margin-top:16px;padding:11px 13px;border:0;border-radius:7px;background:var(--accent);color:white;font:600 14px inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.error{min-height:24px;color:#ad3e4f;margin:13px 0 0;font-size:13px}
-</style></head><body><main><h1>教学工具授权</h1><p>知识库内容仍可直接阅读；只有启动会使用本机默认模型凭据的教学工具需要授权。</p><form id="form"><label for="password">访问密码</label><input id="password" type="password" autocomplete="current-password" autofocus required><button id="submit" type="submit">继续打开工具</button><div class="error" id="error" role="alert"></div></form></main><script>
-const requestedNext=new URLSearchParams(location.search).get('next')||'/';const safeNext=(()=>{try{const target=new URL(requestedNext,location.origin);return target.origin===location.origin&&target.pathname.startsWith('/')?target.pathname+target.search+target.hash:'/'}catch{return '/'}})();const form=document.querySelector('#form');const input=document.querySelector('#password');const button=document.querySelector('#submit');const error=document.querySelector('#error');
-form.addEventListener('submit',async event=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:input.value})});if(!response.ok)throw new Error('invalid');location.replace(safeNext)}catch{error.textContent='密码不正确';input.value='';input.focus()}finally{button.disabled=false}});
-</script></body></html>'''
-
-
-def parse_frontmatter(text: str) -> tuple[dict[str, object], str]:
-    if not text.startswith("---\n"):
-        return {}, text
-    marker = text.find("\n---\n", 4)
-    if marker < 0:
-        return {}, text
-    raw = text[4:marker]
-    data: dict[str, object] = {}
-    active_list: str | None = None
-    for line in raw.splitlines():
-        if re.match(r"^\s+-\s+", line) and active_list:
-            item = re.sub(r"^\s+-\s+", "", line).strip().strip('"\'')
-            data.setdefault(active_list, [])
-            if isinstance(data[active_list], list):
-                data[active_list].append(item)
-            continue
-        match = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", line)
-        if not match:
-            continue
-        key, value = match.groups()
-        value = value.strip()
-        active_list = None
-        if not value:
-            data[key] = []
-            active_list = key
-        elif value.startswith("[") and value.endswith("]"):
-            items = [x.strip().strip('"\'') for x in value[1:-1].split(",") if x.strip()]
-            data[key] = items
-        elif value.lower() in {"true", "false"}:
-            data[key] = value.lower() == "true"
-        else:
-            data[key] = value.strip('"\'')
-    return data, text[marker + 5 :]
-
-
-def scalar(value: object, default: str = "") -> str:
-    if value is None:
-        return default
-    if isinstance(value, list):
-        return ", ".join(str(x) for x in value)
-    return str(value)
-
-
-def excerpt(body: str, title: str) -> str:
-    in_fence = False
-    for raw in body.splitlines():
-        line = raw.strip()
-        if FENCE_RE.match(line):
-            in_fence = not in_fence
-            continue
-        if in_fence or not line or line.startswith(("#", "|", "![", "> [!")):
-            continue
-        line = re.sub(r"^[-*+]\s+", "", line)
-        line = re.sub(r"^\d+[.)]\s+", "", line)
-        line = WIKILINK_RE.sub(lambda m: m.group(2) or Path(m.group(1)).stem, line)
-        line = re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", line)
-        line = re.sub(r"[*_`>]", "", line).strip()
-        if line and line != title:
-            return line[:190]
-    return ""
-
-
 class Vault:
     def __init__(self, root: Path):
         self.root = root.resolve()
         self.notes: dict[str, dict[str, object]] = {}
         self.by_stem: dict[str, list[str]] = {}
-        self._signature: tuple[tuple[str, int, int], ...] | None = None
-        self._edges_cache: list[dict[str, str]] | None = None
         self.refresh()
 
-    def refresh(self) -> bool:
-        files: list[tuple[Path, str, int, int]] = []
+    def refresh(self) -> None:
+        notes: dict[str, dict[str, object]] = {}
         for path in sorted(self.root.rglob("*.md")):
             if not path.is_file() or any(part.startswith(".") for part in path.relative_to(self.root).parts):
                 continue
-            try:
-                stat = path.stat()
-            except OSError:
-                continue
             rel = path.relative_to(self.root).as_posix()
-            files.append((path, rel, stat.st_mtime_ns, stat.st_size))
-        signature = tuple((rel, mtime_ns, size) for _, rel, mtime_ns, size in files)
-        if signature == self._signature:
-            return False
-
-        notes: dict[str, dict[str, object]] = {}
-        for path, rel, mtime_ns, _ in files:
             try:
                 text = path.read_text(encoding="utf-8")
             except (OSError, UnicodeDecodeError):
@@ -531,9 +498,6 @@ class Vault:
             if parts[0] == "工程知识" and len(parts) > 2:
                 category = parts[1]
                 topic = parts[2] if len(parts) > 3 else "概览"
-            elif parts[0] in SKILL_TRACKS:
-                category = parts[0]
-                topic = parts[1] if len(parts) > 2 else "概览"
             elif parts[0] == "知识库管理":
                 category = "知识库管理"
                 topic = parts[1] if len(parts) > 2 else "概览"
@@ -547,11 +511,17 @@ class Vault:
             tags = front.get("tags", [])
             if not isinstance(tags, list):
                 tags = [str(tags)] if tags else []
+            # 知识库管理记录的是维护方法、工具和变更日志，不是技术知识本身。
+            # 它的文章照常可读，但不进图谱：图谱表达"工程知识之间怎么连"，
+            # 混入维护资料会把领域间的真实关系淹掉。
+            # 按 category 判定而不是只认 frontmatter，新增文章无需作者记得加字段。
+            exclude_from_graph = truthy(front.get("exclude_from_graph")) or category == "知识库管理"
             notes[rel] = {
                 "path": rel,
                 "title": title,
                 "category": category,
                 "topic": topic,
+                "exclude_from_graph": exclude_from_graph,
                 "type": scalar(front.get("type"), "note"),
                 "status": scalar(front.get("status"), "active"),
                 "updated": scalar(front.get("updated"), ""),
@@ -561,17 +531,14 @@ class Vault:
                 "tags": tags,
                 "sources": front.get("sources", []) if isinstance(front.get("sources", []), list) else [],
                 "body": body,
-                "mtime": mtime_ns,
+                "mtime": path.stat().st_mtime_ns,
                 "words": len(re.findall(r"\S+", body)),
-                "listed": parts[0] in {"工程知识", "Clippings", *SKILL_TRACKS} or rel == "知识库首页.md",
+                "listed": parts[0] in {"工程知识", "Clippings", "知识库管理"} or rel == "知识库首页.md",
             }
         self.notes = notes
         self.by_stem = {}
         for rel, note in notes.items():
             self.by_stem.setdefault(Path(rel).stem, []).append(rel)
-        self._signature = signature
-        self._edges_cache = None
-        return True
 
     def resolve_note(self, target: str, current: str = "") -> str | None:
         target = unquote(target).strip().replace("\\", "/")
@@ -596,8 +563,6 @@ class Vault:
         return self.notes.get(rel)
 
     def edges(self) -> list[dict[str, str]]:
-        if self._edges_cache is not None:
-            return list(self._edges_cache)
         result: list[dict[str, str]] = []
         seen: set[tuple[str, str]] = set()
         for rel, note in self.notes.items():
@@ -607,8 +572,7 @@ class Vault:
                 if target and target != rel and (rel, target) not in seen:
                     seen.add((rel, target))
                     result.append({"source": rel, "target": target})
-        self._edges_cache = result
-        return list(result)
+        return result
 
     def safe_file(self, rel: str) -> Path | None:
         try:
@@ -641,13 +605,7 @@ def render_inline(source: str, vault: Vault, current: str) -> str:
         elif src.startswith("data:image/"):
             href = src
         else:
-            # A leading "/" means "relative to the vault root"; anything else
-            # is relative to the note being rendered.
-            candidate = (
-                posixpath.normpath(src.lstrip("/"))
-                if src.startswith("/")
-                else (Path(current).parent / src).as_posix()
-            )
+            candidate = (Path(current).parent / src).as_posix()
             if vault.safe_file(candidate) is None:
                 return html.escape(match.group(0))
             href = "/asset?path=" + quote(candidate)
@@ -676,23 +634,13 @@ def render_inline(source: str, vault: Vault, current: str) -> str:
 
     source = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", image, source)
     source = WIKILINK_RE.sub(wiki, source)
-    source = re.sub(r"\[([^\]]+)\]\(((?:[^()]|\([^()]*\))*)\)", link, source)
+    source = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", link, source)
     source = re.sub(r"`([^`]+)`", lambda m: token(f"<code>{html.escape(m.group(1))}</code>"), source)
     escaped = html.escape(source)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
     escaped = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<em>\1</em>", escaped)
-    # A link can contain a token created by an earlier image/link pass.  Keep
-    # expanding placeholders until no nested token remains; otherwise a NUL
-    # placeholder leaks into the HTML response.
-    for _ in range(len(tokens) + 1):
-        changed = False
-        for key, value in tokens.items():
-            marker = html.escape(key)
-            if marker in escaped:
-                escaped = escaped.replace(marker, value)
-                changed = True
-        if not changed:
-            break
+    for key, value in tokens.items():
+        escaped = escaped.replace(html.escape(key), value)
     return escaped
 
 
@@ -793,75 +741,6 @@ def render_markdown(body: str, vault: Vault, current: str) -> str:
     return "\n".join(out)
 
 
-def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes:
-    """Render a checked-in project README without exposing it as raw text."""
-    try:
-        body = path.read_text(encoding="utf-8")
-    except (OSError, UnicodeError):
-        return b""
-    # The upstream README starts with badge-heavy raw HTML.  Preserve local
-    # images as Markdown, while letting this site's renderer own the layout.
-    document_dir = posixpath.dirname(relative)
-
-    def image_markdown(match: re.Match[str]) -> str:
-        attributes = match.group(1)
-        src_match = re.search(r"\bsrc=[\"']([^\"']+)[\"']", attributes, flags=re.IGNORECASE)
-        alt_match = re.search(r"\balt=[\"']([^\"']*)[\"']", attributes, flags=re.IGNORECASE)
-        alt = alt_match.group(1) if alt_match else ""
-        if not src_match:
-            return ""
-        src = src_match.group(1)
-        if src.startswith(("http://", "https://", "data:", "//")):
-            # Remote badge images are third-party widgets.  Keep their alt
-            # text so a badge row reads as labels instead of disappearing.
-            return alt
-        # Each README lives at a different depth, and upstream writes image
-        # paths relative to the README itself (DeepTutor uses
-        # ../../assets/figs/...).  Node paths are resolved against the vault
-        # root, and Vault.safe_file rejects any ".." segment, so emit the
-        # already-normalised project-relative path instead of the raw one.
-        resolved = posixpath.normpath(posixpath.join(document_dir, src))
-        if resolved.startswith(("..", "/")):
-            return alt
-        return f"![{alt}](/{resolved})"
-
-    body = re.sub(r"<img\b([^>]*)>", image_markdown, body, flags=re.IGNORECASE)
-    body = re.sub(r"<!--.*?-->", "", body, flags=re.DOTALL)
-    body = re.sub(r"</?(?:p|a|div|br|picture|source|details|summary)\b[^>]*>", "", body, flags=re.IGNORECASE)
-    body = html.unescape(body).replace("\xa0", " ")
-    project_vault = Vault(PUBLIC_PROJECTS_ROOT)
-    rendered = render_markdown(body, project_vault, relative)
-    # Markdown links and images are resolved by render_inline against the
-    # project root; map those generated URLs back to the project file route.
-    def project_asset_url(match: re.Match[str]) -> str:
-        relative_asset = unquote(match.group(1)).lstrip("/")
-        if not relative_asset or relative_asset.startswith((".", "..")):
-            return "#"
-        encoded_asset = quote(relative_asset, safe="/%:@-._~!$&'()*+,;=")
-        return f'/projects/{encoded_asset}'
-
-    rendered = re.sub(r'href="/\?path=([^"]+)"', lambda match: f'href="{project_asset_url(match)}"', rendered)
-    rendered = re.sub(r'src="/asset\?path=([^"]+)"', lambda match: f'src="{project_asset_url(match)}"', rendered)
-    # The header used to be hardcoded to OpenMAIC, which leaked the wrong
-    # project name onto every other README.  Derive it from the document.
-    if relative.startswith("OpenMAIC/"):
-        back_href, back_label = "/learn/openmaic", "返回课堂指南 →"
-    else:
-        back_href, back_label = "/projects", "返回项目与工具 →"
-    document = f'''<!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{html.escape(title)} · technical-knowledge</title>
-<link rel="stylesheet" href="/static/workbench.css"><script src="/static/workbench.js" data-page="projects" defer></script>
-<style>
-:root{{--doc-bg:#f4f7f5;--doc-paper:#fff;--doc-ink:#18231f;--doc-muted:#65716c;--doc-line:#dce4df;--doc-accent:#087663;--doc-shadow:0 10px 28px rgba(20,42,35,.07)}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--doc-bg);color:var(--doc-ink);font:15px/1.75 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}}a{{color:var(--doc-accent)}}
-.doc-shell{{max-width:1100px;margin:auto;padding:0 30px 70px}}.doc-top{{display:flex;align-items:center;justify-content:space-between;min-height:76px;border-bottom:1px solid var(--doc-line);color:var(--doc-muted);font-size:12px}}.doc-top a{{font-weight:700;text-decoration:none}}
-.doc-body{{margin-top:27px;padding:30px 34px;background:var(--doc-paper);border:1px solid var(--doc-line);border-radius:7px;box-shadow:var(--doc-shadow);overflow-wrap:anywhere}}.doc-body h1,.doc-body h2,.doc-body h3,.doc-body h4{{line-height:1.35}}.doc-body h1{{margin:0 0 22px;font-size:31px}}.doc-body h2{{margin:31px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--doc-line);font-size:22px}}.doc-body h3{{margin:24px 0 7px;font-size:18px}}.doc-body p{{margin:12px 0;color:#40504a}}.doc-body ul,.doc-body ol{{padding-left:24px;color:#40504a}}.doc-body li{{margin:4px 0}}.doc-body img{{display:block;max-width:100%;height:auto;margin:13px auto;border:1px solid var(--doc-line);border-radius:5px}}.doc-body p:has(>img){{display:inline-block;vertical-align:middle;margin:4px 7px}}.doc-body p:has(>img[alt="OpenMAIC Banner"]){{display:block;text-align:center;margin:0 0 13px}}.doc-body blockquote{{margin:16px 0;padding:8px 15px;border-left:3px solid var(--doc-accent);background:#f1f6f3;color:var(--doc-muted)}}.doc-body code{{padding:1px 4px;border:1px solid #d8e5e0;border-radius:3px;background:#edf3f0;color:#0e6657;font-family:"SF Mono",monospace;font-size:.9em}}.doc-body .code-block{{padding:15px;overflow:auto;border-radius:6px;background:#202724;color:#e6ece9;line-height:1.6}}.doc-body .code-block code{{padding:0;border:0;background:none;color:inherit}}.doc-body .callout{{padding:12px 15px;border:1px solid #b9d5cd;border-radius:6px;background:#eff7f4}}.doc-body table{{border-collapse:collapse;width:100%;min-width:560px}}.doc-body .table-wrap{{overflow:auto;margin:15px 0}}.doc-body th,.doc-body td{{padding:8px 10px;border:1px solid var(--doc-line);text-align:left;vertical-align:top}}.doc-body th{{background:#edf3f0}}
-@media(max-width:700px){{.doc-shell{{padding:0 14px 46px}}.doc-top{{min-height:58px}}.doc-body{{margin-top:18px;padding:20px 17px}}.doc-body h1{{font-size:26px}}.doc-body h2{{font-size:20px}}}}
-</style></head><body><div class="doc-shell"><header class="doc-top"><span>{html.escape(title)}</span><a href="{back_href}">{back_label}</a></header><main class="doc-body">{rendered}</main></div></body></html>'''
-    return document.encode("utf-8")
-
-
 INDEX_HTML = r'''<!doctype html>
 <html lang="zh-CN">
 <head>
@@ -869,7 +748,7 @@ INDEX_HTML = r'''<!doctype html>
 <title>工程知识库</title>
 <style>
 :root{--bg:#f3f5f2;--panel:#fff;--text:#202826;--muted:#68736f;--line:#d9dfdb;--accent:#137766;--accent2:#a14e32;--warn:#9b6816;--danger:#ad3e4f;--shadow:0 10px 30px rgba(35,48,43,.07)}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:none}.app{max-width:1540px;margin:0 auto;padding:22px 24px 48px}.topbar{display:flex;align-items:center;gap:18px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px;min-width:270px}.mark{width:34px;height:34px;border:1px solid #2d8979;border-radius:8px;display:grid;place-items:center;color:var(--accent);font-weight:800}.brand h1{font-size:18px;letter-spacing:0;margin:0}.search{flex:1;position:relative}.search input{width:100%;background:#fff;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:11px 15px 11px 40px;outline:0}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #13776618}.search span{position:absolute;left:14px;top:8px;color:var(--muted);font-size:18px}.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px}.sidebar,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}.sidebar{padding:17px;height:max-content;position:sticky;top:18px}.side-title{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);margin:4px 0 9px}.side-item{display:flex;align-items:center;justify-content:space-between;color:#43504c;padding:7px 9px;border-radius:6px;cursor:pointer}.side-item:hover,.side-item.active{background:#e3efeb;color:#0e5f51}.count{font-size:11px;color:var(--muted);background:#edf0ed;padding:1px 7px;border-radius:20px}.main{min-width:0}.toolbar{display:flex;align-items:center;justify-content:space-between;margin:0 0 11px}.toolbar h3{margin:0;font-size:16px}.tabs{display:flex;gap:7px}.tab{border:1px solid var(--line);background:#fff;color:#56625e;border-radius:6px;padding:6px 10px;cursor:pointer}.tab.active,.tab:hover{border-color:var(--accent);color:var(--accent);background:#f5fbf9}.note-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:12px}.note-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:15px;cursor:pointer;min-height:138px;transition:.16s}.note-card:hover{transform:translateY(-2px);border-color:#6bab9f;box-shadow:0 10px 25px #2c4a4314}.note-card h4{margin:0 0 7px;font-size:15px;line-height:1.35}.note-card p{color:var(--muted);font-size:12px;line-height:1.55;margin:0 0 13px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.meta{color:#7a8581;font-size:11px;display:flex;flex-wrap:wrap;gap:5px}.reader{display:none}.reader.open{display:block}.reader-head{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px}.reader h2{font-size:27px;line-height:1.3;margin:0}.reader-sources{font-size:12px;line-height:1.7;color:#586964;background:#f5f8f6;border:1px solid var(--line);border-radius:6px;padding:9px 12px;margin:-7px 0 19px;overflow-wrap:anywhere}.reader-sources:empty{display:none}.source-label{color:var(--accent);font-weight:600}.source-sep{color:#a4aca9;padding:0 3px}.reader-body{font-size:15px;line-height:1.85}.reader-body h1{font-size:29px}.reader-body h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:5px}.reader-body h3{font-size:18px}.reader-body p{margin:13px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:4px 0}.reader-body blockquote{border-left:3px solid var(--accent2);padding:4px 15px;color:#59635f;background:#f7f3f1;margin:16px 0}.reader-body img{max-width:100%;max-height:520px;border:1px solid var(--line);border-radius:6px;margin:7px 0}.reader-body code{background:#edf3f0;color:#0e6657;border:1px solid #d8e5e0;border-radius:4px;padding:1px 5px;font-family:"SF Mono",monospace;font-size:.88em}.reader-body .code-block{background:#202724;border:1px solid #303a36;border-radius:6px;padding:15px;overflow:auto;color:#e6ece9;line-height:1.6}.reader-body .code-block code{background:none;border:0;padding:0;color:inherit}.table-wrap{overflow:auto;margin:15px 0}.reader-body table{border-collapse:collapse;width:100%;min-width:480px}.reader-body th,.reader-body td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}.reader-body th{color:#31443e;background:#edf3f0}.reader-body td{color:#36423e}.callout{padding:11px 15px;border:1px solid #b9d5cd;border-radius:6px;background:#eff7f4;margin:16px 0;display:flex;gap:10px}.callout.warning{border-color:#dcc995;background:#faf6e8}.callout.danger{border-color:#e2b7bf;background:#fbf0f2}.callout strong{color:var(--accent);font-size:11px;text-transform:uppercase}.callout.warning strong{color:var(--warn)}.unresolved{color:var(--danger);border-bottom:1px dashed var(--danger)}.graph-panel{margin-top:20px;padding:17px}.graph-head h3{margin:0}#graph{width:100%;height:590px;background:#fafbf9;border-radius:6px;margin-top:12px;border:1px solid var(--line);cursor:grab}#graph:active{cursor:grabbing}.edge{stroke:#8b9994;stroke-width:1;opacity:.42}.node circle{stroke:#fff;stroke-width:2}.node text{fill:#44514d;font-size:10px;pointer-events:none}.node:hover circle{stroke:#202826;stroke-width:3}.legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px;color:var(--muted);font-size:11px}.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.empty{color:var(--muted);padding:30px;text-align:center;border:1px dashed var(--line);border-radius:6px}@media(max-width:850px){.app{padding:14px}.layout{grid-template-columns:1fr}.sidebar{position:static;display:flex;gap:8px;overflow:auto;padding:10px}.side-title{display:none}.side-item{white-space:nowrap}.topbar{flex-wrap:wrap;gap:11px}.brand{min-width:0}.search{order:3;flex-basis:100%}#graph{height:450px}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}.app{max-width:1540px;margin:0 auto;padding:22px 24px 48px}.topbar{display:flex;align-items:center;gap:18px;margin-bottom:22px}.brand{display:flex;align-items:center;gap:12px;min-width:270px}.mark{width:34px;height:34px;border:1px solid #2d8979;border-radius:8px;display:grid;place-items:center;color:var(--accent);font-weight:800}.brand h1{font-size:18px;letter-spacing:0;margin:0}.search{flex:1;position:relative}.search input{width:100%;background:#fff;border:1px solid var(--line);border-radius:8px;color:var(--text);padding:11px 15px 11px 40px;outline:0}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #13776618}.search span{position:absolute;left:14px;top:8px;color:var(--muted);font-size:18px}.layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:20px}.sidebar,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}.sidebar{padding:17px;height:max-content;position:sticky;top:18px}.side-title{font-size:11px;text-transform:uppercase;letter-spacing:1.3px;color:var(--muted);margin:4px 0 9px}.side-item{display:flex;align-items:center;justify-content:space-between;color:#43504c;padding:7px 9px;border-radius:6px;cursor:pointer}.side-item:hover,.side-item.active{background:#e3efeb;color:#0e5f51}.count{font-size:11px;color:var(--muted);background:#edf0ed;padding:1px 7px;border-radius:20px}.main{min-width:0}.toolbar{display:flex;align-items:center;justify-content:space-between;margin:0 0 11px}.toolbar h3{margin:0;font-size:16px}.tabs{display:flex;gap:7px}.tab{border:1px solid var(--line);background:#fff;color:#56625e;border-radius:6px;padding:6px 10px;cursor:pointer}.tab.active,.tab:hover{border-color:var(--accent);color:var(--accent);background:#f5fbf9}.note-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(255px,1fr));gap:12px}.note-card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:15px;cursor:pointer;min-height:138px;transition:.16s}.note-card:hover{transform:translateY(-2px);border-color:#6bab9f;box-shadow:0 10px 25px #2c4a4314}.note-card h4{margin:0 0 7px;font-size:15px;line-height:1.35}.note-card p{color:var(--muted);font-size:12px;line-height:1.55;margin:0 0 13px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}.meta{color:#7a8581;font-size:11px;display:flex;flex-wrap:wrap;gap:5px}.reader{display:none}.reader.open{display:block}.reader-head{border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px}.reader h2{font-size:27px;line-height:1.3;margin:0}.reader-sources{font-size:12px;line-height:1.7;color:#586964;background:#f5f8f6;border:1px solid var(--line);border-radius:6px;padding:9px 12px;margin:-7px 0 19px;overflow-wrap:anywhere}.reader-sources:empty{display:none}.source-label{color:var(--accent);font-weight:600}.source-sep{color:#a4aca9;padding:0 3px}.reader-body{font-size:15px;line-height:1.85}.reader-body h1{font-size:29px}.reader-body h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:5px}.reader-body h3{font-size:18px}.reader-body p{margin:13px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:4px 0}.reader-body blockquote{border-left:3px solid var(--accent2);padding:4px 15px;color:#59635f;background:#f7f3f1;margin:16px 0}.reader-body img{max-width:100%;max-height:520px;border:1px solid var(--line);border-radius:6px;margin:7px 0}.reader-body code{background:#edf3f0;color:#0e6657;border:1px solid #d8e5e0;border-radius:4px;padding:1px 5px;font-family:"SF Mono",monospace;font-size:.88em}.reader-body .code-block{background:#202724;border:1px solid #303a36;border-radius:6px;padding:15px;overflow:auto;color:#e6ece9;line-height:1.6}.reader-body .code-block code{background:none;border:0;padding:0;color:inherit}.table-wrap{overflow:auto;margin:15px 0}.reader-body table{border-collapse:collapse;width:100%;min-width:480px}.reader-body th,.reader-body td{border:1px solid var(--line);padding:7px 10px;text-align:left;vertical-align:top}.reader-body th{color:#31443e;background:#edf3f0}.reader-body td{color:#36423e}.callout{padding:11px 15px;border:1px solid #b9d5cd;border-radius:6px;background:#eff7f4;margin:16px 0;display:flex;gap:10px}.callout.warning{border-color:#dcc995;background:#faf6e8}.callout.danger{border-color:#e2b7bf;background:#fbf0f2}.callout strong{color:var(--accent);font-size:11px;text-transform:uppercase}.callout.warning strong{color:var(--warn)}.unresolved{color:var(--danger);border-bottom:1px dashed var(--danger)}.graph-panel{margin-top:20px;padding:17px}.graph-head h3{margin:0}#graph{width:100%;height:590px;background:#fafbf9;border-radius:6px;margin-top:12px;border:1px solid var(--line);cursor:grab}#graph:active{cursor:grabbing}.edge{stroke:#8b9994;stroke-width:1;opacity:.42}.node circle{stroke:#fff;stroke-width:2}.node text{fill:#44514d;font-size:10px;pointer-events:none}.node:hover circle{stroke:#202826;stroke-width:3}.legend{display:flex;flex-wrap:wrap;gap:9px;margin-top:9px;color:var(--muted);font-size:11px}.legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px}.empty{color:var(--muted);padding:30px;text-align:center;border:1px dashed var(--line);border-radius:6px}@media(max-width:850px){.app{padding:14px}.layout{grid-template-columns:1fr}.sidebar{position:static;display:flex;gap:8px;overflow:auto;padding:10px}.side-title{display:none}.side-item{white-space:nowrap}.topbar{flex-wrap:wrap;gap:11px}.brand{min-width:0}.search{order:3;flex-basis:100%}#graph{height:450px}}
 </style></head>
 <body><div class="app">
 <header class="topbar"><div class="brand"><div class="mark">⌁</div><div><h1>工程知识库</h1></div></div><div class="search"><span>⌕</span><input id="search" placeholder="搜索知识" autocomplete="off"></div></header>
@@ -885,7 +764,7 @@ const $=s=>document.querySelector(s);
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 async function getJSON(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json();}
 function filtered(){let a=state.notes.filter(n=>(state.category==='all'||n.category===state.category)&&(!state.query||[n.title,n.path,n.type,n.status,(n.tags||[]).join(' '),(n.sources||[]).join(' '),n.search_text||''].join(' ').toLowerCase().includes(state.query.toLowerCase())));a.sort((x,y)=>state.sort==='title'?x.title.localeCompare(y.title,'zh-CN'):(y.updated||'').localeCompare(x.updated||''));return a;}
-function orderedCategories(values){const order=['总览','后端技能','Agent技能','人工智能','软件工程','数据系统','计算机系统与性能','分布式系统','编程语言','质量工程','Clippings'];return [...values].sort((a,b)=>(order.indexOf(a)<0?999:order.indexOf(a))-(order.indexOf(b)<0?999:order.indexOf(b))||a.localeCompare(b,'zh-CN'));}
+function orderedCategories(values){const order=['总览','人工智能','软件工程','数据系统','计算机系统与性能','分布式系统','编程语言','质量工程','Clippings'];return [...values].sort((a,b)=>(order.indexOf(a)<0?999:order.indexOf(a))-(order.indexOf(b)<0?999:order.indexOf(b))||a.localeCompare(b,'zh-CN'));}
 function renderCategories(){const counts={};state.notes.forEach(n=>counts[n.category]=(counts[n.category]||0)+1);const cats=orderedCategories(Object.keys(counts));$('#categories').innerHTML=cats.map(c=>`<div class="side-item ${state.category===c?'active':''}" data-category="${esc(c)}"><span>${esc(c)}</span><span class="count">${counts[c]}</span></div>`).join('');$('#all-count').textContent=state.notes.length;document.querySelectorAll('[data-category]').forEach(e=>e.onclick=()=>showListing(e.dataset.category));}
 function renderNotes(){const list=filtered();$('#listing-title').textContent=state.category==='all'?'全部知识':state.category;$('#notes').innerHTML=list.length?list.map(n=>`<article class="note-card" data-path="${esc(n.path)}"><h4>${esc(n.title)}</h4><p>${esc(n.excerpt||'')}</p>${n.updated?`<div class="meta"><span>${esc(n.updated)}</span></div>`:''}</article>`).join(''):`<div class="empty">没有匹配内容</div>`;document.querySelectorAll('.note-card').forEach(e=>e.onclick=()=>openNote(e.dataset.path));}
 function renderSources(sources){if(!sources||!sources.length)return '';return '<span class="source-label">来源</span> '+sources.map(s=>{const value=String(s);if(value.startsWith('http://')||value.startsWith('https://'))return `<a href="${esc(value)}" target="_blank" rel="noreferrer">${esc(value)}</a>`;const match=value.match(/^\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]$/);if(match){const target=match[1],label=match[2]||target;return `<a data-note="${esc(target)}" href="/?path=${encodeURIComponent(target)}">${esc(label)}</a>`;}return esc(value);}).join('<span class="source-sep"> · </span>');}
@@ -912,15 +791,27 @@ MODERN_INDEX_HTML = r'''<!doctype html>
   --line:#dce2de;--line-strong:#c8d1cc;--accent:#0b705e;--accent-soft:#e9f3f0;
   --code:#202622;--warn:#9b5b23;--max:1480px;
 }
+@media(prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --canvas:#1a1e1c;--paper:#202422;--ink:#e3e7e5;--muted:#9ba39e;
+    --line:#313633;--line-strong:#3d433f;--accent:#3db89f;--accent-soft:#1a332e;
+    --code:#1a1e1c;--warn:#d48852;
+  }
+}
+:root[data-theme="dark"]{
+  --canvas:#1a1e1c;--paper:#202422;--ink:#e3e7e5;--muted:#9ba39e;
+  --line:#313633;--line-strong:#3d433f;--accent:#3db89f;--accent-soft:#1a332e;
+  --code:#1a1e1c;--warn:#d48852;
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--canvas);color:var(--ink);font:14px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Noto Sans CJK SC",sans-serif}
 button,input{font:inherit}
 button{color:inherit}
 a{color:var(--accent);text-decoration:none}
-a:hover{text-decoration:none}
+a:hover{text-decoration:underline}
 .shell{max-width:var(--max);margin:auto;min-height:100vh;padding:0 24px 48px}
-.topbar{height:72px;display:grid;grid-template-columns:260px minmax(280px,620px) 1fr;gap:24px;align-items:center;border-bottom:1px solid var(--line)}
+.topbar{height:72px;display:grid;grid-template-columns:260px minmax(280px,620px) auto 1fr;gap:24px;align-items:center;border-bottom:1px solid var(--line)}
 .brand{border:0;background:none;padding:0;display:flex;align-items:center;gap:11px;cursor:pointer;text-align:left}
 .brand-mark{width:30px;height:30px;border:1px solid var(--accent);color:var(--accent);display:grid;place-items:center;font:700 14px/1 ui-monospace,monospace;border-radius:6px}
 .brand-name{font-size:17px;font-weight:700}
@@ -1042,7 +933,7 @@ a:hover{text-decoration:none}
 .legend{display:flex;gap:14px;flex-wrap:wrap;color:var(--muted);font-size:11px;margin-top:10px}
 .legend i{display:inline-block;width:8px;height:8px;margin-right:5px;border-radius:50%}
 @media(max-width:900px){
-  .shell{padding:0 14px 36px}.topbar{height:auto;padding:14px 0;grid-template-columns:1fr auto}.search{grid-column:1/-1;grid-row:2}.workspace{grid-template-columns:1fr;gap:18px;padding-top:16px}
+  .shell{padding:0 14px 36px}.topbar{height:auto;padding:14px 0;grid-template-columns:1fr auto}.search{grid-column:1;grid-row:2}#theme-toggle{grid-column:2;grid-row:2}.top-actions{grid-column:1/-1;grid-row:3;justify-content:flex-start}.workspace{grid-template-columns:1fr;gap:18px;padding-top:16px}
   .sidebar{position:static;max-height:none;overflow:auto;padding:0 0 9px}.sidebar #domains{display:flex;gap:7px;width:max-content}.nav-heading,.topic-list{display:none!important}.domain{flex:none;margin:0}.domain-button{white-space:nowrap;border:1px solid var(--line);background:var(--paper)}.chevron{display:none}
   .note-row{grid-template-columns:1fr;gap:5px;padding:13px 5px}.reader-title{font-size:26px}.article{font-size:14px}.reader-context{margin-top:2px}#graph{height:520px}.visual-tabs{gap:5px}.visual-tab{padding:6px 8px;font-size:13px}.study-launch{display:block}.study-launch-copy{margin-bottom:10px}.study-launch-form{display:grid;grid-template-columns:1fr 1fr}.study-launch-form input{min-width:0;max-width:none;grid-column:1/-1}.study-launch-form button{width:100%}.tool-entry-grid{grid-template-columns:1fr;gap:10px}.tool-entry{min-height:0}.tool-entry p{max-width:58ch}
 }
@@ -1053,6 +944,7 @@ a:hover{text-decoration:none}
   <header class="topbar">
     <button class="brand" id="home-button"><span class="brand-mark">K</span><span class="brand-name">工程知识库</span></button>
     <label class="search"><input id="search" placeholder="搜索概念、机制或问题" autocomplete="off"><kbd>/</kbd></label>
+    <button class="quiet-button" id="theme-toggle" title="切换主题" aria-label="切换深色/浅色主题">☀</button>
     <div class="top-actions"><button class="quiet-button" id="directory-button">目录</button><button class="quiet-button" id="graph-button">关系图</button></div>
   </header>
   <div class="workspace">
@@ -1089,6 +981,21 @@ window.renderMermaid=async()=>{const nodes=document.querySelectorAll('.mermaid:n
 </script>
 <script>
 const state={notes:[],edges:[],domain:'all',topic:'all',query:'',sort:'title',selected:null,view:'directory',graphMode:'network',zoom:1,pan:{x:0,y:0},navigation:0};
+function initTheme(){
+  const stored=localStorage.getItem('theme');
+  const theme=stored||(window.matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');
+  document.documentElement.setAttribute('data-theme',theme);
+  $('#theme-toggle').textContent=theme==='dark'?'☀':'☾';
+}
+function toggleTheme(){
+  const current=document.documentElement.getAttribute('data-theme')||'light';
+  const next=current==='dark'?'light':'dark';
+  document.documentElement.setAttribute('data-theme',next);
+  localStorage.setItem('theme',next);
+  $('#theme-toggle').textContent=next==='dark'?'☀':'☾';
+}
+initTheme();
+$('#theme-toggle').onclick=toggleTheme;
 const domainOrder=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'];
 const colors=['#0b705e','#3f70a8','#a05b37','#7862a3','#567b42','#9b4660','#697772'];
 const $=s=>document.querySelector(s);
@@ -1129,11 +1036,11 @@ function renderSources(sources){
     return esc(value)
   }).join('<span class="source-sep">·</span>');
 }
-function refreshServiceLinks(){document.querySelectorAll('[data-service-port]').forEach(link=>{const current=link.getAttribute('href')||'';if(current.startsWith('/launch/'))return;const next=link.dataset.servicePort==='3782'?'/chat':'/';link.href=`${link.dataset.servicePort==='3782'?'/launch/deeptutor':'/launch/openmaic'}?next=${encodeURIComponent(next)}`})}
+function refreshServiceLinks(){const host=location.hostname||'127.0.0.1';document.querySelectorAll('[data-service-port]').forEach(link=>{link.href=`http://${host}:${link.dataset.servicePort}/`})}
 function toolEntryMarkup(){return `<section class="tool-entry-grid" aria-label="学习工具入口">
   <article class="tool-entry"><h2>Archify · 图谱与架构</h2><p class="tool-entry-kicker">把系统关系变成可验证、可点击的图</p><p>适合架构、工作流、序列、数据流和生命周期图。效果是关系可追踪，节点可以回到对应知识页。</p><div class="tool-entry-actions"><a class="tool-entry-primary" href="/?view=graph">打开关系图</a><a class="tool-entry-secondary" href="https://github.com/tt-a1i/archify" target="_blank" rel="noreferrer">官方 GitHub ↗</a></div></article>
-  <article class="tool-entry"><h2>OpenMAIC · 互动课堂</h2><p class="tool-entry-kicker">把一个主题变成讲解、互动和练习</p><p>输入主题后生成课堂，可加入互动场景、测验、项目任务和反馈。模型调用前需要输入访问码。</p><div class="tool-entry-actions"><a class="tool-entry-primary" data-service-port="3100" href="/launch/openmaic?next=%2F" target="_blank" rel="noreferrer">打开互动课堂</a><a class="tool-entry-secondary" href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">官方 GitHub ↗</a></div></article>
-  <article class="tool-entry"><h2>DeepTutor · 检索与学习</h2><p class="tool-entry-kicker">把资料、问答、记忆和复习放进一个工作区</p><p>先登录，再进入 Chat 或 Knowledge Bases。模型调用、检索、记忆和 Agent 接口都受账号保护。</p><div class="tool-entry-actions"><a class="tool-entry-primary" data-service-port="3782" href="/launch/deeptutor?next=%2Fchat" target="_blank" rel="noreferrer">打开学习工作区</a><a class="tool-entry-secondary" href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">官方 GitHub ↗</a></div></article>
+  <article class="tool-entry"><h2>OpenMAIC · 互动课堂</h2><p class="tool-entry-kicker">把一个主题变成讲解、互动和练习</p><p>输入主题后生成课堂，可加入互动场景、测验、项目任务和反馈。模型调用前需要输入访问码。</p><div class="tool-entry-actions"><a class="tool-entry-primary" data-service-port="3100" data-service-port="3100" href="#" target="_blank" rel="noreferrer">打开互动课堂</a><a class="tool-entry-secondary" href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">官方 GitHub ↗</a></div></article>
+  <article class="tool-entry"><h2>DeepTutor · 检索与学习</h2><p class="tool-entry-kicker">把资料、问答、记忆和复习放进一个工作区</p><p>先登录，再进入 Chat 或 Knowledge Bases。模型调用、检索、记忆和 Agent 接口都受账号保护。</p><div class="tool-entry-actions"><a class="tool-entry-primary" data-service-port="3782" data-service-port="3782" href="#" target="_blank" rel="noreferrer">打开学习工作区</a><a class="tool-entry-secondary" href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">官方 GitHub ↗</a></div></article>
   <article class="tool-entry"><h2>Matt Skills · 工程协作</h2><p class="tool-entry-kicker">把对齐、设计、实现和验证变成可重复流程</p><p>提供 ask-matt、grill-with-docs、to-spec、TDD、代码审查和架构改进等技能，帮助模型先理解再修改。</p><div class="tool-entry-actions"><a class="tool-entry-primary" href="https://github.com/mattpocock/skills" target="_blank" rel="noreferrer">查看技能仓库 ↗</a><a class="tool-entry-secondary" href="/?path=%E7%9F%A5%E8%AF%86%E5%BA%93%E7%AE%A1%E7%90%86%2F%E7%BB%B4%E6%8A%A4%2F%E5%AD%A6%E4%B9%A0%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8%E4%B8%8E%E8%B0%83%E7%94%A8%E6%88%90%E6%9C%AC.md">用法与成本</a></div></article>
 </section>`}
 function showView(view){
@@ -1162,7 +1069,7 @@ async function openNote(path,push=true){
     if(push)history.pushState({},'', '/?path='+encodeURIComponent(note.path));window.scrollTo({top:0,behavior:'smooth'});
   }catch(error){console.error(error)}
 }
-function launchStudy(kind){const topic=$('#study-topic').value.trim();if(!topic){$('#study-topic').focus();return}const encoded=encodeURIComponent(topic);const next=kind==='classroom'?`/?topic=${encoded}`:`/chat?prompt=${encoded}`;const url=`${kind==='classroom'?'/launch/openmaic':'/launch/deeptutor'}?next=${encodeURIComponent(next)}`;window.open(url,'_blank','noopener,noreferrer')}
+function launchStudy(kind){const topic=$('#study-topic').value.trim();if(!topic){$('#study-topic').focus();return}const encoded=encodeURIComponent(topic);const host=location.hostname||'127.0.0.1';const url=kind==='classroom'?`http://${host}:3100/?topic=${encoded}`:`http://${host}:3782/chat?prompt=${encoded}`;window.open(url,'_blank','noopener,noreferrer')}
 function showGraph(push=true){state.navigation+=1;state.selected=null;state.query='';state.domain='all';state.topic='all';$('#search').value='';renderDomains();showView('graph');renderGraph();if(push)history.pushState({},'','/?view=graph');window.scrollTo({top:0,behavior:'smooth'});}
 function renderNetworkGraph(){
   const svg=$('#graph'),mobile=window.matchMedia('(max-width:900px)').matches,W=mobile?720:1200,H=mobile?920:690,domains=ordered(new Set(state.notes.map(n=>n.category)));svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
@@ -1235,19 +1142,8 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(payload)))
         self.send_header("Cache-Control", "no-store")
-        self.send_header("X-Content-Type-Options", "nosniff")
-        self.send_header("X-Frame-Options", "SAMEORIGIN")
-        self.send_header("Referrer-Policy", "same-origin")
-        self.send_header("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
-        self.send_header("Content-Security-Policy", "default-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'")
         self.end_headers()
-        if self.command == "HEAD":
-            return
-        try:
-            self.wfile.write(payload)
-        except (BrokenPipeError, ConnectionResetError):
-            # Clients can navigate away while a large response is in flight.
-            pass
+        self.wfile.write(payload)
 
     def send_json(self, value: object, status: int = 200) -> None:
         self.send_bytes(json_bytes(value), "application/json; charset=utf-8", status)
@@ -1270,11 +1166,14 @@ class Handler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Location", location)
         self.send_header("Cache-Control", "no-store")
-        self.send_header("X-Content-Type-Options", "nosniff")
         self.end_headers()
 
     def require_tool_access(self) -> bool:
-        """Protect only launches that mint a session for a model-backed tool."""
+        """Protect only launches that mint a session for a model-backed tool.
+
+        Reading the knowledge base stays open; handing out a model credential
+        (OpenMAIC access code, DeepTutor session) is what needs the password.
+        """
         if self.is_authenticated():
             return True
         next_path = self.path if self.path.startswith("/") else "/projects"
@@ -1301,14 +1200,21 @@ class Handler(BaseHTTPRequestHandler):
             return requested
         return public_host()
 
+    def require_access(self) -> bool:
+        parsed = urlsplit(self.path)
+        if parsed.path.startswith("/auth/") or self.is_authenticated():
+            return True
+        if parsed.path.startswith("/api/") or parsed.path == "/health":
+            self.send_json({"error": "authentication required"}, 401)
+        else:
+            next_path = self.path if self.path.startswith("/") else "/"
+            self.redirect("/auth/login?next=" + quote(next_path, safe="/?=&%"))
+        return False
+
     def do_GET(self) -> None:  # noqa: N802
         parsed = urlsplit(self.path)
         path = parsed.path
         query = parse_qs(parsed.query)
-        canonical = canonical_root_location(self.path)
-        if canonical is not None and canonical != self.path:
-            self.redirect(canonical, 308)
-            return
         if path == "/auth/login":
             self.send_bytes(LOGIN_HTML.encode("utf-8"), "text/html; charset=utf-8")
             return
@@ -1321,6 +1227,8 @@ class Handler(BaseHTTPRequestHandler):
             )
             self.end_headers()
             return
+        if not self.require_access():
+            return
         if path in {"/", "/index.html"}:
             try:
                 payload = PUBLIC_SITE.read_bytes()
@@ -1329,49 +1237,28 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self.send_bytes(payload, "text/html; charset=utf-8")
             return
-        if path in {"/learn", "/learn/", "/apps/learning/index.html"}:
+        if path == "/apps/agent-evaluation/index.html":
             try:
-                payload = PUBLIC_LEARNING.read_bytes()
+                payload = PUBLIC_EVALUATION.read_bytes()
             except OSError:
-                self.send_json({"error": "learning center unavailable"}, 503)
+                self.send_json({"error": "evaluation app unavailable"}, 503)
                 return
             self.send_bytes(payload, "text/html; charset=utf-8")
             return
-        if path in {"/learn/openmic", "/learn/openmic/"}:
-            self.redirect("/learn/openmaic", 308)
-            return
-        if path in {"/learn/openmaic", "/learn/openmaic/", "/apps/learning/openmaic.html"}:
+        if path in {"/projects", "/projects/"}:
+            # 项目入口有自己的一页（projects/index.html），它列出了工具、源码和用法。
+            # 以前这里重定向到 总览/项目与工具.md —— 那篇笔记早已不存在，
+            # 于是访问 /projects 得到 "note not found"。直接提供真实的页面。
             try:
-                payload = PUBLIC_OPENMAIC_LEARNING.read_bytes()
+                payload = PUBLIC_PROJECTS_PAGE.read_bytes()
             except OSError:
-                self.send_json({"error": "OpenMAIC learning page unavailable"}, 503)
+                self.send_json({"error": "projects page unavailable"}, 503)
                 return
             self.send_bytes(payload, "text/html; charset=utf-8")
             return
-        if path in {"/learn/intuition", "/learn/intuition/", "/apps/learning/intuition.html"}:
-            try:
-                payload = PUBLIC_INTUITION.read_bytes()
-            except OSError:
-                self.send_json({"error": "intuition lesson unavailable"}, 503)
-                return
-            self.send_bytes(payload, "text/html; charset=utf-8")
-            return
-        if path in {"/learn/transfer", "/learn/transfer/", "/apps/learning/transfer.html"}:
-            try:
-                payload = PUBLIC_TRANSFER.read_bytes()
-            except OSError:
-                self.send_json({"error": "transfer lesson unavailable"}, 503)
-                return
-            self.send_bytes(payload, "text/html; charset=utf-8")
-            return
-        if path in {"/learn/history", "/learn/history/", "/apps/learning/history.html"}:
-            try:
-                payload = PUBLIC_HISTORY.read_bytes()
-            except OSError:
-                self.send_json({"error": "classroom history unavailable"}, 503)
-                return
-            self.send_bytes(payload, "text/html; charset=utf-8")
-            return
+        # ---- 教学工具的启动入口 ----------------------------------------------
+        # 这些入口会为工具签发一次会话（OpenMAIC 访问码 / DeepTutor 登录），
+        # 所以要过站点密码；阅读知识库本身不需要。
         if path == "/launch/openmaic":
             if not self.require_tool_access():
                 return
@@ -1386,9 +1273,8 @@ class Handler(BaseHTTPRequestHandler):
             if not access_code:
                 self.send_json({"error": "OpenMAIC access is not configured"}, 503)
                 return
-            host = self.tool_host()
             self.send_response(303)
-            self.send_header("Location", f"http://{host}:3100{destination}")
+            self.send_header("Location", f"http://{self.tool_host()}:3100{destination}")
             self.send_header(
                 "Set-Cookie",
                 f"openmaic_access={openmaic_auth_cookie(access_code)}; "
@@ -1409,9 +1295,8 @@ class Handler(BaseHTTPRequestHandler):
             except RuntimeError:
                 self.send_json({"error": "DeepTutor login is unavailable"}, 503)
                 return
-            host = self.tool_host()
             self.send_response(303)
-            self.send_header("Location", f"http://{host}:3782{destination}")
+            self.send_header("Location", f"http://{self.tool_host()}:3782{destination}")
             self.send_header(
                 "Set-Cookie",
                 f"dt_token={token}; Max-Age=86400; Path=/; HttpOnly; SameSite=Lax",
@@ -1419,95 +1304,80 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Cache-Control", "no-store")
             self.end_headers()
             return
-        if path in {
-            "/apps/agent-evaluation",
-            "/apps/agent-evaluation/",
-            "/apps/agent-evaluation/index.html",
-        }:
-            try:
-                payload = PUBLIC_EVALUATION.read_bytes()
-            except OSError:
-                self.send_json({"error": "evaluation app unavailable"}, 503)
-                return
-            self.send_bytes(payload, "text/html; charset=utf-8")
+        if path == "/api/learning/status":
+            self.send_json(learning_services_status())
             return
-        if path == "/projects/README.md":
-            try:
-                payload = PUBLIC_PROJECTS_README.read_bytes()
-            except OSError:
-                self.send_json({"error": "projects index unavailable"}, 503)
-                return
-            self.send_bytes(payload, "text/markdown; charset=utf-8")
+        if path == "/api/learning/openmaic-jobs":
+            self.send_json({"jobs": openmaic_generation_jobs()})
             return
-        if path in {
-            "/projects/OpenMAIC/README-zh",
-            "/projects/OpenMAIC/README-zh/",
-            "/projects/OpenMAIC/README-zh.md",
-        }:
-            payload = render_project_markdown_page(
-                PUBLIC_PROJECTS_ROOT / "OpenMAIC" / "README-zh.md",
-                "OpenMAIC/README-zh.md",
-                "OpenMAIC 中文项目说明",
+        if path == "/api/access":
+            self.send_json(
+                {
+                    "local_client": is_local_client(self.client_address[0]),
+                    "knowledge_public": True,
+                    "tool_launch_requires_auth": not self.is_authenticated(),
+                }
             )
-            if not payload:
-                self.send_json({"error": "project document unavailable"}, 404)
-                return
-            self.send_bytes(payload, "text/html; charset=utf-8")
-            return
-        if path in {
-            "/projects/DeepTutor/README-zh",
-            "/projects/DeepTutor/README-zh/",
-            "/projects/DeepTutor/README-zh.md",
-        }:
-            # DeepTutor 上游把简体中文说明放在 assets/README/README_CN.md，
-            # 且其中的图片路径是相对该文件（../../assets/...）书写的。
-            payload = render_project_markdown_page(
-                PUBLIC_PROJECTS_ROOT / "DeepTutor" / "assets" / "README" / "README_CN.md",
-                "DeepTutor/assets/README/README_CN.md",
-                "DeepTutor 中文项目说明",
-            )
-            if not payload:
-                self.send_json({"error": "project document unavailable"}, 404)
-                return
-            self.send_bytes(payload, "text/html; charset=utf-8")
-            return
-        if path in {"/projects", "/projects/"}:
-            try:
-                payload = PUBLIC_PROJECTS_INDEX.read_bytes()
-            except OSError:
-                self.send_json({"error": "projects index unavailable"}, 503)
-                return
-            self.send_bytes(payload, "text/html; charset=utf-8")
             return
         if path.startswith("/projects/"):
-            relative = unquote(path[len("/projects/") :])
-            candidate = (PUBLIC_PROJECTS_ROOT / relative).resolve()
+            # 上游项目的 README 快照，供"查看技能说明""中文说明"这类链接直接读取。
+            # 只放行项目目录下的 Markdown，且必须落在 projects/ 内，
+            # 避免 ../ 之类的路径穿越读到仓库里的其他文件。
+            rel = unquote(path[len("/projects/") :])
+            candidate = (REPOSITORY_ROOT / "projects" / rel).resolve()
+            projects_root = (REPOSITORY_ROOT / "projects").resolve()
             if (
-                candidate != PUBLIC_PROJECTS_ROOT
-                and PUBLIC_PROJECTS_ROOT in candidate.parents
-                and candidate.is_file()
-                and not any(part.startswith(".") for part in candidate.relative_to(PUBLIC_PROJECTS_ROOT).parts)
-                and candidate.suffix.lower() in {".md", ".txt", ".json", ".yaml", ".yml", ".toml", ".py", ".js", ".mjs", ".ts", ".tsx", ".css", ".html", ".sh", ".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"}
+                candidate.suffix.lower() not in {".md", ".markdown"}
+                or projects_root not in candidate.parents
+                or not candidate.is_file()
             ):
-                try:
-                    if candidate.suffix.lower() == ".md":
-                        payload = render_project_markdown_page(
-                            candidate,
-                            candidate.relative_to(PUBLIC_PROJECTS_ROOT).as_posix(),
-                            f"{candidate.stem} · {candidate.parent.name}",
-                        )
-                        content_type = "text/html; charset=utf-8"
-                    else:
-                        payload = candidate.read_bytes()
-                        content_type = mimetypes.guess_type(candidate.name)[0] or "text/plain; charset=utf-8"
-                except OSError:
-                    self.send_json({"error": "project file unavailable"}, 404)
-                    return
-                if len(payload) > 4 * 1024 * 1024:
-                    self.send_json({"error": "project file too large"}, 413)
-                    return
-                self.send_bytes(payload, content_type)
+                self.send_json({"error": "project document not found"}, 404)
                 return
+            self.send_bytes(candidate.read_bytes(), "text/markdown; charset=utf-8")
+            return
+        # 学习中心的独立页面优先于下面的 /learn/* 笔记跳转：
+        # /learn/openmaic 既有讲义页、也有对应笔记，讲义页才是导航要到达的地方。
+        if path.rstrip("/") in LEARNING_PAGES or path in {
+            "/apps/learning/index.html",
+            "/apps/learning/openmaic.html",
+            "/apps/learning/intuition.html",
+            "/apps/learning/transfer.html",
+            "/apps/learning/history.html",
+        }:
+            page = LEARNING_PAGES.get(path.rstrip("/")) or (
+                REPOSITORY_ROOT / "apps" / "learning" / Path(path).name
+            )
+            try:
+                payload = page.read_bytes()
+            except OSError:
+                self.send_json({"error": "learning page unavailable"}, 503)
+                return
+            self.send_bytes(payload, "text/html; charset=utf-8")
+            return
+        if path in {"/learn/openmic", "/learn/openmic/"}:
+            self.redirect("/learn/openmaic", 308)
+            return
+        if path.startswith("/learn/"):
+            # 其余 /learn/* 跳转到对应的知识笔记。
+            # 用 vault 相对路径而非硬编码链接：这些文章位于 知识库管理/归档/ 下，
+            # 归档整理时路径变过一次，硬编码就会静默失效。
+            redirects = {
+                "/learn/deeptutor": "知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md",
+                "/learn/matt-skills": "知识库管理/归档/来源/论文与项目/Matt Skills工程协作技能.md",
+                "/learn/archify": "知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md",
+            }
+            rel = redirects.get(path)
+            if not rel:
+                self.send_json({"error": "not found"}, 404)
+                return
+            resolved = self.vault.resolve_note(rel)
+            if not resolved:
+                self.send_json({"error": "note not found"}, 404)
+                return
+            # Location 头必须是 latin-1：中文路径要先按 URL 规则编码，
+            # 否则 send_header 抛 UnicodeEncodeError，请求会直接断开。
+            self.redirect("/?path=" + quote(resolved, safe=""))
+            return
         if path.startswith("/static/"):
             name = path[8:]
             if "/" in name or name.startswith("."):
@@ -1529,21 +1399,6 @@ class Handler(BaseHTTPRequestHandler):
             host = detect_host() if bound_host in {"0.0.0.0", "::"} else bound_host
             self.send_json({"ok": True, "host": host, "port": self.server.server_address[1], "notes": len(self.vault.notes)})  # type: ignore[attr-defined]
             return
-        if path == "/api/learning/status":
-            self.send_json(learning_services_status())
-            return
-        if path == "/api/learning/openmaic-jobs":
-            self.send_json({"jobs": openmaic_generation_jobs()})
-            return
-        if path == "/api/access":
-            self.send_json(
-                {
-                    "local_client": is_local_client(self.client_address[0]),
-                    "knowledge_public": True,
-                    "tool_launch_requires_auth": not self.is_authenticated(),
-                }
-            )
-            return
         if path == "/api/notes":
             self.vault.refresh()
             notes = []
@@ -1553,10 +1408,21 @@ class Handler(BaseHTTPRequestHandler):
                 public = {k: v for k, v in n.items() if k not in {"body", "mtime", "listed"}}
                 body = str(n["body"])
                 public["excerpt"] = excerpt(body, str(n["title"]))
+                # The frontend searches over search_text and hashes it to detect
+                # changes, so it stays in the payload until search moves server-side.
                 public["search_text"] = body
                 notes.append(public)
-            listed_paths = {str(n["path"]) for n in notes}
-            edges = [e for e in self.vault.edges() if e["source"] in listed_paths and e["target"] in listed_paths]
+            # 图谱与"入链/延伸"的唯一事实源：在服务端一次收口。
+            # 前端三个渲染器（关系网络、阅读页关系、目录）都只读这个结果，
+            # 不再各自判断，否则迟早会像以前那样漏掉一处。
+            graph_paths = {
+                str(n["path"]) for n in notes if not n.get("exclude_from_graph")
+            }
+            edges = [
+                e
+                for e in self.vault.edges()
+                if e["source"] in graph_paths and e["target"] in graph_paths
+            ]
             self.send_json({"notes": notes, "edges": edges})
             return
         if path == "/api/note":
@@ -1590,16 +1456,10 @@ class Handler(BaseHTTPRequestHandler):
             return
         self.send_json({"error": "not found"}, 404)
 
-    def do_HEAD(self) -> None:  # noqa: N802
-        """Serve the same headers as GET without writing a response body."""
-        self.do_GET()
-
-    def do_OPTIONS(self) -> None:  # noqa: N802
-        """Reject browser cross-origin preflights instead of enabling CORS implicitly."""
-        self.send_json({"error": "cross-origin access is disabled"}, 403)
-
     def do_POST(self) -> None:  # noqa: N802
         if urlsplit(self.path).path != "/auth/login":
+            if not self.require_access():
+                return
             self.send_json({"error": "not found"}, 404)
             return
         try:
@@ -1609,13 +1469,9 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json({"error": "invalid request"}, 400)
             return
         password = str(body.get("password") or "")
-        if not self.server.allow_login_attempt(self.client_address[0]):  # type: ignore[attr-defined]
-            self.send_json({"error": "too many attempts"}, 429)
-            return
         if not password or not hmac.compare_digest(password, self.site_password):
             self.send_json({"error": "invalid password"}, 401)
             return
-        self.server.clear_login_attempts(self.client_address[0])  # type: ignore[attr-defined]
         self.send_response(204)
         self.send_header(
             "Set-Cookie",
@@ -1626,38 +1482,10 @@ class Handler(BaseHTTPRequestHandler):
 
 
 def detect_host() -> str:
-    interfaces: list[str] = []
-    try:
-        route = subprocess.run(
-            ["/sbin/route", "-n", "get", "default"],
-            capture_output=True,
-            text=True,
-            timeout=2,
-            check=False,
-        ).stdout
-        match = re.search(r"^\s*interface:\s*([A-Za-z0-9]+)\s*$", route, re.MULTILINE)
-        if match:
-            interfaces.append(match.group(1))
-    except (OSError, subprocess.SubprocessError):
-        pass
-    interfaces.extend(["en0", "en1", "en7", "en8", "bridge0", "bridge100"])
-    try:
-        all_interfaces = subprocess.run(
-            ["/sbin/ifconfig"], capture_output=True, text=True, timeout=2, check=False
-        ).stdout
-        interfaces.extend(re.findall(r"^([A-Za-z0-9]+):", all_interfaces, re.MULTILINE))
-    except (OSError, subprocess.SubprocessError):
-        pass
-    for interface in dict.fromkeys(interfaces):
-        try:
-            output = subprocess.run(
-                ["/sbin/ifconfig", interface], capture_output=True, text=True, timeout=2, check=False
-            ).stdout
-        except (OSError, subprocess.SubprocessError):
-            continue
-        for value in re.findall(r"^\s*inet\s+([0-9.]+)\b", output, re.MULTILINE):
-            if value and not value.startswith("127."):
-                return value
+    for interface in ("en0", "en1"):
+        value = os.popen(f"/sbin/ifconfig {interface} 2>/dev/null | awk '/inet / {{print $2; exit}}'").read().strip()
+        if value and not value.startswith("127."):
+            return value
     return "0.0.0.0"
 
 
@@ -1669,35 +1497,6 @@ def public_host() -> str:
     return detect_host()
 
 
-class KnowledgeHTTPServer(ThreadingHTTPServer):
-    """Threaded server with a small in-memory login throttle."""
-
-    allow_reuse_address = True
-    daemon_threads = True
-
-    def __init__(self, address, handler, vault, site_password):
-        super().__init__(address, handler)
-        self.vault = vault
-        self.site_password = site_password
-        self._login_attempts: dict[str, list[float]] = {}
-        self._login_lock = threading.Lock()
-
-    def allow_login_attempt(self, address: str) -> bool:
-        now = time.monotonic()
-        with self._login_lock:
-            attempts = [stamp for stamp in self._login_attempts.get(address, []) if now - stamp < AUTH_FAILURE_WINDOW]
-            if len(attempts) >= AUTH_FAILURE_LIMIT:
-                self._login_attempts[address] = attempts
-                return False
-            attempts.append(now)
-            self._login_attempts[address] = attempts
-            return True
-
-    def clear_login_attempts(self, address: str) -> None:
-        with self._login_lock:
-            self._login_attempts.pop(address, None)
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Serve the Obsidian vault as a live knowledge site")
     parser.add_argument("--root", type=Path, default=REPOSITORY_ROOT / "vault")
@@ -1705,7 +1504,9 @@ def main() -> None:
     parser.add_argument("--port", type=int, default=int(os.environ.get("KNOWLEDGE_PORT", "8787")))
     args = parser.parse_args()
     vault = Vault(args.root)
-    server = KnowledgeHTTPServer((args.host, args.port), Handler, vault, load_site_password())
+    server = ThreadingHTTPServer((args.host, args.port), Handler)
+    server.vault = vault  # type: ignore[attr-defined]
+    server.site_password = load_site_password()  # type: ignore[attr-defined]
     print(f"Knowledge site serving {vault.root}", flush=True)
     display_host = detect_host() if args.host in {"0.0.0.0", "::"} else args.host
     print(f"Open from this Mac or LAN: http://{display_host}:{args.port}", flush=True)

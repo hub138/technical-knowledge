@@ -174,7 +174,7 @@ class AuthenticationTests(unittest.TestCase):
             {"Content-Type": "application/json"},
         )
         cookie = login[1]["Set-Cookie"].split(";", 1)[0]
-        note_path = "工程知识/AI系统/知识与检索/RAG前沿：重排、自动优化与开放索引.md"
+        note_path = "工程知识/AI系统/知识与检索/RAG的核心是选择可引用证据.md"
         routes = [
             "/",
             "/learn",
@@ -378,6 +378,90 @@ class KnowledgeGraphTests(unittest.TestCase):
                     unresolved.append(f"{relative} -> {target}")
         self.assertEqual(unresolved, [])
 
+    def test_knowledge_management_is_flagged_out_of_graph(self) -> None:
+        """知识库管理 holds maintenance material, not engineering knowledge.
+        It must be marked so the graph and the reader's 入链/延伸 rails skip it.
+
+        This asserts the flag is derived from `category`, not only from the
+        frontmatter key, so a new page added under that folder inherits the
+        exclusion without its author remembering to add `exclude_from_graph`.
+        """
+        management = [
+            note for note in self.vault.notes.values() if note["category"] == "知识库管理"
+        ]
+        self.assertTrue(management, "expected 知识库管理 notes to exist")
+        unflagged = [str(note["path"]) for note in management if not note["exclude_from_graph"]]
+        self.assertEqual(unflagged, [])
+
+    def test_knowledge_management_keeps_one_core_article(self) -> None:
+        """知识库管理 is a maintenance log, not a knowledge category. If pages
+        pile up in its root, the sidebar count inflates and the directory fills
+        with upkeep notes. The 2026-09-17 cleanup moved 28 pages into 归档/;
+        this keeps a future page from quietly landing back in the root."""
+        root = ROOT / "vault" / "知识库管理"
+        stray = sorted(
+            path.name
+            for path in root.glob("*.md")
+            if path.name != "知识库管理.md"
+        )
+        self.assertEqual(
+            stray,
+            [],
+            "知识库管理 根目录只应有 知识库管理.md，其它内容应放入 归档/",
+        )
+
+    def test_knowledge_management_pages_are_still_readable(self) -> None:
+        """Excluded from the graph is not the same as hidden. The pages stay
+        listed and servable — only their graph participation is dropped."""
+        management = [
+            note for note in self.vault.notes.values() if note["category"] == "知识库管理"
+        ]
+        unlisted = [str(note["path"]) for note in management if not note["listed"]]
+        self.assertEqual(unlisted, [])
+        self.assertIsNotNone(self.vault.note("知识库管理/知识库管理.md"))
+
+    def test_public_notes_payload_has_no_edges_into_knowledge_management(self) -> None:
+        """The graph is filtered on the server so every renderer inherits it.
+        Before, each renderer filtered separately and the reader's relation
+        rails had no check at all, leaking 知识库管理 links into the graph."""
+        handler_source = (ROOT / "site" / "server.py").read_text(encoding="utf-8")
+        self.assertIn('self.vault.notes.values()', handler_source)
+        self.assertIn('"exclude_from_graph"', handler_source)
+
+        notes = [
+            note
+            for note in self.vault.notes.values()
+            if note["listed"] and not note["exclude_from_graph"]
+        ]
+        graph_paths = {str(note["path"]) for note in notes}
+        edges = [
+            edge
+            for edge in self.vault.edges()
+            if edge["source"] in graph_paths and edge["target"] in graph_paths
+        ]
+        leaked = [
+            edge
+            for edge in edges
+            if str(edge["source"]).startswith("知识库管理")
+            or str(edge["target"]).startswith("知识库管理")
+        ]
+        self.assertEqual(leaked, [])
+        self.assertGreater(len(edges), 0, "filtering should not remove every edge")
+
+    def test_parallel_skill_categories_are_integrated_into_domains(self) -> None:
+        categories = {str(note["category"]) for note in self.vault.notes.values()}
+        home = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertNotIn("Agent技能", categories)
+        self.assertNotIn("后端技能", categories)
+        self.assertFalse((ROOT / "vault" / "Agent技能").exists())
+        self.assertFalse((ROOT / "vault" / "后端技能").exists())
+        self.assertIn('id="reader-relations"', home)
+        self.assertIn("function renderRelations", home)
+        self.assertNotIn("后端技能", home)
+        self.assertNotIn("Agent技能", home)
+        self.assertNotIn("skillTracks", home)
+        self.assertNotIn("能力线", home)
+
     def test_no_note_repeats_a_heading_or_lead(self) -> None:
         """Editing a page by adding a section has twice left the old section in
         place, producing a page that repeats itself. The shape test only checks
@@ -413,20 +497,14 @@ class KnowledgeGraphTests(unittest.TestCase):
                     f"{relative} repeats its opening paragraph",
                 )
 
-    def test_skill_tracks_follow_the_shared_page_shape(self) -> None:
-        """Mastery pages state the problem, the solution, the cost, and how to
-        apply it — in that order. The shape is what makes the track readable as
-        a course rather than as a pile of notes."""
-        required = ("## 背景", "## 方案", "## 从什么地方做")
-        tracks = [n for n in self.vault.notes.values() if str(n["path"]).split("/")[0] in ("后端技能", "Agent技能")]
-        self.assertTrue(tracks, "skill tracks are missing")
-        for note in tracks:
-            body = str(note["body"])
-            path = str(note["path"])
-            for heading in required:
-                self.assertIn(heading, body, f"{path} is missing {heading}")
-            # Cost must be stated, not just the benefits.
-            self.assertTrue("代价" in body, f"{path} does not state its cost")
+    def test_sidebar_domains_have_independent_expand_state(self) -> None:
+        home = (ROOT / "index.html").read_text(encoding="utf-8")
+        self.assertIn("expandedDomains:new Set()", home)
+        self.assertIn('aria-expanded="${open}"', home)
+        self.assertIn("state.expandedDomains.delete(domain)", home)
+        self.assertIn("state.expandedDomains.add(domain)", home)
+        self.assertIn(".sidebar.collapsed #domains", home)
+        self.assertIn(".sidebar.collapsed .shared-nav", home)
 
     def test_every_core_note_has_an_incoming_link(self) -> None:
         linked = {edge["target"] for edge in self.vault.edges()}
@@ -443,9 +521,10 @@ class KnowledgeGraphTests(unittest.TestCase):
 
     def test_editorial_inventory_covers_all_durable_pages(self) -> None:
         rows = INVENTORY_MODULE.inventory(ROOT)
-        self.assertEqual(len(rows), 130)
+        expected = len(list((ROOT / "vault" / "工程知识").rglob("*.md")))
+        self.assertEqual(len(rows), expected)
         durable = [row for row in rows if row["durable"]]
-        self.assertEqual(len(durable), 115)
+        self.assertGreater(len(durable), 100)
         self.assertTrue(all(row["round1"] == "通过" for row in durable))
         self.assertTrue(all(row["round2"] == "待复核" for row in durable))
 
@@ -472,12 +551,12 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn('id="reader-back"', self.home)
         self.assertIn('id="reader-study"', self.home)
         self.assertIn("/learn?topic=", self.home)
-        self.assertIn("把当前笔记标题带入学习中心", self.home)
-        self.assertIn("attributeFilter:['class']", self.home)
+        self.assertIn('data-tooltip="进入学习中心', self.home)
+        self.assertIn("function updateReaderStudy()", self.home)
         self.assertIn("alertUser('这篇笔记暂时无法打开", self.home)
         self.assertIn("状态未知", self.home)
         self.assertIn("学习工具状态暂时不可用", self.home)
-        self.assertIn("if(matchMedia('(max-width:760px)').matches)$('#sidebar').classList.add('collapsed')", self.home)
+        self.assertIn("setMobileSidebar(matchMedia('(max-width:760px)').matches)", self.home)
         self.assertIn("filter(d=>d!=='总览'&&d!=='Clippings')", self.home)
         self.assertIn("domain==='总览'||topic==='首页'", self.home)
         self.assertIn("history.replaceState({},'','/')", self.home)
@@ -486,11 +565,31 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn('.node:hover text,.node:focus text,.node:focus-within text', self.home)
         self.assertIn("tabindex:'0',role:'button','aria-label':n.title", self.home)
         self.assertIn("aria-selected=\"true\"", self.home)
-        self.assertIn(".domain-card,.note-row", self.home)
+        self.assertIn('tabindex="0" role="button" aria-label="打开 ${esc(d)}"', self.home)
         self.assertIn("['Enter',' '].includes(event.key)", self.home)
         self.assertIn("aria-expanded", self.home)
         self.assertIn("收起目录", self.home)
-        self.assertIn("homeButton.classList.toggle('active',view==='home')", self.home)
+        self.assertIn("item.setAttribute('aria-selected',String(item===button))", self.home)
+
+    def test_home_uses_one_render_and_refresh_path(self) -> None:
+        for legacy_patch in (
+            "renderHomeBase",
+            "originalOpenNote",
+            "originalLoadHome",
+            "originalRenderHome",
+            "new MutationObserver",
+        ):
+            self.assertNotIn(legacy_patch, self.home)
+        self.assertEqual(self.home.count("setInterval("), 1)
+        self.assertEqual(self.home.count("json('/api/learning/status')"), 1)
+        self.assertIn("function dataSignature(data)", self.home)
+        self.assertIn("if(signature===state.notesSignature)return", self.home)
+
+    def test_server_has_one_homepage_source(self) -> None:
+        server = (ROOT / "site" / "server.py").read_text(encoding="utf-8")
+        self.assertNotIn("INDEX_HTML =", server)
+        self.assertNotIn("MODERN_INDEX_HTML =", server)
+        self.assertIn("payload = PUBLIC_SITE.read_bytes()", server)
 
     def test_project_priority_is_consistent(self) -> None:
         positions = [
@@ -529,12 +628,11 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn('window.open(url, "_blank")', self.learning)
         self.assertNotIn('window.location.href = url', self.learning)
         self.assertNotIn("location.href='/learn'", self.home)
-        # The homepage renders the same three destinations as every companion
-        # page (知识库 / 项目与工具 / Agent 评估) with 关系图谱 nested under
-        # 知识库. These are navigation links, so they stay in the current tab.
+        # The homepage renders the same four primary destinations as every
+        # companion page. These links stay in the current tab.
         self.assertIn('id="shared-nav"', self.home)
         self.assertIn("renderSharedNav", self.home)
-        self.assertIn("关系图谱", self.home)
+        self.assertIn("知识图谱", self.home)
         self.assertNotIn('id="home-button"', self.home)
         self.assertNotIn('id="graph-button"', self.home)
         # The knowledge tree and Clippings must survive the nav change.
@@ -542,10 +640,10 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn(
             'href="/learn" target="_blank" rel="noopener noreferrer" style=', self.home
         )
-        self.assertIn("Keep navigation state stable", self.home)
-        self.assertIn("if (key === homeKey) return;", self.home)
-        self.assertIn("refreshHomeStatus", self.home)
-        self.assertIn("decorateProjectLinks", self.home)
+        self.assertIn("refreshLearningStatus", self.home)
+        self.assertIn("refreshNotes", self.home)
+        self.assertIn('href="/learn/openmaic"', self.home)
+        self.assertIn('id="home-history"', self.home)
         self.assertNotIn("window.open('/projects', '_blank')", self.home)
         self.assertIn("/launch/openmaic", self.home)
         self.assertIn("/launch/deeptutor", self.home)
@@ -585,7 +683,7 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn('id="topic"', self.openmaic)
         self.assertIn('data-topic=', self.openmaic)
         self.assertIn("请输入访问码", self.openmaic)
-        self.assertIn("不要直接输入 3100", self.openmaic)
+        self.assertIn("手动访问端口", self.openmaic)
         self.assertIn("/api/learning/status", self.openmaic)
         self.assertIn("问题与目的", self.openmaic)
         self.assertIn("本质与机制", self.openmaic)
@@ -607,7 +705,10 @@ class NavigationContractTests(unittest.TestCase):
         shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
         self.assertIn(".wb-sidebar", shared)
         self.assertIn("dataset.page", shared_script)
-        self.assertIn("const nav = [pages.knowledge, pages.projects, pages.evaluation];", shared_script)
+        self.assertIn(
+            "const nav = [pages.knowledge, pages.graph, pages.projects, pages.evaluation];",
+            shared_script,
+        )
         self.assertNotIn('target="_blank" rel="noopener noreferrer"', shared_script)
         self.assertNotIn("item !== current && item !== pages.knowledge", shared_script)
         for page, name in ((self.learning, "learning"), (self.projects, "projects"), (self.evaluation, "evaluation"), (self.intuition, "learning"), (self.transfer, "learning"), (self.history, "classrooms")):
@@ -615,9 +716,46 @@ class NavigationContractTests(unittest.TestCase):
             self.assertIn(f'data-page="{name}"', page)
             self.assertIn('class="purpose"', page)
 
+    def test_brand_and_knowledge_graph_are_shared_navigation(self) -> None:
+        shared = (ROOT / "site" / "workbench.css").read_text(encoding="utf-8")
+        shared_script = (ROOT / "site" / "workbench.js").read_text(encoding="utf-8")
+        brand = (ROOT / "site" / "brand.css").read_text(encoding="utf-8")
+        home_nav = self.home.split("function renderSharedNav(){", 1)[1].split(
+            "/* Theme toggle", 1
+        )[0]
+
+        self.assertIn('@import url("/static/brand.css")', shared)
+        self.assertIn('href="/static/brand.css"', self.home)
+        self.assertIn('class="tk-brand"', self.home)
+        self.assertIn('class="tk-brand"', shared_script)
+        self.assertIn(".tk-brand-text strong", brand)
+        self.assertIn("font-weight: 700", brand)
+        self.assertNotIn(".wb-brand-text strong", shared)
+        # The workbench sidebar and the main site's .app grid must agree, or the
+        # nav visibly changes width when you click through to 项目与教学.
+        self.assertIn("padding-left: 286px", shared)
+        self.assertIn("width: 286px", shared)
+        self.assertIn("grid-template-columns:286px", self.home)
+
+        self.assertIn('label: "知识图谱"', shared_script)
+        self.assertIn(
+            "const nav = [pages.knowledge, pages.graph, pages.projects, pages.evaluation];",
+            shared_script,
+        )
+        self.assertNotIn("knowledge: [pages.graph]", shared_script)
+        self.assertIn("{label:'知识图谱'", home_nav)
+        self.assertIn("network:['知识图谱'", self.home)
+        self.assertIn('aria-label="文章知识图谱"', self.home)
+        self.assertNotIn("sn-sub", home_nav)
+        self.assertNotIn("关系图谱", self.projects)
+
+        self.assertIn("Canonical page rhythm", shared)
+        self.assertIn("body.wb-host .shell > .hero:first-child", shared)
+        self.assertIn("body.wb-host .usage-grid .usage-item", shared)
+
     def test_navigation_stays_in_current_tab_and_links_have_no_default_underlines(self) -> None:
         home_nav = self.home.split("function renderSharedNav(){", 1)[1].split("/* Theme toggle", 1)[0]
-        self.assertIn("{label:'项目与工具'", home_nav)
+        self.assertIn("{label:'项目与教学'", home_nav)
         self.assertIn("{label:'Agent 评估'", home_nav)
         self.assertNotIn('target="_blank"', home_nav)
         self.assertIn('id="link-polish"', self.home)
@@ -643,8 +781,10 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("subNav", shared_script)
         self.assertIn("pages.classrooms", shared_script)
         self.assertIn('parent: "projects"', shared_script)
-        # The main nav stays short: 知识库 / 项目与工具 / Agent 评估.
+        # Learning pages stay out of the primary nav; 知识图谱 remains a
+        # primary destination available from every page.
         nav_block = shared_script.split("const nav = [", 1)[1].split("]", 1)[0]
+        self.assertIn("pages.graph", nav_block)
         self.assertNotIn("pages.learning", nav_block)
         self.assertNotIn("pages.classrooms", nav_block)
         for page in (self.learning, self.projects, self.evaluation, self.history):

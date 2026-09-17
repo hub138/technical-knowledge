@@ -2,18 +2,47 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>technical-knowledge · 工程知识库</title>
+<title>工程知识库</title>
+<link rel="stylesheet" href="/static/brand.css">
 <style>
-:root{--bg:#f4f6f5;--panel:#fff;--ink:#1f2a27;--muted:#68746f;--line:#dbe2de;--accent:#147766;--accent-soft:#e4f1ed;--surface:#eef3f0;--warm:#a45b2a;--shadow:0 12px 32px rgba(23,45,39,.08)}:root[data-theme="dark"]{--bg:#131a18;--panel:#1a2320;--ink:#e6ede9;--muted:#93a29c;--line:#2b3733;--accent:#5fbfa6;--accent-soft:#1e3630;--warm:#c98a5c;--warm-soft:#3a2c1a;--shadow:0 12px 32px rgba(0,0,0,.4)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}button,input{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:286px minmax(0,1fr);min-height:100vh}.sidebar{background:var(--surface);border-right:1px solid var(--line);padding:21px 15px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 21px;border-bottom:1px solid var(--line)}.mark{width:34px;height:34px;border:1px solid var(--accent);border-radius:9px;display:grid;place-items:center;color:var(--accent);font-weight:800}.brand strong{display:block;font-size:15px}.brand small{display:block;color:var(--muted);font-size:11px}.nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px 0}.nav-actions button,.nav-section button{border:1px solid transparent;background:transparent;color:var(--muted);text-align:left;border-radius:6px;padding:8px 10px}.nav-actions button:hover,.nav-actions button.active,.nav-section button:hover,.nav-section button.active{background:var(--accent-soft);border-color:#c5e0d8;color:var(--accent)}.shared-nav{display:grid;gap:4px;margin-top:16px}.shared-nav a{display:flex;align-items:center;gap:9px;min-height:38px;padding:8px 10px;border:1px solid transparent;border-radius:6px;color:#55635d;font-size:13px;font-weight:650;text-decoration:none}.shared-nav a:hover,.shared-nav a[aria-current="page"]{border-color:#b9d9cf;background:var(--accent-soft);color:var(--accent)}.shared-nav .sn-icon{width:18px;color:currentColor}.shared-nav .sn-sub{display:grid;gap:2px;margin:6px 0 0 10px;padding-left:10px;border-left:2px solid var(--line)}.shared-nav .sn-sub a{min-height:30px;padding:5px 9px;font-size:12.5px;font-weight:600;color:var(--muted)}.shared-nav .sn-sub a:hover{background:var(--accent-soft);color:var(--accent)}.theme-toggle{width:100%;margin-top:14px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--muted);font:600 12px/1 inherit;cursor:pointer}.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}.nav-section{border-top:1px solid var(--line);padding:12px 0}.nav-section h3{font-size:11px;color:var(--muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;justify-content:space-between;width:100%;font-size:13px}.count{font-size:11px;color:var(--muted)}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;padding:20px 30px;background:rgba(244,246,245,.94);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3;backdrop-filter:blur(10px)}.topbar h1{font-size:19px;margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--panel);outline:0}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #1477661a}.search span{position:absolute;left:13px;top:8px;color:var(--muted)}.content{padding:32px;max-width:1500px}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:32px;line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--muted);margin:0}.hero-meta{color:var(--muted);font-size:12px;white-space:nowrap}.section{margin-top:28px}.section h2{font-size:21px;line-height:1.3;margin:0 0 7px}.section>p{color:var(--muted);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.domain-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;min-height:150px;cursor:pointer;transition:.15s}.domain-card:hover{border-color:#8bc2b4;box-shadow:var(--shadow);transform:translateY(-1px)}.domain-card h3{font-size:16px;margin:0 0 8px}.domain-card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 12px}.domain-group{margin:22px 0 10px;font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--muted)}.skill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.domain-card.skill-card{border-left:3px solid var(--accent)}.domain-card b{color:var(--accent);font-size:12px}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.entry h3{font-size:15px;margin:0 0 6px}.entry p{color:var(--muted);font-size:13px;margin:0 0 12px}.entry a{display:inline-block;color:var(--accent);font-size:12px;margin-right:11px}.notice{background:var(--warm-soft);border:1px solid #efd9b3;border-radius:8px;padding:15px 17px;color:var(--warm);font-size:13px}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px}.directory-head h2{font-size:26px;line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--muted);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:5px;padding:5px 9px;font-size:12px}.sort button.active,.sort button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:17px;margin:0 0 8px;display:flex;gap:8px;align-items:center}.topic-title small{font-size:11px;font-weight:400;color:var(--muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--panel);border:1px solid var(--line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--line);border-radius:0 0 7px 7px}.note-row:hover{background:var(--surface)}.note-row h3{font-size:14px;margin:0 0 3px}.note-row .path{font-size:11px;color:var(--accent)}.note-row p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.reader{display:none}.reader.open{display:block}.reader-head{border-bottom:1px solid var(--line);padding-bottom:17px;margin-bottom:19px}.reader-context{color:var(--accent);font-size:12px;margin-bottom:8px}.reader h2{font-size:29px;line-height:1.3;margin:0}.reader-sources{margin:8px 0 0;color:var(--muted);font-size:12px}.reader-sources a{color:var(--accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 204px;column-gap:26px;align-items:start}#reader-body{grid-column:1}#reader-toc{grid-column:2}}.reader-siblings{margin:16px 0 0;display:flex;align-items:center;gap:9px;flex-wrap:wrap}.reader-siblings .rail-head{margin:0;padding:0;border:0;flex:0 0 auto;gap:4px;display:flex;align-items:center}.reader-siblings .rail-list{gap:7px}.reader-siblings .rail-head span{font-size:11px;color:var(--muted)}.reader-siblings .rail-list{display:flex;flex-wrap:wrap;gap:7px}.reader-siblings .rail-list a{padding:5px 11px;border:1px solid var(--line);border-radius:15px;background:var(--panel);white-space:nowrap}.reader-toc{position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto;font-size:12.5px}.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px;padding-bottom:7px;border-bottom:1px solid var(--line);color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.06em}.rail-toggle{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 2px;font-size:13px;line-height:1}.rail-toggle:hover{color:var(--accent)}.rail-list{margin:0;padding:0;list-style:none;display:grid;gap:2px}.rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--muted);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--accent-soft);color:var(--accent)}.rail-list a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--muted);font-size:10.5px;font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:12px;color:var(--muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:12px;color:var(--muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}.reader-body{max-width:960px;font-size:16px;line-height:1.85}.reader-body h1{font-size:28px}.reader-body h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:5px;margin-top:31px}.reader-body h3{font-size:18px;margin-top:25px}.reader-body p{margin:14px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:5px 0}.reader-body blockquote{border-left:3px solid var(--accent);padding:4px 15px;color:var(--muted);background:var(--surface)}.reader-body a{color:var(--accent)}.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--line);border-radius:6px}.reader-body code{background:#edf3f0;color:#0d6656;border:1px solid #d9e9e3;border-radius:4px;padding:1px 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}.reader-body .code-block,.reader-body pre.mermaid{background:#f6f9f8;border:1px solid var(--line);color:#22322c;border-radius:7px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.65}.reader-body .code-block code,.reader-body pre.mermaid code{background:none;border:0;padding:0;color:inherit;font-size:inherit}.reader-body table{border-collapse:collapse;width:100%;margin:17px 0}.reader-body th,.reader-body td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.reader-body th{background:var(--surface)}.reader-body .callout{padding:11px 14px;border-left:3px solid var(--warm);background:var(--warm-soft);color:#6f4c27}.graph{display:none}.graph.open{display:block}.graph-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}.graph-head h2{font-size:26px;margin:0 0 3px}.graph-head p{color:var(--muted);margin:0}.visual-tabs{display:flex;flex-wrap:wrap;gap:6px}.visual-tabs button{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:5px;padding:6px 10px;font-size:12px}.visual-tabs button.active,.visual-tabs button:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}.graph-panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px}.graph-panel svg{display:block;width:100%;height:min(70vh,700px);background:var(--surface);border-radius:6px}.graph-legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;padding:10px 3px 0}.graph-legend span{display:inline-flex;gap:6px;align-items:center}.graph-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.edge{stroke:#cdd8d3;stroke-width:1.1}.edge.focused{stroke:var(--warm);stroke-width:2.6}.topic-link{stroke:#dce6e1;stroke-width:1}.domain-label{font-size:14px;fill:#53655f;font-weight:700}.node circle{stroke:#fff;stroke-width:1.5;cursor:pointer}.node text,.topic-node text{font-size:10px;fill:#53655f;pointer-events:none}.topic-node circle{fill:#fff;stroke-width:2;cursor:pointer}.diagram-edge{stroke:#9db8ad;stroke-width:2;marker-end:url(#graph-arrow)}.diagram-edge.dashed{stroke-dasharray:6 5}.diagram-box{fill:#fff;stroke:#8bb6a9;stroke-width:1.5}.diagram-box.primary{fill:#e5f2ee;stroke:#147766}.diagram-box.secondary{fill:#fff2e7;stroke:#bd7950}.diagram-label{font-size:15px;text-anchor:middle;dominant-baseline:middle;fill:#23332e;font-weight:700}.diagram-small{font-size:11px;text-anchor:middle;fill:#63736d}.diagram-group{cursor:pointer}.graph-note{font-size:12px;fill:#68746f}.axis-line{stroke:#9db8ad;stroke-width:1.5}.axis-label{font-size:13px;fill:#68746f}.quadrant-fill{fill:#f1f7f4}.quadrant-fill.alt{fill:#fbf5ef}.quadrant-title{font-size:14px;fill:#56665f;font-weight:700}.point{stroke:#fff;stroke-width:2}.point-label{font-size:13px;fill:#3f504a}.empty{background:var(--panel);border:1px dashed var(--line);padding:30px;text-align:center;color:var(--muted);border-radius:7px}.mobile-menu{display:none}@media(max-width:1100px){.domain-grid{grid-template-columns:repeat(3,1fr)}.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.app{display:block}.sidebar{position:fixed;z-index:8;width:100%;height:auto;padding:10px 13px}.sidebar.collapsed .nav-actions,.sidebar.collapsed .nav-section{display:none}.brand{padding:0;border:0}.mobile-menu{display:block;margin-left:auto;border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 9px;color:var(--accent)}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.content{padding:21px 15px}.hero{display:block}.hero h2{font-size:26px}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:23px}}
-</style>
-<style>
+:root{--bg:#f4f6f5;--panel:#fff;--ink:#1f2a27;--muted:#68746f;--line:#dbe2de;--accent:#147766;--accent-soft:#e4f1ed;--surface:#eef3f0;--warm:#a45b2a;--shadow:0 12px 32px rgba(23,45,39,.08)}:root[data-theme="dark"]{--bg:#131a18;--panel:#1a2320;--ink:#e6ede9;--muted:#93a29c;--line:#2b3733;--accent:#5fbfa6;--accent-soft:#1e3630;--warm:#c98a5c;--warm-soft:#3a2c1a;--shadow:0 12px 32px rgba(0,0,0,.4)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}button,input{font:inherit}button{cursor:pointer}.app{display:grid;grid-template-columns:286px minmax(0,1fr);min-height:100vh}.sidebar{background:var(--surface);border-right:1px solid var(--line);padding:21px 15px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 21px;border-bottom:1px solid var(--line)}.mark{width:34px;height:34px;border:1px solid var(--accent);border-radius:9px;display:grid;place-items:center;color:var(--accent);font-weight:800}.brand strong{display:block;font-size:15px}.brand small{display:block;color:var(--muted);font-size:11px}.nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px 0}.nav-actions button,.nav-section button{border:1px solid transparent;background:transparent;color:var(--muted);text-align:left;border-radius:6px;padding:8px 10px}.nav-actions button:hover,.nav-actions button.active,.nav-section button:hover,.nav-section button.active{background:var(--accent-soft);border-color:#c5e0d8;color:var(--accent)}.shared-nav{display:grid;gap:4px;margin-top:16px}.shared-nav a{display:flex;align-items:center;gap:9px;min-height:38px;padding:8px 10px;border:1px solid transparent;border-radius:6px;color:#55635d;font-size:13px;font-weight:650;text-decoration:none}.shared-nav a:hover,.shared-nav a[aria-current="page"]{border-color:#b9d9cf;background:var(--accent-soft);color:var(--accent)}.shared-nav .sn-icon{width:18px;color:currentColor}.shared-nav .sn-sub{display:grid;gap:2px;margin:6px 0 0 10px;padding-left:10px;border-left:2px solid var(--line)}.shared-nav .sn-sub a{min-height:30px;padding:5px 9px;font-size:12.5px;font-weight:600;color:var(--muted)}.shared-nav .sn-sub a:hover{background:var(--accent-soft);color:var(--accent)}.theme-toggle{width:100%;margin-top:14px;padding:8px 10px;border:1px solid var(--line);border-radius:6px;background:transparent;color:var(--muted);font:600 12px/1 inherit;cursor:pointer}.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}.nav-section{border-top:1px solid var(--line);padding:12px 0}.nav-section h3{font-size:11px;color:var(--muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;justify-content:space-between;width:100%;font-size:13px}.count{font-size:11px;color:var(--muted)}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:20px 30px;background:rgba(244,246,245,.94);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3;backdrop-filter:blur(10px)}.topbar h1{font-size:19px;margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--panel);outline:0}.search input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #1477661a}.search span{position:absolute;left:13px;top:8px;color:var(--muted)}.content{padding:32px;max-width:1500px}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:32px;line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--muted);margin:0}.hero-meta{color:var(--muted);font-size:12px;white-space:nowrap}.section{margin-top:28px}.section h2{font-size:21px;line-height:1.3;margin:0 0 7px}.section>p{color:var(--muted);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}.domain-card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px;min-height:150px;cursor:pointer;transition:.15s}.domain-card:hover{border-color:#8bc2b4;box-shadow:var(--shadow);transform:translateY(-1px)}.domain-card h3{font-size:16px;margin:0 0 8px}.domain-card p{color:var(--muted);font-size:13px;line-height:1.6;margin:0 0 12px}.domain-card b{color:var(--accent);font-size:12px}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}.entry h3{font-size:15px;margin:0 0 6px}.entry p{color:var(--muted);font-size:13px;margin:0 0 12px}.entry a{display:inline-block;color:var(--accent);font-size:12px;margin-right:11px}.notice{background:var(--warm-soft);border:1px solid #efd9b3;border-radius:8px;padding:15px 17px;color:var(--warm);font-size:13px}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:20px}.directory-head h2{font-size:26px;line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--muted);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:5px;padding:5px 9px;font-size:12px}.sort button.active,.sort button:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:17px;margin:0 0 8px;display:flex;gap:8px;align-items:center}.topic-title small{font-size:11px;font-weight:400;color:var(--muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--panel);border:1px solid var(--line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--line);border-radius:0 0 7px 7px}.note-row:hover{background:var(--surface)}.note-row h3{font-size:14px;margin:0 0 3px}.note-row .path{font-size:11px;color:var(--accent)}.note-row p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}.reader{display:none}.reader.open{display:block}.reader-head{border-bottom:1px solid var(--line);padding-bottom:17px;margin-bottom:19px}.reader-context{color:var(--accent);font-size:12px;margin-bottom:8px}.reader h2{font-size:29px;line-height:1.3;margin:0}.reader-sources{margin:8px 0 0;color:var(--muted);font-size:12px}.reader-sources a{color:var(--accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 204px;column-gap:26px;align-items:start}#reader-body{grid-column:1}#reader-toc{grid-column:2}}.reader-siblings{margin:16px 0 0;display:flex;align-items:center;gap:9px;flex-wrap:wrap}.reader-siblings .rail-head{margin:0;padding:0;border:0;flex:0 0 auto;gap:4px;display:flex;align-items:center}.reader-siblings .rail-list{gap:7px}.reader-siblings .rail-head span{font-size:11px;color:var(--muted)}.reader-siblings .rail-list{display:flex;flex-wrap:wrap;gap:7px}.reader-siblings .rail-list a{padding:5px 11px;border:1px solid var(--line);border-radius:15px;background:var(--panel);white-space:nowrap}.reader-toc{position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto;font-size:12.5px}.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 9px;padding-bottom:7px;border-bottom:1px solid var(--line);color:var(--muted);font-size:11px;font-weight:700;letter-spacing:.06em}.rail-toggle{border:0;background:none;color:var(--muted);cursor:pointer;padding:0 2px;font-size:13px;line-height:1}.rail-toggle:hover{color:var(--accent)}.rail-list{margin:0;padding:0;list-style:none;display:grid;gap:2px}.rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--muted);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--accent-soft);color:var(--accent)}.rail-list a[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--muted);font-size:10.5px;font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:12px;color:var(--muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:12px;color:var(--muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}.reader-body{max-width:960px;font-size:16px;line-height:1.85}.reader-body h1{font-size:28px}.reader-body h2{font-size:22px;border-bottom:1px solid var(--line);padding-bottom:5px;margin-top:31px}.reader-body h3{font-size:18px;margin-top:25px}.reader-body p{margin:14px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:5px 0}.reader-body blockquote{border-left:3px solid var(--accent);padding:4px 15px;color:var(--muted);background:var(--surface)}.reader-body a{color:var(--accent)}.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--line);border-radius:6px}.reader-body code{background:#edf3f0;color:#0d6656;border:1px solid #d9e9e3;border-radius:4px;padding:1px 4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.88em}.reader-body .code-block,.reader-body pre.mermaid{background:#f6f9f8;border:1px solid var(--line);color:#22322c;border-radius:7px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.65}.reader-body .code-block code,.reader-body pre.mermaid code{background:none;border:0;padding:0;color:inherit;font-size:inherit}.reader-body table{border-collapse:collapse;width:100%;margin:17px 0}.reader-body th,.reader-body td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}.reader-body th{background:var(--surface)}.reader-body .callout{padding:11px 14px;border-left:3px solid var(--warm);background:var(--warm-soft);color:#6f4c27}.graph{display:none}.graph.open{display:block}.graph-head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}.graph-head h2{font-size:26px;margin:0 0 3px}.graph-head p{color:var(--muted);margin:0}.visual-tabs{display:flex;flex-wrap:wrap;gap:6px}.visual-tabs button{border:1px solid var(--line);background:var(--panel);color:var(--muted);border-radius:5px;padding:6px 10px;font-size:12px}.visual-tabs button.active,.visual-tabs button:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}.graph-panel{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px}.graph-panel svg{display:block;width:100%;height:min(70vh,700px);background:var(--surface);border-radius:6px}
+/* 图谱工具栏：缩放/平移原本只能用滚轮和拖拽，没有任何可见入口，
+   第一次来的人不知道能操作。补上按钮 + 提示。 */
+.graph-tools{display:flex;align-items:center;gap:7px;padding:0 2px 9px}
+.graph-tool{min-width:32px;height:32px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--muted);font:600 15px/1 inherit;cursor:pointer;transition:border-color .14s ease,color .14s ease,background .14s ease}
+.graph-tool:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.graph-tool--wide{font-size:12px}
+.graph-zoom-value{min-width:46px;text-align:center;color:var(--muted);font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.graph-hint{margin-left:auto;color:var(--muted);font-size:11.5px}
+@media(max-width:760px){.graph-hint{display:none}}.graph-legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:12px;padding:10px 3px 0}.graph-legend span{display:inline-flex;gap:6px;align-items:center}.graph-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.edge{stroke:#cdd8d3;stroke-width:1.1}.edge.focused{stroke:var(--warm);stroke-width:2.6}.topic-link{stroke:#dce6e1;stroke-width:1}.domain-label{font-size:14px;fill:#53655f;font-weight:700}.node circle{stroke:#fff;stroke-width:1.5;cursor:pointer}.node text,.topic-node text{font-size:10px;fill:#53655f;pointer-events:none}.topic-node circle{fill:#fff;stroke-width:2;cursor:pointer}.diagram-edge{stroke:#9db8ad;stroke-width:2;marker-end:url(#graph-arrow)}.diagram-edge.dashed{stroke-dasharray:6 5}.diagram-box{fill:#fff;stroke:#8bb6a9;stroke-width:1.5}.diagram-box.primary{fill:#e5f2ee;stroke:#147766}.diagram-box.secondary{fill:#fff2e7;stroke:#bd7950}.diagram-label{font-size:15px;text-anchor:middle;dominant-baseline:middle;fill:#23332e;font-weight:700}.diagram-small{font-size:11px;text-anchor:middle;fill:#63736d}.diagram-group{cursor:pointer}.graph-note{font-size:12px;fill:#68746f}.axis-line{stroke:#9db8ad;stroke-width:1.5}.axis-label{font-size:13px;fill:#68746f}.quadrant-fill{fill:#f1f7f4}.quadrant-fill.alt{fill:#fbf5ef}.quadrant-title{font-size:14px;fill:#56665f;font-weight:700}.point{stroke:#fff;stroke-width:2}.point-label{font-size:13px;fill:#3f504a}.empty{background:var(--panel);border:1px dashed var(--line);padding:30px;text-align:center;color:var(--muted);border-radius:7px}
+/* 搜索命中高亮：说明这篇为什么被搜出来 */
+.note-row mark.hit{background:#fdf0c8;color:inherit;border-radius:3px;padding:0 2px;font-weight:700}
+:root[data-theme="dark"] .note-row mark.hit{background:#4a3f1c;color:#f0e2b0}
+/* 空结果：给下一步动作，而不是一句死胡同 */
+.empty-title{font-size:15px;font-weight:700;color:var(--ink);margin:0 0 7px}
+.empty-hint{margin:0;font-size:13px;line-height:1.7}
+.empty-hint kbd{margin:0 2px}
+.empty-action{margin-top:13px;padding:7px 12px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--accent);font:650 12px inherit;cursor:pointer}
+.empty-action:hover{border-color:var(--accent);background:var(--accent-soft)}
+/* 目录条目键盘焦点：j/k 移动时要说清"现在在哪一条" */
+.note-row:focus-visible{outline:2px solid var(--accent);outline-offset:-2px;background:var(--accent-soft)}
+/* 首屏骨架：读取知识库需要一点时间，先给出结构避免空白页 */
+.skeleton-note{margin:0 0 14px;color:var(--muted);font-size:13px}
+.skeleton-group{margin-bottom:18px}
+.skeleton-row{display:grid;grid-template-columns:minmax(200px,1.1fr) minmax(0,2fr);gap:18px;padding:13px 15px;background:var(--panel);border:1px solid var(--line);border-bottom:0}
+.skeleton-group .skeleton-row:first-child{border-radius:7px 7px 0 0}
+.skeleton-group .skeleton-row:last-child{border-bottom:1px solid var(--line);border-radius:0 0 7px 7px}
+.skeleton-bar{display:block;height:12px;border-radius:4px;background:linear-gradient(90deg,var(--surface) 25%,#e7edea 50%,var(--surface) 75%);background-size:200% 100%;animation:skeleton-shimmer 1.5s ease-in-out infinite}
+.skeleton-bar.w40{width:40%}
+.skeleton-bar.w85{width:85%}
+@keyframes skeleton-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.skeleton-bar{animation:none}}
+@media(max-width:760px){.skeleton-row{display:block}.skeleton-bar.w40{margin-bottom:8px}}.mobile-menu{display:none}@media(max-width:1100px){.domain-grid{grid-template-columns:repeat(3,1fr)}.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.app{display:block}.sidebar{position:fixed;z-index:8;width:100%;height:auto;max-height:100vh;overflow:auto;padding:10px 13px}.sidebar.collapsed .nav-actions,.sidebar.collapsed .shared-nav,.sidebar.collapsed #domains,.sidebar.collapsed .theme-toggle{display:none}.brand{padding:0;border:0}.mobile-menu{display:block;margin-left:auto;border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:6px 9px;color:var(--accent)}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.content{padding:21px 15px}.hero{display:block}.hero h2{font-size:26px}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:23px}}
 :root{--bg:#f5f7f6;--panel:#fff;--ink:#18231f;--muted:#65716c;--line:#dce3df;--accent:#087663;--accent-soft:#e8f3ef;--warm:#a85f2d;--blue:#3f70a8;--purple:#75599a;--shadow:0 10px 28px rgba(20,42,35,.07)}
 body{background:var(--bg);font-size:15px;line-height:1.7}
 .app{grid-template-columns:260px minmax(0,1fr)}
-.sidebar{background:var(--panel);padding:24px 16px}
-.brand{padding:0 7px 22px;gap:12px}
-.mark{width:36px;height:36px;border-radius:7px;background:var(--accent);color:#fff;border:0}
-.brand strong{font-size:14px}.brand small{font-size:11px;color:var(--muted)}
+.sidebar{background:var(--panel);padding:25px 16px 24px}
+.brand-row{display:flex;align-items:flex-start}.brand-row .tk-brand{flex:1}
 .nav-actions{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:14px 0 16px}
 .nav-actions button{padding:8px 4px;text-align:center;font-size:12px;border:1px solid var(--line);background:var(--panel);color:#596760}
 .nav-actions button:hover,.nav-actions button.active{background:var(--accent-soft);border-color:#b9d9cf;color:var(--accent)}
@@ -21,6 +50,23 @@ body{background:var(--bg);font-size:15px;line-height:1.7}
 .nav-section button{align-items:center;border:1px solid transparent;padding:9px 10px;border-radius:6px;color:var(--muted)}
 .nav-section button:hover,.nav-section button.active{background:var(--surface);border-color:#dbe7e2;color:#075f51}
 .nav-section .topic-button{margin-left:13px;width:calc(100% - 13px);padding:7px 10px;font-size:12px;color:#718079}
+/* 时效性文章（type: radar）置顶在领域标题下方、主题列表之上。
+   橙色边框 + 阴影 + ⚡，让"这份动态有没有更新"在侧边栏就能一眼看到。 */
+.radar-card{display:flex;align-items:center;gap:8px;width:calc(100% - 13px);margin:4px 0 6px 13px;padding:8px 10px;border:1.5px solid var(--warm);border-radius:6px;background:var(--warm-soft);box-shadow:0 3px 10px rgba(164,91,42,.15);cursor:pointer;text-align:left;color:var(--warm);transition:box-shadow .14s ease,transform .14s ease}
+.radar-card:hover{box-shadow:0 5px 14px rgba(164,91,42,.24);transform:translateY(-1px)}
+.radar-card[aria-current="page"]{background:var(--warm);color:#fff}
+.radar-card .radar-icon{flex:none;font-size:13px;line-height:1}
+.radar-card .radar-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.radar-card .radar-text strong{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.radar-card .radar-text small{font-size:10.5px;font-weight:600;opacity:.85}
+.radar-card[aria-current="page"] .radar-text small{opacity:.92}
+:root[data-theme="dark"] .radar-card{box-shadow:0 3px 10px rgba(0,0,0,.4)}
+:root[data-theme="dark"] .radar-card:hover{box-shadow:0 5px 14px rgba(0,0,0,.5)}
+/* 归档：维护资料，不是知识主题。视觉上比正常主题轻一档。 */
+.nav-section .topic-button.archived{color:#8b968f;font-style:italic}
+.nav-section .topic-button.archived::before{content:"";display:inline-block;width:5px;height:5px;margin-right:6px;border-radius:50%;background:currentColor;opacity:.5;vertical-align:middle}
+.nav-section .topic-button.archived .count{opacity:.7}
+.domain-button .domain-label{display:flex;align-items:center;gap:7px;min-width:0}.domain-chevron{width:12px;color:var(--muted);font-size:10px;text-align:center}.domain-button[aria-expanded="true"] .domain-chevron{color:var(--accent)}
 .count{font-variant-numeric:tabular-nums;color:var(--muted)}
 .topbar{padding:18px 38px;background:rgba(245,247,246,.92);gap:22px}
 .topbar h1{font-size:17px;color:var(--ink)}
@@ -52,8 +98,18 @@ body{background:var(--bg);font-size:15px;line-height:1.7}
 .status{flex:none;padding:3px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:750}.status.login{background:#edf3fa;color:var(--blue)}.status.design{background:var(--warm-soft);color:var(--warm)}.status.local{background:#f0edf6;color:var(--purple)}
 .io-grid{display:grid;gap:7px;margin:14px 0}.io-row{display:grid;grid-template-columns:46px minmax(0,1fr);gap:9px;padding-top:7px;border-top:1px solid #edf1ef;font-size:12px}.io-row b{color:var(--ink)}.io-row span{color:var(--muted)}
 .work-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:15px}.work-actions a{display:inline-block;padding:6px 9px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--accent);font-size:12px;font-weight:700}.work-actions a:first-child{background:var(--accent-soft);border-color:#b7d9cf}.work-actions a:hover{border-color:var(--accent)}
+/* 工具卡片的事实徽标：星数、开源许可、部署状态、凭据要求。
+   这些是"能不能直接开始用"的判断依据，所以要一眼可见、可核对。 */
+.tool-facts{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.tool-facts span{display:inline-flex;align-items:center;gap:4px;padding:3px 7px;border:1px solid var(--line);border-radius:4px;background:var(--surface);color:var(--muted);font-size:11px;font-weight:650;font-variant-numeric:tabular-nums}
+.tool-facts .fact-stars{border-color:#e2d3a8;background:#fdf8e8;color:#8a6d1f}
+.tool-facts .fact-open{border-color:#b7d9cf;background:var(--accent-soft);color:var(--accent)}
+.tool-facts .fact-live{border-color:#b7d9cf;background:var(--accent-soft);color:var(--accent)}
+.tool-facts .fact-key{border-color:#efd9b3;background:var(--warm-soft);color:var(--warm)}
+.tool-facts .fact-none{border-color:#dbe7e2;background:var(--panel);color:var(--muted)}
+:root[data-theme="dark"] .tool-facts .fact-stars{border-color:#4a3f1c;background:#2a2413;color:#d9c069}
 .secondary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.secondary-card{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:18px;min-height:210px}.secondary-card h3{font-size:17px;margin:0 0 4px}.secondary-card>p{font-size:13px;color:var(--muted);margin:0 0 12px}.secondary-card .io-grid{margin:8px 0}
-.aux-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:12px}.aux-card{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:17px 18px}.aux-card h3{font-size:15px;margin:0 0 5px}.aux-card p{font-size:13px;color:var(--muted);margin:0 0 10px}.aux-card a{font-size:12px;font-weight:700;color:var(--accent);margin-right:12px}
+.aux-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.aux-card{background:var(--panel);border:1px solid var(--line);border-radius:7px;padding:17px 18px}.aux-card h3{font-size:15px;margin:0 0 5px}.aux-card p{font-size:13px;color:var(--muted);margin:0 0 10px}.aux-card a{font-size:12px;font-weight:700;color:var(--accent);margin-right:12px}
 .sidebar-support{margin-top:17px;padding-top:14px;border-top:1px solid var(--line)}.sidebar-support p{margin:0 9px 5px;color:var(--muted);font-size:10px;font-weight:750;text-transform:uppercase}.sidebar-support button{display:flex;width:100%;justify-content:space-between;border:1px solid transparent;background:transparent;padding:8px 10px;border-radius:6px;color:var(--muted);font-size:12px}.sidebar-support button:hover,.sidebar-support button.active{background:#f5f7f6;border-color:var(--line);color:#53615b}
 .directory-head{padding-bottom:20px;margin-bottom:27px}.directory-head h2{font-size:30px}.directory-head p{font-size:13px}
 .sort button{padding:6px 10px;border-radius:5px}
@@ -65,20 +121,35 @@ body{background:var(--bg);font-size:15px;line-height:1.7}
 .graph-head{padding-bottom:17px;border-bottom:1px solid var(--line)}.graph-head h2{font-size:30px}.graph-panel{padding:13px;border-radius:7px;box-shadow:0 1px 3px rgba(20,42,35,.03)}
 .visual-tabs button{padding:7px 11px}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-@media(max-width:1120px){.domain-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content{padding-left:28px;padding-right:28px}}
-@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}.sidebar.collapsed .sidebar-support{display:none}.brand{padding:0;border:0}.mark{width:32px;height:32px}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:rgba(245,247,246,.97)}.content{padding:26px 15px 48px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:28px}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.domain-card{min-height:148px}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:27px}.reader-body{font-size:15px}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}}
-</style>
-<style>
+@media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}.content{padding-left:28px;padding-right:28px}}
+@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}.sidebar.collapsed .sidebar-support{display:none}.brand-row{align-items:center}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:rgba(245,247,246,.97)}.content{padding:26px 15px 48px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:28px}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.domain-card{min-height:148px}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:27px}.reader-body{font-size:15px}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}}
 /* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
 .app-alert{position:fixed;right:22px;bottom:22px;z-index:20;max-width:min(420px,calc(100vw - 30px));padding:11px 14px;border:1px solid #e8c6a8;border-left:3px solid var(--warm);border-radius:7px;background:#fff9f2;color:#704823;box-shadow:0 12px 30px rgba(35,45,40,.14);font-size:13px;display:none}
 .app-alert.open{display:block}
+/* 键盘快捷键help面板：按 ? 打开。用一个覆盖层说明全部快捷键，
+   避免把提示散在界面上干扰阅读。 */
+.kbd-hint{position:fixed;right:22px;bottom:22px;z-index:19;display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--line);border-radius:20px;background:var(--panel);color:var(--muted);font-size:11px;font-weight:650;cursor:pointer;box-shadow:0 2px 8px rgba(20,42,35,.06)}
+.kbd-hint:hover{border-color:var(--accent);color:var(--accent)}
+.kbd-hint kbd{margin:0}
+.kbd-overlay{position:fixed;inset:0;z-index:30;display:none;place-items:center;background:rgba(19,28,25,.42);backdrop-filter:blur(2px);padding:20px}
+.kbd-overlay.open{display:grid}
+.kbd-panel{width:min(560px,100%);max-height:82vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px 24px;box-shadow:0 24px 60px rgba(20,42,35,.28)}
+.kbd-panel h2{margin:0 0 4px;font-size:19px}
+.kbd-panel>p{margin:0 0 18px;color:var(--muted);font-size:12.5px}
+.kbd-grid{display:grid;gap:9px;margin:0 0 16px}
+.kbd-row{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;align-items:baseline;padding-top:9px;border-top:1px solid var(--line);font-size:13px}
+.kbd-row:first-of-type{border-top:0;padding-top:0}
+.kbd-row span{color:var(--muted)}
+.kbd-close{display:block;width:100%;margin-top:6px;padding:9px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);font:650 13px inherit;cursor:pointer}
+.kbd-close:hover{border-color:var(--accent);color:var(--accent)}
+kbd{display:inline-block;min-width:20px;padding:2px 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;background:var(--surface);color:var(--ink);font:600 11px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center}
 .reader-tools{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:10px}
 .reader-back{border:1px solid var(--line);background:var(--panel);border-radius:5px;color:var(--muted);padding:6px 10px;font-size:12px}
 .reader-back:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-.reader-study{position:relative;border:1px solid #b7d9cf;background:var(--accent-soft);border-radius:5px;color:var(--accent);padding:6px 10px;font-size:12px;font-weight:700;text-decoration:none!important}
+.topbar{overflow:visible}.topbar .reader-tools[hidden]{display:none!important}.reader-study{position:relative;isolation:isolate;border:1px solid #b7d9cf;background:var(--accent-soft);border-radius:5px;color:var(--accent);padding:6px 10px;font-size:12px;font-weight:700;text-decoration:none!important}
 .reader-study:hover,.reader-study:focus-visible{border-color:var(--accent);background:#d9eee8;text-decoration:none!important}
-.reader-study::after{content:attr(title);position:absolute;z-index:5;right:0;top:calc(100% + 8px);width:min(300px,calc(100vw - 42px));padding:9px 11px;border:1px solid var(--line);border-radius:6px;background:#18231f;color:#fff;font-size:11px;font-weight:500;line-height:1.6;opacity:0;pointer-events:none;transform:translateY(-3px);transition:opacity .15s ease,transform .15s ease}
-.reader-study:hover::after,.reader-study:focus-visible::after{opacity:1;transform:translateY(0)}
+.reader-study::after{content:attr(data-tooltip);position:absolute;z-index:30;right:0;top:calc(100% + 8px);display:block;box-sizing:border-box;width:min(300px,calc(100vw - 42px));padding:9px 11px;border:1px solid #30473f;border-radius:6px;background-color:#18231f!important;color:#fff!important;box-shadow:0 10px 24px rgba(10,27,20,.25);font-size:11px;font-weight:500;line-height:1.6;white-space:normal;overflow-wrap:anywhere;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-3px);transition:opacity .15s ease,transform .15s ease,visibility .15s ease}
+.reader-study:hover::after,.reader-study:focus-visible::after{opacity:1;visibility:visible;transform:translateY(0)}
 .graph-panel{overflow:hidden}
 #graph{touch-action:none}
 .node text{display:none}
@@ -87,18 +158,13 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .home:empty::before{content:'正在加载知识库...';display:block;padding:48px 0;color:var(--muted);font-size:14px}
 .domain-card:focus-visible,.note-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 @media(max-width:760px){.app-alert{right:15px;bottom:15px}.reader-tools{justify-content:flex-start;flex-wrap:wrap}.reader-back,.reader-study{flex:1 1 150px;text-align:center}}
-</style>
-<style>
-@media(max-width:760px){.mobile-menu{display:block!important;flex:0 0 auto;min-width:52px;margin-left:auto;visibility:visible}.brand{width:100%;min-width:0}.brand>div:nth-child(2){min-width:0}.brand strong,.brand small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}}
-</style>
-<style>
+@media(max-width:760px){.mobile-menu{display:block!important;flex:0 0 auto;min-width:52px;margin-left:auto;visibility:visible}.brand-row{width:100%;min-width:0}}
 :root[data-theme="dark"]{--bg:#131a18;--panel:#1a2320;--ink:#e6ede9;--muted:#adbdb7;--line:#2b3733;--accent:#5fbfa6;--accent-soft:#1e3630;--surface:#22302b;--warm:#c98a5c;--shadow:0 12px 32px rgba(0,0,0,.4)}
 :root[data-theme="dark"] .sidebar,:root[data-theme="dark"] .domain-card,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .note-card,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .empty,:root[data-theme="dark"] .notice,:root[data-theme="dark"] .reader-sources,:root[data-theme="dark"] .search input,:root[data-theme="dark"] .visual-tabs button,:root[data-theme="dark"] .sort button,:root[data-theme="dark"] .tab,:root[data-theme="dark"] .mobile-menu,:root[data-theme="dark"] .reader-back,:root[data-theme="dark"] .reader-study,:root[data-theme="dark"] .tooltip,:root[data-theme="dark"] .graph-panel,:root[data-theme="dark"] .rail-list a{background-color:var(--panel)!important}
 :root[data-theme="dark"] .topbar{background:rgba(19,26,24,.94)!important}
 :root[data-theme="dark"] .reader-body th,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .count,:root[data-theme="dark"] .reader-body .code-block,:root[data-theme="dark"] .reader-body pre.mermaid,:root[data-theme="dark"] .graph-panel svg{background-color:var(--surface)!important}
-:root[data-theme="dark"] .brand small,:root[data-theme="dark"] .nav-section h3,:root[data-theme="dark"] .side-title,:root[data-theme="dark"] .shared-nav a,:root[data-theme="dark"] .side-item,:root[data-theme="dark"] .search span,:root[data-theme="dark"] .meta,:root[data-theme="dark"] .topbar h1,:root[data-theme="dark"] .count,:root[data-theme="dark"] .nav-actions button{color:var(--muted)!important}
+:root[data-theme="dark"] .nav-section h3,:root[data-theme="dark"] .side-title,:root[data-theme="dark"] .shared-nav a,:root[data-theme="dark"] .side-item,:root[data-theme="dark"] .search span,:root[data-theme="dark"] .meta,:root[data-theme="dark"] .topbar h1,:root[data-theme="dark"] .count,:root[data-theme="dark"] .nav-actions button{color:var(--muted)!important}
 :root[data-theme="dark"] .notice{color:#e8cba4!important;border-color:#5c4a2e!important}
-:root[data-theme="dark"] .mark{color:var(--ink)!important;background:var(--accent-soft)!important;border-color:var(--accent)!important}
 :root[data-theme="dark"] .domain-label,:root[data-theme="dark"] .node text,:root[data-theme="dark"] .topic-node text,:root[data-theme="dark"] .diagram-label,:root[data-theme="dark"] .diagram-small,:root[data-theme="dark"] .graph-note,:root[data-theme="dark"] .axis-label,:root[data-theme="dark"] .quadrant-title,:root[data-theme="dark"] .point-label{fill:var(--ink)!important}
 :root[data-theme="dark"] .node circle,:root[data-theme="dark"] .topic-node circle,:root[data-theme="dark"] .point{stroke:var(--panel)!important}
 :root[data-theme="dark"] .diagram-box{fill:var(--panel)!important;stroke:var(--accent)!important}
@@ -108,6 +174,20 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 :root[data-theme="dark"] .edge{stroke:#42504a!important}
 :root[data-theme="dark"] .topic-link{stroke:#38453f!important}
 :root[data-theme="dark"] .diagram-edge{stroke:#6f8a80!important}
+.topbar .theme-toggle{width:auto;min-width:36px;height:36px;margin:0;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--muted);font-size:16px;cursor:pointer;flex-shrink:0}.topbar .theme-toggle:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.radar-badge{position:relative;border:2px solid var(--warm);background:linear-gradient(135deg,var(--warm-soft) 0%,rgba(250,243,232,.3) 100%);border-radius:7px;padding:9px 11px;margin:8px 8px 4px;cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(168,95,45,.15)}
+.radar-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(168,95,45,.25);border-color:#b8752f}
+.radar-badge-icon{position:absolute;top:-6px;right:8px;font-size:18px}
+.radar-badge-title{font-size:12px;font-weight:700;color:var(--warm);margin:0 0 3px;letter-spacing:.02em}
+.radar-badge-desc{font-size:11px;color:#8a6b4d;line-height:1.4;margin:0}
+.radar-badge-updated{font-size:10px;color:var(--muted);margin-top:4px}
+:root[data-theme="dark"] .radar-badge{border-color:#d19961;background:linear-gradient(135deg,rgba(201,138,92,.2) 0%,rgba(58,44,26,.4) 100%)}
+:root[data-theme="dark"] .radar-badge:hover{border-color:#e0a871}
+:root[data-theme="dark"] .radar-badge-title{color:#e0a871}
+:root[data-theme="dark"] .radar-badge-desc{color:#b8997a}
+
+.topbar .theme-toggle{position:absolute;right:30px;top:20px;z-index:10}
+@media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}
 </style>
 <style id="link-polish">
 /* App navigation and action links stay quiet; article links retain a clear
@@ -116,51 +196,137 @@ a { text-decoration: none; }
 a:hover { text-decoration: none; }
 .reader-body a:hover,
 .reader-sources a:hover { text-decoration: underline; }
+.topbar .theme-toggle{width:auto;min-width:36px;height:36px;margin:0;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--muted);font-size:16px;cursor:pointer;flex-shrink:0}.topbar .theme-toggle:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.radar-badge{position:relative;border:2px solid var(--warm);background:linear-gradient(135deg,var(--warm-soft) 0%,rgba(250,243,232,.3) 100%);border-radius:7px;padding:9px 11px;margin:8px 8px 4px;cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(168,95,45,.15)}
+.radar-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(168,95,45,.25);border-color:#b8752f}
+.radar-badge-icon{position:absolute;top:-6px;right:8px;font-size:18px}
+.radar-badge-title{font-size:12px;font-weight:700;color:var(--warm);margin:0 0 3px;letter-spacing:.02em}
+.radar-badge-desc{font-size:11px;color:#8a6b4d;line-height:1.4;margin:0}
+.radar-badge-updated{font-size:10px;color:var(--muted);margin-top:4px}
+:root[data-theme="dark"] .radar-badge{border-color:#d19961;background:linear-gradient(135deg,rgba(201,138,92,.2) 0%,rgba(58,44,26,.4) 100%)}
+:root[data-theme="dark"] .radar-badge:hover{border-color:#e0a871}
+:root[data-theme="dark"] .radar-badge-title{color:#e0a871}
+:root[data-theme="dark"] .radar-badge-desc{color:#b8997a}
+
+.topbar .theme-toggle{position:absolute;right:30px;top:20px;z-index:10}
+@media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}
+</style>
+<style id="article-relations">
+.search{max-width:640px;flex:0 1 640px}.topbar .reader-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none;margin:0}.topbar .reader-back,.topbar .reader-study{white-space:nowrap}.article-relations{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:11px 0 12px;margin:16px 0}.article-relations-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.article-relations-heading{display:flex;align-items:baseline;gap:9px;min-width:0}.article-relations-head h3{margin:0;font-size:12px;letter-spacing:.06em}.article-relations-head span{color:var(--muted);font-size:11px}.relation-collapse{width:28px;height:28px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--muted);cursor:pointer;font-size:14px;line-height:1}.relation-collapse:hover{border-color:var(--accent);background:var(--accent-soft);color:var(--accent)}.relation-graph{display:block;width:100%;height:205px;overflow:visible}.relation-edge{stroke:#9eb9b0;stroke-width:1.5;fill:none}.relation-edge.incoming{stroke:#8d9d98}.relation-node{cursor:pointer}.relation-node rect{fill:var(--panel);stroke:var(--line);stroke-width:1.2}.relation-node.current rect{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.5}.relation-node:hover rect,.relation-node:focus rect{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.8}.relation-node .relation-node-title{fill:var(--ink);font-size:12px;font-weight:700}.relation-node .relation-node-meta{fill:var(--muted);font-size:10px;font-weight:600}.relation-node.current .relation-node-meta{fill:var(--accent)}.relation-label{fill:var(--muted);font-size:10px;font-weight:700;letter-spacing:.04em}.article-relations.collapsed .relation-graph{display:none}.article-relations.collapsed{padding-bottom:10px}@media(max-width:760px){.topbar{flex-wrap:wrap}.topbar .search{order:1;max-width:none;flex:1 0 100%}.topbar .reader-tools{order:2;width:100%;justify-content:space-between}.topbar .reader-back,.topbar .reader-study{flex:1;text-align:center}.relation-graph{height:390px}.article-relations-heading{align-items:flex-start;flex-direction:column;gap:1px}}
+.topbar .theme-toggle{width:auto;min-width:36px;height:36px;margin:0;padding:0 12px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--muted);font-size:16px;cursor:pointer;flex-shrink:0}.topbar .theme-toggle:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.radar-badge{position:relative;border:2px solid var(--warm);background:linear-gradient(135deg,var(--warm-soft) 0%,rgba(250,243,232,.3) 100%);border-radius:7px;padding:9px 11px;margin:8px 8px 4px;cursor:pointer;transition:.15s;box-shadow:0 2px 8px rgba(168,95,45,.15)}
+.radar-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(168,95,45,.25);border-color:#b8752f}
+.radar-badge-icon{position:absolute;top:-6px;right:8px;font-size:18px}
+.radar-badge-title{font-size:12px;font-weight:700;color:var(--warm);margin:0 0 3px;letter-spacing:.02em}
+.radar-badge-desc{font-size:11px;color:#8a6b4d;line-height:1.4;margin:0}
+.radar-badge-updated{font-size:10px;color:var(--muted);margin-top:4px}
+:root[data-theme="dark"] .radar-badge{border-color:#d19961;background:linear-gradient(135deg,rgba(201,138,92,.2) 0%,rgba(58,44,26,.4) 100%)}
+:root[data-theme="dark"] .radar-badge:hover{border-color:#e0a871}
+:root[data-theme="dark"] .radar-badge-title{color:#e0a871}
+:root[data-theme="dark"] .radar-badge-desc{color:#b8997a}
+
+.topbar .theme-toggle{position:absolute;right:30px;top:20px;z-index:10}
+@media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}
 </style>
 </head>
 <body>
 <div class="app">
-<aside class="sidebar" id="sidebar"><div class="brand"><div class="mark">TK</div><div><strong>technical-knowledge</strong><small>工程知识库</small></div><button type="button" class="mobile-menu" id="mobile-menu" aria-label="打开目录">目录</button></div><div class="shared-nav" id="shared-nav"></div><div id="domains"></div><button type="button" class="theme-toggle" id="theme-toggle" aria-live="polite">☾ 夜晚模式</button></aside>
-<main class="main"><header class="topbar"><h1>工程知识库</h1><label class="search"><span>⌕</span><input id="search" placeholder="搜索知识、机制、项目或来源" autocomplete="off"></label></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><div class="reader-tools"><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" title="把当前笔记标题带入学习中心，不会自动发送" hidden>用这个主题学习</a></div><div id="reader-context" class="reader-context"></div><h2 id="reader-title"></h2><div id="reader-sources" class="reader-sources"></div><aside class="reader-siblings" id="reader-siblings" aria-label="同模块其他文章"></aside></div><div class="reader-layout"><article id="reader-body" class="reader-body"></article><aside class="reader-toc" id="reader-toc" aria-label="本文目录"></aside></div></section><section id="graph-view" class="graph"><div class="graph-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div><div class="visual-tabs" role="tablist"><button type="button" data-visual="network" role="tab" aria-selected="true" class="active">关系网络</button><button type="button" data-visual="flow" role="tab" aria-selected="false">知识流通</button><button type="button" data-visual="learning" role="tab" aria-selected="false">学习循环</button><button type="button" data-visual="architecture" role="tab" aria-selected="false">AI 系统架构</button><button type="button" data-visual="quadrant" role="tab" aria-selected="false">选型象限</button></div></div><div class="graph-panel"><svg id="graph" aria-label="知识图谱"></svg><div id="legend" class="graph-legend"></div></div></section></div></main>
+<aside class="sidebar" id="sidebar"><div class="brand-row"><a class="tk-brand" href="/" aria-label="返回工程知识库"><span class="tk-brand-mark" aria-hidden="true">K</span><span class="tk-brand-text"><strong>工程知识库</strong><small>技术知识图谱</small></span></a><button type="button" class="mobile-menu" id="mobile-menu" aria-label="打开目录">目录</button></div><div class="shared-nav" id="shared-nav"></div><div id="domains"></div></aside>
+<main class="main"><header class="topbar"><h1>工程知识库</h1><label class="search"><span>⌕</span><input id="search" placeholder="搜索知识、机制、项目或来源" autocomplete="off"></label><button type="button" class="theme-toggle" id="theme-toggle" aria-live="polite" style="margin-left:auto">☾</button><div class="reader-tools" id="reader-actions" hidden><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型。" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div>
+<button type="button" class="kbd-hint" id="kbd-hint" title="查看键盘快捷键"><kbd>?</kbd><span>快捷键</span></button>
+<div class="kbd-overlay" id="kbd-overlay" role="dialog" aria-modal="true" aria-labelledby="kbd-title" hidden>
+  <div class="kbd-panel">
+    <h2 id="kbd-title">键盘快捷键</h2>
+    <p>阅读时不必离开键盘。Esc 随时关闭本面板。</p>
+    <div class="kbd-grid">
+      <div class="kbd-row"><span><kbd>/</kbd></span><span>聚焦搜索框</span></div>
+      <div class="kbd-row"><span><kbd>Esc</kbd></span><span>清空搜索，或从文章返回目录</span></div>
+      <div class="kbd-row"><span><kbd>j</kbd> <kbd>k</kbd></span><span>在目录里上下移动选中条目</span></div>
+      <div class="kbd-row"><span><kbd>Enter</kbd></span><span>打开选中的条目</span></div>
+      <div class="kbd-row"><span><kbd>g</kbd> 然后 <kbd>h</kbd></span><span>回到首页</span></div>
+      <div class="kbd-row"><span><kbd>g</kbd> 然后 <kbd>g</kbd></span><span>打开知识图谱</span></div>
+      <div class="kbd-row"><span><kbd>g</kbd> 然后 <kbd>p</kbd></span><span>打开项目与教学</span></div>
+      <div class="kbd-row"><span><kbd>t</kbd></span><span>切换白天 / 夜晚模式</span></div>
+      <div class="kbd-row"><span><kbd>?</kbd></span><span>显示或关闭本面板</span></div>
+    </div>
+    <button type="button" class="kbd-close" id="kbd-close">关闭</button>
+  </div>
+</div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><div id="reader-context" class="reader-context"></div><h2 id="reader-title"></h2><div id="reader-sources" class="reader-sources"></div><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section><aside class="reader-siblings" id="reader-siblings" aria-label="同模块其他文章"></aside></div><div class="reader-layout"><article id="reader-body" class="reader-body"></article><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside></div></section><section id="graph-view" class="graph"><div class="graph-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div><div class="visual-tabs" role="tablist"><button type="button" data-visual="network" role="tab" aria-selected="true" class="active">关系网络</button><button type="button" data-visual="flow" role="tab" aria-selected="false">知识流通</button><button type="button" data-visual="learning" role="tab" aria-selected="false">学习循环</button><button type="button" data-visual="architecture" role="tab" aria-selected="false">AI 系统架构</button><button type="button" data-visual="quadrant" role="tab" aria-selected="false">选型象限</button></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱"></svg><div id="legend" class="graph-legend"></div></div></section></div></main>
 </div>
 <script>
-const $=s=>document.querySelector(s),state={notes:[],edges:[],domain:'all',topic:'all',query:'',sort:'title',selected:null,graphMode:'network',zoom:1,pan:{x:0,y:0},view:'home'};const order=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'],topicOrder={'AI系统':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端与分布式系统':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'计算机系统与性能':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建与质量':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付']},colors=['#147766','#3f70a8','#a45b2a','#7862a3','#567b42','#9b4660','#697772'];const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const ordered=a=>[...a].sort((x,y)=>(order.indexOf(x)<0?99:order.indexOf(x))-(order.indexOf(y)<0?99:order.indexOf(y))||x.localeCompare(y,'zh-CN'));const orderedTopics=(domain,a)=>[...a].sort((x,y)=>{const ranks=topicOrder[domain]||[];const rx=ranks.indexOf(x),ry=ranks.indexOf(y);return (rx<0?999:rx)-(ry<0?999:ry)||x.localeCompare(y,'zh-CN')});
+const $=s=>document.querySelector(s),state={notes:[],edges:[],domain:'all',topic:'all',expandedDomains:new Set(),query:'',sort:'title',selected:null,graphMode:'network',zoom:1,pan:{x:0,y:0},view:'home',notesSignature:'',learningStatus:null};const order=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'],topicOrder={'AI系统':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端与分布式系统':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'计算机系统与性能':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建与质量':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付']},colors=['#147766','#3f70a8','#a45b2a','#7862a3','#567b42','#9b4660','#697772'];const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const ordered=a=>[...a].sort((x,y)=>(order.indexOf(x)<0?99:order.indexOf(x))-(order.indexOf(y)<0?99:order.indexOf(y))||x.localeCompare(y,'zh-CN'));const orderedTopics=(domain,a)=>[...a].sort((x,y)=>{const ranks=topicOrder[domain]||[];const rx=ranks.indexOf(x),ry=ranks.indexOf(y);return (rx<0?999:rx)-(ry<0?999:ry)||x.localeCompare(y,'zh-CN')});
 async function json(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
 function alertUser(message){const box=$('#app-alert');box.textContent=message;box.classList.add('open');clearTimeout(alertUser.timer);alertUser.timer=setTimeout(()=>box.classList.remove('open'),5200)}
-function show(view){state.view=view;$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');document.querySelectorAll('.nav-actions button').forEach(b=>b.classList.toggle('active',(b.id==='home-button'&&view==='home')||(b.id==='graph-button'&&view==='graph')))}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
-function renderDomains(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),clippingCount=state.notes.filter(n=>n.category==='Clippings').length;$('#domains').innerHTML=domains.map(d=>{const topics=orderedTopics(d,new Set(state.notes.filter(n=>n.category===d).map(n=>n.topic)));const open=state.domain===d;return `<section class="nav-section"><button class="domain-button ${open?'active':''}" data-domain="${esc(d)}"><span>${esc(d)}</span><span class="count">${state.notes.filter(n=>n.category===d).length}</span></button>${open?topics.map(t=>`<button class="topic-button ${state.topic===t?'active':''}" data-domain="${esc(d)}" data-topic="${esc(t)}"><span>${esc(t)}</span><span class="count">${state.notes.filter(n=>n.category===d&&n.topic===t).length}</span></button>`).join(''):''}</section>`}).join('')+(clippingCount?`<div class="sidebar-support"><p>保留资料</p><button class="domain-button ${state.domain==='Clippings'?'active':''}" data-domain="Clippings"><span>Clippings</span><span class="count">${clippingCount}</span></button></div>`:'');document.querySelectorAll('.domain-button').forEach(b=>b.onclick=()=>select(b.dataset.domain,'all'));document.querySelectorAll('.topic-button').forEach(b=>b.onclick=()=>select(b.dataset.domain,b.dataset.topic))}
+function show(view){state.view=view;$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view)}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
+function renderDomains(){
+  const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),clippingCount=state.notes.filter(n=>n.category==='Clippings').length;
+  $('#domains').innerHTML=domains.map(d=>{
+    const inDomain=state.notes.filter(n=>n.category===d);
+    const open=state.expandedDomains.has(d),active=state.domain===d;
+    // 时效性文章（type: radar）单独置顶：它标记的是"这份动态有没有更新"，
+    // 属于领域级的信息，不属于任何一个主题，所以放在领域标题下方、主题列表之上。
+    const radars=inDomain.filter(n=>n.type==='radar').sort((a,b)=>(b.updated||'').localeCompare(a.updated||''));
+    // 归档是维护资料，不参与领域计数；单独列在最后，避免和真正的知识主题混在一起。
+    const current=inDomain.filter(n=>n.topic!=='归档');
+    const archived=inDomain.filter(n=>n.topic==='归档');
+    const topics=orderedTopics(d,new Set(current.map(n=>n.topic)));
+    const radarCards=radars.map(n=>`<button class="radar-card" data-path="${esc(n.path)}" title="时效性内容，每周更新：${esc(n.title)}"><span class="radar-icon" aria-hidden="true">⚡</span><span class="radar-text"><strong>${esc(n.title)}</strong><small>每周更新${n.updated?' · 最近 '+esc(n.updated.slice(5)):''}</small></span></button>`).join('');
+    const archiveRow=archived.length?`<button class="topic-button archived" data-domain="${esc(d)}" data-topic="归档"><span>归档</span><span class="count">${archived.length}</span></button>`:'';
+    return `<section class="nav-section"><button class="domain-button ${active?'active':''}" data-domain="${esc(d)}" aria-expanded="${open}"><span class="domain-label"><span class="domain-chevron" aria-hidden="true">${open?'▼':'▶'}</span><span>${esc(d)}</span></span><span class="count">${current.length}</span></button>${open?radarCards+topics.map(t=>`<button class="topic-button ${active&&state.topic===t?'active':''}" data-domain="${esc(d)}" data-topic="${esc(t)}"><span>${esc(t)}</span><span class="count">${current.filter(n=>n.topic===t).length}</span></button>`).join('')+archiveRow:''}</section>`;
+  }).join('')+(clippingCount?`<div class="sidebar-support"><p>保留资料</p><button class="domain-button ${state.domain==='Clippings'?'active':''}" data-domain="Clippings"><span>Clippings</span><span class="count">${clippingCount}</span></button></div>`:'');
+  document.querySelectorAll('.nav-section .domain-button').forEach(button=>button.onclick=()=>{const domain=button.dataset.domain;if(state.expandedDomains.has(domain)){state.expandedDomains.delete(domain);renderDomains();return}state.expandedDomains.add(domain);select(domain,'all')});
+  document.querySelectorAll('.sidebar-support .domain-button').forEach(button=>button.onclick=()=>select(button.dataset.domain,'all'));
+  document.querySelectorAll('.topic-button').forEach(button=>button.onclick=()=>select(button.dataset.domain,button.dataset.topic));
+  document.querySelectorAll('.radar-card').forEach(button=>button.onclick=()=>openNote(button.dataset.path));
+}
 function renderDirectory(){
   const list=noteList(),groups=new Map();
   for(const n of list){const k=state.domain==='all'?n.category:n.topic;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
   const groupRank=g=>state.domain==='all'?(order.indexOf(g)<0?999:order.indexOf(g)):(topicOrder[state.domain]||[]).indexOf(g)<0?999:(topicOrder[state.domain]||[]).indexOf(g);
+  // 命中片段高亮：让"为什么这篇被搜出来"直接可见，而不是只列出标题。
+  const q=state.query.trim();
+  const mark=text=>{
+    const raw=String(text??'');
+    if(!q)return esc(raw);
+    const at=raw.toLowerCase().indexOf(q.toLowerCase());
+    if(at<0)return esc(raw);
+    return esc(raw.slice(0,at))+'<mark class="hit">'+esc(raw.slice(at,at+q.length))+'</mark>'+esc(raw.slice(at+q.length));
+  };
   const sections=[...groups].sort(([a],[b])=>groupRank(a)-groupRank(b)||a.localeCompare(b,'zh-CN')).map(([g,items])=>{
-    const rows=items.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h3>${esc(n.title)}</h3><div class="path">${esc(n.topic)} · ${esc(n.change_rate||'')}</div></div><p>${esc(n.excerpt||'')}</p></article>`).join('');
+    const rows=items.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h3>${mark(n.title)}</h3><div class="path">${esc(n.topic)} · ${esc(n.change_rate||'')}</div></div><p>${q?mark(n.excerpt||''):esc(n.excerpt||'')}</p></article>`).join('');
     return `<section class="topic-section"><h3 class="topic-title"><span>${esc(g==='总览'?'入口':g)}</span><small>${items.length}</small></h3>${rows}</section>`;
   }).join('');
-  const empty=groups.size?'':'<div class="empty">没有匹配内容</div>';
+  // 空结果给可执行的下一步，而不是一句"没有匹配内容"就结束。
+  const empty=groups.size?'':
+    `<div class="empty"><p class="empty-title">没有找到“${esc(q)}”</p><p class="empty-hint">试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识。</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
   $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${list.length} 篇 · 主题按知识对象归属</p></div><div class="sort"><button data-sort="title" class="${state.sort==='title'?'active':''}">按标题</button><button data-sort="updated" class="${state.sort==='updated'?'active':''}">按更新</button></div></div>${sections}${empty}`;
+  const clearDomain=$('#empty-clear-domain');
+  if(clearDomain)clearDomain.onclick=()=>select('all','all');
   document.querySelectorAll('.note-row').forEach(row=>{row.setAttribute('tabindex','0');row.setAttribute('role','button');row.setAttribute('aria-label',row.querySelector('h3')?.textContent||'打开笔记');row.onclick=()=>openNote(row.dataset.path);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(row.dataset.path)}}});
   document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;renderDirectory()});
 }
-const skillTracks=['后端技能','Agent技能'];
-function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length,host=location.hostname;const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。','后端技能':'按能力组织：设计模式、设计思路、并发与一致性、可观测性与演进。','Agent技能':'按能力组织：核心机制、工具与契约、上下文与记忆、评测与可靠。'};$('#home').innerHTML=`<section class="hero"><div><h2>工程知识，从原理到验证</h2><p>围绕真实技术问题组织基础概念、系统机制、工程实现、边界和证据。</p></div><div class="hero-meta">${knowledgeCount} 篇技术笔记</div></section><div class="notice">先从知识领域建立心智模型；需要形成能力时进入学习工具，需要判断系统是否真的有效时进入自研 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>按技术对象归位，不按课程、项目或时间线堆放。前两个领域按技术对象组织，回答“这是什么”；下面的能力轨道按要掌握的技能组织，回答“我该会做什么”。</p><h3 class="domain-group">按技术对象</h3><div class="domain-grid">${domains.filter(d=>!skillTracks.includes(d)).map(d=>`<article class="domain-card" data-domain="${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><b>${state.notes.filter(n=>n.category===d).length} 篇 →</b></article>`).join('')}</div><h3 class="domain-group">按能力掌握</h3><div class="domain-grid skill-grid">${domains.filter(d=>skillTracks.includes(d)).map(d=>`<article class="domain-card skill-card" data-domain="${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><b>${state.notes.filter(n=>n.category===d).length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>这两个入口优先：一个把主题变成课堂，一个把资料变成可追问、可复习的学习工作区。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">3100 · 可用</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}">创建课堂</a><a href="/?path=${encodeURIComponent('知识库管理/来源/论文与项目/OpenMAIC互动课堂与Agent技能.md')}">实现与边界</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">3782 · 已安装</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}">进入学习工作区</a><a href="/?path=${encodeURIComponent('知识库管理/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自研评估项目与外部工程 Skills 分开：前者定义事实边界，后者提供可复用工作流。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md">查看 Skills</a><a href="/?path=${encodeURIComponent('知识库管理/来源/论文与项目/Matt Skills工程协作技能.md')}">融合记录</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和项目源码用于理解关系与回溯证据，不占据主要学习路径。</p><div class="aux-grid"><article class="aux-card"><h3>知识关系与系统图</h3><p>内置图谱展示知识连接、学习循环、AI 系统分层和选型象限；Archify 用于需要确定性校验的架构图。</p><a href="/?view=graph" id="home-graph">查看知识图谱 →</a><a href="/?path=${encodeURIComponent('知识库管理/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects">打开项目入口 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(c=>c.onclick=()=>select(c.dataset.domain,'all'));$('#home-graph').onclick=e=>{e.preventDefault();showGraph()}}
-function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}state.domain=domain;state.topic=topic;state.selected=null;show('directory');renderDomains();renderDirectory();if(matchMedia('(max-width:760px)').matches)$('#sidebar').classList.add('collapsed');if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch{return s}}function renderSources(s){if(!s?.length)return'';return '<b>来源：</b>'+s.map(x=>{x=String(x);if(/^https?:\/\//.test(x))return `<a href="${esc(x)}" target="_blank" rel="noreferrer">${esc(sourceLabel(x))}</a>`;if(x.startsWith('[[')){const t=x.slice(2,-2).split('|')[0];return `<a href="/?path=${encodeURIComponent(t)}">${esc(t.split('/').pop())}</a>`}return esc(x)}).join(' · ')}
+function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero"><div><h2>工程知识，从原理到验证</h2><p>围绕真实技术问题组织基础概念、系统机制、工程实现、边界和证据。</p></div><div class="hero-meta">${knowledgeCount} 篇技术笔记</div></section><div class="notice">先从知识领域建立心智模型；需要形成能力时进入学习工具，需要判断系统是否真的有效时进入自研 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>按技术对象归位，不按课程、项目或时间线堆放。Agent 相关知识已融入 AI 系统的工作流、上下文、检索、质量和安全模块。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="打开 ${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><b>${state.notes.filter(n=>n.category===d&&n.topic!=='归档').length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自研评估项目与外部工程 Skills 分开：前者定义事实边界，后者提供可复用工作流。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和项目源码用于理解关系与回溯证据，不占据主要学习路径。</p><div class="aux-grid"><article class="aux-card"><h3>知识图谱与系统图</h3><p>内置图谱展示知识连接、学习循环、AI 系统分层和选型象限。</p><a href="/?view=graph" id="home-graph">查看知识图谱 →</a></article><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图。</p><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口 →</a></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});applyHomeStatus()}
 
-renderSources=function(sources){if(!sources?.length)return'';const seen=new Set(),visible=[];for(const source of sources){const value=String(source),key=/^https?:\/\//.test(value)?sourceLabel(value):value;if(seen.has(key))continue;seen.add(key);visible.push(value)}return '<b>来源：</b>'+visible.map(x=>{if(/^https?:\/\//.test(x))return `<a href="${esc(x)}" title="${esc(x)}" target="_blank" rel="noreferrer">${esc(sourceLabel(x))}</a>`;if(x.startsWith('[[')){const t=x.slice(2,-2).split('|')[0];return `<a href="/?path=${encodeURIComponent(t)}">${esc(t.split('/').pop())}</a>`}return esc(x)}).join(' · ')};
+function applyHomeStatus(){const cards=[...document.querySelectorAll('#home .work-card')],classroom=cards.find(card=>card.querySelector('h3')?.textContent==='OpenMAIC'),tutor=cards.find(card=>card.querySelector('h3')?.textContent==='DeepTutor'),status=state.learningStatus;if(classroom)classroom.querySelector('.status').textContent=status?status.openmaic?.online&&status.openmaic?.llm?'互动课堂可用':status.openmaic?.online?'服务运行中':'未启动':'状态未知';if(tutor)tutor.querySelector('.status').textContent=status?status.deeptutor?.online&&status.deeptutor?.llm?'导师可用':'配置不完整':'状态未知'}
+function clearSearch(){state.query='';$('#search').value=''}
+function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}clearSearch();state.domain=domain;state.topic=topic;state.selected=null;if(domain!=='all'&&domain!=='Clippings')state.expandedDomains.add(domain);show('directory');renderDomains();renderDirectory();if(matchMedia('(max-width:760px)').matches)collapseMobileSidebar();if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}
+function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch{return s}}
+function renderSources(sources){if(!sources?.length)return'';const seen=new Set(),visible=[];for(const source of sources){const value=String(source),key=/^https?:\/\//.test(value)?sourceLabel(value):value;if(seen.has(key))continue;seen.add(key);visible.push(value)}return '<b>来源：</b>'+visible.map(x=>{if(/^https?:\/\//.test(x))return `<a href="${esc(x)}" title="${esc(x)}" target="_blank" rel="noreferrer">${esc(sourceLabel(x))}</a>`;if(x.startsWith('[[')){const t=x.slice(2,-2).split('|')[0];return `<a href="/?path=${encodeURIComponent(t)}">${esc(t.split('/').pop())}</a>`}return esc(x)}).join(' · ')}
 function renderSharedNav(){
   const mount=document.getElementById('shared-nav');
   if(!mount)return;
   const items=[
-    {label:'知识库',href:'/',icon:'⌂',current:true},
-    {label:'项目与工具',href:'/projects',icon:'▣'},
+    {label:'知识库',href:'/',icon:'⌂'},
+    {label:'知识图谱',href:'/?view=graph',icon:'⌘'},
+    {label:'项目与教学',href:'/projects',icon:'▣'},
     {label:'Agent 评估',href:'/apps/agent-evaluation/index.html',icon:'◎'},
   ];
-  const sub=[{label:'关系图谱',href:'/?view=graph'}];
-  mount.innerHTML='<nav class="wb-nav-like">'+items.map(i=>`<a href="${i.href}"${i.current?' aria-current="page"':''}>${'<span class="sn-icon" aria-hidden="true">'+i.icon+'</span>'}<span>${i.label}</span></a>`).join('')
-    +'<div class="sn-sub">'+sub.map(i=>`<a href="${i.href}">${i.label}</a>`).join('')+'</div></nav>';
-  // 图谱 is an in-page view, so intercept it instead of reloading.
+  mount.innerHTML='<nav class="wb-nav-like">'+items.map(i=>`<a href="${i.href}">${'<span class="sn-icon" aria-hidden="true">'+i.icon+'</span>'}<span>${i.label}</span></a>`).join('')+'</nav>';
+  // 知识图谱 is an in-page view, so intercept it instead of reloading.
   mount.querySelector('a[href="/?view=graph"]').onclick=e=>{e.preventDefault();showGraph()};
+  updateSharedNav(state.view);
 }
+function updateSharedNav(view){const mount=$('#shared-nav');if(!mount)return;mount.querySelectorAll('a').forEach(link=>{const current=link.getAttribute('href')==='/?view=graph'?view==='graph':link.getAttribute('href')==='/'&&view!=='graph';if(current)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')})}
 /* Theme toggle, matching the companion pages: explicit choice wins, otherwise
    follow the OS until the visitor decides. */
 function initTheme(){
@@ -174,6 +340,42 @@ function initTheme(){
   const btn=document.getElementById('theme-toggle');
   if(btn)btn.onclick=()=>{const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
     try{localStorage.setItem(KEY,next)}catch{}apply(next)};
+}
+function renderRelations(note){
+  // 知识库管理记录的是维护方法而不是技术知识，它的页面照常可读，
+  // 但不展示入链和延伸：否则维护资料会挂在正文下方，看起来像技术知识的关联。
+  const root=$('#reader-relations');
+  if(note.exclude_from_graph){root.innerHTML='';root.hidden=true;return}
+  root.hidden=false;
+  const notesByPath=new Map(state.notes.map(item=>[item.path,item]));
+  const incoming=[],outgoing=[],seenIncoming=new Set(),seenOutgoing=new Set();
+  for(const edge of state.edges){
+    if(edge.target===note.path&&!seenIncoming.has(edge.source)&&notesByPath.has(edge.source)){seenIncoming.add(edge.source);incoming.push(notesByPath.get(edge.source))}
+    if(edge.source===note.path&&!seenOutgoing.has(edge.target)&&notesByPath.has(edge.target)){seenOutgoing.add(edge.target);outgoing.push(notesByPath.get(edge.target))}
+  }
+  const moduleOf=item=>`${item.category==='总览'?'首页':item.category} / ${item.topic==='首页'?'入口':item.topic}`;
+  const compact=value=>value.length>20?value.slice(0,19)+'…':value;
+  const mobile=matchMedia('(max-width:760px)').matches;
+  const incomingNodes=incoming.slice(0,mobile?1:3),outgoingNodes=outgoing.slice(0,3);
+  const width=mobile?360:1120,height=mobile?410:220,nodeWidth=mobile?290:250,nodeHeight=54;
+  const current={x:mobile?35:435,y:mobile?100:83};
+  const inputY=index=>mobile?24:incomingNodes.length===1?83:20+index*68;
+  const outputY=index=>mobile?185+index*69:20+index*68;
+  const node=(item,x,y,kind='')=>`<g class="relation-node ${kind}" data-note="${esc(item.path)}" role="button" tabindex="0" aria-label="打开 ${esc(item.title)}"><title>${esc(item.title)}：${esc(moduleOf(item))}</title><rect x="${x}" y="${y}" width="${nodeWidth}" height="${nodeHeight}" rx="5"></rect><text class="relation-node-title" x="${x+12}" y="${y+22}">${esc(compact(item.title))}</text><text class="relation-node-meta" x="${x+12}" y="${y+40}">${esc(compact(moduleOf(item)))}</text></g>`;
+  const edge=(x1,y1,x2,y2,kind='')=>`<path class="relation-edge ${kind}" marker-end="url(#relation-arrow)" d="M${x1} ${y1} C${(x1+x2)/2} ${y1}, ${(x1+x2)/2} ${y2}, ${x2} ${y2}"></path>`;
+  const lines=[];
+  const nodes=[];
+  if(mobile){
+    incomingNodes.forEach((item,index)=>{const y=inputY(index);lines.push(edge(current.x+nodeWidth/2,y+nodeHeight,current.x+nodeWidth/2,current.y,'incoming'));nodes.push(node(item,35,y))});
+    outgoingNodes.forEach((item,index)=>{const y=outputY(index);lines.push(edge(current.x+nodeWidth/2,current.y+nodeHeight,current.x+nodeWidth/2,y));nodes.push(node(item,35,y))});
+  }else{
+    incomingNodes.forEach((item,index)=>{const y=inputY(index);lines.push(edge(40+nodeWidth,y+nodeHeight/2,current.x,current.y+nodeHeight/2,'incoming'));nodes.push(node(item,40,y))});
+    outgoingNodes.forEach((item,index)=>{const y=outputY(index);lines.push(edge(current.x+nodeWidth,current.y+nodeHeight/2,830,y+nodeHeight/2));nodes.push(node(item,830,y))});
+  }
+  root.innerHTML=`<div class="article-relations-head"><div class="article-relations-heading"><h3>知识图谱</h3><span>${incoming.length} 条入链 · ${outgoing.length} 条延伸</span></div><button type="button" class="relation-collapse" title="折叠知识图谱" aria-label="折叠知识图谱" aria-expanded="true">▾</button></div><svg class="relation-graph" viewBox="0 0 ${width} ${height}" role="img" aria-label="${esc(note.title)} 的直接知识图谱"><defs><marker id="relation-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8faea4"></path></marker></defs><text class="relation-label" x="${mobile?35:40}" y="${mobile?15:13}">引用当前节点${incoming.length>incomingNodes.length?' · '+incoming.length:''}</text><text class="relation-label" x="${mobile?35:830}" y="${mobile?177:13}">从当前节点延伸${outgoing.length>outgoingNodes.length?' · '+outgoing.length:''}</text>${lines.join('')}${node(note,current.x,current.y,'current')}${nodes.join('')}</svg>`;
+  root.querySelectorAll('[data-note]').forEach(nodeElement=>{nodeElement.onclick=()=>openNote(nodeElement.dataset.note);nodeElement.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openNote(nodeElement.dataset.note)}}});
+  const toggle=root.querySelector('.relation-collapse');
+  toggle.onclick=()=>{const collapsed=root.classList.toggle('collapsed');toggle.textContent=collapsed?'▸':'▾';toggle.title=collapsed?'展开知识图谱':'折叠知识图谱';toggle.setAttribute('aria-label',toggle.title);toggle.setAttribute('aria-expanded',String(!collapsed))};
 }
 function renderReaderRails(note){
   const siblings=$('#reader-siblings'),toc=$('#reader-toc');
@@ -198,215 +400,126 @@ function railHead(label,hasItems){
   // The toggle is rendered only when there is something to collapse.
   return `<p class="rail-head"><span>${label}</span>${hasItems?'<button type="button" class="rail-toggle" aria-expanded="true" aria-label="折叠'+label+'">▾</button>':''}</p>`;
 }
-async function openNote(path,push=true){if(path==='知识库首页.md'||path==='知识库首页'){loadHome(push);return}try{const n=await json('/api/note?path='+encodeURIComponent(path));state.selected=n.path;show('reader');$('#reader-context').textContent=n.category+' / '+n.topic;$('#reader-title').textContent=n.title;$('#reader-sources').innerHTML=renderSources(n.sources);$('#reader-body').innerHTML=n.html;document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});if(window.renderMermaid)window.renderMermaid().catch(()=>alertUser('图表渲染失败，但正文仍然可读'));renderReaderRails(n);if(push)history.pushState({},'', '/?path='+encodeURIComponent(n.path));window.scrollTo({top:0})}catch(e){console.error(e);alertUser('这篇笔记暂时无法打开，请稍后重试')}}
+function updateReaderStudy(){const study=$('#reader-study'),title=$('#reader-title').textContent.trim(),visible=state.view==='reader'&&Boolean(title);study.hidden=!visible;study.href=visible?'/learn?topic='+encodeURIComponent(title):'/learn'}
+async function openNote(path,push=true){if(path==='知识库首页.md'||path==='知识库首页'){loadHome(push);return}try{const n=await json('/api/note?path='+encodeURIComponent(path));state.selected=n.path;$('#reader-context').textContent=n.category+' / '+n.topic;$('#reader-title').textContent=n.title;$('#reader-sources').innerHTML=renderSources(n.sources);show('reader');renderRelations(n);$('#reader-body').innerHTML=n.html;document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});if(window.renderMermaid)window.renderMermaid().catch(()=>alertUser('图表渲染失败，但正文仍然可读'));renderReaderRails(n);if(push)history.pushState({},'', '/?path='+encodeURIComponent(n.path));window.scrollTo({top:0})}catch(e){console.error(e);alertUser('这篇笔记暂时无法打开，请稍后重试')}}
 function graphCanvas(){const svg=$('#graph'),mobile=matchMedia('(max-width:900px)').matches,W=mobile?720:1200,H=mobile?920:690;svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto'});marker.append(svgEl('path',{d:'M0 0L10 5L0 10z',fill:'#9db8ad'}));defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);return{svg,world,W,H,mobile}}function svgEl(n,a={},text=''){const e=document.createElementNS('http://www.w3.org/2000/svg',n);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));if(text)e.textContent=text;return e}function addBox(w,x,y,ww,h,label,kind='',small='',target=''){const g=svgEl('g',{class:'diagram-group'});g.append(svgEl('rect',{x,y,width:ww,height:h,rx:7,class:`diagram-box ${kind}`}),svgEl('text',{x:x+ww/2,y:y+h/2-(small?8:0),class:'diagram-label'},label));if(small)g.append(svgEl('text',{x:x+ww/2,y:y+h/2+14,class:'diagram-small'},small));if(target)g.onclick=()=>openNote(target);w.append(g)}function arrow(w,x1,y1,x2,y2){w.append(svgEl('line',{x1,y1,x2,y2,class:'diagram-edge'}))}
-function renderNetwork(){const{world,W,H}=graphCanvas(),notes=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings'),domains=ordered(new Set(notes.map(n=>n.category))),positions=new Map(),topics=new Map(),cols=3,cw=W/cols,rh=H/Math.ceil(domains.length/cols);domains.forEach((d,di)=>{const cx=cw*(di%cols+.5),cy=rh*(Math.floor(di/cols)+.5),group=notes.filter(n=>n.category===d),ts=orderedTopics(d,new Set(group.map(n=>n.topic)));ts.forEach((t,ti)=>{const r=Math.min(cw,rh)*.27,a=-Math.PI/2+ti*2*Math.PI/Math.max(ts.length,1),tx=cx+Math.cos(a)*r,ty=cy+Math.sin(a)*r;topics.set(`${d}/${t}`,{x:tx,y:ty,d,t});const ns=group.filter(n=>n.topic===t),nr=ns.length===1?0:Math.min(28,12+ns.length*2);ns.forEach((n,ni)=>{const na=-Math.PI/2+ni*2*Math.PI/Math.max(ns.length,1);positions.set(n.path,{x:tx+Math.cos(na)*nr,y:ty+Math.sin(na)*nr})})});world.append(svgEl('text',{x:cx,y:cy-rh*.38,class:'domain-label','text-anchor':'middle'},`${d} · ${group.length}`))});for(const e of state.edges){const a=positions.get(e.source),b=positions.get(e.target);if(!a||!b)continue;const line=svgEl('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'edge'});line.dataset.source=e.source;line.dataset.target=e.target;world.append(line)}topics.forEach(t=>{const ns=notes.filter(n=>n.category===t.d&&n.topic===t.t);ns.forEach(n=>{const p=positions.get(n.path);world.append(svgEl('line',{x1:t.x,y1:t.y,x2:p.x,y2:p.y,class:'topic-link'}))});const g=svgEl('g',{class:'topic-node',transform:`translate(${t.x},${t.y})`,tabindex:'0',role:'button','aria-label':`${t.d} / ${t.t}`});g.onclick=()=>select(t.d,t.t);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(t.d,t.t)}};g.append(svgEl('circle',{r:7,stroke:colors[domains.indexOf(t.d)%colors.length]}),svgEl('text',{y:-11,'text-anchor':'middle'},t.t));world.append(g)});notes.forEach(n=>{const p=positions.get(n.path);if(!p)return;const g=svgEl('g',{class:'node',transform:`translate(${p.x},${p.y})`,tabindex:'0',role:'button','aria-label':n.title});g.onclick=()=>openNote(n.path);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(n.path)}};g.onmouseenter=()=>document.querySelectorAll('.edge').forEach(e=>{if(e.dataset.source===n.path||e.dataset.target===n.path)e.classList.add('focused')});g.onmouseleave=()=>document.querySelectorAll('.edge.focused').forEach(e=>e.classList.remove('focused'));g.append(svgEl('circle',{r:5,fill:colors[domains.indexOf(n.category)%colors.length]}),svgEl('text',{y:-10,'text-anchor':'middle'},n.title.length>20?n.title.slice(0,19)+'…':n.title));world.append(g)});$('#legend').innerHTML=domains.map((d,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(d)}</span>`).join('')}
-function renderFlow(){const{world,W,H,mobile}=graphCanvas(),steps=[['问题','目标与约束','知识库首页.md'],['理解','机制与关系','工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md'],['召回','倒排 / 向量 / 图','工程知识/AI系统/知识与检索/RAG前沿：重排、自动优化与开放索引.md'],['验证','证据与权限','工程知识/AI系统/质量与运营/可靠生成需要结构、证据、拒答与回归.md'],['行动','模型与工具','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['结果','答案或状态','工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md'],['反馈','评测与回归','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?92:132,bh=70;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===2?'primary':i===4?'secondary':'',small,target));$('#legend').innerHTML='<span><i style="background:#147766"></i>证据获取</span><span><i style="background:#a45b2a"></i>模型与行动</span>'}
+function renderNetwork(){const{world,W,H}=graphCanvas(),notes=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings'&&!n.exclude_from_graph),domains=ordered(new Set(notes.map(n=>n.category))),positions=new Map(),topics=new Map(),cols=3,cw=W/cols,rh=H/Math.ceil(domains.length/cols);domains.forEach((d,di)=>{const cx=cw*(di%cols+.5),cy=rh*(Math.floor(di/cols)+.5),group=notes.filter(n=>n.category===d),ts=orderedTopics(d,new Set(group.map(n=>n.topic)));ts.forEach((t,ti)=>{const r=Math.min(cw,rh)*.27,a=-Math.PI/2+ti*2*Math.PI/Math.max(ts.length,1),tx=cx+Math.cos(a)*r,ty=cy+Math.sin(a)*r;topics.set(`${d}/${t}`,{x:tx,y:ty,d,t});const ns=group.filter(n=>n.topic===t),nr=ns.length===1?0:Math.min(28,12+ns.length*2);ns.forEach((n,ni)=>{const na=-Math.PI/2+ni*2*Math.PI/Math.max(ns.length,1);positions.set(n.path,{x:tx+Math.cos(na)*nr,y:ty+Math.sin(na)*nr})})});world.append(svgEl('text',{x:cx,y:cy-rh*.38,class:'domain-label','text-anchor':'middle'},`${d} · ${group.length}`))});for(const e of state.edges){const a=positions.get(e.source),b=positions.get(e.target);if(!a||!b)continue;const line=svgEl('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'edge'});line.dataset.source=e.source;line.dataset.target=e.target;world.append(line)}topics.forEach(t=>{const ns=notes.filter(n=>n.category===t.d&&n.topic===t.t);ns.forEach(n=>{const p=positions.get(n.path);world.append(svgEl('line',{x1:t.x,y1:t.y,x2:p.x,y2:p.y,class:'topic-link'}))});const g=svgEl('g',{class:'topic-node',transform:`translate(${t.x},${t.y})`,tabindex:'0',role:'button','aria-label':`${t.d} / ${t.t}`});g.onclick=()=>select(t.d,t.t);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(t.d,t.t)}};g.append(svgEl('circle',{r:7,stroke:colors[domains.indexOf(t.d)%colors.length]}),svgEl('text',{y:-11,'text-anchor':'middle'},t.t));world.append(g)});notes.forEach(n=>{const p=positions.get(n.path);if(!p)return;const g=svgEl('g',{class:'node',transform:`translate(${p.x},${p.y})`,tabindex:'0',role:'button','aria-label':n.title});g.onclick=()=>openNote(n.path);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(n.path)}};g.onmouseenter=()=>document.querySelectorAll('.edge').forEach(e=>{if(e.dataset.source===n.path||e.dataset.target===n.path)e.classList.add('focused')});g.onmouseleave=()=>document.querySelectorAll('.edge.focused').forEach(e=>e.classList.remove('focused'));g.append(svgEl('circle',{r:5,fill:colors[domains.indexOf(n.category)%colors.length]}),svgEl('text',{y:-10,'text-anchor':'middle'},n.title.length>20?n.title.slice(0,19)+'…':n.title));world.append(g)});$('#legend').innerHTML=domains.map((d,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(d)}</span>`).join('')}
+function renderFlow(){const{world,W,H,mobile}=graphCanvas(),steps=[['问题','目标与约束','知识库首页.md'],['理解','机制与关系','工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md'],['召回','倒排 / 向量 / 图','工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md'],['验证','证据与权限','工程知识/AI系统/质量与运营/可靠生成需要结构、证据、拒答与回归.md'],['行动','模型与工具','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['结果','答案或状态','工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md'],['反馈','评测与回归','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?92:132,bh=70;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===2?'primary':i===4?'secondary':'',small,target));$('#legend').innerHTML='<span><i style="background:#147766"></i>证据获取</span><span><i style="background:#a45b2a"></i>模型与行动</span>'}
 function renderLearning(){const{world,W,H,mobile}=graphCanvas(),steps=[['目标','要解决什么','知识库首页.md'],['理解','机制、边界、关系','工程知识/AI系统/Agent与工作流/Agent学习工具把资料变成可验证学习循环.md'],['预测','先说出判断','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md'],['练习','最小实验','知识库管理/维护/学习与复习方法.md'],['反馈','错误与证据','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md'],['迁移','换场景使用','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?98:142,bh=72;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===0?'secondary':i===4?'primary':'',small,target));$('#legend').innerHTML='<span><i style="background:#a45b2a"></i>目标与迁移</span><span><i style="background:#147766"></i>证据与反馈</span>'}
-function renderArchitecture(){const{world,W,H,mobile}=graphCanvas(),layers=[['能力层','模型、Embedding、多模态','工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md'],['知识层','RAG、记忆、结构化数据','工程知识/AI系统/知识与检索/RAG前沿：重排、自动优化与开放索引.md'],['编排层','工作流、Agent、状态','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['工具层','API、MCP、A2A、业务系统','工程知识/AI系统/生态与选型/MCP连接能力，A2A委托任务.md'],['运行层','推理服务、队列、存储','工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md'],['治理层','评测、追踪、安全、发布','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],x=mobile?80:180,w=mobile?560:840,top=55,gap=mobile?128:94,h=70;layers.forEach(([label,small,target],i)=>{const y=top+i*gap;if(i<layers.length-1)arrow(world,W/2,y+h,W/2,y+gap);addBox(world,x,y,w,h,label,i===2?'primary':i===5?'secondary':'',small,target)});$('#legend').innerHTML='<span><i style="background:#147766"></i>决策编排</span><span><i style="background:#a45b2a"></i>治理</span>'}
+function renderArchitecture(){const{world,W,H,mobile}=graphCanvas(),layers=[['能力层','模型、Embedding、多模态','工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md'],['知识层','RAG、记忆、结构化数据','工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md'],['编排层','工作流、Agent、状态','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['工具层','API、MCP、A2A、业务系统','工程知识/AI系统/生态与选型/MCP连接能力，A2A委托任务.md'],['运行层','推理服务、队列、存储','工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md'],['治理层','评测、追踪、安全、发布','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],x=mobile?80:180,w=mobile?560:840,top=55,gap=mobile?128:94,h=70;layers.forEach(([label,small,target],i)=>{const y=top+i*gap;if(i<layers.length-1)arrow(world,W/2,y+h,W/2,y+gap);addBox(world,x,y,w,h,label,i===2?'primary':i===5?'secondary':'',small,target)});$('#legend').innerHTML='<span><i style="background:#147766"></i>决策编排</span><span><i style="background:#a45b2a"></i>治理</span>'}
 function renderQuadrant(){const{world,W,H,mobile}=graphCanvas(),x=mobile?92:188,y=88,pw=mobile?536:824,ph=mobile?650:470,mx=x+pw/2,my=y+ph/2;world.append(svgEl('rect',{x,y,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('rect',{x:mx,y,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x,y:my,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x:mx,y:my,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('line',{x1:x,y1:my,x2:x+pw,y2:my,class:'axis-line'}),svgEl('line',{x1:mx,y1:y+ph,x2:mx,y2:y,class:'axis-line'}));[['显式路径 / 本地',x+18,y+25],['显式协作 / 跨系统',mx+18,y+25],['自适应决策 / 本地',x+18,my+25],['自适应协作 / 跨系统',mx+18,my+25]].forEach(([t,tx,ty])=>world.append(svgEl('text',{x:tx,y:ty,class:'quadrant-title'},t)));[['工作流',.18,.18,'#147766'],['单 Agent',.62,.26,'#3f70a8'],['人工审批',.35,.58,'#a45b2a'],['MCP',.72,.55,'#7862a3'],['A2A',.86,.82,'#9b4660']].forEach(([t,px,py,c])=>{const cx=x+pw*px,cy=y+ph*(1-py),g=svgEl('g',{class:'point-group'});g.append(svgEl('circle',{cx,cy,r:10,class:'point',fill:c}),svgEl('text',{x:cx+14,y:cy+5,class:'point-label'},t));world.append(g)});$('#legend').innerHTML='<span><i style="background:#147766"></i>工作流</span><span><i style="background:#3f70a8"></i>Agent</span><span><i style="background:#7862a3"></i>协议</span><span><i style="background:#9b4660"></i>跨系统协作</span>'}
-function renderGraph(){const meta={network:['知识关系','领域、主题与笔记之间的关联'],flow:['知识流通','从问题到证据、行动与反馈的路径'],learning:['学习循环','从目标、理解到练习、反馈与迁移'],architecture:['AI 系统架构','能力、知识、编排、工具、运行与治理的分层'],quadrant:['技术选型象限','用控制方式与协作范围理解组件位置']};const [t,s]=meta[state.graphMode];$('#graph-title').textContent=t;$('#graph-subtitle').textContent=s;document.querySelectorAll('[data-visual]').forEach(b=>b.classList.toggle('active',b.dataset.visual===state.graphMode));({network:renderNetwork,flow:renderFlow,learning:renderLearning,architecture:renderArchitecture,quadrant:renderQuadrant}[state.graphMode]||renderNetwork)()}
-function bindGraph(){const svg=$('#graph');let drag=null;svg.onwheel=e=>{e.preventDefault();state.zoom=Math.max(.55,Math.min(2.5,state.zoom*(e.deltaY<0?1.1:.9)));applyTransform()};svg.onpointerdown=e=>{if(e.target.closest('.node,.topic-node,.diagram-group,.point-group'))return;drag={x:e.clientX,y:e.clientY,px:state.pan.x,py:state.pan.y};svg.setPointerCapture(e.pointerId)};svg.onpointermove=e=>{if(drag)state.pan={x:drag.px+e.clientX-drag.x,y:drag.py+e.clientY-drag.y},applyTransform()};svg.onpointerup=()=>drag=null;document.querySelectorAll('[data-visual]').forEach(b=>b.onclick=()=>{state.graphMode=b.dataset.visual;state.zoom=1;state.pan={x:0,y:0};renderGraph()})}function applyTransform(){const w=$('#graph-world');if(w)w.setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`)}
-const renderHomeBase=renderHome;renderHome=function(){renderHomeBase();const cards=[...document.querySelectorAll('.work-card')],classroom=cards.find(card=>card.querySelector('h3')?.textContent==='OpenMAIC'),tutor=cards.find(card=>card.querySelector('h3')?.textContent==='DeepTutor');if(classroom){const link=classroom.querySelector('.work-actions a');link.href='/launch/openmaic?next='+encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'));link.target='_blank';link.rel='noopener noreferrer';link.textContent='创建课堂';classroom.querySelector('.status').textContent='已安装'}if(tutor){const link=tutor.querySelector('.work-actions a');link.href='/launch/deeptutor?next='+encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'));link.target='_blank';link.rel='noopener noreferrer';link.textContent='进入学习导师';tutor.querySelector('.status').textContent='已安装'}const heading=[...document.querySelectorAll('#home .section h2')].find(node=>node.textContent==='学习与实践');if(heading){const paragraph=heading.nextElementSibling;paragraph.innerHTML='从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。'}json('/api/learning/status').then(status=>{if(classroom)classroom.querySelector('.status').textContent=status.openmaic?.online&&status.openmaic?.llm?'互动课堂可用':status.openmaic?.online?'服务运行中':'未启动';if(tutor)tutor.querySelector('.status').textContent=status.deeptutor?.online&&status.deeptutor?.llm?'导师可用':'配置不完整'}).catch(()=>{if(classroom)classroom.querySelector('.status').textContent='状态未知';if(tutor)tutor.querySelector('.status').textContent='状态未知';alertUser('学习工具状态暂时不可用，入口仍然可以打开')})}
-function loadHome(push=false){state.domain='all';state.topic='all';state.selected=null;renderDomains();renderHome();show('home');if(push)history.pushState({},'','/')}function selectFromUrl(){const p=new URLSearchParams(location.search),path=p.get('path'),domain=p.get('domain'),topic=p.get('topic');if(path==='知识库首页.md'||path==='知识库首页'||domain==='总览'||topic==='首页'){history.replaceState({},'','/');loadHome(false)}else if(path)openNote(path,false);else if(p.get('view')==='graph')showGraph(false);else if(domain)select(domain,topic||'all',false);else loadHome(false)}function showGraph(push=true){state.view='graph';show('graph');renderGraph();if(push)history.pushState({},'', '/?view=graph')}$('#search').oninput=e=>{state.query=e.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};$('#mobile-menu').onclick=()=>$('#sidebar').classList.toggle('collapsed');if(matchMedia('(max-width:760px)').matches)$('#sidebar').classList.add('collapsed');window.onpopstate=selectFromUrl;bindGraph();renderSharedNav();initTheme();json('/api/notes').then(data=>{state.notes=data.notes;state.edges=data.edges;renderDomains();selectFromUrl()}).catch(console.error);setInterval(async()=>{try{const data=await json('/api/notes');state.notes=data.notes;state.edges=data.edges;renderDomains();if(state.view==='home')renderHome();if(state.view==='directory')renderDirectory();if(state.view==='graph')renderGraph()}catch(e){console.error(e)}},10000);
-</script>
-<script>
-(()=>{
-  const baseShow=show;
-  show=view=>{
-    baseShow(view);
-    const homeButton=$('#home-button');
-    if(homeButton)homeButton.classList.toggle('active',view==='home');
-  };
-  const back=$('#reader-back');
-  const mobileMenu=$('#mobile-menu');
-  if(mobileMenu){
-    const collapsed=$('#sidebar').classList.contains('collapsed');
-    mobileMenu.setAttribute('aria-expanded',String(!collapsed));
-    mobileMenu.setAttribute('aria-label',collapsed?'打开目录':'收起目录');
-    mobileMenu.onclick=()=>{const nextCollapsed=$('#sidebar').classList.toggle('collapsed');mobileMenu.setAttribute('aria-expanded',String(!nextCollapsed));mobileMenu.setAttribute('aria-label',nextCollapsed?'打开目录':'收起目录')};
-  }
-  if(back)back.onclick=()=>{
-    if(state.domain!=='all')select(state.domain,state.topic);
-    else if(state.query.trim()){$('#search').focus();show('directory');renderDirectory()}
-    else loadHome(true);
-  };
-  document.querySelectorAll('[data-visual]').forEach(button=>button.addEventListener('click',()=>{
-    document.querySelectorAll('[data-visual]').forEach(item=>item.setAttribute('aria-selected',item===button?'true':'false'));
-  }));
-  const decorate=()=>{
-    document.querySelectorAll('.domain-card,.note-row').forEach(item=>{
-      if(item.getAttribute('tabindex')!=='0')item.setAttribute('tabindex','0');
-      if(item.getAttribute('role')!=='button')item.setAttribute('role','button');
-      if(!item.getAttribute('aria-label'))item.setAttribute('aria-label',item.querySelector('h3')?.textContent||'打开笔记');
-    });
-  };
-  decorate();
-  new MutationObserver(decorate).observe($('#home'),{childList:true,subtree:true});
-  new MutationObserver(decorate).observe($('#directory'),{childList:true,subtree:true});
+function renderGraph(){const meta={network:['知识图谱','领域、主题与笔记之间的关联'],flow:['知识流通','从问题到证据、行动与反馈的路径'],learning:['学习循环','从目标、理解到练习、反馈与迁移'],architecture:['AI 系统架构','能力、知识、编排、工具、运行与治理的分层'],quadrant:['技术选型象限','用控制方式与协作范围理解组件位置']};const [t,s]=meta[state.graphMode];$('#graph-title').textContent=t;$('#graph-subtitle').textContent=s;document.querySelectorAll('[data-visual]').forEach(b=>b.classList.toggle('active',b.dataset.visual===state.graphMode));({network:renderNetwork,flow:renderFlow,learning:renderLearning,architecture:renderArchitecture,quadrant:renderQuadrant}[state.graphMode]||renderNetwork)()}
+function bindGraph(){const svg=$('#graph');let drag=null;svg.onwheel=e=>{e.preventDefault();state.zoom=Math.max(.55,Math.min(2.5,state.zoom*(e.deltaY<0?1.1:.9)));applyTransform()};svg.onpointerdown=e=>{if(e.target.closest('.node,.topic-node,.diagram-group,.point-group'))return;drag={x:e.clientX,y:e.clientY,px:state.pan.x,py:state.pan.y};svg.setPointerCapture(e.pointerId)};svg.onpointermove=e=>{if(drag)state.pan={x:drag.px+e.clientX-drag.x,y:drag.py+e.clientY-drag.y},applyTransform()};svg.onpointerup=()=>drag=null;$('#graph-zoom-in').onclick=()=>{state.zoom=Math.min(2.5,state.zoom*1.18);applyTransform()};$('#graph-zoom-out').onclick=()=>{state.zoom=Math.max(.55,state.zoom/1.18);applyTransform()};$('#graph-reset').onclick=()=>{state.zoom=1;state.pan={x:0,y:0};applyTransform()};document.querySelectorAll('[data-visual]').forEach(button=>button.onclick=()=>{state.graphMode=button.dataset.visual;state.zoom=1;state.pan={x:0,y:0};document.querySelectorAll('[data-visual]').forEach(item=>item.setAttribute('aria-selected',String(item===button)));renderGraph()})}
+function applyTransform(){const world=$('#graph-world');if(world)world.setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`);const label=$('#graph-zoom-value');if(label)label.textContent=Math.round(state.zoom*100)+'%'}
+
+function loadHome(push=false){clearSearch();state.domain='all';state.topic='all';state.selected=null;renderDomains();renderHome();show('home');if(push)history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'})}
+function selectFromUrl(){const params=new URLSearchParams(location.search),path=params.get('path'),domain=params.get('domain'),topic=params.get('topic');if(path==='知识库首页.md'||path==='知识库首页'||domain==='总览'||topic==='首页'){history.replaceState({},'','/');loadHome(false)}else if(path)openNote(path,false);else if(params.get('view')==='graph')showGraph(false);else if(domain)select(domain,topic||'all',false);else loadHome(false)}
+function showGraph(push=true){clearSearch();state.selected=null;show('graph');renderGraph();if(push)history.pushState({},'', '/?view=graph');window.scrollTo({top:0})}
+function setMobileSidebar(collapsed){const sidebar=$('#sidebar'),button=$('#mobile-menu');sidebar.classList.toggle('collapsed',collapsed);button.setAttribute('aria-expanded',String(!collapsed));button.setAttribute('aria-label',collapsed?'打开目录':'收起目录')}
+function collapseMobileSidebar(){setMobileSidebar(true)}
+function bindNavigation(){setMobileSidebar(matchMedia('(max-width:760px)').matches);$('#mobile-menu').onclick=()=>setMobileSidebar(!$('#sidebar').classList.contains('collapsed'));$('#reader-back').onclick=()=>{if(state.domain!=='all')select(state.domain,state.topic);else if(state.query.trim()){show('directory');renderDirectory();$('#search').focus()}else loadHome(true)};$('#search').oninput=event=>{state.query=event.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};window.onpopstate=selectFromUrl}
+/* ── 键盘操作 ──────────────────────────────────────────────────────────
+   阅读时手不离键盘：/ 搜索、j/k 移动、Enter 打开、Esc 返回、
+   g+字母跳转、t 切主题、? 看帮助。
+   "g" 前缀用 1.2 秒窗口，超时自动清除，避免误触后吞掉下一次按键。 */
+function kbdOverlay(open){
+  const el=$('#kbd-overlay');
+  if(!el)return;
+  el.hidden=!open;
+  el.classList.toggle('open',open);
+  if(open){const close=$('#kbd-close');if(close)close.focus()}
+  else if(document.activeElement&&el.contains(document.activeElement))$('#kbd-hint')?.focus();
+}
+function moveSelection(delta){
+  const rows=[...document.querySelectorAll('#directory .note-row')];
+  if(!rows.length)return;
+  const at=rows.indexOf(document.activeElement);
+  const next=at<0?(delta>0?0:rows.length-1):Math.min(rows.length-1,Math.max(0,at+delta));
+  rows[next].focus();
+  rows[next].scrollIntoView({block:'nearest'});
+}
+function toggleThemeFromKeyboard(){
+  const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
+  try{localStorage.setItem('tk-theme',next)}catch{}
+  document.documentElement.dataset.theme=next;
+  const btn=$('#theme-toggle');
+  if(btn)btn.textContent=next==='dark'?'☀':'☾';
+}
+function bindKeyboard(){
+  let gPending=0;
   document.addEventListener('keydown',event=>{
-    if(!['Enter',' '].includes(event.key))return;
-    const item=event.target.closest('.domain-card,.note-row');
-    if(!item)return;
-    event.preventDefault();
-    if(item.classList.contains('domain-card'))select(item.dataset.domain,'all');
-    else openNote(item.dataset.path);
+    const tag=(event.target.tagName||'').toLowerCase();
+    const typing=tag==='input'||tag==='textarea'||event.target.isContentEditable;
+    if(event.key==='Escape'){
+      if($('#kbd-overlay')?.classList.contains('open')){kbdOverlay(false);event.preventDefault();return}
+      if(typing&&event.target.id==='search'){event.target.value='';state.query='';loadHome(false);event.preventDefault();return}
+      if(state.view==='reader'){$('#reader-back').click();event.preventDefault()}
+      return;
+    }
+    if(typing)return;
+    if(event.metaKey||event.ctrlKey||event.altKey)return;
+    const key=event.key;
+    if(key==='?'||(key==='/'&&event.shiftKey)){kbdOverlay(!$('#kbd-overlay')?.classList.contains('open'));event.preventDefault();return}
+    if(key==='/'){$('#search')?.focus();event.preventDefault();return}
+    if(key==='t'){toggleThemeFromKeyboard();event.preventDefault();return}
+    if(key==='j'||key==='ArrowDown'){moveSelection(1);event.preventDefault();return}
+    if(key==='k'||key==='ArrowUp'){moveSelection(-1);event.preventDefault();return}
+    // "g <letter>" 跳转。链式状态：第一次 g 只记时间并等待，
+    // 第二次按键才查表 —— 但第二次也可能是 g（g g = 图谱），
+    // 所以必须先查表再决定是否继续等待。
+    if(key==='g'&&Date.now()-gPending>=1200){gPending=Date.now();return}
+    if(Date.now()-gPending<1200){
+      gPending=0;
+      const targets={h:()=>loadHome(true),g:()=>showGraph(),p:()=>location.assign('/projects')};
+      const run=targets[key.toLowerCase()];
+      if(run){run();event.preventDefault()}
+      return;
+    }
   });
-  setTimeout(()=>{if(!state.notes.length)alertUser('知识内容暂时加载失败，请刷新重试')},6000);
-  fetch('/api/learning/status',{cache:'no-store'}).catch(()=>alertUser('学习工具状态暂时不可用，入口仍然可以打开'));
-})();
-</script>
-<script>
-// Keep the reader and learning center connected without changing the reader's default behavior.
-(()=>{
-  const study=document.querySelector('#reader-study');
-  const updateStudy=()=>{
-    const title=document.querySelector('#reader-title')?.textContent?.trim();
-    const reader=document.querySelector('#reader');
-    if(!study)return;
-    study.title='进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型。';
-    if(title&&reader?.classList.contains('open')){study.hidden=false;study.href='/learn?topic='+encodeURIComponent(title);study.target='_blank';study.rel='noopener noreferrer'}
-    else{study.hidden=true;study.href='/learn';study.target='_blank';study.rel='noopener noreferrer'}
+  $('#kbd-hint').onclick=()=>kbdOverlay(true);
+  $('#kbd-close').onclick=()=>kbdOverlay(false);
+  $('#kbd-overlay').onclick=event=>{if(event.target.id==='kbd-overlay')kbdOverlay(false)};
+}
+function dataSignature(data){return data.notes.map(note=>[note.path,note.updated,note.title,note.search_text].join('\u0000')).join('\u0001')+'\u0002'+JSON.stringify(data.edges)}
+async function refreshNotes(initial=false){const data=await json('/api/notes'),signature=dataSignature(data);if(signature===state.notesSignature)return;state.notes=data.notes;state.edges=data.edges;state.notesSignature=signature;renderDomains();if(initial){selectFromUrl();return}if(state.view==='home')renderHome();else if(state.view==='directory')renderDirectory();else if(state.view==='graph')renderGraph()}
+async function refreshLearningStatus(notify=false){try{state.learningStatus=await json('/api/learning/status');if(state.view==='home')applyHomeStatus()}catch(error){console.error(error);if(!state.learningStatus&&state.view==='home')applyHomeStatus();if(notify)alertUser('学习工具状态暂时不可用，入口仍然可以打开')}}
+async function initialize(){
+  bindGraph();bindNavigation();bindKeyboard();renderSharedNav();initTheme();
+  // 先给出骨架，避免首屏是一片空白让人以为坏了。
+  showLoading();
+  const loadingWarning=setTimeout(()=>{if(!state.notes.length)alertUser('知识内容加载较慢，仍在重试…')},6000);
+  try{await refreshNotes(true);clearTimeout(loadingWarning)}
+  catch(error){console.error(error);showLoadError()}
+  await refreshLearningStatus(true);
+}
+function showLoading(){
+  const box=$('#directory');
+  if(state.notes.length||box.style.display==='block')return;
+  box.innerHTML=`<div class="skeleton" aria-live="polite" aria-busy="true">
+    <p class="skeleton-note">正在读取知识库…</p>
+    ${[3,2,3].map(n=>`<div class="skeleton-group">${Array.from({length:n}).map(()=>'<div class="skeleton-row"><span class="skeleton-bar w40"></span><span class="skeleton-bar w85"></span></div>').join('')}</div>`).join('')}
+  </div>`;
+  show('directory');
+}
+function showLoadError(){
+  $('#directory').innerHTML=`<div class="empty"><p class="empty-title">知识内容暂时读不到</p><p class="empty-hint">本机服务可能正在重启。稍等几秒后重试，或检查站点是否在运行。</p><button type="button" class="empty-action" id="load-retry">重新加载</button></div>`;
+  const retry=$('#load-retry');
+  if(retry)retry.onclick=()=>{
+    showLoading();
+    // refreshNotes 在数据签名没变时会直接返回，错误界面就会一直挂着。
+    // 重试是明确的用户意图，这里强制重新渲染一次。
+    refreshNotes(true).then(()=>renderActiveView()).catch(()=>showLoadError());
   };
-  const reader=document.querySelector('#reader');
-  const title=document.querySelector('#reader-title');
-  if(reader)new MutationObserver(updateStudy).observe(reader,{attributes:true,attributeFilter:['class']});
-  if(title)new MutationObserver(updateStudy).observe(title,{childList:true,subtree:true,characterData:true});
-  updateStudy();
-  const originalOpenNote=window.openNote;
-  if(typeof originalOpenNote==='function')window.openNote=async function(...args){const result=await originalOpenNote(...args);updateStudy();return result};
-  const originalLoadHome=window.loadHome;
-  if(typeof originalLoadHome==='function')window.loadHome=function(...args){if(study){study.hidden=true;study.href='/learn'}return originalLoadHome(...args)};
-})();
-</script>
-<script>
-// Keep learning aids discoverable from the home view.
-(() => {
-  const addHistoryEntry = () => {
-    const grid = document.querySelector('#home .aux-grid');
-    if (!grid || grid.querySelector('#home-history')) return;
-    const card = document.createElement('article');
-    card.className = 'aux-card';
-    card.id = 'home-history';
-    card.innerHTML = '<h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a>';
-    grid.append(card);
-  };
-  const home = document.querySelector('#home');
-  if (home) new MutationObserver(addHistoryEntry).observe(home, { childList: true });
-  addHistoryEntry();
-})();
-</script>
-<script>
-// Keep navigation state stable while the vault is polled for changes.
-(() => {
-  const originalSelect = window.select;
-  const originalShowGraph = window.showGraph;
-  const originalLoadHome = window.loadHome;
-  if (typeof originalSelect === 'function') {
-    window.select = (domain = 'all', topic = 'all', push = true) => {
-      state.query = '';
-      const search = document.querySelector('#search');
-      if (search) search.value = '';
-      return originalSelect(domain, topic, push);
-    };
-  }
-  if (typeof originalShowGraph === 'function') {
-    window.showGraph = (push = true) => {
-      state.query = '';
-      const search = document.querySelector('#search');
-      if (search) search.value = '';
-      return originalShowGraph(push);
-    };
-  }
-  if (typeof originalLoadHome === 'function') {
-    window.loadHome = (...args) => {
-      const result = originalLoadHome(...args);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      return result;
-    };
-  }
-
-  const originalRenderDomains = window.renderDomains;
-  const originalRenderDirectory = window.renderDirectory;
-  const originalRenderHome = window.renderHome;
-  const originalRenderGraph = window.renderGraph;
-  let lastNotesRef = null;
-  let lastNotesKey = '';
-  const notesKey = () => {
-    if (state.notes !== lastNotesRef) {
-      lastNotesRef = state.notes;
-      lastNotesKey = state.notes
-        .map((note) => [note.path, note.updated, note.title, note.search_text].join('\u0000'))
-        .join('\u0001') + '\u0002' + JSON.stringify(state.edges);
-    }
-    return lastNotesKey;
-  };
-  const renderKey = (...parts) => `${notesKey()}\u0003${parts.join('\u0000')}`;
-  let domainsKey = '';
-  let directoryKey = '';
-  let homeKey = '';
-  let graphKey = '';
-  const decorateProjectLinks = () => {
-    document.querySelectorAll('#home a[href^="/projects"], #home a[href^="/apps/agent-evaluation"]').forEach((link) => {
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-    });
-    const classroom = [...document.querySelectorAll('#home .work-card')].find((card) => card.querySelector('h3')?.textContent === 'OpenMAIC');
-    const actions = classroom?.querySelector('.work-actions');
-    if (actions && !actions.querySelector('a[href="/learn/openmaic"]')) {
-      const guide = document.createElement('a');
-      guide.href = '/learn/openmaic';
-      guide.target = '_blank';
-      guide.rel = 'noopener noreferrer';
-      guide.textContent = '完整使用指南';
-      actions.insertBefore(guide, actions.lastElementChild);
-    }
-  };
-  window.renderDomains = () => {
-    const key = renderKey(state.domain, state.topic);
-    if (key === domainsKey) return;
-    domainsKey = key;
-    originalRenderDomains();
-  };
-  window.renderDirectory = () => {
-    const key = renderKey(state.domain, state.topic, state.query, state.sort);
-    if (key === directoryKey) return;
-    directoryKey = key;
-    originalRenderDirectory();
-  };
-  window.renderHome = () => {
-    const key = renderKey('home');
-    if (key === homeKey) return;
-    homeKey = key;
-    originalRenderHome();
-    decorateProjectLinks();
-  };
-  window.renderGraph = () => {
-    const key = renderKey(state.graphMode, state.selected);
-    if (key === graphKey) return;
-    graphKey = key;
-    originalRenderGraph();
-  };
-
-  const refreshHomeStatus = () => {
-    if (state.view !== 'home') return;
-    json('/api/learning/status').then((status) => {
-      const cards = [...document.querySelectorAll('#home .work-card')];
-      const classroom = cards.find((card) => card.querySelector('h3')?.textContent === 'OpenMAIC');
-      const tutor = cards.find((card) => card.querySelector('h3')?.textContent === 'DeepTutor');
-      if (classroom) {
-        classroom.querySelector('.status').textContent = status.openmaic?.online && status.openmaic?.llm
-          ? '互动课堂可用'
-          : status.openmaic?.online ? '服务运行中' : '未启动';
-      }
-      if (tutor) {
-        tutor.querySelector('.status').textContent = status.deeptutor?.online && status.deeptutor?.llm
-          ? '导师可用' : '配置不完整';
-      }
-    }).catch(() => {});
-  };
-  window.setInterval(refreshHomeStatus, 10000);
-})();
+  show('directory');
+}
+/* 按当前视图重画内容。重试、以及任何"数据没变但界面需要恢复"的场合都用它。 */
+function renderActiveView(){
+  if(state.view==='home')renderHome();
+  else if(state.view==='graph')renderGraph();
+  else renderDirectory();
+}
+async function refreshApp(){await Promise.allSettled([refreshNotes(),refreshLearningStatus()])}
+initialize();setInterval(refreshApp,10000);
 </script>
 <script src="/static/mermaid.min.js"></script>
 <script>

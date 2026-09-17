@@ -1,10 +1,13 @@
 /* Shared navigation for the knowledge workbench and its companion pages. */
+@import url("/static/brand.css");
+
 :root {
   --wb-bg: #f4f7f5;
   --wb-paper: #ffffff;
   --wb-ink: #18231f;
   --wb-muted: #64716b;
   --wb-line: #dce4df;
+  --wb-line-strong: #c8d6d0;
   --wb-accent: #087663;
   --wb-accent-soft: #e8f3ef;
   --wb-shadow: 0 10px 28px rgba(20, 42, 35, .07);
@@ -19,6 +22,7 @@
   --wb-ink: #e6ede9;
   --wb-muted: #93a29c;
   --wb-line: #2b3733;
+  --wb-line-strong: #40504a;
   --wb-accent: #5fbfa6;
   --wb-accent-soft: #1e3630;
   --wb-shadow: 0 10px 28px rgba(0, 0, 0, .35);
@@ -26,7 +30,9 @@
 
 body.wb-host {
   min-height: 100vh;
-  padding-left: 248px;
+  /* 与主站的 .app grid 保持一致（286px）。这里是 fixed 侧边栏要自己留位置，
+     两处宽度一旦不同，点「项目与教学」时导航栏会突然变窄。 */
+  padding-left: 286px;
   background: var(--wb-bg);
 }
 
@@ -34,43 +40,14 @@ body.wb-host {
   position: fixed;
   inset: 0 auto 0 0;
   z-index: 10;
-  width: 248px;
+  /* 与主站 .app 的 286px 一致，避免跨页导航时宽度跳动 */
+  width: 286px;
   padding: 25px 16px 20px;
   display: flex;
   flex-direction: column;
   background: var(--wb-paper);
   border-right: 1px solid var(--wb-line);
 }
-
-.wb-brand {
-  display: flex;
-  align-items: center;
-  gap: 11px;
-  padding: 0 8px 22px;
-  border-bottom: 1px solid var(--wb-line);
-  color: var(--wb-ink);
-  font-weight: 760;
-  text-decoration: none;
-}
-
-.wb-mark {
-  width: 35px;
-  height: 35px;
-  display: grid;
-  place-items: center;
-  flex: 0 0 auto;
-  border-radius: 8px;
-  background: var(--wb-accent);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-}
-
-.wb-brand-text { min-width: 0; }
-.wb-brand-text strong,
-.wb-brand-text small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.wb-brand-text strong { font-size: 14px; }
-.wb-brand-text small { margin-top: 2px; color: var(--wb-muted); font-size: 11px; font-weight: 500; }
 
 .wb-nav {
   display: grid;
@@ -91,6 +68,7 @@ body.wb-host {
   font-size: 13px;
   font-weight: 650;
   text-decoration: none;
+  transition: background .14s ease, border-color .14s ease, color .14s ease;
 }
 
 .wb-nav a:hover,
@@ -105,6 +83,14 @@ body.wb-host {
   color: currentColor;
   font-size: 14px;
   text-align: center;
+}
+
+/* Sub-nav icons are a quieter weight so they read as children of the
+   destination above them rather than competing with its icon. */
+.wb-nav-icon--sub {
+  width: 16px;
+  font-size: 12px;
+  opacity: .75;
 }
 
 /* Knowledge-domain tree. Only rendered on pages that opt in via
@@ -185,6 +171,96 @@ body.wb-host .topbar { position: relative; }
 body.wb-host a { text-decoration: none; }
 body.wb-host a:hover { text-decoration: none; }
 
+/* Canonical page rhythm for companion pages. Individual pages still own their
+   content, but the workbench owns the frame: width, first-screen spacing,
+   card density, and mobile behavior stay consistent while navigating. */
+body.wb-host .shell {
+  width: 100%;
+  padding-left: clamp(18px, 2.4vw, 30px);
+  padding-right: clamp(18px, 2.4vw, 30px);
+  padding-bottom: 64px;
+}
+
+body.wb-host .shell > .hero:first-child {
+  margin: 0;
+  padding: 42px 0 28px;
+  border-bottom: 1px solid var(--wb-line);
+}
+
+body.wb-host .hero h1 {
+  max-width: 880px;
+  font-size: clamp(31px, 3vw, 36px);
+  letter-spacing: 0;
+}
+
+body.wb-host .hero p {
+  max-width: 880px;
+  color: var(--wb-muted);
+}
+
+body.wb-host .eyebrow {
+  color: var(--wb-accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .1em;
+}
+
+body.wb-host .section { margin-top: 28px; }
+body.wb-host .section h2,
+body.wb-host .panel h2 { letter-spacing: 0; }
+
+body.wb-host .panel,
+body.wb-host .project,
+body.wb-host .service,
+body.wb-host .card,
+body.wb-host .topic-box,
+body.wb-host .dimension,
+body.wb-host .analysis-card {
+  border-color: var(--wb-line);
+  border-radius: 7px;
+  box-shadow: 0 1px 2px rgba(20, 42, 35, .03);
+}
+
+body.wb-host .usage-grid .usage-item,
+body.wb-host .stages .stage,
+body.wb-host .flow .flow-step {
+  border-radius: 0;
+  box-shadow: none;
+}
+
+body.wb-host .panel,
+body.wb-host .project,
+body.wb-host .service,
+body.wb-host .card,
+body.wb-host .topic-box {
+  background: var(--wb-paper);
+}
+
+body.wb-host .links a,
+body.wb-host .actions a,
+body.wb-host .hero-links a,
+body.wb-host .work-actions a,
+body.wb-host .topic-secondary,
+body.wb-host button {
+  border-radius: 5px;
+}
+
+body.wb-host .button,
+body.wb-host .links a,
+body.wb-host .actions a,
+body.wb-host .hero-links a,
+body.wb-host .work-actions a {
+  transition: border-color .14s ease, background .14s ease, color .14s ease, transform .14s ease;
+}
+
+body.wb-host .button:hover,
+body.wb-host .links a:hover,
+body.wb-host .actions a:hover,
+body.wb-host .hero-links a:hover,
+body.wb-host .work-actions a:hover {
+  transform: translateY(-1px);
+}
+
 .purpose {
   display: flex;
   gap: 14px;
@@ -203,43 +279,51 @@ body.wb-host a:hover { text-decoration: none; }
 .purpose strong { flex: 0 0 auto; color: var(--wb-ink); font-size: 13px; }
 .purpose span { min-width: 0; }
 
-/* Sub-section under 项目与工具: learning pages are tools you reach for, so they
-   nest under that destination rather than competing with it in the main nav. */
+/* Sub-section under 项目与教学: learning pages are tools you reach for, so they
+   nest under that destination rather than competing with it in the main nav.
+   The left rail + indent is what makes them read as children; without it the
+   smaller type just looked like shrunken siblings. */
 .wb-subnav {
   display: grid;
   gap: 2px;
-  margin-top: 10px;
-  padding-left: 10px;
+  margin: 10px 0 0 15px;
+  padding: 8px 0 0 11px;
+  border-top: 1px solid var(--wb-line);
   border-left: 2px solid var(--wb-line);
 }
 
 .wb-subnav-label {
-  margin: 0 0 3px;
+  margin: 0 0 4px;
   padding-left: 10px;
   color: var(--wb-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: .1em;
-  text-transform: uppercase;
+  letter-spacing: .08em;
 }
 
 .wb-subnav a {
-  display: block;
-  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid transparent;
   border-radius: 6px;
   color: var(--wb-muted);
-  font-size: 12.5px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 650;
   text-decoration: none;
+  transition: background .14s ease, color .14s ease, border-color .14s ease;
 }
 
 .wb-subnav a:hover,
 .wb-subnav a[aria-current="page"] {
+  border-color: #b9d9cf;
   background: var(--wb-accent-soft);
   color: var(--wb-accent);
 }
 
-/* Theme toggle. Lives in the sidebar footer so every page gets it. */
+/* Theme toggle. Pinned to the viewport's top-right on every page so it stays
+   where the reader expects it, regardless of which section they are in. */
 .wb-theme-toggle {
   display: flex;
   align-items: center;
@@ -253,11 +337,35 @@ body.wb-host a:hover { text-decoration: none; }
   color: var(--wb-muted);
   font: 600 12px/1 inherit;
   cursor: pointer;
+  transition: border-color .14s ease, color .14s ease, background .14s ease;
 }
 
 .wb-theme-toggle:hover {
   border-color: var(--wb-accent);
   color: var(--wb-accent);
+}
+
+.wb-theme-toggle--fixed {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 20;
+  width: auto;
+  margin: 0;
+  padding: 8px 13px;
+  background: var(--wb-paper);
+}
+
+.wb-theme-toggle--fixed:hover {
+  background: var(--wb-accent-soft);
+}
+
+@media (max-width: 900px) {
+  .wb-theme-toggle--fixed {
+    top: 12px;
+    right: 14px;
+    padding: 7px 11px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -271,27 +379,36 @@ body.wb-host a:hover { text-decoration: none; }
     border-right: 0;
     border-bottom: 1px solid var(--wb-line);
   }
-  .wb-brand { padding: 0 0 11px; border-bottom: 0; }
   .wb-nav {
     display: flex;
     gap: 5px;
     margin-top: 0;
-    padding-top: 5px;
+    padding-top: 4px;
     overflow-x: auto;
     scrollbar-width: none;
   }
   .wb-nav::-webkit-scrollbar { display: none; }
   .wb-nav a { flex: 0 0 auto; min-height: 34px; padding: 7px 9px; font-size: 12px; }
-  .wb-subnav { display: flex; gap: 4px; padding-left: 0; border-left: 0; margin-top: 4px; }
+  .wb-subnav {
+    display: flex;
+    gap: 4px;
+    margin-top: 3px;
+    padding-top: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .wb-subnav::-webkit-scrollbar { display: none; }
   .wb-subnav-label { display: none; }
   .wb-subnav a { flex: 0 0 auto; padding: 5px 8px; font-size: 12px; }
   .wb-context, .wb-sidebar-footer { display: none; }
-  body.wb-host .shell { max-width: none; }
+  body.wb-host .shell { max-width: none; padding: 0 15px 44px; }
+  body.wb-host .shell > .hero:first-child { padding: 30px 0 23px; }
+  body.wb-host .hero h1 { font-size: 29px; line-height: 1.22; }
+  body.wb-host .purpose { margin-top: 18px; }
 }
 
 @media (max-width: 560px) {
   .wb-sidebar { padding-left: 13px; padding-right: 13px; }
-  .wb-brand-text strong { font-size: 13px; }
   .wb-nav a { padding-left: 8px; padding-right: 8px; }
   .wb-nav-icon { display: none; }
   .purpose { display: block; margin-top: 18px; padding: 12px 13px; }
@@ -300,12 +417,24 @@ body.wb-host a:hover { text-decoration: none; }
 
 /* Dark theme: the brand chip and nav used hard-coded light-theme colours, and
    primary buttons kept white text on a now-lighter accent. */
-:root[data-theme="dark"] .wb-mark {
-  color: var(--wb-ink);
-  background: var(--wb-accent-soft);
-  border-color: var(--wb-accent);
-}
 :root[data-theme="dark"] .wb-nav a,
 :root[data-theme="dark"] .wb-subnav a,
 :root[data-theme="dark"] .wb-sidebar-footer { color: var(--wb-muted); }
 :root[data-theme="dark"] .wb-nav-icon { color: inherit; }
+:root[data-theme="dark"] body.wb-host .panel,
+:root[data-theme="dark"] body.wb-host .project,
+:root[data-theme="dark"] body.wb-host .service,
+:root[data-theme="dark"] body.wb-host .card,
+:root[data-theme="dark"] body.wb-host .topic-box,
+:root[data-theme="dark"] body.wb-host .usage-item,
+:root[data-theme="dark"] body.wb-host .dimension,
+:root[data-theme="dark"] body.wb-host .stage,
+:root[data-theme="dark"] body.wb-host .flow-step,
+:root[data-theme="dark"] body.wb-host .analysis-card,
+:root[data-theme="dark"] body.wb-host .hero-links a,
+:root[data-theme="dark"] body.wb-host .actions a,
+:root[data-theme="dark"] body.wb-host .links a {
+  background: var(--wb-paper);
+  border-color: var(--wb-line);
+  color: var(--wb-ink);
+}

@@ -1,0 +1,67 @@
+/* Canonical workbench identity. Every page uses these exact metrics so the
+   brand does not change weight, rhythm, or size while navigating. */
+.tk-brand {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  padding: 0 8px 22px;
+  border-bottom: 1px solid var(--wb-line, var(--line, #dce4df));
+  color: var(--wb-ink, var(--ink, #18231f));
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.tk-brand-mark {
+  display: grid;
+  place-items: center;
+  flex: 0 0 35px;
+  width: 35px;
+  height: 35px;
+  border-radius: 8px;
+  background: var(--wb-accent, var(--accent, #087663));
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tk-brand-text { min-width: 0; }
+
+.tk-brand-text strong,
+.tk-brand-text small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tk-brand-text strong {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.tk-brand-text small {
+  margin-top: 2px;
+  color: var(--wb-muted, var(--muted, #64716b));
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+:root[data-theme="dark"] .tk-brand-mark {
+  background: var(--wb-accent-soft, var(--accent-soft, #1e3630));
+  color: var(--wb-ink, var(--ink, #e6ede9));
+  box-shadow: inset 0 0 0 1px var(--wb-accent, var(--accent, #5fbfa6));
+}
+
+@media (max-width: 900px) {
+  .tk-brand {
+    padding: 0 0 11px;
+    border-bottom: 0;
+  }
+}

@@ -10,7 +10,7 @@
       description: "阅读、搜索，并用图谱看知识之间的关系。",
     },
     projects: {
-      label: "项目与工具",
+      label: "项目与教学",
       href: "/projects",
       icon: "▣",
       title: "进入学习与工程工具",
@@ -23,7 +23,7 @@
       title: "把判断绑定到证据",
       description: "自研评估项目的设计与后续实现入口。",
     },
-    /* Learning lives under 项目与工具 rather than in the main nav: a classroom
+    /* Learning lives under 项目与教学 rather than in the main nav: a classroom
        is a tool you reach for, not a second way to browse knowledge. The
        sub-links keep both pages reachable once you are inside that section. */
     learning: {
@@ -43,38 +43,36 @@
       parent: "projects",
     },
     graph: {
-      label: "关系图谱",
+      label: "知识图谱",
       href: "/?view=graph",
       icon: "⌘",
       title: "看知识之间怎么连",
       description: "领域、主题与笔记之间的关联，以及知识流通路径。",
-      parent: "knowledge",
     },
   };
   const current = pages[page] || pages.knowledge;
-  const nav = [pages.knowledge, pages.projects, pages.evaluation];
+  const nav = [pages.knowledge, pages.graph, pages.projects, pages.evaluation];
   const SUBNAV = {
-    knowledge: [pages.graph],
     projects: [pages.learning, pages.classrooms],
   };
-  // The section's own page shows its sub-links too, so 项目与工具 reveals
-  // 学习中心 / 我的课堂, and 知识库 reveals 关系图谱.
+  // Learning tools stay under 项目与教学. 知识图谱 is a primary destination
+  // because it is useful from every page, not only while browsing knowledge.
   const section = current.parent || page;
   const subNav = SUBNAV[section] || [];
   const aside = document.createElement("aside");
   aside.className = "wb-sidebar";
   aside.setAttribute("aria-label", "工作台导航");
   aside.innerHTML = `
-    <a class="wb-brand" href="/" aria-label="返回 technical-knowledge 知识库">
-      <span class="wb-mark" aria-hidden="true">TK</span>
-      <span class="wb-brand-text"><strong>technical-knowledge</strong><small>工程知识工作台</small></span>
+    <a class="tk-brand" href="/" aria-label="返回工程知识库">
+      <span class="tk-brand-mark" aria-hidden="true">K</span>
+      <span class="tk-brand-text"><strong>工程知识库</strong><small>技术知识图谱</small></span>
     </a>
     <nav class="wb-nav">
-      ${nav.map((item) => `<a href="${item.href}" ${item === current ? 'aria-current="page"' : ""} title="${item.title}：${item.description}"><span class="wb-nav-icon" aria-hidden="true">${item.icon}</span><span>${item.label}</span></a>`).join("")}
+      ${nav.map((item) => `<a href="${item.href}" ${item === current || pages[current.parent] === item ? 'aria-current="page"' : ""} title="${item.title}：${item.description}"><span class="wb-nav-icon" aria-hidden="true">${item.icon}</span><span>${item.label}</span></a>`).join("")}
     </nav>
-    ${subNav.length ? `<nav class="wb-subnav" aria-label="学习工具">
+    ${subNav.length ? `<nav class="wb-subnav" aria-label="学习入口">
       <p class="wb-subnav-label">学习</p>
-      ${subNav.map((item) => `<a href="${item.href}" ${item === current ? 'aria-current="page"' : ""} title="${item.title}：${item.description}"><span>${item.label}</span></a>`).join("")}
+      ${subNav.map((item) => `<a href="${item.href}" ${item === current ? 'aria-current="page"' : ""} title="${item.title}：${item.description}"><span class="wb-nav-icon wb-nav-icon--sub" aria-hidden="true">${item.icon}</span><span>${item.label}</span></a>`).join("")}
     </nav>` : ""}
     ${script?.dataset.domainTree != null ? '<nav class="wb-domains" id="domains" aria-label="知识领域"></nav>' : ""}
     <div class="wb-context">
@@ -83,14 +81,23 @@
       <p>${current.description}</p>
     </div>
     <div class="wb-sidebar-footer">
-      <button type="button" class="wb-theme-toggle" id="wb-theme-toggle" aria-live="polite">
-        <span id="wb-theme-icon" aria-hidden="true">☾</span><span id="wb-theme-label">夜晚模式</span>
-      </button>
-      <div class="wb-sidebar-links"><a href="/?view=graph">图谱</a><a href="/auth/logout">退出</a></div>
+      <div class="wb-sidebar-links"><a href="/auth/logout">退出</a></div>
     </div>
   `;
   document.body.classList.add("wb-host");
   document.body.insertBefore(aside, document.body.firstChild);
+
+  /* The theme toggle is pinned to the top-right of the viewport rather than
+     living in the sidebar footer, so it sits in the same place on every page
+     (workspace, projects, learning) — the reader reaches for it by habit. */
+  const themeToggle = document.createElement("button");
+  themeToggle.type = "button";
+  themeToggle.className = "wb-theme-toggle wb-theme-toggle--fixed";
+  themeToggle.id = "wb-theme-toggle";
+  themeToggle.setAttribute("aria-live", "polite");
+  themeToggle.innerHTML =
+    '<span id="wb-theme-icon" aria-hidden="true">☾</span><span id="wb-theme-label">夜晚模式</span>';
+  document.body.appendChild(themeToggle);
 
   // Theme: an explicit choice is remembered; otherwise follow the OS and keep
   // following it until the visitor decides for themselves.

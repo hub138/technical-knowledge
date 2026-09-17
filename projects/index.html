@@ -11,7 +11,7 @@
         --bg: #f4f6f5;
         --paper: #fff;
         --ink: #1f2a27;
-        --muted: var(--muted);
+        --muted: #68746f;
         --line: #dbe2de;
         --accent: #147766;
         --soft: #e4f1ed;
@@ -47,48 +47,6 @@
         max-width: 1240px;
         margin: 0 auto;
         padding: 0 28px 64px;
-      }
-      .topbar {
-        height: 76px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid var(--line);
-      }
-      .brand {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        color: var(--ink);
-        font-weight: 750;
-      }
-      .mark {
-        width: 34px;
-        height: 34px;
-        border: 1px solid var(--accent);
-        border-radius: 9px;
-        display: grid;
-        place-items: center;
-        color: var(--accent);
-        font-weight: 800;
-      }
-      .nav {
-        display: flex;
-        gap: 7px;
-      }
-      .nav a {
-        font-size: 13px;
-        padding: 7px 10px;
-        border: 1px solid transparent;
-        border-radius: 6px;
-        color: var(--muted);
-      }
-      .nav a:hover,
-      .nav a.active {
-        border-color: #b9d9d0;
-        background: var(--soft);
-        color: var(--accent);
-        text-decoration: none;
       }
       .hero {
         padding: 45px 0 29px;
@@ -212,6 +170,51 @@
         background: #f8faf9;
         border: 1px solid var(--line);
         overflow-wrap: anywhere;
+      }
+      /* 事实徽标：星数、许可、部署状态、凭据要求。
+         和首页"学习与实践"保持同一套判断依据，避免两页说法不一致。 */
+      .facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0 0 14px;
+      }
+      .facts span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 3px 8px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        background: #f8faf9;
+        color: var(--muted);
+        font-size: 11px;
+        font-weight: 650;
+        font-variant-numeric: tabular-nums;
+      }
+      .facts .fact-stars {
+        border-color: #e2d3a8;
+        background: #fdf8e8;
+        color: #8a6d1f;
+      }
+      .facts .fact-open,
+      .facts .fact-live {
+        border-color: #b7d9cf;
+        background: var(--soft);
+        color: var(--accent);
+      }
+      .facts .fact-key {
+        border-color: #efd9b3;
+        background: var(--warm-soft);
+        color: var(--warm);
+      }
+      :root[data-theme="dark"] .facts .fact-stars {
+        border-color: #4a3f1c;
+        background: #2a2413;
+        color: #d9c069;
+      }
+      :root[data-theme="dark"] .facts span {
+        background: #182220;
       }
       .actions {
         display: flex;
@@ -494,7 +497,7 @@
             >打开学习中心</a
           ><a href="/">回到知识库</a
           ><a href="/apps/agent-evaluation/index.html">查看自研 Agent 评估</a
-          ><a href="/?view=graph">查看关系图谱</a>
+          ><a href="/?view=graph">查看知识图谱</a>
         </div>
       </section>
       <div class="purpose">
@@ -514,26 +517,25 @@
         <div class="section-head">
           <div>
             <h2>使用前说明</h2>
-            <p>先按入口进入，不要直接猜 3100、3782 或旧路径。</p>
+            <p>优先使用本页入口：它会处理授权、回跳和主题预填。</p>
           </div>
         </div>
         <div class="usage-grid">
           <article class="usage-item">
             <h3>打开课堂：OpenMAIC</h3>
             <p>
-              点击本页“创建课堂”，或在学习中心先填主题。入口会带上主题并注入访问凭据；直接输入
-              3100、旧的 `/workbench/new` 或空链接，可能出现白框、404 或无内容。
+              点击本页“打开课堂”，或在学习中心先填主题。入口会带上主题并完成授权；手动访问
+              3100、旧的 `/workbench/new` 或空链接，可能停在授权页、404 或空页面。
             </p>
             <b
-              >如果看见白框/404：回到本页重新点击按钮，并确认“互动课堂运行中”。</b
+              >处理方式：回到本页重新点击入口，并确认“互动课堂可用”。</b
             >
           </article>
           <article class="usage-item">
             <h3>打开导师：DeepTutor</h3>
             <p>
               点击“进入学习导师”，系统会先完成本地账号会话，再进入
-              Chat。不要直接打开
-              3782，那会落到原始登录页；如果仍出现登录框，返回本页重试。
+              Chat。手动访问 3782 可能落到原始登录页；如果仍出现登录框，返回本页重试。
             </p>
             <b
               >Embedding
@@ -577,6 +579,7 @@
               </div>
               <span class="status">3100 运行中</span>
             </div>
+            <p class="facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></p>
             <p>
               把一个主题变成可操作的课堂。根据目标选择讲解、互动、测验、PBL
               或可视化页面，适合把知识点从“读懂”推进到“做出来”。
@@ -585,7 +588,7 @@
               本地源码：projects/OpenMAIC · 教学入口：本机 3100 端口
             </div>
             <div class="actions">
-              <a
+              <a title="打开 OpenMAIC 互动课堂：会自动完成授权并带上主题，直接进入生成页"
                 class="primary"
                 data-service-port="3100"
                 data-service-path="/"
@@ -593,8 +596,8 @@
                 rel="noopener noreferrer"
                 href="/launch/openmaic?next=%2F%3Ftopic%3D%E8%AF%B7%E5%9B%B4%E7%BB%95%E4%B8%80%E4%B8%AA%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%E4%B8%BB%E9%A2%98%E7%94%9F%E6%88%90%E5%8C%85%E5%90%AB%E6%9C%BA%E5%88%B6%E8%AE%B2%E8%A7%A3%E3%80%81%E4%BA%92%E5%8A%A8%E7%BB%83%E4%B9%A0%E3%80%81%E5%8F%8D%E9%A6%88%E5%92%8C%E8%BF%81%E7%A7%BB%E4%BB%BB%E5%8A%A1%E7%9A%84%E8%AF%BE%E5%A0%82"
                 >打开课堂</a
-              ><a href="/projects/OpenMAIC/README-zh" target="_blank" rel="noopener noreferrer">中文说明</a
-              ><a
+              ><a title="阅读 OpenMAIC 中文说明：安装、模型配置与页面结构" href="/projects/OpenMAIC/README-zh" target="_blank" rel="noopener noreferrer">中文说明</a
+              ><a title="在 GitHub 打开原始仓库，查看源码、Issue 与最新版本"
                 href="https://github.com/THU-MAIC/OpenMAIC"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -610,6 +613,7 @@
               </div>
               <span class="status auth">3782 运行中</span>
             </div>
+            <p class="facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></p>
             <p>
               把资料导入知识库后进行带引用问答、深度研究、可视化和掌握路径。它适合处理需要来源、追问和长期复习的主题。
             </p>
@@ -618,7 +622,7 @@
               端口，自动建立会话
             </div>
             <div class="actions">
-              <a
+              <a title="打开 DeepTutor：自动建立本机会话后进入 Chat，可直接提问"
                 class="primary"
                 data-service-port="3782"
                 data-service-path="/"
@@ -626,9 +630,9 @@
                 rel="noopener noreferrer"
                 href="/launch/deeptutor?next=%2Fchat%3Fprompt%3D%E8%AF%B7%E9%80%9A%E8%BF%87%E8%BF%BD%E9%97%AE%E3%80%81%E4%BE%8B%E5%AD%90%E5%92%8C%E8%BF%81%E7%A7%BB%E7%BB%83%E4%B9%A0%E5%B8%AE%E6%88%91%E6%8E%8C%E6%8F%A1%E4%B8%80%E4%B8%AA%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%E4%B8%BB%E9%A2%98"
                 >打开学习工作区</a
-              ><a href="/projects/DeepTutor/README-zh">中文说明</a
-              ><a href="/projects/DeepTutor/README.md">README</a
-              ><a
+              ><a title="阅读 DeepTutor 中文说明：安装、模型配置与知识库用法" href="/projects/DeepTutor/README-zh">中文说明</a
+              ><a title="阅读 DeepTutor 英文 README" href="/projects/DeepTutor/README.md">README</a
+              ><a title="在 GitHub 打开原始仓库，查看源码、Issue 与最新版本"
                 href="https://github.com/HKUDS/DeepTutor"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -656,6 +660,7 @@
               </div>
               <span class="status">已同步技能</span>
             </div>
+            <p class="facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-key" style="border-color:#dbe7e2;background:#fff;color:var(--muted)">无需 API Key</span><span>2026-09-17 核验</span></p>
             <p>
               把 Agent
               的工程工作拆成可复用流程：先理解边界，再形成规格，按小步反馈实施，最后用测试和审查确认结果。
@@ -665,9 +670,9 @@
               Codex、Cursor、CodeBuddy
             </div>
             <div class="actions">
-              <a class="primary" href="/projects/mattpocock-skills/README.md"
+              <a title="查看 Matt Skills 各技能的作用与调用方式" class="primary" href="/projects/mattpocock-skills/README.md"
                 >查看技能说明</a
-              ><a
+              ><a title="在 GitHub 打开原始仓库，查看源码、Issue 与最新版本"
                 href="https://github.com/mattpocock/skills"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -685,6 +690,7 @@
               </div>
               <span class="status">辅助 CLI</span>
             </div>
+            <p class="facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-key" style="border-color:#dbe7e2;background:#fff;color:var(--muted)">无需 API Key</span><span>2026-09-17 核验</span></p>
             <p>
               把系统描述或仓库证据变成类型化图描述，再经过确定性校验生成可交互
               HTML/SVG。它负责让关系可追踪，不负责替人编造业务事实。
@@ -694,10 +700,10 @@
               适合：架构阅读、知识关系、证据图
             </div>
             <div class="actions">
-              <a class="primary" href="/projects/archify/README_ZH.md" target="_blank" rel="noopener noreferrer"
+              <a title="阅读 Archify 中文说明：图类型、校验流程与 CLI 用法" class="primary" href="/projects/archify/README_ZH.md" target="_blank" rel="noopener noreferrer"
                 >中文说明</a
-              ><a href="/projects/archify/README.md">README</a
-              ><a
+              ><a title="阅读 Archify 英文 README（README_EN.md）" href="/projects/archify/README.md">README</a
+              ><a title="在 GitHub 打开原始仓库，查看源码、Issue 与最新版本"
                 href="https://github.com/tt-a1i/archify"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -866,7 +872,7 @@
             <p>
               把失败分类为编译、依赖、权限、资源、产品未触发或断言失败，再生成最小回归任务。
             </p>
-            <a href="/apps/agent-evaluation/index.html">查看实现路线</a>
+            <a title="查看自研 Agent 评估的实现路线与待开发项" href="/apps/agent-evaluation/index.html">查看实现路线</a>
           </article>
         </div>
         <div class="note">
