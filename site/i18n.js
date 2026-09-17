@@ -34,6 +34,56 @@
   const DICT = {
     // ── Navigation ──
     "知识库": { en: "Knowledge" },
+
+    // ── Graph controls ──
+    "关系网络": { en: "Relations" },
+    "领域、主题与笔记之间的关联": { en: "How domains, topics and notes connect" },
+    "从问题到证据、行动与反馈的路径": {
+      en: "The path from a question to evidence, action and feedback",
+    },
+    "从目标、理解到练习、反馈与迁移": {
+      en: "From goal and understanding to practice, feedback and transfer",
+    },
+    "能力、知识、编排、工具、运行与治理的分层": {
+      en: "Layers: capability, knowledge, orchestration, tools, runtime, governance",
+    },
+    "技术选型象限": { en: "Technology quadrants" },
+    "用控制方式与协作范围理解组件位置": {
+      en: "Where a component sits, by control style and collaboration scope",
+    },
+    "工作流": { en: "Workflow" },
+    "协议": { en: "Protocol" },
+    "跨系统协作": { en: "Cross-system" },
+    "知识流通": { en: "Knowledge flow" },
+    "学习循环": { en: "Learning loop" },
+    "AI 系统架构": { en: "AI system layers" },
+    "选型象限": { en: "Selection quadrants" },
+    "文章知识图谱": { en: "Article knowledge graph" },
+    "放大": { en: "Zoom in" },
+    "缩小": { en: "Zoom out" },
+    "重置": { en: "Reset" },
+    "放大图谱": { en: "Zoom in on the graph" },
+    "缩小图谱": { en: "Zoom out of the graph" },
+    "重置视图": { en: "Reset the view" },
+    "重置缩放与平移": { en: "Reset zoom and pan" },
+    "滚轮缩放 · 拖拽平移 · 点节点打开": {
+      en: "Scroll to zoom · drag to pan · click a node to open",
+    },
+
+    // ── Article rail ──
+    "本文目录": { en: "On this page" },
+    "同模块其他文章": { en: "More in this module" },
+
+    // ── Insights page ──
+    "INSIGHTS · 仅本机可见": { en: "INSIGHTS · this machine only" },
+    "访问与反馈 · 工程知识库": { en: "Visits and feedback · engineering knowledge" },
+    "概览": { en: "Overview" },
+    "访客": { en: "Visitors" },
+    "读得最多的文章": { en: "Most-read notes" },
+    "只统计能对应到具体文章的访问。": {
+      en: "Only visits that resolve to a specific note are counted.",
+    },
+    "这些数字能说明什么。": { en: "What these numbers do and do not show." },
     "知识图谱": { en: "Graph" },
     "项目与教学": { en: "Projects & Learning" },
     "Agent 评估": { en: "Agent Evaluation" },

@@ -60,22 +60,39 @@ def dictionary_keys() -> set[str]:
     return set(re.findall(r'^\s*"((?:[^"\\]|\\.)*)":\s*\{', block, re.M))
 
 
-def visible_strings(html: str) -> set[str]:
-    """Chinese text a reader can actually see on the page."""
+# Below this length a string is almost always a label, button or heading —
+# interface chrome, which is meant to be translated. Above it, it is prose
+# explaining an engineering mechanism, which stays in the language it was
+# written in. The boundary is a heuristic and is stated so it can be argued
+# with; what it must not be is unstated.
+CHROME_MAX_LENGTH = 20
+
+
+def visible_strings(html: str) -> tuple[set[str], set[str]]:
+    """Chinese text a reader can see, split into chrome and content.
+
+    Chrome is short: labels, buttons, headings, tooltips. Content is the prose
+    that deliberately stays Chinese. Reporting one combined count made the
+    number look alarming and said nothing about whether anything was wrong.
+    """
     html = SKIP_TAGS.sub("", html)
-    out: set[str] = set()
-    for raw in re.findall(r">([^<>{}]*[\u4e00-\u9fff][^<>{}]*)<", html):
-        text = raw.strip()
+    chrome: set[str] = set()
+    content: set[str] = set()
+
+    def place(text: str) -> None:
+        text = text.strip()
         if not text:
-            continue
-        # A run like "184 篇工程笔记，覆盖..." is prose, not UI chrome. Keep the
-        # short runs (headings, labels, buttons) and the sentence-shaped ones
-        # that the dictionary does carry.
-        out.add(text)
+            return
+        bucket = chrome if len(text) <= CHROME_MAX_LENGTH else content
+        bucket.add(text)
+
+    for raw in re.findall(r">([^<>{}]*[\u4e00-\u9fff][^<>{}]*)<", html):
+        place(raw)
+    # Attribute text is read by people but is never prose, so it is always chrome.
     for attr in ("placeholder", "title", "aria-label", "alt"):
         for value in re.findall(rf'{attr}="([^"]*[\u4e00-\u9fff][^"]*)"', html):
-            out.add(value.strip())
-    return out
+            chrome.add(value.strip())
+    return chrome, content
 
 
 def main() -> None:
@@ -85,39 +102,47 @@ def main() -> None:
 
     known = dictionary_keys()
     missing: dict[str, list[str]] = {}
-    total = 0
+    chrome_total = 0
+    content_total = 0
 
     for page in PAGES:
         path = ROOT / page
         if not path.is_file():
             continue
-        strings = visible_strings(path.read_text(encoding="utf-8"))
-        untranslated = sorted(s for s in strings if s not in known)
-        total += len(strings)
+        chrome, content = visible_strings(path.read_text(encoding="utf-8"))
+        chrome_total += len(chrome)
+        content_total += len(content)
+        untranslated = sorted(s for s in chrome if s not in known)
         if untranslated:
             missing[page] = untranslated
 
     if args.json:
         print(json.dumps({
             "dictionary_entries": len(known),
-            "visible_strings": total,
+            "chrome_strings": chrome_total,
+            "content_strings": content_total,
+            "untranslated_chrome": sum(len(v) for v in missing.values()),
             "pages_with_missing": {k: len(v) for k, v in missing.items()},
             "missing": missing,
         }, ensure_ascii=False, indent=2))
         return
 
+    worst = sum(len(v) for v in missing.values())
+    translated = chrome_total - worst
+
     print("i18n coverage")
     print()
-    print(f"  dictionary entries: {len(known)}")
-    print(f"  strings on pages:   {total}")
+    print(f"  dictionary entries:  {len(known)}")
+    print(f"  interface strings:   {chrome_total}  ({translated} translated)")
+    print(f"  knowledge prose:     {content_total}  (stays Chinese by design)")
     print()
 
     if not missing:
-        print("  every visible string has an English translation")
+        print("  every interface string has an English translation")
         return
 
-    worst = sum(len(v) for v in missing.values())
-    print(f"  {worst} strings have no translation, across {len(missing)} page(s):")
+    print(f"  {worst} interface string(s) still have no translation,")
+    print(f"  across {len(missing)} page(s):")
     print()
     for page, items in missing.items():
         print(f"  {page}  ({len(items)})")
