@@ -9,6 +9,48 @@
     <script src="/static/nav.js"></script>
     <script src="/static/i18n.js"></script>
 <script src="/static/shell.js"></script>
+<script>
+      /* 状态标签原本写死在 HTML 里，工具停了页面还在说「运行中」。
+         主站已经从 /api/learning/status 取状态，这一页读同一个接口，
+         用同一套 ok / warn / unknown 语气。取不到就显示「状态未知」，
+         不冒充正常。 */
+      document.addEventListener('DOMContentLoaded', async () => {
+        const chips = [...document.querySelectorAll('.status[data-tool]')];
+        if (!chips.length) return;
+        let status = null;
+        try {
+          const response = await fetch('/api/learning/status', { cache: 'no-store' });
+          if (response.ok) status = await response.json();
+        } catch (error) {
+          status = null;
+        }
+        const mark = (name, labels) => {
+          const chip = document.querySelector(`.status[data-tool="${name}"]`);
+          if (!chip) return;
+          const info = status?.[name];
+          let kind = 'unknown';
+          let text = '状态未知';
+          if (info) {
+            if (info.online && info.llm) { kind = 'ok'; text = labels.up; }
+            else if (info.online) { kind = 'warn'; text = labels.partial; }
+            else { kind = 'warn'; text = labels.down; }
+          }
+          chip.textContent = text;
+          if (name === 'deeptutor' && kind === 'ok') {
+            const lock = document.createElement('span');
+            lock.className = 'lock';
+            lock.setAttribute('aria-label', '需要登录');
+            lock.title = '需要登录本机账号';
+            lock.textContent = '🔒';
+            chip.appendChild(lock);
+          }
+          chip.classList.remove('ok', 'warn', 'unknown');
+          chip.classList.add(kind);
+        };
+        mark('openmaic', { up: '互动课堂可用', partial: '服务运行中', down: '未启动' });
+        mark('deeptutor', { up: '学习导师可用', partial: '配置不完整', down: '未启动' });
+      });
+    </script>
     <script>
       /* 侧边栏由 shell.js 统一渲染，与主站是同一份代码。挂载点在 body 里，
          所以要等 DOM 就绪；shell.js 是同步加载的，主题已经在首帧前应用。 */
@@ -147,9 +189,19 @@
         font-size: 11px;
         font-weight: 750;
       }
-      .status.auth {
-        background: var(--color-warm-soft);
-        color: var(--color-warm);
+      /* 健康状态用 ok / warn / unknown 表达；「需要登录」是工具本身的属性，
+       不是异常，所以用一个小锁标记，不再抢占颜色。 */
+      .status .lock {
+        margin-left: 5px;
+        opacity: 0.65;
+        font-size: 10px;
+      }
+      .status.ok { background: var(--color-ok-soft); color: var(--color-ok); }
+      .status.warn { background: var(--color-warn-soft); color: var(--color-warn); }
+      .status.unknown {
+        background: var(--color-surface);
+        color: var(--color-muted);
+        border: 1px solid var(--color-line);
       }
       .project > p {
         color: var(--color-ink-soft);
@@ -572,7 +624,7 @@
                   互动课堂、测验、模拟、项目任务与反馈
                 </p>
               </div>
-              <span class="status">3100 运行中</span>
+              <span class="status" data-tool="openmaic">3100 运行中</span>
             </div>
             <p class="facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 3100</span><span class="fact-key">需访问码</span></p>
             <p>
@@ -606,7 +658,7 @@
                 <h3>DeepTutor</h3>
                 <p class="project-kicker">检索、研究、记忆、笔记与复习工作区</p>
               </div>
-              <span class="status auth">3782 运行中</span>
+              <span class="status" data-tool="deeptutor">3782 运行中</span>
             </div>
             <p class="facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 3782</span><span class="fact-key">需登录本机账号</span></p>
             <p>
