@@ -167,15 +167,33 @@ def valid_auth_cookie(value: str | None, password: str) -> bool:
 
 
 def local_addresses() -> set[str]:
+    """Every address this machine answers on, whatever interface it arrived on.
+
+    Enumerating a fixed list (en0/en1/bridge*) breaks the moment the machine is
+    on a different interface — a USB or Thunderbolt adapter, a VPN tunnel, a
+    tethered phone — and the operator gets locked out of their own /insights
+    page. So: ask ifconfig which interfaces exist, then read all of them.
+    """
     addresses = {"127.0.0.1", "::1"}
-    for interface in ("en0", "en1", "bridge0", "bridge100"):
+    interfaces = []
+    try:
+        listing = subprocess.run(
+            ["/sbin/ifconfig", "-l"], capture_output=True, text=True, timeout=2, check=False
+        ).stdout
+        interfaces = listing.split()
+    except (OSError, subprocess.SubprocessError):
+        interfaces = []
+    # Fall back to the usual names if `ifconfig -l` is unavailable.
+    for name in interfaces or ("en0", "en1", "en2", "en3", "bridge0", "bridge100"):
         try:
             output = subprocess.run(
-                ["/sbin/ifconfig", interface], capture_output=True, text=True, timeout=2, check=False
+                ["/sbin/ifconfig", name], capture_output=True, text=True, timeout=2, check=False
             ).stdout
         except (OSError, subprocess.SubprocessError):
             continue
         addresses.update(re.findall(r"\binet6?\s+([0-9a-fA-F:.]+)", output))
+    # `ifconfig` drops the address once an interface goes down; the loopback
+    # answer and whatever the OS reports as the primary address are also us.
     addresses.add(detect_host())
     return {
         address
@@ -186,6 +204,11 @@ def local_addresses() -> set[str]:
 
 def is_local_client(address: str) -> bool:
     normalized = address[7:] if address.startswith("::ffff:") else address
+    if normalized in {"127.0.0.1", "::1"}:
+        return True
+    # Any 127.0.0.0/8 address is this machine talking to itself.
+    if normalized.startswith("127."):
+        return True
     return normalized in local_addresses()
 
 

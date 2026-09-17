@@ -94,13 +94,13 @@ body{background:var(--bg);font-size:var(--text-md);line-height:var(--leading-nor
 .nav-section .topic-button{margin-left:13px;width:calc(100% - 13px);padding:7px 10px;font-size:12px;color:#718079}
 /* 时效性文章（type: radar）置顶在领域标题下方、主题列表之上。
    橙色边框 + 阴影 + ⚡，让"这份动态有没有更新"在侧边栏就能一眼看到。 */
-.radar-card{display:flex;align-items:center;gap:8px;width:calc(100% - 13px);margin:4px 0 6px 13px;padding:8px 10px;border:1.5px solid var(--warm);border-radius:6px;background:var(--warm-soft);box-shadow:0 3px 10px rgba(164,91,42,.15);cursor:pointer;text-align:left;color:var(--warm);transition:box-shadow .14s ease,transform .14s ease}
-.radar-card:hover{box-shadow:0 5px 14px rgba(164,91,42,.24);transform:translateY(-1px)}
+.radar-card,.nav-section .radar-card{display:flex;align-items:center;gap:6px;box-sizing:border-box;margin:4px 0 4px 13px;width:calc(100% - 13px);max-width:calc(100% - 13px);padding:7px 10px;min-height:35px;border:1px solid var(--warm-line);border-radius:6px;background:var(--warm-soft);box-shadow:inset 3px 0 0 var(--warm);cursor:pointer;text-align:left;color:var(--warm-ink);font-size:var(--text-sm);line-height:1.4;transition:box-shadow var(--duration-fast) var(--ease-out)}
+.radar-card:hover{box-shadow:var(--shadow-sm);border-color:var(--warm)}
 .radar-card[aria-current="page"]{background:var(--warm);color:#fff}
 .radar-card .radar-icon{flex:none;font-size:13px;line-height:1}
-.radar-card .radar-text{display:flex;flex-direction:column;gap:2px;min-width:0}
-.radar-card .radar-text strong{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.radar-card .radar-text small{font-size:10.5px;font-weight:600;opacity:.85}
+.radar-card .radar-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex:1 1 auto}
+.radar-card .radar-text strong{font-size:var(--text-sm);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto}
+.radar-card .radar-text small{font-size:var(--text-xs);font-weight:600;opacity:.75;white-space:nowrap;flex:0 0 auto}
 .radar-card[aria-current="page"] .radar-text small{opacity:.92}
 :root[data-theme="dark"] .radar-card{box-shadow:0 3px 10px rgba(0,0,0,.4)}
 :root[data-theme="dark"] .radar-card:hover{box-shadow:0 5px 14px rgba(0,0,0,.5)}
