@@ -26,6 +26,7 @@
   const PAGE_META = {
     knowledge: { title: "知识库", description: "阅读、搜索，并用图谱看知识之间的关系。" },
     graph: { title: "知识图谱", description: "领域、主题与笔记之间的关联，以及知识流通路径。" },
+    papers: { title: "论文追踪", description: "追踪 AI 与 Agent 方向的新论文，逐篇给出结构化解析；知识库的结论从这里取材。" },
     projects: { title: "项目与教学", description: "已经安装的工具、学习入口和源码索引。" },
     evaluation: { title: "Agent 评估", description: "自研评估项目的设计与后续实现入口。" },
     insights: { title: "访问与反馈", description: "本机访问记录与读者反馈，只在这台机器上可见。" },
@@ -41,6 +42,7 @@
    * map to the same key or the active entry goes unmarked.
    */
   const PATH_OWNER = [
+    { key: "papers", match: (p) => p === "/papers" || p.startsWith("/papers/") },
     { key: "insights", match: (p) => p === "/insights" },
     { key: "evaluation", match: (p) => p.startsWith("/apps/agent-evaluation") },
     { key: "projects", match: (p) => p === "/projects" || p.startsWith("/projects/") },
@@ -266,10 +268,12 @@
           : ""
       }
       <div class="tk-sidebar-footer">
-        ${opts.auth ? '<div class="tk-sidebar-links"><a href="/auth/logout">退出</a></div>' : ""}
-        <button type="button" class="tk-lang-toggle" data-tk-lang-toggle>
-          <span class="tk-lang-globe" aria-hidden="true">◐</span><span data-tk-lang-label>中文</span>
-        </button>
+        <div class="tk-utility">
+          ${opts.auth ? '<a class="tk-utility-btn" href="/auth/logout">退出</a>' : ""}
+          <button type="button" class="tk-utility-btn" data-tk-lang-toggle>
+            <span class="tk-lang-globe" aria-hidden="true">◐</span><span data-tk-lang-label>中文</span>
+          </button>
+        </div>
       </div>
     `;
 
@@ -340,9 +344,9 @@
     const fab = document.createElement("button");
     fab.type = "button";
     fab.className = "tk-fab";
-    fab.title = "提意见 / 报告问题";
-    fab.setAttribute("aria-label", "提意见或报告问题");
-    fab.innerHTML = '<span aria-hidden="true">?</span><span class="tk-fab-label">提意见</span>';
+    fab.title = tr("提意见 / 报告问题");
+    fab.setAttribute("aria-label", tr("提意见或报告问题"));
+    fab.innerHTML = `<span aria-hidden="true">?</span><span class="tk-fab-label">${tr("提意见")}</span>`;
     document.body.appendChild(fab);
 
     const overlay = document.createElement("div");
@@ -372,6 +376,15 @@
         <p class="tk-fb-note" id="tk-fb-note"></p>
       </form>`;
     document.body.appendChild(overlay);
+
+    /* The overlay is appended after shell.js's own translateDOM(mount) call, so
+       nothing had translated it: every page showed a Chinese feedback dialog
+       inside an English interface. Translate it here, and again on every
+       language switch, since the panel stays in the DOM for the session. */
+    if (window.TKI18N) {
+      window.TKI18N.translateDOM(overlay);
+      document.addEventListener("tk:lang", () => window.TKI18N.translateDOM(overlay));
+    }
 
     const $ = (id) => overlay.querySelector(id);
     const message = $("#tk-fb-message");
@@ -441,7 +454,7 @@
           }),
         });
         const data = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(data.error || "发送失败");
+        if (!response.ok) throw new Error(data.error || tr("发送失败"));
         try {
           localStorage.setItem(FB_NAME_KEY, name.value.trim());
         } catch {
@@ -449,7 +462,7 @@
         }
         message.value = "";
         count();
-        note.textContent = data.message || "收到，谢谢反馈！";
+        note.textContent = data.message || tr("收到，谢谢反馈！");
         setTimeout(() => show(false), 900);
       } catch (error) {
         note.textContent = String(error.message || error);

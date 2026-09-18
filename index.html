@@ -11,13 +11,67 @@
 <script src="/static/shell.js"></script>
 <style>
 *{box-sizing:border-box}body{margin:0;background:var(--color-bg);color:var(--color-ink);font:var(--text-md)/var(--leading-normal) var(--font-sans)}button,input{font:inherit}button{cursor:pointer}.app{display:block;min-height:100vh}.sidebar{background:var(--color-surface);border-right:1px solid var(--color-line);padding:21px 15px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 21px;border-bottom:1px solid var(--color-line)}.mark{width:34px;height:34px;border:1px solid var(--color-accent);border-radius:9px;display:grid;place-items:center;color:var(--color-accent);font-weight:800}.brand strong{display:block;font-size:var(--text-md)}.brand small{display:block;color:var(--color-muted);font-size:var(--text-xs)}.nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px 0}.nav-actions button,.nav-section button{border:1px solid transparent;background:transparent;color:var(--color-ink-soft);text-align:left;border-radius:6px;padding:8px 10px}.nav-actions button:hover,.nav-actions button.active,.nav-section button:hover,.nav-section button.active{background:var(--color-accent-soft);border-color:var(--color-accent-line);color:var(--color-accent)}
-.nav-section{border-top:1px solid var(--color-line);padding:12px 0}.nav-section h3{font-size:var(--text-xs);color:var(--color-muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;font-size:var(--text-body)}.nav-section button .count{flex:none;padding-top:2px}.count{font-size:var(--text-xs);color:var(--color-muted)}
-.count,.fact-stars,.fact-open,.fact-live,.fact-key,.fact-none{font-variant-numeric:tabular-nums}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:20px 30px;background:rgba(244,246,245,.94);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);backdrop-filter:blur(10px)}.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--color-line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--color-panel);outline:0}.search input:focus{border-color:var(--color-accent);box-shadow:0 0 0 3px #1477661a}.search span{position:absolute;left:13px;top:8px;color:var(--color-muted)}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:var(--text-3xl);line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--color-ink-soft);margin:0}.hero-meta{color:var(--color-muted);font-size:var(--text-sm);white-space:nowrap}.section{margin-top:28px}.section h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 7px}.section>p{color:var(--color-ink-soft);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--space-3);align-items:start}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px;padding:16px}.entry h3{font-size:var(--text-md);margin:0 0 6px}.entry p{color:var(--color-ink-soft);font-size:var(--text-base);margin:0 0 12px}.entry a{display:inline-block;color:var(--color-accent);font-size:var(--text-sm);margin-right:11px}.domain-card{position:relative;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
+.nav-section{border-top:1px solid var(--color-line);padding:12px 0}.nav-section h3{font-size:var(--text-xs);color:var(--color-muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;font-size:var(--text-h3)}.nav-section button .count{flex:none;padding-top:2px}.count{font-size:var(--text-xs);color:var(--color-muted)}
+.count,.fact-stars,.fact-open,.fact-live,.fact-key,.fact-none{font-variant-numeric:tabular-nums}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:20px 30px;background:rgba(244,246,245,.94);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);backdrop-filter:blur(10px)}.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--color-line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--color-panel);outline:0}.search input:focus{border-color:var(--color-accent);box-shadow:0 0 0 3px #1477661a}.search span{position:absolute;left:13px;top:8px;color:var(--color-muted)}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:var(--text-3xl);line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--color-ink-soft);margin:0}.hero-meta{color:var(--color-muted);font-size:var(--text-sm);white-space:nowrap}.section{margin-top:28px}.section h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 7px}.section>p{color:var(--color-ink-soft);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--space-3);align-items:start}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px;padding:16px}.entry h3{font-size:var(--text-md);margin:0 0 6px}.entry p{color:var(--color-ink-soft);font-size:var(--text-base);margin:0 0 12px}.entry a{display:inline-block;color:var(--color-accent);font-size:var(--text-sm);margin-right:11px}.claim-list li{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:10px;align-items:baseline}
+/* 破折号单独成元素，不写在文本节点里。
+ *
+ * 原来写的是 <b>问题</b> —— 说明，那个文本节点的值是 " —— 说明"（带前导空格和
+ * 破折号）。i18n 的 translateDOM 按整段文本查词典，带上前缀就永远查不到，
+ * 英文界面下这一句会停在中文。拆开之后每个文本节点都是一句干净的译文。 */
+.claim-list i{color:var(--color-faint);font-style:normal;padding:0 2px}
+.claim-list span{color:var(--color-muted)}
+
+/* 主张区右边原来空着一块。放论文里实测出来的数字，替主张做旁证——
+   道理说了不算，得有别人测过的数。
+   窄屏没有这块空白，整块收掉，不做折叠。 */
+.claim-row{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
+@media (min-width:1180px){.claim-row{grid-template-columns:minmax(0,1fr) minmax(0,336px)}}
+.claim-row .claim{margin:0}
+.claim-quotes{display:none}
+@media (min-width:1180px){.claim-quotes{display:grid;gap:10px;align-content:start}}
+.claim-quotes-head{margin:0;font-size:var(--text-sm);color:var(--color-muted);letter-spacing:.04em}
+.claim-quotes-head a{color:var(--color-accent);font-weight:var(--weight-semibold)}
+.quote-card{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid var(--color-line);border-left:2px solid var(--color-accent);border-radius:var(--radius-sm);background:var(--color-panel);text-decoration:none;color:inherit}
+.quote-card:hover{border-left-color:var(--color-ink)}
+.quote-card b{font-size:var(--text-base);color:var(--color-ink);font-weight:var(--weight-semibold);line-height:1.45}
+.quote-card span{font-size:var(--text-xs);color:var(--color-muted);font-family:var(--font-mono);line-height:1.4}
+.quote-card:hover span{color:var(--color-ink-soft)}
+
+/* 知识地形：首页第一屏之后的第一个视觉块。
+   每个领域一条横排，左侧是领域名和总数，右侧是该领域下所有主题的圆。 */
+.hero p b{font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums}
+.hero p span{font-weight:inherit}
+
+.atlas{margin:34px 0 0;padding:22px 24px 26px;background-color:var(--color-panel);background-image:var(--wash-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);box-shadow:var(--hairline-top),var(--shadow-xs)}
+.atlas-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--ink-rule)}
+.atlas-head h2{font-size:var(--text-h2);margin:0 0 6px;letter-spacing:var(--tracking-h2)}
+.atlas-head p{margin:0;color:var(--color-muted);font-size:var(--text-small);max-width:60ch}
+.atlas-open{flex:none;color:var(--color-accent);font-size:var(--text-small);font-weight:var(--weight-semibold);white-space:nowrap}
+.atlas-open:hover{color:var(--color-accent-hover)}
+.atlas-canvas{display:grid;gap:3px}
+.atlas-row{display:grid;grid-template-columns:210px minmax(0,1fr);gap:20px;align-items:center;padding:9px 0;border-bottom:1px solid var(--color-line)}
+.atlas-row:last-child{border-bottom:0}
+/* 领域名是这一行的轴标签：等宽、右对齐，让右侧的圆有一个统一的起点。 */
+.atlas-domain{display:grid;grid-template-columns:9px minmax(0,1fr) auto;gap:9px;align-items:center;border:0;background:transparent;padding:4px 0;cursor:pointer;text-align:left;color:var(--color-ink);font:var(--weight-semibold) var(--text-small)/1.35 var(--font-sans)}
+.atlas-domain i{width:9px;height:9px;border-radius:50%;background:var(--ink)}
+.atlas-domain b{color:var(--color-muted);font-size:var(--text-small);font-variant-numeric:tabular-nums}
+.atlas-domain:hover span{color:var(--color-accent)}
+.atlas-dots{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+/* 每个主题一个圆，半径由 --dot 决定（来自篇数）。圆外的标签在 hover 前保持安静，
+   因为这一块是给"看一眼分布"用的，不是给逐条读的。 */
+.atlas-topic{display:inline-grid;grid-template-columns:var(--dot) auto auto;gap:7px;align-items:center;border:0;background:transparent;padding:3px 0;cursor:pointer;color:var(--color-muted);font:500 var(--text-small)/1 var(--font-sans)}
+.atlas-topic i{width:var(--dot);height:var(--dot);border-radius:50%;background:var(--ink);opacity:.85;transition:transform var(--duration-fast) var(--ease-out)}
+.atlas-topic b{color:var(--color-muted);font-size:var(--text-micro);font-variant-numeric:tabular-nums}
+.atlas-topic:hover{color:var(--color-ink)}
+.atlas-topic:hover i{transform:scale(1.18);opacity:1}
+@media(max-width:1100px){.atlas-row{grid-template-columns:170px minmax(0,1fr)}}
+@media(max-width:760px){.atlas{padding:18px 16px 20px}.atlas-head{display:block}.atlas-open{display:inline-block;margin-top:10px}.atlas-row{grid-template-columns:1fr;gap:8px}}
+.domain-card{position:relative;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
 .claim{display:grid;gap:12px;max-width:760px;margin:0 0 24px;padding:18px 20px;border:1px solid var(--color-line);border-left:3px solid var(--color-accent);border-radius:var(--radius-sm);background:var(--color-panel)}
-.claim-lead{margin:0;color:var(--color-ink);font-size:var(--text-base);font-weight:var(--weight-semibold)}
-.claim-list{display:grid;gap:6px;margin:0;padding-left:18px;color:var(--color-ink-soft);font-size:var(--text-small);line-height:1.7}
+.claim-lead{margin:0;color:var(--color-ink);font-size:var(--text-body);font-weight:var(--weight-semibold)}.claim-list b{color:var(--color-ink);font-weight:var(--weight-semibold)}
+.claim-list{display:grid;gap:10px;margin:0;padding:0;list-style:none;color:var(--color-muted);font-size:var(--text-body);line-height:1.6}
 .claim-list b{color:var(--color-ink)}
-.claim-links{display:flex;flex-wrap:wrap;gap:16px;margin:2px 0 0;font-size:var(--text-small);font-weight:var(--weight-semibold)}
+
 .domain-card{transition:border-color var(--duration-base) var(--ease-out),box-shadow var(--duration-base) var(--ease-out),transform var(--duration-base) var(--ease-out)}.domain-card:hover{border-color:var(--color-accent-line);box-shadow:var(--hairline-top),var(--shadow-md);transform:translateY(-2px)}
 .domain-card h3{margin:0;font-size:var(--text-lg);font-weight:var(--weight-bold);color:var(--color-ink)}
 .domain-card p{margin:0;color:var(--color-muted);font-size:var(--text-sm);line-height:var(--leading-normal);max-width:38ch}
@@ -29,6 +83,20 @@
 .domain-card b{margin-top:auto;padding-top:var(--space-2);color:var(--color-accent);font-size:var(--text-sm);font-weight:var(--weight-semibold)}
 .domain-card:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
 .notice{background:var(--color-warm-soft);border:1px solid var(--color-warm-line);border-left:3px solid var(--color-warm);border-radius:var(--radius-sm);padding:15px 17px;color:var(--color-warm-ink);font-size:var(--text-base);line-height:1.7}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--color-line);padding-bottom:16px;margin-bottom:20px}.directory-head h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--color-ink-soft);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted);border-radius:5px;padding:5px 9px;font-size:var(--text-sm)}.sort button.active,.sort button:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:var(--text-lg);margin:0 0 8px;display:flex;gap:8px;align-items:center}.topic-title small{font-size:var(--text-xs);font-weight:400;color:var(--color-muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--color-panel);border:1px solid var(--color-line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--color-line);border-radius:0 0 7px 7px}.note-row:hover{background:var(--color-surface)}.note-row h3{font-size:var(--text-md);margin:0 0 3px}.note-row .path{font-size:var(--text-xs);color:var(--color-accent)}.note-row p{margin:0;color:var(--color-ink-soft);font-size:var(--text-base);line-height:1.6}.reader{display:none}.reader.open{display:block}.reader-head{border-bottom:1px solid var(--color-line);padding-bottom:17px;margin-bottom:19px}.reader-context{color:var(--color-accent);font-size:var(--text-sm);margin-bottom:8px}.reader h2{font-size:var(--text-3xl);line-height:1.3;margin:0}.reader-sources{margin:var(--space-2) 0 0;color:var(--color-muted);font-size:var(--text-sm);line-height:1.9}
+.cite-block{margin:0 0 11px}
+.cite-block>b{display:block;margin:0 0 7px;color:var(--color-ink);font-weight:var(--weight-semibold)}
+.cite-list{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+/* 论文条目：标题一行，作者年份与编号另起一行。
+   标题是主信息，作者和编号是佐证，混在一行会让标题读不完整。 */
+.cite-list li{display:grid;gap:1px;padding:7px 10px;border:1px solid var(--color-line);border-left:2px solid var(--color-accent-line);border-radius:var(--radius-sm);background:var(--color-panel)}
+.cite-list li:hover{border-left-color:var(--color-accent);background:var(--color-accent-soft)}
+.cite-list a{color:var(--color-ink);font-weight:var(--weight-medium);line-height:1.45}
+.cite-list li:hover a{color:var(--color-accent)}
+.cite-meta{display:flex;flex-wrap:wrap;gap:0 9px;color:var(--color-muted);font-size:var(--text-xs)}
+.cite-id{font-family:var(--font-mono)}
+.cite-more{display:inline-block;margin-top:7px;color:var(--color-accent);font-size:var(--text-sm);font-weight:var(--weight-semibold)}
+.cite-more:hover{text-decoration:underline}
+
 .reader-sources b{margin-right:6px;color:var(--color-ink);font-weight:var(--weight-semibold)}
 .reader-sources a{color:var(--color-accent);text-decoration:none}
 .reader-sources a:hover{text-decoration:underline}
@@ -48,7 +116,39 @@
 .graph-tool--wide{font-size:var(--text-sm)}
 .graph-zoom-value{min-width:46px;text-align:center;color:var(--color-muted);font-size:var(--text-sm);font-weight:700;font-variant-numeric:tabular-nums}
 .graph-hint{margin-left:auto;color:var(--color-muted);font-size:var(--text-xs)}
-@media(max-width:760px){.graph-hint{display:none}}.graph-legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--color-muted);font-size:var(--text-sm);padding:10px 3px 0}.graph-legend span{display:inline-flex;gap:6px;align-items:center}.graph-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.edge{stroke:#cdd8d3;stroke-width:1.1}.edge.focused{stroke:var(--color-warm);stroke-width:2.6}.topic-link{stroke:#dce6e1;stroke-width:1}.domain-label{font-size:var(--text-md);fill:#53655f;font-weight:700}.node circle{stroke:var(--color-panel);stroke-width:1.5;cursor:pointer}.node text,.topic-node text{font-size:var(--text-2xs);fill:#53655f;pointer-events:none}.topic-node circle{fill:var(--color-panel);stroke-width:2;cursor:pointer}.diagram-edge{stroke:#9db8ad;stroke-width:2;marker-end:url(#graph-arrow)}.diagram-edge.dashed{stroke-dasharray:6 5}.diagram-box{fill:var(--color-panel);stroke:#8bb6a9;stroke-width:1.5}.diagram-box.primary{fill:#e5f2ee;stroke:#147766}.diagram-box.secondary{fill:#fff2e7;stroke:#bd7950}.diagram-label{font-size:var(--text-md);text-anchor:middle;dominant-baseline:middle;fill:#23332e;font-weight:700}.diagram-small{font-size:var(--text-xs);text-anchor:middle;fill:#63736d}.diagram-group{cursor:pointer}.graph-note{font-size:var(--text-sm);fill:#68746f}.axis-line{stroke:#9db8ad;stroke-width:1.5}.axis-label{font-size:var(--text-base);fill:#68746f}.quadrant-fill{fill:#f1f7f4}.quadrant-fill.alt{fill:#fbf5ef}.quadrant-title{font-size:var(--text-md);fill:var(--color-ink-soft);font-weight:var(--weight-bold);opacity:.85}.point{stroke:var(--color-panel);stroke-width:2}.point-label{font-size:var(--text-base);fill:#3f504a}.empty{background:var(--color-panel);border:1px dashed var(--color-line);padding:30px;text-align:center;color:var(--color-muted);border-radius:7px}
+@media(max-width:760px){.graph-hint{display:none}}.graph-legend{display:flex;gap:12px;flex-wrap:wrap;color:var(--color-muted);font-size:var(--text-sm);padding:10px 3px 0}.graph-legend span{display:inline-flex;gap:6px;align-items:center}.graph-legend i{width:9px;height:9px;border-radius:50%;display:inline-block}.edge{stroke-linecap:round}
+/* 线的可见度调了三次，两头都试过才找准。
+ *
+ *   最初 .8px / 50%  → 一百多条叠起来像一团脏网
+ *   然后 .7px / 22%  → 屏幕上直接消失，用户说"我都看不到"
+ *   再  1.4px / 55%  → 看得见了，但线太黑，把节点盖住，用户说"太丑了"
+ *
+ * 前两次都在调"深不深"，没有分开看两件事：一条线要能看见（对比度），
+ * 又不能抢节点的视线（权重）。现在用较细的线宽 + 中等透明度：
+ * 单条线在浅色底上清楚，几十条交叠时仍然是背景层，节点依然是最重的元素。
+ */
+.edge--cross{stroke:var(--color-muted);stroke-width:1;stroke-opacity:.34}
+/* 同领域引用：只在列内离得够远时才画。它们补充的是"这个主题的两头有联系"，
+   权重再低一档，不参与跨领域的视觉竞争。 */
+.edge--inner{stroke:var(--color-line);stroke-width:.9;stroke-opacity:.3}
+/* 连线的可见度调过两次，第一次调过头了。
+ *
+ * 最初是 .8px / .5：一百多条线叠在一起像一团脏网。我把它压到 .7px / .22，
+ * 想让它"安静"，结果直接在屏幕上消失了 —— 用户的原话是"我都看不到"。
+ * 压低和压没是两件事。
+ *
+ * 现在的取值让单条线看得见（1.4px、55% 不透明、圆头端点），但因为用的是
+ * muted 而不是 accent 色，多条交叠时仍然比节点轻。悬停时会进一步提亮。 */
+.edge.focused{stroke:var(--color-warm);stroke-width:2.6;stroke-opacity:1}
+/* 跨列引用线在默认状态下几乎看不见。
+ *
+ * 这些线连接的是笔记之间的引用，而笔记被排在五个领域列里，所以每一条真实
+ * 引用都是一条横穿整个画布的斜线。全站有一百多条，叠在一起是一张网 —— 它
+ * 没有表达任何读得懂的关系，只让画面显脏。
+ *
+ * 保留它们但仍然画出来，是因为悬停某个笔记时 .focused 会把这一条提起来，
+ * 那时它有意义（"这篇被谁引用"）。默认状态安静，交互时才说话。 */
+.edge.focused{stroke:var(--color-warm);stroke-width:2.6;stroke-opacity:1}.topic-link{stroke:var(--color-line-strong);stroke-width:.9;stroke-opacity:.55}.domain-label{font-size:var(--text-small);fill:var(--color-ink);font-weight:750;letter-spacing:var(--tracking-h2)}.domain-head{font:750 var(--text-small)/1.3 var(--font-sans);color:var(--color-ink);text-align:center;overflow-wrap:anywhere}.domain-head span{display:block;margin-top:2px;font-size:var(--text-micro);font-weight:600;color:var(--color-muted);font-variant-numeric:tabular-nums;letter-spacing:0}.domain-count{font-size:var(--text-xs);fill:var(--color-muted);font-weight:600;font-variant-numeric:tabular-nums}.topic-name{font-size:var(--text-small);fill:var(--color-ink-soft);font-weight:650;pointer-events:none}.topic-count{font-size:var(--text-xs);fill:var(--color-ink);font-weight:750;pointer-events:none;font-variant-numeric:tabular-nums}.node circle{stroke:var(--color-panel);stroke-width:1.5;cursor:pointer}.node text,.topic-node text{font-size:var(--text-2xs);fill:var(--color-muted);pointer-events:none}.topic-node circle{cursor:pointer;stroke-width:2}.diagram-edge{stroke:var(--color-line-strong);stroke-width:2;marker-end:url(#graph-arrow)}.graph-arrow path{fill:var(--color-line-strong)}.diagram-edge.dashed{stroke-dasharray:6 5}.diagram-box{fill:var(--color-panel);stroke:var(--color-accent-line);stroke-width:1.5}.diagram-box.primary{fill:var(--color-accent-soft);stroke:var(--color-accent)}.diagram-box.secondary{fill:var(--color-warm-soft);stroke:var(--color-warm)}.diagram-label{font-size:var(--text-md);text-anchor:middle;dominant-baseline:middle;fill:var(--color-ink);font-weight:700}.diagram-small{font-size:var(--text-xs);text-anchor:middle;fill:var(--color-muted)}.diagram-group{cursor:pointer}.graph-note{font-size:var(--text-sm);fill:var(--color-muted)}.axis-line{stroke:var(--color-line-strong);stroke-width:1.5}.axis-label{font-size:var(--text-base);fill:var(--color-muted)}.quadrant-fill{fill:var(--color-surface)}.quadrant-fill.alt{fill:var(--color-warm-soft)}.quadrant-title{font-size:var(--text-md);fill:var(--color-ink-soft);font-weight:var(--weight-bold);opacity:.85}.point{stroke:var(--color-panel);stroke-width:2}.point-label{font-size:var(--text-base);fill:var(--color-ink-soft)}.empty{background:var(--color-panel);border:1px dashed var(--color-line);padding:30px;text-align:center;color:var(--color-muted);border-radius:7px}
 /* 搜索命中高亮：说明这篇为什么被搜出来 */
 .note-row mark.hit{background:#fdf0c8;color:inherit;border-radius:3px;padding:0 2px;font-weight:700}
 :root[data-theme="dark"] .note-row mark.hit{background:var(--color-star-line);color:#f0e2b0}
@@ -128,17 +228,12 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .search input{height:44px;border-radius:7px;padding-left:38px;box-shadow:0 1px 2px rgba(20,42,35,.02)}
 .search span{top:9px;font-size:var(--text-lg)}
 .content{padding:42px calc(40px + var(--float-lane)) calc(var(--float-lane) + 48px) 40px;max-width:1320px;margin:0 auto;width:100%}
-.hero{align-items:flex-end;margin:0 0 30px;padding:0 0 30px;border-bottom:1px solid var(--color-line)}
-.hero h2{font-size:var(--text-4xl);line-height:1.22;margin-bottom:9px}
-.hero p{font-size:var(--text-md);max-width:700px}
+/* The page head itself is defined once in base.css (it is shared with every
+   companion page). Only the parts unique to this page live here. */
+.hero{align-items:flex-end;margin:0 0 30px;padding:0 0 30px}
 .hero-meta{padding:6px 11px;background:var(--color-surface);border:1px solid var(--color-line);border-radius:20px;color:var(--color-muted);font-size:var(--text-small);font-variant-numeric:tabular-nums;white-space:nowrap}
 
 .section{margin-top:34px}.section h2{font-size:var(--text-xl)}.section>p{margin-bottom:17px}
-
-
-
-
-
 
 .entry-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .entry{position:relative;min-height:148px;padding:18px 19px;border-radius:7px;border-top:2px solid #b9d9cf}
@@ -179,7 +274,7 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .visual-tabs button{padding:7px 11px}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
 @media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}.content{padding-left:28px;padding-right:calc(28px + var(--float-lane))}}
-@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:rgba(245,247,246,.97)}.content{padding:26px calc(15px + var(--float-lane)) calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:var(--text-3xl)}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}}
+@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:rgba(245,247,246,.97)}.content{padding:26px calc(15px + var(--float-lane)) calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:var(--text-3xl)}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
 /* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
 .app-alert{position:fixed;right:22px;bottom:22px;z-index:var(--z-fab);max-width:min(420px,calc(100vw - 30px));padding:11px 14px;border:1px solid #e8c6a8;border-left:3px solid var(--color-warm);border-radius:7px;background:#fff9f2;color:#704823;box-shadow:0 12px 30px rgba(35,45,40,.14);font-size:var(--text-base);display:none}
 .app-alert.open{display:block}
@@ -210,6 +305,19 @@ kbd{display:inline-block;min-width:20px;padding:2px 6px;border:1px solid var(--c
 .reader-study:hover,.reader-study:focus-visible{border-color:var(--color-accent);background:var(--color-accent-soft);text-decoration:none!important}
 .reader-study::after{content:attr(data-tooltip);position:absolute;z-index:var(--z-overlay);right:0;top:calc(100% + 8px);display:block;box-sizing:border-box;width:min(300px,calc(100vw - 42px));padding:9px 11px;border:1px solid #30473f;border-radius:6px;background-color:#18231f!important;color:var(--color-panel)!important;box-shadow:0 10px 24px rgba(10,27,20,.25);font-size:var(--text-xs);font-weight:500;line-height:1.6;white-space:normal;overflow-wrap:anywhere;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-3px);transition:opacity var(--duration-fast) var(--ease-out),transform var(--duration-fast) var(--ease-out),visibility var(--duration-fast) var(--ease-out)}
 .reader-study:hover::after,.reader-study:focus-visible::after{opacity:1;visibility:visible;transform:translateY(0)}
+/* 清单模式下缩放控件没有意义（没有可缩放的图），而它们挤在窄屏上会把
+   「重置」压成竖排。整组一起收起来。 */
+.graph-panel:has(.graph-list) .graph-tools{display:none}
+.graph-list{height:100%;overflow:auto;padding:4px 2px 8px}
+.graph-list-domain{margin-bottom:18px}
+.graph-list-domain h3{display:flex;align-items:center;gap:8px;margin:0 0 6px;font-size:var(--text-h3);font-weight:var(--weight-bold);color:var(--color-ink)}
+.graph-list-domain h3 i{width:10px;height:10px;border-radius:50%;background:var(--ink);flex:none}
+.graph-list-domain h3 b{margin-left:auto;color:var(--color-muted);font-size:var(--text-small);font-variant-numeric:tabular-nums}
+.graph-list-domain ul{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.graph-list-domain button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding:9px 11px;border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-panel);color:var(--color-ink-soft);font:var(--weight-medium) var(--text-body)/1.3 var(--font-sans);text-align:left;cursor:pointer}
+.graph-list-domain button:hover{border-color:var(--color-accent-line);background:var(--color-accent-soft);color:var(--color-accent)}
+.graph-list-domain button b{flex:none;color:var(--color-muted);font-variant-numeric:tabular-nums}
+.graph-list-domain button:hover b{color:var(--color-accent)}
 .graph-panel{overflow:hidden}
 #graph{touch-action:none}
 .node text{display:none}
@@ -222,16 +330,9 @@ kbd{display:inline-block;min-width:20px;padding:2px 6px;border:1px solid var(--c
 :root[data-theme="dark"] .topbar{background:rgba(19,26,24,.94)!important}
 :root[data-theme="dark"] .reader-body th,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .count,:root[data-theme="dark"] .reader-body .code-block,:root[data-theme="dark"] .reader-body pre.mermaid,:root[data-theme="dark"] .graph-panel svg{background-color:var(--color-surface)!important}
 :root[data-theme="dark"] .nav-section h3,:root[data-theme="dark"] .side-title,:root[data-theme="dark"] .side-item,:root[data-theme="dark"] .search span,:root[data-theme="dark"] .meta,:root[data-theme="dark"] .topbar h1,:root[data-theme="dark"] .count,:root[data-theme="dark"] .nav-actions button{color:var(--color-muted)!important}
-:root[data-theme="dark"] 
-:root[data-theme="dark"] .domain-label,:root[data-theme="dark"] .node text,:root[data-theme="dark"] .topic-node text,:root[data-theme="dark"] .diagram-label,:root[data-theme="dark"] .diagram-small,:root[data-theme="dark"] .graph-note,:root[data-theme="dark"] .axis-label,:root[data-theme="dark"] .quadrant-title,:root[data-theme="dark"] .point-label{fill:var(--color-ink)!important}
-:root[data-theme="dark"] .node circle,:root[data-theme="dark"] .topic-node circle,:root[data-theme="dark"] .point{stroke:var(--color-panel)!important}
-:root[data-theme="dark"] .diagram-box{fill:var(--color-panel)!important;stroke:var(--color-accent)!important}
-:root[data-theme="dark"] .diagram-box.secondary{fill:var(--color-surface)!important;stroke:var(--color-warm)!important}
-:root[data-theme="dark"] .quadrant-fill{fill:var(--color-surface)!important}
-:root[data-theme="dark"] .quadrant-fill.alt{fill:var(--color-panel)!important}
-:root[data-theme="dark"] .edge{stroke:#42504a!important}
-:root[data-theme="dark"] .topic-link{stroke:#38453f!important}
-:root[data-theme="dark"] .diagram-edge{stroke:#6f8a80!important}
+/* 图谱里的颜色现在全部走 token（见上方 .domain-label 等规则），
+   所以这里不再需要一份深色覆盖。之前那份不仅重复，还把 diagram-label
+   这类小字强行改成 --color-ink，压掉了本该有的次要层级。 */
 .topbar .theme-toggle{width:auto;min-width:36px;height:36px;margin:0;padding:0 12px;border:1px solid var(--color-line);border-radius:6px;background:var(--color-panel);color:var(--color-muted);font-size:var(--text-lg);cursor:pointer;flex-shrink:0}.topbar .theme-toggle:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}
 .radar-badge{position:relative;border:2px solid var(--color-warm);background:linear-gradient(135deg,var(--color-warm-soft) 0%,rgba(250,243,232,.3) 100%);border-radius:7px;padding:9px 11px;margin:8px 8px 4px;cursor:pointer;transition:all var(--duration-fast) var(--ease-out);box-shadow:0 2px 8px rgba(168,95,45,.15)}
 .radar-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(168,95,45,.25);border-color:var(--color-warm)}
@@ -313,7 +414,7 @@ a:hover { text-decoration: none; }
 </div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><div id="reader-context" class="reader-context"></div><h2 id="reader-title"></h2><div id="reader-sources" class="reader-sources"></div><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section><aside class="reader-siblings" id="reader-siblings" aria-label="同模块其他文章"></aside></div><div class="reader-layout"><article id="reader-body" class="reader-body"></article><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside></div></section><section id="graph-view" class="graph"><div class="graph-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div><div class="visual-tabs" role="tablist"><button type="button" data-visual="network" role="tab" aria-selected="true" class="active">关系网络</button><button type="button" data-visual="flow" role="tab" aria-selected="false">知识流通</button><button type="button" data-visual="learning" role="tab" aria-selected="false">学习循环</button><button type="button" data-visual="architecture" role="tab" aria-selected="false">AI 系统架构</button><button type="button" data-visual="quadrant" role="tab" aria-selected="false">选型象限</button></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱"></svg><div id="legend" class="graph-legend"></div></div></section></div></main>
 </div>
 <script>
-const $=s=>document.querySelector(s),state={notes:[],edges:[],domain:'all',topic:'all',expandedDomains:new Set(),query:'',sort:'title',selected:null,graphMode:'network',zoom:1,pan:{x:0,y:0},view:'home',notesSignature:'',learningStatus:null};const order=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'],topicOrder={'AI系统':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端与分布式系统':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'计算机系统与性能':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建与质量':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付']},colors=['#147766','#3f70a8','#a45b2a','#7862a3','#567b42','#9b4660','#697772'];const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const ordered=a=>[...a].sort((x,y)=>(order.indexOf(x)<0?99:order.indexOf(x))-(order.indexOf(y)<0?99:order.indexOf(y))||x.localeCompare(y,'zh-CN'));const orderedTopics=(domain,a)=>[...a].sort((x,y)=>{const ranks=topicOrder[domain]||[];const rx=ranks.indexOf(x),ry=ranks.indexOf(y);return (rx<0?999:rx)-(ry<0?999:ry)||x.localeCompare(y,'zh-CN')});
+const $=s=>document.querySelector(s),state={notes:[],edges:[],papers:[],domain:'all',topic:'all',expandedDomains:new Set(),query:'',sort:'title',selected:null,graphMode:'network',zoom:1,pan:{x:0,y:0},view:'home',notesSignature:'',learningStatus:null};const order=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'],topicOrder={'AI系统':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端与分布式系统':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'计算机系统与性能':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建与质量':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付']},colors=['#147766','#3f70a8','#a45b2a','#7862a3','#567b42','#9b4660','#697772'];const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const ordered=a=>[...a].sort((x,y)=>(order.indexOf(x)<0?99:order.indexOf(x))-(order.indexOf(y)<0?99:order.indexOf(y))||x.localeCompare(y,'zh-CN'));const orderedTopics=(domain,a)=>[...a].sort((x,y)=>{const ranks=topicOrder[domain]||[];const rx=ranks.indexOf(x),ry=ranks.indexOf(y);return (rx<0?999:rx)-(ry<0?999:ry)||x.localeCompare(y,'zh-CN')});
 async function json(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
 /* POST 并把后端的中文错误原样带出来 —— json() 只做 GET，且错误信息是
    JSON body，直接 throw 会显示成 [object Object]。 */
@@ -375,7 +476,74 @@ function renderDirectory(){
   document.querySelectorAll('.note-row').forEach(row=>{row.setAttribute('tabindex','0');row.setAttribute('role','button');row.setAttribute('aria-label',row.querySelector('h3')?.textContent||'打开笔记');row.onclick=()=>openNote(row.dataset.path);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(row.dataset.path)}}});
   document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;renderDirectory()});
 }
-function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const sourceCount=state.notes.reduce((n,x)=>n+((x.sources||[]).length),0);const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero"><div><h2>把技术原理读到能上手用</h2><p>${knowledgeCount} 篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。每篇都写清：它为什么出现、怎么运作、边界在哪、结论从哪来。</p></div><div class="hero-meta">${knowledgeCount} 篇 · ${sourceCount} 条来源</div></section><section class="claim"><p class="claim-lead">每篇都按这四件事写</p><ul class="claim-list"><li><b>背景</b> —— 这个技术为什么出现，之前卡在哪</li><li><b>方案</b> —— 它怎么解决的，机制是什么</li><li><b>效果</b> —— 实际改变了哪个指标，在什么条件下测的</li><li><b>优缺点</b> —— 代价是什么，什么情况下不该用</li></ul><p class="claim-links"><a href="/?path=%E7%9F%A5%E8%AF%86%E5%BA%93%E7%AE%A1%E7%90%86%2F%E6%96%B9%E6%B3%95%2F%E4%B8%80%E7%AF%87%E7%9F%A5%E8%AF%86%E6%80%8E%E4%B9%88%E5%86%99.md">写作约定</a><a href="/?path=%E7%9F%A5%E8%AF%86%E5%BA%93%E7%AE%A1%E7%90%86%2F%E6%96%B9%E6%B3%95%2F%E7%9F%A5%E8%AF%86%E4%BB%8E%E5%93%AA%E6%9D%A5%E6%80%8E%E4%B9%88%E6%9B%B4%E6%96%B0.md">来源与更新</a></p></section><div class="notice">想先看懂一个领域，从下面的卡片进去。想动手练，用学习工具。想知道系统到底有没有变好，看 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间顺序堆。Agent 相关的内容放在 AI 系统里，跟上下文、检索、质量放在一起。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="打开 ${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${state.notes.filter(n=>n.category===d&&n.topic!=='归档').length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自己写的评估项目放一边 —— 它回答"到底有没有变好"。别人开源的工程流程放另一边 —— 它提供现成的做法。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和源码是用来查关系的，不是主线。想顺着读就读，不想就跳过。</p><div class="aux-grid"><article class="aux-card"><h3>知识图谱与系统图</h3><p>内置图谱展示知识连接、学习循环、AI 系统分层和选型象限。</p><a href="/?view=graph" id="home-graph">查看知识图谱 →</a></article><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图。</p><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口 →</a></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});applyHomeStatus();retranslate()}
+/* 首页的「知识地形」。
+ *
+ * 它的职责和 /?view=graph 不同：图谱页是拿来查关系的（缩放、平移、五个视图），
+ * 这里是拿来一眼看懂这个知识库长什么样的。所以它不放交互，只放形状和数字，
+ * 尺寸小、不用等布局、进页面就在。
+ *
+ * 每个领域一条横排，条内每个主题一个圆，半径按篇数。这样看的人先得到
+ * 「AI 系统比计算机系统厚得多」这个结论，再决定要不要点进去。
+ */
+function renderAtlas(){
+  const box=$('#home-atlas');
+  if(!box)return;
+  const tr=(x)=>window.TKI18N?window.TKI18N.t(x):x;
+  const notes=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings'&&!n.exclude_from_graph);
+  const domains=ordered(new Set(notes.map(n=>n.category)));
+  /* 页头说 184 篇（全部非剪藏的笔记），这里只统计 153 篇（已归入领域、进图谱的）。
+     两个数都对，但口径不同，所以要把口径写出来，否则看起来像自相矛盾。 */
+  const noteLine=$('#atlas-note');
+  if(noteLine)noteLine.textContent=`${notes.length} 篇已归入领域的笔记按主题分布。圆越大，主题下的笔记越多。归档来源与剪藏不计入。`;
+  box.innerHTML=domains.map((d,di)=>{
+    const group=notes.filter(n=>n.category===d);
+    const ts=orderedTopics(d,new Set(group.map(n=>n.topic)))
+      .map(t=>({t,n:group.filter(x=>x.topic===t).length}))
+      .sort((a,b)=>b.n-a.n);
+    const color=colors[di%colors.length];
+    const dots=ts.map(item=>{
+      const r=Math.round(6+Math.sqrt(item.n)*3.6);
+      const size=r*2;
+      return `<button type="button" class="atlas-topic" data-domain="${esc(d)}" data-topic="${esc(item.t)}"
+        title="${esc(item.t)} · ${item.n} 篇"
+        style="--dot:${size}px;--ink:${color}"><i></i><span>${esc(tr(item.t))}</span><b>${item.n}</b></button>`;
+    }).join('');
+    return `<div class="atlas-row">
+      <button type="button" class="atlas-domain" data-domain="${esc(d)}" style="--ink:${color}">
+        <i></i><span>${esc(tr(d))}</span><b>${group.length}</b>
+      </button>
+      <div class="atlas-dots">${dots}</div>
+    </div>`;
+  }).join('');
+  box.querySelectorAll('.atlas-topic').forEach(el=>{
+    el.onclick=()=>select(el.dataset.domain, el.dataset.topic);
+  });
+  box.querySelectorAll('.atlas-domain').forEach(el=>{
+    el.onclick=()=>select(el.dataset.domain, 'all');
+  });
+}
+
+/* 挑论文里带数字的结论当旁证。没有数字的不要 —— 旁证的力量全在数字上。
+   优先挑被多篇笔记引用的，再按新近排。
+   整块是按当前语言渲染的，不是翻译 DOM —— 语言切换必须重跑一遍 renderHome，
+   所以 tki18n:change 里也要调 renderHome。 */
+function homeQuotes(){
+  const zh=window.TKI18N?.lang!=='en';
+  const pool=state.papers.filter(p=>zh?p.result_zh:p.key_result);
+  pool.sort((a,b)=>(b.evidence_count+b.survey_count)-(a.evidence_count+a.survey_count)||String(b.published).localeCompare(String(a.published)));
+  const cards=pool.slice(0,3).map(p=>{
+    const text=zh?p.result_zh:p.key_result;
+    const first=(p.authors||[])[0]||'';
+    const who=first?first.split(' ').pop()+(zh?' 等':' et al.')+' · ':'';
+    return `<a class="quote-card" href="/paper?id=${esc(p.id)}" target="_blank" rel="noopener noreferrer"><b>${esc(text)}</b><span>${esc(who)}arXiv ${esc(p.id)} · ${esc(String(p.published).slice(0,4))}</span></a>`;
+  }).join('');
+  if(!cards)return '';
+  const head=zh?'论文站在追踪这些结论背后的原始数字':'The paper tracker follows the raw numbers behind these conclusions';
+  const all=zh?'进入论文追踪':'Open paper tracking';
+  const unit=zh?'篇':'papers';
+  return `<p class="claim-quotes-head">${esc(head)} · <a href="/papers">${esc(all)} · ${state.papers.length} ${esc(unit)} →</a></p>${cards}`;
+}
+function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const sourceCount=state.notes.reduce((n,x)=>n+((x.sources||[]).length),0);const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero"><div><h2>把技术原理读到能上手用</h2><p><b>${knowledgeCount}</b> <span>篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。写的都是能落到手上的东西：一个机制怎么运作、代价在哪、结论有没有实测支撑。</span></p></div><div class="hero-meta">${knowledgeCount} 篇 · ${sourceCount} 条来源</div></section><section class="claim-row"><section class="claim"><p class="claim-lead">每一篇都回答这四个问题</p><ul class="claim-list"><li><b>它为什么出现</b><i>——</i><span>之前卡在哪，没它的时候怎么办</span></li><li><b>它怎么运作</b><i>——</i><span>机制是什么，关键那一步发生了什么</span></li><li><b>它到底改变了什么</b><i>——</i><span>哪个数字动了，在什么条件下测的</span></li><li><b>什么时候不该用它</b><i>——</i><span>代价是什么，边界在哪</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱 →</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><div class="notice">想先看懂一个领域，从下面的卡片进去。想动手练，用学习工具。想知道系统到底有没有变好，看 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间顺序堆。Agent 相关的内容放在 AI 系统里，跟上下文、检索、质量放在一起。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="打开 ${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${state.notes.filter(n=>n.category===d&&n.topic!=='归档').length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自己写的评估项目放一边 —— 它回答"到底有没有变好"。别人开源的工程流程放另一边 —— 它提供现成的做法。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和源码是用来查关系的，不是主线。想顺着读就读，不想就跳过。</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图。</p><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口 →</a></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});renderAtlas();applyHomeStatus();retranslate()}
 function bindSourceToggle(){
   const btn=document.querySelector('.source-toggle');
   if(!btn)return;
@@ -390,13 +558,44 @@ function bindSourceToggle(){
 
 /* 来源常有十几个，全铺开会把标题和正文之间的呼吸挤掉。
    默认只显示前几条，其余收起来并给出条数。 */
-function renderSources(sources){
-  if(!sources?.length)return'';
+/* 来源分两类显示。
+ *
+ * 论文和普通链接不是一回事：一篇 arXiv 论文有标题、作者、年份，而且这个知识
+ * 页的结论可能就建立在它上面。以前它和"某篇博客"一样被折成一行小链接，读者
+ * 看到一个裸编号，看不出这篇东西是什么、有多重。
+ *
+ * 所以论文单独成块，带标题和作者年份，并可跳到论文页看它支撑的其他结论；
+ * 其余来源保持原来的紧凑链接串 —— 那些确实只是链接，铺开反而占地方。
+ */
+function renderPapers(papers){
+  if(!papers?.length)return'';
+  const items=papers.map(p=>{
+    const authors=(p.authors||[]);
+    const shown=authors.slice(0,2).join(', ')+(authors.length>2?(' '+tr('等')):'');
+    const year=(p.published||'').slice(0,4);
+    const meta=[shown,year].filter(Boolean).join(' · ');
+    const title=p.title||p.id;
+    return '<li><a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer">'+esc(title)+'</a>'
+      +'<span class="cite-meta">'+esc(meta)+'<span class="cite-id">arXiv:'+esc(p.id)+'</span></span></li>';
+  }).join('');
+  return '<div class="cite-block"><b>'+esc(tr('论据'))+'</b><ul class="cite-list">'+items+'</ul>'
+    +'<a class="cite-more" href="/papers">'+esc(tr('看这些论文还支撑了什么'))+' →</a></div>';
+}
+
+function renderSources(sources,papers){
+  const block=renderPapers(papers);
+  if(!sources?.length)return block;
+  /* 论文已经从 sources 里单独取出来了，这里跳过它们的裸链接，
+     否则同一篇论文会在页面上出现两次。 */
+  const paperUrls=new Set((papers||[]).map(p=>p.url));
   const seen=new Set(),visible=[];
   for(const source of sources){
-    const value=String(source),key=/^https?:\/\//.test(value)?sourceLabel(value):value;
+    const value=String(source);
+    if(paperUrls.has(value))continue;
+    const key=/^https?:\/\//.test(value)?sourceLabel(value):value;
     if(seen.has(key))continue;seen.add(key);visible.push(value);
   }
+  if(!visible.length)return block;
   const link=x=>{
     if(/^https?:\/\//.test(x))return '<a href="'+esc(x)+'" title="'+esc(x)+'" target="_blank" rel="noreferrer">'+esc(sourceLabel(x))+'</a>';
     if(x.startsWith('[[')){const t=x.slice(2,-2).split('|')[0];return '<a href="/?path='+encodeURIComponent(t)+'">'+esc(t.split('/').pop())+'</a>'}
@@ -405,7 +604,7 @@ function renderSources(sources){
   const sep='<span class="source-sep">·</span>';
   const shown=visible.slice(0,4),rest=visible.slice(4);
   const more=rest.length?('<span class="source-more" hidden>'+sep+rest.map(link).join(sep)+'</span><button type="button" class="source-toggle" aria-expanded="false">还有 '+rest.length+' 个</button>'):'';
-  return '<b>来源</b><span class="source-list">'+shown.map(link).join(sep)+'</span>'+more;
+  return block+'<b>'+esc(tr('来源'))+'</b><span class="source-list">'+shown.map(link).join(sep)+'</span>'+more;
 }
 function applyHomeStatus(){const cards=[...document.querySelectorAll('#home .work-card')],classroom=cards.find(card=>card.querySelector('h3')?.textContent==='OpenMAIC'),tutor=cards.find(card=>card.querySelector('h3')?.textContent==='DeepTutor'),status=state.learningStatus;/* The chip carries the state, so its colour has to as well. A service that is
    down used to render in the same green as one that is up — the text said
@@ -502,9 +701,221 @@ function railHead(label,hasItems){
   return `<p class="rail-head"><span>${label}</span>${hasItems?'<button type="button" class="rail-toggle" aria-expanded="true" aria-label="折叠'+label+'">▾</button>':''}</p>`;
 }
 function updateReaderStudy(){const study=$('#reader-study'),title=$('#reader-title').textContent.trim(),visible=state.view==='reader'&&Boolean(title);study.hidden=!visible;study.href=visible?'/learn?topic='+encodeURIComponent(title):'/learn'}
-async function openNote(path,push=true){if(path==='知识库首页.md'||path==='知识库首页'){loadHome(push);return}try{const n=await json('/api/note?path='+encodeURIComponent(path));state.selected=n.path;$('#reader-context').textContent=n.category+' / '+n.topic;$('#reader-title').textContent=n.title;$('#reader-sources').innerHTML=renderSources(n.sources);bindSourceToggle();show('reader');renderRelations(n);$('#reader-body').innerHTML=n.html;document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});if(window.renderMermaid)window.renderMermaid().catch(()=>alertUser('图表渲染失败，但正文仍然可读'));renderReaderRails(n);reportVisit();if(bindProgress.update)bindProgress.update();if(push)history.pushState({},'', '/?path='+encodeURIComponent(n.path));window.scrollTo({top:0})}catch(e){console.error(e);alertUser('这篇笔记暂时无法打开，请稍后重试')}}
-function graphCanvas(){const svg=$('#graph'),mobile=matchMedia('(max-width:900px)').matches,W=mobile?720:1200,H=mobile?920:690;svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto'});marker.append(svgEl('path',{d:'M0 0L10 5L0 10z',fill:'#9db8ad'}));defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);return{svg,world,W,H,mobile}}function svgEl(n,a={},text=''){const e=document.createElementNS('http://www.w3.org/2000/svg',n);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));if(text)e.textContent=text;return e}function addBox(w,x,y,ww,h,label,kind='',small='',target=''){const g=svgEl('g',{class:'diagram-group'});g.append(svgEl('rect',{x,y,width:ww,height:h,rx:7,class:`diagram-box ${kind}`}),svgEl('text',{x:x+ww/2,y:y+h/2-(small?8:0),class:'diagram-label'},label));if(small)g.append(svgEl('text',{x:x+ww/2,y:y+h/2+14,class:'diagram-small'},small));if(target)g.onclick=()=>openNote(target);w.append(g)}function arrow(w,x1,y1,x2,y2){w.append(svgEl('line',{x1,y1,x2,y2,class:'diagram-edge'}))}
-function renderNetwork(){const tr=(x)=>window.TKI18N?window.TKI18N.t(x):x;const{world,W,H}=graphCanvas(),notes=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings'&&!n.exclude_from_graph),domains=ordered(new Set(notes.map(n=>n.category))),positions=new Map(),topics=new Map(),cols=3,cw=W/cols,rh=H/Math.ceil(domains.length/cols);domains.forEach((d,di)=>{const cx=cw*(di%cols+.5),cy=rh*(Math.floor(di/cols)+.5),group=notes.filter(n=>n.category===d),ts=orderedTopics(d,new Set(group.map(n=>n.topic)));ts.forEach((t,ti)=>{const r=Math.min(cw,rh)*.27,a=-Math.PI/2+ti*2*Math.PI/Math.max(ts.length,1),tx=cx+Math.cos(a)*r,ty=cy+Math.sin(a)*r;topics.set(`${d}/${t}`,{x:tx,y:ty,d,t});const ns=group.filter(n=>n.topic===t),nr=ns.length===1?0:Math.min(28,12+ns.length*2);ns.forEach((n,ni)=>{const na=-Math.PI/2+ni*2*Math.PI/Math.max(ns.length,1);positions.set(n.path,{x:tx+Math.cos(na)*nr,y:ty+Math.sin(na)*nr})})});world.append(svgEl('text',{x:cx,y:cy-rh*.38,class:'domain-label','text-anchor':'middle'},`${d} · ${group.length}`))});for(const e of state.edges){const a=positions.get(e.source),b=positions.get(e.target);if(!a||!b)continue;const line=svgEl('line',{x1:a.x,y1:a.y,x2:b.x,y2:b.y,class:'edge'});line.dataset.source=e.source;line.dataset.target=e.target;world.append(line)}topics.forEach(t=>{const ns=notes.filter(n=>n.category===t.d&&n.topic===t.t);ns.forEach(n=>{const p=positions.get(n.path);world.append(svgEl('line',{x1:t.x,y1:t.y,x2:p.x,y2:p.y,class:'topic-link'}))});const g=svgEl('g',{class:'topic-node',transform:`translate(${t.x},${t.y})`,tabindex:'0',role:'button','aria-label':`${t.d} / ${t.t}`});g.onclick=()=>select(t.d,t.t);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(t.d,t.t)}};g.append(svgEl('circle',{r:7,stroke:colors[domains.indexOf(t.d)%colors.length]}),svgEl('text',{y:-11,'text-anchor':'middle'},t.t));world.append(g)});notes.forEach(n=>{const p=positions.get(n.path);if(!p)return;const g=svgEl('g',{class:'node',transform:`translate(${p.x},${p.y})`,tabindex:'0',role:'button','aria-label':n.title});g.onclick=()=>openNote(n.path);g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(n.path)}};g.onmouseenter=()=>document.querySelectorAll('.edge').forEach(e=>{if(e.dataset.source===n.path||e.dataset.target===n.path)e.classList.add('focused')});g.onmouseleave=()=>document.querySelectorAll('.edge.focused').forEach(e=>e.classList.remove('focused'));g.append(svgEl('circle',{r:5,fill:colors[domains.indexOf(n.category)%colors.length]}),svgEl('text',{y:-10,'text-anchor':'middle'},n.title.length>20?n.title.slice(0,19)+'…':n.title));world.append(g)});$('#legend').innerHTML=domains.map((d,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(tr(d))}</span>`).join('')}
+async function openNote(path,push=true){if(path==='知识库首页.md'||path==='知识库首页'){loadHome(push);return}try{const n=await json('/api/note?path='+encodeURIComponent(path));state.selected=n.path;$('#reader-context').textContent=n.category+' / '+n.topic;$('#reader-title').textContent=n.title;$('#reader-sources').innerHTML=renderSources(n.sources,n.papers);bindSourceToggle();show('reader');renderRelations(n);$('#reader-body').innerHTML=n.html;document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});if(window.renderMermaid)window.renderMermaid().catch(()=>alertUser('图表渲染失败，但正文仍然可读'));renderReaderRails(n);reportVisit();if(bindProgress.update)bindProgress.update();if(push)history.pushState({},'', '/?path='+encodeURIComponent(n.path));window.scrollTo({top:0})}catch(e){console.error(e);alertUser('这篇笔记暂时无法打开，请稍后重试')}}
+function graphCanvas(){
+  /* viewBox 必须匹配容器真实的宽高比。
+   *
+   * 之前写死 1200x690，而 svg 的 CSS 是 width:100% + height:min(70vh,700px)：
+   * 容器宽 986px 时宽高比是 1.41，viewBox 是 1.74，SVG 按 xMidYMid meet 缩放
+   * 后内容缩在中间 —— 实测内容只占画布宽度的 67%，左边距 8%、右边距 25%，
+   * 看起来就是"整体偏左、右边空一大块"。
+   *
+   * 读容器实际尺寸来定 viewBox，内容就填满可用空间，比例也不再被拉伸。
+   */
+  const svg=$('#graph');
+  const mobile=matchMedia('(max-width:900px)').matches;
+  const box=svg.getBoundingClientRect();
+  // 首帧或隐藏时 getBoundingClientRect 可能是 0，退回一组保守的默认值。
+  const W=Math.max(320, Math.round(box.width)||(mobile?720:1200));
+  const H=Math.max(280, Math.round(box.height)||(mobile?920:690));
+  svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto'});marker.append(svgEl('path',{d:'M0 0L10 5L0 10z',fill:'currentColor'}));marker.setAttribute('class','graph-arrow');defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);return{svg,world,W,H,mobile}}function svgEl(n,a={},text=''){const e=document.createElementNS('http://www.w3.org/2000/svg',n);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));if(text)e.textContent=text;return e}function addBox(w,x,y,ww,h,label,kind='',small='',target=''){const g=svgEl('g',{class:'diagram-group'});g.append(svgEl('rect',{x,y,width:ww,height:h,rx:7,class:`diagram-box ${kind}`}),svgEl('text',{x:x+ww/2,y:y+h/2-(small?8:0),class:'diagram-label'},label));if(small)g.append(svgEl('text',{x:x+ww/2,y:y+h/2+14,class:'diagram-small'},small));if(target)g.onclick=()=>openNote(target);w.append(g)}function arrow(w,x1,y1,x2,y2){w.append(svgEl('line',{x1,y1,x2,y2,class:'diagram-edge'}))}
+/* 窄屏的「知识图谱」：按领域分组的清单。
+ *
+ * 和力图表达同一件事（哪个领域厚、哪个主题重），但不依赖横向空间。
+ * 用 foreignObject 装 HTML，因为这是文字排版而不是图形，交给浏览器排更合适 ——
+ * 手写 SVG 的 text 不会换行，窄屏上必然溢出。
+ */
+function renderNetworkList(svg, domains, notes, tr){
+  const FO=document.createElementNS('http://www.w3.org/2000/svg','foreignObject');
+  FO.setAttribute('x','0'); FO.setAttribute('y','0');
+  FO.setAttribute('width','100%'); FO.setAttribute('height','100%');
+  const box=document.createElement('div');
+  box.className='graph-list';
+  box.innerHTML=domains.map((d,di)=>{
+    const group=notes.filter(n=>n.category===d);
+    const ts=orderedTopics(d,new Set(group.map(n=>n.topic)))
+      .map(t=>({t,n:group.filter(x=>x.topic===t).length}))
+      .sort((a,b)=>b.n-a.n);
+    const color=colors[di%colors.length];
+    return `<section class="graph-list-domain" style="--ink:${color}">
+      <h3><i></i>${esc(tr(d))}<b>${group.length}</b></h3>
+      <ul>${ts.map(item=>`<li><button type="button" data-domain="${esc(d)}" data-topic="${esc(item.t)}">
+        <span>${esc(tr(item.t))}</span><b>${item.n}</b>
+      </button></li>`).join('')}</ul>
+    </section>`;
+  }).join('');
+  FO.append(box);
+  svg.append(FO);
+  box.querySelectorAll('button').forEach(b=>{
+    b.onclick=()=>select(b.dataset.domain, b.dataset.topic);
+  });
+}
+
+function renderNetwork(){
+  /* 这个视图要回答一个问题：这个知识库里到底有什么，怎么分布的。
+   *
+   * 之前画的是 153 个圆点加 33 个主题点、全部互相连线 —— 那是一个
+   * 力导向图的默认外观，不是这张图的答案。点太小看不出是哪篇，线太密
+   * 看不出谁连谁，读半天只得到"东西挺多"。
+   *
+   * 现在的画法：五个领域各占一列，一列里的主题按篇数从上往下排，
+   * 每个主题是一个圆，半径表示它有几篇笔记。同一领域内的主题之间连线，
+   * 线只在跨主题引用真实存在时才画。看的人一眼能得到三件事：
+   * 哪个领域最厚、哪个主题最重、哪些主题互相引用。
+   */
+  const tr=(x)=>window.TKI18N?window.TKI18N.t(x):x;
+  const{svg,world,W,H,mobile}=graphCanvas();
+  const notes=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings'&&!n.exclude_from_graph);
+  const domains=ordered(new Set(notes.map(n=>n.category)));
+
+  /* 窄屏改画清单，不画力图。
+   *
+   * 五列布局在 390px 宽下每列只有 78px：主题名、圆、篇数三者必然互相覆盖，
+   * 实测文字糊成一团，比不看还糟。图的价值在于"一眼看出分布"，而这个前提
+   * 在窄屏不成立 —— 硬画出来的东西读不出任何结论。
+   *
+   * 所以窄屏换成按领域分组的清单：同样的信息（哪个领域厚、哪个主题重），
+   * 用可点的行表达，手机上本来也是清单比图好用。
+   */
+  if(mobile && W<620){
+    renderNetworkList(svg, domains, notes, tr);
+    return;
+  }
+  const positions=new Map(), topicPos=new Map();
+  /* 列中心要按「标签 + 圆」这个整体来居中，不能只按圆。
+   *
+   * 主题名现在挂在圆心左侧（text-anchor:end），整列的视觉宽度因此向左边多出
+   * 一个标签宽。列中心仍按 colW 均分的话，圆的位置没变、但内容的实际左边界
+   * 被推到更左 —— 实测左边距 27px、右边距 110px，整幅图看起来偏左。
+   *
+   * labelW 是给左侧标签预留的宽度；把圆心右移它的一半，标签和圆就一起居中。
+   */
+  const padX=mobile?26:40, top=mobile?96:104;
+  const colW=(W-padX*2)/domains.length;
+  const labelW=Math.min(colW*.42, mobile?72:104);
+
+  domains.forEach((d,di)=>{
+    const cx=padX+colW*(di+.5)+labelW/2;
+    const group=notes.filter(n=>n.category===d);
+    const ts=orderedTopics(d,new Set(group.map(n=>n.topic)))
+      .map(t=>({t,n:group.filter(x=>x.topic===t).length}))
+      .sort((a,b)=>b.n-a.n);
+    // A column is a stack of topics. The tallest stack decides the spacing for
+    // all of them, so the columns stay aligned and comparable.
+    const gap=(H-top-58)/Math.max(ts.length,1);
+    ts.forEach((item,ti)=>{
+      const y=top+gap*(ti+.5);
+      topicPos.set(`${d}/${item.t}`,{x:cx,y,d,t:item.t,n:item.n});
+      /* Notes sit on a ring around their topic, not beside it.
+       *
+       * The previous version put them on "a short arc to the right" and added a
+       * hard-coded +18px, while using r*0.5 for x and a different radius for y.
+       * The result was dots that did not lie on any circle around the topic:
+       * measured, they drifted right of the ring and traced an ellipse. It read
+       * as everything being slightly off-grid, which is what it was.
+       *
+       * One radius, one angle, same origin as the topic circle. The radius
+       * grows with the count so a topic with 14 notes does not stack them on
+       * top of each other, and stays clear of the ring itself.
+       */
+      const ns=group.filter(n=>n.topic===item.t);
+      const ring=Math.max(18, 10+Math.sqrt(item.n)*4.2);
+      ns.forEach((n,ni)=>{
+        const a=-Math.PI/2 + (ni/Math.max(ns.length,1))*Math.PI*2;
+        positions.set(n.path,{x:cx+Math.cos(a)*ring, y:y+Math.sin(a)*ring});
+      });
+    });
+    // Domain heading. The count is the point: 60 vs 14 is the first thing a
+    // reader wants to know.
+    /* 领域名可能比一列还宽（"Computer systems and performance"），用 foreignObject
+       让它按列宽换行。SVG 的 text 不会自动折行，之前五个标题在 1440 下会互相压住。 */
+    const head=svgEl('foreignObject',{x:cx-colW/2+6,y:top-56,width:colW-12,height:40});
+    const headBox=document.createElement('div');
+    headBox.className='domain-head';
+    headBox.append(document.createTextNode(tr(d)));
+    const headCount=document.createElement('span');
+    headCount.textContent=`${group.length} 篇 · ${ts.length} 个主题`;
+    headBox.append(headCount);
+    head.append(headBox);
+    world.append(head);
+  });
+
+  // Edges first, so nodes draw over them. Only draw an edge when both ends
+  // resolve — a dangling reference would otherwise silently disappear.
+  /* 连线分两类画，因为它们的信息量不同。
+   *
+   * 实测 528 条引用里，373 条是同领域的（两端在同一列），74 条横跨 2-4 列。
+   * 同领域的两篇笔记本来就同属一个主题，位置上已经挨在一起，那条线只是
+   * 在圆和圆之间重复了"它们相关"这件从位置就能读出来的事 —— 而代价是
+   * 一列之内几十条线互相交叉，把节点糊住。跨领域的引用才是图里有信息量的
+   * 部分：它说明两个原本分开放置的领域之间真的有关联。
+   *
+   * 所以：跨领域的照画，同领域的只在两端在列内离得够远时画（近的不画，
+   * 远的那条反而说明"这个主题的两头有联系"）。两类用不同的 class，
+   * 视觉权重也不同。
+   */
+  const noteDomain=(path)=>{
+    const n=state.notes.find(x=>x.path===path);
+    return n?n.category:'';
+  };
+  for(const e of state.edges){
+    const a=positions.get(e.source), b=positions.get(e.target);
+    if(!a||!b)continue;
+    const crossDomain=noteDomain(e.source)!==noteDomain(e.target);
+    if(!crossDomain){
+      // 列内距离阈值：同一主题的笔记围在环上，彼此很近，那些线纯属噪音。
+      const dx=a.x-b.x, dy=a.y-b.y;
+      if(Math.hypot(dx,dy)<90)continue;
+    }
+    const line=svgEl('line',{
+      x1:a.x,y1:a.y,x2:b.x,y2:b.y,
+      class:crossDomain?'edge edge--cross':'edge edge--inner',
+    });
+    line.dataset.source=e.source; line.dataset.target=e.target;
+    world.append(line);
+  }
+
+  // Topic rings. Radius carries the count: sqrt so area, not radius, is
+  // proportional to how many notes a topic holds.
+  topicPos.forEach(tp=>{
+    const r=9+Math.sqrt(tp.n)*3.1;
+    const color=colors[domains.indexOf(tp.d)%colors.length];
+    /* 圆到笔记点的连线去掉。
+     *
+     * 点已经落在以圆心为中心的那个环上，线只重复了一遍"它们属于这个主题"
+     * 这件已经从位置能读出来的事，代价是每个主题多 n 条线 —— 十四个笔记的
+     * 主题就是十四条，全站加起来糊成一片。删掉之后环本身就在表达归属。
+     */
+    const g=svgEl('g',{class:'topic-node',transform:`translate(${tp.x},${tp.y})`,tabindex:'0',role:'button','aria-label':`${tp.d} / ${tp.t}，${tp.n} 篇`});
+    g.onclick=()=>select(tp.d,tp.t);
+    g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();select(tp.d,tp.t)}};
+    g.append(svgEl('circle',{r,stroke:color,fill:color,'fill-opacity':.14}));
+    /* 名字放在圆的左边，不是上面。
+     *
+     * 笔记点从正上方开始顺时针排满一圈，名字压在正上方就会和点重叠 ——
+     * 之前"模型基础与训练"直接糊在环上。列内圆心之间的横向空间充足，
+     * 左侧是唯一不与环冲突的方向。 */
+    g.append(svgEl('text',{x:-r-8,y:4,'text-anchor':'end',class:'topic-name'},tr(tp.t)));
+    g.append(svgEl('text',{y:4,'text-anchor':'middle',class:'topic-count'},String(tp.n)));
+    world.append(g);
+  });
+
+  notes.forEach(n=>{
+    const p=positions.get(n.path);
+    if(!p)return;
+    const color=colors[domains.indexOf(n.category)%colors.length];
+    const g=svgEl('g',{class:'node',transform:`translate(${p.x},${p.y})`,tabindex:'0',role:'button','aria-label':n.title});
+    g.onclick=()=>openNote(n.path);
+    g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(n.path)}};
+    g.onmouseenter=()=>document.querySelectorAll('.edge').forEach(e=>{if(e.dataset.source===n.path||e.dataset.target===n.path)e.classList.add('focused')});
+    g.onmouseleave=()=>document.querySelectorAll('.edge.focused').forEach(e=>e.classList.remove('focused'));
+    g.append(svgEl('circle',{r:4,fill:color}),svgEl('text',{y:-9,'text-anchor':'middle'},n.title.length>20?n.title.slice(0,19)+'…':n.title));
+    world.append(g);
+  });
+
+  $('#legend').innerHTML=domains.map((d,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(tr(d))}</span>`).join('')
+    +`<span style="color:var(--color-muted)">圆越大，主题下的笔记越多</span>`;
+}
 function renderFlow(){const{world,W,H,mobile}=graphCanvas(),steps=[['问题','目标与约束','知识库首页.md'],['理解','机制与关系','工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md'],['召回','倒排 / 向量 / 图','工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md'],['验证','证据与权限','工程知识/AI系统/质量与运营/可靠生成需要结构、证据、拒答与回归.md'],['行动','模型与工具','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['结果','答案或状态','工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md'],['反馈','评测与回归','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?92:132,bh=70;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===2?'primary':i===4?'secondary':'',small,target));$('#legend').innerHTML='<span><i style="background:#147766"></i>证据获取</span><span><i style="background:#a45b2a"></i>模型与行动</span>'}
 function renderLearning(){const{world,W,H,mobile}=graphCanvas(),steps=[['目标','要解决什么','知识库首页.md'],['理解','机制、边界、关系','工程知识/AI系统/Agent与工作流/Agent学习工具把资料变成可验证学习循环.md'],['预测','先说出判断','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md'],['练习','最小实验','知识库管理/维护/学习与复习方法.md'],['反馈','错误与证据','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md'],['迁移','换场景使用','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?98:142,bh=72;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===0?'secondary':i===4?'primary':'',small,target));$('#legend').innerHTML='<span><i style="background:#a45b2a"></i>目标与迁移</span><span><i style="background:#147766"></i>证据与反馈</span>'}
 function renderArchitecture(){const{world,W,H,mobile}=graphCanvas(),layers=[['能力层','模型、Embedding、多模态','工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md'],['知识层','RAG、记忆、结构化数据','工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md'],['编排层','工作流、Agent、状态','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['工具层','API、MCP、A2A、业务系统','工程知识/AI系统/生态与选型/MCP连接能力，A2A委托任务.md'],['运行层','推理服务、队列、存储','工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md'],['治理层','评测、追踪、安全、发布','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],x=mobile?80:180,w=mobile?560:840,top=55,gap=mobile?128:94,h=70;layers.forEach(([label,small,target],i)=>{const y=top+i*gap;if(i<layers.length-1)arrow(world,W/2,y+h,W/2,y+gap);addBox(world,x,y,w,h,label,i===2?'primary':i===5?'secondary':'',small,target)});$('#legend').innerHTML='<span><i style="background:#147766"></i>决策编排</span><span><i style="background:#a45b2a"></i>治理</span>'}
@@ -671,6 +1082,9 @@ function bindReaderTools(){
 }
 function dataSignature(data){return data.notes.map(note=>[note.path,note.updated,note.title,note.search_text].join('\u0000')).join('\u0001')+'\u0002'+JSON.stringify(data.edges)}
 async function refreshNotes(initial=false){const data=await json('/api/notes'),signature=dataSignature(data);if(signature===state.notesSignature)return;state.notes=data.notes;state.edges=data.edges;state.notesSignature=signature;renderDomains();if(initial){selectFromUrl();return}if(state.view==='home')renderHome();else if(state.view==='directory')renderDirectory();else if(state.view==='graph')renderGraph()}
+/* 论文只在启动时取一次。它跟着 vault 走，不像笔记那样几秒一变，
+   放进 10 秒的轮询里纯属白跑。取不到就不显示，首页其余部分照常。 */
+async function refreshPapers(){try{state.papers=(await json('/api/papers')).papers||[]}catch(error){console.error(error)}if(state.view==='home')renderHome()}
 async function refreshLearningStatus(notify=false){try{state.learningStatus=await json('/api/learning/status');if(state.view==='home')applyHomeStatus()}catch(error){console.error(error);if(!state.learningStatus&&state.view==='home')applyHomeStatus();if(notify)alertUser('学习工具状态暂时不可用，入口仍然可以打开')}}
 async function initialize(){
   /* 主题由 shell.js 在加载时就应用并接管按钮，这里不需要再初始化。
@@ -678,11 +1092,15 @@ async function initialize(){
      所以「手机上先收起」必须在它之后设置，否则收起状态会被这次重建抹掉 ——
      现象就是手机首屏被 390px 高的域树占满，而折叠按钮看起来没反应。 */
   bindGraph();bindKeyboard();bindFeedback();bindProgress();bindReaderTools();renderSharedNav();bindNavigation();
+  // 首页里凡是按数据渲染出来的部分（论文金句、领域卡片）都不是静态文本，
+  // translateDOM 扫不到。切语言后必须整块重画，否则会留下上一种语言的残页。
+  document.addEventListener('tk:lang',()=>{if(state.view==='home')renderHome();else if(state.view==='graph')renderGraph()});
   // 先给出骨架，避免首屏是一片空白让人以为坏了。
   showLoading();
   const loadingWarning=setTimeout(()=>{if(!state.notes.length)alertUser('知识内容加载较慢，仍在重试…')},6000);
   try{await refreshNotes(true);clearTimeout(loadingWarning)}
   catch(error){console.error(error);showLoadError()}
+  await refreshPapers();
   await refreshLearningStatus(true);
 }
 function showLoading(){

@@ -495,11 +495,18 @@ class KnowledgeGraphTests(unittest.TestCase):
         """The category was one grab-bag page mixing structure, update process,
         quality rules and tool costs. It is now an entry page plus a 方法 folder;
         the split has to actually be reachable, not just written on disk."""
+        # The point is that method documents live in 方法/ and are reachable,
+        # not that the folder holds exactly two of them. Pinning the list meant
+        # every new document failed the test, which trains you to edit the
+        # assertion instead of reading it — the test stops being a signal.
         methods = sorted((ROOT / "vault" / "知识库管理" / "方法").glob("*.md"))
-        self.assertEqual(
-            [path.stem for path in methods],
-            sorted(["知识从哪来怎么更新", "一篇知识怎么写"]),
-        )
+        self.assertGreaterEqual(len(methods), 2, "the methods folder must not be empty")
+        for required in ("知识从哪来怎么更新", "一篇知识怎么写"):
+            self.assertIn(
+                required,
+                [path.stem for path in methods],
+                f"{required} must stay in 方法/",
+            )
         topics = {
             str(note["topic"])
             for note in self.vault.notes.values()

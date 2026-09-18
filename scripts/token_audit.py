@@ -57,6 +57,19 @@ BUILT_IN = {
     "--sidebar-width",
 }
 
+# Element-local custom properties: set inline on one element from JS (or in a
+# style attribute) and read by a rule that targets it. They are deliberately not
+# global tokens — the value differs per element — so they cannot be declared in
+# tokens.css and must be listed here instead.
+#
+# Adding a name here is a claim that some element sets it. If that stops being
+# true the var() resolves to nothing and the rule silently drops, so treat this
+# list as something to prune, not a place to silence findings.
+LOCAL = {
+    "--dot",  # index.html renderAtlas: topic circle diameter, from note count
+    "--ink",  # index.html renderAtlas: the domain's accent colour
+}
+
 
 def main() -> None:
     parser = argparse.ArgumentParser()
@@ -92,7 +105,7 @@ def main() -> None:
     missing = {
         name: sorted(set(files))
         for name, files in used.items()
-        if name not in defined and name not in BUILT_IN
+        if name not in defined and name not in BUILT_IN and name not in LOCAL
     }
 
     # Colour tokens must be declared in both themes. Structural ones (spacing,

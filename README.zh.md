@@ -1,14 +1,24 @@
+<div align="center">
+
 # technical-knowledge
 
 **记机制，不记结论 —— 以及服务这套知识库的站点。**
 
-[![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen)](#验证)
-[![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen)](#验证)
-[![dependencies](https://img.shields.io/badge/runtime%20deps-none-blue)](#设计取舍)
-[![python](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
-[![license](https://img.shields.io/badge/license-see%20below-lightgrey)](#许可证)
+[![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen?style=flat-square)](#验证)
+[![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen?style=flat-square)](#验证)
+[![dependencies](https://img.shields.io/badge/runtime%20deps-none-blue?style=flat-square)](#设计取舍)
+[![python](https://img.shields.io/badge/python-3.8%2B-blue?style=flat-square)](https://www.python.org/)
+[![build](https://img.shields.io/badge/build%20step-none-lightgrey?style=flat-square)](#设计取舍)
+[![notes](https://img.shields.io/badge/notes-184-informational?style=flat-square)](#这里有什么)
+[![license](https://img.shields.io/badge/license-see%20below-lightgrey?style=flat-square)](#许可证)
 
-<sup>[English](README.md) · 中文</sup>
+**简体中文** · [English](README.md)
+
+[快速开始](#快速开始) · [站点](#站点) · [设计取舍](#设计取舍) · [验证](#验证) · [更新知识](#怎么更新知识) · [部署](#部署)
+
+</div>
+
+---
 
 184 篇工程笔记，覆盖 AI 系统、后端与分布式系统、数据系统、计算机系统与性能、
 软件构建与质量。每页按同一套结构写，读完能说清一个技术**是拿来干什么的**，
@@ -28,7 +38,7 @@
 
 ---
 
-## 目录结构
+## 这里有什么
 
 ```
 vault/                         可直接用 Obsidian 打开
@@ -64,7 +74,7 @@ projects/                      完整上游源码快照，含各自许可证
 | **评估** | 自研 Agent 评估项目，与上游第三方工具分开维护 |
 | **访问与反馈** | 只在本机可见的运营视图：谁读了什么、说了什么 |
 
-界面提供**英文（默认）与中文**，在侧边栏切换。知识笔记保持写作时的语言 ——
+界面提供**中文（默认）与英文**，在侧边栏切换。知识笔记保持写作时的语言 ——
 机翻一篇机制解释会读起来通顺但是错的，所以没有英文版的笔记会如实说明，
 而不是假装有。
 
@@ -73,7 +83,7 @@ projects/                      完整上游源码快照，含各自许可证
 三个决定影响了其余一切。
 
 **没有构建步骤，没有运行时依赖。** `site/server.py` 是单文件 Python 标准库
-HTTP 服务；`site/base.css` 是一份由 93 个设计 token 驱动的样式表；唯一第三方
+HTTP 服务；`site/base.css` 是一份由设计 token 驱动的样式表；唯一第三方
 资产是 vendored 的 Mermaid。没有 npm install、没有打包器，也没有需要同步的东西。
 
 **同一件事只有一个来源。** 导航在 `site/nav.js` 定义一次，由 `site/shell.js`
@@ -91,6 +101,13 @@ HTTP 服务；`site/base.css` 是一份由 93 个设计 token 驱动的样式表
 | 可读性 | `python3 scripts/contrast_audit.py` —— 逐页逐主题 WCAG AA |
 | 文案质量 | `python3 scripts/copy_audit.py` —— 可数规则 |
 | 翻译覆盖 | `python3 scripts/i18n_audit.py` —— 未翻译的界面字符串 |
+
+一次跑完全部：
+
+```bash
+python3 scripts/check_all.py          # 五项检查，一个结论
+python3 scripts/check_all.py --fast   # 跳过需要浏览器的两项
+```
 
 ## 验证
 

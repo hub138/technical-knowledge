@@ -149,12 +149,31 @@ body.tk-host::before {
   color: var(--color-accent);
 }
 
+/* ── Nav icon ─────────────────────────────────────────────────────────────
+ * The icons are symbol characters, and symbols from different parts of Unicode
+ * do not sit at the same place on the line. Measured ink tops at 40px, the
+ * set that was in use ranged over 11px — enough that the sidebar read as
+ * misaligned no matter what this rule said, because `align-items` centres the
+ * *boxes* and the glyphs were not centred inside their own boxes.
+ *
+ * Two things fix it, and both are needed:
+ *   - site/nav.js picks every icon from one family with a consistent ink box
+ *     (▣ ◎ ◔ ▷ ▤ ◉ ▧ ▨ ▥ ◫ ▦). That is the part CSS cannot do.
+ *   - this rule gives the icon box the same height as the label's line box, so
+ *     the optical centre is the box centre.
+ *
+ * If a new nav icon looks too high or too low, the icon is the wrong glyph, not
+ * this rule. Pick another from the family listed in nav.js.
+ */
 .tk-nav-icon {
   flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 18px;
+  height: 24px;
   font-size: 1em;
   line-height: 1;
-  text-align: center;
   color: currentColor;
 }
 
@@ -162,7 +181,8 @@ body.tk-host::before {
    competing with the destination above it. */
 .tk-nav-icon--sub {
   width: 16px;
-  font-size: 12px;
+  height: 20px;
+  font-size: 11px;
   opacity: 0.75;
 }
 
@@ -253,20 +273,30 @@ body.tk-host::before {
   font-size: 11px;
 }
 
-.tk-sidebar-links { display: flex; gap: 10px; }
+/* ── Sidebar footer: the controls that are not navigation ──────────────────
+ * Sign out and the language switch are both "things you do to the site", not
+ * "places in the site", so they share one row and one visual weight. The sign
+ * out used to be a bare text link sitting above a pill-shaped language button,
+ * which made two controls of equal importance look like two unrelated things.
+ */
+.tk-utility {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
 
-/* Language switch. Sits in the sidebar footer on every page, below the sign-out
-   link where a reader looks for account-level controls. */
-.tk-lang-toggle {
+.tk-utility-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 5px 10px;
   border: 1px solid var(--color-line);
-  border-radius: 20px;
+  border-radius: var(--radius-full);
   background: transparent;
   color: var(--color-muted);
   font: var(--weight-semibold) var(--text-micro) / 1 var(--font-sans);
+  text-decoration: none;
   cursor: pointer;
   transition:
     border-color var(--duration-fast) var(--ease-out),
@@ -274,7 +304,7 @@ body.tk-host::before {
     background var(--duration-fast) var(--ease-out);
 }
 
-.tk-lang-toggle:hover {
+.tk-utility-btn:hover {
   border-color: var(--color-accent);
   background: var(--color-accent-soft);
   color: var(--color-accent);
@@ -287,7 +317,6 @@ body.tk-host::before {
 }
 
 .tk-sidebar-footer a { color: inherit; text-decoration: none; }
-.tk-sidebar-footer a:hover { color: var(--color-accent); }
 
 /* ── Content column ───────────────────────────────────────────────────────
  * Companion pages own their content but not their frame: width, first-screen
@@ -314,7 +343,19 @@ body.tk-host::before {
 .tk-shell > .hero:first-child {
   margin: 0;
   padding: 42px 0 28px;
-  border-bottom: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--ink-rule);
+}
+
+/* The rule does not run to the edge of the column. It stops short, the way a
+   rule in a printed book does. A rule that spans the full width reads as a
+   table border; one that stops reads as a decision. Implemented as a background
+   gradient rather than a border so the gap is on the right only. */
+.tk-shell > .hero:first-child {
+  border-bottom: 0;
+  background-image: linear-gradient(to right, var(--ink-rule) 0, var(--ink-rule) calc(100% - var(--rule-gutter)), transparent calc(100% - var(--rule-gutter)));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 1px;
 }
 
 .tk-pagebar { position: relative; }
@@ -324,28 +365,50 @@ body.tk-host::before {
 body.tk-host a { text-decoration: none; }
 body.tk-host a:hover { text-decoration: none; }
 
-/* ── Page rhythm: hero, eyebrow, sections ───────────────────────────────── */
-
-.hero h1 {
-  max-width: 880px;
-  letter-spacing: 0;
+/* ── Page head ────────────────────────────────────────────────────────────
+ * Every page opens the same way: a small uppercase eyebrow, one large
+ * sentence, a short note, and the actions. That is the whole language. The
+ * pages below used to each invent their own weights and sizes, which is why
+ * /projects and /learn read as two different products that happen to share a
+ * sidebar.
+ *
+ * The claim is the largest type on the page and it is the only place that
+ * size appears. If everything is emphasised, nothing is.
+ */
+.hero h1,
+.hero h2 {
+  max-width: 30ch;
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: var(--weight-bold);
+  text-wrap: balance;
 }
 
 .hero p {
-  max-width: 880px;
+  max-width: 56ch;
+  margin: var(--space-6) 0 0;
   color: var(--color-muted);
+  font-size: var(--text-note);
+  line-height: var(--leading-normal);
 }
 
+/* The eyebrow is a label, not a sentence: uppercase, tracked out, small. It
+   names the section the page sits in, so it gets the accent colour. */
 .eyebrow {
+  margin-bottom: var(--space-4);
   color: var(--color-accent);
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.1em;
+  font-size: var(--text-micro);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
 }
+
+/* ── Page rhythm: sections ──────────────────────────────────────────────── */
 
 .section { margin-top: 28px; }
 .section h2,
-.panel h2 { letter-spacing: 0; }
+.panel h2 { letter-spacing: var(--tracking-h2); }
 
 /* ── Cards ────────────────────────────────────────────────────────────────
  * One border treatment for every card-like surface the pages define. This
@@ -393,7 +456,13 @@ a.card:hover,
   box-shadow: none;
 }
 
-/* ── Buttons and link-buttons ─────────────────────────────────────────────── */
+/* ── Buttons and link-buttons ───────────────────────────────────────────────
+ * A row of equally-weighted buttons says nothing about which one to press. The
+ * page head therefore carries exactly one filled button — the primary action —
+ * and the rest are text links. Pages were giving every action the same
+ * treatment, so /projects opened with four buttons of equal weight and no
+ * obvious way in.
+ */
 
 .button,
 .links a,
@@ -423,6 +492,64 @@ body.tk-host button {
 .hero-links a:hover,
 .work-actions a:hover {
   transform: translateY(-1px);
+}
+
+/* ── Hero actions ─────────────────────────────────────────────────────────
+ * One filled button, then quiet links separated by a hairline. Not a segmented
+ * control: the dividers are what keep four items from reading as a row of equal
+ * chips.
+ */
+.hero-links {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  margin-top: var(--space-6);
+}
+
+.hero-links a {
+  display: inline-flex;
+  align-items: center;
+  padding: 9px 14px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+}
+
+.hero-links a + a {
+  margin-left: var(--space-1);
+  padding-left: var(--space-4);
+  border-left: 1px solid var(--ink-rule);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.hero-links a:hover {
+  background: var(--color-accent-soft);
+  border-color: var(--color-accent-line);
+}
+
+.hero-links a.primary,
+.hero-links a.primary:hover {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: var(--color-on-accent);
+  font-weight: var(--weight-bold);
+}
+
+.hero-links a.primary:hover { background: var(--color-accent-hover); }
+
+/* An action that is a button rather than a link (the insights refresh) sits in
+   the same row and must not look like a second filled button. */
+.hero-links button {
+  padding: 9px 14px;
+  border: 1px solid var(--color-line);
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font: var(--weight-semibold) var(--text-small) / 1 var(--font-sans);
+  cursor: pointer;
 }
 
 /* ── Purpose strip: "what is this page for" ───────────────────────────────── */

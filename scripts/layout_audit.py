@@ -42,6 +42,7 @@ CHROME = (
 # be written into it before the request; see sample().
 PAGES = [
     ("home", "/", "index.html"),
+    ("papers", "/papers", "papers/index.html"),
     ("projects", "/projects", "projects/index.html"),
     ("insights", "/insights", "site/insights.html"),
     ("learning", "/apps/learning/index.html", "apps/learning/index.html"),

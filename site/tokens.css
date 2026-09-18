@@ -120,6 +120,16 @@
   --text-h1: clamp(26px, 2.6vw, 32px);  /* 文章/页面主标题 */
   --text-hero: clamp(30px, 3.2vw, 38px); /* 首页主张 */
 
+  /* 页头专用。hero 每页只出现一次，所以这两档也只会各出现一次：
+   * display 是首屏那句话，note 是它下面那条说明。
+   *
+   * display 用 vw 而不是固定 px —— 它是这一页最大的字，缩小时必须跟着缩，
+   * 否则 390px 宽下会有半屏都在放标题。
+   *
+   * 字距是配套的：字号越大，默认字距越显松，所以要收紧。见 --tracking-*。 */
+  --text-display: clamp(38px, 5.2vw, 66px);
+  --text-note: clamp(15px, 1.25vw, 17px);
+
   /* 旧名保留为别名，迁移期用；改完可删。 */
   --text-2xs: var(--text-micro);
   --text-xs: var(--text-micro);
@@ -132,7 +142,18 @@
   --text-3xl: var(--text-h1);
   --text-4xl: var(--text-hero);
 
+  /* ── Tracking ─────────────────────────────────────────────────────────
+   * Optical, not decorative. Type this large needs negative tracking or the
+   * letters read as a row of separate marks; type this small needs a little
+   * positive tracking or it clogs. One value per size band, so two headings
+   * of the same size never disagree.
+   */
+  --tracking-display: -0.035em;
+  --tracking-h2: -0.008em;
+  --tracking-caps: 0.11em; /* only for uppercase eyebrows and labels */
+
   --leading-tight: 1.25;
+  --leading-display: 1.04; /* hero claims; tighter than tight, checked at 390px */
   --leading-normal: 1.6;
   --leading-relaxed: 1.85; /* long-form reading */
 
@@ -165,6 +186,21 @@
   /* A 1px top highlight reads as a lit edge on an otherwise flat card. */
   --hairline-top: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   --grain-opacity: 0.028;
+
+  /* ── Paper ──────────────────────────────────────────────────────────────
+   * The one thing a screen cannot do that paper can: sit behind the words
+   * without being a colour someone picked. Three rules give that back, and
+   * all three are tokens so light and dark stay telling the same story.
+   *
+   * --ink-rule      the hairline under a page head, plus the heavier rule
+   *                 under a section head. Printed matter uses two weights so
+   *                 the hierarchy is legible before any type is read.
+   * --rule-gutter   the margin beside a rule where it stops. Rules that run
+   *                 the full column width read as a table border; rules that
+   *                 stop short read as someone's decision.
+   */
+  --ink-rule: var(--color-line);
+  --rule-gutter: 96px;
 
   /* ── Motion. Every transition must use a duration + an easing token. ── */
   --duration-fast: 0.12s;
@@ -248,6 +284,10 @@
   --wash-accent: linear-gradient(135deg, var(--color-accent-soft) 0%, transparent 72%);
   --hairline-top: inset 0 1px 0 rgba(255, 255, 255, 0.045);
   --grain-opacity: 0.05;
+
+  /* Paper, dark. The rule lifts rather than stays put: --color-line is only
+   * 1.6:1 against the panel here, which reads as a smudge instead of a rule. */
+  --ink-rule: #33413c;
 }
 
 /* ── Base ────────────────────────────────────────────────────────────── */

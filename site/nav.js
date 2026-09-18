@@ -9,6 +9,16 @@
  *
  * localOnly 的项由调用方按 /api/access 的结果决定是否渲染：中台列出访客地址和
  * 反馈内容，是运营者界面，别人的浏览器里不该出现这个入口。
+ *
+ * ── 图标：为什么必须是这一族 ──
+ * 图标是符号字符，不是图标字体。不同符号的字形在行盒里的垂直位置并不一致：
+ * 实测 ⌂ 上沿 -24、⌘ 上沿 -17、而 ▣◎◔ 族是 -19（40px 字号下），
+ * 相差最多 11px —— 靠 CSS 的 align-items 调不平，因为那对齐的是盒子不是墨迹。
+ * 侧边栏里五个图标就会看起来忽高忽低。
+ *
+ * 所以这里只用上沿一致的那一族：▣ ◎ ◔ ▷ ▤ ◉ ◧ ◨ ▥ ◫ ▦ ▧ ◘ ◙（上沿 -19、高 24）。
+ * 加新项时请从这组里挑，别引入 ⌂ ⌘ ☰ ⬛ 这些 —— 它们会让整列重新错位。
+ * site/base.css 的 .tk-nav-icon 负责盒子对齐，字形一致性由这里保证。
  */
 window.TK_NAV = {
   items: [
@@ -16,7 +26,7 @@ window.TK_NAV = {
       key: "knowledge",
       label: "知识库",
       href: "/",
-      icon: "⌂",
+      icon: "▤",
       title: "按技术对象阅读知识",
       description: "阅读、搜索，并用图谱看知识之间的关系。",
     },
@@ -24,9 +34,17 @@ window.TK_NAV = {
       key: "graph",
       label: "知识图谱",
       href: "/?view=graph",
-      icon: "⌘",
+      icon: "◉",
       title: "看知识之间怎么连",
       description: "领域、主题与笔记之间的关联，以及知识流通路径。",
+    },
+    {
+      key: "papers",
+      label: "论文追踪",
+      href: "/papers",
+      icon: "◫",
+      title: "最新论文怎么解析、怎么进知识库",
+      description: "自己追踪的 AI 与 Agent 论文，逐篇结构化解析，并回流到知识库。",
     },
     {
       key: "projects",
@@ -68,7 +86,7 @@ window.TK_NAV = {
       key: "classrooms",
       label: "我的课堂",
       href: "/learn/history",
-      icon: "☰",
+      icon: "▦",
       title: "回到生成过的课堂",
       description: "列出本机生成过的互动课堂，点开即学。",
       parent: "projects",

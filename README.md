@@ -1,14 +1,24 @@
+<div align="center">
+
 # technical-knowledge
 
 **A knowledge base that explains mechanisms, not conclusions — with the site that serves it.**
 
-[![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen)](#validation)
-[![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen)](#validation)
-[![dependencies](https://img.shields.io/badge/runtime%20deps-none-blue)](#design-notes)
-[![python](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/)
-[![license](https://img.shields.io/badge/license-see%20below-lightgrey)](#license)
+[![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen?style=flat-square)](#validation)
+[![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen?style=flat-square)](#validation)
+[![dependencies](https://img.shields.io/badge/runtime%20deps-none-blue?style=flat-square)](#design-notes)
+[![python](https://img.shields.io/badge/python-3.8%2B-blue?style=flat-square)](https://www.python.org/)
+[![build](https://img.shields.io/badge/build%20step-none-lightgrey?style=flat-square)](#design-notes)
+[![notes](https://img.shields.io/badge/notes-184-informational?style=flat-square)](#what-is-in-here)
+[![license](https://img.shields.io/badge/license-see%20below-lightgrey?style=flat-square)](#license)
 
-<sup>English · [中文](README.zh.md)</sup>
+[简体中文](README.zh.md) · **English**
+
+[Quick start](#quick-start) · [The site](#the-site) · [Design notes](#design-notes) · [Validation](#validation) · [Updating](#updating-the-knowledge) · [Deployment](#deployment)
+
+</div>
+
+---
 
 184 engineering notes on AI systems, backend and distributed systems, data
 systems, computer systems, and software construction — written to a fixed
@@ -27,6 +37,11 @@ A performance claim without the data size, version and hardware it was measured
 on is not a fact. Anything read online is a lead, not a source — it goes in only
 after checking the official documentation, a paper, or a local run.
 
+> **On language.** The notes are written in Chinese, because that is the
+> language they were written in, and machine-translating an explanation of a
+> mechanism produces something that reads fluently and is wrong. This README and
+> the site interface are available in both languages.
+
 ---
 
 ## What is in here
@@ -39,11 +54,11 @@ vault/                         open directly in Obsidian
 site/                          the site: one HTTP server, no runtime dependencies
 apps/agent-evaluation/         in-house Agent evaluation: contract and prototype
 packages/agent-foundation/     sessions, context, memory, recovery, evidence
-projects/                      full upstream source snapshots, licences included
-  archify/                     architecture and flow diagrams
-  OpenMAIC/                    interactive classroom runtime
+projects/                      full upstream source snapshots, each with its licence
+  archify/                     architecture, workflow and relation diagrams
+  OpenMAIC/                    the interactive classroom runtime
   DeepTutor/                   retrieval, memory and study workspace
-  mattpocock-skills/           engineering Agent skills
+  mattpocock-skills/           engineering-collaboration Agent skills
 ```
 
 ## Quick start
@@ -52,51 +67,57 @@ projects/                      full upstream source snapshots, licences included
 ./run-site.sh                  # serves http://localhost:8787
 ```
 
-Open `vault/` as an Obsidian vault to edit. The site reads the Markdown directly
-— save a note and reload, there is no build step and no export.
+Open `vault/` in Obsidian to edit. The site reads the Markdown files directly —
+save and refresh. No build step, no export.
 
 ## The site
 
 | | |
 |---|---|
-| **Reader** | search, per-domain index, article view with backlinks and a source list |
-| **Graph** | relations between notes, plus diagram views of system layers and trade-off quadrants |
-| **Learning** | guided paths into the classroom and tutor tools, with the topic pre-filled |
-| **Evaluation** | the in-house Agent evaluation project, tracked separately from upstream tools |
-| **Visits & feedback** | a local-only operations view: who read what, and what they said |
+| **Reading** | search, domain index, backlinks and sources on each note |
+| **Graph** | relations between notes, plus system layers and a selection quadrant |
+| **Learning** | guided paths into the classroom and tutor tools, topic pre-filled |
+| **Evaluation** | the in-house Agent evaluation, kept apart from the upstream tools |
+| **Visits & feedback** | an operator view visible only on this machine |
 
-The interface is available in **English (default) and Chinese**; switch from the
-sidebar. Knowledge notes stay in the language they were written in — a
-machine-translated explanation of a mechanism reads fluently and is wrong, so a
-note without an English version says so rather than pretending.
+The interface is available in **Chinese (default) and English**; switch it from
+the sidebar. The notes themselves stay in the language they were written in —
+a note with no English version says so rather than pretending otherwise.
 
 ## Design notes
 
-Three decisions shape everything else.
+Three decisions shaped everything else.
 
 **No build step, no runtime dependencies.** `site/server.py` is a single-file
-Python standard-library HTTP server. `site/base.css` is one stylesheet driven by
-93 design tokens. The only third-party asset is Mermaid, vendored. There is no
-npm install, no bundler, and nothing to keep in sync.
+Python standard-library HTTP server; `site/base.css` is one stylesheet driven by
+design tokens; the only third-party asset is a vendored Mermaid. There is no
+`npm install`, no bundler, and nothing to keep in sync.
 
-**One source per fact.** The navigation is defined once, in `site/nav.js`, and
-rendered once, in `site/shell.js`, for every page. This is deliberate: the site
-previously had two page systems that each rendered their own sidebar from their
-own copy of the navigation, and they drifted — one entry existed on one side and
-not the other, and clicking between them changed the layout. Collapsing them
-removed 63 override rules that existed only to reconcile the two.
+**One source for one thing.** Navigation is defined once in `site/nav.js` and
+rendered once by `site/shell.js`, shared by every page. That was not always
+true: the site used to carry two parallel page systems, each with its own
+navigation and its own sidebar renderer, and they drifted — an entry existed on
+one side and not the other, and following it changed the layout. Merging them
+removed 63 override rules that existed only to accommodate the duplicate.
 
-**Evidence over assertion.** Claims in the notes carry their measurement
-conditions. Claims about the site carry a script:
+**Evidence over assertion.** Claims in the notes carry their test conditions;
+claims about the site carry a script:
 
-| What | How it is checked |
+| What | How |
 |---|---|
-| Behaviour | `python3 -m unittest tests/test_site.py` — 50 tests |
-| Layout | `python3 scripts/layout_audit.py` — 27 page-width combinations |
-| Design tokens | `python3 scripts/token_audit.py` — no unresolved `var()` |
-| Readability | `python3 scripts/contrast_audit.py` — WCAG AA per page × theme |
-| Copy quality | `python3 scripts/copy_audit.py` — mechanical rubric |
-| Translation coverage | `python3 scripts/i18n_audit.py` — untranslated UI strings |
+| behaviour | `python3 -m unittest tests/test_site.py` — 50 tests |
+| layout | `python3 scripts/layout_audit.py` — 27 page × width combinations |
+| tokens | `python3 scripts/token_audit.py` — no unresolved `var()` |
+| readability | `python3 scripts/contrast_audit.py` — WCAG AA, per page and theme |
+| copy | `python3 scripts/copy_audit.py` — countable rules |
+| translation | `python3 scripts/i18n_audit.py` — untranslated interface strings |
+
+All of them at once:
+
+```bash
+python3 scripts/check_all.py          # five checks, one verdict
+python3 scripts/check_all.py --fast   # skip the two that need a browser
+```
 
 ## Validation
 
@@ -106,58 +127,57 @@ python3 scripts/contrast_audit.py <url>#dark  # 18/18 page-theme combinations
 python3 scripts/layout_audit.py              # 27/27 page-width combinations
 python3 scripts/token_audit.py               # 0 undefined custom properties
 python3 scripts/copy_audit.py                 # score 2 (lower is better)
-python3 scripts/i18n_audit.py                 # untranslated UI strings
+python3 scripts/i18n_audit.py                 # untranslated interface strings
 ```
 
-The rendered page is the acceptance surface for anything visual — changes are
-verified with full-page screenshots at desktop and mobile widths, not by reading
-the diff.
+For anything visual the rendered page is the acceptance surface: confirm it with
+full-page screenshots at desktop and mobile widths, not by reading the diff.
 
 ## Updating the knowledge
 
-Stable principles and fast-moving product facts are stored separately. A new
-model, protocol or paper is registered as a source first, then its impact on
-existing notes is assessed. Version numbers, deprecation dates, prices and
-security guidance are re-checked against official documentation rather than
-second-hand summaries.
+Stable principles and fast-moving product facts are kept apart. A new model, a
+new protocol or a new paper is registered as a source first, then judged on
+which notes it affects. Facts that change — version numbers, deprecation dates,
+pricing, security posture — are checked against the official documentation, not
+a second-hand summary.
 
-A paper can show that a mechanism is worth trying; only a task run locally with a
-before-and-after comparison shows that it works here.
+A paper can show that a mechanism is worth trying. Only a local run with a
+before-and-after shows that it works here.
 
-One engineering question gets one page. When two notes answer the same question,
-the case, mechanism, cost and validation are merged into the survivor and the
-duplicate is removed — not left half-written in both places.
+One engineering question gets one note. When two notes answer the same question,
+merge the cases, mechanism, costs and validation into the one that stays, then
+delete the old entry — do not leave half an answer in each.
 
 See `vault/知识库管理/方法/一篇知识怎么写.md` and `CONTEXT.md`.
 
 ## Deployment
 
-`DEPLOYMENT.md` and `docker-compose.yml` cover container deployment.
+Container deployment is covered by `DEPLOYMENT.md` and `docker-compose.yml`.
 
-On a LAN, prefer `http://<host>.local:8787/`. Knowledge content is publicly
-readable; only launching a tool that mints a model-backed session requires the
-site password. The exact trust boundary — which routes are open, which are
-gated, and why — is documented in `DEPLOYMENT.md` and enforced in
+On a LAN, prefer `http://<host>.local:8787/`. The knowledge is publicly
+readable; only launching a tool that mints a model session needs the site
+password. The full trust boundary — which routes are open, which need the
+password, and why — is written down in `DEPLOYMENT.md` and enforced by
 `site/server.py`.
 
 ## Upstream projects
 
-`projects/` holds complete Git-tracked source snapshots of four upstream
-projects, each with its own licence, documentation and tests. Dependency
-directories, build output, virtual environments, user data, logs and secrets are
-not tracked; install per each project's own README.
+`projects/` holds full git-tracked source snapshots of four upstream projects,
+each with its own licence, documentation and tests. Dependency directories,
+build output, virtual environments, user data, logs and secrets are excluded;
+follow each project's own README to rebuild.
 
 ## Contributing
 
-Read `AGENTS.md` before adding or moving knowledge — it defines the check that
-must pass first (search for an existing page on the same question before writing
-a new one). Run the validation commands above before proposing a change.
+Read `AGENTS.md` before adding or removing knowledge — it defines the checks
+that must pass first (search for an existing note on the same question before
+writing a new one). Run the validation commands above before proposing a change.
 
 ## License
 
-Knowledge text and integration code in this repository are governed by the
-commit history. Third-party projects under `projects/` remain under their own
-LICENSE and THIRD_PARTY_NOTICES.
+The knowledge text and integration code in this repository are managed through
+its commit history. Third-party projects under `projects/` remain governed by
+their own LICENSE and THIRD_PARTY_NOTICES.
 
-Do not commit credentials, internal addresses, user data or material you are not
-licensed to redistribute into the vault, the graph or a commit.
+Do not put credentials, internal addresses, user data or material you are not
+authorised to redistribute into the knowledge base, the graph, or a commit.

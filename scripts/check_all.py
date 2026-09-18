@@ -11,6 +11,8 @@ contrast pass, a test suite and a careful read of the diff.
     layout       does anything overlap, overflow or get clipped
     tokens       does every var() name something that exists
     copy         is the visitor-facing writing any good
+    readme       do the two READMEs still say the same things
+    i18n-dict    is every dictionary key unique and unambiguous
 
 Usage:
     python3 scripts/check_all.py                # everything
@@ -39,6 +41,7 @@ CONTRAST_PAGES = [
     ("/apps/learning/transfer.html", "apps/learning/transfer.html"),
     ("/apps/learning/history.html", "apps/learning/history.html"),
     ("/apps/agent-evaluation/index.html", "apps/agent-evaluation/index.html"),
+    ("/papers", "papers/index.html"),
 ]
 
 
@@ -63,13 +66,38 @@ def main() -> None:
     results.append(("tests", ok, summary or out.splitlines()[-1] if out else ""))
 
     # 2. Static source checks (no browser needed).
-    for label, script in (("tokens", "scripts/token_audit.py"),
-                          ("copy", "scripts/copy_audit.py")):
-        ok, out = run(label, [PYTHON, str(ROOT / script)])
+    #
+    # The paper registry and its Chinese renderings are checked here so that
+    # adding a paper without a title, or citing one the registry does not know
+    # about, fails the suite instead of silently shipping English into a
+    # Chinese page.
+    for label, script, argv in (
+        ("tokens", "scripts/token_audit.py", []),
+        ("copy", "scripts/copy_audit.py", []),
+        ("readme", "scripts/readme_audit.py", []),
+        ("i18n-dict", "scripts/i18n_dict_audit.py", []),
+        ("papers", "scripts/fetch-papers.py", ["--check"]),
+        ("paper-titles", "scripts/paper-titles.py", []),
+        ("paper-fields", "scripts/paper-fields-zh.py", []),
+    ):
+        script_arg = script
+        ok, out = run(label, [PYTHON, str(ROOT / script_arg), *argv])
         if label == "copy":
             # copy_audit reports a score rather than passing or failing
             score = next((l for l in out.splitlines() if "总分" in l), "")
             results.append((label, True, score.strip() or "score reported"))
+        elif label == "i18n-dict":
+            note = next(
+                (l.strip() for l in out.splitlines() if "maps back to exactly one" in l),
+                "checked",
+            )
+            results.append((label, ok, note))
+        elif label == "readme":
+            note = next(
+                (l.strip() for l in out.splitlines() if "agree on structure" in l),
+                "checked",
+            )
+            results.append((label, ok, note))
         else:
             note = next(
                 (l.strip() for l in out.splitlines() if "referenced custom" in l),

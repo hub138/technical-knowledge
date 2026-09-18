@@ -29,6 +29,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 PAGES = [
     "index.html",
+    "papers/index.html",
+    "papers/paper.html",
     "projects/index.html",
     "site/insights.html",
     "apps/learning/index.html",
@@ -39,7 +41,26 @@ PAGES = [
     "apps/agent-evaluation/index.html",
 ]
 
+# Shared components that build their own markup after load. They are not pages,
+# so walking PAGES missed them entirely: the feedback dialog lives here, and it
+# shipped a Chinese panel inside the English interface on every page while this
+# audit reported full coverage. Only HTML string literals are read from these,
+# which is what the reader ends up seeing.
+COMPONENTS = [
+    "site/shell.js",
+]
+
 HAN = re.compile(r"[\u4e00-\u9fff]")
+
+# Strings that are correct as-is in every language, so a missing dictionary
+# entry is the right state rather than a gap. Each one needs a reason here —
+# this is not a place to silence findings.
+NOT_TRANSLATED = {
+    # The language switch names the language it would take you to. In English
+    # it must read 中文; translating it to "Chinese" would label the button
+    # with the language you are already reading.
+    "中文",
+}
 
 # Text inside these never reaches the reader as UI copy.
 SKIP_TAGS = re.compile(r"<(script|style|noscript)\b.*?</\1>", re.S | re.I)
@@ -95,6 +116,24 @@ def visible_strings(html: str) -> tuple[set[str], set[str]]:
     return chrome, content
 
 
+def html_literals(source: str) -> str:
+    """Concatenate the HTML a JS component builds in template literals.
+
+    shell.js assembles the sidebar, the feedback dialog and the language switch
+    as strings, then injects them. The audit needs to see the same text the
+    reader will, so pull out the pieces that look like markup and drop the rest
+    — the surrounding code is not UI copy and would only add noise.
+    """
+    chunks = []
+    for literal in re.findall(r"`([^`]*)`", source, re.S):
+        if HAN.search(literal) and re.search(r"<[a-zA-Z/]", literal):
+            chunks.append(literal)
+    for literal in re.findall(r'"([^"\n]*)"', source):
+        if HAN.search(literal) and not literal.startswith(("data-", "tk-")):
+            chunks.append(literal)
+    return "\n".join(chunks)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--json", action="store_true")
@@ -105,16 +144,26 @@ def main() -> None:
     chrome_total = 0
     content_total = 0
 
-    for page in PAGES:
-        path = ROOT / page
+    sources = [(rel, rel) for rel in PAGES]
+    # Components carry their own name in the report so a finding points at the
+    # file that has to change, not at the pages that happen to render it.
+    sources += [(rel, rel + " (shared component)") for rel in COMPONENTS]
+
+    for rel, label in sources:
+        path = ROOT / rel
         if not path.is_file():
             continue
-        chrome, content = visible_strings(path.read_text(encoding="utf-8"))
+        text = path.read_text(encoding="utf-8")
+        if rel in COMPONENTS:
+            text = html_literals(text)
+        chrome, content = visible_strings(text)
         chrome_total += len(chrome)
         content_total += len(content)
-        untranslated = sorted(s for s in chrome if s not in known)
+        untranslated = sorted(
+            s for s in chrome if s not in known and s not in NOT_TRANSLATED
+        )
         if untranslated:
-            missing[page] = untranslated
+            missing[label] = untranslated
 
     if args.json:
         print(json.dumps({
