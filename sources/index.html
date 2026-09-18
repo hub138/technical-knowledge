@@ -175,6 +175,41 @@
       .src-feed-when { color: var(--color-faint); }
 
       .src-feed-body { padding: var(--space-2) 0 0; }
+      /* BestBlogs 的富卡片。三列网格 —— 它有 12 条，一条一行会把
+         这一块撑得很长；三列一屏能看九条，和首页那条横滑的密度一致。
+         窄屏收到两列、一列。 */
+      .src-rich { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+      @media (max-width: 1100px) { .src-rich { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+      @media (max-width: 700px) { .src-rich { grid-template-columns: minmax(0, 1fr); } }
+      .src-rich-card {
+        display: grid; grid-template-rows: auto 1fr; overflow: hidden;
+        border: 1px solid var(--color-line); border-radius: var(--radius-md);
+        background: var(--color-panel); text-decoration: none;
+        transition: border-color var(--duration-fast) var(--ease-out);
+      }
+      .src-rich-card:hover { border-color: var(--color-accent-line); }
+      .src-rich-cover { display: block; aspect-ratio: 16/9; background: var(--color-surface); overflow: hidden; }
+      .src-rich-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .src-rich-cover--none { background-image: var(--wash-panel); }
+      .src-rich-body { display: grid; gap: 5px; padding: 11px 13px 13px; align-content: start; }
+      .src-rich-title {
+        color: var(--color-ink); font-size: var(--text-body);
+        font-weight: var(--weight-semibold); line-height: 1.45;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      }
+      .src-rich-card:hover .src-rich-title { color: var(--color-accent); }
+      .src-rich-sum {
+        color: var(--color-muted); font-size: var(--text-small); line-height: 1.6;
+        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      }
+      .src-rich-meta {
+        display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
+        margin-top: 2px; color: var(--color-faint); font-size: var(--text-xs);
+      }
+      .src-rich-icon { width: 15px; height: 15px; border-radius: 50%; object-fit: cover; flex: none; background: var(--color-surface); }
+      .src-rich-source { color: var(--color-ink-soft); font-weight: var(--weight-medium); }
+      .src-rich-facts { font-variant-numeric: tabular-nums; }
+
       .src-feed-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-2); }
       /* 每条 feed 给一层极淡的衬底，像 arXivDaily 的「AI 总结」框。
          它把"这是从外面抓来的摘要"和卡片自己的说明文字区分开，
@@ -420,6 +455,37 @@
         }
         if (!items.length) {
           return `<p class="src-feed-state">${esc(tr("暂时没有新内容。"))}</p>`;
+        }
+        // 有条目的源分两种渲染：
+        //
+        //   富卡片（BestBlogs）—— 它给封面、公众号头像、字数、时长。
+        //     这些字段别的源没有，所以按"有 cover 就走富卡片"分流，
+        //     而不是按 key 写死。将来别的源补上这些字段就自动升级。
+        //   纯文字列表 —— 其余源只有标题、时间、摘要。
+        const rich = items.some((item) => item.cover || item.source_icon);
+        if (rich) {
+          return `<div class="src-rich">${items.map((item) => {
+            const facts = [];
+            if (item.word_count) facts.push(`${Number(item.word_count).toLocaleString()} 字`);
+            if (item.read_minutes) facts.push(`约 ${item.read_minutes} 分钟`);
+            if (item.published) facts.push(String(item.published).slice(0, 10));
+            return `<a class="src-rich-card" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
+              ${item.cover
+                ? `<span class="src-rich-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-crop></span>`
+                : `<span class="src-rich-cover src-rich-cover--none" aria-hidden="true"></span>`}
+              <span class="src-rich-body">
+                <b class="src-rich-title" data-clamp>${esc(item.title)}</b>
+                ${item.summary ? `<span class="src-rich-sum" data-clamp>${esc(item.summary)}</span>` : ""}
+                <span class="src-rich-meta">
+                  ${item.source_icon && item.source_icon !== item.cover
+                    ? `<img class="src-rich-icon" src="${esc(item.source_icon)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
+                    : ""}
+                  ${item.source ? `<span class="src-rich-source">${esc(item.source)}</span>` : ""}
+                  ${facts.length ? `<span class="src-rich-facts">${esc(facts.join(" · "))}</span>` : ""}
+                </span>
+              </span>
+            </a>`;
+          }).join("")}</div>`;
         }
         return `<ul class="src-feed-list">${items.map((item) => `
           <li>

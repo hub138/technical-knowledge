@@ -1268,24 +1268,38 @@ class FeedTests(unittest.TestCase):
         让它根本不存在，XSS 面就从源头没了。有人以后想加回原始字段时这条会红。
         """
         payload = FEEDS_MODULE.snapshot()
-        allowed = {"title", "url", "summary", "published"}
+        # 白名单。新增字段必须同时改这里 —— 那道"要改测试"的门槛就是
+        # 这条测试的全部作用：让加字段这件事必须被看到一次。
+        #
+        # 白名单里全是标量：字符串、数字。**不允许**出现承载 HTML 的键
+        # （content / html / body / rendered 之类）。
+        allowed = {
+            "title", "url", "summary", "published",
+            "cover", "source", "source_icon", "word_count", "read_minutes",
+        }
+        forbidden = {"html", "content", "body", "rendered", "innerHTML"}
         for source in payload["sources"]:
             for item in source["items"]:
                 self.assertTrue(
                     set(item) <= allowed,
                     f"{source['key']} 的条目出现了越界字段: {set(item) - allowed}",
                 )
+                # 即便有人把 forbidden 里的名字加进白名单，这条也会红。
+                self.assertFalse(
+                    set(item) & forbidden,
+                    f"{source['key']} 的条目带了 HTML 承载字段: {set(item) & forbidden}",
+                )
 
-    def test_snapshot_marks_bestblogs_unavailable(self) -> None:
-        """BestBlogs 抓不到（JS 渲染 + 需登录），但必须在响应里出现。
+    def test_snapshot_includes_bestblogs(self) -> None:
+        """BestBlogs 必须在响应里出现。
 
-        删掉的话前端就不知道有这么个源需要解释，而用户要的正是「说清为什么做不到」。
+        它以前走页面抓取（JS 渲染 + 要登录，抓不到），所以标 unavailable。
+        现在走它自己的 OpenAPI，是正常的源 —— 但这条测试守的东西没变：
+        源列表里必须有它，不能因为抓取方式换过就从 FEEDS 里漏掉。
         """
         payload = FEEDS_MODULE.snapshot()
-        by_key = {s["key"]: s for s in payload["sources"]}
-        self.assertIn("bestblogs", by_key)
-        self.assertEqual(by_key["bestblogs"]["status"], "unavailable")
-        self.assertEqual(by_key["bestblogs"]["reason"], "login_required")
+        keys = {source["key"] for source in payload["sources"]}
+        self.assertIn("bestblogs", keys)
 
     def test_snapshot_covers_every_declared_source(self) -> None:
         payload = FEEDS_MODULE.snapshot()
@@ -1296,7 +1310,8 @@ class FeedTests(unittest.TestCase):
 
     def test_feeds_declare_a_known_kind(self) -> None:
         for source in FEEDS_MODULE.FEEDS:
-            self.assertIn(source["kind"], {"rss", "atom", "html", "none"}, source["key"])
+            # api = 走对方提供的开放接口，而不是抓页面（bestblogs 用这个）。
+            self.assertIn(source["kind"], {"rss", "atom", "html", "api", "none"}, source["key"])
             self.assertTrue(source["url"].startswith("https://"), source["key"])
             self.assertIn("ttl", source)
 

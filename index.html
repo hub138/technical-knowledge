@@ -758,7 +758,7 @@ function renderDigest(items, status) {
         <b class="digest-title" data-clamp>${esc(item.title)}</b>
         ${item.summary ? `<span class="digest-sum" data-clamp>${esc(item.summary)}</span>` : ''}
         <span class="digest-meta">
-          ${item.source_icon
+          ${item.source_icon && item.source_icon !== item.cover
             ? `<img class="digest-icon" src="${esc(item.source_icon)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
             : ''}
           ${item.source ? `<span class="digest-source">${esc(item.source)}</span>` : ''}

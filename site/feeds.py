@@ -147,15 +147,20 @@ FEEDS: list[dict] = [
         # `_next/static` 出现 259 次但没有 `__NEXT_DATA__` —— 纯客户端渲染；
         # 而且这个页面叫「我的关注」，本身要登录。不做 headless 抓取：
         # 那是滥用，抓回来也还是登录墙。
+        # 走它的 OpenAPI（见 _fetch_bestblogs），不抓页面。
+        #
+        # 页面确实抓不到 —— 156KB 的 HTML 只有 55 个字符可见文本，
+        # 而且是「我的关注」，本身要登录。但 API 给的东西比页面更全：
+        # 人工精审过的精选、公众号头像、字数、阅读时长、评分。
+        # key 放在 ~/.config/technical-knowledge/bestblogs.key，不入库。
         "key": "bestblogs",
         "group": "reading",
-        "kind": "none",
-        "url": "https://www.bestblogs.dev/reading/follow",
+        "kind": "api",
+        "url": "https://api.bestblogs.dev/openapi/v2/resources",
         "link": "https://www.bestblogs.dev/reading/follow",
-        "ttl": 0,
-        "limit": 0,
+        "ttl": 1800,
+        "limit": 12,
         "delay": 0.0,
-        "reason": "login_required",
     },
 ]
 
@@ -575,8 +580,49 @@ def parse_feed(kind: str, key: str, text: str, base: str) -> tuple[list[dict], s
 # ── 抓取 ──────────────────────────────────────────────────────────────────────
 
 
+def _fetch_bestblogs(source: dict) -> tuple[list[dict], str]:
+    """BestBlogs 走它自己的 OpenAPI，不走 HTTP 抓页面。
+
+    这个源原来标成 kind:"none"（不抓），理由是页面纯客户端渲染 + 要登录。
+    那个判断在当时是对的 —— 但它的 OpenAPI 能拿到同样的内容，而且更好：
+    带公众号名和头像、字数、阅读时长、评分，都是人工精审过的。
+
+    延迟 import 是为了避免循环依赖：bestblogs 不依赖 feeds，
+    而 feeds 只在真正要抓这一源时才需要它。
+    """
+    try:
+        import bestblogs
+    except ImportError:
+        return [], "module_missing"
+    result = bestblogs.digest(limit=int(source.get("limit") or 12))
+    status = result.get("status") or ""
+    if status == "unconfigured":
+        return [], "no_key"
+    if status != "ok":
+        return [], result.get("error") or status or "unreachable"
+    items = []
+    for row in result.get("items") or []:
+        items.append({
+            "title": row.get("title", ""),
+            "url": row.get("url", ""),
+            "summary": row.get("summary", ""),
+            "published": row.get("published_full") or row.get("published", ""),
+            # 下面几个只有 BestBlogs 有。feedEntry 认到就用，不认就忽略 ——
+            # 别的源照旧渲染成纯文字列表。
+            "source": row.get("source", ""),
+            "source_icon": row.get("source_icon", ""),
+            "cover": row.get("cover", ""),
+            "word_count": row.get("word_count") or 0,
+            "read_minutes": row.get("read_minutes") or 0,
+            "tags": row.get("tags") or [],
+        })
+    return items, ""
+
+
 def fetch_one(source: dict) -> tuple[list[dict], str]:
     """抓一个源。**绝不抛异常** —— 一个源失败不能影响其余。"""
+    if source.get("key") == "bestblogs":
+        return _fetch_bestblogs(source)
     if source.get("kind") == "none":
         return [], ""
     if source.get("delay"):
@@ -784,14 +830,25 @@ def snapshot(force: bool = False) -> dict:
             "error": entry.get("error", ""),
             "fetched_at": entry.get("fetched_at", 0),
             "link": source["link"],
-            # 只 expose 这四个字段。**不含任何 HTML 字段** —— 这是安全设计，
-            # 不是在省带宽。tests 里有一条专门守着它，别加回去。
+            # 白名单，不是"返回全部"。**不含任何 HTML 字段** —— 这是安全设计，
+            # 不是在省带宽。tests 里有一条专门守着它：加字段必须先改那条测试，
+            # 这样就没人能顺手把一个承载 HTML 的字段塞进来。
+            #
+            # 这里列出的是几个**标量**：图片 URL、公众号名、字数、时长。
+            # 它们都是数字或短字符串，前端用的时候仍然走 esc()。
             "items": [
                 {
                     "title": item.get("title", ""),
                     "url": item.get("url", ""),
                     "summary": item.get("summary", ""),
                     "published": item.get("published", ""),
+                    # 下面几个只有 BestBlogs 提供；别的源没有就是空值，
+                    # 前端按"有没有 cover"决定走富卡片还是纯文字列表。
+                    "cover": item.get("cover", ""),
+                    "source": item.get("source", ""),
+                    "source_icon": item.get("source_icon", ""),
+                    "word_count": item.get("word_count", 0),
+                    "read_minutes": item.get("read_minutes", 0),
                 }
                 for item in item_list
             ],
