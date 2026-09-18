@@ -170,14 +170,72 @@
       .src-feed-state { margin: 0; color: var(--color-muted); font-size: var(--text-small); }
       .src-feed-state--bad { color: var(--color-warm-ink); }
 
-      /* 页面级刷新，不是每张卡一个 —— 六张卡各配一个按钮是噪音。 */
-      .src-tools {
-        display: flex;
-        align-items: center;
-        gap: var(--space-3);
-        margin-top: var(--space-4);
+      /* 正文 + 右侧目录。
+       *
+       * 目录放右边而不是顶部一排芯片：它是「这一页有什么」的索引，
+       * 内容长了之后右侧索引一直可见，顶部那排会滚出去。
+       * 窄屏收成一列，目录移到正文上面 —— 手机上侧栏也是横条，
+       * 让目录紧跟在标题下面比挤在右边可用。 */
+      .src-layout { display: block; }
+      .src-rail { display: none; }
+
+      @media (min-width: 1100px) {
+        .src-layout {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 210px;
+          column-gap: 36px;
+          align-items: start;
+        }
+        .src-rail {
+          display: block;
+          position: sticky;
+          top: 96px;
+          font-size: var(--text-small);
+        }
       }
-      .src-refresh {
+
+      .src-rail-head {
+        margin: 0 0 9px;
+        padding-bottom: 7px;
+        border-bottom: 1px solid var(--color-line);
+        color: var(--color-muted);
+        font-size: var(--text-xs);
+        font-weight: var(--weight-bold);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .src-rail-group { margin-bottom: var(--space-4); }
+      .src-rail-cat {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 8px;
+        width: 100%;
+        padding: 5px 0;
+        border: 0;
+        background: none;
+        color: var(--color-ink);
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
+        text-align: left;
+        cursor: pointer;
+      }
+      .src-rail-cat:hover { color: var(--color-accent); }
+      .src-rail-cat[aria-pressed="true"] { color: var(--color-accent); }
+      .src-rail-cat .count { flex: none; color: var(--color-muted); font-size: var(--text-small); font-weight: var(--weight-normal); }
+      .src-rail-items { display: grid; gap: 1px; margin: 2px 0 0; padding-left: 11px; border-left: 1px solid var(--color-line); }
+      .src-rail-items a {
+        padding: 3px 0;
+        color: var(--color-muted);
+        font-size: var(--text-small);
+      }
+      .src-rail-items a:hover { color: var(--color-accent); }
+
+      /* 分类目录：全部 / 文章 / 论文 / 资讯。
+         用过滤而不是滚动定位 —— 进这一页要回答的是「这儿有什么」，
+         过滤能立刻把答案缩到一组，滚动只是换个位置继续看。 */
+      .src-tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-top: var(--space-5); }
+      .src-tab {
         padding: 5px 12px;
         border: 1px solid var(--color-line);
         border-radius: var(--radius-sm);
@@ -186,9 +244,22 @@
         font-size: var(--text-small);
         cursor: pointer;
       }
-      .src-refresh:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
-      .src-refresh[disabled] { opacity: 0.55; cursor: default; }
-      .src-updated { color: var(--color-faint); font-size: var(--text-xs); }
+      .src-tab:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      .src-tab[aria-selected="true"] {
+        border-color: var(--color-accent-line);
+        background: var(--color-accent-soft);
+        color: var(--color-accent);
+        font-weight: var(--weight-semibold);
+      }
+      .src-tab b { color: var(--color-faint); font-weight: var(--weight-normal); }
+      .src-tab[aria-selected="true"] b { color: var(--color-accent); }
+
+      .src-updated {
+        display: block;
+        margin-top: var(--space-3);
+        color: var(--color-faint);
+        font-size: var(--text-xs);
+      }
     </style>
   </head>
   <body class="tk-host">
@@ -196,16 +267,19 @@
     <div class="tk-shell">
       <section class="hero">
         <div class="eyebrow">SOURCES · 外部资源</div>
-        <h1>值得订阅的源</h1>
-        <p id="src-intro">论文、文章和资讯的常读源，各自列出最新几条。点标题回原站看全文。</p>
+        <h1>优质好文</h1>
+        <p>几个值得常看的源。下面直接列出各自最新几条，点标题去原站读全文。</p>
       </section>
 
-      <div class="src-tools">
-        <button type="button" class="src-refresh" id="src-refresh">刷新</button>
-        <span class="src-updated" id="src-updated"></span>
+      <div class="src-layout">
+        <div class="src-main">
+          <div id="src-groups"></div>
+        </div>
+        <!-- 右侧目录。它是这一页的索引：有哪些分类、每类下有哪些站。
+             用 <aside> 是因为它确实是附属的 —— 读正文不需要它，
+             但它回答「这里有什么」，而这正是进这一页的第一个问题。 -->
+        <aside class="src-rail" id="src-rail" aria-label="资源目录"></aside>
       </div>
-
-      <div id="src-groups"></div>
     </div>
 
     <script>
@@ -234,7 +308,9 @@
                <div class="src-feed-body"></div>
              </details>`
           : "";
-        return `<article class="src-card${light ? " src-card--light" : ""}">
+        // id 供右侧目录的站名锚点用。用 key 优先，没有 key 的（播客）退回站名。
+        const anchor = `src-${item.key || pick(item, "name")}`;
+        return `<article class="src-card${light ? " src-card--light" : ""}" id="${esc(anchor)}">
           <div class="src-head">
             <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">${esc(pick(item, "name"))}</a>
             <span class="src-kind">${esc(pick(item, "kind"))}</span>
@@ -250,13 +326,49 @@
          硬塞进词典只会得到一个别扭的英文句子，所以这里显式分支。 */
       const countSuffix = () => (lang() === "en" ? "" : " 个");
 
+      /* 当前分类。空字符串 = 全部。 */
+      let activeGroup = "";
+
+      /* 右侧目录：分类 → 该类的站。分类可点（筛正文），站名也可点（跳到该卡）。
+       *
+       * 每个站名都列出来，因为这一页要回答的第一个问题是「这儿有哪些源」——
+       * 只给分类名的话，BestBlogs 这些得滚动才能发现。 */
+      function paintRail(groups) {
+        // 「全部」只作为一个可点的筛选项，不重复列出站名 ——
+        // 下面三组已经逐个列了，再列一遍是同一个清单出现两次。
+        const cats = [{ key: "", title: tr("全部"), items: null }].concat(groups);
+        $("#src-rail").innerHTML = `<p class="src-rail-head">${esc(tr("目录"))}</p>`
+          + cats.map((g) => `
+            <div class="src-rail-group">
+              <button type="button" class="src-rail-cat" data-group="${esc(g.key)}"
+                aria-pressed="${activeGroup === g.key ? "true" : "false"}">
+                <span>${esc(g.title)}</span>
+                <span class="count">${g.items ? g.items.length : groups.reduce((n, x) => n + x.items.length, 0)}</span>
+              </button>
+              ${g.items ? `<div class="src-rail-items">${g.items.map((item) => `
+                <a href="#src-${esc(item.key || pick(item, "name"))}">${esc(pick(item, "name"))}</a>`).join("")}
+              </div>` : ""}
+            </div>`).join("")
+          + `<p class="src-updated" id="src-updated"></p>`;
+        $("#src-rail").querySelectorAll(".src-rail-cat").forEach((button) => {
+          button.onclick = () => {
+            activeGroup = button.dataset.group;
+            render();
+          };
+        });
+      }
+
       function render() {
         const data = window.TK_SOURCES;
         if (!data || !data.groups) {
           $("#src-groups").innerHTML = `<div class="empty"><p class="empty-title">${esc(tr("资源清单读不到"))}</p><p class="empty-hint">${esc(tr("检查 site/sources.js 是否加载成功，然后刷新。"))}</p></div>`;
           return;
         }
-        $("#src-groups").innerHTML = data.groups.map((group) => `
+        paintRail(data.groups);
+        const shown = activeGroup
+          ? data.groups.filter((g) => g.key === activeGroup)
+          : data.groups;
+        $("#src-groups").innerHTML = shown.map((group) => `
           <section class="src-group">
             <h2>${esc(tr(group.title))}<span>${group.items.length}${countSuffix()}</span></h2>
             <p class="src-note">${esc(tr(group.note))}</p>
@@ -267,7 +379,6 @@
         if (window.TKI18N) window.TKI18N.translateDOM($("#src-groups"));
       }
 
-      document.addEventListener("DOMContentLoaded", render);
       // 切语言后整页重画：卡片里的 name/gain/tags 是按语言直接取的，
       // translateDOM 扫不到它们，不重画就会留下上一种语言的残页。
       document.addEventListener("tk:lang", () => { render(); paintFeeds(); });
@@ -386,15 +497,29 @@
         }
       }
 
-      document.addEventListener("DOMContentLoaded", () => loadFeeds(false));
-      $("#src-refresh")?.addEventListener("click", async (event) => {
-        const button = event.currentTarget;
-        button.disabled = true;
-        button.textContent = tr("正在读取…");
-        feedState.retries = 0;
-        await loadFeeds(true);
-        button.disabled = false;
-        button.textContent = tr("刷新");
+      document.addEventListener("DOMContentLoaded", () => {
+        // render() 要先跑：右侧目录里才有 #src-updated 这个节点，
+        // loadFeeds 拿到数据后要往它里面写「刚刚更新」。
+        // 反过来的话第一次的更新时间会丢失（节点还不存在）。
+        render();
+        loadFeeds(false);
+      });
+      /* 定时自动刷新，不设按钮。
+       *
+       * 这里显示的是外部站的最新几条，它们本来就按各自的 TTL（15 分钟到
+       * 1 小时）在服务端更新。放一个「刷新」按钮等于把服务端已经做好的事
+       * 推给读者去点，而且点了也拿不到更新的数据 —— 后端只读缓存。
+       *
+       * 页面开着的时候每 5 分钟拉一次，和内容自己的更新节奏匹配；
+       * 页签切到后台时不拉，切回来立刻拉一次。这样既不用读者操心，
+       * 也不会让一个挂着的页面无限打后端。
+       */
+      const AUTO_REFRESH_MS = 5 * 60 * 1000;
+      setInterval(() => {
+        if (document.visibilityState === "visible") loadFeeds(false);
+      }, AUTO_REFRESH_MS);
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible") loadFeeds(false);
       });
     </script>
   </body>

@@ -982,6 +982,121 @@ FEEDS_MODULE = importlib.util.module_from_spec(FEEDS_SPEC)
 assert FEEDS_SPEC.loader is not None
 FEEDS_SPEC.loader.exec_module(FEEDS_MODULE)
 
+PAPERNOTES_SPEC = importlib.util.spec_from_file_location(
+    "fetch_papernotes", ROOT / "scripts" / "fetch-papernotes.py"
+)
+PAPERNOTES_MODULE = importlib.util.module_from_spec(PAPERNOTES_SPEC)
+assert PAPERNOTES_SPEC.loader is not None
+PAPERNOTES_SPEC.loader.exec_module(PAPERNOTES_MODULE)
+
+
+class PaperNotesTests(unittest.TestCase):
+    """PaperNotes 索引：会议解析、去重、抓取脚本的形状。
+
+    不联网。测的是脚本自己的逻辑，以及入库文件是否可读。
+    """
+
+    def test_parse_location_reads_venue_and_year(self) -> None:
+        venue, conf = PAPERNOTES_MODULE.parse_location(
+            "ICLR2026/llm_agent/a2flow_automating_agentic_workflow"
+        )
+        self.assertEqual(venue, "ICLR")
+        self.assertEqual(conf, "ICLR 2026")
+
+    def test_parse_location_accepts_digit_leading_subfield(self) -> None:
+        """子领域可以是 `3d_vision` 这种数字打头的。
+
+        第一版写的 [a-z_]+ 漏了它们，2101 条论文被判成「没有会议」——
+        首屏因此少了一大块，而且不报错。
+        """
+        _, conf = PAPERNOTES_MODULE.parse_location(
+            "AAAI2026/3d_vision/3d-anc_adaptive_neural_collapse"
+        )
+        self.assertEqual(conf, "AAAI 2026")
+
+    def test_parse_location_accepts_url_encoded_slug(self) -> None:
+        """标题里的重音符号和希腊字母是 URL 编码的（g%C3%B6del、vggt-%CF%89）。"""
+        _, conf = PAPERNOTES_MODULE.parse_location(
+            "ACL2025/llm_agent/g%C3%B6del_agent_a_self-referential"
+        )
+        self.assertEqual(conf, "ACL 2025")
+
+    def test_parse_location_refuses_unlikely_year(self) -> None:
+        """年份是唯一挡住非论文路径的东西 —— 标题段放宽到任意字符之后。"""
+        self.assertEqual(PAPERNOTES_MODULE.parse_location("foo/bar"), ("", ""))
+        self.assertEqual(PAPERNOTES_MODULE.parse_location("ICLR9999/x/y"), ("", ""))
+
+    def test_normalise_title_folds_case_and_punctuation(self) -> None:
+        a = PAPERNOTES_MODULE.normalise_title("Attention Is All You Need")
+        b = PAPERNOTES_MODULE.normalise_title("attention is all you need!")
+        self.assertEqual(a, b)
+
+    def test_normalise_title_keeps_chinese(self) -> None:
+        self.assertTrue(PAPERNOTES_MODULE.normalise_title("机器遗忘"))
+        self.assertNotEqual(
+            PAPERNOTES_MODULE.normalise_title("机器遗忘"),
+            PAPERNOTES_MODULE.normalise_title("记忆"),
+        )
+
+    def test_build_drops_duplicate_titles(self) -> None:
+        docs = [
+            {"title": "Same Paper", "location": "ICLR2026/llm_agent/same_paper",
+             "tags": ["LLM Agent"]},
+            {"title": "Same Paper", "location": "ACL2026/llm_agent/same_paper",
+             "tags": ["LLM Agent"]},
+            {"title": "Other Paper", "location": "ICLR2026/llm_agent/other",
+             "tags": []},
+        ]
+        index = PAPERNOTES_MODULE.build(docs)
+        self.assertEqual(len(index["papers"]), 2)
+        self.assertEqual(index["dropped"], 1)
+
+    def test_build_skips_entries_without_title_or_location(self) -> None:
+        index = PAPERNOTES_MODULE.build([
+            {"title": "", "location": "ICLR2026/llm_agent/x"},
+            {"title": "No location", "location": ""},
+            {"title": "Good", "location": "ICLR2026/llm_agent/good"},
+        ])
+        self.assertEqual(len(index["papers"]), 1)
+        self.assertEqual(index["dropped"], 2)
+
+    def test_build_links_back_to_papernotes(self) -> None:
+        index = PAPERNOTES_MODULE.build([
+            {"title": "X", "location": "ICLR2026/llm_agent/x", "tags": []},
+        ])
+        self.assertEqual(index["papers"][0]["url"], "https://papernotes.org/ICLR2026/llm_agent/x/")
+
+    def test_committed_index_is_readable(self) -> None:
+        """入库的索引必须可读且形状对。这是 --check 的同一条保证。"""
+        index = json.loads(PAPERNOTES_MODULE.INDEX.read_text(encoding="utf-8"))
+        papers = index["papers"]
+        self.assertGreater(len(papers), 20000)
+        for paper in papers[:200]:
+            self.assertTrue(paper["title"])
+            self.assertTrue(paper["url"].startswith("https://papernotes.org/"))
+            self.assertIsInstance(paper["tags"], list)
+
+    def test_committed_index_has_recent_venues(self) -> None:
+        """索引必须含 2025/2026 的会议。
+
+        页面叫「追踪新论文」——如果抓来的数据全是几年前的，那这个页面
+        就又变回它原来那个坏样子了。这条守着那个前提。
+        """
+        index = json.loads(PAPERNOTES_MODULE.INDEX.read_text(encoding="utf-8"))
+        conferences = {p["conference"] for p in index["papers"] if p["conference"]}
+        self.assertTrue(
+            any("2026" in c for c in conferences),
+            f"索引里没有 2026 的会议: {sorted(conferences)}",
+        )
+        self.assertTrue(any("2025" in c for c in conferences))
+
+    def test_committed_index_covers_agent_and_memory_topics(self) -> None:
+        """索引必须能支撑按方向筛选 —— 这是这一页主要的用法。"""
+        index = json.loads(PAPERNOTES_MODULE.INDEX.read_text(encoding="utf-8"))
+        all_tags = {t for p in index["papers"] for t in p["tags"]}
+        for tag in ("LLM Agent", "RAG", "多智能体"):
+            self.assertIn(tag, all_tags)
+
 
 class FeedTests(unittest.TestCase):
     """外部源抓取：清洗、链接、编码、解析、失败隔离。

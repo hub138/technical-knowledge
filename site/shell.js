@@ -269,6 +269,12 @@
       </div>`
           : ""
       }
+      <!-- 知识树槽位。
+           首页把领域/主题两级导航渲染在 #domains 里；其余页面原来没有这个
+           容器，于是侧栏在换页时凭空少掉一半 —— 读者会以为坏了，而不是
+           理解成「这一页不显示知识树」。现在容器始终存在，有数据的页面填，
+           没数据的页面自然为空，形状不变。 -->
+      <div class="tk-domains" id="domains"></div>
       <div class="tk-sidebar-footer">
         <div class="tk-utility">
           ${opts.auth ? '<a class="tk-utility-btn" href="/auth/logout">退出</a>' : ""}
@@ -292,6 +298,36 @@
        above applyTheme() earlier in this function for why the freshly inserted
        subtree needs it. */
     applyTheme(document.documentElement.dataset.theme || "light");
+
+    /* 知识树，给非首页的页面用。
+     *
+     * 首页自己渲染完整的领域树（带展开状态和即时筛选），因为它手里有
+     * 全部笔记。其余页面拿不到那些状态，但至少要显示「这个库有哪些领域、
+     * 各多少篇」—— 侧栏是全局导航，换页时少掉一半会让人以为坏了。
+     *
+     * 这里渲染的是链接版：点一下回首页并筛到那个领域。不做本地展开，
+     * 因为子页面没有笔记数据，展开也没东西可显示。
+     */
+    if (opts.knowledgeTree !== false) {
+      fetch("/api/domains", { cache: "no-store" })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((payload) => {
+          const rows = (payload && payload.domains) || [];
+          const slot = mount.querySelector("#domains");
+          if (!slot || !rows.length) return;
+          const safe = (text) => String(text).replace(/[&<>"']/g, (m) => (
+            { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]
+          ));
+          slot.innerHTML = rows.map((row) => `
+            <a class="tk-domain" href="/?domain=${encodeURIComponent(row.name)}">
+              <span>${safe(row.name)}</span>
+              <span class="count">${row.count}</span>
+            </a>`).join("");
+        })
+        .catch(() => {
+          /* 拿不到就不显示。空着好过显示一个转圈的壳。 */
+        });
+    }
 
     /* The owner-only entry.
      *

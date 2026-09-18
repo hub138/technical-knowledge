@@ -242,26 +242,64 @@ body.tk-host::before {
   border-top: 1px solid var(--color-line);
 }
 
+/* 侧栏文字全部走 token，不用硬编码 px。
+ *
+ * 原来这里是 10/14/12px 三个硬编码值，比正文的 16px 小两到三档。
+ * 侧栏是主级导航（领域名、主题名），不是脚注 —— 读者主要的点击目标
+ * 不该是全页最小的字。--text-small 的注释本来就写着它只用于
+ * 「计数、时间戳、辅助说明」，用在这里和那条约定是矛盾的。 */
 .tk-context-label {
   margin: 0 0 5px;
   color: var(--color-accent);
-  font-size: 10px;
-  font-weight: 800;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .tk-context h2 {
   margin: 0 0 5px;
-  font-size: 14px;
+  font-size: var(--text-body);
   line-height: 1.4;
 }
 
 .tk-context p {
   margin: 0;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: var(--text-small);
   line-height: 1.65;
+}
+
+/* 知识树（非首页侧栏）。
+ * 首页的领域树由 index.html 渲染成可展开的按钮；其余页面拿不到笔记数据，
+ * 这里渲染成回首页的链接。视觉上和首页那套保持一致：
+ * 同样的字号、同样的左缩进、同样的计数位置。 */
+.tk-domains:empty { display: none; }
+
+.tk-domain {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 0 10px;
+  padding: 7px 0 7px 13px;
+  border-left: 1px solid var(--color-line);
+  color: var(--color-ink);
+  font-size: var(--text-body);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+
+.tk-domain:hover {
+  border-left-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.tk-domain .count {
+  flex: none;
+  color: var(--color-muted);
+  font-size: var(--text-small);
+  font-weight: var(--weight-normal);
 }
 
 .tk-sidebar-footer {
@@ -397,12 +435,27 @@ body.tk-host a:hover { text-decoration: none; }
   letter-spacing: var(--tracking-display);
 }
 
+/* 说明段落的宽度分两档。
+ *
+ * 56ch 是给首页那句主张配的（短句，窄行更好读）。套到列表页的说明上
+ * 就错了：实测 /papers 的段落被卡在 600px，而容器有 1034px，
+ * 右边空着 434px 还把「点标题回原站看完整解读」的「点」挤到了下一行 ——
+ * 明明有地方却不给用。
+ *
+ * 默认放到容器宽度（列表页的说明都短，一行放得下就一行）；
+ * 只有首页那句长说明才收窄，那是有意的排版。
+ */
 .hero p {
-  max-width: 56ch;
+  max-width: none;
   margin: var(--space-6) 0 0;
   color: var(--color-muted);
   font-size: var(--text-note);
   line-height: var(--leading-normal);
+}
+
+/* 首页的主张句配窄行宽。别的页面不设上限。 */
+.hero--display p {
+  max-width: 56ch;
 }
 
 /* The eyebrow is a label, not a sentence: uppercase, tracked out, small. It

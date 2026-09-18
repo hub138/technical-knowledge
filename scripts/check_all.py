@@ -78,6 +78,9 @@ def main() -> None:
         ("readme", "scripts/readme_audit.py", []),
         ("i18n-dict", "scripts/i18n_dict_audit.py", []),
         ("papers", "scripts/fetch-papers.py", ["--check"]),
+        # 只校验入库的索引文件可读且形状正确，**不联网** ——
+        # PaperNotes 挂掉不该让这个仓库的检查变红。
+        ("papernotes", "scripts/fetch-papernotes.py", ["--check"]),
         ("paper-titles", "scripts/paper-titles.py", []),
         ("paper-fields", "scripts/paper-fields-zh.py", []),
     ):

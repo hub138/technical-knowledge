@@ -443,9 +443,10 @@
     // 卡片本身的 name/kind/gain/tags 不走词典 —— 它们来自 site/sources.js，
     // 按当前语言直接取（那一份数据里自带 en 字段）。这里只放页面骨架上的文案。
     "外部资源": { en: "Sources" },
-    "值得订阅的源": { en: "Sources worth following" },
-    "论文、文章和资讯的常读源，各自列出最新几条。点标题回原站看全文。": {
-      en: "Standing sources for papers, writing and news, each listing its latest entries. Open a title to read it in full on the source site.",
+    "优质好文": { en: "Good reads" },
+    "资源目录": { en: "Source index" },
+    "几个值得常看的源。下面直接列出各自最新几条，点标题去原站读全文。": {
+      en: "A few sources worth reading regularly. Each one lists its latest entries below; open a title to read it in full on the source site.",
     },
     "值得长期订阅的论文、文章与资讯源，并列出各自的最新几条。": {
       en: "Papers, writing and news worth following, with each source's latest entries listed.",
@@ -477,6 +478,26 @@
     "暂时没有新内容。": { en: "Nothing new right now." },
     "更新于": { en: "Updated" },
     "刚刚更新": { en: "Updated just now" },
+    // 资源页的分类目录。「全部」已在词典里（图谱页用过），不重复定义。
+    "资源分类": { en: "Source categories" },
+    // 论文页的外部收录
+    "外部收录": { en: "External index" },
+    "已精读": { en: "Read closely" },
+    "论文来源": { en: "Paper source" },
+    "分类": { en: "Category" },
+    "子领域": { en: "Subfield" },
+    "会议": { en: "Venue" },
+    "显示更多": { en: "Show more" },
+    "筛出": { en: "Filtered" },
+    "总计": { en: "total" },
+    "两万三千篇顶会论文解读，来自": { en: "23,000 conference paper write-ups, from" },
+    "，按论文自己的分类组织。点标题回原站看完整解读。": {
+      en: ", organised the way the source files them. Open a title to read the full write-up there.",
+    },
+    "搜标题或方向": { en: "Search title or topic" },
+    "读不到论文摘要索引。运行 python3 scripts/fetch-papernotes.py 生成后再刷新。": {
+      en: "Cannot read the paper index. Run python3 scripts/fetch-papernotes.py, then reload.",
+    },
     // 「正在读取…」和「刷新」已在词典里（前面几段），不在这里重复定义 ——
     // 同一个 key 定义两次时 JS 保留最后一个，前面那个变成死代码，
     // i18n_dict_audit 会把这种情况判为失败。
