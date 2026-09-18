@@ -136,18 +136,42 @@
      Does nothing when the page already provides a toggle. */
   const ensureThemeToggle = () => {
     if (document.querySelector("[data-tk-theme-toggle]")) return null;
+    /* 右上角的控件组：语言 + 日夜模式。
+     *
+     * 原来语言切换在侧栏底部、日夜模式浮在右上角，两个都是全局开关却分在两处。
+     * 放一起的道理是：它们回答同一类问题（"我看到的这个站，怎么呈现给我"），
+     * 和"我在哪一页"无关，所以不该混在导航里。
+     *
+     * 尺寸从 34px 提到 38px —— 原来偏小，和 13px 的图标挤在一起像贴纸。
+     */
+    const group = document.createElement("div");
+    group.className = "tk-controls";
+    group.setAttribute("aria-label", "显示设置");
+
+    const lang = document.createElement("button");
+    lang.type = "button";
+    lang.className = "tk-control";
+    lang.dataset.tkLangToggle = "";
+    lang.title = "切换语言";
+    lang.innerHTML = '<span class="tk-control-text" data-tk-lang-label>中文</span>';
+
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "tk-theme-toggle tk-theme-toggle--fixed";
+    btn.className = "tk-control";
     btn.dataset.tkThemeToggle = "";
     btn.setAttribute("aria-live", "polite");
+    btn.title = "切换日夜模式";
     btn.innerHTML =
       '<span data-tk-theme-icon aria-hidden="true"></span>' +
       '<span data-tk-theme-label></span>';
-    document.body.appendChild(btn);
+
+    group.append(lang, btn);
+    document.body.appendChild(group);
     applyTheme(document.documentElement.dataset.theme || "light");
     wireThemeToggles(document);
-    return btn;
+    // 语言按钮走的是全局代理，i18n.js 会接管带这个属性的按钮。
+    if (window.TKI18N?.wireLangToggles) window.TKI18N.wireLangToggles(group);
+    return group;
   };
 
   /* ── Owner-only access, resolved before the first paint ──────────────────
@@ -207,9 +231,28 @@
     const page = opts.page || keyForPath(location.pathname);
     const meta = metaFor(page);
 
+    /* 站点标记。
+     *
+     * 换过两版。第一版是一个字母 K 装在方块里（"没有 logo 时先放个占位"的做法）；
+     * 第二版是三个圆点连成一条线 —— 想表达"知识图谱"，但在 24px 里三个小圆
+     * 加三根细线全糊在一起，显得碎。参考站的做法相反：都在用一个**单一、
+     * 完整的形状**。
+     *
+     * 这一版用层叠：三层圆角矩形错开，前面一层是实心的，后面两层是描边。
+     * 表达的是这个库的核心 —— 一层层堆起来的工程知识，以及它们之间
+     * 相互支撑的关系。形状完整、有纵深，缩到 24px 也认得出来。
+     */
     const brand = `
       <a class="tk-brand" href="/" aria-label="返回工程知识库">
-        <span class="tk-brand-mark" aria-hidden="true">K</span>
+        <span class="tk-brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="7.4" y="3.6" width="13" height="13" rx="3"
+                  stroke="currentColor" stroke-width="1.5" opacity="0.38"/>
+            <rect x="5.2" y="5.8" width="13" height="13" rx="3"
+                  stroke="currentColor" stroke-width="1.5" opacity="0.66"/>
+            <rect x="3" y="8" width="13" height="13" rx="3" fill="currentColor"/>
+          </svg>
+        </span>
         <span class="tk-brand-text"><strong>工程知识库</strong><small>技术知识图谱</small></span>
       </a>`;
 
@@ -278,9 +321,9 @@
       <div class="tk-sidebar-footer">
         <div class="tk-utility">
           ${opts.auth ? '<a class="tk-utility-btn" href="/auth/logout">退出</a>' : ""}
-          <button type="button" class="tk-utility-btn" data-tk-lang-toggle>
-            <span class="tk-lang-globe" aria-hidden="true">◐</span><span data-tk-lang-label>中文</span>
-          </button>
+          <!-- 语言切换已经移到右上角的控件组（见 TKShell.ensureThemeToggle）。
+               侧栏底部只留退出这类和身份相关的操作，
+               显示设置不再混在导航里。 -->
         </div>
       </div>
     `;

@@ -359,9 +359,29 @@
        * 标签给固定宽度，芯片起点就能对齐成一列 —— 这是"整齐"的来源。
        */
       .pn-filters { display: grid; gap: var(--space-2); margin: var(--space-4) 0 0; }
+      /* 标签和**第一行芯片**对齐，不是和整个芯片块居中。
+       *
+       * 这里踩了两次：第一版用 `align-items:start` 配 `padding-top: 6px`，
+       * 标签比芯片低 13px；改成 `align-items:center` 反而更歪（-24px），
+       * 因为芯片会换行，行高是两行的，居中就把标签放到两行中间去了 ——
+       * 看起来像悬在两行之间。
+       *
+       * 正确做法是让标签只跟第一行对齐：给它和芯片首行等高的 line-height，
+       * 再用 align-self:start。这样无论芯片折成几行，标签始终贴着第一行。
+       */
       .pn-filter-row { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: var(--space-2); align-items: start; }
       .pn-filter-label {
-        padding-top: 6px;
+        align-self: start;
+        /* margin: 0 是关键。
+         *
+         * 标签用的是 <p>，浏览器默认给它 `margin: 1em 0` —— 13px 字号就是
+         * 上下各 13px。网格单元格的顶是对齐的（都是 243），但这个外边距把
+         * 段落自己的盒子推下去了 13px，于是标签看起来比芯片低一截。
+         * 这就是「歪」的真正来源，跟对齐方式无关。 */
+        margin: 0;
+        /* 和芯片同高（32px，见下面的 min-height）。用等高的 line-height
+           让两段文字落在同一条水平线上，不靠 padding 去凑。 */
+        line-height: 32px;
         color: var(--color-ink);
         font-size: var(--text-small);
         font-weight: var(--weight-bold);
@@ -373,7 +393,15 @@
       .pn-filter-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 
       .pn-chip {
-        padding: 4px 10px;
+        /* 和 .pn-cat 同高（32px）。两行里放的是不同类的芯片，
+           高度不一致时标签没法同时对齐两行 —— 实测一个 32px 一个 25px，
+           差 7px，这就是"歪"的来源。
+           用 flex 居中而不是靠 padding 上下对称，文字才落在盒子正中。 */
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 32px;
+        padding: 0 11px;
         border: 1px solid var(--color-line);
         border-radius: var(--radius-xs);
         background: var(--color-panel);
@@ -396,7 +424,11 @@
       /* 大类芯片比子领域芯片重一档 —— 它是第一层的选择，
          视觉上要能一眼看出和下面那排不是同级。 */
       .pn-cat {
-        padding: 6px 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 32px;
+        padding: 0 13px;
         border: 1px solid var(--color-line);
         border-radius: var(--radius-sm);
         background: var(--color-panel);
@@ -418,7 +450,6 @@
       @media (max-width: 760px) {
         /* 窄屏标签不再占一列 —— 那会把芯片压到只剩两三个的宽度。 */
         .pn-filter-row { grid-template-columns: 1fr; gap: 4px; }
-        .pn-filter-label { padding-top: 0; }
       }
 
       .pn-list { display: grid; gap: 1px; margin-top: var(--space-3); }
@@ -437,16 +468,54 @@
         line-height: 1.5;
       }
       .pn-row a:hover { color: var(--color-accent); }
-      .pn-row a::after { content: " ↗"; color: var(--color-muted); font-weight: var(--weight-normal); }
-      .pn-meta { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+      /* 不用 ↗ 标记外链。
+       *
+       * 原来每条标题后面挂一个箭头，一屏十几条就是十几个箭头，密而没用 ——
+       * 读者早就知道列表里的标题能点。参考的三个站里 BestBlogs 一个箭头
+       * 都没有，arXivDaily 和 PaperNotes 也没有；它们靠悬停变色和标题本身
+       * 的字重表示可点。
+       *
+       * 去掉之后靠这两条传达可点：悬停变主色（下面那行）+ 手型光标。
+       * 这是列表项，不是文档里的行内链接，不需要额外标记。 */
+      .pn-row a { cursor: pointer; }
+      .pn-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+      /* 子领域和标签做成小芯片。
+       *
+       * 原来是 11-12px 的纯灰文字，一屏十几条下来全糊成一片，看不出
+       * 「学习理论 / 密度比估计 / 扩散蒸馏 / 能量模型」是几个独立的方向标签。
+       * 参考 arXivDaily：这些标记是**有底有边的浅色芯片**，颜色还分工
+       * （蓝色 cs.AI、橙色「新提交」），一眼能分出哪类是哪类。
+       *
+       * 会议用主色的淡底，子领域用中性底，标签最轻 —— 三级层次靠底色
+       * 而不是靠字号，这样都在 12px 也能分清。
+       */
       .pn-conf {
-        color: var(--color-accent);
+        padding: 2px 8px;
+        border-radius: var(--radius-xs);
+        background: var(--color-accent-soft);
+        color: var(--color-accent-ink);
         font-size: var(--text-xs);
         font-weight: var(--weight-semibold);
+        white-space: nowrap;
       }
-      .pn-sub { color: var(--color-ink-soft); font-size: var(--text-xs); }
-      .pn-tag { color: var(--color-faint); font-size: var(--text-xs); }
-      .pn-tag + .pn-tag::before { content: " · "; }
+      .pn-sub {
+        padding: 2px 8px;
+        border-radius: var(--radius-xs);
+        background: var(--color-surface);
+        color: var(--color-ink-soft);
+        font-size: var(--text-xs);
+        font-weight: var(--weight-medium);
+        white-space: nowrap;
+      }
+      .pn-tag {
+        padding: 2px 8px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-xs);
+        color: var(--color-muted);
+        font-size: var(--text-xs);
+        white-space: nowrap;
+      }
+      .pn-meta { margin-top: 1px; }
 
       .pn-more {
         display: block;
@@ -479,11 +548,10 @@
     <div class="tk-shell tl-layout">
       <div class="tl-main">
       <section class="hero">
-        <div class="eyebrow">PAPERS · 追踪与解析</div>
-        <h1>追踪新论文</h1>
+        <h1>追踪新论文和解析</h1>
         <!-- 句子在锚点处断开是必须的：i18n 按文本节点查词典，
              把链接包进整句会让英文界面下段落外的部分翻不过来。 -->
-        <p><span>两万三千篇顶会论文解读，来自</span> <a href="https://papernotes.org/" target="_blank" rel="noopener noreferrer">papernotes.org ↗</a><span>，按论文自己的分类组织。点标题回原站看完整解读。</span></p>
+        <p><span>两万三千篇顶会论文解读，来自</span> <a href="https://papernotes.org/" target="_blank" rel="noopener noreferrer">papernotes.org</a><span>，按论文自己的分类组织。点标题回原站看完整解读。</span></p>
       </section>
 
       <div class="pn-bar">
@@ -743,14 +811,23 @@
        * 的篇数更多。读者找论文时先想的是「LLM 相关的」，不是「五百篇以上的」。
        */
       function pnPaintFilters(categories, conferences) {
-        const catRow = categories.map((c) => `
+        // 「其他」渲染成一个淡色小尾巴，不当作第八个大类。
+        // 它是个兜底桶（953 篇，什么都有），和「LLM」平级会误导；
+        // 而且八个大类之后单独多一个，正好占满第二行 —— 又乱又占地方。
+        const main = categories.filter((c) => !c.tail);
+        const tails = categories.filter((c) => c.tail);
+        const catRow = main.map((c) => `
           <button type="button" class="pn-cat" data-cat="${esc(c.name)}"
+            aria-pressed="${pn.cat === c.name ? "true" : "false"}">${esc(c.name)}
+            <b>${c.count.toLocaleString()}</b></button>`).join("")
+          + tails.map((c) => `
+          <button type="button" class="pn-chip" data-cat="${esc(c.name)}"
             aria-pressed="${pn.cat === c.name ? "true" : "false"}">${esc(c.name)}
             <b>${c.count.toLocaleString()}</b></button>`).join("");
         // 选中大类后展开它的子领域；没选就只显示大类。
         const active = categories.find((c) => c.name === pn.cat);
         const subRow = active && active.subfields.length
-          ? `<div class="pn-filter-row pn-filter-row--sub">
+          ? `<div class="pn-filter-row">
                <p class="pn-filter-label">${esc(tr("子领域"))}</p>
                <div class="pn-filter-chips">
                  <button type="button" class="pn-chip" data-kind="sub-clear"

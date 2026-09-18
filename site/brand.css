@@ -3,9 +3,9 @@
 .tk-brand {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 12px;
   min-width: 0;
-  padding: 0 8px 22px;
+  padding: 0 8px 20px;
   border-bottom: 1px solid var(--color-line);
   color: var(--color-ink);
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
@@ -18,15 +18,24 @@
 .tk-brand-mark {
   display: grid;
   place-items: center;
-  flex: 0 0 35px;
-  width: 35px;
-  height: 35px;
-  border-radius: 8px;
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  /* 实心主色底 + 白色图形。
+   *
+   * 上一版是淡底 + 主色图形，想"不跟内容抢"，结果整个标记太轻 ——
+   * 跟 BestBlogs 和 arXivDaily 并排看，它们都是**一块明确的颜色**加白色
+   * 图形，体量和文字配得上。侧栏顶部只有一个标记，它是识别锚点，
+   * 该有分量；淡到看不见就失去了做标记的意义。 */
+  border-radius: 11px;
   background: var(--color-accent);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1;
+  color: var(--color-on-accent);
+}
+
+.tk-brand-mark svg {
+  width: 24px;
+  height: 24px;
+  display: block;
 }
 
 .tk-brand-text { min-width: 0; }
@@ -39,25 +48,30 @@
   white-space: nowrap;
 }
 
+/* 站名放到 18px 加粗。
+ *
+ * 原来是 14px/700，而标记 34px —— 比例上文字太小，整体像挂件。
+ * 参考的两个站右侧文字都比标记大或相当：arXivDaily 的「arXiv每日学术速递」
+ * 是 20px 上下的粗体，BestBlogs 的「BestBlogs」也是大字。
+ * 站名是"我在哪"的答案，不该比正文还小。 */
 .tk-brand-text strong {
-  font-size: 14px;
+  font-size: 17px;
   font-weight: 700;
-  line-height: 1.35;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 .tk-brand-text small {
-  margin-top: 2px;
+  margin-top: 3px;
   color: var(--color-muted);
   font-size: 11px;
   font-weight: 500;
   line-height: 1.35;
 }
 
-:root[data-theme="dark"] .tk-brand-mark {
-  background: var(--color-accent-soft);
-  color: var(--color-ink);
-  box-shadow: inset 0 0 0 1px var(--color-accent);
-}
+/* 暗色下不需要单独覆盖：标记用 --color-accent-soft 底 + --color-accent 图形，
+   这两条 token 在暗色档里已经各自换成了深蓝底和亮蓝，自动适配。
+   原来这里是实心块，才需要一条 :root[data-theme] 规则把字色从白改掉。 */
 
 @media (max-width: 900px) {
   .tk-brand {

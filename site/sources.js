@@ -28,7 +28,7 @@ window.TK_SOURCES = {
           url: "https://www.bestblogs.dev/reading/follow",
           kind: "中文技术公众号聚合",
           gain:
-            "散在几十个技术公众号里的文章，按你关注的方向聚到一处。今天更新了什么、哪些值得点开，扫一遍标题就知道，不用一个个点进去。",
+            "把散在几十个技术公众号里的文章聚到一处，按方向筛。今天更新了什么、哪几篇值得点开，扫一遍标题就知道。",
           tags: ["公众号聚合", "今日更新", "自选订阅", "速看标题"],
           en: {
             name: "BestBlogs",
@@ -44,7 +44,7 @@ window.TK_SOURCES = {
           url: "https://www.ruanyifeng.com/blog/index.html",
           kind: "个人技术博客",
           gain:
-            "每周一期的「科技爱好者周刊」，把一周里值得看的科技内容挑出来讲。写得慢但讲得透，适合当周末的固定读物。",
+            "每周一期，把一周里值得看的科技内容挑出来讲。写得慢、讲得透，适合当周末的固定读物。",
           tags: ["周刊", "长期更新", "讲透"],
           en: {
             name: "Ruan Yifeng's blog",
@@ -67,7 +67,7 @@ window.TK_SOURCES = {
           url: "https://papernotes.org/",
           kind: "AI 顶会论文解读",
           gain:
-            "两万多篇 AI 顶会论文的中文解读，每篇五分钟读完核心思想。按会议再按子领域组织，下面列出它最近新增的几篇。想找某个方向的工作，从这里进比翻 arXiv 快。",
+            "两万多篇 AI 顶会论文的中文解读，每篇五分钟读完核心思想。按会议和子领域组织，找某个方向的工作比翻 arXiv 快。",
           tags: ["2.3 万篇", "五分钟一篇", "按会议分类"],
           en: {
             name: "PaperNotes",
@@ -83,7 +83,7 @@ window.TK_SOURCES = {
           url: "https://www.arxivdaily.com/",
           kind: "每日 arXiv 速递",
           gain:
-            "每天新提交的 arXiv 论文，带中文摘要和机构信息，可按学科、机构筛。它不替你判断哪篇重要，但保证你不会漏掉今天出了什么。",
+            "每天新提交的 arXiv 论文，带中文摘要和作者机构。它不替你判断哪篇重要，但保证不漏掉今天出了什么。",
           tags: ["每日更新", "中文摘要", "按机构筛"],
           en: {
             name: "arXivDaily",
@@ -100,7 +100,7 @@ window.TK_SOURCES = {
           url: "https://www.xiaoyuzhoufm.com/podcast/667d1ecfc13b46d76c3f64b8",
           kind: "播客 · HuggingFace 出品",
           gain:
-            "同一批论文的音频版，每期十来分钟。通勤、走路的时候能跟上进度 —— 不占用眼睛，所以能和阅读并行。",
+            "同一批论文的音频版，每期十来分钟。通勤、走路时能跟上进度，不占用眼睛。",
           tags: ["音频", "每期十分钟", "通勤可用"],
           en: {
             name: "Daily AI Paper Digest (podcast)",
@@ -123,7 +123,7 @@ window.TK_SOURCES = {
           url: "https://readhub.cn/hot",
           kind: "科技新闻聚合",
           gain:
-            "当天科技新闻压成一句话一条，扫一眼就知道发生了什么。用来不漏掉大事，不是用来读懂一件事。",
+            "当天科技新闻压成一句话一条，扫一眼就知道发生了什么。用来不漏掉大事。",
           tags: ["24 小时热榜", "一句话一条"],
           en: {
             name: "ReadHub",
@@ -139,7 +139,7 @@ window.TK_SOURCES = {
           url: "https://zeli.app/zh",
           kind: "资讯聚合",
           gain:
-            "偏 Hacker News 一线的资讯聚合，和 ReadHub 一起看能同时覆盖中英文两边在关注什么。",
+            "偏 Hacker News 一线的资讯聚合。和 ReadHub 一起看，能同时覆盖中英文两边在关注什么。",
           tags: ["Hacker News", "中英两边"],
           en: {
             name: "zeli",

@@ -29,6 +29,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 # 同目录的兄弟模块。用显式路径插入而不是相对导入：server.py 会被
 # `python3 site/server.py` 直接跑，那时它不在包上下文里，相对导入会失败。
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bestblogs  # noqa: E402  （必须在 sys.path 调整之后）
 import feeds  # noqa: E402  （必须在 sys.path 调整之后）
 
 
@@ -926,6 +927,10 @@ class Vault:
                 {
                     "name": category,
                     "count": cat_counts.get(category, 0),
+                    # 「其他」是兜底桶，不是和 LLM 平级的方向。
+                    # 它挂在「科学与跨学科」后面显示成一个小尾巴，
+                    # 免得八个大类里的最后一个孤零零占满一整行。
+                    "tail": category == "其他",
                     "subfields": sorted(
                         (
                             {"name": name, "count": count}
@@ -1996,6 +2001,23 @@ class Handler(BaseHTTPRequestHandler):
                 "conferences": index.get("conferences") or [],
                 "papers": page,
             })
+            return
+        if path == "/api/digest":
+            # BestBlogs 的精选文章。走它的 OpenAPI，不爬页面。
+            # 没配 key 时返回 unconfigured，页面照常显示别的源。
+            force = query.get("refresh", ["0"])[0] == "1"
+            try:
+                limit = min(24, max(1, int(query.get("limit", ["12"])[0])))
+            except ValueError:
+                limit = 12
+            hours = query.get("time", ["3d"])[0]
+            if hours not in {"24h", "3d", "1w", "1m", "all"}:
+                hours = "3d"
+            self.send_json(bestblogs.digest(limit=limit, hours=hours, force=force))
+            return
+        if path == "/api/sources":
+            # BestBlogs 的公共订阅源目录（公众号列表）。
+            self.send_json(bestblogs.sources())
             return
         if path == "/api/feeds":
             # 外部源的最新几条，给 /sources 页面就地显示。

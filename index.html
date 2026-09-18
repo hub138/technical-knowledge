@@ -12,7 +12,7 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:var(--color-bg);color:var(--color-ink);font:var(--text-md)/var(--leading-normal) var(--font-sans)}button,input{font:inherit}button{cursor:pointer}.app{display:block;min-height:100vh}.sidebar{background:var(--color-surface);border-right:1px solid var(--color-line);padding:21px 15px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 21px;border-bottom:1px solid var(--color-line)}.mark{width:34px;height:34px;border:1px solid var(--color-accent);border-radius:9px;display:grid;place-items:center;color:var(--color-accent);font-weight:800}.brand strong{display:block;font-size:var(--text-md)}.brand small{display:block;color:var(--color-muted);font-size:var(--text-xs)}.nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px 0}.nav-actions button,.nav-section button{border:1px solid transparent;background:transparent;color:var(--color-ink-soft);text-align:left;border-radius:6px;padding:8px 10px}.nav-actions button:hover,.nav-actions button.active,.nav-section button:hover,.nav-section button.active{background:var(--color-accent-soft);border-color:var(--color-accent-line);color:var(--color-accent)}
 .nav-section{border-top:1px solid var(--color-line);padding:12px 0}.nav-section h3{font-size:var(--text-xs);color:var(--color-muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;font-size:var(--text-h3)}.nav-section button .count{flex:none;padding-top:2px}.count{font-size:var(--text-xs);color:var(--color-muted)}
-.count,.fact-stars,.fact-open,.fact-live,.fact-key,.fact-none{font-variant-numeric:tabular-nums}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:20px 30px;background:rgba(244,246,245,.94);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);backdrop-filter:blur(10px)}.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--color-line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--color-panel);outline:0}.search input:focus{border-color:var(--color-accent);box-shadow:0 0 0 3px #4051b51a}.search span{position:absolute;left:13px;top:8px;color:var(--color-muted)}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:var(--text-3xl);line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--color-ink-soft);margin:0}.hero-meta{color:var(--color-muted);font-size:var(--text-sm);white-space:nowrap}.section{margin-top:28px}.section h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 7px}.section>p{color:var(--color-ink-soft);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--space-3);align-items:start}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px;padding:16px}.entry h3{font-size:var(--text-md);margin:0 0 6px}.entry p{color:var(--color-ink-soft);font-size:var(--text-base);margin:0 0 12px}.entry a{display:inline-block;color:var(--color-accent);font-size:var(--text-sm);margin-right:11px}.claim-list li{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:10px;align-items:baseline}
+.count,.fact-stars,.fact-open,.fact-live,.fact-key,.fact-none{font-variant-numeric:tabular-nums}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:20px 30px;background:var(--color-bg-veil);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);backdrop-filter:blur(10px)}.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--color-line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--color-panel);outline:0}.search input:focus{border-color:var(--color-accent);box-shadow:0 0 0 3px #2563eb1a}.search span{position:absolute;left:13px;top:8px;color:var(--color-muted)}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:var(--text-3xl);line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--color-ink-soft);margin:0}.hero-meta{color:var(--color-muted);font-size:var(--text-sm);white-space:nowrap}.section{margin-top:28px}.section h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 7px}.section>p{color:var(--color-ink-soft);margin:0 0 16px}.domain-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:var(--space-3);align-items:start}.entry-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.entry{background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px;padding:16px}.entry h3{font-size:var(--text-md);margin:0 0 6px}.entry p{color:var(--color-ink-soft);font-size:var(--text-base);margin:0 0 12px}.entry a{display:inline-block;color:var(--color-accent);font-size:var(--text-sm);margin-right:11px}.claim-list li{display:grid;grid-template-columns:auto auto minmax(0,1fr);gap:10px;align-items:baseline}
 /* 破折号单独成元素，不写在文本节点里。
  *
  * 原来写的是 <b>问题</b> —— 说明，那个文本节点的值是 " —— 说明"（带前导空格和
@@ -42,6 +42,41 @@
 .hero p b{font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums}
 .hero p span{font-weight:inherit}
 
+/* ── 最新优质好文：横向滚动 ────────────────────────────────────────────
+ *
+ * 卡片照 arXivDaily 的做法：封面在上、标题加粗、摘要在下、来源和时间做脚注。
+ * 横向滚动而不是网格 —— 这一块是"扫一眼有什么新东西"，一行摆开比四行网格
+ * 更容易一次看完，也不把首页撑长。
+ *
+ * 滚动条隐藏但保留键盘和触控板滚动；右侧用一个渐隐提示还有更多，
+ * 不然在触控板上看不出这一行可以往右划。
+ */
+.digest{margin:34px 0 0;position:relative}
+.digest-head{display:flex;align-items:baseline;gap:10px;margin:0 0 14px}
+.digest-head h2{font-size:var(--text-h2);margin:0;line-height:1.3}
+.digest-note{color:var(--color-muted);font-size:var(--text-small)}
+.digest-row{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 12px;scrollbar-width:none}
+.digest-row::-webkit-scrollbar{display:none}
+.digest-card{
+  flex:0 0 268px;display:grid;gap:0;scroll-snap-align:start;
+  border:1px solid var(--color-line);border-radius:var(--radius-md);
+  background:var(--color-panel);overflow:hidden;text-decoration:none;
+  transition:border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out);
+}
+.digest-card:hover{border-color:var(--color-accent-line);box-shadow:var(--shadow-sm)}
+.digest-cover{display:block;aspect-ratio:16/9;background:var(--color-surface);overflow:hidden}
+.digest-cover img{width:100%;height:100%;object-fit:cover;display:block}
+.digest-cover--none{background-image:var(--wash-panel)}
+.digest-body{display:grid;gap:6px;padding:13px 15px 15px}
+.digest-title{color:var(--color-ink);font-size:var(--text-body);font-weight:var(--weight-semibold);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.digest-card:hover .digest-title{color:var(--color-accent)}
+.digest-sum{color:var(--color-muted);font-size:var(--text-small);line-height:1.65;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.digest-meta{color:var(--color-faint);font-size:var(--text-xs);margin-top:2px}
+@media (max-width:760px){
+  .digest-card{flex-basis:236px}
+}
 .atlas{margin:34px 0 0;padding:22px 24px 26px;background-color:var(--color-panel);background-image:var(--wash-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);box-shadow:var(--hairline-top),var(--shadow-xs)}
 .atlas-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--ink-rule)}
 .atlas-head h2{font-size:var(--text-h2);margin:0 0 6px;letter-spacing:var(--tracking-h2)}
@@ -220,9 +255,9 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .nav-section .topic-button.archived{color:var(--color-muted);font-style:italic}
 .nav-section .topic-button.archived::before{content:"";display:inline-block;width:5px;height:5px;margin-right:6px;border-radius:50%;background:currentColor;opacity:.5;vertical-align:middle}
 .nav-section .topic-button.archived .count{opacity:.7}
-.domain-button .domain-label{display:flex;align-items:flex-start;gap:7px;min-width:0;padding-top:1px;line-height:1.35}.domain-chevron{flex:none;width:11px;color:var(--color-muted);font-size:9px;line-height:1;text-align:center;transition:color var(--duration-fast) var(--ease-out)}.domain-button[aria-expanded="true"] .domain-chevron{color:var(--color-accent)}
+.domain-button .domain-label{display:flex;align-items:flex-start;gap:7px;min-width:0;padding-top:1px;line-height:1.35}.domain-chevron{flex:none;width:10px;height:10px;position:relative;transition:transform var(--duration-fast) var(--ease-out)}.domain-chevron::before{content:"";position:absolute;top:1px;left:2px;width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);border-radius:1px}.domain-chevron[data-open="true"]{transform:rotate(90deg)}.domain-button[aria-expanded="true"] .domain-chevron{color:var(--color-accent)}
 .count{font-variant-numeric:tabular-nums;color:var(--color-muted)}
-.topbar{padding:18px 38px;background:rgba(245,247,246,.92);gap:22px}
+.topbar{padding:18px 38px;background:var(--color-bg-veil);gap:22px}
 .topbar h1{font-size:var(--text-md);font-weight:var(--weight-semibold);color:var(--color-muted)}
 .search{max-width:880px}
 .search input{height:44px;border-radius:7px;padding-left:38px;box-shadow:0 1px 2px rgba(20,42,35,.02)}
@@ -274,7 +309,7 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .visual-tabs button{padding:7px 11px}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
 @media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}.content{padding-left:28px;padding-right:calc(28px + var(--float-lane))}}
-@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:rgba(245,247,246,.97)}.content{padding:26px calc(15px + var(--float-lane)) calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:var(--text-3xl)}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
+@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:var(--color-bg-veil)}.content{padding:26px calc(15px + var(--float-lane)) calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:var(--text-3xl)}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
 /* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
 .app-alert{position:fixed;right:22px;bottom:22px;z-index:var(--z-fab);max-width:min(420px,calc(100vw - 30px));padding:11px 14px;border:1px solid #e8c6a8;border-left:3px solid var(--color-warm);border-radius:7px;background:#fff9f2;color:#704823;box-shadow:0 12px 30px rgba(35,45,40,.14);font-size:var(--text-base);display:none}
 .app-alert.open{display:block}
@@ -391,7 +426,7 @@ a:hover { text-decoration: none; }
 <body class="tk-host">
 <div class="app">
 <aside class="tk-sidebar" id="tk-sidebar"></aside>
-<main class="main"><header class="topbar"><h1>工程知识库</h1><label class="search"><span>⌕</span><input id="search" placeholder="搜索知识、机制、项目或来源" autocomplete="off"></label><button type="button" class="tk-theme-toggle" id="theme-toggle" data-tk-theme-toggle aria-live="polite" style="margin-left:auto"><span data-tk-theme-icon aria-hidden="true">☾</span><span data-tk-theme-label>夜晚模式</span></button><div class="reader-tools" id="reader-actions" hidden><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><button id="reader-download" class="reader-tool" type="button" title="下载这篇的 Markdown 原文">下载 .md</button><button id="reader-copy" class="reader-tool" type="button" title="复制这篇的链接">复制链接</button><button id="reader-print" class="reader-tool" type="button" title="打印或另存为 PDF">打印</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型。" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div>
+<main class="main"><header class="topbar"><h1>工程知识库</h1><label class="search"><span>⌕</span><input id="search" placeholder="搜索知识、机制、项目或来源" autocomplete="off"></label><div class="reader-tools" id="reader-actions" hidden><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><button id="reader-download" class="reader-tool" type="button" title="下载这篇的 Markdown 原文">下载 .md</button><button id="reader-copy" class="reader-tool" type="button" title="复制这篇的链接">复制链接</button><button id="reader-print" class="reader-tool" type="button" title="打印或另存为 PDF">打印</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型。" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div>
 <div class="progress-bar" id="progress-bar" aria-hidden="true"></div>
 <button type="button" class="kbd-hint" id="kbd-hint" title="查看键盘快捷键"><kbd>?</kbd><span>快捷键</span></button>
 <div class="kbd-overlay" id="kbd-overlay" role="dialog" aria-modal="true" aria-labelledby="kbd-title" hidden>
@@ -414,7 +449,7 @@ a:hover { text-decoration: none; }
 </div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><div id="reader-context" class="reader-context"></div><h2 id="reader-title"></h2><div id="reader-sources" class="reader-sources"></div><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section><aside class="reader-siblings" id="reader-siblings" aria-label="同模块其他文章"></aside></div><div class="reader-layout"><article id="reader-body" class="reader-body"></article><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside></div></section><section id="graph-view" class="graph"><div class="graph-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div><div class="visual-tabs" role="tablist"><button type="button" data-visual="network" role="tab" aria-selected="true" class="active">关系网络</button><button type="button" data-visual="flow" role="tab" aria-selected="false">知识流通</button><button type="button" data-visual="learning" role="tab" aria-selected="false">学习循环</button><button type="button" data-visual="architecture" role="tab" aria-selected="false">AI 系统架构</button><button type="button" data-visual="quadrant" role="tab" aria-selected="false">选型象限</button></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱"></svg><div id="legend" class="graph-legend"></div></div></section></div></main>
 </div>
 <script>
-const $=s=>document.querySelector(s),state={notes:[],edges:[],papers:[],domain:'all',topic:'all',expandedDomains:new Set(),query:'',sort:'title',selected:null,graphMode:'network',zoom:1,pan:{x:0,y:0},view:'home',notesSignature:'',learningStatus:null};const order=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'],topicOrder={'AI系统':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端与分布式系统':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'计算机系统与性能':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建与质量':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付']},colors=['#4051b5','#2563eb','#c2521f','#7c4dff','#0f7a5a','#b03052','#6b7688'];const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const ordered=a=>[...a].sort((x,y)=>(order.indexOf(x)<0?99:order.indexOf(x))-(order.indexOf(y)<0?99:order.indexOf(y))||x.localeCompare(y,'zh-CN'));const orderedTopics=(domain,a)=>[...a].sort((x,y)=>{const ranks=topicOrder[domain]||[];const rx=ranks.indexOf(x),ry=ranks.indexOf(y);return (rx<0?999:rx)-(ry<0?999:ry)||x.localeCompare(y,'zh-CN')});
+const $=s=>document.querySelector(s),state={notes:[],edges:[],papers:[],domain:'all',topic:'all',expandedDomains:new Set(),query:'',sort:'title',selected:null,graphMode:'network',zoom:1,pan:{x:0,y:0},view:'home',notesSignature:'',learningStatus:null};const order=['总览','AI系统','后端与分布式系统','数据系统','计算机系统与性能','软件构建与质量','Clippings'],topicOrder={'AI系统':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端与分布式系统':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'计算机系统与性能':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建与质量':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付']},colors=['#2563eb','#7c4dff','#c2521f','#0f7a5a','#0891b2','#b03052','#6b7688'];const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));const ordered=a=>[...a].sort((x,y)=>(order.indexOf(x)<0?99:order.indexOf(x))-(order.indexOf(y)<0?99:order.indexOf(y))||x.localeCompare(y,'zh-CN'));const orderedTopics=(domain,a)=>[...a].sort((x,y)=>{const ranks=topicOrder[domain]||[];const rx=ranks.indexOf(x),ry=ranks.indexOf(y);return (rx<0?999:rx)-(ry<0?999:ry)||x.localeCompare(y,'zh-CN')});
 async function json(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error(await r.text());return r.json()}
 /* POST 并把后端的中文错误原样带出来 —— json() 只做 GET，且错误信息是
    JSON body，直接 throw 会显示成 [object Object]。 */
@@ -443,7 +478,7 @@ function renderDomains(){
     const topics=orderedTopics(d,new Set(current.map(n=>n.topic)));
     const radarCards=radars.map(n=>`<button class="radar-card" data-path="${esc(n.path)}" title="时效性内容，每周更新：${esc(n.title)}"><span class="radar-icon" aria-hidden="true">⚡</span><span class="radar-text"><strong>${esc(n.title)}</strong><small>每周更新</small></span></button>`).join('');
     const archiveRow=archived.length?`<button class="topic-button archived" data-domain="${esc(d)}" data-topic="归档"><span>归档</span><span class="count">${archived.length}</span></button>`:'';
-    return `<section class="nav-section"><button class="domain-button ${active?'active':''}" data-domain="${esc(d)}" aria-expanded="${open}"><span class="domain-label"><span class="domain-chevron" aria-hidden="true">${open?'▼':'▶'}</span><span>${esc(d)}</span></span><span class="count">${current.length}</span></button>${open?radarCards+topics.map(t=>`<button class="topic-button ${active&&state.topic===t?'active':''}" data-domain="${esc(d)}" data-topic="${esc(t)}"><span>${esc(t)}</span><span class="count">${current.filter(n=>n.topic===t).length}</span></button>`).join('')+archiveRow:''}</section>`;
+    return `<section class="nav-section"><button class="domain-button ${active?'active':''}" data-domain="${esc(d)}" aria-expanded="${open}"><span class="domain-label"><span class="domain-chevron" aria-hidden="true" data-open="${open}"></span><span>${esc(d)}</span></span><span class="count">${current.length}</span></button>${open?radarCards+topics.map(t=>`<button class="topic-button ${active&&state.topic===t?'active':''}" data-domain="${esc(d)}" data-topic="${esc(t)}"><span>${esc(t)}</span><span class="count">${current.filter(n=>n.topic===t).length}</span></button>`).join('')+archiveRow:''}</section>`;
   }).join('')+(clippingCount?`<div class="sidebar-support"><p>保留资料</p><button class="domain-button ${state.domain==='Clippings'?'active':''}" data-domain="Clippings"><span>Clippings</span><span class="count">${clippingCount}</span></button></div>`:'');
   document.querySelectorAll('.nav-section .domain-button').forEach(button=>button.onclick=()=>{const domain=button.dataset.domain;if(state.expandedDomains.has(domain)){state.expandedDomains.delete(domain);renderDomains();return}state.expandedDomains.add(domain);select(domain,'all')});
   document.querySelectorAll('.sidebar-support .domain-button').forEach(button=>button.onclick=()=>select(button.dataset.domain,'all'));
@@ -535,6 +570,65 @@ function renderAtlas(){
  * 摆在首页当论据是误导。
  *
  * 整块按当前语言渲染，不是翻译 DOM —— 语言切换必须重跑 renderHome。 */
+/* ── 最新优质好文（横向滚动）─────────────────────────────────────────────
+ *
+ * 数据来自 BestBlogs 的 OpenAPI（见 site/bestblogs.py）—— 它返回的是
+ * 人工精审过的 Featured 内容，比"抓一堆标题"有用得多。
+ *
+ * 没有配 API Key 时整块**不显示**，而不是显示一个空框或错误。
+ * 一块从来不出现的东西不会让人以为是坏了；一个写着"未配置"的框会。
+ *
+ * 用横向滚动而不是纵向列表：这一块要回答的是"最近有什么值得读"，
+ * 一眼扫过七八个封面比往下滚三屏快得多，而且不占首页的纵向空间。
+ */
+let digestCache = null;
+
+function renderDigest(items, status) {
+  const box = $('#home-digest');
+  if (!box) return;
+  if (!items || !items.length) {
+    // 没配 key / 配额用完 / 网络不通 —— 三种情况都不显示这一块。
+    // 它不出现不影响首页别的部分，出现了反而要解释一堆。
+    box.innerHTML = '';
+    box.hidden = true;
+    return;
+  }
+  box.hidden = false;
+  const cards = items.map((item) => {
+    const meta = [item.source, item.read_minutes ? `约 ${item.read_minutes} 分钟` : '']
+      .filter(Boolean).join(' · ');
+    return `<a class="digest-card" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
+      ${item.cover
+        ? `<span class="digest-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer"></span>`
+        : `<span class="digest-cover digest-cover--none" aria-hidden="true"></span>`}
+      <span class="digest-body">
+        <b class="digest-title">${esc(item.title)}</b>
+        ${item.summary ? `<span class="digest-sum">${esc(item.summary)}</span>` : ''}
+        <span class="digest-meta">${esc(meta)}</span>
+      </span>
+    </a>`;
+  }).join('');
+  box.innerHTML = `<div class="digest-head">
+      <h2>最新优质好文</h2>
+      <span class="digest-note">来自 BestBlogs 的精选</span>
+    </div>
+    <div class="digest-row">${cards}</div>`;
+}
+
+async function loadDigest() {
+  const box = $('#home-digest');
+  if (!box) return;
+  try {
+    const response = await fetch('/api/digest?limit=12', { cache: 'no-store' });
+    if (!response.ok) throw new Error('unavailable');
+    digestCache = await response.json();
+  } catch {
+    box.hidden = true;
+    return;
+  }
+  renderDigest(digestCache.items, digestCache.status);
+}
+
 function homeQuotes(){
   const zh=window.TKI18N?.lang!=='en';
   const since=String(new Date().getFullYear()-2);
@@ -551,7 +645,7 @@ function homeQuotes(){
   const unit=zh?'篇':'papers';
   return `<p class="claim-quotes-head">${esc(lead)} · <a href="/papers">${esc(all)} · ${state.papers.length} ${esc(unit)} →</a></p>${cards}`;
 }
-function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const sourceCount=state.notes.reduce((n,x)=>n+((x.sources||[]).length),0);const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero hero--display"><div><h2>把技术原理读到能上手用</h2><p><b>${knowledgeCount}</b> <span>篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。写的都是能落到手上的东西：一个机制怎么运作、代价在哪、结论有没有实测支撑。</span></p></div><div class="hero-meta">${knowledgeCount} 篇 · ${sourceCount} 条来源</div></section><section class="claim-row"><section class="claim"><p class="claim-lead">每一篇都回答这四个问题</p><ul class="claim-list"><li><b>它为什么出现</b><i>——</i><span>之前卡在哪，没它的时候怎么办</span></li><li><b>它怎么运作</b><i>——</i><span>机制是什么，关键那一步发生了什么</span></li><li><b>它到底改变了什么</b><i>——</i><span>哪个数字动了，在什么条件下测的</span></li><li><b>什么时候不该用它</b><i>——</i><span>代价是什么，边界在哪</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱 →</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><div class="notice">想先看懂一个领域，从下面的卡片进去。想动手练，用学习工具。想知道系统到底有没有变好，看 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间顺序堆。Agent 相关的内容放在 AI 系统里，跟上下文、检索、质量放在一起。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="打开 ${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${state.notes.filter(n=>n.category===d&&n.topic!=='归档').length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自己写的评估项目放一边 —— 它回答"到底有没有变好"。别人开源的工程流程放另一边 —— 它提供现成的做法。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和源码是用来查关系的，不是主线。想顺着读就读，不想就跳过。</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图。</p><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口 →</a></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});renderAtlas();applyHomeStatus();retranslate()}
+function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const sourceCount=state.notes.reduce((n,x)=>n+((x.sources||[]).length),0);const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero hero--display"><div><h2>把技术原理读到能上手用</h2><p><b>${knowledgeCount}</b> <span>篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。写的都是能落到手上的东西：一个机制怎么运作、代价在哪、结论有没有实测支撑。</span></p></div><div class="hero-meta">${knowledgeCount} 篇 · ${sourceCount} 条来源</div></section><section class="claim-row"><section class="claim"><p class="claim-lead">每一篇都回答这四个问题</p><ul class="claim-list"><li><b>它为什么出现</b><i>——</i><span>之前卡在哪，没它的时候怎么办</span></li><li><b>它怎么运作</b><i>——</i><span>机制是什么，关键那一步发生了什么</span></li><li><b>它到底改变了什么</b><i>——</i><span>哪个数字动了，在什么条件下测的</span></li><li><b>什么时候不该用它</b><i>——</i><span>代价是什么，边界在哪</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱 →</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><div class="notice">想先看懂一个领域，从下面的卡片进去。想动手练，用学习工具。想知道系统到底有没有变好，看 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间顺序堆。Agent 相关的内容放在 AI 系统里，跟上下文、检索、质量放在一起。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="打开 ${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${state.notes.filter(n=>n.category===d&&n.topic!=='归档').length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自己写的评估项目放一边 —— 它回答"到底有没有变好"。别人开源的工程流程放另一边 —— 它提供现成的做法。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和源码是用来查关系的，不是主线。想顺着读就读，不想就跳过。</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图。</p><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口 →</a></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});renderAtlas();applyHomeStatus();retranslate();loadDigest()}
 function bindSourceToggle(){
   const btn=document.querySelector('.source-toggle');
   if(!btn)return;
@@ -577,6 +671,11 @@ function bindSourceToggle(){
  */
 function renderPapers(papers){
   if(!papers?.length)return'';
+  /* 这个文件里 tr 是**按函数局部定义**的（见 renderAtlas / renderNetwork 等），
+     没有全局的那一个。少了这一行，renderPapers 一被调用就抛
+     ReferenceError，而它包在 reader 的渲染里，表现是"这篇笔记暂时无法打开"
+     —— 整个知识库的每一篇都打不开，看起来像后端坏了，其实是这里少了一行。 */
+  const tr=(x)=>window.TKI18N?window.TKI18N.t(x):x;
   const items=papers.map(p=>{
     const authors=(p.authors||[]);
     const shown=authors.slice(0,2).join(', ')+(authors.length>2?(' '+tr('等')):'');
@@ -591,6 +690,8 @@ function renderPapers(papers){
 }
 
 function renderSources(sources,papers){
+  // 同 renderPapers：这个文件里 tr 是按函数局部定义的，没有全局那一个。
+  const tr=(x)=>window.TKI18N?window.TKI18N.t(x):x;
   const block=renderPapers(papers);
   if(!sources?.length)return block;
   /* 论文已经从 sources 里单独取出来了，这里跳过它们的裸链接，
@@ -646,6 +747,10 @@ function renderSharedNav(){
   }
   renderDomains();
   updateSharedNav(state.view);
+  /* 右上角控件组（语言 + 日夜模式）。
+     首页顶栏里原来有一个行内的主题按钮，和别页的浮动按钮长得不一样 ——
+     同一个功能两种位置两套样式。现在统一用 shell 提供的那一组。 */
+  TKShell.ensureThemeToggle();
 }
 function updateSharedNav(view){const mount=$('#tk-sidebar');if(!mount)return;mount.querySelectorAll('a').forEach(link=>{const href=link.getAttribute('href');const current=href==='/?view=graph'?view==='graph':href==='/'&&view!=='graph';if(current)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current')})}
 function renderRelations(note){
@@ -924,10 +1029,10 @@ function renderNetwork(){
   $('#legend').innerHTML=domains.map((d,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(tr(d))}</span>`).join('')
     +`<span style="color:var(--color-muted)">圆越大，主题下的笔记越多</span>`;
 }
-function renderFlow(){const{world,W,H,mobile}=graphCanvas(),steps=[['问题','目标与约束','知识库首页.md'],['理解','机制与关系','工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md'],['召回','倒排 / 向量 / 图','工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md'],['验证','证据与权限','工程知识/AI系统/质量与运营/可靠生成需要结构、证据、拒答与回归.md'],['行动','模型与工具','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['结果','答案或状态','工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md'],['反馈','评测与回归','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?92:132,bh=70;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===2?'primary':i===4?'secondary':'',small,target));$('#legend').innerHTML='<span><i style="background:#4051b5"></i>证据获取</span><span><i style="background:#c2521f"></i>模型与行动</span>'}
-function renderLearning(){const{world,W,H,mobile}=graphCanvas(),steps=[['目标','要解决什么','知识库首页.md'],['理解','机制、边界、关系','工程知识/AI系统/Agent与工作流/Agent学习工具把资料变成可验证学习循环.md'],['预测','先说出判断','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md'],['练习','最小实验','知识库管理/维护/学习与复习方法.md'],['反馈','错误与证据','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md'],['迁移','换场景使用','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?98:142,bh=72;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===0?'secondary':i===4?'primary':'',small,target));$('#legend').innerHTML='<span><i style="background:#c2521f"></i>目标与迁移</span><span><i style="background:#4051b5"></i>证据与反馈</span>'}
-function renderArchitecture(){const{world,W,H,mobile}=graphCanvas(),layers=[['能力层','模型、Embedding、多模态','工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md'],['知识层','RAG、记忆、结构化数据','工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md'],['编排层','工作流、Agent、状态','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['工具层','API、MCP、A2A、业务系统','工程知识/AI系统/生态与选型/MCP连接能力，A2A委托任务.md'],['运行层','推理服务、队列、存储','工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md'],['治理层','评测、追踪、安全、发布','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],x=mobile?80:180,w=mobile?560:840,top=55,gap=mobile?128:94,h=70;layers.forEach(([label,small,target],i)=>{const y=top+i*gap;if(i<layers.length-1)arrow(world,W/2,y+h,W/2,y+gap);addBox(world,x,y,w,h,label,i===2?'primary':i===5?'secondary':'',small,target)});$('#legend').innerHTML='<span><i style="background:#4051b5"></i>决策编排</span><span><i style="background:#c2521f"></i>治理</span>'}
-function renderQuadrant(){const{world,W,H,mobile}=graphCanvas(),x=mobile?92:188,y=88,pw=mobile?536:824,ph=mobile?650:470,mx=x+pw/2,my=y+ph/2;world.append(svgEl('rect',{x,y,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('rect',{x:mx,y,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x,y:my,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x:mx,y:my,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('line',{x1:x,y1:my,x2:x+pw,y2:my,class:'axis-line'}),svgEl('line',{x1:mx,y1:y+ph,x2:mx,y2:y,class:'axis-line'}));[['显式路径 / 本地',x+18,y+25],['显式协作 / 跨系统',mx+18,y+25],['自适应决策 / 本地',x+18,my+25],['自适应协作 / 跨系统',mx+18,my+25]].forEach(([t,tx,ty])=>world.append(svgEl('text',{x:tx,y:ty,class:'quadrant-title'},t)));[['工作流',.18,.18,'#4051b5'],['单 Agent',.62,.26,'#2563eb'],['人工审批',.35,.58,'#c2521f'],['MCP',.72,.55,'#7c4dff'],['A2A',.86,.82,'#b03052']].forEach(([t,px,py,c])=>{const cx=x+pw*px,cy=y+ph*(1-py),g=svgEl('g',{class:'point-group'});g.append(svgEl('circle',{cx,cy,r:10,class:'point',fill:c}),svgEl('text',{x:cx+14,y:cy+5,class:'point-label'},t));world.append(g)});$('#legend').innerHTML='<span><i style="background:#4051b5"></i>工作流</span><span><i style="background:#2563eb"></i>Agent</span><span><i style="background:#7c4dff"></i>协议</span><span><i style="background:#b03052"></i>跨系统协作</span>'}
+function renderFlow(){const{world,W,H,mobile}=graphCanvas(),steps=[['问题','目标与约束','知识库首页.md'],['理解','机制与关系','工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md'],['召回','倒排 / 向量 / 图','工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md'],['验证','证据与权限','工程知识/AI系统/质量与运营/可靠生成需要结构、证据、拒答与回归.md'],['行动','模型与工具','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['结果','答案或状态','工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md'],['反馈','评测与回归','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?92:132,bh=70;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===2?'primary':i===4?'secondary':'',small,target));$('#legend').innerHTML='<span><i style="background:#2563eb"></i>证据获取</span><span><i style="background:#c2521f"></i>模型与行动</span>'}
+function renderLearning(){const{world,W,H,mobile}=graphCanvas(),steps=[['目标','要解决什么','知识库首页.md'],['理解','机制、边界、关系','工程知识/AI系统/Agent与工作流/Agent学习工具把资料变成可验证学习循环.md'],['预测','先说出判断','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md'],['练习','最小实验','知识库管理/维护/学习与复习方法.md'],['反馈','错误与证据','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md'],['迁移','换场景使用','工程知识/AI系统/质量与运营/学习活动需要结果、轨迹与迁移证据.md']],pad=mobile?34:64,y=mobile?205:250,gap=(W-pad*2)/(steps.length-1),bw=mobile?98:142,bh=72;for(let i=0;i<steps.length-1;i++)arrow(world,pad+i*gap+bw/2,y+bh/2,pad+(i+1)*gap-bw/2,y+bh/2);steps.forEach(([label,small,target],i)=>addBox(world,pad+i*gap-bw/2,y,bw,bh,label,i===0?'secondary':i===4?'primary':'',small,target));$('#legend').innerHTML='<span><i style="background:#c2521f"></i>目标与迁移</span><span><i style="background:#2563eb"></i>证据与反馈</span>'}
+function renderArchitecture(){const{world,W,H,mobile}=graphCanvas(),layers=[['能力层','模型、Embedding、多模态','工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md'],['知识层','RAG、记忆、结构化数据','工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md'],['编排层','工作流、Agent、状态','工程知识/AI系统/Agent与工作流/构建可靠Agent应用.md'],['工具层','API、MCP、A2A、业务系统','工程知识/AI系统/生态与选型/MCP连接能力，A2A委托任务.md'],['运行层','推理服务、队列、存储','工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md'],['治理层','评测、追踪、安全、发布','工程知识/AI系统/质量与运营/Agent评测必须覆盖轨迹而不只看最终答案.md']],x=mobile?80:180,w=mobile?560:840,top=55,gap=mobile?128:94,h=70;layers.forEach(([label,small,target],i)=>{const y=top+i*gap;if(i<layers.length-1)arrow(world,W/2,y+h,W/2,y+gap);addBox(world,x,y,w,h,label,i===2?'primary':i===5?'secondary':'',small,target)});$('#legend').innerHTML='<span><i style="background:#2563eb"></i>决策编排</span><span><i style="background:#c2521f"></i>治理</span>'}
+function renderQuadrant(){const{world,W,H,mobile}=graphCanvas(),x=mobile?92:188,y=88,pw=mobile?536:824,ph=mobile?650:470,mx=x+pw/2,my=y+ph/2;world.append(svgEl('rect',{x,y,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('rect',{x:mx,y,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x,y:my,width:pw/2,height:ph/2,class:'quadrant-fill alt'}),svgEl('rect',{x:mx,y:my,width:pw/2,height:ph/2,class:'quadrant-fill'}),svgEl('line',{x1:x,y1:my,x2:x+pw,y2:my,class:'axis-line'}),svgEl('line',{x1:mx,y1:y+ph,x2:mx,y2:y,class:'axis-line'}));[['显式路径 / 本地',x+18,y+25],['显式协作 / 跨系统',mx+18,y+25],['自适应决策 / 本地',x+18,my+25],['自适应协作 / 跨系统',mx+18,my+25]].forEach(([t,tx,ty])=>world.append(svgEl('text',{x:tx,y:ty,class:'quadrant-title'},t)));[['工作流',.18,.18,'#4051b5'],['单 Agent',.62,.26,'#2563eb'],['人工审批',.35,.58,'#c2521f'],['MCP',.72,.55,'#7c4dff'],['A2A',.86,.82,'#b03052']].forEach(([t,px,py,c])=>{const cx=x+pw*px,cy=y+ph*(1-py),g=svgEl('g',{class:'point-group'});g.append(svgEl('circle',{cx,cy,r:10,class:'point',fill:c}),svgEl('text',{x:cx+14,y:cy+5,class:'point-label'},t));world.append(g)});$('#legend').innerHTML='<span><i style="background:#2563eb"></i>工作流</span><span><i style="background:#2563eb"></i>Agent</span><span><i style="background:#7c4dff"></i>协议</span><span><i style="background:#b03052"></i>跨系统协作</span>'}
 function renderGraph(){const tr=(x)=>window.TKI18N?window.TKI18N.t(x):x;const meta={network:['知识图谱','领域、主题与笔记之间的关联'],flow:['知识流通','从问题到证据、行动与反馈的路径'],learning:['学习循环','从目标、理解到练习、反馈与迁移'],architecture:['AI 系统架构','能力、知识、编排、工具、运行与治理的分层'],quadrant:['技术选型象限','用控制方式与协作范围理解组件位置']};const [t,s]=meta[state.graphMode];$('#graph-title').textContent=tr(t);$('#graph-subtitle').textContent=tr(s);document.querySelectorAll('[data-visual]').forEach(b=>b.classList.toggle('active',b.dataset.visual===state.graphMode));({network:renderNetwork,flow:renderFlow,learning:renderLearning,architecture:renderArchitecture,quadrant:renderQuadrant}[state.graphMode]||renderNetwork)()}
 function bindGraph(){const svg=$('#graph');let drag=null;svg.onwheel=e=>{e.preventDefault();state.zoom=Math.max(.55,Math.min(2.5,state.zoom*(e.deltaY<0?1.1:.9)));applyTransform()};svg.onpointerdown=e=>{if(e.target.closest('.node,.topic-node,.diagram-group,.point-group'))return;drag={x:e.clientX,y:e.clientY,px:state.pan.x,py:state.pan.y};svg.setPointerCapture(e.pointerId)};svg.onpointermove=e=>{if(drag)state.pan={x:drag.px+e.clientX-drag.x,y:drag.py+e.clientY-drag.y},applyTransform()};svg.onpointerup=()=>drag=null;$('#graph-zoom-in').onclick=()=>{state.zoom=Math.min(2.5,state.zoom*1.18);applyTransform()};$('#graph-zoom-out').onclick=()=>{state.zoom=Math.max(.55,state.zoom/1.18);applyTransform()};$('#graph-reset').onclick=()=>{state.zoom=1;state.pan={x:0,y:0};applyTransform()};document.querySelectorAll('[data-visual]').forEach(button=>button.onclick=()=>{state.graphMode=button.dataset.visual;state.zoom=1;state.pan={x:0,y:0};document.querySelectorAll('[data-visual]').forEach(item=>item.setAttribute('aria-selected',String(item===button)));renderGraph()})}
 function applyTransform(){const world=$('#graph-world');if(world)world.setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`);const label=$('#graph-zoom-value');if(label)label.textContent=Math.round(state.zoom*100)+'%'}
@@ -1151,5 +1256,130 @@ if(window.mermaid){
     await window.mermaid.run({nodes});
   };
 }
+</script>
+
+<script>
+(function(){
+  function label(el){
+    var cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/)[0] : '';
+    return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
+  }
+
+  var out = {};
+
+
+  /* Measure only once the sidebar exists.
+     --dump-dom snapshots after parsing, which is before the sidebar's
+     DOMContentLoaded handler builds the nav. Taking the numbers synchronously
+     records the skeleton — the first run of this script reported "0 nav" on
+     eight pages and called them clean. So the wait comes first and the
+     measurement happens inside it. */
+  var waited = 0;
+  (function settle(){
+    var hasNav = document.querySelectorAll('.tk-nav a').length > 0;
+    var hasSidebar = !!document.querySelector('.tk-sidebar');
+    var exhausted = waited > 120;
+    if((hasNav || (!hasSidebar && exhausted)) && waited > 2){ done(); return; }
+    if(exhausted){ done(); return; }
+    waited++;
+    setTimeout(settle, 40);
+  })();
+
+  function done(){ document.title = '@@' + JSON.stringify(measure()); }
+
+  function measure(){
+    var out = {};
+  /* 1. No horizontal overflow. Elements inside a deliberate scroller — a wide
+        table, the mobile nav strip — are excluded: they are meant to scroll. */
+  var offenders = [];
+  document.querySelectorAll('*').forEach(function(el){
+    var r = el.getBoundingClientRect();
+    if(r.width < 1 || r.right <= innerWidth + 1) return;
+    var n = el.parentElement, inScroller = false;
+    while(n){
+      var s = getComputedStyle(n);
+      if(s.overflowX === 'auto' || s.overflowX === 'scroll'){ inScroller = true; break; }
+      n = n.parentElement;
+    }
+    if(!inScroller) offenders.push(label(el));
+  });
+  out.overflow = {
+    docScrollWidth: document.documentElement.scrollWidth,
+    innerWidth: innerWidth,
+    offenders: Array.from(new Set(offenders)).slice(0, 6)
+  };
+
+  /* 2. The floating feedback button must not sit on text a reader needs. */
+  var fab = document.querySelector('.tk-fab');
+  var covered = [];
+  if(fab){
+    var fr = fab.getBoundingClientRect();
+    document.querySelectorAll('*').forEach(function(el){
+      if(el === fab || fab.contains(el)) return;
+      if(el.querySelector && el.querySelector('.tk-fab')) return;
+      var b = el.getBoundingClientRect();
+      if(b.width < 8 || b.height < 8) return;
+      if(b.right < fr.left || b.left > fr.right || b.bottom < fr.top || b.top > fr.bottom) return;
+      var st = getComputedStyle(el);
+      if(st.visibility === 'hidden' || st.display === 'none' || +st.opacity < 0.1) return;
+      var ownText = [].some.call(el.childNodes, function(n){
+        return n.nodeType === 3 && n.textContent.trim();
+      });
+      if(ownText) covered.push(label(el));
+    });
+  }
+  out.fabCovers = fab ? Array.from(new Set(covered)).slice(0, 6) : null;
+
+  /* 3. The floating controls must not overlap each other. */
+  var boxes = [];
+  [['fab', '.tk-fab'], ['theme', '.tk-theme-toggle'],
+   ['kbd', '#kbd-hint'], ['lang', '.tk-lang-toggle']].forEach(function(pair){
+    var el = document.querySelector(pair[1]);
+    if(!el) return;
+    var r = el.getBoundingClientRect();
+    if(r.width < 1) return;
+    boxes.push({name: pair[0], x: r.x, y: r.y, w: r.width, h: r.height});
+  });
+  var clashes = [];
+  for(var i = 0; i < boxes.length; i++){
+    for(var j = i + 1; j < boxes.length; j++){
+      var a = boxes[i], b = boxes[j];
+      var overlap = !(a.x + a.w <= b.x || b.x + b.w <= a.x ||
+                      a.y + a.h <= b.y || b.y + b.h <= a.y);
+      if(overlap) clashes.push(a.name + '+' + b.name);
+    }
+  }
+  out.controlClashes = clashes;
+
+  /* 4. The sidebar must be where the page expects it. */
+  var sb = document.querySelector('.tk-sidebar');
+  if(sb){
+    var sr = sb.getBoundingClientRect();
+    out.sidebar = {
+      position: getComputedStyle(sb).position,
+      x: Math.round(sr.x),
+      width: Math.round(sr.width),
+      navItems: document.querySelectorAll('.tk-nav a').length
+    };
+  } else {
+    out.sidebar = null;
+  }
+
+  /* 5. The nav must be complete on the first paint, not grown afterwards.
+        A bar that reads four items and then five is the flicker this checks. */
+  out.navItems = document.querySelectorAll('.tk-nav a').length;
+
+  /* 6. Text clipped by a fixed-height ancestor. */
+  var clipped = [];
+  document.querySelectorAll('*').forEach(function(el){
+    var st = getComputedStyle(el);
+    if(st.overflowY === 'auto' || st.overflowY === 'scroll' || st.overflowY === 'visible') return;
+    if(el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 4) clipped.push(label(el));
+  });
+  out.clipped = Array.from(new Set(clipped)).slice(0, 6);
+
+    return out;
+  }
+})();
 </script>
 </body></html>

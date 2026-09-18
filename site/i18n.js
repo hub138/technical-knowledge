@@ -79,7 +79,6 @@
     "同模块其他文章": { en: "More in this module" },
 
     // ── Insights page ──
-    "INSIGHTS · 仅本机可见": { en: "INSIGHTS · this machine only" },
     "访问与反馈 · 工程知识库": { en: "Visits and feedback · engineering knowledge" },
     "概览": { en: "Summary" },
     "访客": { en: "Visitors" },
@@ -333,6 +332,7 @@
     "已处理": { en: "Done" },
     "本机": { en: "local" },
     "刷新": { en: "Refresh" },
+    "切换日夜模式": { en: "Toggle light or dark mode" },
     "回到知识库": { en: "Back to Knowledge" },
     "其他": { en: "Other" },
     "（未指定文章）": { en: "(no article)" },
@@ -373,9 +373,11 @@
 
     // ── Papers page ──
     "时间线": { en: "Timeline" },
-    "PAPERS · 追踪与解析": { en: "PAPERS · tracked & analysed" },
     "正在读取…": { en: "Loading…" },
+    "优质好文": { en: "Good reads" },
+    "资源目录": { en: "Source index" },
     "追踪新论文": { en: "Tracking new papers" },
+    "追踪新论文和解析": { en: "New papers, with write-ups" },
     "按时间倒序。每篇给出它解决的问题、做法，以及论文自己报出的数字——摘要里没写的就留空。2024 年前的收在「历史奠基」里。": {
       en: "Newest first. Each entry gives the problem, the approach, and the numbers the paper itself reports — anything the abstract leaves out stays blank. Papers before 2024 sit under Foundations.",
     },
@@ -443,14 +445,6 @@
     // 卡片本身的 name/kind/gain/tags 不走词典 —— 它们来自 site/sources.js，
     // 按当前语言直接取（那一份数据里自带 en 字段）。这里只放页面骨架上的文案。
     "外部资源": { en: "Sources" },
-    "优质好文": { en: "Good reads" },
-    "资源目录": { en: "Source index" },
-    "几个值得常看的源。下面直接列出各自最新几条，点标题去原站读全文。": {
-      en: "A few sources worth reading regularly. Each one lists its latest entries below; open a title to read it in full on the source site.",
-    },
-    "值得长期订阅的论文、文章与资讯源，并列出各自的最新几条。": {
-      en: "Papers, writing and news worth following, with each source's latest entries listed.",
-    },
     "外部有哪些做得更好的站": { en: "Sites that do this better" },
     "文章": { en: "Writing" },
     "成篇的文章，适合慢慢读。": { en: "Finished pieces, for slow reading." },
@@ -471,9 +465,6 @@
     "最新几条": { en: "Latest" },
     "这一站暂时读不到，入口仍然可用。": {
       en: "This source is not reachable right now. The link above still works.",
-    },
-    "它的内容在登录后才看得到，抓不到。点上面的站名进去，登录一次就能自己选要跟哪些号。": {
-      en: "Its content is only visible after signing in, so it cannot be fetched here. Open the site above and sign in once to pick which accounts to follow.",
     },
     "暂时没有新内容。": { en: "Nothing new right now." },
     "更新于": { en: "Updated" },
@@ -501,7 +492,6 @@
     // 「正在读取…」和「刷新」已在词典里（前面几段），不在这里重复定义 ——
     // 同一个 key 定义两次时 JS 保留最后一个，前面那个变成死代码，
     // i18n_dict_audit 会把这种情况判为失败。
-    "SOURCES · 外部资源": { en: "SOURCES" },
 
     // ── Home page: what every note answers ──
     "篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。写的都是能落到手上的东西：一个机制怎么运作、代价在哪、结论有没有实测支撑。": {
