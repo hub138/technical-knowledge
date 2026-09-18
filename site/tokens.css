@@ -19,79 +19,283 @@
 :root {
   color-scheme: light;
 
-  /* ── Surfaces, from furthest back to closest to the reader ──────────── */
-  /* 冷白偏蓝，取自 arXivDaily 的 #f5f7fb。
-   *
-   * 上一版是靛蓝主色配绿灰底，还是偏闷。这次整套照 arXivDaily：
-   * 底比白多一点蓝，卡片纯白，于是白卡片浮得起来、淡边框看得见。
-   * 这是那些"看起来亮"的站共同的做法 —— 底不是纯白。 */
-  --color-bg: #f5f7fb;
-  --color-surface: #eff2f8; /* inset areas: graph canvas, table headers */
-  --color-panel: #ffffff; /* cards, sidebar, panels */
-  --color-raised: #ffffff; /* panels that also carry a shadow */
-  --color-overlay: rgba(23, 32, 51, 0.42);
-  /* 顶栏那种"半透明底 + 背景模糊"的表面色。
-   * 原来这里硬编码了 rgba(245,247,246,.92) —— 绿色的灰，和换色后的
-   * --color-bg(#f5f7fb) 对不上，顶栏和页面之间有一道肉眼看得见的色差，
-   * 整页因此发脏。用 token 派生的值，两边永远一致。 */
-  --color-bg-veil: rgba(245, 247, 251, 0.92);
+  /* ── Surfaces ───────────────────────────────────────────────────────── */
+  /* 暖白底（BestBlogs 的 254 253 251）。比纯白暖，和琥珀橙同温 ——
+   * 这是整套配色的基础：底暖、字冷、点缀暖，三者温度一致。 */
+  --color-bg: #fefdfb;
+  --color-surface: #fbf9f5; /* 比底再暖一档，用于衬底块 */
+  --color-panel: #ffffff;
+  --color-raised: #ffffff;
+  --color-overlay: rgba(15, 23, 42, 0.42);
+  --color-bg-veil: rgba(254, 253, 251, 0.92);
 
-  /* ── Text, by descending emphasis ───────────────────────────────────── */
-  /* 近黑的深蓝。arXivDaily 用 #172033，不是纯黑也不是灰 ——
-     带色相的黑比纯黑柔和，又比灰色有分量，长文读起来不累。 */
-  --color-ink: #172033; /* headings, primary content */
-  --color-ink-soft: #2b3648; /* body text inside dense tables */
-  /* 次要文字。取 7:1 上下的对比度，不是刚好过 4.5 的及格线。 */
-  --color-muted: #4a5568;
-  /* 只用于非文字（图标、分隔线、装饰）。它按设计比 --color-muted 低一档，
-   * 小字用它会掉到 WCAG AA 以下 —— 时间戳、计数请用 --color-muted。 */
-  --color-faint: #6b7688;
+  /* ── Text ───────────────────────────────────────────────────────────── */
+  /* 石板灰蓝（slate-800 / slate-700）。
+   *
+   * 比纯黑柔和。原来用近黑 #172033，太硬 —— 配上暖白底显得文字和纸
+   * 是两张皮。slate 带一点蓝，和 primary 同族，读起来是"印上去的"。 */
+  --color-ink: #1e293b;
+  --color-ink-soft: #334155;
+  --color-muted: #475569; /* slate-600，对比度 8:1 */
+  --color-faint: #64748b; /* slate-500，非文字专用 */
 
   /* ── Borders ────────────────────────────────────────────────────────── */
-  --color-line: #dfe4ec; /* default hairline */
-  --color-line-strong: #c8d0de; /* hover / emphasis borders */
+  --color-line: #e2e8f0; /* slate-200 */
+  --color-line-strong: #cbd5e1; /* slate-300 */
 
-  /* ── Accent: the product's own colour ───────────────────────────────── */
-  /* 亮蓝，arXivDaily 的 #2563eb。 */
-  --color-accent: #2563eb;
-  --color-accent-hover: #1d4ed8;
-  --color-accent-soft: #eff6ff; /* tinted background */
-  --color-accent-line: #bfdbfe; /* tinted border */
-  --color-accent-ink: #1d4ed8; /* accent-coloured text on light bg */
-  --color-on-accent: #ffffff; /* text on top of --color-accent */
+  /* ── Accent：深海军蓝 ───────────────────────────────────────────────── */
+  /* BestBlogs 的 primary 26 54 93。比常见的亮蓝深一档，
+   * 在暖白底上更沉，和琥珀橙的互补对比也更强。 */
+  --color-accent: #1a365d;
+  --color-accent-hover: #142a49;
+  --color-accent-soft: #eef2f8;
+  --color-accent-line: #c3d0e4;
+  --color-accent-ink: #1a365d;
+  --color-on-accent: #ffffff;
 
-  /* AI 摘要框。arXivDaily 用它整段衬底，标签「AI总结」比正文重。
-     单独一组 token 而不是复用 accent-soft：这个底色要比 accent-soft
-     更浅一点，才能衬满一整段而不吵。 */
-  --color-summary-bg: #eff6ff;
-  --color-summary-line: #dbeafe;
-  --color-summary-label: #1d4ed8;
-  --color-summary-text: #1e3a8a;
+  /* AI 摘要框：淡蓝衬底（info 色系，2 132 199 的浅版）。 */
+  --color-summary-bg: #f0f7fe;
+  --color-summary-line: #cfe6f8;
+  --color-summary-label: #075985;
+  --color-summary-text: #0c4a6e;
 
-  /* ── Secondary hues, each with a soft background pairing ────────────── */
-  /* 焦橙。arXivDaily 的「新提交」标和 BestBlogs 的「值得优先关注」都是暖色，
-     在一套蓝里是唯一的强对比，留给真正需要跳出来的标记。 */
-  --color-warm: #c2521f;
-  --color-warm-soft: #fdf1ea;
-  --color-warm-line: #f2cdb8;
-  --color-warm-ink: #94400f;
-  --color-info: #2563eb;
-  --color-info-soft: #eff6ff;
-  --color-violet: #7c4dff;
-  --color-violet-soft: #f2edff;
+  /* ── 次色：琥珀橙 ───────────────────────────────────────────────────── */
+  /* 217 119 6（amber-600）。这套配色的灵魂 —— 深海军蓝单独用是沉闷的，
+   * 橙色是唯一跳出来的暖色。所以橙的用法要**足**：强调标记、新的东西、
+   * 待处理、星标、hover 态都用它，不做成难得一见的点缀。
+   *
+   * 浅色档取 amber-700（b45309）而不是 600，是为了在白底上过 AA；
+   * 600 用在大面积（背景/边框）上没问题，用在文字上偏浅。 */
+  --color-warm: #b45309;
+  --color-warm-soft: #fffbeb;
+  --color-warm-line: #fde68a;
+  --color-warm-ink: #92400e;
+  --color-info: #0284c7;
+  --color-info-soft: #f0f7fe;
+  --color-violet: #7c3aed;
+  --color-violet-soft: #f5f3ff;
 
-  /* ── Status. Used by insights and feedback. ─────────────────────────── */
-  --color-ok: #0f7a5a;
-  --color-ok-soft: #e7f5f0;
-  --color-warn: #c2521f;
-  --color-warn-soft: #fdf1ea;
-  --color-danger: #b03052;
-  --color-danger-soft: #fdeef3;
-  --color-star: #9a6b12; /* star-count badges */
-  --color-star-soft: #fdf7e6;
-  --color-star-line: #e6d5a3;
+  /* ── Status ─────────────────────────────────────────────────────────── */
+  --color-ok: #059669;
+  --color-ok-soft: #ecfdf5;
+  --color-warn: #b45309;
+  --color-warn-soft: #fffbeb;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-star: #b45309;
+  --color-star-soft: #fffbeb;
+  --color-star-line: #fde68a;
 
   /* ── Space. 4px base; pick the nearest step, never a raw value. ─────── */
+  /* 唯一的侧边栏宽度。常见范围 240-280px；取 260 给内容多留 26px，
+     同时仍容得下最长的导航项（推理服务与平台 + 计数）。 */
+  --sidebar-width: 260px;
+  /* 右下角悬浮控件（反馈按钮 52px + 右边距 22px）或右上角主题按钮要占的宽度。
+     内容列右侧留出这条通道，否则浮动按钮会压在正文上 —— 实测压住过状态徽标、
+     小节标题和反馈正文。移动端按钮缩小，用下面的媒体查询覆盖。 */
+  --float-lane: 86px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ── Radius ─────────────────────────────────────────────────────────── */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-full: 999px;
+
+  /* ── Type scale ───────────────────────────────────────────────────────
+   * 参照的行业基线：正文 16px 起、辅助文字比正文小约 2px、
+   * 整页字号种类控制在 4 种左右（Learn UI 的通用建议）。
+   * 本站是阅读为主的站，取偏大的正文；界面部分（导航/标签）可以更小，
+   * 但每一档必须有唯一职责，否则同一层次会出现两个尺寸。
+   *
+   * 层级（由大到小，用途互斥）：
+   *   hero   首页主张，一屏一个
+   *   h1     文章/页面主标题
+   *   h2     区块标题
+   *   h3     卡片标题、小节标题
+   *   body   正文与说明文字（导航、表单、按钮都用它——控件不该比正文小）
+   *   small  次级信息：计数、时间戳、来源、辅助说明
+   *   micro  仅非文字场景：图形角标、chevron
+   */
+  --text-micro: 11px;   /* 只用于图形/角标，不做文字 */
+  --text-small: 13px;   /* 次级信息：计数、时间戳、来源、辅助说明 */
+  --text-body: 16px;    /* 正文，也是导航与控件的字号 */
+  --text-h3: 18px;      /* 卡片标题、小节标题 */
+  --text-h2: 22px;      /* 区块标题 */
+  --text-h1: clamp(26px, 2.6vw, 32px);  /* 文章/页面主标题 */
+  --text-hero: clamp(30px, 3.2vw, 38px); /* 首页主张 */
+
+  /* 页头专用。hero 每页只出现一次，所以这两档也只会各出现一次：
+   * display 是首屏那句话，note 是它下面那条说明。
+   *
+   * display 用 vw 而不是固定 px —— 它是这一页最大的字，缩小时必须跟着缩，
+   * 否则 390px 宽下会有半屏都在放标题。
+   *
+   * 字距是配套的：字号越大，默认字距越显松，所以要收紧。见 --tracking-*。 */
+  --text-display: clamp(38px, 5.2vw, 66px);
+  --text-note: clamp(15px, 1.25vw, 17px);
+
+  /* 旧名保留为别名，迁移期用；改完可删。 */
+  --text-2xs: var(--text-micro);
+  --text-xs: var(--text-micro);
+  --text-sm: var(--text-small);
+  --text-base: var(--text-body);
+  --text-md: var(--text-body);
+  --text-lg: var(--text-h3);
+  --text-xl: var(--text-h2);
+  --text-2xl: var(--text-h2);
+  --text-3xl: var(--text-h1);
+  --text-4xl: var(--text-hero);
+
+  /* ── Tracking ─────────────────────────────────────────────────────────
+   * Optical, not decorative. Type this large needs negative tracking or the
+   * letters read as a row of separate marks; type this small needs a little
+   * positive tracking or it clogs. One value per size band, so two headings
+   * of the same size never disagree.
+   */
+  --tracking-display: -0.035em;
+  --tracking-h2: -0.008em;
+  --tracking-caps: 0.11em; /* only for uppercase eyebrows and labels */
+
+  --leading-tight: 1.25;
+  --leading-display: 1.04; /* hero claims; tighter than tight, checked at 390px */
+  --leading-normal: 1.6;
+  --leading-relaxed: 1.85; /* long-form reading */
+
+  /* ── Weights ────────────────────────────────────────────────────────── */
+  --weight-normal: 400;
+  --weight-medium: 550;
+  --weight-semibold: 650;
+  --weight-bold: 750;
+
+  /* ── Elevation. Dark mode needs its own set (see below). ────────────── */
+  --shadow-xs: 0 1px 2px rgba(20, 42, 35, 0.04);
+  --shadow-sm: 0 2px 8px rgba(20, 42, 35, 0.06);
+  --shadow-md: 0 10px 28px rgba(20, 42, 35, 0.07);
+  --shadow-lg: 0 24px 60px rgba(20, 42, 35, 0.28);
+  --shadow-ring: 0 0 0 3px rgba(20, 119, 102, 0.18);
+
+  /* ── Depth ──────────────────────────────────────────────────────────────
+   * Flat colour at every scale reads as a wireframe: nothing tells the eye
+   * which surface is nearer. Two cheap devices fix that without adding
+   * decoration — a barely-perceptible wash across large surfaces, and a grain
+   * overlay that breaks up the flatness of a big fill.
+   *
+   * The wash moves between colours two or three steps apart in the same hue.
+   * That is the point: it should register as depth, not as a gradient someone
+   * chose. The channel deltas here are 2-4.
+   */
+  --wash-page: linear-gradient(168deg, #f7f9f8 0%, var(--color-bg) 42%, #eef3f0 100%);
+  --wash-panel: linear-gradient(180deg, #ffffff 0%, #fcfdfd 100%);
+  --wash-accent: linear-gradient(135deg, var(--color-accent-soft) 0%, transparent 72%);
+  /* A 1px top highlight reads as a lit edge on an otherwise flat card. */
+  --hairline-top: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  --grain-opacity: 0.028;
+
+  /* ── Paper ──────────────────────────────────────────────────────────────
+   * The one thing a screen cannot do that paper can: sit behind the words
+   * without being a colour someone picked. Three rules give that back, and
+   * all three are tokens so light and dark stay telling the same story.
+   *
+   * --ink-rule      the hairline under a page head, plus the heavier rule
+   *                 under a section head. Printed matter uses two weights so
+   *                 the hierarchy is legible before any type is read.
+   * --rule-gutter   the margin beside a rule where it stops. Rules that run
+   *                 the full column width read as a table border; rules that
+   *                 stop short read as someone's decision.
+   */
+  --ink-rule: var(--color-line);
+  --rule-gutter: 96px;
+
+  /* ── Motion. Every transition must use a duration + an easing token. ── */
+  --duration-fast: 0.12s;
+  --duration-base: 0.18s;
+  --duration-slow: 0.28s;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+
+  /* ── Stacking. Named so overlaps are decided once, not per component. ─ */
+  --z-sticky: 3;
+  --z-sidebar: 10;
+  --z-fab: 21;
+  --z-overlay: 30;
+  --z-toast: 40;
+
+  /* ── Typefaces ──────────────────────────────────────────────────────── */
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif,
+    "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols 2";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+  --font-feature-numeric: "tnum" 1, "cv01" 1;
+}
+
+/* Dark theme. Shadows are re-declared rather than reused: a light shadow on a
+ * dark surface reads as a smudge, so these lean on deeper alpha instead. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* 深海军（15 23 42 = slate-900）、卡片 slate-800、边框 slate-700。 */
+  --color-bg: #0f172a;
+  --color-surface: #182034;
+  --color-panel: #1e293b;
+  --color-raised: #26334a;
+  --color-overlay: rgba(2, 6, 16, 0.66);
+  --color-bg-veil: rgba(15, 23, 42, 0.92);
+
+  --color-ink: #f1f5f9;
+  --color-ink-soft: #cbd5e1;
+  --color-muted: #94a3b8;
+  --color-faint: #7c8ba1;
+
+  --color-line: #334155;
+  --color-line-strong: #475569;
+
+  /* 深色下主色翻成浅蓝（147 197 253）。 */
+  --color-accent: #93c5fd;
+  --color-accent-hover: #bfdbfe;
+  --color-accent-soft: #1c2f4d;
+  --color-accent-line: #33517d;
+  --color-accent-ink: #bcd7fd;
+  --color-on-accent: #0f172a;
+
+  --color-summary-bg: #142c42;
+  --color-summary-line: #1f4560;
+  --color-summary-label: #7dd3fc;
+  --color-summary-text: #bae6fd;
+
+  /* 暗底上橙色提亮到 251 191 36（amber-400），它在这套里是唯一的暖源，
+   * 暗色下要更亮才跳得出来。 */
+  --color-warm: #fbbf24;
+  --color-warm-soft: #3a2c0c;
+  --color-warm-line: #5c451a;
+  --color-warm-ink: #fcd34d;
+  --color-info: #7dd3fc;
+  --color-info-soft: #142c42;
+  --color-violet: #c4b5fd;
+  --color-violet-soft: #2a2145;
+
+  --color-ok: #34d399;
+  --color-ok-soft: #0d2e26;
+  --color-warn: #fbbf24;
+  --color-warn-soft: #3a2c0c;
+  --color-danger: #f87171;
+  --color-danger-soft: #3a1a1a;
+  --color-star: #fbbf24;
+  --color-star-soft: #3a2c0c;
+  --color-star-line: #5c451a;
+/* ── Space. 4px base; pick the nearest step, never a raw value. ─────── */
   /* 唯一的侧边栏宽度。常见范围 240-280px；取 260 给内容多留 26px，
      同时仍容得下最长的导航项（推理服务与平台 + 计数）。 */
   --sidebar-width: 260px;
