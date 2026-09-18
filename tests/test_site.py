@@ -1230,8 +1230,16 @@ class FeedTests(unittest.TestCase):
         self.assertEqual(error, "selector_missing")
 
     def test_source_failure_does_not_break_others(self) -> None:
-        """一个源抛异常，其余源必须照常返回。"""
-        original = FEEDS_MODULE.fetch_one
+        """一个源抛异常，其余源必须照常返回。
+
+        `_refresh_all()` 结尾会调 `_save_to_disk()` 把缓存写进
+        data/feeds-cache.json。测试里必须把它换掉 —— 否则这个桩数据
+        （`{"title": "t"}`）会覆盖真实缓存，页面上的「最新几条」就变成
+        一个字母 `t`。这个坑犯过一次：写进真实缓存后，四个源的 feed
+        全成了同一份假数据，而且每次跑测试都会再写一次。
+        """
+        original_fetch = FEEDS_MODULE.fetch_one
+        original_save = FEEDS_MODULE._save_to_disk
         calls: list[str] = []
 
         def fake(source: dict) -> tuple[list[dict], str]:
@@ -1241,10 +1249,12 @@ class FeedTests(unittest.TestCase):
             return ([{"title": "t", "url": "https://x.com/a", "summary": "", "published": ""}], "")
 
         FEEDS_MODULE.fetch_one = fake
+        FEEDS_MODULE._save_to_disk = lambda: None   # 不碰真实缓存文件
         try:
             FEEDS_MODULE._refresh_all()
         finally:
-            FEEDS_MODULE.fetch_one = original
+            FEEDS_MODULE.fetch_one = original_fetch
+            FEEDS_MODULE._save_to_disk = original_save
             FEEDS_MODULE._CACHE.clear()
 
         self.assertIn("readhub", calls)

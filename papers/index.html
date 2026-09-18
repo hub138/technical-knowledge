@@ -328,16 +328,36 @@
         flex-wrap: wrap;
         margin: var(--space-4) 0 var(--space-3);
       }
-      .pn-tabs { display: flex; gap: 4px; }
+      /* 两个视图的切换按钮。
+       *
+       * 原来是 13px 的浅灰文字、67×32px 的小方块，读者反馈"完全不知道是啥"。
+       * 三个问题一起改：
+       *   1. 加大。13px → --text-body，内边距 6/13 → 9/16，高度 32 → 40。
+       *   2. 加数字。光看"已精读"不知道有多少篇；带上计数才知道点进去是什么。
+       *   3. 未选中的那一个不再是浅灰 —— 它是另一个可选项，不是禁用态。
+       */
+      .pn-tabs { display: flex; gap: 6px; }
       .pn-tab {
-        padding: 6px 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 40px;
+        padding: 0 16px;
         border: 1px solid var(--color-line);
         border-radius: var(--radius-sm);
         background: var(--color-panel);
-        color: var(--color-ink-soft);
-        font-size: var(--text-small);
+        color: var(--color-ink);
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
         cursor: pointer;
       }
+      .pn-tab b {
+        color: var(--color-muted);
+        font-size: var(--text-small);
+        font-weight: var(--weight-normal);
+        font-variant-numeric: tabular-nums;
+      }
+      .pn-tab[aria-selected="true"] b { color: var(--color-on-accent); opacity: 0.85; }
       .pn-tab:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
       .pn-tab[aria-selected="true"] {
         border-color: var(--color-accent-line);
@@ -556,8 +576,12 @@
 
       <div class="pn-bar">
         <div class="pn-tabs" role="tablist" aria-label="论文来源">
-          <button type="button" class="pn-tab" id="tab-external" role="tab" aria-selected="true">外部收录</button>
-          <button type="button" class="pn-tab" id="tab-read" role="tab" aria-selected="false">已精读</button>
+          <button type="button" class="pn-tab" id="tab-external" role="tab" aria-selected="true">
+            外部收录 <b id="tab-external-count"></b>
+          </button>
+          <button type="button" class="pn-tab" id="tab-read" role="tab" aria-selected="false">
+            已精读 <b id="tab-read-count"></b>
+          </button>
         </div>
         <span class="pn-stat" id="pn-stat"></span>
         <span id="method-slot"></span>
@@ -893,6 +917,10 @@
           const payload = await response.json();
           pn.total = payload.total;
           pn.grand = payload.grand_total;
+          // 两个视图的计数：外部是总量（不随筛选变，否则读者会以为库变小了），
+          // 已精读是本地那批。
+          const extCount = $("#tab-external-count");
+          if (extCount) extCount.textContent = pn.grand.toLocaleString();
           if (!append) pnPaintFilters(payload.categories || [], payload.conferences || []);
           const rows = (payload.papers || []).map(pnRow).join("");
           const list = $("#pn-list");
@@ -957,6 +985,8 @@
           const payload = await response.json();
           all = payload.papers || [];
           methodPath = payload.method || "";
+          const readCount = $("#tab-read-count");
+          if (readCount) readCount.textContent = all.length.toLocaleString();
         } catch (error) {
           $("#paper-list").innerHTML = `<div class="paper-empty">${esc(tr("读不到论文注册表。运行 python3 scripts/fetch-papers.py 生成后再刷新。"))}</div>`;
           return;

@@ -30,25 +30,55 @@
        */
       .src-group { margin-top: var(--space-8); }
       .src-group:first-of-type { margin-top: var(--space-5); }
-      .src-group > h2 {
+      /* 分类标题 + 计数 + 刷新按钮同一行。
+         标题加大到 --text-h2（原来是 h3），因为它是这一块的主标题，
+         而且要压得住下面一排卡片标题。计数改成 chip，不再是一串小灰字 ——
+         「用户看不到已精读按钮」那次教训：太小太浅的标记等于不存在。 */
+      .src-group-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        margin: 0 0 var(--space-3);
+      }
+      .src-group > h2,
+      .src-group-head > h2 {
         display: flex;
         align-items: center;
         gap: 10px;
-        margin: 0 0 var(--space-3);
+        margin: 0;
         color: var(--color-ink);
-        font-size: var(--text-h3);
+        font-size: var(--text-h2);
         font-weight: var(--weight-bold);
       }
+      .src-group-count {
+        order: 3;
+        padding: 2px 9px;
+        border-radius: var(--radius-xs);
+        background: var(--color-surface);
+        color: var(--color-ink-soft);
+        font-size: var(--text-small);
+        font-weight: var(--weight-medium);
+      }
+      .src-group-refresh {
+        flex: none;
+        padding: 5px 13px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-sm);
+        background: var(--color-panel);
+        color: var(--color-ink-soft);
+        font-size: var(--text-small);
+        font-weight: var(--weight-medium);
+        cursor: pointer;
+      }
+      .src-group-refresh:hover { border-color: var(--color-accent-line); color: var(--color-accent); }
+      .src-group-refresh[disabled] { opacity: 0.55; cursor: default; }
       /* 标题后面不再拉一条横线过去。
          一屏里原本有四五种线：分组标题的下划线、卡片的边框、目录的分隔线、
          每条 feed 的 border-top —— 线太多反而看不出层级。改为只靠留白和
          字号分区，这也是参考站的做法。 */
-      .src-group > h2 span {
-        order: 3;
-        color: var(--color-muted);
-        font-size: var(--text-small);
-        font-weight: var(--weight-normal);
-      }
+      /* 计数的样式移到 .src-group-count（上面）。原来靠 `h2 span` 命中，
+         现在标题外面多了一层 .src-group-head，选择器要跟着改。 */
       .src-note {
         margin: 0 0 var(--space-4);
         color: var(--color-muted);
@@ -188,60 +218,10 @@
        * 内容长了之后右侧索引一直可见，顶部那排会滚出去。
        * 窄屏收成一列，目录移到正文上面 —— 手机上侧栏也是横条，
        * 让目录紧跟在标题下面比挤在右边可用。 */
+      /* 单列。原来右侧挂了一个目录，但它列的分类和站名在正文里
+         （分类标题 + 每张卡片的站名）已经各出现一次 —— 同一个清单
+         在屏幕上一份、右边又一份，看着像两套导航。删掉。 */
       .src-layout { display: block; }
-      .src-rail { display: none; }
-
-      @media (min-width: 1100px) {
-        .src-layout {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) 210px;
-          column-gap: 36px;
-          align-items: start;
-        }
-        .src-rail {
-          display: block;
-          position: sticky;
-          top: 96px;
-          font-size: var(--text-small);
-        }
-      }
-
-      .src-rail-head {
-        margin: 0 0 9px;
-        padding-bottom: 7px;
-        border-bottom: 1px solid var(--color-line);
-        color: var(--color-muted);
-        font-size: var(--text-xs);
-        font-weight: var(--weight-bold);
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-      }
-      .src-rail-group { margin-bottom: var(--space-4); }
-      .src-rail-cat {
-        display: flex;
-        align-items: baseline;
-        justify-content: space-between;
-        gap: 8px;
-        width: 100%;
-        padding: 5px 0;
-        border: 0;
-        background: none;
-        color: var(--color-ink);
-        font-size: var(--text-body);
-        font-weight: var(--weight-semibold);
-        text-align: left;
-        cursor: pointer;
-      }
-      .src-rail-cat:hover { color: var(--color-accent); }
-      .src-rail-cat[aria-pressed="true"] { color: var(--color-accent); }
-      .src-rail-cat .count { flex: none; color: var(--color-muted); font-size: var(--text-small); font-weight: var(--weight-normal); }
-      .src-rail-items { display: grid; gap: 1px; margin: 2px 0 0; padding-left: 11px; border-left: 1px solid var(--color-line); }
-      .src-rail-items a {
-        padding: 3px 0;
-        color: var(--color-muted);
-        font-size: var(--text-small);
-      }
-      .src-rail-items a:hover { color: var(--color-accent); }
 
       /* 分类目录：全部 / 文章 / 论文 / 资讯。
          用过滤而不是滚动定位 —— 进这一页要回答的是「这儿有什么」，
@@ -289,7 +269,6 @@
         <!-- 右侧目录。它是这一页的索引：有哪些分类、每类下有哪些站。
              用 <aside> 是因为它确实是附属的 —— 读正文不需要它，
              但它回答「这里有什么」，而这正是进这一页的第一个问题。 -->
-        <aside class="src-rail" id="src-rail" aria-label="资源目录"></aside>
       </div>
     </div>
 
@@ -344,47 +323,38 @@
        *
        * 每个站名都列出来，因为这一页要回答的第一个问题是「这儿有哪些源」——
        * 只给分类名的话，BestBlogs 这些得滚动才能发现。 */
-      function paintRail(groups) {
-        // 「全部」只作为一个可点的筛选项，不重复列出站名 ——
-        // 下面三组已经逐个列了，再列一遍是同一个清单出现两次。
-        const cats = [{ key: "", title: tr("全部"), items: null }].concat(groups);
-        $("#src-rail").innerHTML = `<p class="src-rail-head">${esc(tr("目录"))}</p>`
-          + cats.map((g) => `
-            <div class="src-rail-group">
-              <button type="button" class="src-rail-cat" data-group="${esc(g.key)}"
-                aria-pressed="${activeGroup === g.key ? "true" : "false"}">
-                <span>${esc(g.title)}</span>
-                <span class="count">${g.items ? g.items.length : groups.reduce((n, x) => n + x.items.length, 0)}</span>
-              </button>
-              ${g.items ? `<div class="src-rail-items">${g.items.map((item) => `
-                <a href="#src-${esc(item.key || pick(item, "name"))}">${esc(pick(item, "name"))}</a>`).join("")}
-              </div>` : ""}
-            </div>`).join("")
-          + `<p class="src-updated" id="src-updated"></p>`;
-        $("#src-rail").querySelectorAll(".src-rail-cat").forEach((button) => {
-          button.onclick = () => {
-            activeGroup = button.dataset.group;
-            render();
-          };
-        });
-      }
-
       function render() {
         const data = window.TK_SOURCES;
         if (!data || !data.groups) {
           $("#src-groups").innerHTML = `<div class="empty"><p class="empty-title">${esc(tr("资源清单读不到"))}</p><p class="empty-hint">${esc(tr("检查 site/sources.js 是否加载成功，然后刷新。"))}</p></div>`;
           return;
         }
-        paintRail(data.groups);
         const shown = activeGroup
           ? data.groups.filter((g) => g.key === activeGroup)
           : data.groups;
         $("#src-groups").innerHTML = shown.map((group) => `
           <section class="src-group">
-            <h2>${esc(tr(group.title))}<span>${group.items.length}${countSuffix()}</span></h2>
+            <div class="src-group-head">
+              <h2>${esc(tr(group.title))}<span class="src-group-count">${group.items.length}${countSuffix()}</span></h2>
+              <button type="button" class="src-group-refresh" data-refresh="${esc(group.key)}">
+                ${esc(tr("刷新"))}
+              </button>
+            </div>
             <p class="src-note">${esc(tr(group.note))}</p>
             <div class="src-list">${group.items.map((item) => card(item, group.key === "news")).join("")}</div>
           </section>`).join("");
+        // 每类一个刷新按钮。放在标题右侧 —— 它刷新的是这一组的数据，
+        // 贴着标题才看得出作用范围。全局刷新按钮做不到这一点。
+        $("#src-groups").querySelectorAll(".src-group-refresh").forEach((button) => {
+          button.onclick = async () => {
+            button.disabled = true;
+            const original = button.textContent;
+            button.textContent = tr("正在读取…");
+            await loadFeeds(true);
+            button.disabled = false;
+            button.textContent = original;
+          };
+        });
         // 分组标题、说明、intro 都是 tr() 出来的静态中文，需要再过一遍词典；
         // 卡片内是按当前语言直接取的，不重复翻译。
         if (window.TKI18N) window.TKI18N.translateDOM($("#src-groups"));
