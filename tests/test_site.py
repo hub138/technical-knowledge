@@ -1276,6 +1276,7 @@ class FeedTests(unittest.TestCase):
         allowed = {
             "title", "url", "summary", "published",
             "cover", "source", "source_icon", "word_count", "read_minutes",
+            "tags",
         }
         forbidden = {"html", "content", "body", "rendered", "innerHTML"}
         for source in payload["sources"]:
@@ -1289,6 +1290,12 @@ class FeedTests(unittest.TestCase):
                     set(item) & forbidden,
                     f"{source['key']} 的条目带了 HTML 承载字段: {set(item) & forbidden}",
                 )
+                # tags 必须是字符串数组 —— 不接受对象或嵌套结构，
+                # 那会重新打开"通过字段传结构化内容"的口子。
+                if "tags" in item:
+                    self.assertIsInstance(item["tags"], list)
+                    for tag in item["tags"]:
+                        self.assertIsInstance(tag, str)
 
     def test_snapshot_includes_bestblogs(self) -> None:
         """BestBlogs 必须在响应里出现。

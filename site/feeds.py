@@ -516,12 +516,25 @@ def parse_arxivdaily(text: str, base: str) -> tuple[list[dict], str]:
         if not title_en or url in seen:
             continue
         seen.add(url)
+        summary = clean_text(summary_raw, 300)
+        # 「AI总结」是页面上的小标题，不是摘要内容。原来它跟着正文一起被
+        # 抓进来，读起来像"AI总结 本文研究…"这种黏在一起的句子。
+        #
+        # 它其实是个有意义的标记 —— 说明这段摘要是模型写的，不是作者原话。
+        # 所以提成 tags，前端渲染成一个小徽标，而不是删掉丢掉这个信息。
+        tags = []
+        if summary.startswith("AI总结"):
+            tags.append("AI总结")
+            summary = summary[len("AI总结"):].lstrip(" ：:")
         items.append({
             # 中文标题更符合这个页面的读者，缺了再退英文。
             "title": title_cn or title_en,
             "url": url,
-            "summary": clean_text(summary_raw, 300),
+            "summary": summary,
+            # arXivDaily 首页不给发布日期，只有论文编号。
+            # 留空而不是编一个 —— 编的日期会被人当真的用。
             "published": "",
+            "tags": tags,
         })
         if len(items) >= 40:
             break
@@ -849,6 +862,13 @@ def snapshot(force: bool = False) -> dict:
                     "source_icon": item.get("source_icon", ""),
                     "word_count": item.get("word_count", 0),
                     "read_minutes": item.get("read_minutes", 0),
+                    # 标签是字符串数组（「AI总结」这类标记）。仍是标量集合，
+                    # 不承载 HTML。
+                    "tags": [
+                        str(tag)[:20]
+                        for tag in (item.get("tags") or [])
+                        if isinstance(tag, str) and tag.strip()
+                    ][:4],
                 }
                 for item in item_list
             ],

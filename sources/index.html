@@ -178,11 +178,11 @@
       /* BestBlogs 的富卡片。三列网格 —— 它有 12 条，一条一行会把
          这一块撑得很长；三列一屏能看九条，和首页那条横滑的密度一致。
          窄屏收到两列、一列。 */
-      .src-rich { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+      .src-rich { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); align-items: stretch; }
       @media (max-width: 1100px) { .src-rich { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
       @media (max-width: 700px) { .src-rich { grid-template-columns: minmax(0, 1fr); } }
       .src-rich-card {
-        display: grid; grid-template-rows: auto 1fr; overflow: hidden;
+        display: grid; grid-template-rows: auto 1fr; overflow: hidden; height: 100%;
         border: 1px solid var(--color-line); border-radius: var(--radius-md);
         background: var(--color-panel); text-decoration: none;
         transition: border-color var(--duration-fast) var(--ease-out);
@@ -202,6 +202,17 @@
         color: var(--color-muted); font-size: var(--text-small); line-height: 1.6;
         display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
       }
+      /* 标签徽标（「AI总结」这类）。放在标题上方，一行小芯片。
+         它是"这段摘要是模型写的"这个信息的载体，用 --color-info-soft
+         的淡蓝底 —— 和 AI 摘要框同一族颜色，读者能对上。 */
+      .src-rich-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+      .src-rich-tags i {
+        padding: 1px 7px; border-radius: var(--radius-xs);
+        background: var(--color-info-soft); color: var(--color-summary-label);
+        font-size: var(--text-xs); font-style: normal;
+        font-weight: var(--weight-semibold);
+      }
+
       .src-rich-meta {
         display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
         margin-top: 2px; color: var(--color-faint); font-size: var(--text-xs);
@@ -456,14 +467,13 @@
         if (!items.length) {
           return `<p class="src-feed-state">${esc(tr("暂时没有新内容。"))}</p>`;
         }
-        // 有条目的源分两种渲染：
+        // 所有源都用同一套卡片，只是 BestBlogs 多一张封面。
         //
-        //   富卡片（BestBlogs）—— 它给封面、公众号头像、字数、时长。
-        //     这些字段别的源没有，所以按"有 cover 就走富卡片"分流，
-        //     而不是按 key 写死。将来别的源补上这些字段就自动升级。
-        //   纯文字列表 —— 其余源只有标题、时间、摘要。
-        const rich = items.some((item) => item.cover || item.source_icon);
-        if (rich) {
+        // 原来分成"富卡片"和"纯文字列表"两套：只有 BestBlogs 走卡片，
+        // 其余四个是标题 + 小灰字 + 段落，两种视觉混在一页里。
+        // 它们的数据结构其实一样（标题、链接、摘要、日期），差别只是
+        // BestBlogs 多一个 cover —— 那就用一种卡片，封面可选。
+        if (true) {
           return `<div class="src-rich">${items.map((item) => {
             const facts = [];
             if (item.word_count) facts.push(`${Number(item.word_count).toLocaleString()} 字`);
@@ -471,9 +481,12 @@
             if (item.published) facts.push(String(item.published).slice(0, 10));
             return `<a class="src-rich-card" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
               ${item.cover
-                ? `<span class="src-rich-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-crop></span>`
-                : `<span class="src-rich-cover src-rich-cover--none" aria-hidden="true"></span>`}
+                ? `<span class="src-rich-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-crop data-fallback></span>`
+                : ""}
               <span class="src-rich-body">
+                ${(item.tags || []).length
+                  ? `<span class="src-rich-tags">${(item.tags || []).map((tag) => `<i>${esc(tag)}</i>`).join("")}</span>`
+                  : ""}
                 <b class="src-rich-title" data-clamp>${esc(item.title)}</b>
                 ${item.summary ? `<span class="src-rich-sum" data-clamp>${esc(item.summary)}</span>` : ""}
                 <span class="src-rich-meta">
@@ -505,6 +518,18 @@
           if (!source) return;
           node.hidden = false;
           node.querySelector(".src-feed-body").innerHTML = feedEntry(source);
+        });
+        // 封面图加载失败时把那一格收掉，不留一个灰框。
+        //
+        // BestBlogs 的封面走 imagedelivery.net，是第三方 CDN —— 挂了或
+        // 被墙时图片请求会失败。一个裂图或空白块比没有封面更难看；
+        // 收掉之后卡片自己撑满，和其它卡片对齐（.src-rich-card 用了
+        // height:100%，所以同一行的高度不会塌）。
+        document.querySelectorAll(".src-rich-cover img[data-fallback]").forEach((img) => {
+          img.addEventListener("error", () => {
+            const box = img.closest(".src-rich-cover");
+            if (box) box.remove();
+          }, { once: true });
         });
         const updated = $("#src-updated");
         if (updated && payload.fetched_at) {
