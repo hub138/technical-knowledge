@@ -233,7 +233,7 @@
         color: var(--color-star);
       }
       :root[data-theme="dark"] .facts span {
-        background: #182220;
+        background: var(--color-panel);
       }
       .actions {
         display: flex;
@@ -342,11 +342,11 @@
       }
       .analysis-card:nth-child(2) {
         background: var(--color-info-soft);
-        border-color: #c9d9ea;
+        border-color: var(--color-accent-line);
       }
       .analysis-card:nth-child(3) {
         background: var(--color-warm-soft);
-        border-color: #efd4b8;
+        border-color: var(--color-warm-line);
       }
       .analysis-card h3 {
         font-size: 15px;
@@ -368,7 +368,7 @@
         padding: 13px 15px;
         border-left: 3px solid var(--color-accent);
         background: var(--color-accent-soft);
-        color: #3b6158;
+        color: var(--color-ok);
         font-size: 13px;
       }
       .source-note {
@@ -421,23 +421,27 @@
     <script src="/static/project-links.js" defer></script>
     <script src="/static/projects-page.js" defer></script>
     <style>
+      /* 同 .purpose：13px → 16px。
+         另外这里原来硬编码了边框色 #c8dcd5（旧的绿灰），
+         换色后它和 --color-accent-soft 的底不再是一家人，改用 token。 */
       .access-banner {
         display: flex;
         align-items: baseline;
         gap: 12px;
-        margin-top: 14px;
+        margin-top: 10px;
         padding: 12px 15px;
-        border: 1px solid #c8dcd5;
+        border: 1px solid var(--color-accent-line);
         border-left: 3px solid var(--color-accent);
         border-radius: 6px;
         background: var(--color-accent-soft);
-        font-size: 13px;
+        font-size: var(--text-body);
+        line-height: 1.65;
       }
       .access-banner strong {
         flex: 0 0 auto;
       }
       .access-banner span {
-        color: var(--color-muted);
+        color: var(--color-ink-soft);
       }
       .access-banner a {
         margin-left: auto;
@@ -491,7 +495,7 @@
 <style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] .project-links a,:root[data-theme="dark"] .links a,:root[data-theme="dark"] .project a,:root[data-theme="dark"] .entry a{background:var(--color-panel)!important}:root[data-theme="dark"] a.primary{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] .note{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] a{background-color:transparent}:root[data-theme="dark"] .entry a,:root[data-theme="dark"] .panel a{background:var(--color-panel)!important}</style>
-<style>:root[data-theme="dark"] .entry a:not(.primary),:root[data-theme="dark"] .panel a:not(.primary),:root[data-theme="dark"] .actions a:not(.primary){color:#7fd4bb!important}</style>
+<style>:root[data-theme="dark"] .entry a:not(.primary),:root[data-theme="dark"] .panel a:not(.primary),:root[data-theme="dark"] .actions a:not(.primary){color:var(--color-accent)!important}</style>
 <style>:root[data-theme="dark"] .panel a.primary,:root[data-theme="dark"] .entry a.primary,:root[data-theme="dark"] .actions a.primary{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}</style>
 </head>
   <body class="tk-host">

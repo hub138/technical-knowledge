@@ -380,7 +380,11 @@ body.tk-host::before {
 
 .tk-shell > .hero:first-child {
   margin: 0;
-  padding: 42px 0 28px;
+  /* 42/28 → 26/18。实测 hero 高 277px 里，上下 padding 70px + 内部两个
+     间隔 49px = 119px 是纯空白，占了 43%。标题、说明、按钮三块内容
+     加起来才 137px。收掉一半之后三块的间隔仍然是 16px 上下，
+     视觉上仍分得开，但不再像中间塞了空气。 */
+  padding: 26px 0 18px;
   border-bottom: 1px solid var(--ink-rule);
 }
 
@@ -447,7 +451,9 @@ body.tk-host a:hover { text-decoration: none; }
  */
 .hero p {
   max-width: none;
-  margin: var(--space-6) 0 0;
+  /* 24px → 16px。标题、说明、按钮是同一组信息的三行，
+     间隔 24px 把它们读成了三段独立内容。 */
+  margin: var(--space-4) 0 0;
   color: var(--color-muted);
   font-size: var(--text-note);
   line-height: var(--leading-normal);
@@ -569,7 +575,8 @@ body.tk-host button {
   flex-wrap: wrap;
   align-items: center;
   gap: 0;
-  margin-top: var(--space-6);
+  /* 同 .hero p：24 → 16，让标题/说明/按钮读成一组。 */
+  margin-top: var(--space-4);
 }
 
 .hero-links a {
@@ -618,26 +625,35 @@ body.tk-host button {
 }
 
 /* ── Purpose strip: "what is this page for" ───────────────────────────────── */
-
+/*
+ * 字号从 13px 提到 --text-body（16px）。
+ *
+ * 这一条不是脚注 —— 它回答的是「这一页是干什么的」，是读者进页面后
+ * 第一个要读的东西。13px 配 1.7 行高，在 1440 宽的页面上像免责声明。
+ * 参考站里对应的都是正文大小。
+ *
+ * 上边距从 22px 收到 14px：这条紧跟着 hero，是它的补充说明，
+ * 拉太开就断开了从属关系。
+ */
 .purpose {
   display: flex;
   gap: 14px;
   align-items: baseline;
-  margin-top: 22px;
-  padding: 13px 16px;
+  margin-top: 14px;
+  padding: 12px 16px;
   border: 1px solid var(--color-line);
   border-left: 3px solid var(--color-accent);
   border-radius: 6px;
   background: var(--color-panel);
-  color: var(--color-muted);
-  font-size: 13px;
-  line-height: 1.7;
+  color: var(--color-ink-soft);
+  font-size: var(--text-body);
+  line-height: 1.65;
 }
 
 .purpose strong {
   flex: 0 0 auto;
   color: var(--color-ink);
-  font-size: 13px;
+  font-size: var(--text-body);
 }
 
 .purpose span { min-width: 0; }
