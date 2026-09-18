@@ -44,7 +44,7 @@ window.TK_NAV = {
       href: "/papers",
       icon: "◫",
       title: "最新论文怎么解析、怎么进知识库",
-      description: "自己追踪的 AI 与 Agent 论文，逐篇结构化解析，并回流到知识库。",
+      description: "自己追踪的新论文，逐篇结构化解析，并回流到知识库。",
     },
     {
       key: "projects",

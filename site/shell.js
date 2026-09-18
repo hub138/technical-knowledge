@@ -26,7 +26,7 @@
   const PAGE_META = {
     knowledge: { title: "知识库", description: "阅读、搜索，并用图谱看知识之间的关系。" },
     graph: { title: "知识图谱", description: "领域、主题与笔记之间的关联，以及知识流通路径。" },
-    papers: { title: "论文追踪", description: "追踪 AI 与 Agent 方向的新论文，逐篇给出结构化解析；知识库的结论从这里取材。" },
+    papers: { title: "论文追踪", description: "追踪新论文，逐篇给出结构化解析；知识库的结论从这里取材。" },
     projects: { title: "项目与教学", description: "已经安装的工具、学习入口和源码索引。" },
     evaluation: { title: "Agent 评估", description: "自研评估项目的设计与后续实现入口。" },
     insights: { title: "访问与反馈", description: "本机访问记录与读者反馈，只在这台机器上可见。" },
