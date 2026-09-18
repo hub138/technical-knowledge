@@ -349,57 +349,77 @@
 
       /* 筛选芯片。标签是这页的主要导航方式 —— 两万篇里找出
          「Agent 相关的」靠的就是它，所以给它足够的视觉重量。 */
-      .pn-filters { display: grid; gap: 6px; margin: var(--space-3) 0 0; }
-      .pn-filter-row { display: flex; align-items: baseline; gap: 7px; flex-wrap: wrap; }
+      /* 筛选区。
+       *
+       * 对齐按 PaperNotes 的做法：标签在左固定宽度、芯片在右，同一行
+       * baseline 对齐。第一版把标签单独占一行，结果是「分类」和它下面的
+       * 芯片分成两块，看起来像两组不相干的东西；而且因为大类多、
+       * 会议少，两行的高度还不一样（122px vs 108px），参差不齐。
+       *
+       * 标签给固定宽度，芯片起点就能对齐成一列 —— 这是"整齐"的来源。
+       */
+      .pn-filters { display: grid; gap: var(--space-2); margin: var(--space-4) 0 0; }
+      .pn-filter-row { display: grid; grid-template-columns: 3.2em minmax(0, 1fr); gap: var(--space-2); align-items: start; }
       .pn-filter-label {
-        flex: none;
-        min-width: 4.5em;
-        color: var(--color-faint);
-        font-size: var(--text-xs);
+        padding-top: 6px;
+        color: var(--color-ink);
+        font-size: var(--text-small);
+        font-weight: var(--weight-bold);
+        letter-spacing: 0.02em;
+        white-space: nowrap;
       }
+      /* 芯片平铺。分类 8 个、会议 10 个、子领域最多 11 个，
+         数量本来就会换行，所以不限制行数，只保证左对齐整齐。 */
+      .pn-filter-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+
       .pn-chip {
-        padding: 3px 9px;
+        padding: 4px 10px;
         border: 1px solid var(--color-line);
         border-radius: var(--radius-xs);
-        background: var(--color-surface);
+        background: var(--color-panel);
         color: var(--color-ink-soft);
-        font-size: var(--text-xs);
+        font-size: var(--text-small);
+        font-weight: var(--weight-medium);
         cursor: pointer;
         white-space: nowrap;
       }
       .pn-chip:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
       .pn-chip[aria-pressed="true"] {
-        border-color: var(--color-accent-line);
+        border-color: var(--color-accent);
         background: var(--color-accent-soft);
-        color: var(--color-accent);
+        color: var(--color-accent-ink);
         font-weight: var(--weight-semibold);
       }
-      .pn-chip b { color: var(--color-faint); font-weight: var(--weight-normal); }
-      .pn-chip[aria-pressed="true"] b { color: var(--color-accent); }
+      .pn-chip b { color: var(--color-muted); font-weight: var(--weight-normal); }
+      .pn-chip[aria-pressed="true"] b { color: var(--color-accent-ink); }
 
       /* 大类芯片比子领域芯片重一档 —— 它是第一层的选择，
          视觉上要能一眼看出和下面那排不是同级。 */
       .pn-cat {
-        padding: 5px 12px;
+        padding: 6px 13px;
         border: 1px solid var(--color-line);
         border-radius: var(--radius-sm);
         background: var(--color-panel);
-        color: var(--color-ink-soft);
+        color: var(--color-ink);
         font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
         cursor: pointer;
         white-space: nowrap;
       }
-      .pn-cat:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      .pn-cat:hover { border-color: var(--color-accent-line); }
       .pn-cat[aria-pressed="true"] {
-        border-color: var(--color-accent-line);
-        background: var(--color-accent-soft);
-        color: var(--color-accent);
-        font-weight: var(--weight-semibold);
+        border-color: var(--color-accent);
+        background: var(--color-accent);
+        color: var(--color-on-accent);
       }
-      .pn-cat b { color: var(--color-faint); font-weight: var(--weight-normal); }
-      .pn-cat[aria-pressed="true"] b { color: var(--color-accent); }
-      /* 子领域那一排缩进一点，从位置上也看出它挂在上面的大类下。 */
-      .pn-filter-row--sub { padding-left: 1.6em; }
+      .pn-cat b { color: var(--color-muted); font-weight: var(--weight-normal); }
+      .pn-cat[aria-pressed="true"] b { color: var(--color-on-accent); opacity: 0.85; }
+
+      @media (max-width: 760px) {
+        /* 窄屏标签不再占一列 —— 那会把芯片压到只剩两三个的宽度。 */
+        .pn-filter-row { grid-template-columns: 1fr; gap: 4px; }
+        .pn-filter-label { padding-top: 0; }
+      }
 
       .pn-list { display: grid; gap: 1px; margin-top: var(--space-3); }
       /* 外部论文一条只有标题+标签，用紧排的列表而不是卡片 ——
@@ -727,31 +747,37 @@
           <button type="button" class="pn-cat" data-cat="${esc(c.name)}"
             aria-pressed="${pn.cat === c.name ? "true" : "false"}">${esc(c.name)}
             <b>${c.count.toLocaleString()}</b></button>`).join("");
-        // 选中大类后展开它的子领域；没选就显示全部大类的概览。
+        // 选中大类后展开它的子领域；没选就只显示大类。
         const active = categories.find((c) => c.name === pn.cat);
         const subRow = active && active.subfields.length
           ? `<div class="pn-filter-row pn-filter-row--sub">
-               <span class="pn-filter-label">${esc(tr("子领域"))}</span>
-               <button type="button" class="pn-chip" data-kind="sub-clear"
-                 aria-pressed="${pn.sub ? "false" : "true"}">${esc(tr("全部"))} <b>${active.count.toLocaleString()}</b></button>
-               ${active.subfields.map((s) => `<button type="button" class="pn-chip"
-                 data-kind="sub" data-name="${esc(s.name)}"
-                 aria-pressed="${pn.sub === s.name ? "true" : "false"}">${esc(s.name)} <b>${s.count.toLocaleString()}</b></button>`).join("")}
+               <p class="pn-filter-label">${esc(tr("子领域"))}</p>
+               <div class="pn-filter-chips">
+                 <button type="button" class="pn-chip" data-kind="sub-clear"
+                   aria-pressed="${pn.sub ? "false" : "true"}">${esc(tr("全部"))} <b>${active.count.toLocaleString()}</b></button>
+                 ${active.subfields.map((s) => `<button type="button" class="pn-chip"
+                   data-kind="sub" data-name="${esc(s.name)}"
+                   aria-pressed="${pn.sub === s.name ? "true" : "false"}">${esc(s.name)} <b>${s.count.toLocaleString()}</b></button>`).join("")}
+               </div>
              </div>`
           : "";
         $("#pn-filters").innerHTML = `
           <div class="pn-filter-row">
-            <span class="pn-filter-label">${esc(tr("分类"))}</span>
-            <button type="button" class="pn-cat" data-cat=""
-              aria-pressed="${pn.cat ? "false" : "true"}">${esc(tr("全部"))} <b>${pn.grand.toLocaleString()}</b></button>
-            ${catRow}
+            <p class="pn-filter-label">${esc(tr("分类"))}</p>
+            <div class="pn-filter-chips">
+              <button type="button" class="pn-cat" data-cat=""
+                aria-pressed="${pn.cat ? "false" : "true"}">${esc(tr("全部"))} <b>${pn.grand.toLocaleString()}</b></button>
+              ${catRow}
+            </div>
           </div>
           ${subRow}
           <div class="pn-filter-row">
-            <span class="pn-filter-label">${esc(tr("会议"))}</span>
-            ${conferences.slice(0, 8).map((c) => `<button type="button" class="pn-chip"
-              data-kind="conf" data-name="${esc(c.name)}"
-              aria-pressed="${pn.conf === c.name ? "true" : "false"}">${esc(c.name)} <b>${c.count.toLocaleString()}</b></button>`).join("")}
+            <p class="pn-filter-label">${esc(tr("会议"))}</p>
+            <div class="pn-filter-chips">
+              ${conferences.slice(0, 10).map((c) => `<button type="button" class="pn-chip"
+                data-kind="conf" data-name="${esc(c.name)}"
+                aria-pressed="${pn.conf === c.name ? "true" : "false"}">${esc(c.name)} <b>${c.count.toLocaleString()}</b></button>`).join("")}
+            </div>
           </div>`;
         $("#pn-filters").querySelectorAll("button").forEach((button) => {
           button.onclick = () => {

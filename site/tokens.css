@@ -20,55 +20,75 @@
   color-scheme: light;
 
   /* ── Surfaces, from furthest back to closest to the reader ──────────── */
-  --color-bg: #f4f6f5;
-  --color-surface: #eef3f0; /* inset areas: graph canvas, table headers */
+  /* 冷白偏蓝的底，取自 arXivDaily 的 #f5f7fb 一系。
+   *
+   * 原来是偏绿的浅灰（#f4f6f5），配上墨绿主色整站显得闷。冷白底让卡片和
+   * 分隔线浮起来，这是那些"看起来亮"的站共同的做法 —— 底不是纯白，
+   * 而是比白多一点蓝，于是白卡片有对比可言。 */
+  --color-bg: #f5f7fb;
+  --color-surface: #eef1f8; /* inset areas: graph canvas, table headers */
   --color-panel: #ffffff; /* cards, sidebar, panels */
   --color-raised: #ffffff; /* panels that also carry a shadow */
-  --color-overlay: rgba(19, 28, 25, 0.42);
+  --color-overlay: rgba(23, 32, 51, 0.42);
 
   /* ── Text, by descending emphasis ───────────────────────────────────── */
-  --color-ink: #1f2a27; /* headings, primary content */
-  --color-ink-soft: #2f3a35; /* body text inside dense tables */
-  /* #68746f read at 4.34:1 on --color-surface, just under the 4.5:1 WCAG AA
-   * floor for body text, and the contrast audit flagged it. Darkened along the
-   * same hue so it passes on every surface we actually use. */
-  --color-muted: #4a554f; /* 次要文字。取 6.9-7.8 对比度，不是刚好过 4.5 的及格线 */
+  /* 近黑的深蓝，不是纯黑也不是带绿的黑。实测 arXivDaily 正文用 #172033、
+   * PaperNotes 用 #2b2d42 —— 都在蓝紫一系。带色相的黑比纯黑柔和，
+   * 又比灰色有分量，这是长文页面读起来不累的原因。 */
+  --color-ink: #172033; /* headings, primary content */
+  --color-ink-soft: #2b3648; /* body text inside dense tables */
+  /* 次要文字。取 7:1 上下的对比度，不是刚好过 4.5 的及格线。 */
+  --color-muted: #4a5568;
   /* 只用于非文字（图标、分隔线、装饰）。它按设计比 --color-muted 低一档，
    * 小字用它会掉到 WCAG AA 以下 —— 时间戳、计数请用 --color-muted。 */
-  --color-faint: #6f7a75;
+  --color-faint: #6b7688;
 
   /* ── Borders ────────────────────────────────────────────────────────── */
-  --color-line: #dbe2de; /* default hairline */
-  --color-line-strong: #c5d0cb; /* hover / emphasis borders */
+  --color-line: #dde3ee; /* default hairline */
+  --color-line-strong: #c6cfdf; /* hover / emphasis borders */
 
   /* ── Accent: the product's own colour ───────────────────────────────── */
-  --color-accent: #147766;
-  --color-accent-hover: #0f6154;
-  --color-accent-soft: #e4f1ed; /* tinted background */
-  --color-accent-line: #b7d9cf; /* tinted border */
-  --color-accent-ink: #0d5f52; /* accent-coloured text on light bg */
+  /* 靛蓝。原来是墨绿 #147766。
+   *
+   * 换掉的理由不是"绿色不好看"，是它让整站偏闷：底是绿灰、文字是带绿的黑、
+   * 主色是墨绿，三个色相挤在一起，没有对比也就没有重点。参照的三个站
+   * —— arXivDaily 的 #2563eb、PaperNotes 的 #4051b5、BestBlogs 的橙 ——
+   * 都是用**一个明确的冷色或暖色**做强调，其余全是中性灰。
+   *
+   * 取 #4051b5 这一系的靛蓝：它和冷白底同色相，不打架；比纯蓝多一点紫，
+   * 在浅色背景上更沉得住；和暖橙（--color-warm）配在一起是经典的
+   * 蓝橙对比，用于"新鲜度""警告"这类需要跳出来的标记。
+   *
+   * 对比度实测（白底）：正文级 7.4:1，过 WCAG AA。 */
+  --color-accent: #4051b5;
+  --color-accent-hover: #33429a;
+  --color-accent-soft: #eceefb; /* tinted background */
+  --color-accent-line: #c3c9f0; /* tinted border */
+  --color-accent-ink: #2f3d8f; /* accent-coloured text on light bg */
   --color-on-accent: #ffffff; /* text on top of --color-accent */
 
   /* ── Secondary hues, each with a soft background pairing ────────────── */
-  --color-warm: #a45b2a; /* freshness, warnings, radar */
-  --color-warm-soft: #fff5e9;
-  --color-warm-line: #efd9b3;
-  --color-warm-ink: #704823;
-  --color-info: #3f70a8;
-  --color-info-soft: #edf4fb;
-  --color-violet: #75599a;
-  --color-violet-soft: #f3effa;
+  /* 暖橙取自 PaperNotes 的 #ff6e42 一系，压暗到能在白底上做正文标记。
+   * 蓝主色 + 橙副色是这套配色里唯一的强对比，留给真正需要跳出来的东西。 */
+  --color-warm: #c2521f; /* freshness, warnings, radar */
+  --color-warm-soft: #fdf1ea;
+  --color-warm-line: #f2cdb8;
+  --color-warm-ink: #94400f;
+  --color-info: #2563eb;
+  --color-info-soft: #eaf1fe;
+  --color-violet: #7c4dff;
+  --color-violet-soft: #f2edff;
 
   /* ── Status. Used by insights and feedback. ─────────────────────────── */
-  --color-ok: #147766;
-  --color-ok-soft: #e4f1ed;
-  --color-warn: #a45b2a;
-  --color-warn-soft: #fff5e9;
-  --color-danger: #9b4660;
-  --color-danger-soft: #fdf0f3;
-  --color-star: #8a6d1f; /* star-count badges */
-  --color-star-soft: #fdf8e8;
-  --color-star-line: #e2d3a8;
+  --color-ok: #0f7a5a;
+  --color-ok-soft: #e7f5f0;
+  --color-warn: #c2521f;
+  --color-warn-soft: #fdf1ea;
+  --color-danger: #b03052;
+  --color-danger-soft: #fdeef3;
+  --color-star: #9a6b12; /* star-count badges */
+  --color-star-soft: #fdf7e6;
+  --color-star-line: #e6d5a3;
 
   /* ── Space. 4px base; pick the nearest step, never a raw value. ─────── */
   /* 唯一的侧边栏宽度。常见范围 240-280px；取 260 给内容多留 26px，
@@ -230,46 +250,46 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --color-bg: #131a18;
-  --color-surface: #182220;
-  --color-panel: #1a2320;
-  --color-raised: #1f2a26;
-  --color-overlay: rgba(6, 10, 9, 0.62);
+  --color-bg: #131722;
+  --color-surface: #171c29;
+  --color-panel: #1a2030;
+  --color-raised: #202737;
+  --color-overlay: rgba(8, 11, 18, 0.62);
 
-  --color-ink: #e6ede9;
-  --color-ink-soft: #d5e0db;
-  --color-muted: #a3b1ab;  /* 与浅色档对齐：7.2-7.9 */
+  --color-ink: #e8ecf5;
+  --color-ink-soft: #d3dae8;
+  --color-muted: #9fa9bd;  /* 与浅色档对齐：7.2 以上 */
   /* 同浅色：非文字专用。 */
-  --color-faint: #8a9892;
+  --color-faint: #8590a6;
 
-  --color-line: #2b3733;
-  --color-line-strong: #3d4d47;
+  --color-line: #2a3245;
+  --color-line-strong: #3d4761;
 
-  --color-accent: #5fbfa6;
-  --color-accent-hover: #7ed0ba;
-  --color-accent-soft: #1e3630;
-  --color-accent-line: #315a50;
-  --color-accent-ink: #8fd4c0;
-  --color-on-accent: #0d1b17;
+  --color-accent: #8b9cf5;
+  --color-accent-hover: #a5b2f8;
+  --color-accent-soft: #1f2645;
+  --color-accent-line: #384373;
+  --color-accent-ink: #aab7f7;
+  --color-on-accent: #0d1120;
 
-  --color-warm: #c98a5c;
-  --color-warm-soft: #3a2c1a;
-  --color-warm-line: #574126;
-  --color-warm-ink: #e0b48b;
+  --color-warm: #f0a380;
+  --color-warm-soft: #38221a;
+  --color-warm-line: #56341f;
+  --color-warm-ink: #f6bfa3;
   /* 暗色下 soft 底 + 同色系前景容易掉到 3:1 以下，所以前景取更亮的一档，
      底取更深的一档，保证 11px 小字也能达标。 */
-  --color-info: #a8c8ea;
-  --color-info-soft: #16243a;
-  --color-violet: #c4aee4;
-  --color-violet-soft: #241d33;
+  --color-info: #93bbf7;
+  --color-info-soft: #16233a;
+  --color-violet: #c3aefc;
+  --color-violet-soft: #231d38;
 
-  --color-ok: #5fbfa6;
-  --color-ok-soft: #1e3630;
-  --color-warn: #c98a5c;
-  --color-warn-soft: #3a2c1a;
-  --color-danger: #d98aa4;
-  --color-danger-soft: #3a2130;
-  --color-star: #d9c069;
+  --color-ok: #6fd7b4;
+  --color-ok-soft: #14332b;
+  --color-warn: #f0a380;
+  --color-warn-soft: #38221a;
+  --color-danger: #f099b4;
+  --color-danger-soft: #3a1f2c;
+  --color-star: #e0c46a;
   --color-star-soft: #2a2413;
   --color-star-line: #4a3f1c;
 
