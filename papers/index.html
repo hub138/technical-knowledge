@@ -860,17 +860,10 @@
        * 的篇数更多。读者找论文时先想的是「LLM 相关的」，不是「五百篇以上的」。
        */
       function pnPaintFilters(categories, conferences) {
-        // 「其他」渲染成一个淡色小尾巴，不当作第八个大类。
-        // 它是个兜底桶（953 篇，什么都有），和「LLM」平级会误导；
-        // 而且八个大类之后单独多一个，正好占满第二行 —— 又乱又占地方。
-        const main = categories.filter((c) => !c.tail);
-        const tails = categories.filter((c) => c.tail);
-        const catRow = main.map((c) => `
+        // 分类芯片。服务端已经不返回「其他」了（见 site/server.py 的
+        // PAPERNOTES_CATEGORY_ORDER），所以这里不需要再特判兜底桶。
+        const catRow = categories.map((c) => `
           <button type="button" class="pn-cat" data-cat="${esc(c.name)}"
-            aria-pressed="${pn.cat === c.name ? "true" : "false"}">${esc(c.name)}
-            <b>${c.count.toLocaleString()}</b></button>`).join("")
-          + tails.map((c) => `
-          <button type="button" class="pn-chip" data-cat="${esc(c.name)}"
             aria-pressed="${pn.cat === c.name ? "true" : "false"}">${esc(c.name)}
             <b>${c.count.toLocaleString()}</b></button>`).join("");
         // 选中大类后展开它的子领域；没选就只显示大类。

@@ -48,7 +48,7 @@ window.TK_NAV = {
     },
     {
       key: "sources",
-      label: "外部资源",
+      label: "优质好文",
       href: "/sources",
       icon: "◱",
       title: "外部有哪些做得更好的站",

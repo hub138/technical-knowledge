@@ -42,7 +42,12 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-API_BASE = "https://www.bestblogs.dev/openapi/v2"
+# 端点在 api. 子域，**不是** www。
+#
+# 文档里的 curl 示例写的是 bestblogs.dev，而那个域名把 /openapi/* 301 到
+# www，www 上返回 404 —— 三个域名里只有 api. 是真的服务端点。
+# 这是实测出来的：同样一个 key，www 上 /me 也 404，api 上返回账号信息。
+API_BASE = "https://api.bestblogs.dev/openapi/v2"
 TIMEOUT = 12.0
 
 USER_AGENT = (
@@ -137,25 +142,46 @@ def _text(value: object, limit: int = 300) -> str:
 def _normalise(item: dict) -> dict:
     """把一条 API 结果整理成页面要的形状。
 
-    只保留这几个字段，**不含正文** —— 这一页是入口，全文在原站。
+    字段名照真实响应，不照文档 —— 文档只列了几个，实际有四十多个，
+    其中好几个正是页面需要的（公众号头像、金句、字数/时长）。
+
+    正文不入库：这一页是入口，全文在原站。
     """
-    # id 字段在不同端点叫法略有差异，都兜一下。
-    rid = item.get("id") or item.get("resourceId") or ""
-    title = _text(item.get("title") or item.get("name"), 200)
+    rid = item.get("id") or ""
+    # 优先用 BestBlogs 的站内页（排版统一、不跳微信），
+    # 没有才退回原文 url —— 微信链接会过期，站内页不会。
+    url = item.get("readUrl") or item.get("url") or ""
+    quotes = [q for q in (item.get("keyQuotes") or []) if isinstance(q, str) and q.strip()]
+    points = []
+    for point in item.get("mainPoints") or []:
+        if isinstance(point, dict) and point.get("point"):
+            points.append({
+                "point": _text(point.get("point"), 160),
+                "explain": _text(point.get("explanation"), 240),
+            })
     return {
-        "title": title,
-        "url": f"https://www.bestblogs.dev/article/{rid}" if rid else "",
-        "summary": _text(item.get("summary") or item.get("description"), 300),
-        # 源名（公众号名）。这是这一页最有信息量的一个字段 ——
-        # 读者关心的往往是"这是谁写的"。
-        "source": _text(item.get("sourceName") or item.get("source"), 40),
-        "cover": str(item.get("cover") or item.get("image") or ""),
-        "published": str(item.get("publishDate") or item.get("publishedAt") or ""),
+        "id": rid,
+        "title": _text(item.get("title") or item.get("originalTitle"), 200),
+        # 一句话总结比长摘要更适合卡片；长摘要留给详情。
+        "summary": _text(item.get("oneSentenceSummary") or item.get("summary"), 220),
+        "long_summary": _text(item.get("summary"), 400),
+        # 公众号名 + 头像。sourceImage 就是它 —— 不需要去微信后台拿。
+        "source": _text(item.get("sourceName"), 40),
+        "source_icon": str(item.get("sourceImage") or ""),
+        "cover": str(item.get("cover") or item.get("enclosureUrl") or ""),
+        "url": url,
+        "published": str(item.get("publishDateStr") or ""),
+        "published_full": str(item.get("publishDateTimeStr") or ""),
         "score": item.get("score") or "",
-        "category": _text(item.get("category") or item.get("categoryName"), 30),
-        # 阅读量/时长这类细节，有就带上 —— arXivDaily 那种
-        # 「10994 字（约 44 分钟）」的质感就是从这来的。
-        "read_minutes": item.get("readTime") or item.get("readMinutes") or "",
+        "category": _text(item.get("categoryDesc") or item.get("mainDomainDesc"), 30),
+        # 阅读量/字数/时长 —— arXivDaily 那种「10994 字（约 44 分钟）」的质感。
+        "word_count": item.get("wordCount") or 0,
+        "read_minutes": item.get("readTime") or 0,
+        "read_count": item.get("readCount") or 0,
+        "tags": [t for t in (item.get("tags") or []) if isinstance(t, str)][:6],
+        "quotes": quotes[:3],
+        "points": points[:4],
+        "authors": [a for a in (item.get("authors") or []) if isinstance(a, str)][:4],
     }
 
 
@@ -170,9 +196,13 @@ def digest(limit: int = 12, hours: str = "3d", force: bool = False) -> dict:
             "cached": True,
         }
 
+    # 参数取值是实测出来的，文档写的不准：
+    #   type      要大写 ARTICLE。小写 article 返回 0 条（totalCount=0），
+    #             而不是报错 —— 静默失败，只能靠总数看出来。
+    #   language  是 zh_CN / en_US，不是 zh / en。
     data, error = _get("resources", {
-        "type": "article",
-        "language": "zh",
+        "type": "ARTICLE",
+        "language": "zh_CN",
         "time": hours,
         "qualified": "true",   # 只要 Featured，这是它人工精审的那一层
         "limit": str(min(50, max(1, limit))),
@@ -191,7 +221,12 @@ def digest(limit: int = 12, hours: str = "3d", force: bool = False) -> dict:
             }
         return {"status": error, "items": [], "fetched_at": 0, "cached": False, "error": error}
 
-    rows = data if isinstance(data, list) else (data or {}).get("list") or []
+    # 分页响应形如 {"currentPage","pageSize","totalCount","pageCount","dataList":[...]}。
+    # 文档没写这个形状，是照真实响应试出来的 —— 之前猜 data / data.list
+    # 都是 0 条，而接口其实返回了 14 万条。
+    rows = data if isinstance(data, list) else (
+        (data or {}).get("dataList") or (data or {}).get("list") or []
+    )
     items = [_normalise(row) for row in rows if isinstance(row, dict)]
     items = [item for item in items if item["title"] and item["url"]]
 
@@ -201,10 +236,12 @@ def digest(limit: int = 12, hours: str = "3d", force: bool = False) -> dict:
 
 def sources(limit: int = 60) -> dict:
     """公共订阅源目录 —— 就是公众号列表。"""
-    data, error = _get("sources", {"language": "zh", "limit": str(limit), "page": "1"})
+    data, error = _get("sources", {"language": "zh_CN", "limit": str(limit), "page": "1"})
     if error:
         return {"status": error, "items": []}
-    rows = data if isinstance(data, list) else (data or {}).get("list") or []
+    rows = data if isinstance(data, list) else (
+        (data or {}).get("dataList") or (data or {}).get("list") or []
+    )
     items = []
     for row in rows:
         if not isinstance(row, dict):

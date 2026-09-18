@@ -102,10 +102,16 @@
         gap: 10px;
         flex-wrap: wrap;
       }
+      /* 站名加大到 22px、最粗一档。
+       *
+       * 原来是 --text-lg（18px）。读者反馈"别人的 logo 字都大大的"——
+       * 这里是整页的入口，站名是读者找东西的锚点，该比卡片里的标题重。
+       * 参考的两个站，站名都是页面上仅次于页面主标题的一级字号。 */
       .src-head a {
         color: var(--color-ink);
-        font-size: var(--text-lg);
+        font-size: var(--text-xl);
         font-weight: var(--weight-bold);
+        letter-spacing: -0.01em;
       }
       .src-head a:hover { color: var(--color-accent); }
       /* 外链标记：告诉读者会离开本站。放在名字后面，不抢标题。 */
@@ -159,17 +165,6 @@
        * 靠间距和底色分区。
        */
       .src-feed { margin-top: var(--space-3); }
-      .src-feed > summary {
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        padding: var(--space-1) 0;
-        color: var(--color-muted);
-        font-size: var(--text-small);
-        cursor: pointer;
-        list-style: none;
-      }
-      .src-feed > summary::-webkit-details-marker { display: none; }
       .src-feed > summary::before {
         content: "▸";
         flex: none;
@@ -259,7 +254,7 @@
     <div class="tk-shell">
       <section class="hero">
         <h1>优质好文</h1>
-        <p>几个值得常看的源。下面直接列出各自最新几条，点标题去原站读全文。</p>
+        <p>几个值得常看的好文章网站，下面直接列出它们最新的文章，点标题去原站读。</p>
       </section>
 
       <div class="src-layout">
@@ -292,11 +287,18 @@
         // 有 key 才配 feed 槽。播客（key 为空）没有可抓的文字列表。
         // 初始 hidden，由 loadFeeds 拿到数据后移除 —— 这样 JS 或接口挂了，
         // 页面就退化成纯导航页，不会留下一个永远转圈的框。
+        // 文章列表直接展开，不折在 <details> 后面。
+        //
+        // 原来要先点一次「最新几条」才看得到 —— 但"这个站最近有什么"
+        // 正是读者来这一页要的，藏起来等于让每个人都多点一次。
+        // 折叠对"次要信息"合适，这里它是主要内容。
+        //
+        // 仍然保留 src-feed-body 这个容器：loadFeeds 拿到数据后往里填，
+        // 在那之前是空的，所以页面不会先显示一个假的空框。
         const feed = item.key
-          ? `<details class="src-feed" data-feed="${esc(item.key)}" hidden>
-               <summary>${esc(tr("最新几条"))}</summary>
+          ? `<div class="src-feed" data-feed="${esc(item.key)}">
                <div class="src-feed-body"></div>
-             </details>`
+             </div>`
           : "";
         // id 供右侧目录的站名锚点用。用 key 优先，没有 key 的（播客）退回站名。
         const anchor = `src-${item.key || pick(item, "name")}`;
@@ -436,8 +438,6 @@
           const source = byKey[node.dataset.feed];
           if (!source) return;
           node.hidden = false;
-          // 默认展开：用户要看的就是这个。折叠是给他收起的选项，不是初始状态。
-          node.open = true;
           node.querySelector(".src-feed-body").innerHTML = feedEntry(source);
         });
         const updated = $("#src-updated");

@@ -25,12 +25,35 @@
    道理说了不算，得有别人测过的数。
    窄屏没有这块空白，整块收掉，不做折叠。 */
 .claim-row{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;align-items:start}
-@media (min-width:1180px){.claim-row{grid-template-columns:minmax(0,1fr) minmax(0,336px)}}
+/* 两块等宽。
+ *
+ * 右栏原来是 336px 固定宽，而左栏是 1fr（约 620px）—— 五条短句在 336px 里
+ * 每句换 3-4 行，和左边四条一行一个的排法完全不成对比，看起来像两块
+ * 不同性质的东西。它们是对等的，宽度也该对等。
+ *
+ * 1fr 1fr 让两栏平分；gap 用 20px 保持呼吸。 */
+@media (min-width:1180px){.claim-row{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 .claim-row .claim{margin:0}
+/* 右侧方法论块的补充样式。复用左边 .claim-list 的排法，只加两条：
+   紧凑一档的行距（五条比四条多），以及底部的入口链接。 */
+.claim-list--tight li { line-height: 1.55; }
+.claim-list--tight li + li { margin-top: 4px; }
+.claim-quotes-more {
+  display: inline-block;
+  margin-top: 10px;
+  color: var(--color-accent);
+  font-size: var(--text-small);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+}
+.claim-quotes-more:hover { text-decoration: underline; }
+
+/* 窄屏放不下两栏，右侧整块收掉（不做折叠）。
+   ≥1180 时两块并排，各走上面那条 .claim,.claim-quotes 的卡片样式。 */
 .claim-quotes{display:none}
-@media (min-width:1180px){.claim-quotes{display:grid;gap:10px;align-content:start}}
-.claim-quotes-head{margin:0;font-size:var(--text-sm);color:var(--color-muted);letter-spacing:.04em}
-.claim-quotes-head a{color:var(--color-accent);font-weight:var(--weight-semibold)}
+@media (min-width:1180px){.claim-quotes{display:grid}}
+
+
 .quote-card{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid var(--color-line);border-left:2px solid var(--color-accent);border-radius:var(--radius-sm);background:var(--color-panel);text-decoration:none;color:inherit}
 .quote-card:hover{border-left-color:var(--color-ink)}
 .quote-card b{font-size:var(--text-base);color:var(--color-ink);font-weight:var(--weight-semibold);line-height:1.45}
@@ -65,7 +88,32 @@
 .digest-head{display:flex;align-items:baseline;gap:10px;margin:0 0 14px}
 .digest-head h2{font-size:var(--text-h2);margin:0;line-height:1.3}
 .digest-note{color:var(--color-muted);font-size:var(--text-small)}
-.digest-row{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;padding:2px 2px 12px;scrollbar-width:none}
+/* 右侧留出悬浮按钮的通道。
+ *
+ * .digest-row 横向滚动，卡片一直延伸到内容列右边界 —— 而反馈按钮浮在
+ * 那个位置，实测压住了最后一张卡片的标题和摘要（布局审计报的
+ * "feedback button covers"）。给滚动容器右侧留出 --float-lane，
+ * 卡片到那里就截止，按钮落在一片空处。
+ *
+ * 用 padding 而不是 width 收窄：滚动区域的右端仍可点到，只是内容不进通道。 */
+/* 横向滚动行要**整体收窄**，让开右侧悬浮按钮的通道。
+ *
+ * 上一版只加了 padding-right，没用 —— padding 是滚动内容的一部分，
+ * 卡片仍然延伸到通道里（实测卡片右边 1398，按钮左边 1366，压住 32px）。
+ * 要让开就得收容器宽度：margin-right 把它推开，滚动区跟着变窄。
+ *
+ * 用 1180px 断点而不是所有宽度：窄屏没有右栏，也不该白留一条。 */
+.digest-row{
+  display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;
+  padding:2px 2px 12px;scrollbar-width:none;
+}
+@media (min-width:1180px){
+  .digest-row{margin-right:var(--float-lane);padding-right:0}
+  /* 滚动内容末尾补一段空白，让最后一张卡能完整滚进可视区。
+     没有它的话，滚到底时最后一张正好停在悬浮按钮下面 —— 点标题点到
+     按钮上。这是横向滚动 + 浮动控件的常见冲突，垫一段是最省事的解法。 */
+  .digest-row::after{content:"";flex:0 0 var(--float-lane)}
+}
 .digest-row::-webkit-scrollbar{display:none}
 .digest-card{
   flex:0 0 268px;display:grid;gap:0;scroll-snap-align:start;
@@ -83,7 +131,20 @@
 .digest-card:hover .digest-title{color:var(--color-accent)}
 .digest-sum{color:var(--color-muted);font-size:var(--text-small);line-height:1.65;
   display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.digest-meta{color:var(--color-faint);font-size:var(--text-xs);margin-top:2px}
+.digest-meta{
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+  margin-top:2px;color:var(--color-faint);font-size:var(--text-xs);
+}
+/* 公众号头像。14px 足够认出是谁，又不会比标题抢眼。
+   圆形裁切是因为它们的头像是方形图，圆角让它在文字行里不显突兀。 */
+.digest-icon{width:15px;height:15px;border-radius:50%;object-fit:cover;flex:none;background:var(--color-surface)}
+.digest-source{color:var(--color-ink-soft);font-weight:var(--weight-medium)}
+/* 字数和时长用等宽数字，卡片之间对齐时不会因为数字宽度不同而抖动。 */
+.digest-facts{font-variant-numeric:tabular-nums}
+/* 「全部 →」跟在标题右边，把 note 推到自己旁边 */
+.digest-all{margin-left:auto;color:var(--color-accent);font-size:var(--text-small);font-weight:var(--weight-semibold);text-decoration:none}
+.digest-all:hover{text-decoration:underline}
+.digest-head{align-items:baseline}
 @media (max-width:760px){
   .digest-card{flex-basis:236px}
 }
@@ -112,7 +173,21 @@
 @media(max-width:1100px){.atlas-row{grid-template-columns:170px minmax(0,1fr)}}
 @media(max-width:760px){.atlas{padding:18px 16px 20px}.atlas-head{display:block}.atlas-open{display:inline-block;margin-top:10px}.atlas-row{grid-template-columns:1fr;gap:8px}}
 .domain-card{position:relative;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
-.claim{display:grid;gap:12px;max-width:760px;margin:0 0 24px;padding:18px 20px;border:1px solid var(--color-line);border-left:3px solid var(--color-accent);border-radius:var(--radius-sm);background:var(--color-panel)}
+/* 左右两块用同一套卡片样式。
+ *
+ * 原来只有左边 .claim 有边框和内边距，右边是裸的文字 —— 并排看是
+ * 一个框 + 一段飘着的文字，读者看不出它们是对等的两块。
+ * 现在两边都走这个规则。
+ *
+ * gap 从 12px 收到 8px、padding 从 18/20 收到 14/16：标题和列表之间
+ * 原来空 12px，加上标题自己是 16px 行高，看上去像标题下有个洞。 */
+.claim,.claim-quotes{
+  display:grid;gap:8px;max-width:760px;margin:0;
+  padding:14px 16px;border:1px solid var(--color-line);
+  border-left:3px solid var(--color-accent);border-radius:var(--radius-sm);
+  background:var(--color-panel);
+}
+.claim-lead--right{color:var(--color-accent)}
 .claim-lead{margin:0;color:var(--color-ink);font-size:var(--text-body);font-weight:var(--weight-semibold)}.claim-list b{color:var(--color-ink);font-weight:var(--weight-semibold)}
 .claim-list{display:grid;gap:10px;margin:0;padding:0;list-style:none;color:var(--color-muted);font-size:var(--text-body);line-height:1.6}
 .claim-list b{color:var(--color-ink)}
@@ -625,16 +700,22 @@ function renderAtlas(){
  */
 let digestCache = null;
 
+/* 最新优质好文。
+ *
+ * 数据来自 BestBlogs 的 OpenAPI（site/bestblogs.py），每条带：
+ * 公众号名 + 头像、封面、一句话总结、字数 / 阅读时长、金句、评分。
+ *
+ * 卡片学 arXivDaily 的层次：封面在上、标题加粗、摘要其次、
+ * 公众号（带头像）和字数时长做脚注。头像很重要 —— 读者认的是
+ * "谁写的"，名字比标题更快建立可信度。
+ *
+ * 没有 key / 配额用完 / 网络不通时不显示这一块。唯一例外是"没配 key"：
+ * 那是读者自己能解决一次的状态，给一行说明（见下面 unconfigured 分支）。
+ */
 function renderDigest(items, status) {
   const box = $('#home-digest');
   if (!box) return;
   if (!items || !items.length) {
-    // 没配 key / 配额用完 / 网络不通 —— 三种都不显示这一块。
-    // 它不出现不影响首页别的部分。
-    //
-    // 唯一例外：**没配 key**。那是一个读者可以自己解决一次的状态，
-    // 而且解决之后整块就活了。藏起来的话，功能看起来像没做。
-    // 这种情况给一行说明，不做成大横幅 —— 它是提示不是错误。
     if (status === "unconfigured") {
       box.hidden = false;
       box.innerHTML = `<div class="digest-head">
@@ -654,22 +735,33 @@ function renderDigest(items, status) {
   }
   box.hidden = false;
   const cards = items.map((item) => {
-    const meta = [item.source, item.read_minutes ? `约 ${item.read_minutes} 分钟` : '']
-      .filter(Boolean).join(' · ');
+    // 脚注：公众号（带头像）· 字数/时长 · 日期。
+    // 字数用时长的说法（"约 28 分钟"）比"6835 字"更直观，两个都给。
+    const facts = [];
+    if (item.word_count) facts.push(`${item.word_count.toLocaleString()} 字`);
+    if (item.read_minutes) facts.push(`约 ${item.read_minutes} 分钟`);
+    if (item.published) facts.push(item.published.slice(5));
     return `<a class="digest-card" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
       ${item.cover
-        ? `<span class="digest-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer"></span>`
+        ? `<span class="digest-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-crop></span>`
         : `<span class="digest-cover digest-cover--none" aria-hidden="true"></span>`}
       <span class="digest-body">
-        <b class="digest-title">${esc(item.title)}</b>
-        ${item.summary ? `<span class="digest-sum">${esc(item.summary)}</span>` : ''}
-        <span class="digest-meta">${esc(meta)}</span>
+        <b class="digest-title" data-clamp>${esc(item.title)}</b>
+        ${item.summary ? `<span class="digest-sum" data-clamp>${esc(item.summary)}</span>` : ''}
+        <span class="digest-meta">
+          ${item.source_icon
+            ? `<img class="digest-icon" src="${esc(item.source_icon)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
+            : ''}
+          ${item.source ? `<span class="digest-source">${esc(item.source)}</span>` : ''}
+          ${facts.length ? `<span class="digest-facts">${esc(facts.join(' · '))}</span>` : ''}
+        </span>
       </span>
     </a>`;
   }).join('');
   box.innerHTML = `<div class="digest-head">
       <h2>最新优质好文</h2>
       <span class="digest-note">来自 BestBlogs 的精选</span>
+      <a class="digest-all" href="/sources">全部 →</a>
     </div>
     <div class="digest-row">${cards}</div>`;
 }
@@ -688,22 +780,59 @@ async function loadDigest() {
   renderDigest(digestCache.items, digestCache.status);
 }
 
+/* 右侧那一栏：论文怎么追踪、怎么解析 + 去论文追踪的入口。
+ *
+ * 它和左边「每一篇都回答这四个问题」是对称的 —— 左边说这个库怎么组织
+ * 一篇知识，右边说它怎么筛和读一篇论文。**不该显示某篇论文的结论**：
+ *
+ *   1. 那是二手结论。读者在这里看到的是一个数字（"在 QuALITY 上提升了
+ *      20 个点"），但没有上下文 —— 什么条件测的、代价是什么、谁还
+ *      复现过。断章取义的分数比不给更误导。
+ *   2. 它不稳定。哪篇被引用得多就显示哪篇，今天 RAPTOR、明天换一个，
+ *      读者两次看到的内容没有连续性。
+ *   3. 左边讲方法，右边讲某个具体结果，两边不对等。
+ *
+ * 所以这里放的是**管道自己的判断标准** —— 那五条铁律，以及去两万篇
+ * 里的入口。它和左边一样是长期的、可积累的。
+ */
+/* 首页那一行两块，一左一右：
+ *
+ *   左边 讲知识文章怎么写   —— 「每一篇都回答这四个问题」
+ *   右边 讲论文怎么读       —— 「论文只回答一个问题：它真的做到了吗」
+ *
+ * 两块对称：都是「方法 + 几个可检查的问题」，左边四条右边三条。
+ *
+ * 右边**不放具体论文的结论**。之前放的是某篇论文报的数字（"在 QuALITY 上
+ * 提升 20 个点"），那是二手结论 —— 没有条件、没有代价、没有复现，读者
+ * 拿它当判据会被误导。而且哪篇引用多就显示哪篇，今天这个明天那个。
+ * 放方法才稳定，也才和左边对等。
+ *
+ * 文案要求：说人话。"宁缺毋滥""分级投入""主流程瘦"这类是内部术语，
+ * 读者看不懂 —— 改成它实际做的事情。
+ */
 function homeQuotes(){
-  const zh=window.TKI18N?.lang!=='en';
-  const since=String(new Date().getFullYear()-2);
-  const pool=state.papers.filter(p=>(zh?p.result_zh:p.key_result)&&String(p.published||'')>=since);
-  pool.sort((a,b)=>(b.evidence_count+b.survey_count)-(a.evidence_count+a.survey_count)||String(b.published).localeCompare(String(a.published)));
-  const cards=pool.slice(0,3).map(p=>{
-    const text=zh?p.result_zh:p.key_result;
-    const first=(p.authors||[])[0]||'';
-    const who=first?first.split(' ').pop()+(zh?' 等':' et al.')+' · ':'';
-    return `<a class="quote-card" href="/paper?id=${esc(p.id)}" target="_blank" rel="noopener noreferrer"><b>${esc(text)}</b><span>${esc(who)}arXiv ${esc(p.id)} · ${esc(String(p.published).slice(0,4))}</span></a>`;
-  }).join('');
-  const lead=zh?'论文里的结论，原文怎么说':'What the papers actually reported';
-  const all=zh?'论文追踪':'Paper tracking';
-  const unit=zh?'篇':'papers';
-  return `<p class="claim-quotes-head">${esc(lead)} · <a href="/papers">${esc(all)} · ${state.papers.length} ${esc(unit)} →</a></p>${cards}`;
+  const zh = window.TKI18N?.lang !== 'en';
+  const t_ = (zhText, enText) => (zh ? zhText : enText);
+  // 三条判断，对应 知识库管理/方法/论文怎么追踪怎么解析.md 里的规则，
+  // 但用的是读者能懂的说法。
+  const rules = [
+    [t_('它能复现吗', 'Can it be reproduced?'),
+     t_('数字必须来自真实请求。编一个像样的指标比不给更糟', 'Numbers come from real requests')],
+    [t_('值得深读吗', 'Is it worth deep reading?'),
+     t_('绝大多数不值得。先判断价值，再决定花多少时间', 'Most are not. Judge value first')],
+    [t_('一篇坏了会影响别人吗', 'Does one failure spread?'),
+     t_('单篇失败不阻断整批，也不会污染已经收进来的', 'One bad item stays contained')],
+  ];
+  const list = rules.map(([name, note]) =>
+    `<li><b>${esc(name)}</b><i>——</i><span>${esc(note)}</span></li>`).join('');
+  const lead = t_('论文只回答一个问题：它真的做到了吗', 'Papers answer one question: did it actually work?');
+  const all = t_('论文追踪', 'Paper tracking');
+  const unit = t_('篇', 'papers');
+  return `<p class="claim-lead claim-lead--right">${esc(lead)}</p>
+    <ul class="claim-list claim-list--tight">${list}</ul>
+    <a class="claim-quotes-more" href="/papers">${esc(all)} · ${state.papers.length} ${esc(unit)} →</a>`;
 }
+
 function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const sourceCount=state.notes.reduce((n,x)=>n+((x.sources||[]).length),0);const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero hero--display"><div><h2>把技术原理读到能上手用</h2><p><b>${knowledgeCount}</b> <span>篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。写的都是能落到手上的东西：一个机制怎么运作、代价在哪、结论有没有实测支撑。</span></p></div><div class="hero-meta">${knowledgeCount} 篇 · ${sourceCount} 条来源</div></section><section class="claim-row"><section class="claim"><p class="claim-lead">每一篇都回答这四个问题</p><ul class="claim-list"><li><b>它为什么出现</b><i>——</i><span>之前卡在哪，没它的时候怎么办</span></li><li><b>它怎么运作</b><i>——</i><span>机制是什么，关键那一步发生了什么</span></li><li><b>它到底改变了什么</b><i>——</i><span>哪个数字动了，在什么条件下测的</span></li><li><b>什么时候不该用它</b><i>——</i><span>代价是什么，边界在哪</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱 →</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><div class="notice">想先看懂一个领域，从下面的卡片进去。想动手练，用学习工具。想知道系统到底有没有变好，看 Agent 评估。</div><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间顺序堆。Agent 相关的内容放在 AI 系统里，跟上下文、检索、质量放在一起。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="打开 ${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${state.notes.filter(n=>n.category===d&&n.topic!=='归档').length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自己写的评估项目放一边 —— 它回答"到底有没有变好"。别人开源的工程流程放另一边 —— 它提供现成的做法。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>图和源码是用来查关系的，不是主线。想顺着读就读，不想就跳过。</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图。</p><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口 →</a></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a></article></div></section>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});renderAtlas();applyHomeStatus();retranslate();loadDigest()}
 function bindSourceToggle(){
   const btn=document.querySelector('.source-toggle');

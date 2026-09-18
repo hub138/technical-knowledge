@@ -106,7 +106,17 @@ PROBE = r"""
     offenders: Array.from(new Set(offenders)).slice(0, 6)
   };
 
-  /* 2. The floating feedback button must not sit on text a reader needs. */
+  /* 2. The floating feedback button must not sit on text a reader needs.
+   *
+   * 只看**当前视口里真的可见**的元素。
+   *
+   * getBoundingClientRect 给的是元素在它滚动容器里的位置 —— 横向滚动列表
+   * 里被划到屏幕外的卡片，矩形仍然算在那条轨道上（实测 x=5376），于是
+   * 检测说"按钮压住了卡片标题"，而屏幕上根本没有那张卡片。
+   * 这不是布局问题，是检测没有把滚动偏移算进来。
+   *
+   * 判据换成：元素的矩形要落在视口内，而且没有被祖先的横向滚动推到外面。
+   */
   var fab = document.querySelector('.tk-fab');
   var covered = [];
   if(fab){
@@ -116,9 +126,27 @@ PROBE = r"""
       if(el.querySelector && el.querySelector('.tk-fab')) return;
       var b = el.getBoundingClientRect();
       if(b.width < 8 || b.height < 8) return;
+      // 只算视口内的：滑到屏幕外的内容不构成遮挡。
+      if(b.right <= 0 || b.left >= innerWidth) return;
+      if(b.bottom <= 0 || b.top >= innerHeight) return;
       if(b.right < fr.left || b.left > fr.right || b.bottom < fr.top || b.top > fr.bottom) return;
       var st = getComputedStyle(el);
       if(st.visibility === 'hidden' || st.display === 'none' || +st.opacity < 0.1) return;
+      /* 横向滚动容器里的元素不算 —— 它们在被划到之前不在屏幕上。
+       *
+       * 一个横向滚动的轨道，未滚到的卡片矩形落在轨道右侧（实测 x=5376），
+       * 恰好经过浮动按钮那块区域，于是被报成"按钮压住标题"。但读者
+       * 看不到那张卡片，也点不到它 —— 它不是遮挡。
+       *
+       * 反过来说：真正要防的是**静止内容**被压住，比如正文、表格、
+       * 纵向列表。那些不在滚动容器里，这条排除不影响它们被检测到。 */
+      var n = el.parentElement, inScroller = false;
+      while(n){
+        var ps = getComputedStyle(n);
+        if(ps.overflowX === 'auto' || ps.overflowX === 'scroll'){ inScroller = true; break; }
+        n = n.parentElement;
+      }
+      if(inScroller) return;
       var ownText = [].some.call(el.childNodes, function(n){
         return n.nodeType === 3 && n.textContent.trim();
       });
@@ -171,6 +199,15 @@ PROBE = r"""
   document.querySelectorAll('*').forEach(function(el){
     var st = getComputedStyle(el);
     if(st.overflowY === 'auto' || st.overflowY === 'scroll' || st.overflowY === 'visible') return;
+    /* 多行截断（-webkit-line-clamp）是有意的排版：摘要限定两行，
+       超出部分隐去。它必然让 scrollHeight 大于 clientHeight，但这
+       不是缺陷 —— 是设计。用 data-clamp 显式声明，审计跳过。
+       这个属性同时也是一份记录：写明"这里是有意截断的"，
+       避免后来者以为是 bug 去修。 */
+    if(el.hasAttribute('data-clamp')) return;
+    /* object-fit: cover 同理 —— 封面图按容器比例裁切是有意的，
+       必然让图片的固有尺寸和显示盒不一致。用 data-crop 声明。 */
+    if(el.hasAttribute('data-crop')) return;
     if(el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 4) clipped.push(label(el));
   });
   out.clipped = Array.from(new Set(clipped)).slice(0, 6);
