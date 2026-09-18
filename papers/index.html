@@ -317,7 +317,7 @@
       <section class="hero">
         <div class="eyebrow">PAPERS · 追踪与解析</div>
         <h1>追踪新论文</h1>
-        <p>按发布时间倒序，每篇给出它解决的问题、做法，以及摘要里写明的量化结果。结果一栏只收录论文自己报出的数字，摘不出来就留空，不替它总结；2024 年前的论文收在「历史奠基」里，需要时展开。</p>
+        <p>按时间倒序。每篇给出它解决的问题、做法，以及论文自己报出的数字——摘要里没写的就留空。2024 年前的收在「历史奠基」里。</p>
       </section>
 
       <div class="paper-toolbar">
@@ -367,6 +367,12 @@
           + `${esc(tr("筛选与解析方法"))}</a>`;
       }
 
+      /* 历史奠基的论文只给「解决的问题」和「做法」，不给「关键结果」。
+       *
+       * 理由：关键结果是给"这篇值不值得跟进"用的，而 2024 年前的论文要么已经
+       * 变成常识进了教科书，要么已经被后来的工作超越 —— 它的 2017 年数字对今天
+       * 没有决策价值，摆在列表里只是噪音。解决的问题和做法不过时，留下。
+       */
       function l1(paper) {
         const rows = [];
         const problem = fieldOf(paper, "problem");
@@ -374,7 +380,9 @@
         const result = fieldOf(paper, "key_result");
         if (problem) rows.push(`<div><dt>${esc(tr("解决的问题"))}</dt><dd>${esc(problem)}</dd></div>`);
         if (approach) rows.push(`<div><dt>${esc(tr("做法"))}</dt><dd>${esc(approach)}</dd></div>`);
-        if (result) rows.push(`<div><dt>${esc(tr("关键结果"))}</dt><dd class="result">${esc(result)}</dd></div>`);
+        if (result && !isFoundational(paper)) {
+          rows.push(`<div><dt>${esc(tr("关键结果"))}</dt><dd class="result">${esc(result)}</dd></div>`);
+        }
         return rows.length ? `<dl class="l1">${rows.join("")}</dl>` : "";
       }
 

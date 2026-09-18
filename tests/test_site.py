@@ -975,5 +975,206 @@ class NavigationContractTests(unittest.TestCase):
         self.assertIn("location.replace(safeNext)", SERVER_MODULE.LOGIN_HTML)
 
 
+FEEDS_SPEC = importlib.util.spec_from_file_location(
+    "knowledge_site_feeds", ROOT / "site" / "feeds.py"
+)
+FEEDS_MODULE = importlib.util.module_from_spec(FEEDS_SPEC)
+assert FEEDS_SPEC.loader is not None
+FEEDS_SPEC.loader.exec_module(FEEDS_MODULE)
+
+
+class FeedTests(unittest.TestCase):
+    """外部源抓取：清洗、链接、编码、解析、失败隔离。
+
+    这些测试**完全不碰网络** —— 外部站抖一下就让测试变红，那种测试没人会信。
+    只测纯函数，以及在空缓存下返回结构的形状。
+    """
+
+    RSS_SAMPLE = """<?xml version="1.0" encoding="utf-8"?>
+    <rss version="2.0"><channel><title>Readhub</title>
+      <item>
+        <title>某公司发布某产品</title>
+        <link>https://readhub.cn/topic/abc</link>
+        <description>&lt;p&gt;摘要里的&lt;b&gt;正文&lt;/b&gt;内容&lt;/p&gt;</description>
+        <pubDate>Fri, 18 Sep 2026 04:31:23 GMT</pubDate>
+      </item>
+      <item>
+        <title>第二条</title>
+        <link>/topic/relative</link>
+        <description>纯文本摘要</description>
+        <pubDate>Thu, 17 Sep 2026 10:00:00 GMT</pubDate>
+      </item>
+    </channel></rss>"""
+
+    ATOM_SAMPLE = """<?xml version="1.0" encoding="utf-8"?>
+    <feed xmlns="http://www.w3.org/2005/Atom">
+      <entry>
+        <title>周刊第 412 期</title>
+        <link rel="alternate" href="http://example.com/blog/412.html"/>
+        <summary>这里记录每周值得分享的内容。</summary>
+        <published>2026-09-11T00:11:50Z</published>
+        <updated>2026-09-18T10:18:41Z</updated>
+      </entry>
+    </feed>"""
+
+    def test_clean_text_drops_script_content(self) -> None:
+        """script/style 要连**内容**一起丢。
+
+        只剥标签的话 `<script>alert(1)</script>` 会留下 `alert(1)` 这段文本，
+        虽然不可执行，但会混进摘要里冒充正文。
+        """
+        result = FEEDS_MODULE.clean_text(
+            "<script>alert('xss')</script><style>.a{color:red}</style><p>真正的正文</p>"
+        )
+        self.assertIn("真正的正文", result)
+        self.assertNotIn("alert", result)
+        self.assertNotIn("color:red", result)
+
+    def test_clean_text_strips_all_tags(self) -> None:
+        result = FEEDS_MODULE.clean_text('<a href="x">链接文字</a><div>块级</div>')
+        self.assertNotIn("<", result)
+        self.assertIn("链接文字", result)
+        self.assertIn("块级", result)
+
+    def test_clean_text_survives_malformed_html(self) -> None:
+        """畸形输入返回空串，不能抛 —— 一个坏页面不该让整个源失败。"""
+        for bad in ("<p>未闭合", "</unopened>", "<a href='>'>", ""):
+            self.assertIsInstance(FEEDS_MODULE.clean_text(bad), str)
+
+    def test_clean_text_truncates(self) -> None:
+        result = FEEDS_MODULE.clean_text("字" * 500, limit=50)
+        self.assertLessEqual(len(result), 51)  # 50 + 省略号
+        self.assertTrue(result.endswith("…"))
+
+    def test_absolute_url_rewrites_relative(self) -> None:
+        self.assertEqual(
+            FEEDS_MODULE.absolute_url("/foo", "https://x.com/blog/"),
+            "https://x.com/foo",
+        )
+        self.assertEqual(
+            FEEDS_MODULE.absolute_url("a/b", "https://x.com/blog/"),
+            "https://x.com/blog/a/b",
+        )
+
+    def test_absolute_url_rejects_dangerous_schemes(self) -> None:
+        """协议白名单是必需的：urljoin 不拦 javascript:，原样进 href 就在本站执行。"""
+        for bad in (
+            "javascript:alert(1)",
+            "data:text/html,<script>alert(1)</script>",
+            "vbscript:x",
+            "file:///etc/passwd",
+        ):
+            self.assertEqual(FEEDS_MODULE.absolute_url(bad, "https://x.com/"), "", bad)
+
+    def test_decode_body_prefers_declared_charset(self) -> None:
+        raw = "中文内容".encode("gbk")
+        self.assertEqual(FEEDS_MODULE.decode_body(raw, "text/html; charset=gbk"), "中文内容")
+
+    def test_decode_body_falls_back_to_utf8(self) -> None:
+        self.assertEqual(
+            FEEDS_MODULE.decode_body("中文内容".encode("utf-8"), "text/html"), "中文内容"
+        )
+
+    def test_decode_body_never_raises_on_broken_bytes(self) -> None:
+        self.assertIsInstance(FEEDS_MODULE.decode_body(b"\xff\xfe\x00bad", ""), str)
+
+    def test_parse_rss(self) -> None:
+        items, error = FEEDS_MODULE.parse_xml_feed(self.RSS_SAMPLE, "https://readhub.cn/rss")
+        self.assertEqual(error, "")
+        self.assertEqual(len(items), 2)
+        self.assertEqual(items[0]["title"], "某公司发布某产品")
+        self.assertEqual(items[0]["url"], "https://readhub.cn/topic/abc")
+        self.assertIn("正文", items[0]["summary"])
+        self.assertNotIn("<b>", items[0]["summary"])
+        # 相对链接要补成绝对，否则点了会打到本站。
+        self.assertEqual(items[1]["url"], "https://readhub.cn/topic/relative")
+
+    def test_parse_atom_prefers_published_over_updated(self) -> None:
+        """`updated` 是 feed 重新生成的时间，不是文章日期。
+
+        实测阮一峰的 Atom 里 413 期和 411 期的 updated 都是今天，
+        按 updated 排会出现 413、411、412 这种乱序。
+        """
+        items, error = FEEDS_MODULE.parse_xml_feed(self.ATOM_SAMPLE, "http://example.com/blog/atom.xml")
+        self.assertEqual(error, "")
+        self.assertEqual(len(items), 1)
+        self.assertTrue(items[0]["published"].startswith("2026-09-11"), items[0]["published"])
+
+    def test_parse_xml_reports_bad_input(self) -> None:
+        _, error = FEEDS_MODULE.parse_xml_feed("not xml at all", "https://x.com/")
+        self.assertEqual(error, "parse_error")
+
+    def test_html_parser_missing_container_reports_selector_missing(self) -> None:
+        """选择器失效必须报错，不能当成「今天没更新」。
+
+        抓到 200 但解不出条目时，代码是「成功」的，items 为空 ——
+        如果报 empty，站方改版就会静默变成空列表，没人会去修。
+        """
+        items, error = FEEDS_MODULE.parse_arxivdaily("<html>完全不同的页面</html>", "https://x.com/")
+        self.assertEqual(items, [])
+        self.assertEqual(error, "selector_missing")
+
+    def test_source_failure_does_not_break_others(self) -> None:
+        """一个源抛异常，其余源必须照常返回。"""
+        original = FEEDS_MODULE.fetch_one
+        calls: list[str] = []
+
+        def fake(source: dict) -> tuple[list[dict], str]:
+            calls.append(source["key"])
+            if source["key"] == "readhub":
+                return [], "unreachable"
+            return ([{"title": "t", "url": "https://x.com/a", "summary": "", "published": ""}], "")
+
+        FEEDS_MODULE.fetch_one = fake
+        try:
+            FEEDS_MODULE._refresh_all()
+        finally:
+            FEEDS_MODULE.fetch_one = original
+            FEEDS_MODULE._CACHE.clear()
+
+        self.assertIn("readhub", calls)
+        # 每个源都被尝试过，没有因为第一个失败就中断。
+        self.assertGreaterEqual(len(calls), 5)
+
+    def test_snapshot_exposes_no_html_field(self) -> None:
+        """守着一个安全属性：响应里不能有 HTML 字段。
+
+        外部 HTML 一旦有字段承载，前端就得靠「记得转义」来兜；
+        让它根本不存在，XSS 面就从源头没了。有人以后想加回原始字段时这条会红。
+        """
+        payload = FEEDS_MODULE.snapshot()
+        allowed = {"title", "url", "summary", "published"}
+        for source in payload["sources"]:
+            for item in source["items"]:
+                self.assertTrue(
+                    set(item) <= allowed,
+                    f"{source['key']} 的条目出现了越界字段: {set(item) - allowed}",
+                )
+
+    def test_snapshot_marks_bestblogs_unavailable(self) -> None:
+        """BestBlogs 抓不到（JS 渲染 + 需登录），但必须在响应里出现。
+
+        删掉的话前端就不知道有这么个源需要解释，而用户要的正是「说清为什么做不到」。
+        """
+        payload = FEEDS_MODULE.snapshot()
+        by_key = {s["key"]: s for s in payload["sources"]}
+        self.assertIn("bestblogs", by_key)
+        self.assertEqual(by_key["bestblogs"]["status"], "unavailable")
+        self.assertEqual(by_key["bestblogs"]["reason"], "login_required")
+
+    def test_snapshot_covers_every_declared_source(self) -> None:
+        payload = FEEDS_MODULE.snapshot()
+        self.assertEqual(
+            {s["key"] for s in payload["sources"]},
+            {s["key"] for s in FEEDS_MODULE.FEEDS},
+        )
+
+    def test_feeds_declare_a_known_kind(self) -> None:
+        for source in FEEDS_MODULE.FEEDS:
+            self.assertIn(source["kind"], {"rss", "atom", "html", "none"}, source["key"])
+            self.assertTrue(source["url"].startswith("https://"), source["key"])
+            self.assertIn("ttl", source)
+
+
 if __name__ == "__main__":
     unittest.main()

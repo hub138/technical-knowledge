@@ -16,6 +16,7 @@ import re
 import secrets
 import socket
 import subprocess
+import sys
 import threading
 import time
 from http.cookies import SimpleCookie
@@ -24,6 +25,11 @@ from urllib.parse import parse_qs, quote, unquote, urlsplit
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+# 同目录的兄弟模块。用显式路径插入而不是相对导入：server.py 会被
+# `python3 site/server.py` 直接跑，那时它不在包上下文里，相对导入会失败。
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import feeds  # noqa: E402  （必须在 sys.path 调整之后）
 
 
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]")
@@ -1765,6 +1771,19 @@ class Handler(BaseHTTPRequestHandler):
                 # simply does not show the pin.
                 "method": PAPER_METHOD_NOTE,
             })
+            return
+        if path == "/api/feeds":
+            # 外部源的最新几条，给 /sources 页面就地显示。
+            #
+            # 这里**只读缓存，不发任何网络请求** —— 返回时间恒定在毫秒级。
+            # 快照过期时 feeds.snapshot 会起一个后台线程去刷，不阻塞本次请求。
+            # 冷启动（完全没有缓存）时它会在内部等最多几秒，否则第一个访客
+            # 必然看到空列表。
+            #
+            # ?refresh=1 只是"立刻检查有没有新数据"，仍然不同步抓 ——
+            # 做成同步抓就等于把访客变成打向外部站的触发器。
+            force = query.get("refresh", ["0"])[0] == "1"
+            self.send_json(feeds.snapshot(force=force))
             return
         if path == "/api/paper":
             self.vault.refresh()

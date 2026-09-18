@@ -33,6 +33,9 @@ ROOT = Path(__file__).resolve().parents[1]
 # Every file that can reference a custom property.
 SOURCES = [
     "index.html",
+    "papers/index.html",
+    "papers/paper.html",
+    "sources/index.html",
     "projects/index.html",
     "site/insights.html",
     "apps/learning/index.html",

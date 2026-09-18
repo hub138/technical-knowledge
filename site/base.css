@@ -372,17 +372,29 @@ body.tk-host a:hover { text-decoration: none; }
  * /projects and /learn read as two different products that happen to share a
  * sidebar.
  *
- * The claim is the largest type on the page and it is the only place that
- * size appears. If everything is emphasised, nothing is.
+ * 字号分两档，不要再混：
+ *   .hero h1/h2     页面主标题，用 --text-3xl（32px），和首页的
+ *                   「把技术原理读到能上手用」同一个量级。列表页、导航页
+ *                   用它 —— 一个标题占半屏是错的，屏幕该留给内容。
+ *   .hero--display  只给首页的主张句用。--text-display 是 clamp(38px,5.2vw,66px)，
+ *                   全站只有这一处出现。原来这条规则套在所有 .hero 上，
+ *                   结果 /papers、/sources、/projects 的标题全是 66px，
+ *                   比首页还大 —— 把「唯一的最大字号」变成了默认值。
  */
 .hero h1,
 .hero h2 {
   max-width: 30ch;
+  font-size: var(--text-3xl);
+  line-height: 1.25;
+  font-weight: var(--weight-bold);
+  text-wrap: balance;
+}
+
+.hero--display h1,
+.hero--display h2 {
   font-size: var(--text-display);
   line-height: var(--leading-display);
   letter-spacing: var(--tracking-display);
-  font-weight: var(--weight-bold);
-  text-wrap: balance;
 }
 
 .hero p {
@@ -891,7 +903,9 @@ body.tk-host button {
   }
 
   .tk-shell > .hero:first-child { padding: 30px 0 23px; }
-  .hero h1 { font-size: 29px; line-height: 1.22; }
+  /* 只有首页的主张句在手机上要单独收一档。其余页面走 --text-3xl，
+     它在小屏本来就够小（clamp 的下界 26px），不用再覆盖。 */
+  .hero--display h1 { font-size: 29px; line-height: 1.22; }
   .purpose { margin-top: 18px; }
 
   .tk-theme-toggle--fixed {

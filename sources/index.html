@@ -28,7 +28,7 @@
        * 用户对资讯类的原话是「不算知识」「放在最后吧」，所以它单独一组、
        * 视觉上也更轻（没有 gain 的长段落）。
        */
-      .src-group { margin-top: var(--space-7); }
+      .src-group { margin-top: var(--space-8); }
       .src-group:first-of-type { margin-top: var(--space-5); }
       .src-group > h2 {
         display: flex;
@@ -115,6 +115,80 @@
         .src-card { padding: var(--space-4); }
         .src-head a { font-size: var(--text-md); }
       }
+
+      /* ── 卡片下方的最新几条 ────────────────────────────────────────────
+       *
+       * 这是「把他们的东西显示进来」那部分。取回的是服务端剥好的纯文本，
+       * 这里只负责排版 —— 外部 HTML 一个字都不进 innerHTML。
+       *
+       * 失败时**不隐藏卡片**：卡片本身是入口，入口永远可用；
+       * 只有这个「最新几条」的窗口会说读不到。入口是主，内容是附。
+       */
+      .src-feed { margin-top: var(--space-2); border-top: 1px solid var(--color-line); }
+      .src-feed > summary {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: var(--space-2) 0 0;
+        color: var(--color-muted);
+        font-size: var(--text-small);
+        cursor: pointer;
+        list-style: none;
+      }
+      .src-feed > summary::-webkit-details-marker { display: none; }
+      .src-feed > summary::before {
+        content: "▸";
+        flex: none;
+        transition: transform var(--duration-fast) var(--ease-out);
+      }
+      .src-feed[open] > summary::before { transform: rotate(90deg); }
+      .src-feed > summary:hover { color: var(--color-ink); }
+      .src-feed-when { color: var(--color-faint); }
+
+      .src-feed-body { padding: var(--space-2) 0 0; }
+      .src-feed-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-3); }
+      .src-feed-list li { display: grid; gap: 2px; }
+      .src-feed-title {
+        color: var(--color-ink);
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
+        line-height: 1.5;
+      }
+      .src-feed-title:hover { color: var(--color-accent); }
+      .src-feed-title::after {
+        content: " ↗";
+        color: var(--color-muted);
+        font-weight: var(--weight-normal);
+      }
+      .src-feed-meta { color: var(--color-faint); font-size: var(--text-xs); }
+      .src-feed-sum {
+        margin: 0;
+        color: var(--color-muted);
+        font-size: var(--text-small);
+        line-height: 1.7;
+      }
+      .src-feed-state { margin: 0; color: var(--color-muted); font-size: var(--text-small); }
+      .src-feed-state--bad { color: var(--color-warm-ink); }
+
+      /* 页面级刷新，不是每张卡一个 —— 六张卡各配一个按钮是噪音。 */
+      .src-tools {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        margin-top: var(--space-4);
+      }
+      .src-refresh {
+        padding: 5px 12px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-sm);
+        background: var(--color-panel);
+        color: var(--color-ink-soft);
+        font-size: var(--text-small);
+        cursor: pointer;
+      }
+      .src-refresh:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      .src-refresh[disabled] { opacity: 0.55; cursor: default; }
+      .src-updated { color: var(--color-faint); font-size: var(--text-xs); }
     </style>
   </head>
   <body class="tk-host">
@@ -122,9 +196,14 @@
     <div class="tk-shell">
       <section class="hero">
         <div class="eyebrow">SOURCES · 外部资源</div>
-        <h1>别人做得更好的地方</h1>
-        <p id="src-intro">这一页不重复造已经有人做好的东西。每个站都写清它补了什么、什么情况下该去那里而不是留在这里 —— 与其在本地做一个更差的版本，不如把入口放好。</p>
+        <h1>值得订阅的源</h1>
+        <p id="src-intro">论文、文章和资讯的常读源，各自列出最新几条。点标题回原站看全文。</p>
       </section>
+
+      <div class="src-tools">
+        <button type="button" class="src-refresh" id="src-refresh">刷新</button>
+        <span class="src-updated" id="src-updated"></span>
+      </div>
 
       <div id="src-groups"></div>
     </div>
@@ -146,6 +225,15 @@
 
       function card(item, light) {
         const tags = (lang() === "en" && item.en && item.en.tags ? item.en.tags : item.tags) || [];
+        // 有 key 才配 feed 槽。播客（key 为空）没有可抓的文字列表。
+        // 初始 hidden，由 loadFeeds 拿到数据后移除 —— 这样 JS 或接口挂了，
+        // 页面就退化成纯导航页，不会留下一个永远转圈的框。
+        const feed = item.key
+          ? `<details class="src-feed" data-feed="${esc(item.key)}" hidden>
+               <summary>${esc(tr("最新几条"))}</summary>
+               <div class="src-feed-body"></div>
+             </details>`
+          : "";
         return `<article class="src-card${light ? " src-card--light" : ""}">
           <div class="src-head">
             <a href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">${esc(pick(item, "name"))}</a>
@@ -153,6 +241,7 @@
           </div>
           <p class="src-gain">${esc(pick(item, "gain"))}</p>
           ${tags.length ? `<div class="src-tags">${tags.map((t) => `<i>${esc(t)}</i>`).join("")}</div>` : ""}
+          ${feed}
         </article>`;
       }
 
@@ -181,7 +270,132 @@
       document.addEventListener("DOMContentLoaded", render);
       // 切语言后整页重画：卡片里的 name/gain/tags 是按语言直接取的，
       // translateDOM 扫不到它们，不重画就会留下上一种语言的残页。
-      document.addEventListener("tk:lang", render);
+      document.addEventListener("tk:lang", () => { render(); paintFeeds(); });
+
+      /* ── 外部源的最新几条 ──────────────────────────────────────────────
+       *
+       * 内容是服务端剥好的纯文本（feeds.py 里已剥标签），这里再 esc 一遍是
+       * 纵深防御 —— 外部 HTML 一个字都不进 innerHTML。
+       *
+       * 加载策略是一次请求拿全部，不做六张卡各发一个请求：那样只有一个来源
+       * 变慢就各自等待，还多出六个失败点。后端读缓存是毫秒级，所以不存在
+       * 「六个站要等最慢的那个」的问题。
+       */
+      const feedState = { payload: null, timer: null, retries: 0 };
+
+      function relativeTime(iso) {
+        if (!iso) return "";
+        const then = Date.parse(iso);
+        if (Number.isNaN(then)) return "";
+        const seconds = Math.round((then - Date.now()) / 1000);
+        const units = [
+          ["year", 31536000], ["month", 2592000], ["day", 86400],
+          ["hour", 3600], ["minute", 60],
+        ];
+        // Intl 中英文都能给出正确语序，比拼接「更新于 X 分钟前」稳。
+        // 它不可用时回退到一句整话，不用拼接 —— 中文的「前」在数字后、
+        // 英文的 "ago" 也在数字后，但别的语言未必。
+        try {
+          const fmt = new Intl.RelativeTimeFormat(lang() === "en" ? "en" : "zh", { numeric: "auto" });
+          for (const [unit, span] of units) {
+            if (Math.abs(seconds) >= span) return fmt.format(Math.round(seconds / span), unit);
+          }
+          return fmt.format(seconds, "second");
+        } catch {
+          return "";
+        }
+      }
+
+      function feedEntry(source) {
+        const items = source.items || [];
+        // 三种不同状态必须区分开，否则「选择器失效」会伪装成「今天没更新」。
+        if (source.status === "unavailable") {
+          // 这一站抓不到，但别只说「抓不到」——那是个死胡同。
+          // 说清为什么 + 你现在能做什么，比一句错误提示有用。
+          return `<p class="src-feed-state">${esc(tr("它的内容在登录后才看得到，抓不到。点上面的站名进去，登录一次就能自己选要跟哪些号。"))}</p>`;
+        }
+        // 「还没轮到它」和「抓过了但没有内容」是两件事。
+        // 混在一起的话，冷启动时几个空框会显示成「暂时没有新内容」——
+        // 那是对外部站做了个错误的断言。
+        if (source.status === "pending") {
+          return `<p class="src-feed-state">${esc(tr("正在读取…"))}</p>`;
+        }
+        if (source.error || source.status === "selector_missing") {
+          return `<p class="src-feed-state src-feed-state--bad">${esc(tr("这一站暂时读不到，入口仍然可用。"))}</p>`;
+        }
+        if (!items.length) {
+          return `<p class="src-feed-state">${esc(tr("暂时没有新内容。"))}</p>`;
+        }
+        return `<ul class="src-feed-list">${items.map((item) => `
+          <li>
+            <a class="src-feed-title" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">${esc(item.title)}</a>
+            ${item.published ? `<span class="src-feed-meta">${esc(relativeTime(item.published))}</span>` : ""}
+            ${item.summary ? `<p class="src-feed-sum">${esc(item.summary)}</p>` : ""}
+          </li>`).join("")}</ul>`;
+      }
+
+      function paintFeeds() {
+        const payload = feedState.payload;
+        if (!payload) return;
+        const byKey = {};
+        (payload.sources || []).forEach((s) => { byKey[s.key] = s; });
+        document.querySelectorAll(".src-feed").forEach((node) => {
+          const source = byKey[node.dataset.feed];
+          if (!source) return;
+          node.hidden = false;
+          // 默认展开：用户要看的就是这个。折叠是给他收起的选项，不是初始状态。
+          node.open = true;
+          node.querySelector(".src-feed-body").innerHTML = feedEntry(source);
+        });
+        const updated = $("#src-updated");
+        if (updated && payload.fetched_at) {
+          // 刚刷新完时 RelativeTimeFormat 会给出「现在」，「更新于 现在」读起来很别扭。
+          // 一分钟内就直说，不绕这一道。
+          const ago = Date.now() - payload.fetched_at * 1000;
+          updated.textContent = ago < 60000
+            ? tr("刚刚更新")
+            : `${tr("更新于")} ${relativeTime(new Date(payload.fetched_at * 1000).toISOString())}`;
+        }
+      }
+
+      async function loadFeeds(force) {
+        try {
+          const response = await fetch(`/api/feeds${force ? "?refresh=1" : ""}`, { cache: "no-store" });
+          if (!response.ok) throw new Error("unavailable");
+          feedState.payload = await response.json();
+        } catch {
+          // 接口读不到就保持卡片原样，不显示错误 —— 入口本身还能用。
+          return;
+        }
+        paintFeeds();
+        /* 还有源在读就再等一轮。
+         *
+         * 后端全量刷新实测约 40s（PaperNotes 的 sitemap 一个就 30s），而首个
+         * 请求只等 4 秒就返回了，所以展开页面时通常还有几个框是「正在读取」。
+         * 隔 5 秒补一次，最多补 8 次（约 40 秒）覆盖整轮 —— 比只重试一次好，
+         * 否则慢的那几个源要等用户手动刷新才出现。
+         *
+         * 上限是必需的：没有上限的话，某个源一直失败就会无限轮询。
+         */
+        const stillPending = (feedState.payload.sources || [])
+          .some((s) => s.status === "pending");
+        if (stillPending && feedState.retries < 8) {
+          feedState.retries += 1;
+          clearTimeout(feedState.timer);
+          feedState.timer = setTimeout(() => loadFeeds(false), 5000);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => loadFeeds(false));
+      $("#src-refresh")?.addEventListener("click", async (event) => {
+        const button = event.currentTarget;
+        button.disabled = true;
+        button.textContent = tr("正在读取…");
+        feedState.retries = 0;
+        await loadFeeds(true);
+        button.disabled = false;
+        button.textContent = tr("刷新");
+      });
     </script>
   </body>
 </html>

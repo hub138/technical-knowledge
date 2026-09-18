@@ -1,0 +1,812 @@
+"""取回外部源的最新几条，供 /sources 页面就地显示。
+
+## 为什么是这个形态
+
+用户的原话：「不是抓进来 是直接给个入口 一个页面框 把他们的东西 直接显示进来
+不就行吗 直接 curl那种？」所以要做的是**服务端取回 + 本站样式重排**，
+不是 iframe 嵌原站（实测 bestblogs 的 CSP 是 `frame-ancestors 'none'`、
+ruanyifeng 是 `X-Frame-Options: SAMEORIGIN`，用户最看重的两个站恰好禁止嵌入），
+也不是整页镜像。
+
+三条硬边界，后面每个决策都从这儿推：
+  1. 只显示标题 + 摘要 + 时间，**不显示正文**。搬运正文就从「入口」滑向「镜像」了，
+     而用户明确说了「不是抓进来」。摘要只用源自己给的 description/summary。
+  2. 永远不白屏。外部站挂了，卡片照常渲染，只是那一条窗口说读不到。
+  3. 不能拖垮本站。server 是 ThreadingHTTPServer，现抓会让慢源占住请求线程。
+
+## 所以是「缓存 + 过期重抓 + 后台预热」
+
+`/api/feeds` 只读内存/磁盘快照，**零网络请求**，毫秒级返回。过期时不阻塞本次请求，
+起一个后台线程去刷。这不只是性能选择 —— 如果请求时现抓，那就是**每个访客触发一轮对外抓取**，
+等于把本站变成打向外部站的反射放大器；PaperNotes 的 `Crawl-delay: 1` 还会让 6 源串行
+最坏跑到 8-10 秒，把请求线程占满。
+
+## 抓取礼貌
+
+各站 robots.txt 实测（2026-09-18）：
+  readhub.cn      Content-Signal: ai-train=no, search=yes, ai-input=no；/rss 允许
+  papernotes.org  Allow: / 且 **Crawl-delay: 1** —— 必须限速
+  arxivdaily.com  Disallow: /*? 但 Allow: /topics$ /topics/ 等
+  zeli.app        Allow: /，Disallow /api/ /debug/
+  ruanyifeng.com  robots.txt 为空
+
+注意 `ai-input=no`/`ai-train=no` 是针对训练和 AI 输入的。我们做的是「给人看」，
+落在 `search=yes` 一侧。**将来若想把抓来的内容喂给模型，就触碰了这条 —— 不要那么做。**
+"""
+
+from __future__ import annotations
+
+import html
+import json
+import os
+import re
+import threading
+import time
+import urllib.error
+import urllib.request
+import xml.etree.ElementTree as ET
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
+from html.parser import HTMLParser
+from pathlib import Path
+from urllib.parse import urljoin, urlsplit
+
+REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
+
+# 反馈与访问日志也落在这里；内容性质相同 —— 运行时数据，不该进版本库。
+DATA_HOME = Path(os.environ.get("KNOWLEDGE_DATA_HOME") or REPOSITORY_ROOT / "data")
+CACHE_FILE = DATA_HOME / "feeds-cache.json"
+
+# 带可识别的身份和联系方式是礼貌抓取的标准做法，照 scripts/fetch-paper-text.py 的写法。
+USER_AGENT = (
+    "technical-knowledge/1.0 (source preview; "
+    "+https://github.com/hub138/technical-knowledge)"
+)
+TIMEOUT = 8.0
+# 单源下载上限。2MB 对绝大多数页面都够，但 PaperNotes 的 sitemap 实测 5.7MB ——
+# 所以按源可覆盖（见 FEEDS 里的 max_bytes）。上限的意义是防止误抓到大文件，
+# 不是省流量，所以给足余量比卡得刚好更合适。
+MAX_BYTES = 2 * 1024 * 1024
+
+ATOM_NS = {"a": "http://www.w3.org/2005/Atom"}
+
+
+# ── 源定义 ────────────────────────────────────────────────────────────────────
+#
+# 声明式。加源只改这里，解析器按 kind 分发。
+#
+# ttl 按内容性质定，不是拍脑袋：ReadHub/zeli 是当天热点，15 分钟；
+# 阮一峰是周刊，1 小时；论文站的增补是批量导入，30-60 分钟。
+FEEDS: list[dict] = [
+    {
+        "key": "readhub",
+        "group": "news",
+        "kind": "rss",
+        "url": "https://readhub.cn/rss",
+        "link": "https://readhub.cn/hot",
+        "ttl": 900,
+        "limit": 5,
+        "delay": 0.0,
+    },
+    {
+        "key": "ruanyifeng",
+        "group": "reading",
+        "kind": "atom",
+        "url": "https://www.ruanyifeng.com/blog/atom.xml",
+        "link": "https://www.ruanyifeng.com/blog/index.html",
+        "ttl": 3600,
+        "limit": 5,
+        "delay": 0.0,
+    },
+    {
+        "key": "papernotes",
+        "group": "papers",
+        "kind": "html",
+        # 首页没有论文列表，取 sitemap（robots: Allow: / 且 Crawl-delay: 1）。
+        "url": "https://papernotes.org/sitemap.xml",
+        "link": "https://papernotes.org/",
+        "ttl": 3600,
+        "limit": 5,
+        # sitemap 实测 5.7MB，默认 2MB 上限会把它挡掉（第一版就报 too_large）。
+        "max_bytes": 12 * 1024 * 1024,
+        # 而且实测下载要 15.4s，默认 8s 超时会报 unreachable（第二版踩到）。
+        # 它的 ttl 是一小时，抓得慢一点无所谓 —— 反正在后台线程里。
+        "timeout": 45.0,
+        # robots.txt 明确写了 Crawl-delay: 1。只在后台线程里 sleep，不影响访客。
+        # 这个源还要逐页补标题，所以每条之间也会 sleep 同样的间隔。
+        "delay": 1.0,
+    },
+    {
+        "key": "arxivdaily",
+        "group": "papers",
+        "kind": "html",
+        # robots: Allow: /$ —— 用首页，论文列表在那儿。
+        # 实测 /topics 只是子领域目录（列的是分类说明不是论文），所以不抓它。
+        "url": "https://www.arxivdaily.com/",
+        "link": "https://www.arxivdaily.com/",
+        "ttl": 1800,
+        "limit": 5,
+        "max_bytes": 4 * 1024 * 1024,
+        "delay": 0.0,
+    },
+    {
+        "key": "zeli",
+        "group": "news",
+        "kind": "html",
+        "url": "https://zeli.app/zh",
+        "link": "https://zeli.app/zh",
+        "ttl": 900,
+        "limit": 5,
+        "delay": 0.0,
+    },
+    {
+        # BestBlogs 保留条目但 kind=none。删掉的话前端就不知道有这么个源需要解释，
+        # 而用户要的正是「说清为什么做不到」。
+        #
+        # 实测为什么抓不到：156KB 的 HTML 只有 55 个字符可见文本，
+        # `_next/static` 出现 259 次但没有 `__NEXT_DATA__` —— 纯客户端渲染；
+        # 而且这个页面叫「我的关注」，本身要登录。不做 headless 抓取：
+        # 那是滥用，抓回来也还是登录墙。
+        "key": "bestblogs",
+        "group": "reading",
+        "kind": "none",
+        "url": "https://www.bestblogs.dev/reading/follow",
+        "link": "https://www.bestblogs.dev/reading/follow",
+        "ttl": 0,
+        "limit": 0,
+        "delay": 0.0,
+        "reason": "login_required",
+    },
+]
+
+BY_KEY = {source["key"]: source for source in FEEDS}
+
+
+# ── 清洗：外部 HTML 绝不进 innerHTML ──────────────────────────────────────────
+#
+# 这是整个模块的安全核心。做法是让**响应里根本不存在 HTML 字段** ——
+# 从源头消灭 XSS 面，而不是靠前端「记得转义」。前端还会再 esc 一次，那是纵深防御。
+
+
+class _TextOnly(HTMLParser):
+    """只收可见文本。
+
+    关键是 script/style **连内容一起丢**。单纯用正则 `<[^>]+>` 剥标签的话，
+    `<script>alert(1)</script>` 会留下 `alert(1)` 这段文本 —— 虽然已经不是可执行代码，
+    但脏数据会混进摘要，看起来像正文的一部分。
+
+    也不用 `re.sub(r"<[^>]*>", "", ...)`：属性里出现 `>` 就能骗过它。
+    HTMLParser 是有状态的，遇到畸形标签不会误判。
+    """
+
+    SKIP = {"script", "style", "noscript", "template"}
+    BLOCK = {"p", "br", "div", "li", "h1", "h2", "h3", "h4", "tr", "section", "article"}
+
+    def __init__(self) -> None:
+        # convert_charrefs=True 让 &amp; 变成 &，拿到的才是真文本。
+        super().__init__(convert_charrefs=True)
+        self.parts: list[str] = []
+        self._skip_depth = 0
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        if tag in self.SKIP:
+            self._skip_depth += 1
+        elif tag in self.BLOCK:
+            self.parts.append(" ")
+
+    def handle_startendtag(self, tag: str, attrs) -> None:
+        if tag in self.BLOCK:
+            self.parts.append(" ")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in self.SKIP and self._skip_depth:
+            self._skip_depth -= 1
+        elif tag in self.BLOCK:
+            self.parts.append(" ")
+
+    def handle_data(self, data: str) -> None:
+        if not self._skip_depth:
+            self.parts.append(data)
+
+    def text(self) -> str:
+        return " ".join("".join(self.parts).split())
+
+
+def clean_text(raw_html: str, limit: int = 300) -> str:
+    """把一段 HTML 变成纯文本。畸形输入返回空串，不抛。"""
+    if not raw_html:
+        return ""
+    parser = _TextOnly()
+    try:
+        parser.feed(raw_html)
+        parser.close()
+    except Exception:  # 畸形 HTML 不该让整个源失败
+        return ""
+    text = parser.text()
+    if len(text) <= limit:
+        return text
+    return text[:limit].rstrip() + "…"
+
+
+def absolute_url(href: str, base: str) -> str:
+    """把相对链接按源的地址补成绝对链接，并挡掉非 http(s) 协议。
+
+    不补的话，他们页面里的 `/foo` 会变成打向**本站**的请求 ——
+    点了跳到本站 404，看起来像本站坏了。
+
+    协议白名单是必需的而不是可选：`urljoin` 不拦 `javascript:`（它不是相对地址，
+    会原样返回），原样进 `href` 就是在本站执行脚本。
+    """
+    href = (href or "").strip()
+    if not href:
+        return ""
+    try:
+        absolute = urljoin(base, href)
+    except ValueError:
+        return ""
+    if urlsplit(absolute).scheme.lower() not in {"http", "https"}:
+        return ""
+    return absolute
+
+
+def decode_body(raw: bytes, content_type: str) -> str:
+    """按声明的 charset → utf-8 → gb18030 → utf-8/replace 依次尝试。
+
+    顺序有讲究：utf-8 排在 gb18030 前面，因为它对无效字节会抛错，正好当探测器用。
+    gb18030 几乎能解码任何字节序列（不会抛），所以只能垫底 ——
+    放前面会把合法的 UTF-8 中文解成乱码而且不报错。
+    """
+    declared = ""
+    match = re.search(r"charset=[\"']?([\w-]+)", content_type or "", re.I)
+    if match:
+        declared = match.group(1)
+    for encoding in (declared, "utf-8", "gb18030"):
+        if not encoding:
+            continue
+        try:
+            return raw.decode(encoding)
+        except (UnicodeDecodeError, LookupError):
+            continue
+    return raw.decode("utf-8", errors="replace")
+
+
+# ── 解析 ──────────────────────────────────────────────────────────────────────
+
+
+def _parse_date(value: str) -> str:
+    """把 RFC 2822 或 ISO 8601 的日期统一成 ISO 字符串。解析不了就返回空。
+
+    解析失败**不能丢条目** —— 时间只是显示用的，为了它丢掉内容不划算。
+    """
+    value = (value or "").strip()
+    if not value:
+        return ""
+    try:
+        return parsedate_to_datetime(value).astimezone(timezone.utc).isoformat()
+    except (TypeError, ValueError, IndexError):
+        pass
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+        if parsed.tzinfo is None:
+            parsed = parsed.replace(tzinfo=timezone.utc)
+        return parsed.astimezone(timezone.utc).isoformat()
+    except ValueError:
+        return ""
+
+
+def _first_text(node, paths: list[str]) -> str:
+    for path in paths:
+        found = node.find(path, ATOM_NS)
+        if found is not None and (found.text or "").strip():
+            return (found.text or "").strip()
+    return ""
+
+
+def parse_xml_feed(text: str, base: str) -> tuple[list[dict], str]:
+    """RSS 2.0 和 Atom 共用一个入口，靠根标签区分。"""
+    try:
+        root = ET.fromstring(text)
+    except ET.ParseError:
+        return [], "parse_error"
+
+    tag = root.tag.split("}")[-1].lower()
+    if tag == "rss":
+        nodes = root.findall("./channel/item")
+    elif tag == "feed":
+        nodes = root.findall("a:entry", ATOM_NS)
+    else:
+        return [], "unsupported_feed"
+
+    items: list[dict] = []
+    for node in nodes:
+        if tag == "rss":
+            title = _first_text(node, ["title"])
+            link = _first_text(node, ["link"])
+            summary_raw = _first_text(node, ["description"])
+            published = _parse_date(_first_text(node, ["pubDate", "date"]))
+        else:
+            title = _first_text(node, ["a:title"])
+            link = ""
+            for candidate in node.findall("a:link", ATOM_NS):
+                if candidate.get("rel") in (None, "alternate"):
+                    link = candidate.get("href", "")
+                    break
+            summary_raw = _first_text(node, ["a:summary", "a:content"])
+            # 优先 `published` 而不是 `updated`。实测阮一峰的 Atom 里
+            # `updated` 是「这份 feed 什么时候重新生成的」—— 它的 413 期和 411 期
+            # 都是今天被 touch 的，于是按 updated 排会出现 413、411、412 这种乱序。
+            # `published` 才是文章自己的日期（411 是 09-03、412 是 09-11、413 是 09-18）。
+            published = _parse_date(_first_text(node, ["a:published", "a:updated"]))
+
+        title = clean_text(title, 200)
+        url = absolute_url(link, base)
+        if not title or not url:
+            continue
+        items.append({
+            "title": title,
+            "url": url,
+            "summary": clean_text(summary_raw, 300),
+            "published": published,
+        })
+    return items, ""
+
+
+class _LinkCollector(HTMLParser):
+    """收集 <a> 的 href 和可见文本。
+
+    HTML 源用这个而不是正则：正则要同时处理属性顺序、单双引号、嵌套标签，
+    很快就变成一个没人敢改的东西。HTMLParser 把这些都处理掉了。
+    """
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.links: list[tuple[str, str]] = []
+        self._href: str | None = None
+        self._depth = 0
+        self._buf: list[str] = []
+        self._skip = 0
+
+    def handle_starttag(self, tag: str, attrs) -> None:
+        if tag in _TextOnly.SKIP:
+            self._skip += 1
+            return
+        if tag == "a":
+            self._href = dict(attrs).get("href", "")
+            self._depth = 1
+            self._buf = []
+        elif self._href is not None:
+            self._depth += 1
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in _TextOnly.SKIP:
+            self._skip = max(0, self._skip - 1)
+            return
+        if self._href is None:
+            return
+        self._depth -= 1
+        if self._depth <= 0:
+            text = " ".join("".join(self._buf).split())
+            if self._href and text:
+                self.links.append((self._href, text))
+            self._href = None
+            self._buf = []
+
+    def handle_data(self, data: str) -> None:
+        if self._href is not None and not self._skip:
+            self._buf.append(data)
+
+
+def _collect_links(html_text: str) -> list[tuple[str, str]]:
+    collector = _LinkCollector()
+    try:
+        collector.feed(html_text)
+        collector.close()
+    except Exception:
+        return []
+    return collector.links
+
+
+# 论文详情页的形状：/ICLR2026/llm_reasoning/some-paper-title/
+_PAPER_PATH = re.compile(r"^/[A-Za-z]+\d{4}/[a-z_]+/[a-z0-9_-]+/?$")
+
+
+def parse_papernotes(text: str, base: str) -> tuple[list[dict], str]:
+    """PaperNotes 的 sitemap → 它最近收录的论文 URL 列表。
+
+    首页只有会议和子领域的目录，**没有论文列表也没有时间戳**，所以不能从首页取。
+    改用 sitemap 的 `lastmod`。
+
+    这里有个必须说清的语义：`lastmod` 是**它导入这批论文的日期**，不是论文发表的时间。
+    它一次批量导入几千篇（实测有一天 6574 条同一天），所以这个列表的含义是
+    「PaperNotes 最近新增了什么」，不是「最近发表了什么」。页面措辞按前者写。
+
+    本函数只取 URL 和时间。**标题和摘要要靠 fetch_one 里额外抓的详情页补上** ——
+    sitemap 里没有标题，凭空造一个（比如从 URL 反推）会得到人看不懂的 slug。
+    """
+    if not base.endswith(".xml"):
+        return [], "selector_missing"
+    try:
+        root = ET.fromstring(text)
+    except ET.ParseError:
+        return [], "parse_error"
+
+    ns = "{http://www.sitemaps.org/schemas/sitemap/0.9}"
+    found: list[tuple[str, str]] = []
+    for url_node in root.findall(f"{ns}url"):
+        loc = url_node.findtext(f"{ns}loc", "") or ""
+        lastmod = url_node.findtext(f"{ns}lastmod", "") or ""
+        if loc and lastmod and _PAPER_PATH.match(urlsplit(loc).path):
+            found.append((lastmod, loc))
+    if not found:
+        return [], "selector_missing"
+    found.sort(reverse=True)
+    return [
+        {"title": "", "url": url, "summary": "", "published": _parse_date(day)}
+        for day, url in found
+    ], ""
+
+
+# 论文详情页里的标题和「一句话总结」。用 og:title 而不是 h1 ——
+# 实测这个站（MkDocs）的正文标题是 h2，页面级标题只在 og:title/title 标签里。
+_OG_TITLE = re.compile(r'<meta[^>]+property=["\']og:title["\'][^>]+content=["\']([^"\']*)', re.I)
+_SUMMARY = re.compile(r"一句话总结[\s\S]{0,800}?<p>([\s\S]{0,600}?)</p>", re.I)
+
+
+def enrich_papernotes(items: list[dict], delay: float, timeout: float = TIMEOUT) -> list[dict]:
+    """给 PaperNotes 的条目补标题和摘要，逐页抓。
+
+    **只抓 limit 条**，不是两万条。逐页扫全站是滥用，也违背「只做入口」的定位。
+    """
+    enriched: list[dict] = []
+    for index, item in enumerate(items):
+        if index:
+            time.sleep(delay)
+        request = urllib.request.Request(
+            item["url"], headers={"User-Agent": USER_AGENT, "Accept": "text/html"}
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                page = decode_body(response.read(MAX_BYTES), response.headers.get("Content-Type", ""))
+        except (urllib.error.URLError, urllib.error.HTTPError, OSError, ValueError):
+            continue
+        title_match = _OG_TITLE.search(page)
+        title = html.unescape(title_match.group(1)).strip() if title_match else ""
+        # og:title 带「[论文解读] 」前缀，是站点自己的标记，不是标题的一部分。
+        title = re.sub(r"^\[[^\]]{0,12}\]\s*", "", title).strip()
+        if not title:
+            continue
+        summary_match = _SUMMARY.search(page)
+        summary = clean_text(summary_match.group(1)) if summary_match else ""
+        enriched.append({**item, "title": clean_text(title, 200), "summary": summary})
+    return enriched
+
+
+# arXivDaily 首页上一条论文的形状。实测（2026-09-18）长这样：
+#   <h2>Coding Agents with an Obstacle-Aware Harness…</h2>
+#   <p class="title-cn">面向安全机器人操作、具有障碍物感知约束框架的编码智能体</p>
+#   <p class="summary"><span class="summary-label">AI总结</span>本研究提出…</p>
+#   <a class="icon-button url-button" href="https://arxiv.org/abs/2609.20822">URL</a>
+#
+# 抓 `/` 而不是 `/topics`：robots 两条都放行（`Allow: /$` 和 `Allow: /topics$`），
+# 但实测 `/topics` 只是子领域目录，列的是「3D 视觉 / 三维重建、NeRF…」这种分类说明，
+# 不是论文。第一版抓 /topics 拿到一条「3D 视觉 三维重建、NeRF、Gaussian Splatting…」，
+# 看着像标题其实是分类描述 —— 这正是 sanity check 要抓的东西。
+_AD_BLOCK = re.compile(
+    r'<h2[^>]*>([\s\S]{0,300}?)</h2>'
+    r"(?:[\s\S]{0,400}?<p[^>]+class=[\"']title-cn[\"'][^>]*>([\s\S]{0,300}?)</p>)?"
+    r"[\s\S]{0,900}?<p[^>]+class=[\"']summary[\"'][^>]*>([\s\S]{0,900}?)</p>"
+    r"[\s\S]{0,2500}?href=[\"'](https://arxiv\.org/abs/[^\"']+)[\"']",
+    re.I,
+)
+
+
+def parse_arxivdaily(text: str, base: str) -> tuple[list[dict], str]:
+    """arXivDaily 首页的论文列表。"""
+    items: list[dict] = []
+    seen: set[str] = set()
+    for match in _AD_BLOCK.finditer(text):
+        title_en, title_cn, summary_raw, url = match.groups()
+        title_en = clean_text(title_en, 200)
+        title_cn = clean_text(title_cn, 200)
+        if not title_en or url in seen:
+            continue
+        seen.add(url)
+        items.append({
+            # 中文标题更符合这个页面的读者，缺了再退英文。
+            "title": title_cn or title_en,
+            "url": url,
+            "summary": clean_text(summary_raw, 300),
+            "published": "",
+        })
+        if len(items) >= 40:
+            break
+    if not items:
+        return [], "selector_missing"
+    return items, ""
+
+
+def parse_zeli(text: str, base: str) -> tuple[list[dict], str]:
+    """zeli 首页。同样是「指向外链的标题」这个模式。"""
+    links = _collect_links(text)
+    items: list[dict] = []
+    seen: set[str] = set()
+    for href, label in links:
+        url = absolute_link = absolute_url(href, base)
+        if not url or url in seen:
+            continue
+        # zeli 聚合的是 Hacker News 一类的外链，所以指向站外的更像条目。
+        if urlsplit(url).netloc == urlsplit(base).netloc:
+            continue
+        if len(label) < 18 or len(label) > 220:
+            continue
+        seen.add(url)
+        items.append({
+            "title": clean_text(label, 200),
+            "url": url,
+            "summary": "",
+            "published": "",
+        })
+        if len(items) >= 40:
+            break
+    if not items:
+        return [], "selector_missing"
+    return items, ""
+
+
+def parse_html_source(key: str, text: str, base: str) -> tuple[list[dict], str]:
+    if key == "papernotes":
+        return parse_papernotes(text, base)
+    if key == "arxivdaily":
+        return parse_arxivdaily(text, base)
+    if key == "zeli":
+        return parse_zeli(text, base)
+    return [], "unsupported_source"
+
+
+def parse_feed(kind: str, key: str, text: str, base: str) -> tuple[list[dict], str]:
+    """返回 (items, error)。items 为空且 error 为空 = 确实没有内容。"""
+    if kind in {"rss", "atom"}:
+        return parse_xml_feed(text, base)
+    if kind == "html":
+        return parse_html_source(key, text, base)
+    return [], "unsupported_kind"
+
+
+# ── 抓取 ──────────────────────────────────────────────────────────────────────
+
+
+def fetch_one(source: dict) -> tuple[list[dict], str]:
+    """抓一个源。**绝不抛异常** —— 一个源失败不能影响其余。"""
+    if source.get("kind") == "none":
+        return [], ""
+    if source.get("delay"):
+        # 只在后台刷新线程里 sleep。刷新是串行的，所以这里睡不会拖住任何访客。
+        time.sleep(float(source["delay"]))
+
+    request = urllib.request.Request(
+        source["url"],
+        headers={
+            "User-Agent": USER_AGENT,
+            "Accept": (
+                "application/rss+xml, application/atom+xml, application/xml, "
+                "text/html;q=0.9, */*;q=0.8"
+            ),
+        },
+    )
+    try:
+        timeout = float(source.get("timeout", TIMEOUT))
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            cap = int(source.get("max_bytes", MAX_BYTES))
+            raw = response.read(cap + 1)
+            if len(raw) > cap:
+                return [], "too_large"
+            content_type = response.headers.get("Content-Type", "")
+    except urllib.error.HTTPError as error:
+        return [], f"http_{error.code}"
+    except (urllib.error.URLError, OSError, ValueError):
+        return [], "unreachable"
+
+    text = decode_body(raw, content_type)
+    items, error = parse_feed(source["kind"], source["key"], text, source["url"])
+    if error:
+        return [], error
+    if not items and source["kind"] == "html":
+        # 抓到 200 但一条都没解出来，最可能是选择器失效（站方改版）。
+        # 这和「今天没有新内容」是两回事，必须分开报，否则改版会静默变成空列表。
+        return [], "selector_missing"
+
+    limit = source.get("limit", 5)
+    # PaperNotes 的 sitemap 只有 URL 和时间，标题要逐页去补。
+    # 先截断到 limit 再补，避免为了显示 5 条去抓 40 个页面。
+    if source["key"] == "papernotes":
+        items = enrich_papernotes(
+            items[:limit],
+            float(source.get("delay", 0)),
+            float(source.get("timeout", TIMEOUT)),
+        )
+        return items[:limit], ""
+    # 其余源按同一条规矩：宁可按发布时间/新增顺序排，但只有能解析出时间的才排。
+    if all(item.get("published") for item in items):
+        items.sort(key=lambda item: item["published"], reverse=True)
+    return items[:limit], ""
+
+
+# ── 缓存与后台刷新 ────────────────────────────────────────────────────────────
+
+_CACHE: dict[str, dict] = {}
+_CACHE_LOCK = threading.Lock()
+# 保证同一时刻只有一个刷新在跑。没有它的话，6 个源各自过期 + 多个访客同时命中，
+# 会启动多个并发刷新线程，把外部站打穿。
+_REFRESH_LOCK = threading.Lock()
+_LOADED = False
+
+
+def _load_from_disk() -> None:
+    """启动后第一次访问时把上次的快照读进内存，这样重启后的首个访客不用等。"""
+    global _LOADED
+    if _LOADED:
+        return
+    _LOADED = True
+    try:
+        payload = json.loads(CACHE_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return
+    sources = payload.get("sources")
+    if not isinstance(sources, dict):
+        return
+    with _CACHE_LOCK:
+        for key, entry in sources.items():
+            if isinstance(entry, dict) and isinstance(entry.get("items"), list):
+                _CACHE[key] = entry
+
+
+def _save_to_disk() -> None:
+    try:
+        DATA_HOME.mkdir(parents=True, exist_ok=True)
+    except OSError:
+        return
+    with _CACHE_LOCK:
+        payload = {"saved_at": int(time.time()), "sources": dict(_CACHE)}
+    tmp = CACHE_FILE.with_name(CACHE_FILE.name + ".tmp")
+    try:
+        tmp.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(CACHE_FILE)
+    except OSError:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+
+
+def _refresh_all() -> None:
+    """串行抓所有源。只在后台线程里跑。"""
+    for source in FEEDS:
+        key = source["key"]
+        if source.get("kind") == "none":
+            with _CACHE_LOCK:
+                _CACHE[key] = {
+                    "items": [],
+                    "fetched_at": 0,
+                    "error": "",
+                    "status": "unavailable",
+                    "reason": source.get("reason", ""),
+                }
+            continue
+        items, error = fetch_one(source)
+        with _CACHE_LOCK:
+            _CACHE[key] = {
+                "items": items,
+                "fetched_at": int(time.time()) if not error else
+                              _CACHE.get(key, {}).get("fetched_at", 0),
+                "error": error,
+                "status": "error" if error else ("ok" if items else "empty"),
+            }
+    _save_to_disk()
+
+
+def _kick_refresh() -> None:
+    """起一个后台线程刷新。拿不到锁就直接返回 —— 已经有人在刷了。"""
+    if not _REFRESH_LOCK.acquire(blocking=False):
+        print("[feeds] refresh already running, skipped", flush=True)
+        return
+
+    def run() -> None:
+        try:
+            _refresh_all()
+        finally:
+            _REFRESH_LOCK.release()
+
+    threading.Thread(target=run, daemon=True, name="feeds-refresh").start()
+
+
+def _is_stale(now: float) -> bool:
+    for source in FEEDS:
+        if source.get("kind") == "none":
+            continue
+        entry = _CACHE.get(source["key"])
+        if not entry:
+            return True
+        if now - entry.get("fetched_at", 0) > source.get("ttl", 1800):
+            return True
+    return False
+
+
+def snapshot(force: bool = False) -> dict:
+    """给 /api/feeds 用的快照。**不发起任何网络请求**，所以返回时间恒定在毫秒级。"""
+    _load_from_disk()
+    now = time.time()
+    with _CACHE_LOCK:
+        cached = {k: dict(v) for k, v in _CACHE.items()}
+
+    stale = _is_stale(now)
+    # 冷启动（完全没有缓存）时**短暂**等一下，但不等满。
+    #
+    # 抓取是串行的，全量实测约 41s（papernotes 的 sitemap 一个就 30s）。
+    # 让访客等 41 秒去换一个完整的首屏是不划算的：页面本身（卡片、外链、
+    # 说明）才是主体，内容窗格是附带的。所以只等 4 秒 —— 够快到的那几个源
+    # 到位（ReadHub 0.5s、阮一峰 0.7s、arXivDaily 2.5s、zeli 3.2s），
+    # 慢的留空，前端会在 2.5s 后自己重试一次把剩下的补上。
+    #
+    # 有旧数据时**完全不等**，立刻返回旧数据 + 后台刷新：陈旧但完整，
+    # 好过新鲜但空。
+    if not cached:
+        _kick_refresh()
+        deadline = time.time() + 4.0
+        while time.time() < deadline:
+            with _CACHE_LOCK:
+                if len(_CACHE) >= 4:
+                    break
+            time.sleep(0.2)
+        with _CACHE_LOCK:
+            cached = {k: dict(v) for k, v in _CACHE.items()}
+    elif stale or force:
+        _kick_refresh()
+
+    sources = []
+    for source in FEEDS:
+        entry = cached.get(source["key"], {})
+        item_list = entry.get("items", [])
+        if not entry:
+            # 还没有它的任何记录 —— 后台刷新还没走到这个源。
+            # 这必须和「抓过了，确实没有内容」区分开：前者是"正在读取"，
+            # 后者是"今天没更新"。混在一起的话，冷启动的几个空框会
+            # 显示成「暂时没有新内容」，等于对外部站做了个错误的断言。
+            status = "pending"
+        else:
+            status = entry.get("status") or ("ok" if item_list else "empty")
+        if source.get("kind") == "none":
+            status = "unavailable"
+        sources.append({
+            "key": source["key"],
+            "group": source["group"],
+            "status": status,
+            "reason": source.get("reason", ""),
+            "error": entry.get("error", ""),
+            "fetched_at": entry.get("fetched_at", 0),
+            "link": source["link"],
+            # 只 expose 这四个字段。**不含任何 HTML 字段** —— 这是安全设计，
+            # 不是在省带宽。tests 里有一条专门守着它，别加回去。
+            "items": [
+                {
+                    "title": item.get("title", ""),
+                    "url": item.get("url", ""),
+                    "summary": item.get("summary", ""),
+                    "published": item.get("published", ""),
+                }
+                for item in item_list
+            ],
+        })
+
+    return {
+        "stale": not any(s["items"] for s in sources),
+        "fetched_at": int(now),
+        "sources": sources,
+    }
+
+
+def refresh_now() -> dict:
+    """同步刷新一次。只给离线校验脚本用，不接在请求路径上。"""
+    global _LOADED
+    _LOADED = True
+    _refresh_all()
+    return snapshot()

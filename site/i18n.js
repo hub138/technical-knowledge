@@ -376,7 +376,9 @@
     "PAPERS · 追踪与解析": { en: "PAPERS · tracked & analysed" },
     "正在读取…": { en: "Loading…" },
     "追踪新论文": { en: "Tracking new papers" },
-    "按发布时间倒序，每篇给出它解决的问题、做法，以及摘要里写明的量化结果。结果一栏只收录论文自己报出的数字，摘不出来就留空，不替它总结；2024 年前的论文收在「历史奠基」里，需要时展开。": { en: "Newest first. Each entry gives the problem, the approach, and the measured result stated in the paper's own abstract. A figure the abstract does not state stays blank rather than being summarised for it. Papers before 2024 sit under Foundations — expand when you need them." },
+    "按时间倒序。每篇给出它解决的问题、做法，以及论文自己报出的数字——摘要里没写的就留空。2024 年前的收在「历史奠基」里。": {
+      en: "Newest first. Each entry gives the problem, the approach, and the numbers the paper itself reports — anything the abstract leaves out stays blank. Papers before 2024 sit under Foundations.",
+    },
     "论文追踪": { en: "Paper Tracking" },
     "追踪新论文，逐篇给出结构化解析；知识库的结论从这里取材。": { en: "New papers are tracked and analysed here, one by one. The knowledge base draws its evidence from them." },
     "最新论文怎么解析、怎么进知识库": { en: "How new papers are read and fed into the knowledge base" },
@@ -441,30 +443,44 @@
     // 卡片本身的 name/kind/gain/tags 不走词典 —— 它们来自 site/sources.js，
     // 按当前语言直接取（那一份数据里自带 en 字段）。这里只放页面骨架上的文案。
     "外部资源": { en: "Sources" },
-    "别人做得更好的地方": { en: "Where others do it better" },
-    "这一页不重复造已经有人做好的东西。每个站都写清它补了什么、什么情况下该去那里而不是留在这里 —— 与其在本地做一个更差的版本，不如把入口放好。": {
-      en: "This page does not rebuild what someone already does well. Each entry says what it adds and when to go there instead of staying here. A good link beats a worse local copy.",
+    "值得订阅的源": { en: "Sources worth following" },
+    "论文、文章和资讯的常读源，各自列出最新几条。点标题回原站看全文。": {
+      en: "Standing sources for papers, writing and news, each listing its latest entries. Open a title to read it in full on the source site.",
     },
-    "值得长期订阅的论文、文章与资讯源，每个都说明它补了什么。": {
-      en: "Papers, writing and news worth subscribing to, each with a note on what it adds.",
+    "值得长期订阅的论文、文章与资讯源，并列出各自的最新几条。": {
+      en: "Papers, writing and news worth following, with each source's latest entries listed.",
     },
     "外部有哪些做得更好的站": { en: "Sites that do this better" },
-    "知识文章": { en: "Writing" },
-    "成篇的、有人写过的内容。适合慢慢读，适合订阅。": {
-      en: "Finished pieces by people who thought it through. Good for slow reading and for subscribing.",
-    },
+    "文章": { en: "Writing" },
+    "成篇的文章，适合慢慢读。": { en: "Finished pieces, for slow reading." },
     "论文": { en: "Papers" },
-    "一手研究。比二手解读更可信，但也更需要筛选和结构化。": {
-      en: "Primary research. More trustworthy than a second-hand read, and more in need of filtering and structure.",
+    "一手研究。比二手解读可信，也更需要筛选。": {
+      en: "Primary research. More trustworthy than a second-hand read, and in more need of filtering.",
     },
     "资讯": { en: "News" },
-    "知道发生了什么。不等同于知识，也不该按知识的用法读。": {
-      en: "Knowing what happened. Not the same as knowledge, and not to be read as if it were.",
+    "知道发生了什么。用来看动向，不当知识读。": {
+      en: "Knowing what happened. For tracking the field, not as knowledge.",
     },
     "资源清单读不到": { en: "Cannot read the source list" },
     "检查 site/sources.js 是否加载成功，然后刷新。": {
       en: "Check that site/sources.js loaded, then reload.",
     },
+    // 卡片里带回来的外部内容（标题、摘要）**不进词典** —— 那些是内容不是界面文案，
+    // 英文站的内容在中文界面里显示英文是正常的。这里只放窗口自己的界面字。
+    "最新几条": { en: "Latest" },
+    "这一站暂时读不到，入口仍然可用。": {
+      en: "This source is not reachable right now. The link above still works.",
+    },
+    "它的内容在登录后才看得到，抓不到。点上面的站名进去，登录一次就能自己选要跟哪些号。": {
+      en: "Its content is only visible after signing in, so it cannot be fetched here. Open the site above and sign in once to pick which accounts to follow.",
+    },
+    "暂时没有新内容。": { en: "Nothing new right now." },
+    "更新于": { en: "Updated" },
+    "刚刚更新": { en: "Updated just now" },
+    // 「正在读取…」和「刷新」已在词典里（前面几段），不在这里重复定义 ——
+    // 同一个 key 定义两次时 JS 保留最后一个，前面那个变成死代码，
+    // i18n_dict_audit 会把这种情况判为失败。
+    "SOURCES · 外部资源": { en: "SOURCES" },
 
     // ── Home page: what every note answers ──
     "篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。写的都是能落到手上的东西：一个机制怎么运作、代价在哪、结论有没有实测支撑。": {

@@ -31,6 +31,7 @@ PAGES = [
     "index.html",
     "papers/index.html",
     "papers/paper.html",
+    "sources/index.html",
     "projects/index.html",
     "site/insights.html",
     "apps/learning/index.html",

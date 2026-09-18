@@ -50,7 +50,7 @@ window.TK_NAV = {
       key: "sources",
       label: "外部资源",
       href: "/sources",
-      icon: "◧",
+      icon: "◱",
       title: "外部有哪些做得更好的站",
       description: "值得长期订阅的论文、文章与资讯源，每个都说明它补了什么。",
     },
