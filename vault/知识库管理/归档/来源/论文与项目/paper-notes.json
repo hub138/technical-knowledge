@@ -1,0 +1,1901 @@
+{
+ "generated": "2026-09-18",
+ "source": "arXiv abstracts; derived by scripts/build-paper-notes.py",
+ "note": "L1 fields are extracted from each paper's own abstract, which is kept alongside them for checking. L2 deep reads are written by hand into 归档/来源/论文与项目/解析/ and never generated, because an abstract does not contain the technical detail, ablations, limitations or reproduction steps a deep read must state.",
+ "stats": {
+  "papers": 44,
+  "with_key_result": 12,
+  "with_deep_read": 1,
+  "without_chinese_title": 0,
+  "with_untranslated_field": 0
+ },
+ "papers": {
+  "1508.07909": {
+   "id": "1508.07909",
+   "title": "Neural Machine Translation of Rare Words with Subword Units",
+   "authors": [
+    "Rico Sennrich",
+    "Barry Haddow",
+    "Alexandra Birch"
+   ],
+   "published": "2015-08-31",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/1508.07909",
+   "abstract": "Neural machine translation (NMT) models typically operate with a fixed vocabulary, but translation is an open-vocabulary problem. Previous work addresses the translation of out-of-vocabulary words by backing off to a dictionary. In this paper, we introduce a simpler and more effective approach, making the NMT model capable of open-vocabulary translation by encoding rare and unknown words as sequences of subword units. This is based on the intuition that various word classes are translatable via smaller units than words, for instance names (via character copying or transliteration), compounds (via compositional translation), and cognates and loanwords (via phonological and morphological transformations). We discuss the suitability of different word segmentation techniques, including simple character n-gram models and a segmentation based on the byte pair encoding compression algorithm, and empirically show that subword models improve over a back-off dictionary baseline for the WMT 15 translation tasks English-German and English-Russian by 1.1 and 1.3 BLEU, respectively.",
+   "overview": "Neural machine translation (NMT) models typically operate with a fixed vocabulary, but translation is an open-vocabulary problem.",
+   "problem": "Neural machine translation (NMT) models typically operate with a fixed vocabulary, but translation is an open-vocabulary problem.",
+   "approach": "In this paper, we introduce a simpler and more effective approach, making the NMT model capable of open-vocabulary translation by encoding rare and unknown words as sequences of subword units.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
+     "title": "Token、Embedding 与表示学习连接数据和模型",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "用子词单元翻译稀有词",
+   "title_en": "Neural Machine Translation of Rare Words with Subword Units",
+   "problem_zh": "神经机器翻译（NMT）模型通常使用固定词表，但翻译本身是一个开放词表问题。",
+   "approach_zh": "提出一个更简单也更有效的做法：把稀有词和未登录词编码成子词单元序列，使 NMT 模型具备开放词表翻译能力。",
+   "result_zh": ""
+  },
+  "1701.06538": {
+   "id": "1701.06538",
+   "title": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer",
+   "authors": [
+    "Noam Shazeer",
+    "Azalia Mirhoseini",
+    "Krzysztof Maziarz",
+    "Andy Davis",
+    "Quoc Le",
+    "Geoffrey Hinton",
+    "Jeff Dean"
+   ],
+   "published": "2017-01-23",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/1701.06538",
+   "abstract": "The capacity of a neural network to absorb information is limited by its number of parameters. Conditional computation, where parts of the network are active on a per-example basis, has been proposed in theory as a way of dramatically increasing model capacity without a proportional increase in computation. In practice, however, there are significant algorithmic and performance challenges. In this work, we address these challenges and finally realize the promise of conditional computation, achieving greater than 1000x improvements in model capacity with only minor losses in computational efficiency on modern GPU clusters. We introduce a Sparsely-Gated Mixture-of-Experts layer (MoE), consisting of up to thousands of feed-forward sub-networks. A trainable gating network determines a sparse combination of these experts to use for each example. We apply the MoE to the tasks of language modeling and machine translation, where model capacity is critical for absorbing the vast quantities of knowledge available in the training corpora. We present model architectures in which a MoE with up to 137 billion parameters is applied convolutionally between stacked LSTM layers. On large language modeling and machine translation benchmarks, these models achieve significantly better results than state-of-the-art at lower computational cost.",
+   "overview": "The capacity of a neural network to absorb information is limited by its number of parameters.",
+   "problem": "The capacity of a neural network to absorb information is limited by its number of parameters.",
+   "approach": "We introduce a Sparsely-Gated Mixture-of-Experts layer (MoE), consisting of up to thousands of feed-forward sub-networks.",
+   "key_result": "In this work, we address these challenges and finally realize the promise of conditional computation, achieving greater than 1000x improvements in model capacity with only minor losses in computational efficiency on modern GPU clusters.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "稀疏门控混合专家层",
+   "title_en": "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer",
+   "problem_zh": "神经网络吸收信息的能力受限于它的参数量。",
+   "approach_zh": "提出稀疏门控混合专家层（MoE），由多达成千上万个前馈子网络组成。",
+   "result_zh": "本文解决了这些挑战，最终兑现了条件计算的承诺：模型容量提升超过 1000 倍，而计算开销只有很小的损失。"
+  },
+  "1706.03762": {
+   "id": "1706.03762",
+   "title": "Attention Is All You Need",
+   "authors": [
+    "Ashish Vaswani",
+    "Noam Shazeer",
+    "Niki Parmar",
+    "Jakob Uszkoreit",
+    "Llion Jones",
+    "Aidan N. Gomez",
+    "Lukasz Kaiser",
+    "Illia Polosukhin"
+   ],
+   "published": "2017-06-12",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/1706.03762",
+   "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train. Our model achieves 28.4 BLEU on the WMT 2014 English-to-German translation task, improving over the existing best results, including ensembles by over 2 BLEU. On the WMT 2014 English-to-French translation task, our model establishes a new single-model state-of-the-art BLEU score of 41.8 after training for 3.5 days on eight GPUs, a small fraction of the training costs of the best models from the literature. We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "overview": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks in an encoder-decoder configuration.",
+   "problem": "We show that the Transformer generalizes well to other tasks by applying it successfully to English constituency parsing both with large and limited training data.",
+   "approach": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/AI系统工程：把模型能力变成生产能力.md",
+     "title": "AI 系统工程：把模型能力变成生产能力",
+     "domain": "",
+     "topic": "",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md",
+     "title": "Transformer 如何把序列建模成可扩展计算",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "title": "位置编码和长上下文限制有效利用",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md",
+     "title": "模型提出候选，系统定义正确性",
+     "domain": "AI系统",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "title": "预训练、后训练、RAG 与工具改变不同层次",
+     "domain": "AI系统",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "Attention Is All You Need：只靠注意力机制的 Transformer",
+   "title_en": "Attention Is All You Need",
+   "problem_zh": "本文把 Transformer 成功应用于英语成分句法分析，在训练数据充足和有限两种情况下都表现良好，说明它能很好地泛化到其他任务。",
+   "approach_zh": "提出一种新的简洁网络架构 Transformer，完全基于注意力机制，彻底去掉了循环和卷积。",
+   "result_zh": ""
+  },
+  "1904.09751": {
+   "id": "1904.09751",
+   "title": "The Curious Case of Neural Text Degeneration",
+   "authors": [
+    "Ari Holtzman",
+    "Jan Buys",
+    "Li Du",
+    "Maxwell Forbes",
+    "Yejin Choi"
+   ],
+   "published": "2019-04-22",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/1904.09751",
+   "abstract": "Despite considerable advancements with deep neural language models, the enigma of neural text degeneration persists when these models are tested as text generators. The counter-intuitive empirical observation is that even though the use of likelihood as training objective leads to high quality models for a broad range of language understanding tasks, using likelihood as a decoding objective leads to text that is bland and strangely repetitive. In this paper, we reveal surprising distributional differences between human text and machine text. In addition, we find that decoding strategies alone can dramatically effect the quality of machine text, even when generated from exactly the same neural language model. Our findings motivate Nucleus Sampling, a simple but effective method to draw the best out of neural generation. By sampling text from the dynamic nucleus of the probability distribution, which allows for diversity while effectively truncating the less reliable tail of the distribution, the resulting text better demonstrates the quality of human text, yielding enhanced diversity without sacrificing fluency and coherence.",
+   "overview": "Despite considerable advancements with deep neural language models, the enigma of neural text degeneration persists when these models are tested as text generators.",
+   "problem": "",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/解码采样决定生成行为而不是知识本身.md",
+     "title": "解码采样决定生成行为而不是知识本身",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "神经文本退化的奇怪现象",
+   "title_en": "The Curious Case of Neural Text Degeneration",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "1908.10084": {
+   "id": "1908.10084",
+   "title": "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks",
+   "authors": [
+    "Nils Reimers",
+    "Iryna Gurevych"
+   ],
+   "published": "2019-08-27",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/1908.10084",
+   "abstract": "BERT (Devlin et al., 2018) and RoBERTa (Liu et al., 2019) has set a new state-of-the-art performance on sentence-pair regression tasks like semantic textual similarity (STS). However, it requires that both sentences are fed into the network, which causes a massive computational overhead: Finding the most similar pair in a collection of 10,000 sentences requires about 50 million inference computations (~65 hours) with BERT. The construction of BERT makes it unsuitable for semantic similarity search as well as for unsupervised tasks like clustering. In this publication, we present Sentence-BERT (SBERT), a modification of the pretrained BERT network that use siamese and triplet network structures to derive semantically meaningful sentence embeddings that can be compared using cosine-similarity. This reduces the effort for finding the most similar pair from 65 hours with BERT / RoBERTa to about 5 seconds with SBERT, while maintaining the accuracy from BERT. We evaluate SBERT and SRoBERTa on common STS tasks and transfer learning tasks, where it outperforms other state-of-the-art sentence embeddings methods.",
+   "overview": "BERT (Devlin et al., 2018) and RoBERTa (Liu et al., 2019) has set a new state-of-the-art performance on sentence-pair regression tasks like semantic textual similarity (STS).",
+   "problem": "However, it requires that both sentences are fed into the network, which causes a massive computational overhead: Finding the most similar pair in a collection of 10,000 sentences requires about 50 million inference computations (~65 hours) with BERT.",
+   "approach": "In this publication, we present Sentence-BERT (SBERT), a modification of the pretrained BERT network that use siamese and triplet network structures to derive semantically meaningful sentence embeddings that can be compared using cosine-similarity.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
+     "title": "Token、Embedding 与表示学习连接数据和模型",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Sentence-BERT：用孪生网络得到句子向量",
+   "title_en": "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks",
+   "problem_zh": "但它要求两句同时输入网络，带来巨大的计算开销：在 10000 句里找最相似的一对，用 BERT 需要约 5000 万次推理计算（约 65 小时）。",
+   "approach_zh": "提出 Sentence-BERT（SBERT），对预训练的 BERT 网络做改造，用孪生和三元组网络结构得到语义上有意义的句子向量，可直接用余弦相似度比较。",
+   "result_zh": ""
+  },
+  "1910.02054": {
+   "id": "1910.02054",
+   "title": "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models",
+   "authors": [
+    "Samyam Rajbhandari",
+    "Jeff Rasley",
+    "Olatunji Ruwase",
+    "Yuxiong He"
+   ],
+   "published": "2019-10-04",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/1910.02054",
+   "abstract": "Large deep learning models offer significant accuracy gains, but training billions to trillions of parameters is challenging. Existing solutions such as data and model parallelisms exhibit fundamental limitations to fit these models into limited device memory, while obtaining computation, communication and development efficiency. We develop a novel solution, Zero Redundancy Optimizer (ZeRO), to optimize memory, vastly improving training speed while increasing the model size that can be efficiently trained. ZeRO eliminates memory redundancies in data- and model-parallel training while retaining low communication volume and high computational granularity, allowing us to scale the model size proportional to the number of devices with sustained high efficiency. Our analysis on memory requirements and communication volume demonstrates: ZeRO has the potential to scale beyond 1 Trillion parameters using today's hardware. We implement and evaluate ZeRO: it trains large models of over 100B parameter with super-linear speedup on 400 GPUs, achieving throughput of 15 Petaflops. This represents an 8x increase in model size and 10x increase in achievable performance over state-of-the-art. In terms of usability, ZeRO can train large models of up to 13B parameters (e.g., larger than Megatron GPT 8.3B and T5 11B) without requiring model parallelism which is harder for scientists to apply. Last but not the least, researchers have used the system breakthroughs of ZeRO to create the world's largest language model (Turing-NLG, 17B parameters) with record breaking accuracy.",
+   "overview": "Large deep learning models offer significant accuracy gains, but training billions to trillions of parameters is challenging.",
+   "problem": "Existing solutions such as data and model parallelisms exhibit fundamental limitations to fit these models into limited device memory, while obtaining computation, communication and development efficiency.",
+   "approach": "We develop a novel solution, Zero Redundancy Optimizer (ZeRO), to optimize memory, vastly improving training speed while increasing the model size that can be efficiently trained.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/分布式训练与并行策略如何切分模型.md",
+     "title": "分布式训练与并行策略如何切分模型",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "ZeRO：万亿参数模型训练的内存优化",
+   "title_en": "ZeRO: Memory Optimizations Toward Training Trillion Parameter Models",
+   "problem_zh": "数据并行和模型并行等现有方案有根本局限：既要塞进有限的设备显存，又要兼顾计算、通信和开发效率。",
+   "approach_zh": "提出 Zero Redundancy Optimizer（ZeRO）来优化显存，在大幅提升训练速度的同时扩大可高效训练的模型规模。",
+   "result_zh": ""
+  },
+  "2001.08361": {
+   "id": "2001.08361",
+   "title": "Scaling Laws for Neural Language Models",
+   "authors": [
+    "Jared Kaplan",
+    "Sam McCandlish",
+    "Tom Henighan",
+    "Tom B. Brown",
+    "Benjamin Chess",
+    "Rewon Child",
+    "Scott Gray",
+    "Alec Radford",
+    "Jeffrey Wu",
+    "Dario Amodei"
+   ],
+   "published": "2020-01-23",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2001.08361",
+   "abstract": "We study empirical scaling laws for language model performance on the cross-entropy loss. The loss scales as a power-law with model size, dataset size, and the amount of compute used for training, with some trends spanning more than seven orders of magnitude. Other architectural details such as network width or depth have minimal effects within a wide range. Simple equations govern the dependence of overfitting on model/dataset size and the dependence of training speed on model size. These relationships allow us to determine the optimal allocation of a fixed compute budget. Larger models are significantly more sample-efficient, such that optimally compute-efficient training involves training very large models on a relatively modest amount of data and stopping significantly before convergence.",
+   "overview": "We study empirical scaling laws for language model performance on the cross-entropy loss.",
+   "problem": "",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
+     "title": "Scaling Law 把训练预算分配成可测量假设",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型基础与训练/预训练数据决定模型能力上限.md",
+     "title": "预训练数据决定模型能力上限",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "神经语言模型的缩放定律",
+   "title_en": "Scaling Laws for Neural Language Models",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2004.12832": {
+   "id": "2004.12832",
+   "title": "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT",
+   "authors": [
+    "Omar Khattab",
+    "Matei Zaharia"
+   ],
+   "published": "2020-04-27",
+   "primary": "cs.IR",
+   "url": "https://arxiv.org/abs/2004.12832",
+   "abstract": "Recent progress in Natural Language Understanding (NLU) is driving fast-paced advances in Information Retrieval (IR), largely owed to fine-tuning deep language models (LMs) for document ranking. While remarkably effective, the ranking models based on these LMs increase computational cost by orders of magnitude over prior approaches, particularly as they must feed each query-document pair through a massive neural network to compute a single relevance score. To tackle this, we present ColBERT, a novel ranking model that adapts deep LMs (in particular, BERT) for efficient retrieval. ColBERT introduces a late interaction architecture that independently encodes the query and the document using BERT and then employs a cheap yet powerful interaction step that models their fine-grained similarity. By delaying and yet retaining this fine-granular interaction, ColBERT can leverage the expressiveness of deep LMs while simultaneously gaining the ability to pre-compute document representations offline, considerably speeding up query processing. Beyond reducing the cost of re-ranking the documents retrieved by a traditional model, ColBERT's pruning-friendly interaction mechanism enables leveraging vector-similarity indexes for end-to-end retrieval directly from a large document collection. We extensively evaluate ColBERT using two recent passage search datasets. Results show that ColBERT's effectiveness is competitive with existing BERT-based models (and outperforms every non-BERT baseline), while executing two orders-of-magnitude faster and requiring four orders-of-magnitude fewer FLOPs per query.",
+   "overview": "Recent progress in Natural Language Understanding (NLU) is driving fast-paced advances in Information Retrieval (IR), largely owed to fine-tuning deep language models (LMs) for document ranking.",
+   "problem": "",
+   "approach": "To tackle this, we present ColBERT, a novel ranking model that adapts deep LMs (in particular, BERT) for efficient retrieval.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
+     "title": "混合检索、重排与查询改写各自解决什么问题",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "ColBERT：基于上下文化延迟交互的高效段落检索",
+   "title_en": "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT",
+   "problem_zh": "",
+   "approach_zh": "为此提出 ColBERT，一种把深度语言模型（具体是 BERT）改造成高效检索的排序模型。",
+   "result_zh": ""
+  },
+  "2005.11401": {
+   "id": "2005.11401",
+   "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+   "authors": [
+    "Patrick Lewis",
+    "Ethan Perez",
+    "Aleksandra Piktus",
+    "Fabio Petroni",
+    "Vladimir Karpukhin",
+    "Naman Goyal",
+    "Heinrich Küttler",
+    "Mike Lewis",
+    "Wen-tau Yih",
+    "Tim Rocktäschel",
+    "Sebastian Riedel",
+    "Douwe Kiela"
+   ],
+   "published": "2020-05-22",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2005.11401",
+   "abstract": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures. Additionally, providing provenance for their decisions and updating their world knowledge remain open research problems. Pre-trained models with a differentiable access mechanism to explicit non-parametric memory can overcome this issue, but have so far been only investigated for extractive downstream tasks. We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG) -- models which combine pre-trained parametric and non-parametric memory for language generation. We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever. We compare two RAG formulations, one which conditions on the same retrieved passages across the whole generated sequence, the other can use different passages per token. We fine-tune and evaluate our models on a wide range of knowledge-intensive NLP tasks and set the state-of-the-art on three open domain QA tasks, outperforming parametric seq2seq models and task-specific retrieve-and-extract architectures. For language generation tasks, we find that RAG models generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline.",
+   "overview": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks.",
+   "problem": "However, their ability to access and precisely manipulate knowledge is still limited, and hence on knowledge-intensive tasks, their performance lags behind task-specific architectures.",
+   "approach": "We introduce RAG models where the parametric memory is a pre-trained seq2seq model and the non-parametric memory is a dense vector index of Wikipedia, accessed with a pre-trained neural retriever.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/AI系统工程：把模型能力变成生产能力.md",
+     "title": "AI 系统工程：把模型能力变成生产能力",
+     "domain": "",
+     "topic": "",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/知识与检索/RAG数据管道从文档到可引用证据.md",
+     "title": "RAG 数据管道从文档到可引用证据",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/知识与检索/RAG的核心是选择可引用证据.md",
+     "title": "RAG 的核心是选择可引用证据",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "title": "检索从一次查询演进为有状态的证据获取",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "title": "预训练、后训练、RAG 与工具改变不同层次",
+     "domain": "AI系统",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": true,
+   "title_zh": "RAG：面向知识密集型任务的检索增强生成",
+   "title_en": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+   "problem_zh": "但模型访问和精确操纵知识的能力仍然有限，因此在知识密集型任务上，表现落后于为任务专门设计的架构。",
+   "approach_zh": "提出 RAG 模型：参数记忆是一个预训练的 seq2seq 模型，非参数记忆是一个维基百科稠密向量索引，通过预训练的神经检索器访问。",
+   "result_zh": "",
+   "deep_read": "# RAG：把参数记忆和非参数记忆拼起来\n\n> **这份解读是不完整的，缺的部分明确标出来了。**\n> 下面每个模块都注明它来自摘要还是正文。标 `[待读全文]` 的段落我还没有\n> 拿到全文，不替它编内容 —— 摘要里没有消融设置、超参和失败案例，\n> 凭摘要补出来的每一句都可能是错的，而读者分辨不出来。\n\n## 1 背景与问题\n\n**动机。** 大规模预训练语言模型把事实知识存在参数里，在各类下游任务上微调后\n能达到当时的最高水平。但**它们访问和精确操纵知识的能力仍然有限** —— 在知识密集型\n任务上，表现反而落后于为任务专门设计的架构。此外，为模型决策提供出处、\n以及更新模型的世界知识，都还是未解决的问题。\n\n**核心问题。** 能不能把\"存在参数里的记忆\"和\"存在外部索引里的记忆\"结合起来，\n让模型既能生成流畅文本，又能在需要事实时取用可更新的外部证据？\n\n**直觉洞见。** 参数记忆像\"训练时记住的东西\"，非参数记忆像\"手边可以翻的资料\"。\n前者稳定但难更新、难追溯；后者可更新、可给出处，但本身不会说话。\n把两者接在一起，就是在生成时让模型边写边查。\n\n一个已知的相关尝试是\"带可微访问机制的预训练模型\"，但它此前**只在抽取式任务上\n被研究过**，没有做成通用方案。\n\n## 2 核心方法\n\n摘要能确认的设计决策有三条：\n\n1. **两种记忆的组合方式。** 参数记忆是一个预训练的 seq2seq 模型；\n   非参数记忆是一个用预训练神经检索器访问的**维基百科稠密向量索引**。\n   注意非参数那一侧选的是维基百科索引，而不是任意文档 —— 这决定了它的\n   知识边界是\"维基百科覆盖的\"，也决定了更新方式是重建索引。\n\n2. **两种 RAG 形式，区别在检索结果的复用粒度。**\n   - 一种在**整个生成序列**上条件于同一批检索到的段落；\n   - 另一种**每个 token** 都可以用不同的段落。\n   这是这篇论文里最值得注意的设计分歧：前者更稳，后者更灵活，\n   代价是训练的复杂度和推理时的检索开销。\n\n3. **通用微调配方。** 论文的定位是\"通用配方\"，即 RAG 不是为某个任务定制的\n   架构，而是在预训练模型上做的可迁移改造。\n\n`[待读全文]` 检索器与被检索索引的具体结构、段落如何切分与编码、\n两种形式各自的训练目标与损失、训练时检索结果是否参与梯度回传，\n这些摘要里都没有。它们决定了这套方法能不能被复现，必须在正文里确认。\n\n## 3 技术细节\n\n`[待读全文]` 摘要没有给出任何公式、超参或算法步骤。这一节在此论文上依赖正文，\n现在留空。\n\n## 4 实验与结果\n\n摘要明确报告了三件事：\n\n| 结论 | 摘要原文依据 |\n|---|---|\n| 在三个开放域问答任务上达到当时最高水平 | \"set the state-of-the-art on three open domain QA tasks\" |\n| 优于纯参数的 seq2seq 模型 | \"outperforming parametric seq2seq models\" |\n| 优于任务专用的「检索-抽取」架构 | \"task-specific retrieve-and-extract architectures\" |\n| 生成质量更具体、更多样、更符合事实 | \"generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline\" |\n\n**关键发现的性质**：这里是**方向性结论**（超过、优于、更具体），\n摘要里**没有给出具体数值**。三个任务各提升了多少、用的是哪些数据集、\n生成质量的\"更符合事实\"怎么量化，都要回正文。\n\n这对使用这篇论文是有影响的：它足以支撑\"RAG 这条路线值得走\"这个判断，\n**不足以支撑\"RAG 在你的场景能提升多少\"这个判断**。后者必须自己测。\n\n`[待读全文]` 三件套的具体名称、指标定义、对比基线版本、消融结果、\n超参设置。\n\n## 5 局限性\n\n摘要自述的边界（可直接引用）：\n\n1. **非参数记忆是维基百科稠密向量索引** —— 意味着知识覆盖受限于该索引，\n   且更新一次的成本取决于重建索引的代价，不是改一行数据。\n2. **当时只在通用配方层面验证** —— 论文说这是\"通用配方的探索\"，\n   在具体领域的迁移效果需要单独验证。\n\n从摘要可以推理、但需要正文确认的：\n\n3. **两条检索路径都会有失败模式** —— 检索不到正确证据时，模型仍会生成流畅的\n   错误内容。这是后来 RAG 评测里要分离\"检索质量\"和\"生成质量\"的原因。\n4. **每个 token 用不同段落的方案** 推理开销更高，长生成任务上尤其明显。\n\n`[待读全文]` 论文自己列出的局限性章节、失败案例分析、以及作者对\n\"什么时候不该用 RAG\"的说明。\n\n## 6 复现指南\n\n`[待读全文]` 摘要未提供环境、代码骨架和步骤。这篇论文有公开实现，\n补这一节时应当以官方仓库为准，而不是从摘要推断。\n\n---\n\n## 依赖这篇论文的知识\n\n本库有 5 篇知识把这篇论文作为论据：\n\n- [[工程知识/AI系统/知识与检索/RAG的核心是选择可引用证据]]\n- [[工程知识/AI系统/知识与检索/RAG数据管道从文档到可引用证据]]\n- [[工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取]]\n- [[工程知识/AI系统/模型与上下文/预训练、后训练、RAG与工具改变不同层次]]\n- [[工程知识/AI系统/AI系统工程：把模型能力变成生产能力]]\n\n这些页面引用的是本文第 4 节那条\"方向性结论\"。如果后续读全文发现\n具体数值与这些页面的表述有出入，以论文为准，并回来更新这几页。\n\n## 怎么把这份解读补全\n\n按 [[知识库管理/方法/论文怎么追踪怎么解析]] 的 L2 规范，缺的是第 2、3、4 节的\n正文级细节。补齐时需要：\n\n1. 读全文（arXiv 上有 PDF）\n2. 找到论文自述的局限性章节，替换第 5 节的推理部分\n3. 从正文抄出三件套名称与指标数值，回填第 4 节的表格\n4. 把 `status: partial` 改成 `status: complete`，并把 `confidence` 提到 high"
+  },
+  "2101.03961": {
+   "id": "2101.03961",
+   "title": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+   "authors": [
+    "William Fedus",
+    "Barret Zoph",
+    "Noam Shazeer"
+   ],
+   "published": "2021-01-11",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2101.03961",
+   "abstract": "In deep learning, models typically reuse the same parameters for all inputs. Mixture of Experts (MoE) defies this and instead selects different parameters for each incoming example. The result is a sparsely-activated model -- with outrageous numbers of parameters -- but a constant computational cost. However, despite several notable successes of MoE, widespread adoption has been hindered by complexity, communication costs and training instability -- we address these with the Switch Transformer. We simplify the MoE routing algorithm and design intuitive improved models with reduced communication and computational costs. Our proposed training techniques help wrangle the instabilities and we show large sparse models may be trained, for the first time, with lower precision (bfloat16) formats. We design models based off T5-Base and T5-Large to obtain up to 7x increases in pre-training speed with the same computational resources. These improvements extend into multilingual settings where we measure gains over the mT5-Base version across all 101 languages. Finally, we advance the current scale of language models by pre-training up to trillion parameter models on the \"Colossal Clean Crawled Corpus\" and achieve a 4x speedup over the T5-XXL model.",
+   "overview": "In deep learning, models typically reuse the same parameters for all inputs.",
+   "problem": "However, despite several notable successes of MoE, widespread adoption has been hindered by complexity, communication costs and training instability -- we address these with the Switch Transformer.",
+   "approach": "Our proposed training techniques help wrangle the instabilities and we show large sparse models may be trained, for the first time, with lower precision (bfloat16) formats.",
+   "key_result": "Finally, we advance the current scale of language models by pre-training up to trillion parameter models on the \"Colossal Clean Crawled Corpus\" and achieve a 4x speedup over the T5-XXL model.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Switch Transformer：用稀疏激活扩展到万亿参数",
+   "title_en": "Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity",
+   "problem_zh": "尽管 MoE 已有若干显著成果，但复杂度、通信开销和训练不稳定性阻碍了它被广泛采用 —— Switch Transformer 针对这三点。",
+   "approach_zh": "提出的训练技巧有助于控制这些不稳定性，并首次证明大型稀疏模型可以用更低的精度（bfloat16）训练。",
+   "result_zh": "在 Colossal Clean Crawled Corpus 上把语言模型的规模推进到万亿参数，相对 T5-XXL 取得 4 倍加速。"
+  },
+  "2104.04473": {
+   "id": "2104.04473",
+   "title": "Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM",
+   "authors": [
+    "Deepak Narayanan",
+    "Mohammad Shoeybi",
+    "Jared Casper",
+    "Patrick LeGresley",
+    "Mostofa Patwary",
+    "Vijay Anand Korthikanti",
+    "Dmitri Vainbrand",
+    "Prethvi Kashinkunti",
+    "Julie Bernauer",
+    "Bryan Catanzaro",
+    "Amar Phanishayee",
+    "Matei Zaharia"
+   ],
+   "published": "2021-04-09",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2104.04473",
+   "abstract": "Large language models have led to state-of-the-art accuracies across a range of tasks. However, training these models efficiently is challenging for two reasons: a) GPU memory capacity is limited, making it impossible to fit large models on even a multi-GPU server, and b) the number of compute operations required to train these models can result in unrealistically long training times. Consequently, new methods of model parallelism such as tensor and pipeline parallelism have been proposed. Unfortunately, naive usage of these methods leads to fundamental scaling issues at thousands of GPUs, e.g., due to expensive cross-node communication or devices spending significant time waiting on other devices to make progress. In this paper, we show how different types of parallelism methods (tensor, pipeline, and data parallelism) can be composed to scale to thousands of GPUs and models with trillions of parameters. We survey techniques for pipeline parallelism and propose a novel interleaved pipeline parallelism schedule that can improve throughput by 10+% with memory footprint comparable to existing approaches. We quantitatively study the trade-offs between tensor, pipeline, and data parallelism, and provide intuition as to how to configure distributed training of a large model. Our approach allows us to perform training iterations on a model with 1 trillion parameters at 502 petaFLOP/s on 3072 GPUs with achieved per-GPU throughput of 52% of theoretical peak. Our code is open sourced at https://github.com/nvidia/megatron-lm.",
+   "overview": "Large language models have led to state-of-the-art accuracies across a range of tasks.",
+   "problem": "However, training these models efficiently is challenging for two reasons: a) GPU memory capacity is limited, making it impossible to fit large models on even a multi-GPU server, and b) the number of compute operations required to train these models can result in unrealistically long training times.",
+   "approach": "In this paper, we show how different types of parallelism methods (tensor, pipeline, and data parallelism) can be composed to scale to thousands of GPUs and models with trillions of parameters.",
+   "key_result": "Our approach allows us to perform training iterations on a model with 1 trillion parameters at 502 petaFLOP/s on 3072 GPUs with achieved per-GPU throughput of 52% of theoretical peak.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/分布式训练与并行策略如何切分模型.md",
+     "title": "分布式训练与并行策略如何切分模型",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "用 Megatron-LM 在 GPU 集群上高效训练大模型",
+   "title_en": "Efficient Large-Scale Language Model Training on GPU Clusters Using Megatron-LM",
+   "problem_zh": "高效训练这类模型有两点困难：一是 GPU 显存容量有限，大模型连放到一台多卡服务器上都做不到；二是训练所需的计算量会导致长到不现实的训练时间。",
+   "approach_zh": "展示如何把不同类型的并行方法（张量并行、流水并行、数据并行）组合起来，扩展到数千块 GPU 和万亿参数模型。",
+   "result_zh": "在 3072 块 GPU 上，对 1 万亿参数模型做到每次训练迭代 502 petaFLOP/s，单卡吞吐达到理论峰值的 52%。"
+  },
+  "2104.08646": {
+   "id": "2104.08646",
+   "title": "Competency Problems: On Finding and Removing Artifacts in Language Data",
+   "authors": [
+    "Matt Gardner",
+    "William Merrill",
+    "Jesse Dodge",
+    "Matthew E. Peters",
+    "Alexis Ross",
+    "Sameer Singh",
+    "Noah A. Smith"
+   ],
+   "published": "2021-04-17",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2104.08646",
+   "abstract": "Much recent work in NLP has documented dataset artifacts, bias, and spurious correlations between input features and output labels. However, how to tell which features have \"spurious\" instead of legitimate correlations is typically left unspecified. In this work we argue that for complex language understanding tasks, all simple feature correlations are spurious, and we formalize this notion into a class of problems which we call competency problems. For example, the word \"amazing\" on its own should not give information about a sentiment label independent of the context in which it appears, which could include negation, metaphor, sarcasm, etc. We theoretically analyze the difficulty of creating data for competency problems when human bias is taken into account, showing that realistic datasets will increasingly deviate from competency problems as dataset size increases. This analysis gives us a simple statistical test for dataset artifacts, which we use to show more subtle biases than were described in prior work, including demonstrating that models are inappropriately affected by these less extreme biases. Our theoretical treatment of this problem also allows us to analyze proposed solutions, such as making local edits to dataset instances, and to give recommendations for future data collection and model design efforts that target competency problems.",
+   "overview": "Much recent work in NLP has documented dataset artifacts, bias, and spurious correlations between input features and output labels.",
+   "problem": "However, how to tell which features have \"spurious\" instead of legitimate correlations is typically left unspecified.",
+   "approach": "This analysis gives us a simple statistical test for dataset artifacts, which we use to show more subtle biases than were described in prior work, including demonstrating that models are inappropriately affected by these less extreme biases.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/质量与运营/RAG评测要分离检索质量与生成质量.md",
+     "title": "RAG 评测要分离检索质量与生成质量",
+     "domain": "AI系统",
+     "topic": "质量与运营",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "语言数据中的伪特征：如何发现与移除",
+   "title_en": "Competency Problems: On Finding and Removing Artifacts in Language Data",
+   "problem_zh": "但哪些特征是「伪相关」、哪些是合理相关，通常并没有被说明清楚。",
+   "approach_zh": "这一分析给出一个简单的数据集伪特征统计检验，并用它揭示出比此前工作更隐蔽的偏差，包括证明模型会被这些不那么极端的偏差不当影响。",
+   "result_zh": ""
+  },
+  "2104.09864": {
+   "id": "2104.09864",
+   "title": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+   "authors": [
+    "Jianlin Su",
+    "Yu Lu",
+    "Shengfeng Pan",
+    "Ahmed Murtadha",
+    "Bo Wen",
+    "Yunfeng Liu"
+   ],
+   "published": "2021-04-20",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2104.09864",
+   "abstract": "Position encoding recently has shown effective in the transformer architecture. It enables valuable supervision for dependency modeling between elements at different positions of the sequence. In this paper, we first investigate various methods to integrate positional information into the learning process of transformer-based language models. Then, we propose a novel method named Rotary Position Embedding(RoPE) to effectively leverage the positional information. Specifically, the proposed RoPE encodes the absolute position with a rotation matrix and meanwhile incorporates the explicit relative position dependency in self-attention formulation. Notably, RoPE enables valuable properties, including the flexibility of sequence length, decaying inter-token dependency with increasing relative distances, and the capability of equipping the linear self-attention with relative position encoding. Finally, we evaluate the enhanced transformer with rotary position embedding, also called RoFormer, on various long text classification benchmark datasets. Our experiments show that it consistently overcomes its alternatives. Furthermore, we provide a theoretical analysis to explain some experimental results. RoFormer is already integrated into Huggingface: \\url{https://huggingface.co/docs/transformers/model_doc/roformer}.",
+   "overview": "Position encoding recently has shown effective in the transformer architecture.",
+   "problem": "",
+   "approach": "Then, we propose a novel method named Rotary Position Embedding(RoPE) to effectively leverage the positional information.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "title": "位置编码和长上下文限制有效利用",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "RoFormer：用旋转位置编码增强 Transformer",
+   "title_en": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
+   "problem_zh": "",
+   "approach_zh": "提出旋转位置编码（RoPE），以更有效地利用位置信息。",
+   "result_zh": ""
+  },
+  "2203.02155": {
+   "id": "2203.02155",
+   "title": "Training language models to follow instructions with human feedback",
+   "authors": [
+    "Long Ouyang",
+    "Jeff Wu",
+    "Xu Jiang",
+    "Diogo Almeida",
+    "Carroll L. Wainwright",
+    "Pamela Mishkin",
+    "Chong Zhang",
+    "Sandhini Agarwal",
+    "Katarina Slama",
+    "Alex Ray",
+    "John Schulman",
+    "Jacob Hilton",
+    "Fraser Kelton",
+    "Luke Miller",
+    "Maddie Simens",
+    "Amanda Askell",
+    "Peter Welinder",
+    "Paul Christiano",
+    "Jan Leike",
+    "Ryan Lowe"
+   ],
+   "published": "2022-03-04",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2203.02155",
+   "abstract": "Making language models bigger does not inherently make them better at following a user's intent. For example, large language models can generate outputs that are untruthful, toxic, or simply not helpful to the user. In other words, these models are not aligned with their users. In this paper, we show an avenue for aligning language models with user intent on a wide range of tasks by fine-tuning with human feedback. Starting with a set of labeler-written prompts and prompts submitted through the OpenAI API, we collect a dataset of labeler demonstrations of the desired model behavior, which we use to fine-tune GPT-3 using supervised learning. We then collect a dataset of rankings of model outputs, which we use to further fine-tune this supervised model using reinforcement learning from human feedback. We call the resulting models InstructGPT. In human evaluations on our prompt distribution, outputs from the 1.3B parameter InstructGPT model are preferred to outputs from the 175B GPT-3, despite having 100x fewer parameters. Moreover, InstructGPT models show improvements in truthfulness and reductions in toxic output generation while having minimal performance regressions on public NLP datasets. Even though InstructGPT still makes simple mistakes, our results show that fine-tuning with human feedback is a promising direction for aligning language models with human intent.",
+   "overview": "Making language models bigger does not inherently make them better at following a user's intent.",
+   "problem": "",
+   "approach": "In this paper, we show an avenue for aligning language models with user intent on a wide range of tasks by fine-tuning with human feedback.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "title": "后训练对齐与微调改变行为边界",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md",
+     "title": "模型提出候选，系统定义正确性",
+     "domain": "AI系统",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "title": "预训练、后训练、RAG 与工具改变不同层次",
+     "domain": "AI系统",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "用人类反馈训练语言模型遵循指令",
+   "title_en": "Training language models to follow instructions with human feedback",
+   "problem_zh": "",
+   "approach_zh": "本文展示了一条让语言模型在广泛任务上对齐用户意图的路径：用人类反馈做微调。",
+   "result_zh": ""
+  },
+  "2203.10050": {
+   "id": "2203.10050",
+   "title": "SURF: Semi-supervised Reward Learning with Data Augmentation for Feedback-efficient Preference-based Reinforcement Learning",
+   "authors": [
+    "Jongjin Park",
+    "Younggyo Seo",
+    "Jinwoo Shin",
+    "Honglak Lee",
+    "Pieter Abbeel",
+    "Kimin Lee"
+   ],
+   "published": "2022-03-18",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2203.10050",
+   "abstract": "Preference-based reinforcement learning (RL) has shown potential for teaching agents to perform the target tasks without a costly, pre-defined reward function by learning the reward with a supervisor's preference between the two agent behaviors. However, preference-based learning often requires a large amount of human feedback, making it difficult to apply this approach to various applications. This data-efficiency problem, on the other hand, has been typically addressed by using unlabeled samples or data augmentation techniques in the context of supervised learning. Motivated by the recent success of these approaches, we present SURF, a semi-supervised reward learning framework that utilizes a large amount of unlabeled samples with data augmentation. In order to leverage unlabeled samples for reward learning, we infer pseudo-labels of the unlabeled samples based on the confidence of the preference predictor. To further improve the label-efficiency of reward learning, we introduce a new data augmentation that temporally crops consecutive subsequences from the original behaviors. Our experiments demonstrate that our approach significantly improves the feedback-efficiency of the state-of-the-art preference-based method on a variety of locomotion and robotic manipulation tasks.",
+   "overview": "Preference-based reinforcement learning (RL) has shown potential for teaching agents to perform the target tasks without a costly, pre-defined reward function by learning the reward with a supervisor's preference between the two agent behaviors.",
+   "problem": "However, preference-based learning often requires a large amount of human feedback, making it difficult to apply this approach to various applications.",
+   "approach": "Motivated by the recent success of these approaches, we present SURF, a semi-supervised reward learning framework that utilizes a large amount of unlabeled samples with data augmentation.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/数据与MLOps/数据集、特征与模型版本必须可追溯.md",
+     "title": "数据集、特征与模型版本必须可追溯",
+     "domain": "AI系统",
+     "topic": "数据与MLOps",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "SURF：用数据增强的半监督奖励学习",
+   "title_en": "SURF: Semi-supervised Reward Learning with Data Augmentation for Feedback-efficient Preference-based Reinforcement Learning",
+   "problem_zh": "基于偏好的学习往往需要大量人类反馈，使得这类方法难以应用到多种场景。",
+   "approach_zh": "受这些方法近期成功的启发，提出 SURF：一个半监督奖励学习框架，利用大量未标注样本配合数据增强。",
+   "result_zh": ""
+  },
+  "2203.15556": {
+   "id": "2203.15556",
+   "title": "Training Compute-Optimal Large Language Models",
+   "authors": [
+    "Jordan Hoffmann",
+    "Sebastian Borgeaud",
+    "Arthur Mensch",
+    "Elena Buchatskaya",
+    "Trevor Cai",
+    "Eliza Rutherford",
+    "Diego de Las Casas",
+    "Lisa Anne Hendricks",
+    "Johannes Welbl",
+    "Aidan Clark",
+    "Tom Hennigan",
+    "Eric Noland",
+    "Katie Millican",
+    "George van den Driessche",
+    "Bogdan Damoc",
+    "Aurelia Guy",
+    "Simon Osindero",
+    "Karen Simonyan",
+    "Erich Elsen",
+    "Jack W. Rae",
+    "Oriol Vinyals",
+    "Laurent Sifre"
+   ],
+   "published": "2022-03-29",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2203.15556",
+   "abstract": "We investigate the optimal model size and number of tokens for training a transformer language model under a given compute budget. We find that current large language models are significantly undertrained, a consequence of the recent focus on scaling language models whilst keeping the amount of training data constant. By training over 400 language models ranging from 70 million to over 16 billion parameters on 5 to 500 billion tokens, we find that for compute-optimal training, the model size and the number of training tokens should be scaled equally: for every doubling of model size the number of training tokens should also be doubled. We test this hypothesis by training a predicted compute-optimal model, Chinchilla, that uses the same compute budget as Gopher but with 70B parameters and 4$\\times$ more more data. Chinchilla uniformly and significantly outperforms Gopher (280B), GPT-3 (175B), Jurassic-1 (178B), and Megatron-Turing NLG (530B) on a large range of downstream evaluation tasks. This also means that Chinchilla uses substantially less compute for fine-tuning and inference, greatly facilitating downstream usage. As a highlight, Chinchilla reaches a state-of-the-art average accuracy of 67.5% on the MMLU benchmark, greater than a 7% improvement over Gopher.",
+   "overview": "We investigate the optimal model size and number of tokens for training a transformer language model under a given compute budget.",
+   "problem": "",
+   "approach": "",
+   "key_result": "As a highlight, Chinchilla reaches a state-of-the-art average accuracy of 67.5% on the MMLU benchmark, greater than a 7% improvement over Gopher.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
+     "title": "Scaling Law 把训练预算分配成可测量假设",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型基础与训练/预训练数据决定模型能力上限.md",
+     "title": "预训练数据决定模型能力上限",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "按计算量最优训练大模型",
+   "title_en": "Training Compute-Optimal Large Language Models",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": "一个亮点：Chinchilla 在 MMLU 基准上取得 67.5% 的平均准确率，比 Gopher 提升超过 7%。"
+  },
+  "2204.07196": {
+   "id": "2204.07196",
+   "title": "Testing distributional assumptions of learning algorithms",
+   "authors": [
+    "Ronitt Rubinfeld",
+    "Arsen Vasilyan"
+   ],
+   "published": "2022-04-14",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2204.07196",
+   "abstract": "There are many high dimensional function classes that have fast agnostic learning algorithms when assumptions on the distribution of examples can be made, such as Gaussianity or uniformity over the domain. But how can one be confident that data indeed satisfies such assumption, so that one can trust in output quality of the agnostic learning algorithm? We propose a model by which to systematically study the design of tester-learner pairs $(\\mathcal{A},\\mathcal{T})$, such that if the distribution on examples in the data passes the tester $\\mathcal{T}$ then one can safely trust the output of the agnostic learner $\\mathcal{A}$ on the data. To demonstrate the power of the model, we apply it to the classical problem of agnostically learning halfspaces under the standard Gaussian distribution and present a tester-learner pair with combined run-time of $n^{\\tilde{O}(1/ε^4)}$. This qualitatively matches that of the best known ordinary agnostic learning algorithms for this task. In contrast, finite sample Gaussianity testers do not exist for the $L_1$ and EMD distance measures. A key step is to show that half-spaces are well-approximated with low-degree polynomials relative to distributions with low-degree moments close to those of a Gaussian. We also go beyond spherically-symmetric distributions, and give a tester-learner pair for halfspaces under the uniform distribution on $\\{0,1\\}^n$ with combined run-time of $n^{\\tilde{O}(1/ε^4)}$. This is achieved using polynomial approximation theory and critical index machinery. We also show there exist some well-studied settings where $2^{\\tilde{O}(\\sqrt{n})}$ run-time agnostic learning algorithms are available, yet the combined run-times of tester-learner pairs must be as high as $2^{Ω(n)}$. On that account, the design of tester-learner pairs is a research direction in its own right independent of standard agnostic learning.",
+   "overview": "There are many high dimensional function classes that have fast agnostic learning algorithms when assumptions on the distribution of examples can be made, such as Gaussianity or uniformity over the domain.",
+   "problem": "To demonstrate the power of the model, we apply it to the classical problem of agnostically learning halfspaces under the standard Gaussian distribution and present a tester-learner pair with combined run-time of $n^{\\tilde{O}(1/ε^4)}$.",
+   "approach": "We propose a model by which to systematically study the design of tester-learner pairs $(\\mathcal{A},\\mathcal{T})$, such that if the distribution on examples in the data passes the tester $\\mathcal{T}$ then one can safely trust the output of the agnostic learner $\\mathcal{A}$ on the data.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
+     "title": "混合检索、重排与查询改写各自解决什么问题",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "学习算法的分布假设检验",
+   "title_en": "Testing distributional assumptions of learning algorithms",
+   "problem_zh": "为展示该模型的能力，把它用于标准高斯分布下不可知地学习半空间这一经典问题，给出一个检验器-学习器组合，合计运行时间为 n^{Õ(1/ε⁴)}。",
+   "approach_zh": "提出一个模型来系统研究检验器-学习器对 (A, T) 的设计：如果数据分布通过了检验器 T，就可以放心地信任不可知学习器 A 在该数据上的输出。",
+   "result_zh": ""
+  },
+  "2205.14135": {
+   "id": "2205.14135",
+   "title": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+   "authors": [
+    "Tri Dao",
+    "Daniel Y. Fu",
+    "Stefano Ermon",
+    "Atri Rudra",
+    "Christopher Ré"
+   ],
+   "published": "2022-05-27",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2205.14135",
+   "abstract": "Transformers are slow and memory-hungry on long sequences, since the time and memory complexity of self-attention are quadratic in sequence length. Approximate attention methods have attempted to address this problem by trading off model quality to reduce the compute complexity, but often do not achieve wall-clock speedup. We argue that a missing principle is making attention algorithms IO-aware -- accounting for reads and writes between levels of GPU memory. We propose FlashAttention, an IO-aware exact attention algorithm that uses tiling to reduce the number of memory reads/writes between GPU high bandwidth memory (HBM) and GPU on-chip SRAM. We analyze the IO complexity of FlashAttention, showing that it requires fewer HBM accesses than standard attention, and is optimal for a range of SRAM sizes. We also extend FlashAttention to block-sparse attention, yielding an approximate attention algorithm that is faster than any existing approximate attention method. FlashAttention trains Transformers faster than existing baselines: 15% end-to-end wall-clock speedup on BERT-large (seq. length 512) compared to the MLPerf 1.1 training speed record, 3$\\times$ speedup on GPT-2 (seq. length 1K), and 2.4$\\times$ speedup on long-range arena (seq. length 1K-4K). FlashAttention and block-sparse FlashAttention enable longer context in Transformers, yielding higher quality models (0.7 better perplexity on GPT-2 and 6.4 points of lift on long-document classification) and entirely new capabilities: the first Transformers to achieve better-than-chance performance on the Path-X challenge (seq. length 16K, 61.4% accuracy) and Path-256 (seq. length 64K, 63.1% accuracy).",
+   "overview": "Transformers are slow and memory-hungry on long sequences, since the time and memory complexity of self-attention are quadratic in sequence length.",
+   "problem": "Approximate attention methods have attempted to address this problem by trading off model quality to reduce the compute complexity, but often do not achieve wall-clock speedup.",
+   "approach": "We propose FlashAttention, an IO-aware exact attention algorithm that uses tiling to reduce the number of memory reads/writes between GPU high bandwidth memory (HBM) and GPU on-chip SRAM.",
+   "key_result": "FlashAttention trains Transformers faster than existing baselines: 15% end-to-end wall-clock speedup on BERT-large (seq.",
+   "cites_evidence": [],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "FlashAttention：考虑 IO 的精确注意力计算",
+   "title_en": "FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness",
+   "problem_zh": "近似注意力方法试图用牺牲模型质量来降低计算复杂度，但往往拿不到实际的墙上时间加速。",
+   "approach_zh": "提出 FlashAttention，一种考虑 IO 的精确注意力算法，通过分块减少 GPU 高带宽显存（HBM）与片上 SRAM 之间的读写次数。",
+   "result_zh": "FlashAttention 训练 Transformer 比现有基线更快：在 BERT-large 上端到端墙上时间加速 15%。"
+  },
+  "2210.03629": {
+   "id": "2210.03629",
+   "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+   "authors": [
+    "Shunyu Yao",
+    "Jeffrey Zhao",
+    "Dian Yu",
+    "Nan Du",
+    "Izhak Shafran",
+    "Karthik Narasimhan",
+    "Yuan Cao"
+   ],
+   "published": "2022-10-06",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2210.03629",
+   "abstract": "While large language models (LLMs) have demonstrated impressive capabilities across tasks in language understanding and interactive decision making, their abilities for reasoning (e.g. chain-of-thought prompting) and acting (e.g. action plan generation) have primarily been studied as separate topics. In this paper, we explore the use of LLMs to generate both reasoning traces and task-specific actions in an interleaved manner, allowing for greater synergy between the two: reasoning traces help the model induce, track, and update action plans as well as handle exceptions, while actions allow it to interface with external sources, such as knowledge bases or environments, to gather additional information. We apply our approach, named ReAct, to a diverse set of language and decision making tasks and demonstrate its effectiveness over state-of-the-art baselines, as well as improved human interpretability and trustworthiness over methods without reasoning or acting components. Concretely, on question answering (HotpotQA) and fact verification (Fever), ReAct overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API, and generates human-like task-solving trajectories that are more interpretable than baselines without reasoning traces. On two interactive decision making benchmarks (ALFWorld and WebShop), ReAct outperforms imitation and reinforcement learning methods by an absolute success rate of 34% and 10% respectively, while being prompted with only one or two in-context examples. Project site with code: https://react-lm.github.io",
+   "overview": "While large language models (LLMs) have demonstrated impressive capabilities across tasks in language understanding and interactive decision making, their abilities for reasoning (e.g.",
+   "problem": "Concretely, on question answering (HotpotQA) and fact verification (Fever), ReAct overcomes issues of hallucination and error propagation prevalent in chain-of-thought reasoning by interacting with a simple Wikipedia API, and generates human-like task-solving trajectories that are more interpreta…",
+   "approach": "",
+   "key_result": "On two interactive decision making benchmarks (ALFWorld and WebShop), ReAct outperforms imitation and reinforcement learning methods by an absolute success rate of 34% and 10% respectively, while being prompted with only one or two in-context examples.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md",
+     "title": "上下文工程是在有限预算内构造决策现场",
+     "domain": "AI系统",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "ReAct：让推理与行动交替进行",
+   "title_en": "ReAct: Synergizing Reasoning and Acting in Language Models",
+   "problem_zh": "在问答（HotpotQA）和事实核查（Fever）上，ReAct 通过与一个简单的 Wikipedia API 交互，克服了思维链推理中普遍存在的幻觉和错误传播问题，并生成更可解释的、类人的解题轨迹。",
+   "approach_zh": "",
+   "result_zh": "在两个交互式决策基准（ALFWorld 和 WebShop）上，ReAct 分别以 34% 和 10% 的绝对成功率超过模仿学习和强化学习方法，而提示只需要一两个示例。"
+  },
+  "2210.17323": {
+   "id": "2210.17323",
+   "title": "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers",
+   "authors": [
+    "Elias Frantar",
+    "Saleh Ashkboos",
+    "Torsten Hoefler",
+    "Dan Alistarh"
+   ],
+   "published": "2022-10-31",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2210.17323",
+   "abstract": "Generative Pre-trained Transformer models, known as GPT or OPT, set themselves apart through breakthrough performance across complex language modelling tasks, but also by their extremely high computational and storage costs. Specifically, due to their massive size, even inference for large, highly-accurate GPT models may require multiple performant GPUs, which limits the usability of such models. While there is emerging work on relieving this pressure via model compression, the applicability and performance of existing compression techniques is limited by the scale and complexity of GPT models. In this paper, we address this challenge, and propose GPTQ, a new one-shot weight quantization method based on approximate second-order information, that is both highly-accurate and highly-efficient. Specifically, GPTQ can quantize GPT models with 175 billion parameters in approximately four GPU hours, reducing the bitwidth down to 3 or 4 bits per weight, with negligible accuracy degradation relative to the uncompressed baseline. Our method more than doubles the compression gains relative to previously-proposed one-shot quantization methods, preserving accuracy, allowing us for the first time to execute an 175 billion-parameter model inside a single GPU for generative inference. Moreover, we also show that our method can still provide reasonable accuracy in the extreme quantization regime, in which weights are quantized to 2-bit or even ternary quantization levels. We show experimentally that these improvements can be leveraged for end-to-end inference speedups over FP16, of around 3.25x when using high-end GPUs (NVIDIA A100) and 4.5x when using more cost-effective ones (NVIDIA A6000). The implementation is available at https://github.com/IST-DASLab/gptq.",
+   "overview": "Generative Pre-trained Transformer models, known as GPT or OPT, set themselves apart through breakthrough performance across complex language modelling tasks, but also by their extremely high computational and storage costs.",
+   "problem": "Specifically, due to their massive size, even inference for large, highly-accurate GPT models may require multiple performant GPUs, which limits the usability of such models.",
+   "approach": "Our method more than doubles the compression gains relative to previously-proposed one-shot quantization methods, preserving accuracy, allowing us for the first time to execute an 175 billion-parameter model inside a single GPU for generative inference.",
+   "key_result": "We show experimentally that these improvements can be leveraged for end-to-end inference speedups over FP16, of around 3.25x when using high-end GPUs (NVIDIA A100) and 4.5x when using more cost-effective ones (NVIDIA A6000).",
+   "cites_evidence": [],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "GPTQ：生成式模型的训练后量化",
+   "title_en": "GPTQ: Accurate Post-Training Quantization for Generative Pre-trained Transformers",
+   "problem_zh": "由于体积巨大，即便是推理，高精度的大型 GPT 模型也可能需要多块高性能 GPU，限制了可用性。",
+   "approach_zh": "本方法相对此前的一次性量化方法把压缩收益提高一倍以上，同时保住精度，并首次让 1750 亿参数模型能在单块 GPU 上做生成式推理。",
+   "result_zh": "实验表明这些改进可以转化为端到端推理的加速：相对 FP16，在高性能 GPU（NVIDIA A100）上约 3.25 倍，在更廉价的 GPU（NVIDIA A6000）上约 4.5 倍。"
+  },
+  "2211.10438": {
+   "id": "2211.10438",
+   "title": "SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models",
+   "authors": [
+    "Guangxuan Xiao",
+    "Ji Lin",
+    "Mickael Seznec",
+    "Hao Wu",
+    "Julien Demouth",
+    "Song Han"
+   ],
+   "published": "2022-11-18",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2211.10438",
+   "abstract": "Large language models (LLMs) show excellent performance but are compute- and memory-intensive. Quantization can reduce memory and accelerate inference. However, existing methods cannot maintain accuracy and hardware efficiency at the same time. We propose SmoothQuant, a training-free, accuracy-preserving, and general-purpose post-training quantization (PTQ) solution to enable 8-bit weight, 8-bit activation (W8A8) quantization for LLMs. Based on the fact that weights are easy to quantize while activations are not, SmoothQuant smooths the activation outliers by offline migrating the quantization difficulty from activations to weights with a mathematically equivalent transformation. SmoothQuant enables an INT8 quantization of both weights and activations for all the matrix multiplications in LLMs, including OPT, BLOOM, GLM, MT-NLG, Llama-1/2, Falcon, Mistral, and Mixtral models. We demonstrate up to 1.56x speedup and 2x memory reduction for LLMs with negligible loss in accuracy. SmoothQuant enables serving 530B LLM within a single node. Our work offers a turn-key solution that reduces hardware costs and democratizes LLMs. Code is available at https://github.com/mit-han-lab/smoothquant.",
+   "overview": "Large language models (LLMs) show excellent performance but are compute- and memory-intensive.",
+   "problem": "However, existing methods cannot maintain accuracy and hardware efficiency at the same time.",
+   "approach": "We propose SmoothQuant, a training-free, accuracy-preserving, and general-purpose post-training quantization (PTQ) solution to enable 8-bit weight, 8-bit activation (W8A8) quantization for LLMs.",
+   "key_result": "",
+   "cites_evidence": [],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "SmoothQuant：大模型训练后量化的精度与效率平衡",
+   "title_en": "SmoothQuant: Accurate and Efficient Post-Training Quantization for Large Language Models",
+   "problem_zh": "现有方法无法同时保住精度和硬件效率。",
+   "approach_zh": "提出 SmoothQuant，一个免训练、保精度、通用的训练后量化方案，使 LLM 可以做到 8 位权重、8 位激活（W8A8）量化。",
+   "result_zh": ""
+  },
+  "2211.17192": {
+   "id": "2211.17192",
+   "title": "Fast Inference from Transformers via Speculative Decoding",
+   "authors": [
+    "Yaniv Leviathan",
+    "Matan Kalman",
+    "Yossi Matias"
+   ],
+   "published": "2022-11-30",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2211.17192",
+   "abstract": "Inference from large autoregressive models like Transformers is slow - decoding K tokens takes K serial runs of the model. In this work we introduce speculative decoding - an algorithm to sample from autoregressive models faster without any changes to the outputs, by computing several tokens in parallel. At the heart of our approach lie the observations that (1) hard language-modeling tasks often include easier subtasks that can be approximated well by more efficient models, and (2) using speculative execution and a novel sampling method, we can make exact decoding from the large models faster, by running them in parallel on the outputs of the approximation models, potentially generating several tokens concurrently, and without changing the distribution. Our method can accelerate existing off-the-shelf models without retraining or architecture changes. We demonstrate it on T5-XXL and show a 2X-3X acceleration compared to the standard T5X implementation, with identical outputs.",
+   "overview": "Inference from large autoregressive models like Transformers is slow - decoding K tokens takes K serial runs of the model.",
+   "problem": "",
+   "approach": "In this work we introduce speculative decoding - an algorithm to sample from autoregressive models faster without any changes to the outputs, by computing several tokens in parallel.",
+   "key_result": "",
+   "cites_evidence": [],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "投机解码：加速 Transformer 推理",
+   "title_en": "Fast Inference from Transformers via Speculative Decoding",
+   "problem_zh": "",
+   "approach_zh": "提出投机解码：通过并行计算多个词元，在不改变输出的前提下更快地从自回归模型采样。",
+   "result_zh": ""
+  },
+  "2212.10496": {
+   "id": "2212.10496",
+   "title": "Precise Zero-Shot Dense Retrieval without Relevance Labels",
+   "authors": [
+    "Luyu Gao",
+    "Xueguang Ma",
+    "Jimmy Lin",
+    "Jamie Callan"
+   ],
+   "published": "2022-12-20",
+   "primary": "cs.IR",
+   "url": "https://arxiv.org/abs/2212.10496",
+   "abstract": "While dense retrieval has been shown effective and efficient across tasks and languages, it remains difficult to create effective fully zero-shot dense retrieval systems when no relevance label is available. In this paper, we recognize the difficulty of zero-shot learning and encoding relevance. Instead, we propose to pivot through Hypothetical Document Embeddings~(HyDE). Given a query, HyDE first zero-shot instructs an instruction-following language model (e.g. InstructGPT) to generate a hypothetical document. The document captures relevance patterns but is unreal and may contain false details. Then, an unsupervised contrastively learned encoder~(e.g. Contriever) encodes the document into an embedding vector. This vector identifies a neighborhood in the corpus embedding space, where similar real documents are retrieved based on vector similarity. This second step ground the generated document to the actual corpus, with the encoder's dense bottleneck filtering out the incorrect details. Our experiments show that HyDE significantly outperforms the state-of-the-art unsupervised dense retriever Contriever and shows strong performance comparable to fine-tuned retrievers, across various tasks (e.g. web search, QA, fact verification) and languages~(e.g. sw, ko, ja).",
+   "overview": "While dense retrieval has been shown effective and efficient across tasks and languages, it remains difficult to create effective fully zero-shot dense retrieval systems when no relevance label is available.",
+   "problem": "While dense retrieval has been shown effective and efficient across tasks and languages, it remains difficult to create effective fully zero-shot dense retrieval systems when no relevance label is available.",
+   "approach": "Instead, we propose to pivot through Hypothetical Document Embeddings~(HyDE).",
+   "key_result": "",
+   "cites_evidence": [],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "无需相关性标注的零样本稠密检索",
+   "title_en": "Precise Zero-Shot Dense Retrieval without Relevance Labels",
+   "problem_zh": "稠密检索已在跨任务、跨语言上被证明有效，但在没有任何相关性标注时，很难构建真正零样本可用的稠密检索系统。",
+   "approach_zh": "提出通过「假设文档嵌入」（HyDE）来转换问题。",
+   "result_zh": ""
+  },
+  "2302.12173": {
+   "id": "2302.12173",
+   "title": "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection",
+   "authors": [
+    "Kai Greshake",
+    "Sahar Abdelnabi",
+    "Shailesh Mishra",
+    "Christoph Endres",
+    "Thorsten Holz",
+    "Mario Fritz"
+   ],
+   "published": "2023-02-23",
+   "primary": "cs.CR",
+   "url": "https://arxiv.org/abs/2302.12173",
+   "abstract": "Large Language Models (LLMs) are increasingly being integrated into various applications. The functionalities of recent LLMs can be flexibly modulated via natural language prompts. This renders them susceptible to targeted adversarial prompting, e.g., Prompt Injection (PI) attacks enable attackers to override original instructions and employed controls. So far, it was assumed that the user is directly prompting the LLM. But, what if it is not the user prompting? We argue that LLM-Integrated Applications blur the line between data and instructions. We reveal new attack vectors, using Indirect Prompt Injection, that enable adversaries to remotely (without a direct interface) exploit LLM-integrated applications by strategically injecting prompts into data likely to be retrieved. We derive a comprehensive taxonomy from a computer security perspective to systematically investigate impacts and vulnerabilities, including data theft, worming, information ecosystem contamination, and other novel security risks. We demonstrate our attacks' practical viability against both real-world systems, such as Bing's GPT-4 powered Chat and code-completion engines, and synthetic applications built on GPT-4. We show how processing retrieved prompts can act as arbitrary code execution, manipulate the application's functionality, and control how and if other APIs are called. Despite the increasing integration and reliance on LLMs, effective mitigations of these emerging threats are currently lacking. By raising awareness of these vulnerabilities and providing key insights into their implications, we aim to promote the safe and responsible deployment of these powerful models and the development of robust defenses that protect users and systems from potential attacks.",
+   "overview": "Large Language Models (LLMs) are increasingly being integrated into various applications.",
+   "problem": "",
+   "approach": "We show how processing retrieved prompts can act as arbitrary code execution, manipulate the application's functionality, and control how and if other APIs are called.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/安全与治理/提示注入和工具越权是不同威胁.md",
+     "title": "提示注入和工具越权是不同威胁",
+     "domain": "AI系统",
+     "topic": "安全与治理",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "间接提示注入如何攻破集成 LLM 的真实应用",
+   "title_en": "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection",
+   "problem_zh": "",
+   "approach_zh": "展示处理检索到的提示可以达到任意代码执行的效果，操纵应用的功能，并控制其他 API 是否以及如何被调用。",
+   "result_zh": ""
+  },
+  "2303.11366": {
+   "id": "2303.11366",
+   "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+   "authors": [
+    "Noah Shinn",
+    "Federico Cassano",
+    "Edward Berman",
+    "Ashwin Gopinath",
+    "Karthik Narasimhan",
+    "Shunyu Yao"
+   ],
+   "published": "2023-03-20",
+   "primary": "cs.AI",
+   "url": "https://arxiv.org/abs/2303.11366",
+   "abstract": "Large language models (LLMs) have been increasingly used to interact with external environments (e.g., games, compilers, APIs) as goal-driven agents. However, it remains challenging for these language agents to quickly and efficiently learn from trial-and-error as traditional reinforcement learning methods require extensive training samples and expensive model fine-tuning. We propose Reflexion, a novel framework to reinforce language agents not by updating weights, but instead through linguistic feedback. Concretely, Reflexion agents verbally reflect on task feedback signals, then maintain their own reflective text in an episodic memory buffer to induce better decision-making in subsequent trials. Reflexion is flexible enough to incorporate various types (scalar values or free-form language) and sources (external or internally simulated) of feedback signals, and obtains significant improvements over a baseline agent across diverse tasks (sequential decision-making, coding, language reasoning). For example, Reflexion achieves a 91% pass@1 accuracy on the HumanEval coding benchmark, surpassing the previous state-of-the-art GPT-4 that achieves 80%. We also conduct ablation and analysis studies using different feedback signals, feedback incorporation methods, and agent types, and provide insights into how they affect performance.",
+   "overview": "Large language models (LLMs) have been increasingly used to interact with external environments (e.g., games, compilers, APIs) as goal-driven agents.",
+   "problem": "However, it remains challenging for these language agents to quickly and efficiently learn from trial-and-error as traditional reinforcement learning methods require extensive training samples and expensive model fine-tuning.",
+   "approach": "We propose Reflexion, a novel framework to reinforce language agents not by updating weights, but instead through linguistic feedback.",
+   "key_result": "For example, Reflexion achieves a 91% pass@1 accuracy on the HumanEval coding benchmark, surpassing the previous state-of-the-art GPT-4 that achieves 80%.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/Agent与工作流/反思要有外部锚点.md",
+     "title": "反思要有外部锚点，否则只是自我说服",
+     "domain": "AI系统",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Reflexion：用语言反馈做强化学习的智能体",
+   "title_en": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+   "problem_zh": "语言智能体很难快速有效地从试错中学习，因为传统强化学习需要大量训练样本和昂贵的模型微调。",
+   "approach_zh": "提出 Reflexion，不通过更新权重，而是通过语言反馈来强化语言智能体。",
+   "result_zh": "在 HumanEval 编程基准上，Reflexion 取得 91% 的 pass@1 准确率，超过此前最好的 GPT-4（80%）。"
+  },
+  "2304.08485": {
+   "id": "2304.08485",
+   "title": "Visual Instruction Tuning",
+   "authors": [
+    "Haotian Liu",
+    "Chunyuan Li",
+    "Qingyang Wu",
+    "Yong Jae Lee"
+   ],
+   "published": "2023-04-17",
+   "primary": "cs.CV",
+   "url": "https://arxiv.org/abs/2304.08485",
+   "abstract": "Instruction tuning large language models (LLMs) using machine-generated instruction-following data has improved zero-shot capabilities on new tasks, but the idea is less explored in the multimodal field. In this paper, we present the first attempt to use language-only GPT-4 to generate multimodal language-image instruction-following data. By instruction tuning on such generated data, we introduce LLaVA: Large Language and Vision Assistant, an end-to-end trained large multimodal model that connects a vision encoder and LLM for general-purpose visual and language understanding.Our early experiments show that LLaVA demonstrates impressive multimodel chat abilities, sometimes exhibiting the behaviors of multimodal GPT-4 on unseen images/instructions, and yields a 85.1% relative score compared with GPT-4 on a synthetic multimodal instruction-following dataset. When fine-tuned on Science QA, the synergy of LLaVA and GPT-4 achieves a new state-of-the-art accuracy of 92.53%. We make GPT-4 generated visual instruction tuning data, our model and code base publicly available.",
+   "overview": "Instruction tuning large language models (LLMs) using machine-generated instruction-following data has improved zero-shot capabilities on new tasks, but the idea is less explored in the multimodal field.",
+   "problem": "",
+   "approach": "In this paper, we present the first attempt to use language-only GPT-4 to generate multimodal language-image instruction-following data.",
+   "key_result": "When fine-tuned on Science QA, the synergy of LLaVA and GPT-4 achieves a new state-of-the-art accuracy of 92.53%.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
+     "title": "多模态模型把不同输入映射到共同推理接口",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "视觉指令微调",
+   "title_en": "Visual Instruction Tuning",
+   "problem_zh": "",
+   "approach_zh": "首次尝试用纯语言的 GPT-4 生成多模态的语言-图像指令跟随数据。",
+   "result_zh": "在 Science QA 上微调后，LLaVA 与 GPT-4 的配合达到 92.53% 的新最高准确率。"
+  },
+  "2305.06983": {
+   "id": "2305.06983",
+   "title": "Active Retrieval Augmented Generation",
+   "authors": [
+    "Zhengbao Jiang",
+    "Frank F. Xu",
+    "Luyu Gao",
+    "Zhiqing Sun",
+    "Qian Liu",
+    "Jane Dwivedi-Yu",
+    "Yiming Yang",
+    "Jamie Callan",
+    "Graham Neubig"
+   ],
+   "published": "2023-05-11",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2305.06983",
+   "abstract": "Despite the remarkable ability of large language models (LMs) to comprehend and generate language, they have a tendency to hallucinate and create factually inaccurate output. Augmenting LMs by retrieving information from external knowledge resources is one promising solution. Most existing retrieval augmented LMs employ a retrieve-and-generate setup that only retrieves information once based on the input. This is limiting, however, in more general scenarios involving generation of long texts, where continually gathering information throughout generation is essential. In this work, we provide a generalized view of active retrieval augmented generation, methods that actively decide when and what to retrieve across the course of the generation. We propose Forward-Looking Active REtrieval augmented generation (FLARE), a generic method which iteratively uses a prediction of the upcoming sentence to anticipate future content, which is then utilized as a query to retrieve relevant documents to regenerate the sentence if it contains low-confidence tokens. We test FLARE along with baselines comprehensively over 4 long-form knowledge-intensive generation tasks/datasets. FLARE achieves superior or competitive performance on all tasks, demonstrating the effectiveness of our method. Code and datasets are available at https://github.com/jzbjyb/FLARE.",
+   "overview": "Despite the remarkable ability of large language models (LMs) to comprehend and generate language, they have a tendency to hallucinate and create factually inaccurate output.",
+   "problem": "This is limiting, however, in more general scenarios involving generation of long texts, where continually gathering information throughout generation is essential.",
+   "approach": "We propose Forward-Looking Active REtrieval augmented generation (FLARE), a generic method which iteratively uses a prediction of the upcoming sentence to anticipate future content, which is then utilized as a query to retrieve relevant documents to regenerate the sentence if it contains low-confidence tokens.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "title": "检索从一次查询演进为有状态的证据获取",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "主动检索增强生成",
+   "title_en": "Active Retrieval Augmented Generation",
+   "problem_zh": "在长文本生成这类更一般的场景中，需要在生成过程中持续收集信息，只在开头检索一次是不够的。",
+   "approach_zh": "提出 FLARE（Forward-Looking Active REtrieval），迭代地用对下一句的预测来预估后续内容，再以此为查询检索文档；若生成的句子含有低置信度词元，就检索并重写。",
+   "result_zh": ""
+  },
+  "2305.18290": {
+   "id": "2305.18290",
+   "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+   "authors": [
+    "Rafael Rafailov",
+    "Archit Sharma",
+    "Eric Mitchell",
+    "Stefano Ermon",
+    "Christopher D. Manning",
+    "Chelsea Finn"
+   ],
+   "published": "2023-05-29",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2305.18290",
+   "abstract": "While large-scale unsupervised language models (LMs) learn broad world knowledge and some reasoning skills, achieving precise control of their behavior is difficult due to the completely unsupervised nature of their training. Existing methods for gaining such steerability collect human labels of the relative quality of model generations and fine-tune the unsupervised LM to align with these preferences, often with reinforcement learning from human feedback (RLHF). However, RLHF is a complex and often unstable procedure, first fitting a reward model that reflects the human preferences, and then fine-tuning the large unsupervised LM using reinforcement learning to maximize this estimated reward without drifting too far from the original model. In this paper we introduce a new parameterization of the reward model in RLHF that enables extraction of the corresponding optimal policy in closed form, allowing us to solve the standard RLHF problem with only a simple classification loss. The resulting algorithm, which we call Direct Preference Optimization (DPO), is stable, performant, and computationally lightweight, eliminating the need for sampling from the LM during fine-tuning or performing significant hyperparameter tuning. Our experiments show that DPO can fine-tune LMs to align with human preferences as well as or better than existing methods. Notably, fine-tuning with DPO exceeds PPO-based RLHF in ability to control sentiment of generations, and matches or improves response quality in summarization and single-turn dialogue while being substantially simpler to implement and train.",
+   "overview": "While large-scale unsupervised language models (LMs) learn broad world knowledge and some reasoning skills, achieving precise control of their behavior is difficult due to the completely unsupervised nature of their training.",
+   "problem": "While large-scale unsupervised language models (LMs) learn broad world knowledge and some reasoning skills, achieving precise control of their behavior is difficult due to the completely unsupervised nature of their training.",
+   "approach": "In this paper we introduce a new parameterization of the reward model in RLHF that enables extraction of the corresponding optimal policy in closed form, allowing us to solve the standard RLHF problem with only a simple classification loss.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "title": "后训练对齐与微调改变行为边界",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "DPO：语言模型本身就是一个奖励模型",
+   "title_en": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+   "problem_zh": "大规模无监督语言模型学到了广泛的世界知识和一些推理能力，但由于训练完全无监督，精确控制其行为很困难。",
+   "approach_zh": "对 RLHF 中的奖励模型给出一种新的参数化，使对应的最优策略可以闭式求出，从而只用简单的分类损失就能解标准的 RLHF 问题。",
+   "result_zh": ""
+  },
+  "2305.18654": {
+   "id": "2305.18654",
+   "title": "Faith and Fate: Limits of Transformers on Compositionality",
+   "authors": [
+    "Nouha Dziri",
+    "Ximing Lu",
+    "Melanie Sclar",
+    "Xiang Lorraine Li",
+    "Liwei Jiang",
+    "Bill Yuchen Lin",
+    "Peter West",
+    "Chandra Bhagavatula",
+    "Ronan Le Bras",
+    "Jena D. Hwang",
+    "Soumya Sanyal",
+    "Sean Welleck",
+    "Xiang Ren",
+    "Allyson Ettinger",
+    "Zaid Harchaoui",
+    "Yejin Choi"
+   ],
+   "published": "2023-05-29",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2305.18654",
+   "abstract": "Transformer large language models (LLMs) have sparked admiration for their exceptional performance on tasks that demand intricate multi-step reasoning. Yet, these models simultaneously show failures on surprisingly trivial problems. This begs the question: Are these errors incidental, or do they signal more substantial limitations? In an attempt to demystify transformer LLMs, we investigate the limits of these models across three representative compositional tasks -- multi-digit multiplication, logic grid puzzles, and a classic dynamic programming problem. These tasks require breaking problems down into sub-steps and synthesizing these steps into a precise answer. We formulate compositional tasks as computation graphs to systematically quantify the level of complexity, and break down reasoning steps into intermediate sub-procedures. Our empirical findings suggest that transformer LLMs solve compositional tasks by reducing multi-step compositional reasoning into linearized subgraph matching, without necessarily developing systematic problem-solving skills. To round off our empirical study, we provide theoretical arguments on abstract multi-step reasoning problems that highlight how autoregressive generations' performance can rapidly decay with\\,increased\\,task\\,complexity.",
+   "overview": "Transformer large language models (LLMs) have sparked admiration for their exceptional performance on tasks that demand intricate multi-step reasoning.",
+   "problem": "Yet, these models simultaneously show failures on surprisingly trivial problems.",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "title": "后训练对齐与微调改变行为边界",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "语言模型的组合能力边界",
+   "title_en": "Faith and Fate: Limits of Transformers on Compositionality",
+   "problem_zh": "然而这些模型同时在相当简单的问题上出现失败。",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2306.00978": {
+   "id": "2306.00978",
+   "title": "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration",
+   "authors": [
+    "Ji Lin",
+    "Jiaming Tang",
+    "Haotian Tang",
+    "Shang Yang",
+    "Wei-Ming Chen",
+    "Wei-Chen Wang",
+    "Guangxuan Xiao",
+    "Xingyu Dang",
+    "Chuang Gan",
+    "Song Han"
+   ],
+   "published": "2023-06-01",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2306.00978",
+   "abstract": "Large language models (LLMs) have transformed numerous AI applications. On-device LLM is becoming increasingly important: running LLMs locally on edge devices can reduce the cloud computing cost and protect users' privacy. However, the astronomical model size and the limited hardware resource pose significant deployment challenges. We propose Activation-aware Weight Quantization (AWQ), a hardware-friendly approach for LLM low-bit weight-only quantization. AWQ finds that not all weights in an LLM are equally important. Protecting only 1% salient weights can greatly reduce quantization error. To identify salient weight channels, we should refer to the activation distribution, not weights. To avoid the hardware-inefficient mix-precision quantization, we mathematically derive that scaling up the salient channels can reduce the quantization error. AWQ employs an equivalent transformation to scale the salient weight channels to protect them. The scale is determined by collecting the activation statistics offline. AWQ does not rely on any backpropagation or reconstruction, so it generalizes to different domains and modalities without overfitting the calibration set. AWQ outperforms existing work on various language modeling and domain-specific benchmarks (coding and math). Thanks to better generalization, it achieves excellent quantization performance for instruction-tuned LMs and, for the first time, multi-modal LMs. Alongside AWQ, we implement TinyChat, an efficient and flexible inference framework tailored for 4-bit on-device LLM/VLMs. With kernel fusion and platform-aware weight packing, TinyChat offers more than 3x speedup over the Huggingface FP16 implementation on both desktop and mobile GPUs. It also democratizes the deployment of the 70B Llama-2 model on mobile GPUs.",
+   "overview": "Large language models (LLMs) have transformed numerous AI applications.",
+   "problem": "However, the astronomical model size and the limited hardware resource pose significant deployment challenges.",
+   "approach": "We propose Activation-aware Weight Quantization (AWQ), a hardware-friendly approach for LLM low-bit weight-only quantization.",
+   "key_result": "With kernel fusion and platform-aware weight packing, TinyChat offers more than 3x speedup over the Huggingface FP16 implementation on both desktop and mobile GPUs.",
+   "cites_evidence": [],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "AWQ：激活感知的权重量化",
+   "title_en": "AWQ: Activation-aware Weight Quantization for LLM Compression and Acceleration",
+   "problem_zh": "模型体量极大而硬件资源有限，部署面临显著挑战。",
+   "approach_zh": "提出 Activation-aware Weight Quantization（AWQ），一种对硬件友好的 LLM 低位权重量化方法。",
+   "result_zh": "配合算子融合与面向平台的权重打包，TinyChat 相对 Huggingface 的 FP16 实现取得超过 3 倍加速。"
+  },
+  "2306.05685": {
+   "id": "2306.05685",
+   "title": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+   "authors": [
+    "Lianmin Zheng",
+    "Wei-Lin Chiang",
+    "Ying Sheng",
+    "Siyuan Zhuang",
+    "Zhanghao Wu",
+    "Yonghao Zhuang",
+    "Zi Lin",
+    "Zhuohan Li",
+    "Dacheng Li",
+    "Eric P. Xing",
+    "Hao Zhang",
+    "Joseph E. Gonzalez",
+    "Ion Stoica"
+   ],
+   "published": "2023-06-09",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2306.05685",
+   "abstract": "Evaluating large language model (LLM) based chat assistants is challenging due to their broad capabilities and the inadequacy of existing benchmarks in measuring human preferences. To address this, we explore using strong LLMs as judges to evaluate these models on more open-ended questions. We examine the usage and limitations of LLM-as-a-judge, including position, verbosity, and self-enhancement biases, as well as limited reasoning ability, and propose solutions to mitigate some of them. We then verify the agreement between LLM judges and human preferences by introducing two benchmarks: MT-bench, a multi-turn question set; and Chatbot Arena, a crowdsourced battle platform. Our results reveal that strong LLM judges like GPT-4 can match both controlled and crowdsourced human preferences well, achieving over 80% agreement, the same level of agreement between humans. Hence, LLM-as-a-judge is a scalable and explainable way to approximate human preferences, which are otherwise very expensive to obtain. Additionally, we show our benchmark and traditional benchmarks complement each other by evaluating several variants of LLaMA and Vicuna. The MT-bench questions, 3K expert votes, and 30K conversations with human preferences are publicly available at https://github.com/lm-sys/FastChat/tree/main/fastchat/llm_judge.",
+   "overview": "Evaluating large language model (LLM) based chat assistants is challenging due to their broad capabilities and the inadequacy of existing benchmarks in measuring human preferences.",
+   "problem": "We examine the usage and limitations of LLM-as-a-judge, including position, verbosity, and self-enhancement biases, as well as limited reasoning ability, and propose solutions to mitigate some of them.",
+   "approach": "Additionally, we show our benchmark and traditional benchmarks complement each other by evaluating several variants of LLaMA and Vicuna.",
+   "key_result": "Our results reveal that strong LLM judges like GPT-4 can match both controlled and crowdsourced human preferences well, achieving over 80% agreement, the same level of agreement between humans.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/Agent与工作流/反思要有外部锚点.md",
+     "title": "反思要有外部锚点，否则只是自我说服",
+     "domain": "AI系统",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "用 MT-Bench 与 Chatbot Arena 检验 LLM 作为裁判的可靠性",
+   "title_en": "Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena",
+   "problem_zh": "考察以 LLM 作为裁判的用法与局限，包括位置偏差、冗长偏好、自我增强偏好，以及推理能力有限，并提出缓解其中一部分的办法。",
+   "approach_zh": "另外，通过在 LLaMA 和 Vicuna 的多个版本上评测，说明本文基准与传统基准是互补的。",
+   "result_zh": "结果显示，像 GPT-4 这样的强 LLM 裁判与受控标注和众包的人类偏好都能吻合，一致率超过 80%，达到人与人之间的一致水平。"
+  },
+  "2306.07179": {
+   "id": "2306.07179",
+   "title": "Benchmarking Neural Network Training Algorithms",
+   "authors": [
+    "George E. Dahl",
+    "Frank Schneider",
+    "Zachary Nado",
+    "Naman Agarwal",
+    "Chandramouli Shama Sastry",
+    "Philipp Hennig",
+    "Sourabh Medapati",
+    "Runa Eschenhagen",
+    "Priya Kasimbeg",
+    "Daniel Suo",
+    "Juhan Bae",
+    "Justin Gilmer",
+    "Abel L. Peirson",
+    "Bilal Khan",
+    "Rohan Anil",
+    "Mike Rabbat",
+    "Shankar Krishnan",
+    "Daniel Snider",
+    "Ehsan Amid",
+    "Kongtao Chen",
+    "Chris J. Maddison",
+    "Rakshith Vasudev",
+    "Michal Badura",
+    "Ankush Garg",
+    "Peter Mattson"
+   ],
+   "published": "2023-06-12",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2306.07179",
+   "abstract": "Training algorithms, broadly construed, are an essential part of every deep learning pipeline. Training algorithm improvements that speed up training across a wide variety of workloads (e.g., better update rules, tuning protocols, learning rate schedules, or data selection schemes) could save time, save computational resources, and lead to better, more accurate, models. Unfortunately, as a community, we are currently unable to reliably identify training algorithm improvements, or even determine the state-of-the-art training algorithm. In this work, using concrete experiments, we argue that real progress in speeding up training requires new benchmarks that resolve three basic challenges faced by empirical comparisons of training algorithms: (1) how to decide when training is complete and precisely measure training time, (2) how to handle the sensitivity of measurements to exact workload details, and (3) how to fairly compare algorithms that require hyperparameter tuning. In order to address these challenges, we introduce a new, competitive, time-to-result benchmark using multiple workloads running on fixed hardware, the AlgoPerf: Training Algorithms benchmark. Our benchmark includes a set of workload variants that make it possible to detect benchmark submissions that are more robust to workload changes than current widely-used methods. Finally, we evaluate baseline submissions constructed using various optimizers that represent current practice, as well as other optimizers that have recently received attention in the literature. These baseline results collectively demonstrate the feasibility of our benchmark, show that non-trivial gaps between methods exist, and set a provisional state-of-the-art for future benchmark submissions to try and surpass.",
+   "overview": "Training algorithms, broadly construed, are an essential part of every deep learning pipeline.",
+   "problem": "In this work, using concrete experiments, we argue that real progress in speeding up training requires new benchmarks that resolve three basic challenges faced by empirical comparisons of training algorithms: (1) how to decide when training is complete and precisely measure training time, (2) how…",
+   "approach": "In order to address these challenges, we introduce a new, competitive, time-to-result benchmark using multiple workloads running on fixed hardware, the AlgoPerf: Training Algorithms benchmark.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "title": "位置编码和长上下文限制有效利用",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "神经网络训练算法的基准测试方法",
+   "title_en": "Benchmarking Neural Network Training Algorithms",
+   "problem_zh": "要让训练真正提速，需要新的基准来解决训练算法经验对比中的三个基本问题：如何判定训练完成并精确测量训练时间；如何在固定资源下公平比较；以及如何排除实现细节带来的差异。",
+   "approach_zh": "提出 AlgoPerf 训练算法基准：在固定硬件上跑多个负载，以「出结果的时间」为指标，具备竞争性。",
+   "result_zh": ""
+  },
+  "2308.08155": {
+   "id": "2308.08155",
+   "title": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+   "authors": [
+    "Qingyun Wu",
+    "Gagan Bansal",
+    "Jieyu Zhang",
+    "Yiran Wu",
+    "Beibin Li",
+    "Erkang Zhu",
+    "Li Jiang",
+    "Xiaoyun Zhang",
+    "Shaokun Zhang",
+    "Jiale Liu",
+    "Ahmed Hassan Awadallah",
+    "Ryen W White",
+    "Doug Burger",
+    "Chi Wang"
+   ],
+   "published": "2023-08-16",
+   "primary": "cs.AI",
+   "url": "https://arxiv.org/abs/2308.08155",
+   "abstract": "AutoGen is an open-source framework that allows developers to build LLM applications via multiple agents that can converse with each other to accomplish tasks. AutoGen agents are customizable, conversable, and can operate in various modes that employ combinations of LLMs, human inputs, and tools. Using AutoGen, developers can also flexibly define agent interaction behaviors. Both natural language and computer code can be used to program flexible conversation patterns for different applications. AutoGen serves as a generic infrastructure to build diverse applications of various complexities and LLM capacities. Empirical studies demonstrate the effectiveness of the framework in many example applications, with domains ranging from mathematics, coding, question answering, operations research, online decision-making, entertainment, etc.",
+   "overview": "AutoGen is an open-source framework that allows developers to build LLM applications via multiple agents that can converse with each other to accomplish tasks.",
+   "problem": "",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/Agent与工作流/任务分解的质量决定Agent的上限.md",
+     "title": "任务分解的质量决定 Agent 的上限",
+     "domain": "AI系统",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/Agent与工作流/多智能体只在能并行或需要独立上下文时才值得.md",
+     "title": "多智能体只在能并行或需要独立上下文时才值得",
+     "domain": "AI系统",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "AutoGen：用多智能体对话搭建 LLM 应用",
+   "title_en": "AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2308.12966": {
+   "id": "2308.12966",
+   "title": "Qwen-VL: A Versatile Vision-Language Model for Understanding, Localization, Text Reading, and Beyond",
+   "authors": [
+    "Jinze Bai",
+    "Shuai Bai",
+    "Shusheng Yang",
+    "Shijie Wang",
+    "Sinan Tan",
+    "Peng Wang",
+    "Junyang Lin",
+    "Chang Zhou",
+    "Jingren Zhou"
+   ],
+   "published": "2023-08-24",
+   "primary": "cs.CV",
+   "url": "https://arxiv.org/abs/2308.12966",
+   "abstract": "In this work, we introduce the Qwen-VL series, a set of large-scale vision-language models (LVLMs) designed to perceive and understand both texts and images. Starting from the Qwen-LM as a foundation, we endow it with visual capacity by the meticulously designed (i) visual receptor, (ii) input-output interface, (iii) 3-stage training pipeline, and (iv) multilingual multimodal cleaned corpus. Beyond the conventional image description and question-answering, we implement the grounding and text-reading ability of Qwen-VLs by aligning image-caption-box tuples. The resulting models, including Qwen-VL and Qwen-VL-Chat, set new records for generalist models under similar model scales on a broad range of visual-centric benchmarks (e.g., image captioning, question answering, visual grounding) and different settings (e.g., zero-shot, few-shot). Moreover, on real-world dialog benchmarks, our instruction-tuned Qwen-VL-Chat also demonstrates superiority compared to existing vision-language chatbots. Code, demo and models are available at https://github.com/QwenLM/Qwen-VL.",
+   "overview": "In this work, we introduce the Qwen-VL series, a set of large-scale vision-language models (LVLMs) designed to perceive and understand both texts and images.",
+   "problem": "",
+   "approach": "In this work, we introduce the Qwen-VL series, a set of large-scale vision-language models (LVLMs) designed to perceive and understand both texts and images.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
+     "title": "多模态模型把不同输入映射到共同推理接口",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Qwen-VL：可理解、定位与读文字的多模态模型",
+   "title_en": "Qwen-VL: A Versatile Vision-Language Model for Understanding, Localization, Text Reading, and Beyond",
+   "problem_zh": "",
+   "approach_zh": "提出 Qwen-VL 系列，一组用于感知和理解文本与图像的大规模视觉语言模型。",
+   "result_zh": ""
+  },
+  "2309.06180": {
+   "id": "2309.06180",
+   "title": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+   "authors": [
+    "Woosuk Kwon",
+    "Zhuohan Li",
+    "Siyuan Zhuang",
+    "Ying Sheng",
+    "Lianmin Zheng",
+    "Cody Hao Yu",
+    "Joseph E. Gonzalez",
+    "Hao Zhang",
+    "Ion Stoica"
+   ],
+   "published": "2023-09-12",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2309.06180",
+   "abstract": "High throughput serving of large language models (LLMs) requires batching sufficiently many requests at a time. However, existing systems struggle because the key-value cache (KV cache) memory for each request is huge and grows and shrinks dynamically. When managed inefficiently, this memory can be significantly wasted by fragmentation and redundant duplication, limiting the batch size. To address this problem, we propose PagedAttention, an attention algorithm inspired by the classical virtual memory and paging techniques in operating systems. On top of it, we build vLLM, an LLM serving system that achieves (1) near-zero waste in KV cache memory and (2) flexible sharing of KV cache within and across requests to further reduce memory usage. Our evaluations show that vLLM improves the throughput of popular LLMs by 2-4$\\times$ with the same level of latency compared to the state-of-the-art systems, such as FasterTransformer and Orca. The improvement is more pronounced with longer sequences, larger models, and more complex decoding algorithms. vLLM's source code is publicly available at https://github.com/vllm-project/vllm",
+   "overview": "High throughput serving of large language models (LLMs) requires batching sufficiently many requests at a time.",
+   "problem": "However, existing systems struggle because the key-value cache (KV cache) memory for each request is huge and grows and shrinks dynamically.",
+   "approach": "To address this problem, we propose PagedAttention, an attention algorithm inspired by the classical virtual memory and paging techniques in operating systems.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/AI系统工程：把模型能力变成生产能力.md",
+     "title": "AI 系统工程：把模型能力变成生产能力",
+     "domain": "",
+     "topic": "",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/推理服务与平台/批处理、KV缓存、量化与并行如何改变服务容量.md",
+     "title": "批处理、KV 缓存、量化与并行如何改变服务容量",
+     "domain": "AI系统",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md",
+     "title": "推理服务的核心矛盾是延迟、吞吐、显存与质量",
+     "domain": "AI系统",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "PagedAttention：大模型服务的高效显存管理",
+   "title_en": "Efficient Memory Management for Large Language Model Serving with PagedAttention",
+   "problem_zh": "现有系统吃力，是因为每个请求的 KV 缓存显存占用巨大，而且会动态地涨落。",
+   "approach_zh": "提出 PagedAttention，一种受操作系统虚拟内存与分页技术启发的注意力算法。",
+   "result_zh": ""
+  },
+  "2309.15217": {
+   "id": "2309.15217",
+   "title": "Ragas: Automated Evaluation of Retrieval Augmented Generation",
+   "authors": [
+    "Shahul Es",
+    "Jithin James",
+    "Luis Espinosa-Anke",
+    "Steven Schockaert"
+   ],
+   "published": "2023-09-26",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2309.15217",
+   "abstract": "We introduce Ragas (Retrieval Augmented Generation Assessment), a framework for reference-free evaluation of Retrieval Augmented Generation (RAG) pipelines. RAG systems are composed of a retrieval and an LLM based generation module, and provide LLMs with knowledge from a reference textual database, which enables them to act as a natural language layer between a user and textual databases, reducing the risk of hallucinations. Evaluating RAG architectures is, however, challenging because there are several dimensions to consider: the ability of the retrieval system to identify relevant and focused context passages, the ability of the LLM to exploit such passages in a faithful way, or the quality of the generation itself. With Ragas, we put forward a suite of metrics which can be used to evaluate these different dimensions \\textit{without having to rely on ground truth human annotations}. We posit that such a framework can crucially contribute to faster evaluation cycles of RAG architectures, which is especially important given the fast adoption of LLMs.",
+   "overview": "We introduce Ragas (Retrieval Augmented Generation Assessment), a framework for reference-free evaluation of Retrieval Augmented Generation (RAG) pipelines.",
+   "problem": "Evaluating RAG architectures is, however, challenging because there are several dimensions to consider: the ability of the retrieval system to identify relevant and focused context passages, the ability of the LLM to exploit such passages in a faithful way, or the quality of the generation itself.",
+   "approach": "We introduce Ragas (Retrieval Augmented Generation Assessment), a framework for reference-free evaluation of Retrieval Augmented Generation (RAG) pipelines.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/质量与运营/RAG评测要分离检索质量与生成质量.md",
+     "title": "RAG 评测要分离检索质量与生成质量",
+     "domain": "AI系统",
+     "topic": "质量与运营",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Ragas：RAG 管道的自动化评测",
+   "title_en": "Ragas: Automated Evaluation of Retrieval Augmented Generation",
+   "problem_zh": "评测 RAG 架构很困难，因为要同时考虑多个维度：检索系统能否找到相关且聚焦的上下文、LLM 能否忠实地利用这些上下文，以及生成本身的质量。",
+   "approach_zh": "提出 Ragas（Retrieval Augmented Generation Assessment），一个无需参考答案即可评测 RAG 管道的框架。",
+   "result_zh": ""
+  },
+  "2310.11511": {
+   "id": "2310.11511",
+   "title": "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection",
+   "authors": [
+    "Akari Asai",
+    "Zeqiu Wu",
+    "Yizhong Wang",
+    "Avirup Sil",
+    "Hannaneh Hajishirzi"
+   ],
+   "published": "2023-10-17",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2310.11511",
+   "abstract": "Despite their remarkable capabilities, large language models (LLMs) often produce responses containing factual inaccuracies due to their sole reliance on the parametric knowledge they encapsulate. Retrieval-Augmented Generation (RAG), an ad hoc approach that augments LMs with retrieval of relevant knowledge, decreases such issues. However, indiscriminately retrieving and incorporating a fixed number of retrieved passages, regardless of whether retrieval is necessary, or passages are relevant, diminishes LM versatility or can lead to unhelpful response generation. We introduce a new framework called Self-Reflective Retrieval-Augmented Generation (Self-RAG) that enhances an LM's quality and factuality through retrieval and self-reflection. Our framework trains a single arbitrary LM that adaptively retrieves passages on-demand, and generates and reflects on retrieved passages and its own generations using special tokens, called reflection tokens. Generating reflection tokens makes the LM controllable during the inference phase, enabling it to tailor its behavior to diverse task requirements. Experiments show that Self-RAG (7B and 13B parameters) significantly outperforms state-of-the-art LLMs and retrieval-augmented models on a diverse set of tasks. Specifically, Self-RAG outperforms ChatGPT and retrieval-augmented Llama2-chat on Open-domain QA, reasoning and fact verification tasks, and it shows significant gains in improving factuality and citation accuracy for long-form generations relative to these models.",
+   "overview": "Despite their remarkable capabilities, large language models (LLMs) often produce responses containing factual inaccuracies due to their sole reliance on the parametric knowledge they encapsulate.",
+   "problem": "Retrieval-Augmented Generation (RAG), an ad hoc approach that augments LMs with retrieval of relevant knowledge, decreases such issues.",
+   "approach": "We introduce a new framework called Self-Reflective Retrieval-Augmented Generation (Self-RAG) that enhances an LM's quality and factuality through retrieval and self-reflection.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "title": "检索从一次查询演进为有状态的证据获取",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "Self-RAG：通过自我反思决定何时检索、如何评判",
+   "title_en": "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection",
+   "problem_zh": "检索增强生成（RAG）这类把相关知识检索出来补给语言模型的做法，能减少上述问题。",
+   "approach_zh": "提出 Self-RAG 框架，通过检索与自我反思提升语言模型的质量和事实性。",
+   "result_zh": ""
+  },
+  "2401.04088": {
+   "id": "2401.04088",
+   "title": "Mixtral of Experts",
+   "authors": [
+    "Albert Q. Jiang",
+    "Alexandre Sablayrolles",
+    "Antoine Roux",
+    "Arthur Mensch",
+    "Blanche Savary",
+    "Chris Bamford",
+    "Devendra Singh Chaplot",
+    "Diego de las Casas",
+    "Emma Bou Hanna",
+    "Florian Bressand",
+    "Gianna Lengyel",
+    "Guillaume Bour",
+    "Guillaume Lample",
+    "Lélio Renard Lavaud",
+    "Lucile Saulnier",
+    "Marie-Anne Lachaux",
+    "Pierre Stock",
+    "Sandeep Subramanian",
+    "Sophia Yang",
+    "Szymon Antoniak",
+    "Teven Le Scao",
+    "Théophile Gervet",
+    "Thibaut Lavril",
+    "Thomas Wang",
+    "Timothée Lacroix",
+    "William El Sayed"
+   ],
+   "published": "2024-01-08",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2401.04088",
+   "abstract": "We introduce Mixtral 8x7B, a Sparse Mixture of Experts (SMoE) language model. Mixtral has the same architecture as Mistral 7B, with the difference that each layer is composed of 8 feedforward blocks (i.e. experts). For every token, at each layer, a router network selects two experts to process the current state and combine their outputs. Even though each token only sees two experts, the selected experts can be different at each timestep. As a result, each token has access to 47B parameters, but only uses 13B active parameters during inference. Mixtral was trained with a context size of 32k tokens and it outperforms or matches Llama 2 70B and GPT-3.5 across all evaluated benchmarks. In particular, Mixtral vastly outperforms Llama 2 70B on mathematics, code generation, and multilingual benchmarks. We also provide a model fine-tuned to follow instructions, Mixtral 8x7B - Instruct, that surpasses GPT-3.5 Turbo, Claude-2.1, Gemini Pro, and Llama 2 70B - chat model on human benchmarks. Both the base and instruct models are released under the Apache 2.0 license.",
+   "overview": "We introduce Mixtral 8x7B, a Sparse Mixture of Experts (SMoE) language model.",
+   "problem": "",
+   "approach": "We introduce Mixtral 8x7B, a Sparse Mixture of Experts (SMoE) language model.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/模型基础与训练/预训练数据决定模型能力上限.md",
+     "title": "预训练数据决定模型能力上限",
+     "domain": "AI系统",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Mixtral 混合专家模型",
+   "title_en": "Mixtral of Experts",
+   "problem_zh": "",
+   "approach_zh": "提出 Mixtral 8x7B，一个稀疏混合专家（SMoE）语言模型。",
+   "result_zh": ""
+  },
+  "2401.08281": {
+   "id": "2401.08281",
+   "title": "The Faiss library",
+   "authors": [
+    "Matthijs Douze",
+    "Alexandr Guzhva",
+    "Chengqi Deng",
+    "Jeff Johnson",
+    "Gergely Szilvasy",
+    "Pierre-Emmanuel Mazaré",
+    "Maria Lomeli",
+    "Lucas Hosseini",
+    "Hervé Jégou"
+   ],
+   "published": "2024-01-16",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2401.08281",
+   "abstract": "Vector databases typically manage large collections of embedding vectors. Currently, AI applications are growing rapidly, and so is the number of embeddings that need to be stored and indexed. The Faiss library is dedicated to vector similarity search, a core functionality of vector databases. Faiss is a toolkit of indexing methods and related primitives used to search, cluster, compress and transform vectors. This paper describes the trade-off space of vector search and the design principles of Faiss in terms of structure, approach to optimization and interfacing. We benchmark key features of the library and discuss a few selected applications to highlight its broad applicability.",
+   "overview": "Vector databases typically manage large collections of embedding vectors.",
+   "problem": "",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/向量数据库不是RAG本身.md",
+     "title": "向量数据库不是 RAG 本身",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Faiss 向量检索库",
+   "title_en": "The Faiss library",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2401.15884": {
+   "id": "2401.15884",
+   "title": "Corrective Retrieval Augmented Generation",
+   "authors": [
+    "Shi-Qi Yan",
+    "Jia-Chen Gu",
+    "Yun Zhu",
+    "Zhen-Hua Ling"
+   ],
+   "published": "2024-01-29",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2401.15884",
+   "abstract": "Large language models (LLMs) inevitably exhibit hallucinations since the accuracy of generated texts cannot be secured solely by the parametric knowledge they encapsulate. Although retrieval-augmented generation (RAG) is a practicable complement to LLMs, it relies heavily on the relevance of retrieved documents, raising concerns about how the model behaves if retrieval goes wrong. To this end, we propose the Corrective Retrieval Augmented Generation (CRAG) to improve the robustness of generation. Specifically, a lightweight retrieval evaluator is designed to assess the overall quality of retrieved documents for a query, returning a confidence degree based on which different knowledge retrieval actions can be triggered. Since retrieval from static and limited corpora can only return sub-optimal documents, large-scale web searches are utilized as an extension for augmenting the retrieval results. Besides, a decompose-then-recompose algorithm is designed for retrieved documents to selectively focus on key information and filter out irrelevant information in them. CRAG is plug-and-play and can be seamlessly coupled with various RAG-based approaches. Experiments on four datasets covering short- and long-form generation tasks show that CRAG can significantly improve the performance of RAG-based approaches.",
+   "overview": "Large language models (LLMs) inevitably exhibit hallucinations since the accuracy of generated texts cannot be secured solely by the parametric knowledge they encapsulate.",
+   "problem": "Large language models (LLMs) inevitably exhibit hallucinations since the accuracy of generated texts cannot be secured solely by the parametric knowledge they encapsulate.",
+   "approach": "To this end, we propose the Corrective Retrieval Augmented Generation (CRAG) to improve the robustness of generation.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "title": "检索从一次查询演进为有状态的证据获取",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "Corrective RAG：让检索结果先过一遍自查",
+   "title_en": "Corrective Retrieval Augmented Generation",
+   "problem_zh": "大模型必然会出现幻觉 —— 生成文本的准确性无法只靠模型参数里编码的知识来保证。",
+   "approach_zh": "提出 Corrective RAG（CRAG），提升生成的稳健性。",
+   "result_zh": ""
+  },
+  "2401.18059": {
+   "id": "2401.18059",
+   "title": "RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval",
+   "authors": [
+    "Parth Sarthi",
+    "Salman Abdullah",
+    "Aditi Tuli",
+    "Shubh Khanna",
+    "Anna Goldie",
+    "Christopher D. Manning"
+   ],
+   "published": "2024-01-31",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2401.18059",
+   "abstract": "Retrieval-augmented language models can better adapt to changes in world state and incorporate long-tail knowledge. However, most existing methods retrieve only short contiguous chunks from a retrieval corpus, limiting holistic understanding of the overall document context. We introduce the novel approach of recursively embedding, clustering, and summarizing chunks of text, constructing a tree with differing levels of summarization from the bottom up. At inference time, our RAPTOR model retrieves from this tree, integrating information across lengthy documents at different levels of abstraction. Controlled experiments show that retrieval with recursive summaries offers significant improvements over traditional retrieval-augmented LMs on several tasks. On question-answering tasks that involve complex, multi-step reasoning, we show state-of-the-art results; for example, by coupling RAPTOR retrieval with the use of GPT-4, we can improve the best performance on the QuALITY benchmark by 20% in absolute accuracy.",
+   "overview": "Retrieval-augmented language models can better adapt to changes in world state and incorporate long-tail knowledge.",
+   "problem": "However, most existing methods retrieve only short contiguous chunks from a retrieval corpus, limiting holistic understanding of the overall document context.",
+   "approach": "We introduce the novel approach of recursively embedding, clustering, and summarizing chunks of text, constructing a tree with differing levels of summarization from the bottom up.",
+   "key_result": "On question-answering tasks that involve complex, multi-step reasoning, we show state-of-the-art results; for example, by coupling RAPTOR retrieval with the use of GPT-4, we can improve the best performance on the QuALITY benchmark by 20% in absolute accuracy.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
+     "title": "GraphRAG 适合关系与全局问题但成本更高",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "title": "检索从一次查询演进为有状态的证据获取",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [
+    {
+     "path": "知识库管理/归档/AI系统内容缺口研究.md",
+     "title": "AI 系统内容缺口研究",
+     "domain": "",
+     "topic": "",
+     "kind": "survey"
+    }
+   ],
+   "has_deep_read": false,
+   "title_zh": "RAPTOR：面向树状组织的递归摘要式检索",
+   "title_en": "RAPTOR: Recursive Abstractive Processing for Tree-Organized Retrieval",
+   "problem_zh": "多数现有方法只从语料里检索短的连续片段，难以形成对文档整体脉络的理解。",
+   "approach_zh": "递归地对文本块做嵌入、聚类和摘要，自底向上构建一棵具有不同摘要层级的树。",
+   "result_zh": "取得当前最佳效果：把 RAPTOR 检索与 GPT-4 结合，在 QuALITY 基准上把最好成绩提升了 20 个百分点（绝对准确率）。"
+  },
+  "2403.14403": {
+   "id": "2403.14403",
+   "title": "Adaptive-RAG: Learning to Adapt Retrieval-Augmented Large Language Models through Question Complexity",
+   "authors": [
+    "Soyeong Jeong",
+    "Jinheon Baek",
+    "Sukmin Cho",
+    "Sung Ju Hwang",
+    "Jong C. Park"
+   ],
+   "published": "2024-03-21",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2403.14403",
+   "abstract": "Retrieval-Augmented Large Language Models (LLMs), which incorporate the non-parametric knowledge from external knowledge bases into LLMs, have emerged as a promising approach to enhancing response accuracy in several tasks, such as Question-Answering (QA). However, even though there are various approaches dealing with queries of different complexities, they either handle simple queries with unnecessary computational overhead or fail to adequately address complex multi-step queries; yet, not all user requests fall into only one of the simple or complex categories. In this work, we propose a novel adaptive QA framework, that can dynamically select the most suitable strategy for (retrieval-augmented) LLMs from the simplest to the most sophisticated ones based on the query complexity. Also, this selection process is operationalized with a classifier, which is a smaller LM trained to predict the complexity level of incoming queries with automatically collected labels, obtained from actual predicted outcomes of models and inherent inductive biases in datasets. This approach offers a balanced strategy, seamlessly adapting between the iterative and single-step retrieval-augmented LLMs, as well as the no-retrieval methods, in response to a range of query complexities. We validate our model on a set of open-domain QA datasets, covering multiple query complexities, and show that ours enhances the overall efficiency and accuracy of QA systems, compared to relevant baselines including the adaptive retrieval approaches. Code is available at: https://github.com/starsuzi/Adaptive-RAG.",
+   "overview": "Retrieval-Augmented Large Language Models (LLMs), which incorporate the non-parametric knowledge from external knowledge bases into LLMs, have emerged as a promising approach to enhancing response accuracy in several tasks, such as Question-Answering (QA).",
+   "problem": "However, even though there are various approaches dealing with queries of different complexities, they either handle simple queries with unnecessary computational overhead or fail to adequately address complex multi-step queries; yet, not all user requests fall into only one of the simple or comp…",
+   "approach": "In this work, we propose a novel adaptive QA framework, that can dynamically select the most suitable strategy for (retrieval-augmented) LLMs from the simplest to the most sophisticated ones based on the query complexity.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "title": "检索从一次查询演进为有状态的证据获取",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Adaptive-RAG：按问题复杂度自适应选择检索策略",
+   "title_en": "Adaptive-RAG: Learning to Adapt Retrieval-Augmented Large Language Models through Question Complexity",
+   "problem_zh": "已有方法面对不同复杂度的问题时，要么用多余的计算开销处理简单问题，要么处理不了复杂的多步问题；而用户的请求并不总是落在「简单」或「复杂」的某一端。",
+   "approach_zh": "提出自适应问答框架，按问题复杂度在从最简到最复杂的策略之间动态选择，交给检索增强的 LLM 执行。",
+   "result_zh": ""
+  },
+  "2404.16130": {
+   "id": "2404.16130",
+   "title": "From Local to Global: A Graph RAG Approach to Query-Focused Summarization",
+   "authors": [
+    "Darren Edge",
+    "Ha Trinh",
+    "Newman Cheng",
+    "Joshua Bradley",
+    "Alex Chao",
+    "Apurva Mody",
+    "Steven Truitt",
+    "Dasha Metropolitansky",
+    "Robert Osazuwa Ness",
+    "Jonathan Larson"
+   ],
+   "published": "2024-04-24",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2404.16130",
+   "abstract": "The use of retrieval-augmented generation (RAG) to retrieve relevant information from an external knowledge source enables large language models (LLMs) to answer questions over private and/or previously unseen document collections. However, RAG fails on global questions directed at an entire text corpus, such as \"What are the main themes in the dataset?\", since this is inherently a query-focused summarization (QFS) task, rather than an explicit retrieval task. Prior QFS methods, meanwhile, do not scale to the quantities of text indexed by typical RAG systems. To combine the strengths of these contrasting methods, we propose GraphRAG, a graph-based approach to question answering over private text corpora that scales with both the generality of user questions and the quantity of source text. Our approach uses an LLM to build a graph index in two stages: first, to derive an entity knowledge graph from the source documents, then to pregenerate community summaries for all groups of closely related entities. Given a question, each community summary is used to generate a partial response, before all partial responses are again summarized in a final response to the user. For a class of global sensemaking questions over datasets in the 1 million token range, we show that GraphRAG leads to substantial improvements over a conventional RAG baseline for both the comprehensiveness and diversity of generated answers.",
+   "overview": "The use of retrieval-augmented generation (RAG) to retrieve relevant information from an external knowledge source enables large language models (LLMs) to answer questions over private and/or previously unseen document collections.",
+   "problem": "However, RAG fails on global questions directed at an entire text corpus, such as \"What are the main themes in the dataset?\", since this is inherently a query-focused summarization (QFS) task, rather than an explicit retrieval task.",
+   "approach": "To combine the strengths of these contrasting methods, we propose GraphRAG, a graph-based approach to question answering over private text corpora that scales with both the generality of user questions and the quantity of source text.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
+     "title": "GraphRAG 适合关系与全局问题但成本更高",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "title": "检索从一次查询演进为有状态的证据获取",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "从局部到全局：面向查询聚焦摘要的 Graph RAG 方法",
+   "title_en": "From Local to Global: A Graph RAG Approach to Query-Focused Summarization",
+   "problem_zh": "RAG 在面向整个语料的全局问题上会失效，比如「这份数据的主要主题是什么」。这类问题本质是查询聚焦摘要，而不是显式的检索任务。",
+   "approach_zh": "为兼顾两种对立方法的优点，提出 GraphRAG：一种基于图的问答方法，在私有语料上同时应对问题的开放性和原文的规模。",
+   "result_zh": ""
+  },
+  "2410.20878": {
+   "id": "2410.20878",
+   "title": "AutoRAG: Automated Framework for optimization of Retrieval Augmented Generation Pipeline",
+   "authors": [
+    "Dongkyu Kim",
+    "Byoungwook Kim",
+    "Donggeon Han",
+    "Matouš Eibich"
+   ],
+   "published": "2024-10-28",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2410.20878",
+   "abstract": "Using LLMs (Large Language Models) in conjunction with external documents has made RAG (Retrieval-Augmented Generation) an essential technology. Numerous techniques and modules for RAG are being researched, but their performance can vary across different datasets. Finding RAG modules that perform well on specific datasets is challenging. In this paper, we propose the AutoRAG framework, which automatically identifies suitable RAG modules for a given dataset. AutoRAG explores and approximates the optimal combination of RAG modules for the dataset. Additionally, we share the results of optimizing a dataset using AutoRAG. All experimental results and data are publicly available and can be accessed through our GitHub repository https://github.com/Marker-Inc-Korea/AutoRAG_ARAGOG_Paper .",
+   "overview": "Using LLMs (Large Language Models) in conjunction with external documents has made RAG (Retrieval-Augmented Generation) an essential technology.",
+   "problem": "",
+   "approach": "In this paper, we propose the AutoRAG framework, which automatically identifies suitable RAG modules for a given dataset.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "title": "检索从一次查询演进为有状态的证据获取",
+     "domain": "AI系统",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "AutoRAG：自动优化 RAG 管道",
+   "title_en": "AutoRAG: Automated Framework for optimization of Retrieval Augmented Generation Pipeline",
+   "problem_zh": "",
+   "approach_zh": "提出 AutoRAG 框架，针对给定数据集自动找出合适的 RAG 模块组合。",
+   "result_zh": ""
+  }
+ }
+}

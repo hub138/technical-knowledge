@@ -60,6 +60,11 @@ projects/archify/archify.zip
 /vault/**/*.jpeg
 /vault/**/*.pdf
 
+# Paper full texts pulled down to write an L2 deep read. They are the
+# publishers' copyrighted text, kept only as a local writing aid — the
+# registry, the notes and the analyses are what get committed.
+/vault/知识库管理/归档/来源/论文与项目/全文/
+
 # Reader feedback and visit logs. This is visitor data collected at runtime,
 # not knowledge: it must never be committed. The directory is created on first
 # write by the server, so a fresh clone simply has no data/.

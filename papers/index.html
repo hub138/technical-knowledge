@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>论文追踪 · technical-knowledge</title>
+    <link rel="stylesheet" href="/static/tokens.css" />
+    <link rel="stylesheet" href="/static/base.css" />
+    <script src="/static/nav.js"></script>
+    <script src="/static/i18n.js"></script>
+    <script src="/static/shell.js"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({ page: 'papers' }));
+      document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
+        where: () => '当前页面：<b>论文追踪</b>',
+        title: () => '论文追踪',
+      }));
+    </script>
+    <style>
+      /* 论文追踪页。
+       *
+       * 定位是"追踪"不是"书目"，所以按时间倒序，新的在前。第一版按被引次数
+       * 排序，把 2017 年的 Attention 摆在最上面 —— 那是基石清单，读者看不出
+       * 最近发生了什么，而"最近发生了什么"才是这个页面存在的理由。
+       *
+       * 每篇给 L1 的三个要点（问题 / 做法 / 结果），让读者在列表里就能决定
+       * 要不要点进去，而不是点开才知道有没有用。
+       */
+      /* 方法论原本是一整块带标题和说明的横幅，占了首屏近三分之一。
+         它是一份"规则出处"，读者在需要的时候才会去看，不需要一直占着地方。
+         收成一个按钮，放在工具栏右端 —— 位置固定，想找时找得到。 */
+      .method-link {
+        flex: none;
+        padding: 8px 15px;
+        border: 1px solid var(--color-accent-line);
+        border-radius: var(--radius-full);
+        background: var(--color-accent-soft);
+        color: var(--color-accent);
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        white-space: nowrap;
+      }
+      .method-link:hover { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-panel); }
+
+      .paper-toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3);
+        margin: var(--space-6) 0 var(--space-3);
+      }
+      .paper-toolbar input[type="search"] {
+        flex: 1 1 240px;
+        min-width: 0;
+        padding: 9px 12px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-sm);
+        background: var(--color-panel);
+        color: var(--color-ink);
+        font: var(--weight-normal) var(--text-body) / 1.4 var(--font-sans);
+      }
+      .paper-toolbar input[type="search"]:focus {
+        border-color: var(--color-accent);
+        box-shadow: var(--shadow-ring);
+        outline: none;
+      }
+      /* 年份筛选：追踪页最常用的切分维度就是"哪一年"。 */
+      .paper-count {
+        color: var(--color-muted);
+        font-size: var(--text-small);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .paper-year {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: var(--space-6) 0 var(--space-3);
+        color: var(--color-ink);
+        font-size: var(--text-h3);
+        font-weight: var(--weight-bold);
+        font-variant-numeric: tabular-nums;
+      }
+      .paper-year::after {
+        content: "";
+        flex: 1;
+        height: 1px;
+        background: var(--color-line);
+      }
+      .paper-year span { color: var(--color-muted); font-size: var(--text-small); font-weight: var(--weight-normal); }
+
+      /* 历史奠基区块。
+       *
+       * 44 篇里 37 篇是 2024 年前的，摊在列表主体会把新论文压到几十屏之后 ——
+       * 一个「追踪新论文」的页面打开先看到 2015 年的论文，定位自己就没了。
+       * 数据不删，只是默认不展开。
+       *
+       * 视觉上跟 .paper-year 同色同字号，但整块读起来像「资料区」而不是
+       * 「又一个章节」：底色下沉一档，标题带一个可点的手势。
+       * 刻意不用 .paper-year 那条 ::after 发丝线 —— summary 里已经有可点的
+       * 三角，再加一条横贯的线会读成「这是分隔符、不可点」。
+       */
+      .paper-past { margin-top: var(--space-6); }
+      .paper-past > summary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin: 0 0 var(--space-3);
+        padding: 10px 14px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-sm);
+        background: var(--color-surface);
+        color: var(--color-ink);
+        font-size: var(--text-h3);
+        font-weight: var(--weight-bold);
+        font-variant-numeric: tabular-nums;
+        cursor: pointer;
+        list-style: none;
+      }
+      .paper-past > summary::-webkit-details-marker { display: none; }
+      .paper-past > summary:hover { border-color: var(--color-accent-line); }
+      .paper-past > summary::before {
+        content: "▸";
+        flex: none;
+        color: var(--color-muted);
+        transition: transform var(--duration-fast) var(--ease-out);
+      }
+      .paper-past[open] > summary::before { transform: rotate(90deg); }
+      .paper-past .past-title { flex: 1; min-width: 0; }
+      .paper-past .past-count {
+        flex: none;
+        color: var(--color-muted);
+        font-size: var(--text-small);
+        font-weight: var(--weight-normal);
+      }
+      /* 展开后的第一个年份标题不要再顶一大段空白，否则看起来像断成两截。 */
+      .paper-past-body > .paper-year:first-child { margin-top: var(--space-4); }
+
+      .paper-list { display: grid; gap: var(--space-3); }
+
+      .paper {
+        display: grid;
+        gap: var(--space-3);
+        padding: var(--space-4) var(--space-5);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-md);
+        background-color: var(--color-panel);
+        background-image: var(--wash-panel);
+        box-shadow: var(--hairline-top), var(--shadow-xs);
+        transition: border-color var(--duration-fast) var(--ease-out);
+      }
+      .paper:hover { border-color: var(--color-accent-line); }
+      .paper[data-href] { cursor: pointer; }
+      .paper[data-href]:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+      /* 有手写深度解读的，是真正被读过的，值得一个视觉标记。 */
+      .paper.read { border-left: 3px solid var(--color-accent); }
+
+      .paper-head { display: flex; align-items: baseline; gap: var(--space-3); }
+      .paper h3 {
+        margin: 0;
+        flex: 1;
+        min-width: 0;
+        font-size: var(--text-h3);
+        line-height: 1.35;
+      }
+      .paper h3 a { color: var(--color-ink); }
+      .paper h3 a:hover { color: var(--color-accent); }
+      .paper-when { flex: none; color: var(--color-muted); font-size: var(--text-small); font-variant-numeric: tabular-nums; }
+      .paper-meta { margin: 0; color: var(--color-muted); font-size: var(--text-small); }
+      .paper-meta code {
+        padding: 1px 5px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-xs);
+        background: var(--color-surface);
+        font-family: var(--font-mono);
+        font-size: 0.92em;
+      }
+
+      /* L1 要点表。字段缺哪条就不显示哪行，不为表格完整去填占位内容。 */
+      .l1 { display: grid; gap: 5px; margin: 0; }
+      .l1 div {
+        display: grid;
+        grid-template-columns: 68px minmax(0, 1fr);
+        gap: 10px;
+        align-items: baseline;
+      }
+      .l1 dt { color: var(--color-muted); font-size: var(--text-small); font-weight: var(--weight-semibold); }
+      .l1 dd { margin: 0; color: var(--color-ink-soft); font-size: var(--text-small); line-height: 1.65; }
+      .l1 dd.result { color: var(--color-accent-ink); font-weight: var(--weight-medium); }
+
+      .paper-foot {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--space-3);
+        padding-top: var(--space-3);
+        border-top: 1px solid var(--color-line);
+      }
+      .paper-tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 3px 9px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-full);
+        background: var(--color-surface);
+        color: var(--color-muted);
+        font-size: var(--text-micro);
+      }
+      .paper-tag.evidence { border-color: var(--color-accent-line); background: var(--color-accent-soft); color: var(--color-accent); }
+      .paper-more {
+        margin-left: auto;
+        color: var(--color-accent);
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        white-space: nowrap;
+      }
+      .paper-more:hover { text-decoration: underline; }
+
+      /* 右侧时间线：按年份分组的全部论文，可以跳。
+       *
+       * 主列表已经按时间排了，但 44 篇滚起来很长，读者想直接跳到某一篇时
+       * 只能滚。这一栏把它压成一行一篇的索引，和文章页的目录同一个位置、
+       * 同一套视觉。
+       */
+      .tl-layout { display: block; }
+      .p-timeline { display: none; }
+      @media (min-width: 1280px) {
+        .tl-layout {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) 264px;
+          column-gap: 34px;
+          align-items: start;
+        }
+        .p-timeline {
+          display: block;
+          position: sticky;
+          top: 96px;
+          max-height: calc(100vh - 130px);
+          overflow: auto;
+          font-size: var(--text-sm);
+        }
+      }
+      .p-timeline .rail-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin: 0 0 9px;
+        padding-bottom: 7px;
+        border-bottom: 1px solid var(--color-line);
+        color: var(--color-muted);
+        font-size: var(--text-xs);
+        font-weight: var(--weight-bold);
+        letter-spacing: 0.06em;
+      }
+      .p-timeline ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; }
+      .p-timeline .tl-year {
+        margin: 12px 0 4px;
+        padding-left: 8px;
+        color: var(--color-ink);
+        font-size: var(--text-small);
+        font-weight: var(--weight-bold);
+        font-variant-numeric: tabular-nums;
+      }
+      .p-timeline .tl-year:first-child { margin-top: 0; }
+      .p-timeline a {
+        display: block;
+        padding: 4px 8px;
+        border-radius: var(--radius-xs);
+        color: var(--color-muted);
+        line-height: 1.45;
+        /* 两行封顶。只显示一行会把标题切在没意义的地方
+           （"AutoRAG: Automated Framework for" 就断了），
+           而完全不限行又会让年份分组失去节奏。两行是能认出论文的最少行数。 */
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+      .p-timeline a:hover { background: var(--color-accent-soft); color: var(--color-accent); }
+      .p-timeline a.read { color: var(--color-ink-soft); }
+      .p-timeline a.read::before {
+        content: "";
+        display: inline-block;
+        width: 5px;
+        height: 5px;
+        margin-right: 6px;
+        border-radius: 50%;
+        background: var(--color-accent);
+        vertical-align: middle;
+      }
+
+      .paper-empty {
+        padding: var(--space-10);
+        border: 1px dashed var(--color-line);
+        border-radius: var(--radius-md);
+        color: var(--color-muted);
+        text-align: center;
+        font-size: var(--text-small);
+      }
+
+      @media (max-width: 760px) {
+        .method-pin { display: block; }
+        .method-pin a { display: inline-block; margin-top: var(--space-3); }
+        .paper-head { display: block; }
+        .paper-when { display: inline-block; margin-top: 4px; }
+        .l1 div { grid-template-columns: 1fr; gap: 1px; }
+        .paper { padding: var(--space-4); }
+      }
+    </style>
+  </head>
+  <body class="tk-host">
+    <aside class="tk-sidebar" id="tk-sidebar"></aside>
+    <div class="tk-shell tl-layout">
+      <div class="tl-main">
+      <section class="hero">
+        <div class="eyebrow">PAPERS · 追踪与解析</div>
+        <h1>追踪 AI 与 Agent 方向的新论文</h1>
+        <p>按发布时间倒序，每篇给出它解决的问题、做法，以及摘要里写明的量化结果。结果一栏只收录论文自己报出的数字，摘不出来就留空，不替它总结；2024 年前的论文收在「历史奠基」里，需要时展开。</p>
+      </section>
+
+      <div class="paper-toolbar">
+        <input type="search" id="paper-search" placeholder="搜标题、作者、arXiv 编号" autocomplete="off" />
+        <span class="paper-count" id="paper-count"></span>
+        <span id="method-slot"></span>
+      </div>
+
+      <div id="paper-list"></div>
+      </div>
+      <aside class="p-timeline" id="timeline" aria-label="时间线"></aside>
+    </div>
+
+    <script>
+      const $ = (s) => document.querySelector(s);
+      const esc = (v) => String(v ?? "").replace(/[&<>"']/g,
+        (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+      const tr = (x) => (window.TKI18N ? window.TKI18N.t(x) : x);
+      const lang = () => (window.TKI18N?.lang || "zh");  // i18n 把它暴露成 getter，不是方法
+      /* 论文标题是专有名词，两种语言各有各的正确写法：
+         中文界面显示中文标题，英文界面显示论文原名 ——
+         后者才是读者在 arXiv、在别的文章里会看到的那一行。
+         中文标题缺失时回退到原名，不显示空。 */
+      const titleOf = (p) => (lang() === "en" ? (p.title_en || p.title) : (p.title_zh || p.title));
+      /* L1 三个字段同样中英并存。中文缺了就回退英文 ——
+         显示英文总好过显示空白。
+         key_result 的中文键叫 result_zh，不是 key_result_zh（历史命名，
+         服务端已经这么出了）。不特判的话中文界面下这一行会露出英文原文。 */
+      const ZH_KEY = { key_result: "result_zh" };
+      const fieldOf = (p, key) => (lang() === "en"
+        ? (p[key] || "")
+        : (p[ZH_KEY[key] || `${key}_zh`] || p[key] || ""));
+
+      let all = [];
+      let methodPath = "";
+
+      function authorLine(authors) {
+        if (!authors || !authors.length) return "";
+        const shown = authors.slice(0, 2).join(", ");
+        return authors.length > 2 ? `${shown} ${tr("等")}` : shown;
+      }
+
+      function renderPin() {
+        if (!methodPath) return;
+        $("#method-slot").innerHTML =
+          `<a class="method-link" href="/?path=${encodeURIComponent(methodPath)}">`
+          + `${esc(tr("筛选与解析方法"))}</a>`;
+      }
+
+      function l1(paper) {
+        const rows = [];
+        const problem = fieldOf(paper, "problem");
+        const approach = fieldOf(paper, "approach");
+        const result = fieldOf(paper, "key_result");
+        if (problem) rows.push(`<div><dt>${esc(tr("解决的问题"))}</dt><dd>${esc(problem)}</dd></div>`);
+        if (approach) rows.push(`<div><dt>${esc(tr("做法"))}</dt><dd>${esc(approach)}</dd></div>`);
+        if (result) rows.push(`<div><dt>${esc(tr("关键结果"))}</dt><dd class="result">${esc(result)}</dd></div>`);
+        return rows.length ? `<dl class="l1">${rows.join("")}</dl>` : "";
+      }
+
+      function card(p) {
+        const ev = p.evidence_count;
+        const tags = [];
+        if (ev) tags.push(`<span class="paper-tag evidence">${esc(tr("支撑"))} ${ev} ${esc(tr("篇知识"))}</span>`);
+        if (p.survey_count) tags.push(`<span class="paper-tag">${esc(tr("调研引用"))} ${p.survey_count}</span>`);
+        if (p.primary) tags.push(`<span class="paper-tag">${esc(p.primary)}</span>`);
+        // 有手写深度解读就标出来，让读者知道点进去能看到完整六模块。
+        if (p.has_deep_read) tags.push(`<span class="paper-tag evidence">${esc(tr("已深度解析"))}</span>`);
+        const href = `/paper?id=${encodeURIComponent(p.id)}`;
+        return `<article class="paper${p.has_deep_read ? " read" : ""}" data-href="${esc(href)}" tabindex="0" role="link" aria-label="${esc(titleOf(p) || p.id)}">
+          <div class="paper-head">
+            <h3><a href="${esc(href)}">${esc(titleOf(p) || p.id)}</a></h3>
+            <span class="paper-when">${esc(p.published)}</span>
+          </div>
+          <p class="paper-meta">${esc(authorLine(p.authors))} · <code>arXiv:${esc(p.id)}</code></p>
+          ${l1(p)}
+          <div class="paper-foot">
+            ${tags.join("")}
+            <a class="paper-more" href="${esc(href)}">${esc(tr("解析"))} →</a>
+          </div>
+        </article>`;
+      }
+
+      /* 2024 年前算历史奠基。
+       *
+       * 写成一个阈值而不是列一串年份：数据每年会涨，列出来的年份表明年就错。
+       * published 是 YYYY-MM-DD，取前四位比较即可。 */
+      const FOUNDATIONAL_MAX = 2023;
+      const isFoundational = (p) => Number((p.published || "").slice(0, 4) || 0) <= FOUNDATIONAL_MAX;
+
+      /* 按年份分组。追踪页最自然的切分是"哪一年"，比一条长列表好扫。 */
+      function yearGroups(list) {
+        const groups = [];
+        let year = null;
+        let chunk = [];
+        const flush = () => {
+          if (!chunk.length) return;
+          groups.push({ year, items: chunk });
+          chunk = [];
+        };
+        list.forEach((p) => {
+          const y = (p.published || "").slice(0, 4) || "—";
+          if (y !== year) { flush(); year = y; }
+          chunk.push(p);
+        });
+        flush();
+        return groups;
+      }
+
+      function yearBlock({ year, items }) {
+        return `<h2 class="paper-year">${esc(year)}<span>${items.length} ${esc(tr("篇"))}</span></h2>`
+             + `<div class="paper-list">${items.map(card).join("")}</div>`;
+      }
+
+      function render() {
+        const q = $("#paper-search").value.trim().toLowerCase();
+        const filtered = all.filter((p) => {
+          if (!q) return true;
+          return [p.title, p.id, (p.authors || []).join(" "), p.primary,
+                  p.problem, p.approach, p.key_result]
+            .join(" ").toLowerCase().includes(q);
+        });
+
+        const list = $("#paper-list");
+        if (!filtered.length) {
+          list.innerHTML = `<div class="paper-empty">${esc(tr("搜「标题 / 作者 / arXiv 编号」都没命中。试试论文标题里的一个词，或者 4 位年份。"))}</div>`;
+          $("#paper-count").textContent = `0 / ${all.length}`;
+          return;
+        }
+
+        const recent = filtered.filter((p) => !isFoundational(p));
+        const foundational = filtered.filter(isFoundational);
+        let out = yearGroups(recent).map(yearBlock).join("");
+        if (foundational.length) {
+          /* 搜索时自动展开。搜到的东西必须看得见，默认折叠会把它藏起来 ——
+             这是唯一一处折叠状态不由用户决定的地方，所以规则保持单一：
+             有搜索词就开，清空就收，不记忆用户的手动展开。 */
+          out += `<details class="paper-past"${q ? " open" : ""}>
+            <summary>
+              <span class="past-title">${esc(tr("2023 及更早 · 历史奠基"))}</span>
+              <span class="past-count">${foundational.length} ${esc(tr("篇"))}</span>
+            </summary>
+            <div class="paper-past-body">${yearGroups(foundational).map(yearBlock).join("")}</div>
+          </details>`;
+        }
+        list.innerHTML = out;
+        /* 整块可点：解析是这一页的主线动作，读者不该被要求瞄准右下角那个
+           小链接。卡内已有的链接保持自己的跳转，不重复处理。 */
+        list.querySelectorAll(".paper").forEach((card) => {
+          const go = (event) => {
+            if (event.target.closest("a")) return;
+            location.href = card.dataset.href;
+          };
+          card.onclick = go;
+          card.onkeydown = (event) => {
+            if (event.key === "Enter" || event.key === " ") { event.preventDefault(); go(event); }
+          };
+        });
+
+        const withResult = filtered.filter((p) => p.key_result).length;
+        $("#paper-count").textContent =
+          `${filtered.length} / ${all.length} ${tr("篇")} · ${withResult} ${tr("篇有摘要里的量化结果")}`;
+      }
+
+      /* 时间线用全部论文，不跟着搜索过滤 ——
+         它的作用是"让我跳到别处"，跟着过滤就把去路也砍掉了。
+         已深度解析的用圆点标出来。 */
+      function renderTimeline() {
+        const aside = $("#timeline");
+        if (!all.length) { aside.innerHTML = ""; return; }
+        let out = `<div class="rail-head">${esc(tr("时间线"))}<span>${all.length} ${esc(tr("篇"))}</span></div>`;
+        let year = null;
+        all.forEach((p) => {
+          const y = (p.published || "").slice(0, 4) || "—";
+          if (y !== year) {
+            if (year !== null) out += "</ul>";
+            out += `<div class="tl-year">${esc(y)}</div><ul>`;
+            year = y;
+          }
+          out += `<li><a href="/paper?id=${encodeURIComponent(p.id)}"`
+               + ` class="${p.has_deep_read ? "read" : ""}"`
+               + ` title="${esc(titleOf(p) || p.id)}">${esc(titleOf(p) || p.id)}</a></li>`;
+        });
+        if (year !== null) out += "</ul>";
+        aside.innerHTML = out;
+      }
+
+      async function load() {
+        try {
+          const response = await fetch("/api/papers", { cache: "no-store" });
+          if (!response.ok) throw new Error("unavailable");
+          const payload = await response.json();
+          all = payload.papers || [];
+          methodPath = payload.method || "";
+        } catch (error) {
+          $("#paper-list").innerHTML = `<div class="paper-empty">${esc(tr("读不到论文注册表。运行 python3 scripts/fetch-papers.py 生成后再刷新。"))}</div>`;
+          return;
+        }
+        renderPin();
+        renderTimeline();
+        render();
+      }
+
+      $("#paper-search").oninput = render;
+      /* 这一页的正文全部由 JS 生成，translateDOM 走的是静态 markup，
+         够不到这些节点，所以语言切换后要自己重画一遍。 */
+      document.addEventListener("tk:lang", () => { renderPin(); renderTimeline(); render(); });
+      load();
+    </script>
+  </body>
+</html>

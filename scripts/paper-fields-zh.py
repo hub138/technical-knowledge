@@ -1,0 +1,232 @@
+#!/usr/bin/env python3
+"""Chinese renderings of the L1 fields, so the list is readable in Chinese.
+
+The L1 fields are extracted from each paper's English abstract, which makes them
+accurate but unreadable to a Chinese reader in a list. This file holds the
+translations, keyed by arXiv id and then by field.
+
+Two rules, both deliberate:
+
+  - The English original is never discarded. It stays in paper-notes.json and is
+    what the English view shows; this file only adds a Chinese rendering.
+  - Method, model and dataset names stay in the original script (RAG, GPT-4,
+    QuALITY, W8A8). Translating them would make a reader unable to match the
+    sentence against the paper.
+
+A translation of an abstract is a second-hand account, so it is kept in one
+reviewable place rather than generated at build time — the same reason the
+titles live in their own file.
+
+Used by scripts/build-paper-notes.py via scripts/paper-fields-zh.json.
+"""
+
+from __future__ import annotations
+
+import json
+import pathlib
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+OUT = pathlib.Path(__file__).resolve().parent / "paper-fields-zh.json"
+
+# arxiv id -> {"problem" | "approach" | "result": Chinese}
+FIELDS = {
+    # ── 2024 ──
+    "2410.20878": {
+        "approach": "提出 AutoRAG 框架，针对给定数据集自动找出合适的 RAG 模块组合。",
+    },
+    "2404.16130": {
+        "problem": "RAG 在面向整个语料的全局问题上会失效，比如「这份数据的主要主题是什么」。这类问题本质是查询聚焦摘要，而不是显式的检索任务。",
+        "approach": "为兼顾两种对立方法的优点，提出 GraphRAG：一种基于图的问答方法，在私有语料上同时应对问题的开放性和原文的规模。",
+    },
+    "2403.14403": {
+        "problem": "已有方法面对不同复杂度的问题时，要么用多余的计算开销处理简单问题，要么处理不了复杂的多步问题；而用户的请求并不总是落在「简单」或「复杂」的某一端。",
+        "approach": "提出自适应问答框架，按问题复杂度在从最简到最复杂的策略之间动态选择，交给检索增强的 LLM 执行。",
+    },
+    "2401.18059": {
+        "problem": "多数现有方法只从语料里检索短的连续片段，难以形成对文档整体脉络的理解。",
+        "approach": "递归地对文本块做嵌入、聚类和摘要，自底向上构建一棵具有不同摘要层级的树。",
+        "result": "取得当前最佳效果：把 RAPTOR 检索与 GPT-4 结合，在 QuALITY 基准上把最好成绩提升了 20 个百分点（绝对准确率）。",
+    },
+    "2401.15884": {
+        "problem": "大模型必然会出现幻觉 —— 生成文本的准确性无法只靠模型参数里编码的知识来保证。",
+        "approach": "提出 Corrective RAG（CRAG），提升生成的稳健性。",
+    },
+    "2401.04088": {
+        "approach": "提出 Mixtral 8x7B，一个稀疏混合专家（SMoE）语言模型。",
+    },
+    # ── 2023 ──
+    "2310.11511": {
+        "problem": "检索增强生成（RAG）这类把相关知识检索出来补给语言模型的做法，能减少上述问题。",
+        "approach": "提出 Self-RAG 框架，通过检索与自我反思提升语言模型的质量和事实性。",
+    },
+    "2309.15217": {
+        "problem": "评测 RAG 架构很困难，因为要同时考虑多个维度：检索系统能否找到相关且聚焦的上下文、LLM 能否忠实地利用这些上下文，以及生成本身的质量。",
+        "approach": "提出 Ragas（Retrieval Augmented Generation Assessment），一个无需参考答案即可评测 RAG 管道的框架。",
+    },
+    "2309.06180": {
+        "problem": "现有系统吃力，是因为每个请求的 KV 缓存显存占用巨大，而且会动态地涨落。",
+        "approach": "提出 PagedAttention，一种受操作系统虚拟内存与分页技术启发的注意力算法。",
+    },
+    "2308.12966": {
+        "approach": "提出 Qwen-VL 系列，一组用于感知和理解文本与图像的大规模视觉语言模型。",
+    },
+    "2306.07179": {
+        "problem": "要让训练真正提速，需要新的基准来解决训练算法经验对比中的三个基本问题：如何判定训练完成并精确测量训练时间；如何在固定资源下公平比较；以及如何排除实现细节带来的差异。",
+        "approach": "提出 AlgoPerf 训练算法基准：在固定硬件上跑多个负载，以「出结果的时间」为指标，具备竞争性。",
+    },
+    "2306.05685": {
+        "problem": "考察以 LLM 作为裁判的用法与局限，包括位置偏差、冗长偏好、自我增强偏好，以及推理能力有限，并提出缓解其中一部分的办法。",
+        "approach": "另外，通过在 LLaMA 和 Vicuna 的多个版本上评测，说明本文基准与传统基准是互补的。",
+        "result": "结果显示，像 GPT-4 这样的强 LLM 裁判与受控标注和众包的人类偏好都能吻合，一致率超过 80%，达到人与人之间的一致水平。",
+    },
+    "2306.00978": {
+        "problem": "模型体量极大而硬件资源有限，部署面临显著挑战。",
+        "approach": "提出 Activation-aware Weight Quantization（AWQ），一种对硬件友好的 LLM 低位权重量化方法。",
+        "result": "配合算子融合与面向平台的权重打包，TinyChat 相对 Huggingface 的 FP16 实现取得超过 3 倍加速。",
+    },
+    "2305.18290": {
+        "problem": "大规模无监督语言模型学到了广泛的世界知识和一些推理能力，但由于训练完全无监督，精确控制其行为很困难。",
+        "approach": "对 RLHF 中的奖励模型给出一种新的参数化，使对应的最优策略可以闭式求出，从而只用简单的分类损失就能解标准的 RLHF 问题。",
+    },
+    "2305.18654": {
+        "problem": "然而这些模型同时在相当简单的问题上出现失败。",
+    },
+    "2305.06983": {
+        "problem": "在长文本生成这类更一般的场景中，需要在生成过程中持续收集信息，只在开头检索一次是不够的。",
+        "approach": "提出 FLARE（Forward-Looking Active REtrieval），迭代地用对下一句的预测来预估后续内容，再以此为查询检索文档；若生成的句子含有低置信度词元，就检索并重写。",
+    },
+    "2304.08485": {
+        "approach": "首次尝试用纯语言的 GPT-4 生成多模态的语言-图像指令跟随数据。",
+        "result": "在 Science QA 上微调后，LLaVA 与 GPT-4 的配合达到 92.53% 的新最高准确率。",
+    },
+    "2303.11366": {
+        "problem": "语言智能体很难快速有效地从试错中学习，因为传统强化学习需要大量训练样本和昂贵的模型微调。",
+        "approach": "提出 Reflexion，不通过更新权重，而是通过语言反馈来强化语言智能体。",
+        "result": "在 HumanEval 编程基准上，Reflexion 取得 91% 的 pass@1 准确率，超过此前最好的 GPT-4（80%）。",
+    },
+    "2302.12173": {
+        "approach": "展示处理检索到的提示可以达到任意代码执行的效果，操纵应用的功能，并控制其他 API 是否以及如何被调用。",
+    },
+    # ── 2022 ──
+    "2212.10496": {
+        "problem": "稠密检索已在跨任务、跨语言上被证明有效，但在没有任何相关性标注时，很难构建真正零样本可用的稠密检索系统。",
+        "approach": "提出通过「假设文档嵌入」（HyDE）来转换问题。",
+    },
+    "2211.17192": {
+        "approach": "提出投机解码：通过并行计算多个词元，在不改变输出的前提下更快地从自回归模型采样。",
+    },
+    "2211.10438": {
+        "problem": "现有方法无法同时保住精度和硬件效率。",
+        "approach": "提出 SmoothQuant，一个免训练、保精度、通用的训练后量化方案，使 LLM 可以做到 8 位权重、8 位激活（W8A8）量化。",
+    },
+    "2210.17323": {
+        "problem": "由于体积巨大，即便是推理，高精度的大型 GPT 模型也可能需要多块高性能 GPU，限制了可用性。",
+        "approach": "本方法相对此前的一次性量化方法把压缩收益提高一倍以上，同时保住精度，并首次让 1750 亿参数模型能在单块 GPU 上做生成式推理。",
+        "result": "实验表明这些改进可以转化为端到端推理的加速：相对 FP16，在高性能 GPU（NVIDIA A100）上约 3.25 倍，在更廉价的 GPU（NVIDIA A6000）上约 4.5 倍。",
+    },
+    "2210.03629": {
+        "problem": "在问答（HotpotQA）和事实核查（Fever）上，ReAct 通过与一个简单的 Wikipedia API 交互，克服了思维链推理中普遍存在的幻觉和错误传播问题，并生成更可解释的、类人的解题轨迹。",
+        "result": "在两个交互式决策基准（ALFWorld 和 WebShop）上，ReAct 分别以 34% 和 10% 的绝对成功率超过模仿学习和强化学习方法，而提示只需要一两个示例。",
+    },
+    "2205.14135": {
+        "problem": "近似注意力方法试图用牺牲模型质量来降低计算复杂度，但往往拿不到实际的墙上时间加速。",
+        "approach": "提出 FlashAttention，一种考虑 IO 的精确注意力算法，通过分块减少 GPU 高带宽显存（HBM）与片上 SRAM 之间的读写次数。",
+        "result": "FlashAttention 训练 Transformer 比现有基线更快：在 BERT-large 上端到端墙上时间加速 15%。",
+    },
+    "2204.07196": {
+        "problem": "为展示该模型的能力，把它用于标准高斯分布下不可知地学习半空间这一经典问题，给出一个检验器-学习器组合，合计运行时间为 n^{Õ(1/ε⁴)}。",
+        "approach": "提出一个模型来系统研究检验器-学习器对 (A, T) 的设计：如果数据分布通过了检验器 T，就可以放心地信任不可知学习器 A 在该数据上的输出。",
+    },
+    # ── 2021 ──
+    "2203.15556": {
+        "result": "一个亮点：Chinchilla 在 MMLU 基准上取得 67.5% 的平均准确率，比 Gopher 提升超过 7%。",
+    },
+    "2203.10050": {
+        "problem": "基于偏好的学习往往需要大量人类反馈，使得这类方法难以应用到多种场景。",
+        "approach": "受这些方法近期成功的启发，提出 SURF：一个半监督奖励学习框架，利用大量未标注样本配合数据增强。",
+    },
+    "2203.02155": {
+        "approach": "本文展示了一条让语言模型在广泛任务上对齐用户意图的路径：用人类反馈做微调。",
+    },
+    "2104.09864": {
+        "approach": "提出旋转位置编码（RoPE），以更有效地利用位置信息。",
+    },
+    "2104.08646": {
+        "problem": "但哪些特征是「伪相关」、哪些是合理相关，通常并没有被说明清楚。",
+        "approach": "这一分析给出一个简单的数据集伪特征统计检验，并用它揭示出比此前工作更隐蔽的偏差，包括证明模型会被这些不那么极端的偏差不当影响。",
+    },
+    "2104.04473": {
+        "problem": "高效训练这类模型有两点困难：一是 GPU 显存容量有限，大模型连放到一台多卡服务器上都做不到；二是训练所需的计算量会导致长到不现实的训练时间。",
+        "approach": "展示如何把不同类型的并行方法（张量并行、流水并行、数据并行）组合起来，扩展到数千块 GPU 和万亿参数模型。",
+        "result": "在 3072 块 GPU 上，对 1 万亿参数模型做到每次训练迭代 502 petaFLOP/s，单卡吞吐达到理论峰值的 52%。",
+    },
+    # ── 2020 ──
+    "2101.03961": {
+        "problem": "尽管 MoE 已有若干显著成果，但复杂度、通信开销和训练不稳定性阻碍了它被广泛采用 —— Switch Transformer 针对这三点。",
+        "approach": "提出的训练技巧有助于控制这些不稳定性，并首次证明大型稀疏模型可以用更低的精度（bfloat16）训练。",
+        "result": "在 Colossal Clean Crawled Corpus 上把语言模型的规模推进到万亿参数，相对 T5-XXL 取得 4 倍加速。",
+    },
+    "2005.11401": {
+        "problem": "但模型访问和精确操纵知识的能力仍然有限，因此在知识密集型任务上，表现落后于为任务专门设计的架构。",
+        "approach": "提出 RAG 模型：参数记忆是一个预训练的 seq2seq 模型，非参数记忆是一个维基百科稠密向量索引，通过预训练的神经检索器访问。",
+    },
+    "2004.12832": {
+        "approach": "为此提出 ColBERT，一种把深度语言模型（具体是 BERT）改造成高效检索的排序模型。",
+    },
+    # ── 2019 ──
+    "1910.02054": {
+        "problem": "数据并行和模型并行等现有方案有根本局限：既要塞进有限的设备显存，又要兼顾计算、通信和开发效率。",
+        "approach": "提出 Zero Redundancy Optimizer（ZeRO）来优化显存，在大幅提升训练速度的同时扩大可高效训练的模型规模。",
+    },
+    "1908.10084": {
+        "problem": "但它要求两句同时输入网络，带来巨大的计算开销：在 10000 句里找最相似的一对，用 BERT 需要约 5000 万次推理计算（约 65 小时）。",
+        "approach": "提出 Sentence-BERT（SBERT），对预训练的 BERT 网络做改造，用孪生和三元组网络结构得到语义上有意义的句子向量，可直接用余弦相似度比较。",
+    },
+    # ── 2017 ──
+    "1706.03762": {
+        "problem": "本文把 Transformer 成功应用于英语成分句法分析，在训练数据充足和有限两种情况下都表现良好，说明它能很好地泛化到其他任务。",
+        "approach": "提出一种新的简洁网络架构 Transformer，完全基于注意力机制，彻底去掉了循环和卷积。",
+    },
+    "1701.06538": {
+        "problem": "神经网络吸收信息的能力受限于它的参数量。",
+        "approach": "提出稀疏门控混合专家层（MoE），由多达成千上万个前馈子网络组成。",
+        "result": "本文解决了这些挑战，最终兑现了条件计算的承诺：模型容量提升超过 1000 倍，而计算开销只有很小的损失。",
+    },
+    # ── 2015 ──
+    "1508.07909": {
+        "problem": "神经机器翻译（NMT）模型通常使用固定词表，但翻译本身是一个开放词表问题。",
+        "approach": "提出一个更简单也更有效的做法：把稀有词和未登录词编码成子词单元序列，使 NMT 模型具备开放词表翻译能力。",
+    },
+}
+
+
+def main() -> None:
+    registry = json.loads(
+        (ROOT / "vault" / "知识库管理" / "归档" / "来源" / "论文与项目"
+         / "arxiv-registry.json").read_text(encoding="utf-8")
+    )
+    notes = json.loads(
+        (ROOT / "vault" / "知识库管理" / "归档" / "来源" / "论文与项目"
+         / "paper-notes.json").read_text(encoding="utf-8")
+    )
+
+    unknown = sorted(set(FIELDS) - set(registry["papers"]))
+    if unknown:
+        raise SystemExit(f"translation for unknown paper(s): {unknown}")
+
+    for pid, fields in FIELDS.items():
+        source = notes["papers"].get(pid, {})
+        for key in fields:
+            field = {"problem": "problem", "approach": "approach",
+                     "result": "key_result"}[key]
+            if not source.get(field):
+                raise SystemExit(f"{pid}: has no English {key} to translate")
+
+    OUT.write_text(json.dumps(FIELDS, ensure_ascii=False, indent=1, sort_keys=True) + "\n",
+                   encoding="utf-8")
+    total = sum(len(v) for v in FIELDS.values())
+    print(f"wrote {OUT.name} — {len(FIELDS)} paper(s), {total} field(s)")
+
+
+if __name__ == "__main__":
+    main()
