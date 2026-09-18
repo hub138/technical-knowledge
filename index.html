@@ -372,7 +372,14 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .nav-section .topic-button.archived{color:var(--color-muted);font-style:italic}
 .nav-section .topic-button.archived::before{content:"";display:inline-block;width:5px;height:5px;margin-right:6px;border-radius:50%;background:currentColor;opacity:.5;vertical-align:middle}
 .nav-section .topic-button.archived .count{opacity:.7}
-.domain-button .domain-label{display:flex;align-items:center;gap:7px;min-width:0;line-height:1.35}.domain-chevron{flex:none;width:10px;height:10px;position:relative;transition:transform var(--duration-fast) var(--ease-out)}.domain-chevron::before{content:"";position:absolute;top:1px;left:2px;width:5px;height:5px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);border-radius:1px}.domain-chevron[data-open="true"]{transform:rotate(90deg)}.domain-button[aria-expanded="true"] .domain-chevron{color:var(--color-accent)}
+.domain-button .domain-label{display:flex;align-items:center;gap:7px;min-width:0;line-height:1.35}/* 箭头加大加粗一档。
+ *
+ * 原来是 5×5 的方框、1.5px 描边 —— 在 16px 的文字旁边显得太细，
+ * 像是没渲染完整。改成 6×6、2px 描边、整体 12px 的盒子：
+ * 笔画和旁边文字的字重（750）配得上了，缩小到 90% 也还看得清。
+ *
+ * transform-origin 定在中心，展开旋转时不会偏。 */
+.domain-chevron{flex:none;width:12px;height:12px;position:relative;transform-origin:center;transition:transform var(--duration-fast) var(--ease-out)}.domain-chevron::before{content:"";position:absolute;top:1.5px;left:2px;width:6px;height:6px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(-45deg);border-radius:1.5px}.domain-chevron[data-open="true"]{transform:rotate(90deg)}.domain-button[aria-expanded="true"] .domain-chevron{color:var(--color-accent)}
 .count{font-variant-numeric:tabular-nums;color:var(--color-muted)}
 .topbar{padding:12px 30px;background:var(--color-bg-veil);gap:18px}
 .topbar h1{font-size:var(--text-md);font-weight:var(--weight-semibold);color:var(--color-muted)}
@@ -740,7 +747,9 @@ function renderDigest(items, status) {
     const facts = [];
     if (item.word_count) facts.push(`${item.word_count.toLocaleString()} 字`);
     if (item.read_minutes) facts.push(`约 ${item.read_minutes} 分钟`);
-    if (item.published) facts.push(item.published.slice(5));
+    // 用完整日期：接口给的 publishDateStr 有时省略年份（"04-24"），
+    // 显示出来像陈年旧文，实际是今年的。
+    if (item.published_full) facts.push(item.published_full);
     return `<a class="digest-card" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
       ${item.cover
         ? `<span class="digest-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-crop></span>`

@@ -34,6 +34,7 @@ ID，那不是工程是碰运气。
 
 from __future__ import annotations
 
+import datetime
 import json
 import os
 import pathlib
@@ -171,7 +172,19 @@ def _normalise(item: dict) -> dict:
         "cover": str(item.get("cover") or item.get("enclosureUrl") or ""),
         "url": url,
         "published": str(item.get("publishDateStr") or ""),
-        "published_full": str(item.get("publishDateTimeStr") or ""),
+        # 毫秒时间戳 + 由它推出的完整日期。
+        #
+        # 接口的 publishDateStr 有两种格式："2025-04-17" 和 "04-24"。
+        # 后者不是"很久以前"，是**今年**（省略了年份）—— 实测 04-24 的
+        # 时间戳是 2026-04-24。直接显示这个字符串会让最新的文章看起来
+        # 像陈年旧文。统一从时间戳推日期，显示层不再碰原字符串。
+        "published_ts": item.get("publishTimeStamp") or 0,
+        "published_full": (
+            datetime.datetime.fromtimestamp(
+                (item.get("publishTimeStamp") or 0) / 1000
+            ).strftime("%Y-%m-%d")
+            if item.get("publishTimeStamp") else ""
+        ),
         "score": item.get("score") or "",
         "category": _text(item.get("categoryDesc") or item.get("mainDomainDesc"), 30),
         # 阅读量/字数/时长 —— arXivDaily 那种「10994 字（约 44 分钟）」的质感。
@@ -229,6 +242,13 @@ def digest(limit: int = 12, hours: str = "3d", force: bool = False) -> dict:
     )
     items = [_normalise(row) for row in rows if isinstance(row, dict)]
     items = [item for item in items if item["title"] and item["url"]]
+    # 按发布时间倒序排。
+    #
+    # 接口自己的排序**不是**按时间 —— 实测 time=24h/3d/1w/1m 四个窗口返回的
+    # 总数完全一样（52742），第一页的日期从 2024 混到 2025，说明它按评分或
+    # 相关性排。它给的是"精选库里最值得读的"，不是"最近发布的"。
+    # 而这一页要的是后者，所以自己排。
+    items.sort(key=lambda item: item.get("published_ts") or 0, reverse=True)
 
     _CACHE.update({"at": now, "items": items, "status": "ok" if items else "empty"})
     return {"status": "ok" if items else "empty", "items": items, "fetched_at": int(now), "cached": False}
