@@ -85,7 +85,7 @@ FEEDS: list[dict] = [
         "url": "https://readhub.cn/rss",
         "link": "https://readhub.cn/hot",
         "ttl": 900,
-        "limit": 5,
+        "limit": 12,
         "delay": 0.0,
     },
     {
@@ -106,7 +106,7 @@ FEEDS: list[dict] = [
         "url": "https://papernotes.org/sitemap.xml",
         "link": "https://papernotes.org/",
         "ttl": 3600,
-        "limit": 5,
+        "limit": 12,
         # sitemap 实测 5.7MB，默认 2MB 上限会把它挡掉（第一版就报 too_large）。
         "max_bytes": 12 * 1024 * 1024,
         # 而且实测下载要 15.4s，默认 8s 超时会报 unreachable（第二版踩到）。
@@ -125,7 +125,7 @@ FEEDS: list[dict] = [
         "url": "https://www.arxivdaily.com/",
         "link": "https://www.arxivdaily.com/",
         "ttl": 1800,
-        "limit": 5,
+        "limit": 12,
         "max_bytes": 4 * 1024 * 1024,
         "delay": 0.0,
     },
@@ -136,7 +136,7 @@ FEEDS: list[dict] = [
         "url": "https://zeli.app/zh",
         "link": "https://zeli.app/zh",
         "ttl": 900,
-        "limit": 5,
+        "limit": 12,
         "delay": 0.0,
     },
     {
@@ -544,31 +544,100 @@ def parse_arxivdaily(text: str, base: str) -> tuple[list[dict], str]:
 
 
 def parse_zeli(text: str, base: str) -> tuple[list[dict], str]:
-    """zeli 首页。同样是「指向外链的标题」这个模式。"""
-    links = _collect_links(text)
+    """zeli 首页的故事列表。
+
+    数据不在 HTML 元素里，而在 Next.js 的 RSC payload 里 —— 一条条的
+    `self.__next_f.push([1,"..."])`。直接抓 DOM 只能拿到标题和链接，
+    而 payload 里有钱日期、作者、热度和**摘要**。
+
+    解析有三个坑，都踩过：
+
+      1. **payload 被拆在多个 <script> 标签里。** 单看一个标签的 json
+         只到一半，怎么补都是错的（表现为"Expecting ',' delimiter"）。
+         必须先把所有 push 的参数拼起来再解析。
+
+      2. **两层转义混在一起。** 结构键是 `\"`（一层），字符串内部真正的
+         引号是 `\\"`（两层）。要先保护两层、再收一层，否则摘要里带引号
+         的那几条会把 JSON 撕开。
+
+      3. **不能用括号配平找数组结尾。** 摘要里可能出现 `]` 或 `"])`，
+         配平会被带偏。合并成完整 payload 之后就没这个问题了 ——
+         配平只在完整文本上才可靠。
+    """
+    import datetime as _dt
+
+    parts: list[str] = []
+    for chunk in re.finditer(r'self\.__next_f\.push\(\[\d+,\s*("(?:[^"\\]|\\.)*")\s*\]\)', text):
+        try:
+            parts.append(json.loads(chunk.group(1)))
+        except (ValueError, TypeError):
+            continue
+    payload = "".join(parts)
+    marker = payload.find('"initialPosts"')
+    if marker < 0:
+        return [], "selector_missing"
+
+    start = payload.index("[", marker)
+    depth = 0
+    in_string = False
+    escaped = False
+    end = None
+    for i in range(start, len(payload)):
+        ch = payload[i]
+        if escaped:
+            escaped = False
+            continue
+        if ch == "\\":
+            escaped = True
+            continue
+        if ch == '"':
+            in_string = not in_string
+            continue
+        if in_string:
+            continue
+        if ch == "[":
+            depth += 1
+        elif ch == "]":
+            depth -= 1
+            if depth == 0:
+                end = i
+                break
+    if end is None:
+        return [], "selector_missing"
+
+    try:
+        posts = json.loads(payload[start:end + 1])
+    except (ValueError, TypeError):
+        return [], "selector_missing"
+
     items: list[dict] = []
-    seen: set[str] = set()
-    for href, label in links:
-        url = absolute_link = absolute_url(href, base)
-        if not url or url in seen:
+    for post in posts:
+        if not isinstance(post, dict):
             continue
-        # zeli 聚合的是 Hacker News 一类的外链，所以指向站外的更像条目。
-        if urlsplit(url).netloc == urlsplit(base).netloc:
+        title = clean_text(post.get("title"), 200)
+        url = str(post.get("url") or "")
+        if not title or not url.startswith("http"):
             continue
-        if len(label) < 18 or len(label) > 220:
-            continue
-        seen.add(url)
+        stamp = post.get("time")
+        published = ""
+        if isinstance(stamp, (int, float)) and stamp > 0:
+            published = _dt.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
+        score = post.get("score")
         items.append({
-            "title": clean_text(label, 200),
+            "title": title,
             "url": url,
-            "summary": "",
-            "published": "",
+            # zeli 自己写的摘要，比标题多得多 —— 原来这一格是空的。
+            "summary": clean_text(post.get("abstract"), 300),
+            "published": published,
+            # 热度和作者做标签。Hacker News 的分数是有意义的信号：
+            # 170 分和 3 分不是同一件事。
+            "tags": ([f"▲ {score}"] if isinstance(score, int) and score > 0 else [])
+                    + ([str(post.get("by"))] if post.get("by") else []),
         })
         if len(items) >= 40:
             break
-    if not items:
-        return [], "selector_missing"
     return items, ""
+
 
 
 def parse_html_source(key: str, text: str, base: str) -> tuple[list[dict], str]:

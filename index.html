@@ -103,6 +103,28 @@
  * 要让开就得收容器宽度：margin-right 把它推开，滚动区跟着变窄。
  *
  * 用 1180px 断点而不是所有宽度：窄屏没有右栏，也不该白留一条。 */
+/* 横向滚动的可视提示：两个箭头 + 右侧渐隐。
+ *
+ * 滚动条藏起来更干净，但那样没有任何东西告诉读者"这一行可以往右划"。
+ * 渐隐是暗示，箭头是操作 —— 两个都给。
+ */
+.digest-viewport{position:relative}
+.digest-fade{
+  position:absolute;top:0;right:0;bottom:12px;width:56px;pointer-events:none;
+  background:linear-gradient(to right, transparent, var(--color-bg));
+}
+.digest-fade[hidden]{display:none}
+.digest-nav{display:flex;gap:4px;margin-left:auto}
+.digest-arrow{
+  width:28px;height:28px;display:grid;place-items:center;
+  border:1px solid var(--color-line);border-radius:var(--radius-xs);
+  background:var(--color-panel);color:var(--color-ink-soft);
+  font-size:16px;line-height:1;cursor:pointer;padding:0;
+}
+.digest-arrow:hover:not(:disabled){border-color:var(--color-accent-line);color:var(--color-accent)}
+.digest-arrow:disabled{opacity:0.35;cursor:default}
+.digest-all{margin-left:0}
+
 .digest-row{
   display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;
   padding:2px 2px 12px;scrollbar-width:none;
@@ -785,9 +807,41 @@ function renderDigest(items, status) {
   box.innerHTML = `<div class="digest-head">
       <h2>最新优质好文</h2>
       <span class="digest-note">来自 BestBlogs 的精选</span>
+      <span class="digest-nav">
+        <button type="button" class="digest-arrow" data-dir="-1" aria-label="往前">‹</button>
+        <button type="button" class="digest-arrow" data-dir="1" aria-label="往后">›</button>
+      </span>
       <a class="digest-all" href="/sources">全部 →</a>
     </div>
-    <div class="digest-row">${cards}</div>`;
+    <div class="digest-viewport">
+      <div class="digest-row">${cards}</div>
+      <span class="digest-fade" aria-hidden="true"></span>
+    </div>`;
+  // 横向滚动的位置控制。
+  //
+  // 加两个按钮是因为：这一行看不见滚动条（藏起来更干净），而在触控板上
+  // "划一下"不是所有人都会想到的。右侧的渐隐只是暗示"还有"，按钮才是
+  // 可操作的东西。
+  const row = box.querySelector(".digest-row");
+  const fade = box.querySelector(".digest-fade");
+  const syncFade = () => {
+    // 滚到最右时收掉渐隐，否则它会一直暗示"还有更多"。
+    const more = row.scrollLeft + row.clientWidth < row.scrollWidth - 8;
+    if (fade) fade.hidden = !more;
+    const left = box.querySelector('[data-dir="-1"]');
+    const right = box.querySelector('[data-dir="1"]');
+    if (left) left.disabled = row.scrollLeft <= 4;
+    if (right) right.disabled = !more;
+  };
+  box.querySelectorAll(".digest-arrow").forEach((btn) => {
+    btn.onclick = () => {
+      row.scrollBy({ left: Number(btn.dataset.dir) * (row.clientWidth * 0.8), behavior: "smooth" });
+    };
+  });
+  row.addEventListener("scroll", syncFade, { passive: true });
+  // 图片是 lazy 的，加载完宽度才稳定；resize 也要重算。
+  window.addEventListener("resize", syncFade);
+  syncFade();
   // 封面加载失败就收掉那一格（同 sources 页的理由：第三方 CDN）。
   box.querySelectorAll(".digest-cover img").forEach((img) => {
     img.addEventListener("error", () => {
