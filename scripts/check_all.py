@@ -42,6 +42,7 @@ CONTRAST_PAGES = [
     ("/apps/learning/history.html", "apps/learning/history.html"),
     ("/apps/agent-evaluation/index.html", "apps/agent-evaluation/index.html"),
     ("/papers", "papers/index.html"),
+    ("/sources", "sources/index.html"),
 ]
 
 

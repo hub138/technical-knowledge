@@ -406,13 +406,15 @@
     "知识库中依赖它的结论": { en: "In the knowledge base, resting on it" },
     "这篇还没有深度解读": { en: "No deep read yet" },
     "上面是 L1，来自论文自己的摘要。深度解读（L2）要把全文读完才能写：摘要里没有消融实验、超参设置、失败案例和复现步骤，靠摘要拼出来的解读每一句都可能是错的。": { en: "The fields above are L1, taken from the paper's own abstract. A deep read (L2) needs the full paper: an abstract does not contain ablations, hyperparameters, failure cases or reproduction steps, so a deep read assembled from it would be wrong in ways a reader cannot detect." },
-    "按追踪方法论的 L2 规范，需要补这六个模块：": { en: "The L2 standard requires these six modules:" },
+    "按追踪方法论的 L2 规范，需要补这八个模块：": { en: "The L2 standard requires these eight modules:" },
     "背景与问题": { en: "Background and problem" },
     "核心方法": { en: "Method" },
     "技术细节": { en: "Technical detail" },
     "实验与结果": { en: "Experiments and results" },
+    "亮点与洞察": { en: "Strengths and insights" },
     "局限性": { en: "Limitations" },
     "复现指南": { en: "Reproduction guide" },
+    "相关工作与启发": { en: "Related work and what it suggests" },
     "写好之后放进": { en: "Write it into" },
     "，页面会自动显示。": { en: " and this page picks it up automatically." },
     "缺少论文编号。": { en: "No paper id given." },
@@ -434,6 +436,35 @@
     "读不到论文注册表。运行 python3 scripts/fetch-papers.py 生成后再刷新。": { en: "Cannot read the paper registry. Run python3 scripts/fetch-papers.py, then reload." },
     "篇": { en: "papers" },
     "条结论有论文支撑": { en: "conclusions backed by a paper" },
+
+    // ── Sources page ──
+    // 卡片本身的 name/kind/gain/tags 不走词典 —— 它们来自 site/sources.js，
+    // 按当前语言直接取（那一份数据里自带 en 字段）。这里只放页面骨架上的文案。
+    "外部资源": { en: "Sources" },
+    "别人做得更好的地方": { en: "Where others do it better" },
+    "这一页不重复造已经有人做好的东西。每个站都写清它补了什么、什么情况下该去那里而不是留在这里 —— 与其在本地做一个更差的版本，不如把入口放好。": {
+      en: "This page does not rebuild what someone already does well. Each entry says what it adds and when to go there instead of staying here. A good link beats a worse local copy.",
+    },
+    "值得长期订阅的论文、文章与资讯源，每个都说明它补了什么。": {
+      en: "Papers, writing and news worth subscribing to, each with a note on what it adds.",
+    },
+    "外部有哪些做得更好的站": { en: "Sites that do this better" },
+    "知识文章": { en: "Writing" },
+    "成篇的、有人写过的内容。适合慢慢读，适合订阅。": {
+      en: "Finished pieces by people who thought it through. Good for slow reading and for subscribing.",
+    },
+    "论文": { en: "Papers" },
+    "一手研究。比二手解读更可信，但也更需要筛选和结构化。": {
+      en: "Primary research. More trustworthy than a second-hand read, and more in need of filtering and structure.",
+    },
+    "资讯": { en: "News" },
+    "知道发生了什么。不等同于知识，也不该按知识的用法读。": {
+      en: "Knowing what happened. Not the same as knowledge, and not to be read as if it were.",
+    },
+    "资源清单读不到": { en: "Cannot read the source list" },
+    "检查 site/sources.js 是否加载成功，然后刷新。": {
+      en: "Check that site/sources.js loaded, then reload.",
+    },
 
     // ── Home page: what every note answers ──
     "篇工程笔记，覆盖 AI 系统、后端、数据、系统性能与软件构建。写的都是能落到手上的东西：一个机制怎么运作、代价在哪、结论有没有实测支撑。": {

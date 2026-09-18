@@ -43,6 +43,7 @@ CHROME = (
 PAGES = [
     ("home", "/", "index.html"),
     ("papers", "/papers", "papers/index.html"),
+    ("sources", "/sources", "sources/index.html"),
     ("projects", "/projects", "projects/index.html"),
     ("insights", "/insights", "site/insights.html"),
     ("learning", "/apps/learning/index.html", "apps/learning/index.html"),

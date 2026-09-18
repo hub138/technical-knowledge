@@ -47,6 +47,14 @@ window.TK_NAV = {
       description: "自己追踪的新论文，逐篇结构化解析，并回流到知识库。",
     },
     {
+      key: "sources",
+      label: "外部资源",
+      href: "/sources",
+      icon: "◧",
+      title: "外部有哪些做得更好的站",
+      description: "值得长期订阅的论文、文章与资讯源，每个都说明它补了什么。",
+    },
+    {
       key: "projects",
       label: "项目与教学",
       href: "/projects",

@@ -384,7 +384,7 @@
         if (ev) tags.push(`<span class="paper-tag evidence">${esc(tr("支撑"))} ${ev} ${esc(tr("篇知识"))}</span>`);
         if (p.survey_count) tags.push(`<span class="paper-tag">${esc(tr("调研引用"))} ${p.survey_count}</span>`);
         if (p.primary) tags.push(`<span class="paper-tag">${esc(p.primary)}</span>`);
-        // 有手写深度解读就标出来，让读者知道点进去能看到完整六模块。
+        // 有手写深度解读就标出来，让读者知道点进去能看到完整八模块。
         if (p.has_deep_read) tags.push(`<span class="paper-tag evidence">${esc(tr("已深度解析"))}</span>`);
         const href = `/paper?id=${encodeURIComponent(p.id)}`;
         return `<article class="paper${p.has_deep_read ? " read" : ""}" data-href="${esc(href)}" tabindex="0" role="link" aria-label="${esc(titleOf(p) || p.id)}">

@@ -53,6 +53,7 @@ PUBLIC_EVALUATION = REPOSITORY_ROOT / "apps" / "agent-evaluation" / "index.html"
 PUBLIC_INSIGHTS = REPOSITORY_ROOT / "site" / "insights.html"
 PUBLIC_PAPERS = REPOSITORY_ROOT / "papers" / "index.html"
 PUBLIC_PAPER = REPOSITORY_ROOT / "papers" / "paper.html"
+PUBLIC_SOURCES = REPOSITORY_ROOT / "sources" / "index.html"
 
 # arXiv 元数据注册表。由 scripts/fetch-papers.py 生成并入库，不是运行时数据 ——
 # 它记录的是"这个知识库建立在哪些论文上"，属于要能追溯、能 diff 的资产。
@@ -1484,13 +1485,22 @@ class Handler(BaseHTTPRequestHandler):
             self.send_bytes(payload, "text/html; charset=utf-8")
             return
         if path in {"/papers", "/papers/"}:
-            # 论文页：列出知识库引用的 arXiv 论文，以及每篇支撑了哪些结论。
-            # 数据来自 scripts/fetch-papers.py 生成的注册表；文件缺失时页面
+            # 论文追踪页：自己追踪的论文，逐篇结构化解析，并回流到知识库。
+            # 列表数据来自 scripts/fetch-papers.py 生成的注册表；文件缺失时页面
             # 自己会说明要跑哪个命令，不在这里兜底造数据。
             try:
                 payload = PUBLIC_PAPERS.read_bytes()
             except OSError:
                 self.send_json({"error": "papers page unavailable"}, 503)
+                return
+            self.send_bytes(payload, "text/html; charset=utf-8")
+            return
+        if path in {"/sources", "/sources/"}:
+            # 外部资源导航。内容在 site/sources.js 里，这一页只是壳。
+            try:
+                payload = PUBLIC_SOURCES.read_bytes()
+            except OSError:
+                self.send_json({"error": "sources page unavailable"}, 503)
                 return
             self.send_bytes(payload, "text/html; charset=utf-8")
             return
@@ -1685,14 +1695,30 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path.startswith("/static/"):
             name = path[8:]
-            if "/" in name or name.startswith("."):
+            if name.startswith("."):
                 self.send_json({"error": "asset not found"}, 404)
                 return
-            file = (Path(__file__).resolve().parent / name).resolve()
-            if file.parent != Path(__file__).resolve().parent or not file.is_file():
+            root = Path(__file__).resolve().parent
+            # One level of subdirectory is allowed, for KaTeX's fonts/.
+            # Anything deeper, or any path segment that could climb out, is
+            # refused before it reaches the filesystem: the check below is
+            # what actually enforces it, this just rejects the obvious cases
+            # with a cheaper test.
+            parts = [part for part in name.split("/") if part]
+            if len(parts) > 2 or any(part in {".", ".."} for part in parts):
                 self.send_json({"error": "asset not found"}, 404)
                 return
-            allowed = {".css", ".js", ".mjs", ".map"}
+            file = (root / Path(*parts)).resolve()
+            # The resolved parent must still be inside /static. Comparing to a
+            # fixed set rather than merely "is under root" keeps a symlink or a
+            # crafted name from reaching the repo root.
+            if file.parent != root and file.parent != root / "fonts":
+                self.send_json({"error": "asset not found"}, 404)
+                return
+            if not file.is_file():
+                self.send_json({"error": "asset not found"}, 404)
+                return
+            allowed = {".css", ".js", ".mjs", ".map", ".woff2", ".woff"}
             if file.suffix.lower() not in allowed:
                 self.send_json({"error": "asset not found"}, 404)
                 return

@@ -46,6 +46,9 @@ projects/archify/archify.zip
 
 # Vendored browser libraries pulled in by install scripts, not written here.
 /site/mermaid.min.js
+/site/katex.min.js
+/site/katex.min.css
+/site/fonts/
 
 # Large media and exports that do not belong in history.
 *.mov

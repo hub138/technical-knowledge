@@ -6,6 +6,10 @@
     <title>论文追踪 · technical-knowledge</title>
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/base.css" />
+    <!-- KaTeX 是 vendored 到本地的（scripts/vendor-katex.sh），不走 CDN。
+         论文解析的「技术细节」模块要求写公式，没有它就只能写成一堆反斜杠。 -->
+    <link rel="stylesheet" href="/static/katex.min.css" />
+    <script src="/static/katex.min.js" defer></script>
     <script src="/static/nav.js"></script>
     <script src="/static/i18n.js"></script>
     <script src="/static/shell.js"></script>
@@ -21,7 +25,7 @@
        *
        * 分两层，和追踪方法论里的分级一致：
        *   L1  从论文自己的摘要抽取的要点。可靠，但只是摘要能支撑的部分。
-       *   L2  六模块深度解读。需要真读过全文才能写，所以它要么是手写的，
+       *   L2  八模块深度解读。需要真读过全文才能写，所以它要么是手写的，
        *       要么明确标成"还没有"。
        *
        * 不给 L2 生造内容。摘要里没有消融实验、超参和局限，靠摘要拼出来的
@@ -133,6 +137,30 @@
       }
 
       .p-deep { margin: var(--space-3) 0 0; }
+
+      /* 块级公式居中并给出呼吸；行内公式跟随正文行高，不额外撑开。
+         KaTeX 自己管排版，这里只负责间距和溢出（长公式在窄屏要能横向滚动，
+         撑破容器比滚动难看得多）。 */
+      .math--display {
+        margin: var(--space-4) 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        text-align: center;
+      }
+      .math { font-size: 1.02em; }
+      /* KaTeX 没加载出来时的兜底：把 TeX 原文当代码显示。
+         不静默吞掉 —— 读者至少知道这里本来有个公式。 */
+      .math-raw {
+        display: inline-block;
+        padding: 1px 5px;
+        border: 1px dashed var(--color-line);
+        border-radius: var(--radius-xs);
+        background: var(--color-surface);
+        color: var(--color-muted);
+        font-family: var(--font-mono);
+        font-size: var(--text-sm);
+      }
+      .math-raw.math--display, div.math-raw { display: block; margin: var(--space-3) 0; }
       .p-deep h3 {
         margin: var(--space-6) 0 var(--space-2);
         padding-bottom: 5px;
@@ -168,7 +196,7 @@
 
       .p-empty { padding: var(--space-10); color: var(--color-muted); text-align: center; }
 
-      /* 右侧目录。深度解读有六个模块，正文长了以后需要能跳 ——
+      /* 右侧目录。深度解读有八个模块，正文长了以后需要能跳 ——
          和知识库文章页的目录用同一套视觉，读者不用重新学。 */
       .p-layout { display: block; }
       .p-toc { display: none; }
@@ -255,15 +283,25 @@
         return `<div class="p-field${cls ? " " + cls : ""}"><dt>${esc(tr(label))}</dt><dd>${esc(value)}</dd></div>`;
       }
 
-      /* 深度解读的六个模块名，与方法论里的 L2 一一对应。
+      /* 深度解读的八个模块名，与方法论里的 L2 一一对应。
          展示时按这个顺序，缺哪个模块一眼能看出来。 */
+      /* 八模块，与方法页 [[知识库管理/方法/论文怎么追踪怎么解析]] 的 L2 规范一一对应。
+       *
+       * 「亮点与洞察」「相关工作与启发」是参考 PaperNotes 的解析结构补的 ——
+       * 它这两节写得比我原来的六模块好：前者说清"为什么这样设计而不是那样"，
+       * 后者把论文放回它所在的脉络里。这两件事恰恰是读完论文后最该留下的。
+       *
+       * 没有采纳它的「评分」和「标签云」：本库是个人知识库，评分没有消费者；
+       * 标签也和已有的领域/主题两级分类重复。 */
       const MODULES = [
         ["背景与问题", "background"],
         ["核心方法", "method"],
         ["技术细节", "detail"],
         ["实验与结果", "results"],
+        ["亮点与洞察", "insight"],
         ["局限性", "limits"],
         ["复现指南", "reproduce"],
+        ["相关工作与启发", "related"],
       ];
 
       /* 行内标记：粗体、行内代码、wikilink。
@@ -300,8 +338,75 @@
         return out.join("\n");
       }
 
+      /* ── 数学公式 ──────────────────────────────────────────────────────
+       *
+       * 顺序是这里唯一难搞的地方。inline() 第一件事就是 esc()，它会把 `\`
+       * 和 `_` 转成实体；而 KaTeX 要的是**原始** LaTeX，被转义过就废了。
+       * 直接把 $...$ 丢给后面的规则，结果是页面上出现一堆字面的 \ell。
+       *
+       * 所以分两步走：先把公式整段抠出来换成占位符（\u0000 包起来的序号，
+       * 正文里不可能出现），走完所有转义规则之后再换回 <span class="math">。
+       * 最后交给 KaTeX 在 DOM 上渲染。
+       *
+       * 语法按写作规范：$...$ 行内，$$...$$ 块级。
+       */
+      const mathStore = [];
+
+      function stashMath(text) {
+        // 块级先处理，否则 $$...$$ 会被行内规则从中间切开。
+        let out = text.replace(/\$\$([\s\S]+?)\$\$/g, (_m, body) => {
+          mathStore.push({ body: body.trim(), display: true });
+          return `\u0000${mathStore.length - 1}\u0000`;
+        });
+        out = out.replace(/(?<!\\)\$([^\n$]+?)(?<!\\)\$/g, (_m, body) => {
+          mathStore.push({ body: body.trim(), display: false });
+          return `\u0000${mathStore.length - 1}\u0000`;
+        });
+        return out;
+      }
+
+      function unstashMath(html) {
+        return html.replace(/\u0000(\d+)\u0000/g, (_m, i) => {
+          const item = mathStore[Number(i)];
+          if (!item) return "";
+          // The raw TeX goes into a data attribute, not into the text, so the
+          // HTML escaping that already ran cannot corrupt it. renderMath()
+          // reads it back off the DOM.
+          const tag = item.display ? "div" : "span";
+          const cls = item.display ? "math math--display" : "math";
+          return `<${tag} class="${cls}" data-tex="${encodeURIComponent(item.body)}"></${tag}>`;
+        });
+      }
+
+      /* 把占位符换成真正的公式。必须在 innerHTML 之后调用。
+         用 data-tex 而不是把 TeX 放在文本里：容器建好后文本已被当作 HTML
+         解析过一轮，放在属性里才能保证字节不变。 */
+      function renderMath(root) {
+        const nodes = (root || document).querySelectorAll(".math[data-tex]");
+        if (!nodes.length) return;
+        if (!window.katex) {
+          // 没加载出来时不要把原文吞掉 —— 显示可读的源码，并说清为什么。
+          nodes.forEach((n) => { n.className = "math-raw"; n.textContent = decodeURIComponent(n.dataset.tex); });
+          return;
+        }
+        nodes.forEach((n) => {
+          const tex = decodeURIComponent(n.dataset.tex);
+          try {
+            katex.render(tex, n, {
+              displayMode: n.classList.contains("math--display"),
+              throwOnError: false,
+              strict: "ignore",
+              trust: false,
+            });
+          } catch (error) {
+            n.className = "math-raw";
+            n.textContent = tex;
+          }
+        });
+      }
+
       function inline(text) {
-        let out = esc(text);
+        let out = esc(stashMath(text));
         // 行内代码先处理，避免它的内容被后面的规则二次加工。
         out = out.replace(/`([^`]+)`/g, "<code>$1</code>");
         out = out.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
@@ -310,7 +415,7 @@
           const shown = (label || target.split("/").pop());
           return `<a href="/?path=${encodeURIComponent(target)}">${shown}</a>`;
         });
-        return out;
+        return unstashMath(out);
       }
 
       function deepBlock(text) {
@@ -321,6 +426,25 @@
         for (let idx = 0; idx < lines.length; idx += 1) {
           const line = lines[idx].trimEnd();
           if (!line.trim()) { closeList(); continue; }
+          // 块级公式常常独占多行：
+          //   $$
+          //   \sum_{\ell=1}^{L} I(\mathbf{Z}_\ell; Y)
+          //   $$
+          // 逐行处理会把 $ 和内容拆到不同分支，所以先整段吃掉，
+          // 交给 inline() 里的 stashMath 统一处理。
+          if (/^\s*\$\$/.test(line) && (line.match(/\$\$/g) || []).length % 2 === 1) {
+            closeList();
+            const buf = [line];
+            let k = idx + 1;
+            while (k < lines.length) {
+              buf.push(lines[k]);
+              if (/\$\$\s*$/.test(lines[k])) { k += 1; break; }
+              k += 1;
+            }
+            out += inline(buf.join(" "));
+            idx = k - 1;   // 外层循环会再 +1
+            continue;
+          }
           // 引用块：连续的 `>` 行合成一个块。
           //
           // 第一版每行单独输出一个 blockquote，结果一段四行的说明变成四个
@@ -380,7 +504,7 @@
           <div class="p-todo">
             <h3>${esc(tr("这篇还没有深度解读"))}</h3>
             <p>${esc(tr("上面是 L1，来自论文自己的摘要。深度解读（L2）要把全文读完才能写：摘要里没有消融实验、超参设置、失败案例和复现步骤，靠摘要拼出来的解读每一句都可能是错的。"))}</p>
-            <p>${esc(tr("按追踪方法论的 L2 规范，需要补这六个模块："))}</p>
+            <p>${esc(tr("按追踪方法论的 L2 规范，需要补这八个模块："))}</p>
             <ol>${MODULES.map(([name]) => `<li>${esc(tr(name))}</li>`).join("")}</ol>
             <p style="margin-top:var(--space-3)">${esc(tr("写好之后放进"))} <code>vault/知识库管理/归档/来源/论文与项目/解析/${esc(p.id)}.md</code>${esc(tr("，页面会自动显示。"))}</p>
           </div>`;
@@ -414,6 +538,14 @@
           ${evidence}
         `;
         $("#shell").innerHTML = body;
+        // 公式必须在 DOM 建好之后渲染。KaTeX 是 defer 加载的，
+        // 首次渲染时可能还没就位 —— renderMath 里有兜底，不吞原文。
+        renderMath($("#shell"));
+        // defer 脚本可能在这次渲染之后才执行完。等它到了再试一次，
+        // 否则首屏会停在兜底的代码样式上，刷新一下才对。
+        if (!window.katex) {
+          window.addEventListener("load", () => renderMath($("#shell")), { once: true });
+        }
         buildToc();
       }
 

@@ -27,6 +27,7 @@
     knowledge: { title: "知识库", description: "阅读、搜索，并用图谱看知识之间的关系。" },
     graph: { title: "知识图谱", description: "领域、主题与笔记之间的关联，以及知识流通路径。" },
     papers: { title: "论文追踪", description: "追踪新论文，逐篇给出结构化解析；知识库的结论从这里取材。" },
+    sources: { title: "外部资源", description: "值得长期订阅的论文、文章与资讯源，每个都说明它补了什么。" },
     projects: { title: "项目与教学", description: "已经安装的工具、学习入口和源码索引。" },
     evaluation: { title: "Agent 评估", description: "自研评估项目的设计与后续实现入口。" },
     insights: { title: "访问与反馈", description: "本机访问记录与读者反馈，只在这台机器上可见。" },
@@ -43,6 +44,7 @@
    */
   const PATH_OWNER = [
     { key: "papers", match: (p) => p === "/papers" || p.startsWith("/papers/") },
+    { key: "sources", match: (p) => p === "/sources" || p.startsWith("/sources/") },
     { key: "insights", match: (p) => p === "/insights" },
     { key: "evaluation", match: (p) => p.startsWith("/apps/agent-evaluation") },
     { key: "projects", match: (p) => p === "/projects" || p.startsWith("/projects/") },
