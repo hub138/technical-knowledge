@@ -208,6 +208,11 @@ PROBE = r"""
     /* object-fit: cover 同理 —— 封面图按容器比例裁切是有意的，
        必然让图片的固有尺寸和显示盒不一致。用 data-crop 声明。 */
     if(el.hasAttribute('data-crop')) return;
+    /* KaTeX 会给每个公式额外输出一份 MathML —— 那是给屏幕阅读器和
+       复制粘贴用的，kaTEX 自己的 CSS 就把它 clip 成 1×1 并绝对定位。
+       它必然"溢出"（内容比 1px 的盒子大得多），但那是标准做法，
+       不是排版问题。按类名跳过：这个类由 KaTeX 生成，没法给它加属性。 */
+    if(el.classList.contains('katex-mathml')) return;
     if(el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 4) clipped.push(label(el));
   });
   out.clipped = Array.from(new Set(clipped)).slice(0, 6);

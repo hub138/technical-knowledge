@@ -609,7 +609,9 @@
         .pn-filter-label { min-width: 0; }
       }
     </style>
-  </head>
+    <link rel="stylesheet" href="/static/katex.min.css">
+  <script src="/static/katex.min.js" defer></script>
+</head>
   <body class="tk-host">
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
     <div class="tk-shell tl-layout">
@@ -872,8 +874,75 @@
                值不值得读"最直接的依据 —— 比标题有用得多。
                它是模型读完论文写的，不是作者原话，所以照站内统一的
                「AI总结」标记来渲染（和 /sources 那套同一个视觉）。 */""}
-          ${paper.summary ? `<p class="pn-summary"><b class="pn-summary-label">AI总结</b><span>${esc(paper.summary)}</span></p>` : ""}
+          ${paper.summary ? `<p class="pn-summary"><b class="pn-summary-label">AI总结</b><span>${renderSummary(paper.summary)}</span></p>` : ""}
         </article>`;
+      }
+
+      /* 一句话总结里的数学公式。
+       *
+       * PaperNotes 的总结是 LaTeX 写的：`\(M\)`、`$x$`、`\[...\]` 这些
+       * 分隔符直接显示出来的话，读者看到的是 "放大一个倍数 \(M\)" 这种
+       * 带着反斜杠和括号的源码。
+       *
+       * 做法和 paper.html 一致：先把公式抽成占位符，让转义只作用在普通
+       * 文本上，再把占位符交给 KaTeX 渲染成真正的公式。公式不经过 esc，
+       * 所以不会被破坏；普通文本仍然转义，所以不会引入 XSS。 */
+      function renderSummary(text) {
+        const parts = [];
+        let rest = String(text || "");
+        // 行内 \(...\) 与 $...$，以及独立行 \\[...\\] 与 $$...$$
+        // 用 new RegExp 写，避免字面量里反斜杠层数数错。
+        // 上一版写成正则字面量，括号没配对（Unmatched ')'），整个 script
+        // 直接语法错误 —— 结果不是公式没渲染，而是**整页空白**。
+        // 公式内部可以有反斜杠（\alpha、\frac 这些），所以用 [\s\S]+?
+        // 而不是 [^\\]+? —— 后者会在遇到第一个反斜杠时停住，
+        // "放大一个倍数 \(M\)" 里的 M 能匹配，但 \(x_{i}\) 这种就断在半路。
+        const patterns = [
+          [/\\\[([\s\S]+?)\\\]/g, true],     // \[...\]
+          [/\\\(([\s\S]+?)\\\)/g, false],    // \(...\)
+          [/\$\$([\s\S]+?)\$\$/g, true],     // $$...$$
+          [/\$([^$\n]+?)\$/g, false],        // $...$
+        ];
+        let out = "";
+        let cursor = 0;
+        for (;;) {
+          let hit = null;
+          for (const [re, display] of patterns) {
+            re.lastIndex = cursor;
+            const m = re.exec(rest);
+            if (m && (!hit || m.index < hit.m.index)) hit = { m, display };
+          }
+          if (!hit) break;
+          out += esc(rest.slice(cursor, hit.m.index));
+          const tag = hit.display ? "div" : "span";
+          out += `<${tag} class="math${hit.display ? " math--display" : ""}" data-tex="${encodeURIComponent(hit.m[1])}"></${tag}>`;
+          cursor = hit.m.index + hit.m[0].length;
+        }
+        out += esc(rest.slice(cursor));
+        return out;
+      }
+
+      /* 把占位符换成真正的公式。必须在 innerHTML 之后调用。 */
+      function renderMath(root) {
+        const nodes = (root || document).querySelectorAll(".math[data-tex]");
+        if (!nodes.length) return;
+        if (!window.katex) {
+          // 没加载出来时不要把原文吞掉 —— 显示可读的源码。
+          nodes.forEach((n) => { n.className = "math-raw"; n.textContent = decodeURIComponent(n.dataset.tex); });
+          return;
+        }
+        nodes.forEach((n) => {
+          const tex = decodeURIComponent(n.dataset.tex);
+          try {
+            katex.render(tex, n, {
+              displayMode: n.classList.contains("math--display"),
+              throwOnError: false, strict: "ignore", trust: false,
+            });
+          } catch (error) {
+            n.className = "math-raw";
+            n.textContent = tex;
+          }
+        });
       }
 
       /* 两层分类：大类一行，选中后展开它的子领域。
@@ -971,6 +1040,8 @@
           const list = $("#pn-list");
           if (append) list.insertAdjacentHTML("beforeend", rows);
           else list.innerHTML = rows || `<div class="pn-empty">${esc(tr("没有匹配的论文。"))}</div>`;
+          // 公式要在 innerHTML 之后渲染：占位符这时候才在 DOM 里。
+          renderMath(list);
           pn.offset += (payload.papers || []).length;
           const more = $("#pn-more");
           more.hidden = pn.offset >= pn.total;

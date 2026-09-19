@@ -162,7 +162,19 @@ def _fetch_paper_summary(url: str) -> dict:
     if match:
         text = re.sub(r"<[^>]+>", "", match.group(1))
         summary = html.unescape(text).strip()
-        summary = re.sub(r"\s+", " ", summary)[:600]
+        # 截断时别把公式切一半。
+        #
+        # 摘要里有 \(M\) 这类 LaTeX。按字符数硬切会把右括号切掉，
+        # 剩下的 \( 就没有闭合 —— 前端的公式匹配找不到结尾，
+        # 只能把源码原样显示出来，读者看到的就是一个反斜杠。
+        # 切完后如果最后一个 \( 没有对应的 \)，就退到它前面再切。
+        summary = re.sub(r"\s+", " ", summary)
+        if len(summary) > 600:
+            cut = summary[:600]
+            open_at = cut.rfind("\\(")
+            if open_at > 0 and "\\)" not in cut[open_at:]:
+                cut = cut[:open_at]
+            summary = cut
     # 中文标题：PaperNotes 的详情页正文里，标题下方常有一行中文译名。
     # 抓不到就不给 —— 宁可只显示英文原题，也不自己翻译一个假译名。
     title_cn = ""
