@@ -507,6 +507,21 @@
       .pn-list { display: grid; gap: 1px; margin-top: var(--space-3); }
       /* 外部论文一条只有标题+标签，用紧排的列表而不是卡片 ——
          卡片适合"有内容要展开"的条目，这里一屏看二十条才有意义。 */
+      /* 一句话总结。和 /sources 的 AI 总结框同一套视觉：淡蓝底 + 深蓝左竖线。
+         两处都是"模型写的摘要"，读者该看到同一种标记。 */
+      .pn-summary {
+        margin: 7px 0 0; padding: 9px 11px;
+        border-left: 3px solid var(--color-summary-label);
+        border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+        background: var(--color-summary-bg);
+        color: var(--color-summary-text);
+        font-size: var(--text-small); line-height: 1.7;
+      }
+      .pn-summary-label {
+        color: var(--color-summary-label); font-weight: var(--weight-bold);
+        margin-right: 6px;
+      }
+
       .pn-row {
         display: grid;
         gap: 3px;
@@ -853,6 +868,11 @@
             ${sub ? `<span class="pn-sub">${esc(sub)}</span>` : ""}
             ${tags.map((t) => `<span class="pn-tag">${esc(t)}</span>`).join("")}
           </div>
+          ${/* 一句话总结。PaperNotes 每篇正文开头都有，是"这篇讲了什么、
+               值不值得读"最直接的依据 —— 比标题有用得多。
+               它是模型读完论文写的，不是作者原话，所以照站内统一的
+               「AI总结」标记来渲染（和 /sources 那套同一个视觉）。 */""}
+          ${paper.summary ? `<p class="pn-summary"><b class="pn-summary-label">AI总结</b><span>${esc(paper.summary)}</span></p>` : ""}
         </article>`;
       }
 

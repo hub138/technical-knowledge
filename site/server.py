@@ -32,6 +32,7 @@ import threading
 import time
 from http.cookies import SimpleCookie
 from pathlib import Path
+import urllib.request
 from urllib.parse import parse_qs, quote, unquote, urlsplit
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -97,6 +98,136 @@ PAPERNOTES_INDEX = (
 )
 # 大类的展示顺序。照 PaperNotes 自己的导航 —— LLM 打头，尽管生成与多模态
 # 的篇数更多。读者找论文时先想的是「LLM 相关的」，不是「五百篇以上的」。
+# 论文摘要的本地缓存（url → {summary, title_cn}）。
+#
+# 论文页的一条记录只有英文标题。而每篇在 papernotes.org 上都有详情页，
+# 正文开头就是「一句话总结」—— 那才是"这篇讲了什么、值不值得读"的依据。
+# 索引里没有它，只能去详情页拿。
+#
+# 23802 篇不可能全抓（那要两万次请求）。做法是：只对**当前这一页**抓取，
+# 结果按 url 存盘。同一篇第二次看到就直接读缓存，一次请求都不发。
+# 翻过的页会越攒越多，常看的那几页很快就全命中了。
+PAPERNOTES_SUMMARY_CACHE = REPOSITORY_ROOT / "data" / "papernotes-summaries.json"
+_SUMMARY_RE = re.compile(r"一句话总结[\s\S]{0,1500}?<p>([\s\S]{0,900}?)</p>", re.I)
+_SUMMARY_TTL = 30 * 86400  # 论文解读写完就不变了，缓存一个月足够
+
+# 同一时间只跑一个补抓线程。并发请求（前端会重试、多个标签页）
+# 不该各自起一批，否则同一篇被抓好几遍。
+_enriching = [False]
+_summary_cache: dict[str, dict] = {}
+
+
+def _load_summary_cache() -> None:
+    try:
+        raw = json.loads(PAPERNOTES_SUMMARY_CACHE.read_text(encoding="utf-8"))
+        if isinstance(raw, dict):
+            _summary_cache.update(raw)
+    except (OSError, ValueError):
+        pass
+
+
+def _save_summary_cache() -> None:
+    try:
+        PAPERNOTES_SUMMARY_CACHE.parent.mkdir(parents=True, exist_ok=True)
+        PAPERNOTES_SUMMARY_CACHE.write_text(
+            json.dumps(_summary_cache, ensure_ascii=False), encoding="utf-8"
+        )
+    except OSError:
+        pass
+
+
+def _fetch_paper_summary(url: str) -> dict:
+    """抓一篇论文的详情页，取「一句话总结」。
+
+    PaperNotes 的每篇正文开头都有一句「一句话总结」，那是读这篇之前最该
+    看到的一句话。索引里没有，只能去详情页拿 —— 所以这里抓一次就存起来。
+    """
+    if not url.startswith("http"):
+        return {}
+    hit = _summary_cache.get(url)
+    if hit and time.time() - float(hit.get("at") or 0) < _SUMMARY_TTL:
+        return hit
+    try:
+        request = urllib.request.Request(
+            url, headers={"User-Agent": "technical-knowledge/1.0 (personal notes)"}
+        )
+        with urllib.request.urlopen(request, timeout=15) as response:
+            page = response.read(3 * 1024 * 1024).decode("utf-8", errors="replace")
+    except Exception:
+        # 抓不到就记一个空结果，免得每次翻页都重试同一批失败的。
+        _summary_cache[url] = {"at": time.time(), "summary": "", "title_cn": ""}
+        return {}
+    match = _SUMMARY_RE.search(page)
+    summary = ""
+    if match:
+        text = re.sub(r"<[^>]+>", "", match.group(1))
+        summary = html.unescape(text).strip()
+        summary = re.sub(r"\s+", " ", summary)[:600]
+    # 中文标题：PaperNotes 的详情页正文里，标题下方常有一行中文译名。
+    # 抓不到就不给 —— 宁可只显示英文原题，也不自己翻译一个假译名。
+    title_cn = ""
+    cn = re.search(r'<p[^>]*class="[^"]*title-cn[^"]*"[^>]*>([\s\S]{0,200}?)</p>', page)
+    if cn:
+        title_cn = re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cn.group(1)))).strip()[:200]
+    entry = {"at": time.time(), "summary": summary, "title_cn": title_cn}
+    _summary_cache[url] = entry
+    return entry
+
+
+def _enrich_papers(papers: list[dict]) -> list[dict]:
+    """给一页论文补上「一句话总结」和中文译名。
+
+    只抓缓存里没有的。已经抓过的（翻过的页）直接读盘，不发请求。
+    抓不到的保留原样 —— 列表条目本身还能点进去看原文。
+    """
+    # 但**不要在这里同步抓**。
+    #
+    # 一页 60 篇、并发 6，实测要 26 秒 —— 首屏等 26 秒是不能接受的，
+    # 而读者看到的就是"页面卡住了"。改成：有缓存就直接用，缺的丢给后台
+    # 线程补，本次请求立刻返回。本地网络下后台通常一两秒就补完，
+    # 前端那一轮重试（loadPapers 已有）会把补好的带回来。
+    missing = [p for p in papers
+               if isinstance(p, dict) and p.get("url")
+               and not (_summary_cache.get(p["url"])
+                        and time.time() - float(_summary_cache[p["url"]].get("at") or 0) < _SUMMARY_TTL)]
+    if missing and not _enriching[0]:
+        _enriching[0] = True
+
+        def _background() -> None:
+            try:
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=6) as pool:
+                    list(pool.map(lambda p: _fetch_paper_summary(p["url"]), missing))
+            except Exception:
+                for p in missing:
+                    _fetch_paper_summary(p["url"])
+            finally:
+                _save_summary_cache()
+                _enriching[0] = False
+
+        try:
+            import threading
+            threading.Thread(target=_background, daemon=True).start()
+        except Exception:
+            _enriching[0] = False
+    out = []
+    for p in papers:
+        if not isinstance(p, dict):
+            out.append(p)
+            continue
+        hit = _summary_cache.get(p.get("url") or "")
+        out.append({
+            **p,
+            "summary": (hit or {}).get("summary") or "",
+            "title_cn": (hit or {}).get("title_cn") or "",
+            # 这一句总结是模型读完论文写的，不是作者原话 —— 标出来。
+            "summary_ai": bool((hit or {}).get("summary")),
+        })
+    return out
+
+
+_load_summary_cache()
+
 PAPERNOTES_CATEGORY_ORDER = [
     "LLM", "LLM 应用", "生成与多模态", "视觉感知",
     "决策与具身", "基础与理论", "科学与跨学科",
@@ -2110,7 +2241,9 @@ class Handler(BaseHTTPRequestHandler):
                 "tags": (index.get("tags") or [])[:60],
                 "categories": index.get("categories") or [],
                 "conferences": index.get("conferences") or [],
-                "papers": page,
+                # 补上「一句话总结」和中文译名。只抓这一页，
+                # 抓过的按 url 存盘，第二次翻到就是零请求。
+                "papers": _enrich_papers(page),
             })
             return
         if path == "/api/digest":
