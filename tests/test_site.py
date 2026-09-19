@@ -1413,11 +1413,20 @@ class BestBlogsRequestTests(unittest.TestCase):
         self._orig_save = BESTBLOGS_MODULE._save_cache
         self._orig_save_brief = BESTBLOGS_MODULE._save_brief_cache
         # 不打网络，也不写盘。
-        BESTBLOGS_MODULE._get = lambda path, params: (
-            self.calls.append((path, dict(params))) or ([], "")
-        )
         BESTBLOGS_MODULE._save_cache = lambda: None
         BESTBLOGS_MODULE._save_brief_cache = lambda: None
+        self.respond_with([], "")
+
+    def respond_with(self, data: object, error: str) -> None:
+        """让下一次请求返回指定的结果，同时照旧记录调用参数。
+
+        注入错误时必须走这里，不能自己写 lambda —— 那样就绕过了 self.calls
+        的记录，测试会看到"0 次调用"而误报。这个坑踩过。
+        """
+        def fake_get(path: str, params: dict) -> tuple[object, str]:
+            self.calls.append((path, dict(params)))
+            return data, error
+        BESTBLOGS_MODULE._get = fake_get
 
     def tearDown(self) -> None:
         BESTBLOGS_MODULE._get = self._orig_get
@@ -1450,6 +1459,89 @@ class BestBlogsRequestTests(unittest.TestCase):
         for _, params in calls:
             self.assertRegex(params.get("date", ""), r"^\d{4}-\d{2}-\d{2}$")
             self.assertIn(params.get("language"), {"zh", "en"})
+
+    def test_a_failed_fetch_is_not_cached_for_a_whole_day(self) -> None:
+        """抓失败只能锁一小段时间，不能锁一天。
+
+        这是两个不同的判断，第一版把它们混成了一个：
+
+          · 那天确实没有内容  → 结果稳定，锁一天没问题
+          · 配额耗尽 / 网络不通 → 暂时的，恢复后该立刻能抓到
+
+        混在一起的后果：配额中午恢复，页面却要空到第二天。缓存把"这次没
+        抓到"当成了"确认没有"。
+
+        digest 和 brief 两条路径都要守 —— 修完 digest 才发现 brief 同样有
+        这个问题。
+        """
+        retry = float(BESTBLOGS_MODULE._RETRY_TTL)
+        day = float(BESTBLOGS_MODULE._CACHE_TTL)
+        self.assertLess(retry, day, "失败的重试间隔必须短于成功的缓存时长")
+
+        # 让请求返回配额错误，看缓存里写的 ttl 是哪一档。
+        self.respond_with(None, "quota")
+
+        digest_cache_backup = dict(BESTBLOGS_MODULE._CACHE)
+        BESTBLOGS_MODULE._CACHE.clear()
+        BESTBLOGS_MODULE._CACHE.update({"at": 0.0, "items": [], "status": "unknown", "ttl": 0.0})
+        result = BESTBLOGS_MODULE.digest(limit=3, force=True)
+        self.assertEqual(result.get("status"), "quota")
+        self.assertLessEqual(
+            float(BESTBLOGS_MODULE._CACHE.get("ttl") or 0), retry,
+            "配额耗尽后写入的 ttl 必须是短档，否则要等一天才会重试",
+        )
+        BESTBLOGS_MODULE._CACHE.clear()
+        BESTBLOGS_MODULE._CACHE.update(digest_cache_backup)
+
+        brief_cache_backup = dict(BESTBLOGS_MODULE._brief_cache)
+        BESTBLOGS_MODULE._brief_cache.clear()
+        BESTBLOGS_MODULE._brief_cache.update({"at": 0.0, "payload": {}, "ttl": 0.0})
+        result = BESTBLOGS_MODULE.brief(force=True)
+        self.assertEqual(result.get("status"), "empty")
+        self.assertLessEqual(
+            float(BESTBLOGS_MODULE._brief_cache.get("ttl") or 0), retry,
+            "早报抓失败后写入的 ttl 也必须是短档",
+        )
+        BESTBLOGS_MODULE._brief_cache.clear()
+        BESTBLOGS_MODULE._brief_cache.update(brief_cache_backup)
+
+    def test_quota_error_stops_trying_more_dates(self) -> None:
+        """配额耗尽时不要为每个候选日期各试一次。
+
+        每次试探都是一次调用，而配额已经没了 —— 继续试只是白烧。
+        这条用错误注入来验：如果停止逻辑失效，调用次数会等于候选日期数。
+        """
+        self.respond_with(None, "quota")
+        brief_cache_backup = dict(BESTBLOGS_MODULE._brief_cache)
+        BESTBLOGS_MODULE._brief_cache.clear()
+        BESTBLOGS_MODULE._brief_cache.update({"at": 0.0, "payload": {}, "ttl": 0.0})
+        BESTBLOGS_MODULE.brief(force=True)
+        brief_calls = [c for c in self.calls if c[0] == "brief"]
+        self.assertEqual(
+            len(brief_calls), 1,
+            f"配额错误应当立即停止，实际问了 {len(brief_calls)} 个日期",
+        )
+        BESTBLOGS_MODULE._brief_cache.clear()
+        BESTBLOGS_MODULE._brief_cache.update(brief_cache_backup)
+
+    def test_a_successful_fetch_is_cached_long(self) -> None:
+        """抓成功之后锁一天 —— 别把长短两档也搞反了。"""
+        self.respond_with(
+            [{"id": "art_1", "title": "标题", "url": "https://example.test/a",
+              "readUrl": "https://example.test/a", "publishDateStr": "2026-09-19"}], ""
+        )
+        brief_cache_backup = dict(BESTBLOGS_MODULE._brief_cache)
+        BESTBLOGS_MODULE._brief_cache.clear()
+        BESTBLOGS_MODULE._brief_cache.update({"at": 0.0, "payload": {}, "ttl": 0.0})
+        result = BESTBLOGS_MODULE.brief(force=True)
+        self.assertEqual(result.get("status"), "ok")
+        self.assertEqual(
+            float(BESTBLOGS_MODULE._brief_cache.get("ttl") or 0),
+            float(BESTBLOGS_MODULE._BRIEF_TTL),
+            "成功抓到之后应当锁一整天",
+        )
+        BESTBLOGS_MODULE._brief_cache.clear()
+        BESTBLOGS_MODULE._brief_cache.update(brief_cache_backup)
 
     def test_brief_date_candidates_skip_sunday(self) -> None:
         """文档写明没有周日版（no Sunday edition），候选日期不能含周日。"""

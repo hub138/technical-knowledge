@@ -62,7 +62,7 @@ KEY_FILE = pathlib.Path(
 )
 
 # 缓存。API 有每日配额，**一天只打一次**。
-_CACHE: dict[str, object] = {"at": 0.0, "items": [], "status": "unknown"}
+_CACHE: dict[str, object] = {"at": 0.0, "items": [], "status": "unknown", "ttl": 0.0}
 # 每账号每天 500 次调用，翻 N 页就是 N 次。
 # 2 小时刷新 = 12 次/天 × 4 页 = 48 次，看着安全，但再加上手动刷新和服务重启
 # 就顶到上限了 —— 超了以后整个源静默变空（429 → quota），页面什么都不显示。
@@ -70,6 +70,16 @@ _CACHE: dict[str, object] = {"at": 0.0, "items": [], "status": "unknown"}
 # 一天一次：4 页 × 1 次 = 4 次/天，怎么用都用不完。这批内容本来就是按天更新的
 # 精选，一天取一次对它没有损失。
 _CACHE_TTL = 86400
+
+# 请求**失败**后的重试间隔，和成功时不同。
+#
+# 失败的两种原因要分开看：
+#   · 那天确实没有内容 —— 结果稳定，锁一天没问题。
+#   · 配额耗尽 / 网络不通 —— 这是暂时的，可能几小时后就恢复。
+#
+# 第一版两种都锁 24 小时。于是配额在中午恢复、页面却要空到第二天才重新抓 ——
+# 缓存把"抓失败"当成了"确认没有"，而它俩完全不是一回事。
+_RETRY_TTL = 3600
 
 # 落盘。
 #
@@ -86,7 +96,7 @@ _BRIEF_TTL = 86400
 _BRIEF_CACHE_FILE = pathlib.Path(
     pathlib.Path(__file__).resolve().parent.parent / "data" / "bestblogs-brief.json"
 )
-_brief_cache: dict[str, object] = {"at": 0.0, "payload": {}}
+_brief_cache: dict[str, object] = {"at": 0.0, "payload": {}, "ttl": 0.0}
 
 
 def _load_brief_cache() -> None:
@@ -95,6 +105,7 @@ def _load_brief_cache() -> None:
         if isinstance(raw, dict) and isinstance(raw.get("payload"), dict):
             _brief_cache["at"] = float(raw.get("at") or 0.0)
             _brief_cache["payload"] = raw["payload"]
+            _brief_cache["ttl"] = float(raw.get("ttl") or 0.0)
     except (OSError, ValueError):
         pass
 
@@ -126,6 +137,7 @@ def _load_cache() -> None:
     _CACHE["at"] = float(raw.get("at") or 0.0)
     _CACHE["items"] = items
     _CACHE["status"] = str(raw.get("status") or "unknown")
+    _CACHE["ttl"] = float(raw.get("ttl") or 0.0)
 
 
 def _save_cache() -> None:
@@ -138,6 +150,10 @@ def _save_cache() -> None:
                     "at": _CACHE["at"],
                     "items": _CACHE["items"],
                     "status": _CACHE["status"],
+                    # ttl 必须落盘。它是"这次结果该锁多久"，重启后要能读出
+                    # 来 —— 不存的话失败态重启后又变回默认的长 TTL（一天），
+                    # 配额恢复后还是要等一天。
+                    "ttl": _CACHE.get("ttl") or 0.0,
                 },
                 ensure_ascii=False,
             ),
@@ -322,7 +338,9 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
     # 配额耗尽时恰好就是这种状态，结果服务每重启一次就重试一次。
     #
     # 改成看"有没有抓过"（at 有值）而不是"抓到了什么"。
-    if not force and _CACHE["at"] and now - float(_CACHE["at"]) < _CACHE_TTL:
+    # TTL 按上次结果取：失败用短的那档，成功后用长的那档。
+    ttl = float(_CACHE.get("ttl") or _CACHE_TTL)
+    if not force and _CACHE["at"] and now - float(_CACHE["at"]) < ttl:
         return {
             "status": _CACHE["status"],
             "items": _CACHE["items"],
@@ -350,6 +368,14 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
     # 串行翻 10 页要 ~100 秒（实测）。虽然结果缓存 30 分钟、且抓取在后台
     # 串行进行不阻塞访客，但它会拖住同一批里的其它源。10 个请求之间没依赖，
     # 并行是对的：实测 10 页从 ~100 秒降到 ~15 秒。
+    # 每页的请求错误要收集起来。
+    #
+    # 第一版 fetch_page 遇到错误直接 return []，外层于是永远看不到失败 ——
+    # 配额耗尽被当成"抓到了 0 条"，返回 empty 而不是 quota。后果有两层：
+    # 前端显示"没有内容"而不是"取数失败"，而缓存又会用短 TTL 之外的分支
+    # 处理，重试节奏也就跟着错了。错误必须往上传，不能就地咽掉。
+    page_errors: list[str] = []
+
     def fetch_page(page: int) -> list[dict]:
         # 参数取值必须以文档为准（bestblogs.dev/docs/api/endpoints）：
         #
@@ -371,6 +397,7 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
             "page": str(page),
         })
         if err:
+            page_errors.append(err)
             return []
         chunk = data if isinstance(data, list) else (
             (data or {}).get("dataList") or (data or {}).get("list") or []
@@ -386,6 +413,11 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
         # 极简回退：串行翻页。
         for page in range(1, (pages or 1) + 1):
             rows.extend(fetch_page(page))
+
+    # 一条都没抓到、而且有请求失败 —— 这才是真失败（配额 / 网络）。
+    # 抓到过内容时不算失败，个别页翻不到不影响整体。
+    if not rows and page_errors:
+        error = page_errors[0]
 
     if error:
         # 已经有缓存就继续用它 —— 配额用完或网络抖动不该让首页空掉。
@@ -403,6 +435,7 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
         # 而重启在这台机器上是常事。记下"刚刚试过"，TTL 就会挡住紧接着的重试。
         _CACHE["at"] = now
         _CACHE["status"] = error
+        _CACHE["ttl"] = _RETRY_TTL   # 配额/网络问题，一小时后可以再试
         _save_cache()
         return {"status": error, "items": [], "fetched_at": 0, "cached": False, "error": error}
 
@@ -435,7 +468,8 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
         cutoff = time.time() - days * 86400
         items = [i for i in items if (i.get("published_ts") or 0) / 1000 >= cutoff]
 
-    _CACHE.update({"at": now, "items": items, "status": "ok" if items else "empty"})
+    _CACHE.update({"at": now, "items": items, "status": "ok" if items else "empty",
+                   "ttl": _CACHE_TTL})
     # 落盘。下次服务启动直接读它，不用重新抓 —— 重启不该消耗配额。
     # 抓到空结果时也存：那是"今天确实没有新内容"这个事实，
     # 不存的话每次启动都会再去问一遍。
@@ -471,8 +505,10 @@ def brief(date: str = "", force: bool = False) -> dict:
     结果按天缓存：同一天只抓一次，且落盘，服务重启不重抓。
     """
     now = time.time()
+    # TTL 和 digest 同理：失败用短的那档。
+    ttl = float(_brief_cache.get("ttl") or _BRIEF_TTL)
     if not force and _brief_cache.get("at") and \
-            now - float(_brief_cache["at"]) < _BRIEF_TTL and _brief_cache.get("payload"):
+            now - float(_brief_cache["at"]) < ttl and _brief_cache.get("payload"):
         return {**_brief_cache["payload"], "cached": True}
 
     key = api_key()
@@ -503,13 +539,17 @@ def brief(date: str = "", force: bool = False) -> dict:
             "fetched_at": int(now),
             "cached": False,
         }
-        _brief_cache.update({"at": now, "payload": payload})
+        _brief_cache.update({"at": now, "payload": payload, "ttl": _BRIEF_TTL})
         _save_brief_cache()
         return payload
 
     # 一天都没拿到。记下时间，免得每次都重试一遍（每次都是好几次调用）。
+    #
+    # 但**只锁一小时**，不是一天：这里多半是配额耗尽或网络不通，属于暂时
+    # 状态。锁满一天的话，配额中午恢复、页面要空到第二天 —— 缓存把"这次
+    # 没抓到"当成了"确认没有"，这两件事不一样。
     payload = {"status": "empty", "date": "", "items": [], "fetched_at": int(now), "cached": False}
-    _brief_cache.update({"at": now, "payload": payload})
+    _brief_cache.update({"at": now, "payload": payload, "ttl": _RETRY_TTL})
     _save_brief_cache()
     return payload
 
