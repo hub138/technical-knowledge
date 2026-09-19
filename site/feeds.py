@@ -157,7 +157,17 @@ FEEDS: list[dict] = [
         "group": "reading",
         "kind": "api",
         "url": "https://api.bestblogs.dev/openapi/v2/resources",
-        "link": "https://www.bestblogs.dev/reading/follow",
+        # 链接指向早报页 —— 那才是"今天该读什么"。
+        #
+        # 说明一处 API 的限制：`/openapi/v2/resources` 返回的是一个**旧快照**
+        # （实测最新一篇是 2025-12，而当天是 2026-09），而且排序、时间窗、
+        # category 这些参数**全部被忽略** —— 试过 sortBy / orderBy / order /
+        # recent / days / from / time=24h|3d|1w|1m，返回的总数完全一样。
+        # brief 端点存在但 `metaData` 恒为 null。网页版早报要登录才看得到内容。
+        #
+        # 所以这里的定位是"BestBlogs 的人工精审精选（带年份标注）"，
+        # 不是"今天的早报"。要今天的内容点 link 去原站登录看。
+        "link": "https://www.bestblogs.dev/reading/brief",
         "ttl": 1800,
         "limit": 12,
         "delay": 0.0,
@@ -778,6 +788,9 @@ def _fetch_bestblogs(source: dict) -> tuple[list[dict], str]:
             "word_count": row.get("word_count") or 0,
             "read_minutes": row.get("read_minutes") or 0,
             "tags": row.get("tags") or [],
+            # 内容自带的分类（人工智能 / 商业科技 / 软件编程）。
+            # 前端拿它做本地筛选 —— 接口的 category 参数不生效。
+            "category": row.get("category") or "",
         })
     return items, ""
 
@@ -1028,6 +1041,7 @@ def snapshot(force: bool = False) -> dict:
                         if isinstance(a, str)
                     ][:4],
                     "arxiv_id": str(item.get("arxiv_id") or "")[:20],
+                    "category": str(item.get("category") or "")[:30],
                 }
                 for item in item_list
             ],

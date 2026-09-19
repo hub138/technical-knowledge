@@ -209,7 +209,10 @@ def _normalise(item: dict) -> dict:
             if item.get("publishTimeStamp") else ""
         ),
         "score": item.get("score") or "",
-        "category": _text(item.get("categoryDesc") or item.get("mainDomainDesc"), 30),
+        # 内容自带的两个分类字段。接口的 category 参数**不生效**（实测五种
+        # 取值返回的总数几乎一样），所以筛选用它随数据带回来的这个值。
+        "category": _text(item.get("categoryDesc"), 30),
+        "domain": _text(item.get("mainDomainDesc"), 30),
         # 阅读量/字数/时长 —— arXivDaily 那种「10994 字（约 44 分钟）」的质感。
         "word_count": item.get("wordCount") or 0,
         "read_minutes": item.get("readTime") or 0,

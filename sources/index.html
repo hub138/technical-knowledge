@@ -184,6 +184,33 @@
       /* BestBlogs 的富卡片。三列网格 —— 它有 12 条，一条一行会把
          这一块撑得很长；三列一屏能看九条，和首页那条横滑的密度一致。
          窄屏收到两列、一列。 */
+      /* 分类筛选芯片。和论文页的筛选同一套视觉 —— 两处的交互语义一样
+         （点一下筛内容），不该长得不一样。 */
+      /* 「最新一篇 2026-07-17」这一行。
+         它是诚实标注：BestBlogs 的 API 返回旧快照，读者看到日期不至于以为
+         页面坏了。色调比正文轻，但比 faint 重 —— 是一句说明，不是脚注。 */
+      .src-rich-fresh {
+        margin: 0 0 var(--space-2); color: var(--color-muted);
+        font-size: var(--text-small); font-variant-numeric: tabular-nums;
+      }
+
+      .src-rich-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-3); }
+      .src-rich-chip {
+        display: inline-flex; align-items: center; gap: 5px;
+        min-height: 32px; padding: 0 12px;
+        border: 1px solid var(--color-line); border-radius: var(--radius-xs);
+        background: var(--color-panel); color: var(--color-ink-soft);
+        font-size: var(--text-small); font-weight: var(--weight-medium);
+        cursor: pointer;
+      }
+      .src-rich-chip:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      .src-rich-chip[aria-pressed="true"] {
+        border-color: var(--color-accent); background: var(--color-accent-soft);
+        color: var(--color-accent-ink); font-weight: var(--weight-semibold);
+      }
+      .src-rich-chip b { color: var(--color-muted); font-weight: var(--weight-normal); font-variant-numeric: tabular-nums; }
+      .src-rich-chip[aria-pressed="true"] b { color: var(--color-accent-ink); }
+
       .src-rich { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); align-items: stretch; }
       @media (max-width: 1100px) { .src-rich { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
       @media (max-width: 700px) { .src-rich { grid-template-columns: minmax(0, 1fr); } }
@@ -201,6 +228,24 @@
        * 其实是裁掉了。contain 让原图完整可见，留白用底色托住。 */
       /* 同首页：absolute + inset:0 而不是 max-height:100%。
        * grid 容器里 max-height 的百分比参照不到确定高度，图会溢出被裁。 */
+      /* 无封面的卡片。
+       *
+       * 网格让同行等高，而没有封面时卡片顶部会空出封面的高度（约 150px），
+       * 看起来像图加载失败了。改成：内容靠上顶满，左侧加一条主色竖线作为
+       * 视觉锚点（替代封面的作用），标题字号提一档。
+       *
+       * 这样一屏里两种卡是"有图的"和"文字的"，而不是"正常的"和"缺图的"。 */
+      .src-rich-card--text {
+        border-left: 3px solid var(--color-accent-line);
+        background: var(--color-panel);
+      }
+      .src-rich-card--text:hover { border-left-color: var(--color-accent); }
+      .src-rich-card--text .src-rich-body { align-content: start; padding: 15px 15px 16px; gap: 7px; }
+      .src-rich-card--text .src-rich-title { font-size: var(--text-lg); line-height: 1.4; }
+      /* 详情行推到卡片底部，让两种卡的下沿对齐 */
+      .src-rich-card--text { grid-template-rows: 1fr; }
+      .src-rich-card--text .src-rich-meta { margin-top: auto; padding-top: 6px; }
+
       .src-rich-cover {
         position: relative; display: block; aspect-ratio: 16/9;
         background: var(--color-surface); overflow: hidden;
@@ -527,12 +572,40 @@
         // 它们的数据结构其实一样（标题、链接、摘要、日期），差别只是
         // BestBlogs 多一个 cover —— 那就用一种卡片，封面可选。
         if (true) {
-          return `<div class="src-rich">${items.map((item) => {
+          // 分类筛选。用内容自带的 categoryDesc（人工智能 / 商业科技 / 软件编程），
+          // 在本地筛 —— 接口的 category 参数**不生效**（实测五种取值返回的
+          // 总数几乎一样：53367 / 53367 / 53368）。
+          //
+          // 只在有多个分类时才显示芯片：只有一个分类时那排芯片没有选择
+          // 余地，白占一行。
+          const cats = [...new Set(items.map((i) => i.category).filter(Boolean))];
+          const bar = cats.length > 1
+            ? `<div class="src-rich-filter">
+                 <button type="button" class="src-rich-chip" data-cat="" aria-pressed="true">${esc(tr("全部"))} <b>${items.length}</b></button>
+                 ${cats.map((c) => `<button type="button" class="src-rich-chip" data-cat="${esc(c)}"
+                   aria-pressed="false">${esc(c)} <b>${items.filter((i) => i.category === c).length}</b></button>`).join("")}
+               </div>`
+            : "";
+          // 一行"这批数据有多新"。放在筛选芯片上面，读者先看到它。
+          const stamp = (() => {
+            const dates = items.map((i) => i.published_full).filter(Boolean).sort().reverse();
+            if (!dates.length) return "";
+            return `<p class="src-rich-fresh">${esc(tr("最新一篇"))} ${esc(dates[0])}</p>`;
+          })();
+          return stamp + bar + `<div class="src-rich">${items.map((item) => {
             const facts = [];
             if (item.word_count) facts.push(`${Number(item.word_count).toLocaleString()} 字`);
             if (item.read_minutes) facts.push(`约 ${item.read_minutes} 分钟`);
-            if (item.published) facts.push(String(item.published).slice(0, 10));
-            return `<a class="src-rich-card" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
+            if (item.published_full) facts.push(String(item.published_full).slice(0, 10));
+            // 无封面的卡片加一个修饰类。
+            //
+            // 实测 71 张卡里 61 张没有封面（BestBlogs 只给部分文章配图），
+            // 而网格让同行等高 —— 无封面的卡片顶部就空出一大块（441px 的卡
+            // 里空 150px），看起来像"图加载失败了"。
+            //
+            // 给它自己的排法：内容整体撑满，标题从顶部开始，用一条左侧竖线
+            // 代替封面作为视觉锚点，读起来是"一张文字卡"而不是"缺图的卡"。
+            return `<a class="src-rich-card${item.cover ? "" : " src-rich-card--text"}" href="${esc(item.url)}" data-category="${esc(item.category || "")}" target="_blank" rel="noopener noreferrer">
               ${item.cover
                 ? `<span class="src-rich-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-crop data-fallback></span>`
                 : ""}
@@ -577,6 +650,20 @@
       function paintFeeds() {
         const payload = feedState.payload;
         if (!payload) return;
+        // 每一组下面补一行"数据有多新"。
+        //
+        // 为什么需要：BestBlogs 的 OpenAPI 返回的是一个旧快照（实测最新一篇
+        // 是 2025-12，而当天是 2026-09），而且它不给任何排序/时间参数 ——
+        // 试过十几种取值，第一条恒定。网页版早报要登录才有内容。
+        //
+        // 我们没法让它变新，但**不能假装它是新的**：读者看到日期是去年的
+        // 会以为页面坏了。把"这是它的经典精选，最新内容去原站看"写在旁边，
+        // 读者就知道自己在看什么。
+        const freshness = (items) => {
+          const dates = items.map((i) => i.published_full).filter(Boolean).sort().reverse();
+          if (!dates.length) return "";
+          return `${tr("最新一篇")} ${dates[0]}`;
+        };
         const byKey = {};
         (payload.sources || []).forEach((s) => { byKey[s.key] = s; });
         document.querySelectorAll(".src-feed").forEach((node) => {
@@ -591,6 +678,23 @@
         // 被墙时图片请求会失败。一个裂图或空白块比没有封面更难看；
         // 收掉之后卡片自己撑满，和其它卡片对齐（.src-rich-card 用了
         // height:100%，所以同一行的高度不会塌）。
+        // 分类筛选：点芯片 → 只显示这一类。本地过滤，不发请求。
+        document.querySelectorAll(".src-rich-filter").forEach((bar) => {
+          bar.querySelectorAll(".src-rich-chip").forEach((chip) => {
+            chip.onclick = () => {
+              const want = chip.dataset.cat;
+              bar.querySelectorAll(".src-rich-chip").forEach((c) => {
+                c.setAttribute("aria-pressed", String(c === chip));
+              });
+              const grid = bar.nextElementSibling;
+              if (!grid) return;
+              grid.querySelectorAll(".src-rich-card").forEach((card) => {
+                // category 记在卡片的 dataset 上（渲染时写的）。
+                card.hidden = Boolean(want) && card.dataset.category !== want;
+              });
+            };
+          });
+        });
         document.querySelectorAll(".src-rich-cover img[data-fallback]").forEach((img) => {
           img.addEventListener("error", () => {
             const box = img.closest(".src-rich-cover");

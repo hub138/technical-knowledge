@@ -1276,7 +1276,7 @@ class FeedTests(unittest.TestCase):
         allowed = {
             "title", "url", "summary", "published",
             "cover", "source", "source_icon", "word_count", "read_minutes",
-            "tags", "title_cn", "authors", "affiliations", "arxiv_id",
+            "tags", "title_cn", "authors", "affiliations", "arxiv_id", "category",
         }
         forbidden = {"html", "content", "body", "rendered", "innerHTML"}
         for source in payload["sources"]:
@@ -1298,7 +1298,7 @@ class FeedTests(unittest.TestCase):
                         self.assertIsInstance(item[key], list)
                         for entry in item[key]:
                             self.assertIsInstance(entry, str)
-                for key in ("title_cn", "authors", "arxiv_id"):
+                for key in ("title_cn", "authors", "arxiv_id", "category"):
                     if key in item:
                         self.assertIsInstance(item[key], str)
 
