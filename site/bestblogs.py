@@ -100,16 +100,39 @@ def _get(path: str, params: dict[str, str]) -> tuple[object, str]:
             "Accept": "application/json",
         },
     )
-    try:
-        with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-            content_type = response.headers.get("Content-Type", "")
-            body = response.read().decode("utf-8", errors="replace")
-    except urllib.error.HTTPError as error:
-        if error.code in (401, 403):
-            return None, "bad_key"
-        return None, f"http_{error.code}"
-    except (urllib.error.URLError, OSError):
-        return None, "unreachable"
+
+    # 重试两次。
+    #
+    # 实测这个端点会出现 TLS 握手直接超时（`The handshake operation timed
+    # out` / `TLS/SSL connection has been closed (EOF)`），而且是**连续多次
+    # 都失败**再恢复的那种，不是单次抖动。抓取是后台串行的，多花几秒没成本；
+    # 一次失败就让整块精选消失才是代价。
+    #
+    # 只重试网络层错误。HTTP 错误（401 / 429）重试没意义 —— 那是服务端
+    # 明确回答了"不行"，再问一遍答案一样。
+    body = ""
+    content_type = ""
+    last_error = ""
+    for attempt in range(3):
+        if attempt:
+            time.sleep(0.8 * attempt)
+        try:
+            with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+                content_type = response.headers.get("Content-Type", "")
+                body = response.read().decode("utf-8", errors="replace")
+            break
+        except urllib.error.HTTPError as error:
+            if error.code in (401, 403):
+                return None, "bad_key"
+            if error.code == 429:
+                return None, "quota"
+            return None, f"http_{error.code}"
+        except (urllib.error.URLError, OSError) as error:
+            # 记下最后一次的具体原因，方便排查是 DNS、TLS 还是超时。
+            last_error = type(error).__name__
+            continue
+    else:
+        return None, f"unreachable:{last_error}" if last_error else "unreachable"
 
     # 端点不存在或 key 无效时它返回的是一个 HTML 页面（前端路由接住了请求），
     # 不是 JSON。直接 json.loads 会抛，把它误报成"网络不可达"会让排查方向跑偏。

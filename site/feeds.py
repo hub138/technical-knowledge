@@ -496,51 +496,132 @@ def enrich_papernotes(items: list[dict], delay: float, timeout: float = TIMEOUT)
 # 但实测 `/topics` 只是子领域目录，列的是「3D 视觉 / 三维重建、NeRF…」这种分类说明，
 # 不是论文。第一版抓 /topics 拿到一条「3D 视觉 三维重建、NeRF、Gaussian Splatting…」，
 # 看着像标题其实是分类描述 —— 这正是 sanity check 要抓的东西。
+# arXivDaily 的条目块。一条论文一个 <article class="paper-card">。
+#
+# 这一版把整块一起抓，因为块内含好几个字段，分开抓会在条目边界上串味：
+#
+#   data-paper-updated  论文日期（不是抓取日期）
+#   paper-meta 里的 span  编号 2609.20822 + 日期 + 分类芯片 + 「新提交」标
+#   h2                  英文原标题
+#   title-cn            中文译名
+#   authors             作者
+#   affiliations        机构（带中文译名，标注是 AI 分析生成的、可能有误）
+#   summary             摘要
+#
+# `[\s\S]{0,n}?` 的非贪婪配上明确的分隔标签，条目之间不会互相吃。
 _AD_BLOCK = re.compile(
-    r'<h2[^>]*>([\s\S]{0,300}?)</h2>'
-    r"(?:[\s\S]{0,400}?<p[^>]+class=[\"']title-cn[\"'][^>]*>([\s\S]{0,300}?)</p>)?"
-    r"[\s\S]{0,900}?<p[^>]+class=[\"']summary[\"'][^>]*>([\s\S]{0,900}?)</p>"
-    r"[\s\S]{0,2500}?href=[\"'](https://arxiv\.org/abs/[^\"']+)[\"']",
+    r'<article[^>]+class=["\'][^"\']*paper-card[^"\']*["\']'
+    r'(?P<attrs>[^>]*)>'
+    r'(?P<body>[\s\S]{0,6000}?)'
+    r'</article>',
+    re.I,
+)
+_AD_ID = re.compile(r'<span>\s*(\d{4}\.\d{4,5})\s*</span>')
+_AD_DATE = re.compile(r'data-paper-updated=["\'](\d{4}-\d{2}-\d{2})["\']')
+_AD_TITLE_EN = re.compile(r'<h2[^>]*>([\s\S]{0,300}?)</h2>', re.I)
+_AD_TITLE_CN = re.compile(r'<p[^>]+class=["\'][^"\']*title-cn[^"\']*["\'][^>]*>([\s\S]{0,300}?)</p>', re.I)
+_AD_AUTHORS = re.compile(r'<p[^>]+class=["\'][^"\']*authors[^"\']*["\'][^>]*>([\s\S]{0,400}?)</p>', re.I)
+_AD_SUMMARY = re.compile(r'<p[^>]+class=["\'][^"\']*summary[^"\']*["\'][^>]*>([\s\S]{0,1200}?)</p>', re.I)
+_AD_ARXIV = re.compile(r'href=["\'](https://arxiv\.org/abs/[^"\']+)["\']', re.I)
+# 分类芯片：cs.AI / cs.CL 这种。标题属性里是英文全称，标签内容是短码。
+_AD_CATEGORY = re.compile(
+    r'<span[^>]+class=["\'][^"\']*category-pill[^"\']*["\'][^>]*>\s*([A-Za-z0-9.\-]{2,12})\s*</span>',
+    re.I,
+)
+# 「新提交」/「版本更新」这类标记。
+_AD_SUBMISSION = re.compile(
+    r'<span[^>]+class=["\'][^"\']*submission-pill[^"\']*["\'][^>]*>\s*([^<]{2,12})\s*</span>',
+    re.I,
+)
+# 机构名（含中文译名）。
+_AD_AFFILIATION = re.compile(
+    r'<span[^>]+class=["\'][^"\']*affiliation-item[^"\']*["\'][^>]*>\s*([^<]{2,60}?)\s*</span>',
     re.I,
 )
 
 
 def parse_arxivdaily(text: str, base: str) -> tuple[list[dict], str]:
-    """arXivDaily 首页的论文列表。"""
+    """arXivDaily 首页的论文列表。
+
+    每条论文一个 <article class="paper-card">，块内有编号、日期、分类芯片、
+    英文标题、中文译名、作者、机构、摘要 —— 这些都取，因为页面上有。
+    以前只取标题和摘要，是因为按 `<h2>` 逐个抓，块边界都没碰到。
+
+    日期取 `data-paper-updated`，那是**论文的日期**，不是抓取时间。
+
+    「AI总结」是页面上的小标题（说明这段摘要是模型写的），提成 tag，
+    不混进正文 —— 否则每条都读成 "AI总结 本文研究…"。
+    """
     items: list[dict] = []
     seen: set[str] = set()
     for match in _AD_BLOCK.finditer(text):
-        title_en, title_cn, summary_raw, url = match.groups()
-        title_en = clean_text(title_en, 200)
-        title_cn = clean_text(title_cn, 200)
-        if not title_en or url in seen:
+        attrs = match.group("attrs") or ""
+        body = match.group("body") or ""
+
+        title_match = _AD_TITLE_EN.search(body)
+        if not title_match:
+            continue
+        title_en = clean_text(title_match.group(1), 200)
+        if not title_en:
+            continue
+
+        link = _AD_ARXIV.search(body)
+        url = link.group(1) if link else ""
+        if not url or url in seen:
             continue
         seen.add(url)
-        summary = clean_text(summary_raw, 300)
-        # 「AI总结」是页面上的小标题，不是摘要内容。原来它跟着正文一起被
-        # 抓进来，读起来像"AI总结 本文研究…"这种黏在一起的句子。
-        #
-        # 它其实是个有意义的标记 —— 说明这段摘要是模型写的，不是作者原话。
-        # 所以提成 tags，前端渲染成一个小徽标，而不是删掉丢掉这个信息。
-        tags = []
+
+        cn_match = _AD_TITLE_CN.search(body)
+        title_cn = clean_text(cn_match.group(1), 200) if cn_match else ""
+
+        date_match = _AD_DATE.search(attrs) or _AD_DATE.search(body)
+        published = date_match.group(1) if date_match else ""
+
+        summary_match = _AD_SUMMARY.search(body)
+        summary = clean_text(summary_match.group(1), 320) if summary_match else ""
+        tags: list[str] = []
         if summary.startswith("AI总结"):
             tags.append("AI总结")
             summary = summary[len("AI总结"):].lstrip(" ：:")
+
+        # 分类芯片和「新提交」标。它们是页面上最显眼的元数据，
+        # 拿过来当标签比我自己编一个"论文"强。
+        for code in _AD_CATEGORY.findall(body):
+            if code not in tags:
+                tags.append(code)
+        for note in _AD_SUBMISSION.findall(body):
+            note = clean_text(note, 12)
+            if note and note not in tags:
+                tags.append(note)
+
+        author_match = _AD_AUTHORS.search(body)
+        authors = clean_text(author_match.group(1), 200) if author_match else ""
+        affiliations = [clean_text(a, 60) for a in _AD_AFFILIATION.findall(body)][:4]
+
+        arxiv_id = ""
+        id_match = _AD_ID.search(body)
+        if id_match:
+            arxiv_id = id_match.group(1)
+
         items.append({
-            # 中文标题更符合这个页面的读者，缺了再退英文。
-            "title": title_cn or title_en,
+            # 中英并列，和 arXivDaily 一致：英文是论文原名（读者在 arXiv
+            # 和别的文章里看到的就是这一行），中文是译名。
+            "title": title_en,
+            "title_cn": title_cn,
             "url": url,
             "summary": summary,
-            # arXivDaily 首页不给发布日期，只有论文编号。
-            # 留空而不是编一个 —— 编的日期会被人当真的用。
-            "published": "",
-            "tags": tags,
+            "published": published,
+            "tags": tags[:6],
+            "authors": authors,
+            "affiliations": affiliations,
+            "arxiv_id": arxiv_id,
         })
         if len(items) >= 40:
             break
     if not items:
         return [], "selector_missing"
     return items, ""
+
 
 
 def parse_zeli(text: str, base: str) -> tuple[list[dict], str]:
@@ -937,7 +1018,16 @@ def snapshot(force: bool = False) -> dict:
                         str(tag)[:20]
                         for tag in (item.get("tags") or [])
                         if isinstance(tag, str) and tag.strip()
+                    ][:6],
+                    # 下面几个只有 arXivDaily 提供：中文译名、作者、机构。
+                    # 都是标量或字符串数组，仍不承载 HTML。
+                    "title_cn": item.get("title_cn", ""),
+                    "authors": str(item.get("authors") or "")[:200],
+                    "affiliations": [
+                        str(a)[:60] for a in (item.get("affiliations") or [])
+                        if isinstance(a, str)
                     ][:4],
+                    "arxiv_id": str(item.get("arxiv_id") or "")[:20],
                 }
                 for item in item_list
             ],
