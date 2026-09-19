@@ -492,7 +492,31 @@ def enrich_papernotes(items: list[dict], delay: float, timeout: float = TIMEOUT)
             continue
         summary_match = _SUMMARY.search(page)
         summary = clean_text(summary_match.group(1)) if summary_match else ""
-        enriched.append({**item, "title": clean_text(title, 200), "summary": summary})
+
+        # PaperNotes 的「一句话总结」和 arXivDaily 的「AI总结」是同一类东西：
+        # 都是模型读完论文写的一句话。所以打同一个标签，前端就用同一个
+        # 蓝底框渲染 —— 两处的读者看到的是同一种可信度标记。
+        #
+        # 它的原话（实测 JarvisEvo 那篇）：
+        #   "JarvisEvo 把"会修图的设计师"做成一个单模型 Agent：它一边调用
+        #    Lightroom 工具迭代修图、一边对中间结果做视觉自评…在 ArtEdit-Bench
+        #    上像素保真度比 Nano-Banana 高 44.96%。"
+        tags = ["AI总结"] if summary else []
+
+        # 论文编号从 URL 反推不了（PaperNotes 的 slug 是标题），所以从页面里找
+        # arXiv 链接。有就显示，没有就不显示 —— 不编。
+        arxiv_id = ""
+        arxiv_match = re.search(r"arxiv\.org/(?:abs|pdf)/(\d{4}\.\d{4,5})", page)
+        if arxiv_match:
+            arxiv_id = arxiv_match.group(1)
+
+        enriched.append({
+            **item,
+            "title": clean_text(title, 200),
+            "summary": summary,
+            "tags": tags,
+            "arxiv_id": arxiv_id,
+        })
     return enriched
 
 

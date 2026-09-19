@@ -84,8 +84,11 @@
          字号分区，这也是参考站的做法。 */
       /* 计数的样式移到 .src-group-count（上面）。原来靠 `h2 span` 命中，
          现在标题外面多了一层 .src-group-head，选择器要跟着改。 */
+      /* 站名 → 说明 → 卡片，是一个连续的阅读序列：先看到"这是什么"，
+         再看"最近有什么"。所以三者之间用同一档间距（10-12px），
+         不用 16px 那种跨层次的间隔。 */
       .src-note {
-        margin: 0 0 var(--space-4);
+        margin: 0 0 var(--space-3);
         color: var(--color-muted);
         font-size: var(--text-body);
       }
@@ -170,7 +173,7 @@
        * 用留白和字号区分层级，这也更接近参考站的做法：它们几乎不用线，
        * 靠间距和底色分区。
        */
-      .src-feed { margin-top: var(--space-3); }
+      .src-feed { margin-top: 0; }
       .src-feed > summary::before {
         content: "▸";
         flex: none;
@@ -190,7 +193,7 @@
          它是诚实标注：BestBlogs 的 API 返回旧快照，读者看到日期不至于以为
          页面坏了。色调比正文轻，但比 faint 重 —— 是一句说明，不是脚注。 */
       .src-rich-fresh {
-        margin: 0 0 var(--space-2); color: var(--color-muted);
+        margin: 0 0 6px; color: var(--color-muted);
         font-size: var(--text-small); font-variant-numeric: tabular-nums;
       }
 
@@ -588,7 +591,7 @@
             : "";
           // 一行"这批数据有多新"。放在筛选芯片上面，读者先看到它。
           const stamp = (() => {
-            const dates = items.map((i) => i.published_full).filter(Boolean).sort().reverse();
+            const dates = items.map((i) => i.published).filter(Boolean).map((d) => String(d).slice(0, 10)).sort().reverse();
             if (!dates.length) return "";
             return `<p class="src-rich-fresh">${esc(tr("最新一篇"))} ${esc(dates[0])}</p>`;
           })();
@@ -596,7 +599,7 @@
             const facts = [];
             if (item.word_count) facts.push(`${Number(item.word_count).toLocaleString()} 字`);
             if (item.read_minutes) facts.push(`约 ${item.read_minutes} 分钟`);
-            if (item.published_full) facts.push(String(item.published_full).slice(0, 10));
+            if (item.published) facts.push(String(item.published).slice(0, 10));
             // 无封面的卡片加一个修饰类。
             //
             // 实测 71 张卡里 61 张没有封面（BestBlogs 只给部分文章配图），

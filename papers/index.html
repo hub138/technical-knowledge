@@ -384,10 +384,17 @@
       }
       .pn-tab[aria-selected="true"] b { color: var(--color-on-accent); opacity: 0.85; }
       .pn-tab:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      /* 选中态用实心主色 + 白字，和同页的分类芯片一致。
+       *
+       * 原来写的是浅底（accent-soft）+ 主色文字，但 `b`（计数）另有一条
+       * `--color-on-accent` 的白字规则 —— 浅底配白字，对比度 1.12，
+       * 那个数字基本看不见。对比度审计抓到了（41/42 → 40/42）。
+       *
+       * 两处改成实心：底 accent、字 on-accent、计数继承同一色。 */
       .pn-tab[aria-selected="true"] {
-        border-color: var(--color-accent-line);
-        background: var(--color-accent-soft);
-        color: var(--color-accent);
+        border-color: var(--color-accent);
+        background: var(--color-accent);
+        color: var(--color-on-accent);
         font-weight: var(--weight-semibold);
       }
       .pn-stat { color: var(--color-muted); font-size: var(--text-small); }

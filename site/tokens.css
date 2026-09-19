@@ -78,6 +78,15 @@
   /* ── Status ─────────────────────────────────────────────────────────── */
   --color-ok: #059669;
   --color-ok-soft: #ecfdf5;
+  /* 文字专用的深一档。
+   *
+   * --color-ok 在 --color-ok-soft 上只有 3.58:1，不到 AA 的 4.5 ——
+   * 它是给**填充**（圆点、进度条）用的。做文字要更深的绿。
+   * 同理 --color-info / --color-warn 也各有 ink 变体。
+   * 这类"同一个色相、两个明度档"的区分是这套 token 的既有做法
+   * （--color-accent vs --color-accent-ink）。 */
+  --color-ok-ink: #046c4e;
+  --color-info-ink: #075985;
   --color-warn: #b45309;
   --color-warn-soft: #fffbeb;
   --color-danger: #dc2626;
@@ -288,6 +297,8 @@
 
   --color-ok: #34d399;
   --color-ok-soft: #0d2e26;
+  --color-ok-ink: #6ee7b7;
+  --color-info-ink: #7dd3fc;
   --color-warn: #fbbf24;
   --color-warn-soft: #3a2c0c;
   --color-danger: #f87171;

@@ -161,7 +161,7 @@
         opacity: 0.65;
         font-size: 10px;
       }
-      .status.ok { background: var(--color-ok-soft); color: var(--color-ok); }
+      .status.ok { background: var(--color-ok-soft); color: var(--color-ok-ink); }
       .status.warn { background: var(--color-warn-soft); color: var(--color-warn); }
       .status.unknown {
         background: var(--color-surface);
@@ -363,13 +363,17 @@
         margin-top: 9px;
         font-size: 12px;
       }
+      /* 底色是 accent-soft（淡蓝），文字却用 --color-ok（绿）——
+         色相不搭，而且绿在淡蓝上对比度只有 3.35:1。它讲的是"这个项目的
+         边界在哪"，是提示，不是成功状态，改用主色系的深档。 */
       .note {
         margin-top: 14px;
         padding: 13px 15px;
         border-left: 3px solid var(--color-accent);
         background: var(--color-accent-soft);
-        color: var(--color-ok);
-        font-size: 13px;
+        color: var(--color-accent-ink);
+        font-size: var(--text-body);
+        line-height: 1.65;
       }
       .source-note {
         color: var(--color-muted);
