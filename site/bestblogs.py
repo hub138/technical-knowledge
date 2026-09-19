@@ -61,12 +61,63 @@ KEY_FILE = pathlib.Path(
     or pathlib.Path.home() / ".config" / "technical-knowledge" / "bestblogs.key"
 )
 
-# 缓存。API 有每日配额，不该每次开页面都打一次。
+# 缓存。API 有每日配额，**一天只打一次**。
 _CACHE: dict[str, object] = {"at": 0.0, "items": [], "status": "unknown"}
-# 缓存时长是**配额**驱动的。每账号每天 500 次调用，翻 N 页就是 N 次。
-# 30 分钟 × 4 页 ≈ 190 次/天，太接近上限；超了以后整个源静默变空（实测 429 → quota）。
-# 2 小时 × 4 页 ≈ 48 次/天，安全。早报和精选本来也是按天的节奏。
-_CACHE_TTL = 7200
+# 每账号每天 500 次调用，翻 N 页就是 N 次。
+# 2 小时刷新 = 12 次/天 × 4 页 = 48 次，看着安全，但再加上手动刷新和服务重启
+# 就顶到上限了 —— 超了以后整个源静默变空（429 → quota），页面什么都不显示。
+#
+# 一天一次：4 页 × 1 次 = 4 次/天，怎么用都用不完。这批内容本来就是按天更新的
+# 精选，一天取一次对它没有损失。
+_CACHE_TTL = 86400
+
+# 落盘。
+#
+# 原来只放内存 —— 服务一重启缓存就没了，重启一次就要重新抓一次。
+# 而重启在这台机器上是常事（改完代码 kickstart）。落盘之后重启直接读文件，
+# 一次请求都不发。
+_CACHE_FILE = pathlib.Path(
+    os.environ.get("BESTBLOGS_CACHE_FILE")
+    or pathlib.Path(__file__).resolve().parent.parent / "data" / "bestblogs-cache.json"
+)
+
+
+def _load_cache() -> None:
+    """启动时把上次抓的结果读回来。读不到或坏了就当没有。"""
+    try:
+        raw = json.loads(_CACHE_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    if not isinstance(raw, dict):
+        return
+    items = raw.get("items")
+    if not isinstance(items, list):
+        return
+    _CACHE["at"] = float(raw.get("at") or 0.0)
+    _CACHE["items"] = items
+    _CACHE["status"] = str(raw.get("status") or "unknown")
+
+
+def _save_cache() -> None:
+    """把结果写到盘上。写失败不算错误 —— 下次重新抓就是了。"""
+    try:
+        _CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _CACHE_FILE.write_text(
+            json.dumps(
+                {
+                    "at": _CACHE["at"],
+                    "items": _CACHE["items"],
+                    "status": _CACHE["status"],
+                },
+                ensure_ascii=False,
+            ),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+
+
+_load_cache()
 
 
 def api_key() -> str:
@@ -234,7 +285,14 @@ _WINDOW_DAYS = {"24h": 1, "3d": 3, "1w": 7, "1m": 30, "2m": 60, "all": 0}
 def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = False) -> dict:
     """精选文章列表。带缓存，失败时返回上一次的结果而不是空。"""
     now = time.time()
-    if not force and _CACHE["items"] and now - float(_CACHE["at"]) < _CACHE_TTL:
+    # TTL 判断**不能要求缓存非空**。
+    #
+    # 原来写的是 `_CACHE["items"] and ...` —— 于是"抓到了，但窗口内没有文章"
+    # 这种结果（items 为空）每次都会被当成"没抓过"重新去问一遍。
+    # 配额耗尽时恰好就是这种状态，结果服务每重启一次就重试一次。
+    #
+    # 改成看"有没有抓过"（at 有值）而不是"抓到了什么"。
+    if not force and _CACHE["at"] and now - float(_CACHE["at"]) < _CACHE_TTL:
         return {
             "status": _CACHE["status"],
             "items": _CACHE["items"],
@@ -296,6 +354,13 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
                 "cached": True,
                 "error": error,
             }
+        # 失败也要记时间。
+        #
+        # 不记的话，配额耗尽的这段时间里服务每重启一次就重试一次（4 次调用），
+        # 而重启在这台机器上是常事。记下"刚刚试过"，TTL 就会挡住紧接着的重试。
+        _CACHE["at"] = now
+        _CACHE["status"] = error
+        _save_cache()
         return {"status": error, "items": [], "fetched_at": 0, "cached": False, "error": error}
 
     items = [_normalise(row) for row in rows if isinstance(row, dict)]
@@ -328,6 +393,10 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
         items = [i for i in items if (i.get("published_ts") or 0) / 1000 >= cutoff]
 
     _CACHE.update({"at": now, "items": items, "status": "ok" if items else "empty"})
+    # 落盘。下次服务启动直接读它，不用重新抓 —— 重启不该消耗配额。
+    # 抓到空结果时也存：那是"今天确实没有新内容"这个事实，
+    # 不存的话每次启动都会再去问一遍。
+    _save_cache()
     return {"status": "ok" if items else "empty", "items": items, "fetched_at": int(now), "cached": False}
 
 

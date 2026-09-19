@@ -20,7 +20,7 @@ window.TK_SOURCES = {
     {
       key: "reading",
       title: "文章",
-      note: "成篇的文章，适合慢慢读。",
+      note: "写完的完整文章。适合从头读到尾，也适合挑一节查。",
       items: [
         {
           key: "bestblogs",
@@ -59,7 +59,7 @@ window.TK_SOURCES = {
     {
       key: "papers",
       title: "论文",
-      note: "一手研究。比二手解读可信，也更需要筛选。",
+      note: "论文原文。结论最可靠，但得自己判断值不值得信。",
       items: [
         {
           key: "papernotes",
@@ -115,7 +115,7 @@ window.TK_SOURCES = {
     {
       key: "news",
       title: "资讯",
-      note: "知道发生了什么。用来看动向，不当知识读。",
+      note: "行业动态。用来看方向，不适合当知识记住。",
       items: [
         {
           key: "readhub",
