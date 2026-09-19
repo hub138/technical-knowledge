@@ -207,12 +207,19 @@
         cursor: pointer;
       }
       .src-rich-chip:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      /* 选中态用实心主色，和论文页的 .pn-cat 一致。
+       *
+       * 原来这里是 accent-soft 浅底，而论文页那个同类交互是实心深蓝 ——
+       * 同一个动作（点一下筛内容）在两个页面长得不一样，读者得重新学。
+       * 注释里我写的是"和论文页同一套视觉"，但实际没对齐；这次对齐。 */
       .src-rich-chip[aria-pressed="true"] {
-        border-color: var(--color-accent); background: var(--color-accent-soft);
-        color: var(--color-accent-ink); font-weight: var(--weight-semibold);
+        border-color: var(--color-accent);
+        background: var(--color-accent);
+        color: var(--color-on-accent);
+        font-weight: var(--weight-semibold);
       }
       .src-rich-chip b { color: var(--color-muted); font-weight: var(--weight-normal); font-variant-numeric: tabular-nums; }
-      .src-rich-chip[aria-pressed="true"] b { color: var(--color-accent-ink); }
+      .src-rich-chip[aria-pressed="true"] b { color: var(--color-on-accent); opacity: 0.85; }
 
       .src-rich { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); align-items: stretch; }
       @media (max-width: 1100px) { .src-rich { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -284,7 +291,21 @@
       /* 中英双标题：英文原名在上，中文译名紧跟，两个都是粗体。
          中文用略小一档 —— 它是译名，不是原文；但同属标题层级，
          所以仍然是粗体，不像作者那样用常规字重。 */
-      .src-rich-title--cn { margin-top: -3px; color: var(--color-ink); }
+      /* 中文译名：字号小一档，但仍然粗体。
+       *
+       * 两个都是 18px/650 时，读者分不出哪行是论文原名、哪行是译名 ——
+       * 而"哪一行是我在 arXiv 上会看到的那一行"是关键信息。
+       * 英文保持主标题字号，中文降一档但保留粗体（同属标题层级，
+       * 不像作者那样用常规字重）。
+       *
+       * 间距用 -4px 而不是 -3px：中文行高比英文紧，视觉上要贴得近一点
+       * 才像一对，而不是两段独立文字。 */
+      .src-rich-title--cn {
+        margin-top: -4px;
+        color: var(--color-ink-soft);
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
+      }
       .src-rich-authors { color: var(--color-muted); font-size: var(--text-xs); line-height: 1.5; }
       .src-rich-affil {
         color: var(--color-faint); font-size: var(--text-xs); line-height: 1.5;

@@ -236,6 +236,11 @@ body.tk-host::before {
 
 /* ── Sidebar footer: where am I, and how do I leave ─────────────────────── */
 
+/* 「当前位置」块。它在知识树下面（顺序见 shell.js 的说明）。
+ *
+ * margin-top: auto 让它在侧栏高度富余时沉到底部、和 footer 相邻 ——
+ * 这样知识树紧跟着导航，说明块自成一段，中间的空隙落在两者之间，
+ * 而不是把知识树往下推。 */
 .tk-context {
   margin-top: auto;
   padding: 14px 10px 0;
@@ -565,6 +570,9 @@ body.tk-host button {
   transform: translateY(-1px);
 }
 
+/* 动作类按钮（刷新等）。和前面的导航链接空开一档，语义不同。 */
+.hero-links .action { margin-left: var(--space-4); }
+
 /* ── Hero actions ─────────────────────────────────────────────────────────
  * One filled button, then quiet links separated by a hairline. Not a segmented
  * control: the dividers are what keep four items from reading as a row of equal
@@ -575,6 +583,10 @@ body.tk-host button {
   flex-wrap: wrap;
   align-items: center;
   gap: 0;
+  /* 按钮之间靠各自的内边距分开（见下面的 .hero-links a）。
+     但"动作类"按钮（刷新这类，作用于当前页而不是跳转）要额外空开一档 ——
+     否则它看起来像第三个导航项。 */
+  /* gap 保持 0，间距由 .action 单独给 */
   /* 同 .hero p：24 → 16，让标题/说明/按钮读成一组。 */
   margin-top: var(--space-4);
 }

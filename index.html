@@ -129,13 +129,19 @@
   display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x proximity;
   padding:2px 2px 12px;scrollbar-width:none;
 }
-@media (min-width:1180px){
-  .digest-row{margin-right:var(--float-lane);padding-right:0}
-  /* 滚动内容末尾补一段空白，让最后一张卡能完整滚进可视区。
-     没有它的话，滚到底时最后一张正好停在悬浮按钮下面 —— 点标题点到
-     按钮上。这是横向滚动 + 浮动控件的常见冲突，垫一段是最省事的解法。 */
-  .digest-row::after{content:"";flex:0 0 var(--float-lane)}
-}
+/* 横滑行整体收窄，让开右侧悬浮按钮的通道 —— **所有宽度都要**。
+ *
+ * 原来这条裹在 `@media (min-width:1180px)` 里，于是 1180px 以下的窗口
+ * 卡片直接延伸到右边界被裁掉（实测 1024px：右边界 910，卡片被切）。
+ * 而悬浮按钮在所有宽度都浮在右下角。
+ *
+ * 我之前反复没看到这个问题，是因为截图一直用 1440px —— 那个宽度下
+ * 断点生效，看不出毛病。教训：改布局要覆盖窄宽度截图，不能只看宽屏。
+ *
+ * ::after 那段空白是给滚动内容末尾垫的：滚到底时最后一张卡能完整
+ * 滚进可视区，而不是停在悬浮按钮下面。 */
+.digest-row{margin-right:var(--float-lane);padding-right:0}
+.digest-row::after{content:"";flex:0 0 var(--float-lane)}
 .digest-row::-webkit-scrollbar{display:none}
 .digest-card{
   flex:0 0 288px;display:grid;gap:0;scroll-snap-align:start;

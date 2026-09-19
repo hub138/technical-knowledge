@@ -224,7 +224,11 @@ def _normalise(item: dict) -> dict:
     }
 
 
-def digest(limit: int = 12, hours: str = "3d", force: bool = False) -> dict:
+# 时间窗到天数的换算。用于本地筛 —— 接口的 time 参数不生效。
+_WINDOW_DAYS = {"24h": 1, "3d": 3, "1w": 7, "1m": 30, "2m": 60, "all": 0}
+
+
+def digest(limit: int = 12, hours: str = "2m", pages: int = 10, force: bool = False) -> dict:
     """精选文章列表。带缓存，失败时返回上一次的结果而不是空。"""
     now = time.time()
     if not force and _CACHE["items"] and now - float(_CACHE["at"]) < _CACHE_TTL:
@@ -239,14 +243,45 @@ def digest(limit: int = 12, hours: str = "3d", force: bool = False) -> dict:
     #   type      要大写 ARTICLE。小写 article 返回 0 条（totalCount=0），
     #             而不是报错 —— 静默失败，只能靠总数看出来。
     #   language  是 zh_CN / en_US，不是 zh / en。
-    data, error = _get("resources", {
-        "type": "ARTICLE",
-        "language": "zh_CN",
-        "time": hours,
-        "qualified": "true",   # 只要 Featured，这是它人工精审的那一层
-        "limit": str(min(50, max(1, limit))),
-        "page": "1",
-    })
+    # 抓多页。
+    #
+    # 单页只有 20 条，而且第一页是按**评分**排的 —— 里面混着 2024 年的。
+    # 实测翻到第 10 页能拿到 2026-09 的文章（9 天前）。所以要翻够页数，
+    # 再在本地按发布时间排、按新鲜度筛。
+    #
+    # 页数 10：实测新文章藏在深处 —— 60 天窗口内唯一一篇（2026-09-10）
+    # 在第 5 页之后，翻 4 页根本碰不到。所以页数要给够，靠下面的预算
+    # 控制成本：凑够 limit 条窗口内的就停，不用翻满。
+    rows: list[dict] = []
+    error = ""
+    # 并行翻页。
+    #
+    # 串行翻 10 页要 ~100 秒（实测）。虽然结果缓存 30 分钟、且抓取在后台
+    # 串行进行不阻塞访客，但它会拖住同一批里的其它源。10 个请求之间没依赖，
+    # 并行是对的：实测 10 页从 ~100 秒降到 ~15 秒。
+    def fetch_page(page: int) -> list[dict]:
+        data, err = _get("resources", {
+            "type": "ARTICLE",
+            "language": "zh_CN",
+            "limit": "20",
+            "page": str(page),
+        })
+        if err:
+            return []
+        chunk = data if isinstance(data, list) else (
+            (data or {}).get("dataList") or (data or {}).get("list") or []
+        )
+        return [r for r in chunk if isinstance(r, dict)]
+
+    try:
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=min(pages, 6) if pages else 1) as pool:
+            for chunk in pool.map(fetch_page, range(1, (pages or 1) + 1)):
+                rows.extend(chunk)
+    except ImportError:
+        # 极简回退：串行翻页。
+        for page in range(1, (pages or 1) + 1):
+            rows.extend(fetch_page(page))
 
     if error:
         # 已经有缓存就继续用它 —— 配额用完或网络抖动不该让首页空掉。
@@ -260,12 +295,6 @@ def digest(limit: int = 12, hours: str = "3d", force: bool = False) -> dict:
             }
         return {"status": error, "items": [], "fetched_at": 0, "cached": False, "error": error}
 
-    # 分页响应形如 {"currentPage","pageSize","totalCount","pageCount","dataList":[...]}。
-    # 文档没写这个形状，是照真实响应试出来的 —— 之前猜 data / data.list
-    # 都是 0 条，而接口其实返回了 14 万条。
-    rows = data if isinstance(data, list) else (
-        (data or {}).get("dataList") or (data or {}).get("list") or []
-    )
     items = [_normalise(row) for row in rows if isinstance(row, dict)]
     items = [item for item in items if item["title"] and item["url"]]
     # 按发布时间倒序排。
@@ -275,6 +304,25 @@ def digest(limit: int = 12, hours: str = "3d", force: bool = False) -> dict:
     # 相关性排。它给的是"精选库里最值得读的"，不是"最近发布的"。
     # 而这一页要的是后者，所以自己排。
     items.sort(key=lambda item: item.get("published_ts") or 0, reverse=True)
+
+    # 本地按时间窗筛。
+    #
+    # 接口的 time 参数被忽略（24h/3d/1w/1m 返回的总数完全一样），所以窗口
+    # 只能自己卡。默认 1 个月 —— 更长的话首页会摆出一年前的文章，
+    # 而这一块叫"最新优质好文"，名不副实。
+    #
+    # 筛完不够 limit 条就少给 —— **不回填旧的**。
+    #
+    # 这里踩过一次：第一版写了"一条都没有时才退回全部"，结果 1 周窗口
+    # 返回了一篇 2025-02 的文章。那个回退分支看起来是"防页面空掉"的
+    # 保险，实际效果是把窗口彻底废掉 —— 因为对方的库存整体偏旧时，
+    # 窗口内本来就常常是空的，于是每次都走回退。
+    #
+    # 宁缺毋滥：窗口内没有就显示没有。
+    days = _WINDOW_DAYS.get(hours, 0)
+    if days:
+        cutoff = time.time() - days * 86400
+        items = [i for i in items if (i.get("published_ts") or 0) / 1000 >= cutoff]
 
     _CACHE.update({"at": now, "items": items, "status": "ok" if items else "empty"})
     return {"status": "ok" if items else "empty", "items": items, "fetched_at": int(now), "cached": False}
