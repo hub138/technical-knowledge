@@ -552,6 +552,12 @@
         font-weight: var(--weight-semibold);
         line-height: 1.5;
       }
+      .pn-title-cn {
+        margin: 2px 0 0; color: var(--color-ink);
+        font-size: var(--text-body); font-weight: var(--weight-medium);
+        line-height: 1.5;
+      }
+
       .pn-row a:hover { color: var(--color-accent); }
       /* 不用 ↗ 标记外链。
        *
@@ -883,6 +889,10 @@
         const tags = (paper.tags || []).filter((t) => fold(t) !== subKey).slice(0, 3);
         return `<article class="pn-row">
           <a href="${esc(paper.url)}" target="_blank" rel="noopener noreferrer">${esc(paper.title)}</a>
+          ${/* 中文名。PaperNotes 只给英文标题，这一栏是模型译的 ——
+               所以排在第二行、字号小一档：它是帮助理解的对译，
+               不是论文自己的标题。译不出来就不显示这一行。 */""}
+          ${paper.title_cn ? `<p class="pn-title-cn">${esc(paper.title_cn)}</p>` : ""}
           <div class="pn-meta">
             ${paper.conference ? `<span class="pn-conf">${esc(paper.conference)}</span>` : ""}
             ${sub ? `<span class="pn-sub">${esc(sub)}</span>` : ""}

@@ -21,6 +21,7 @@ import html
 import json
 import mimetypes
 import os
+import pathlib
 import posixpath
 import pwd
 import re
@@ -28,6 +29,7 @@ import secrets
 import socket
 import subprocess
 import sys
+import traceback
 import threading
 import time
 from http.cookies import SimpleCookie
@@ -115,6 +117,79 @@ _SUMMARY_TTL = 30 * 86400  # 论文解读写完就不变了，缓存一个月足
 # 不该各自起一批，否则同一篇被抓好几遍。
 _enriching = [False]
 _summary_cache: dict[str, dict] = {}
+
+
+_TRANSLATE_TIMEOUT = 90
+
+
+def _model_credentials() -> tuple[str, str]:
+    """模型端点与 key。从 Claude Code 的 settings.json 读，不另存一份。
+
+    站点自己不持有模型凭据 —— 复用本机已有的配置，少一处要同步的
+    秘密。读不到就返回空，翻译静默跳过，页面照常显示英文原题。
+    """
+    try:
+        settings = json.loads(
+            (pathlib.Path.home() / ".claude" / "settings.json").read_text(encoding="utf-8")
+        )
+        env = settings.get("env") or {}
+        key = env.get("ANTHROPIC_AUTH_TOKEN") or env.get("ANTHROPIC_API_KEY") or ""
+        base = (env.get("ANTHROPIC_BASE_URL") or "").rstrip("/")
+        return base, key
+    except (OSError, ValueError):
+        return "", ""
+
+
+def _translate_titles(titles: list[str]) -> list[str]:
+    """把一批英文论文标题译成中文。
+
+    一次请求译一批（而不是每个标题一次请求）—— 60 篇标题各发一次
+    要 60 次调用，慢且容易撞限流。批量一次拿回来。
+
+    失败返回空串列表：宁可显示英文原题，也不显示半截的或错的译文。
+    """
+    if not titles:
+        return []
+    base, key = _model_credentials()
+    if not (base and key):
+        return [""] * len(titles)
+    numbered = "\n".join(f"{i + 1}. {t}" for i, t in enumerate(titles))
+    prompt = (
+        "把下列英文学术论文标题译成简体中文。\n"
+        "要求：\n"
+        "  · 术语准确，保留英文缩写（如 LLM、RAG、Agent、Transformer）\n"
+        "  · 只输出译文，每行一条，行首为「序号. 」，不要解释、不要空行\n"
+        "  · 专有名词和模型名不译\n\n"
+        + numbered
+    )
+    payload = json.dumps({
+        "model": "claude-haiku-4-5-20251001",
+        "max_tokens": 4000,
+        "messages": [{"role": "user", "content": prompt}],
+    }).encode("utf-8")
+    request = urllib.request.Request(
+        base + "/v1/messages",
+        data=payload,
+        headers={
+            "x-api-key": key,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=_TRANSLATE_TIMEOUT) as response:
+            data = json.loads(response.read())
+    except Exception:
+        return [""] * len(titles)
+    text = ""
+    for block in data.get("content") or []:
+        if isinstance(block, dict) and block.get("type") == "text":
+            text += str(block.get("text") or "")
+    out: list[str] = []
+    for i in range(len(titles)):
+        match = re.search(rf"^{i + 1}\.\s*(.+)$", text, re.M)
+        out.append(match.group(1).strip() if match else "")
+    return out
 
 
 def _load_summary_cache() -> None:
@@ -210,11 +285,31 @@ def _enrich_papers(papers: list[dict]) -> list[dict]:
                 from concurrent.futures import ThreadPoolExecutor
                 with ThreadPoolExecutor(max_workers=6) as pool:
                     list(pool.map(lambda p: _fetch_paper_summary(p["url"]), missing))
-            except Exception:
-                for p in missing:
-                    _fetch_paper_summary(p["url"])
-            finally:
                 _save_summary_cache()
+                # 摘要齐了再译标题。
+                #
+                # PaperNotes 只给英文标题，中文名得靠模型。批量一次译完，
+                # 结果存在同一份缓存里，下一次翻到直接读。
+                # 翻译只是锦上添花：失败就留空，页面显示英文原题。
+                need_cn = [p for p in missing
+                           if not ((_summary_cache.get(p["url"]) or {}).get("title_cn"))]
+                if need_cn:
+                    titles = [str(p.get("title") or "") for p in need_cn]
+                    for paper, cn in zip(need_cn, _translate_titles(titles)):
+                        hit = _summary_cache.get(paper["url"])
+                        if isinstance(hit, dict) and cn:
+                            hit["title_cn"] = cn[:200]
+                    _save_summary_cache()
+            except Exception:
+                # 不要静默吞掉。
+                #
+                # 第一版这里写的是 `except Exception: pass`，于是翻译环节
+                # 一个 NameError（少 import pathlib）在后台线程里被吃掉，
+                # 页面上表现为"没有中文名"，没有任何线索可查。
+                # 补抓取和翻译都不是主流程，失败不该影响页面 —— 但要把
+                # 原因打出来，否则下次还得靠猜。
+                traceback.print_exc()
+            finally:
                 _enriching[0] = False
 
         try:
