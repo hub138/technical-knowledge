@@ -108,6 +108,32 @@ class AuthenticationTests(unittest.TestCase):
         connection.close()
         return result
 
+    def test_large_json_is_gzipped_when_accepted(self) -> None:
+        """大 JSON 必须压缩，且解压后与未压缩完全一致。
+
+        这条守两件事：
+          1. 压缩没被误删 —— 它是 /api/notes 1.7MB → 485KB 的唯一来源，
+             丢了不会有任何功能报错，只是慢，属于最难发现的那种退化。
+          2. 压缩没有损坏内容。半截的 gzip 流解压会抛异常，而页面只会
+             表现为"数据加载失败"，排查方向会被带到别处。
+        """
+        import gzip as _gzip
+
+        status, headers, plain = self.request("GET", "/api/notes")
+        self.assertEqual(status, 200)
+        self.assertNotIn("Content-Encoding", headers,
+                         "没请求 gzip 时不该压缩")
+
+        status, headers, packed = self.request(
+            "GET", "/api/notes", headers={"Accept-Encoding": "gzip"}
+        )
+        self.assertEqual(status, 200)
+        self.assertEqual(headers.get("Content-Encoding"), "gzip")
+        self.assertLess(len(packed), len(plain),
+                        "压缩后应当更小；没更小说明压了也没意义")
+        self.assertEqual(_gzip.decompress(packed), plain,
+                         "解压后的字节必须和未压缩逐字节相同")
+
     def test_external_knowledge_is_public_but_tool_launch_requires_authentication(self) -> None:
         page = self.request("GET", "/?domain=%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD")
         api = self.request("GET", "/api/notes")

@@ -63,7 +63,10 @@ KEY_FILE = pathlib.Path(
 
 # 缓存。API 有每日配额，不该每次开页面都打一次。
 _CACHE: dict[str, object] = {"at": 0.0, "items": [], "status": "unknown"}
-_CACHE_TTL = 1800  # 30 分钟；早报和精选本来就是按天的节奏
+# 缓存时长是**配额**驱动的。每账号每天 500 次调用，翻 N 页就是 N 次。
+# 30 分钟 × 4 页 ≈ 190 次/天，太接近上限；超了以后整个源静默变空（实测 429 → quota）。
+# 2 小时 × 4 页 ≈ 48 次/天，安全。早报和精选本来也是按天的节奏。
+_CACHE_TTL = 7200
 
 
 def api_key() -> str:
@@ -228,7 +231,7 @@ def _normalise(item: dict) -> dict:
 _WINDOW_DAYS = {"24h": 1, "3d": 3, "1w": 7, "1m": 30, "2m": 60, "all": 0}
 
 
-def digest(limit: int = 12, hours: str = "2m", pages: int = 10, force: bool = False) -> dict:
+def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = False) -> dict:
     """精选文章列表。带缓存，失败时返回上一次的结果而不是空。"""
     now = time.time()
     if not force and _CACHE["items"] and now - float(_CACHE["at"]) < _CACHE_TTL:

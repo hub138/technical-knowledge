@@ -3,6 +3,17 @@
 
 from __future__ import annotations
 
+# ── 响应压缩 ────────────────────────────────────────────────────────────
+# /api/notes 是 1.7MB 的 JSON，是首页最大的一笔下载。gzip 后约 485KB（28%）。
+# 只压文本：图片和字体本身已是压缩格式，再压没收益还费 CPU。
+_COMPRESSIBLE = ("text/", "application/json", "application/javascript",
+                 "application/xml", "image/svg+xml")
+_GZIP_MIN = 1024  # 太小的压了没意义
+
+
+def _is_compressible(content_type: str) -> bool:
+    return any(content_type.startswith(p) for p in _COMPRESSIBLE)
+
 import argparse
 import hashlib
 import hmac
@@ -1435,12 +1446,30 @@ class Handler(BaseHTTPRequestHandler):
         tag = f'<meta name="tk-local-client" content="{local}">'.encode("utf-8")
         return payload.replace(b"<head>", b"<head>" + tag, 1)
 
+    def _wants_gzip(self) -> bool:
+        """客户端是否接受 gzip。"""
+        return "gzip" in (self.headers.get("Accept-Encoding", "")).lower()
+
     def send_bytes(
         self, payload: bytes, content_type: str, status: int = 200, download: str = ""
     ) -> None:
         payload = self.stamp_client_scope(payload, content_type)
+        # gzip。/api/notes 是 1.7MB 的 JSON —— 未压缩时它就是首页最大的一笔下载。实测压缩后约 300KB。压缩放在 send_bytes，因为每个响应都经过这里，一处生效全站生效。
+        # 只压文本类：图片/字体已经是压缩格式，压了没收益还费 CPU。
+        if self._wants_gzip() and _is_compressible(content_type) and len(payload) >= _GZIP_MIN:
+            try:
+                import gzip as _gzip
+                packed = _gzip.compress(payload, 6)
+                if len(packed) < len(payload):
+                    payload = packed
+                    self._gzipped = True
+            except Exception:
+                self._gzipped = False
         self.send_response(status)
         self.send_header("Content-Type", content_type)
+        if getattr(self, "_gzipped", False):
+            self.send_header("Content-Encoding", "gzip")
+            self.send_header("Vary", "Accept-Encoding")
         self.send_header("Content-Length", str(len(payload)))
         self.send_header("Cache-Control", "no-store")
         # Baseline browser hardening. These were dropped once and nothing failed
@@ -2013,9 +2042,14 @@ class Handler(BaseHTTPRequestHandler):
                 limit = min(24, max(1, int(query.get("limit", ["12"])[0])))
             except ValueError:
                 limit = 12
-            hours = query.get("time", ["3d"])[0]
-            if hours not in {"24h", "3d", "1w", "1m", "all"}:
-                hours = "3d"
+            # 默认 2 个月，和 bestblogs.digest 一致。
+            #
+            # 原来是 3 天 —— 但对方库存里 3 天内常常一篇都没有（实测最新一篇
+            # 是 9 天前），于是这个接口永远返回空，首页那块就永远不显示。
+            # 窗口值要和 bestblogs._WINDOW_DAYS 同步，否则会静默降级成默认值。
+            hours = query.get("time", ["2m"])[0]
+            if hours not in bestblogs._WINDOW_DAYS:
+                hours = "2m"
             self.send_json(bestblogs.digest(limit=limit, hours=hours, force=force))
             return
         if path == "/api/sources":
