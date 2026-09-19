@@ -1522,7 +1522,26 @@ function bindReaderTools(){
   if(download)download.onclick=downloadCurrentNote;
 }
 function dataSignature(data){return data.notes.map(note=>[note.path,note.updated,note.title,note.search_text].join('\u0000')).join('\u0001')+'\u0002'+JSON.stringify(data.edges)}
-async function refreshNotes(initial=false){const data=await json('/api/notes'),signature=dataSignature(data);if(signature===state.notesSignature)return;state.notes=data.notes;state.edges=data.edges;state.notesSignature=signature;renderDomains();if(initial){selectFromUrl();return}if(state.view==='home')renderHome();else if(state.view==='directory')renderDirectory();else if(state.view==='graph')renderGraph()}
+/* 每 10 秒轮询一次看笔记有没有变。
+ *
+ * 改前：拉完整 /api/notes（gzip 后 474KB）再在本地算签名 —— 光回答
+ * "变没变"就每 10 秒传一次全量。实测一次页面停留会传 3 次。
+ *
+ * 改后：先问 /api/notes/version（几十字节），签名一致就直接返回，
+ * 不一致才拉全量。笔记多数时间不变，所以这条路径几乎总是省下 474KB。 */
+async function refreshNotes(initial=false){
+  if(!initial){
+    try{
+      const v=await json('/api/notes/version');
+      if(v.signature===state.notesSignature)return;
+    }catch(e){/* 版本端点不可用时退回拉全量 */}
+  }
+  const data=await json('/api/notes');
+  // 用服务端给的签名，不是本地 dataSignature() 算的。
+  // 两边算法不同（服务端是 sha256，前端是原始拼接），比较就永远不相等，
+  // 版本端点等于白加 —— 第一版就是这个毛病。服务端是唯一事实源。
+  const signature=data.signature||dataSignature(data);
+  if(signature===state.notesSignature)return;state.notes=data.notes;state.edges=data.edges;state.notesSignature=signature;renderDomains();if(initial){selectFromUrl();return}if(state.view==='home')renderHome();else if(state.view==='directory')renderDirectory();else if(state.view==='graph')renderGraph()}
 /* 论文只在启动时取一次。它跟着 vault 走，不像笔记那样几秒一变，
    放进 10 秒的轮询里纯属白跑。取不到就不显示，首页其余部分照常。 */
 async function refreshPapers(){try{state.papers=(await json('/api/papers')).papers||[]}catch(error){console.error(error)}if(state.view==='home')renderHome()}
@@ -1573,17 +1592,30 @@ function renderActiveView(){
 async function refreshApp(){await Promise.allSettled([refreshNotes(),refreshLearningStatus()])}
 initialize();setInterval(refreshApp,10000);
 </script>
-<script src="/static/mermaid.min.js"></script>
+<!-- mermaid 改成按需加载。
+     它 gzip 后仍有 957KB（原始 3.5MB），是首页最大的一笔下载 ——
+     而首页默认不渲染任何图表：只有打开一篇**带 ```mermaid 代码块**的笔记
+     才用得上。同步加载等于让每个访客都为少数几篇笔记付 957KB。
+
+     做法：先扫页面有没有 pre.mermaid，有才插 script 标签。
+     没图表时这一整个库连请求都不会发出去。 -->
 <script>
-if(window.mermaid){
-  window.mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'neutral'});
-  window.renderMermaid=async function(){
-    const nodes=[...document.querySelectorAll('pre.mermaid')];
-    if(!nodes.length)return;
-    nodes.forEach((node,index)=>{node.dataset.mermaidSource=node.textContent||'';node.id=node.id||`mermaid-${index}-${Date.now()}`});
-    await window.mermaid.run({nodes});
-  };
-}
+window.renderMermaid=async function(){
+  const nodes=[...document.querySelectorAll('pre.mermaid')];
+  if(!nodes.length)return;
+  if(!window.mermaid){
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='/static/mermaid.min.js';
+      s.onload=resolve;
+      s.onerror=()=>reject(new Error('mermaid 加载失败'));
+      document.head.appendChild(s);
+    });
+    window.mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'neutral'});
+  }
+  nodes.forEach((node,index)=>{node.dataset.mermaidSource=node.textContent||'';node.id=node.id||`mermaid-${index}-${Date.now()}`});
+  await window.mermaid.run({nodes});
+};
 </script>
 
 <script>

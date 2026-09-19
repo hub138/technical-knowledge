@@ -737,6 +737,39 @@ class Vault:
         self.by_stem: dict[str, list[str]] = {}
         self.refresh()
 
+    def signature(self) -> str:
+        """笔记集的变更签名，和前端 dataSignature 算的是同一份内容。
+
+        前端每 10 秒问一次"变没变"。以前它为此拉全量 /api/notes（gzip 后
+        474KB），只为在本地算这个签名。这里在服务端算，只回一个哈希。
+
+        签名的输入必须覆盖前端真正会用到的东西：path / updated / title /
+        正文（前端拿它做搜索，也拿它算签名）+ 图谱边。漏掉正文的话，
+        改了笔记内容但签名不变，页面就不会刷新。
+        """
+        import hashlib as _hashlib
+
+        parts: list[str] = []
+        for path in sorted(self.notes):
+            n = self.notes[path]
+            if not n.get("listed"):
+                continue
+            parts.append(
+                "\x00".join(
+                    [
+                        str(n.get("path", "")),
+                        str(n.get("updated", "")),
+                        str(n.get("title", "")),
+                        str(n.get("body", "")),
+                    ]
+                )
+            )
+        digest = _hashlib.sha256("\x01".join(parts).encode("utf-8")).hexdigest()
+        edges = _hashlib.sha256(
+            json.dumps(self.edges(), sort_keys=True, ensure_ascii=False).encode("utf-8")
+        ).hexdigest()
+        return f"{digest}:{edges}"
+
     def refresh(self) -> None:
         notes: dict[str, dict[str, object]] = {}
         for path in sorted(self.root.rglob("*.md")):
@@ -1916,6 +1949,18 @@ class Handler(BaseHTTPRequestHandler):
             host = detect_host() if bound_host in {"0.0.0.0", "::"} else bound_host
             self.send_json({"ok": True, "host": host, "port": self.server.server_address[1], "notes": len(self.vault.notes)})  # type: ignore[attr-defined]
             return
+        if path == "/api/notes/version":
+            # 变更检测的轻量端点。
+            #
+            # 前端每 10 秒轮询一次看笔记有没有变。以前它拉完整 /api/notes
+            # （gzip 后 474KB）再在本地算 signature —— 光是为了回答"变没变"
+            # 就每 10 秒传一次全量。实测一次页面停留会请求 3 次。
+            #
+            # 这里在服务端算同一个签名，只回几十字节。客户端先问它，
+            # 不一样才去拉全量。
+            self.vault.refresh()
+            self.send_json({"signature": self.vault.signature()})
+            return
         if path == "/api/notes":
             self.vault.refresh()
             notes = []
@@ -1940,7 +1985,14 @@ class Handler(BaseHTTPRequestHandler):
                 for e in self.vault.edges()
                 if e["source"] in graph_paths and e["target"] in graph_paths
             ]
-            self.send_json({"notes": notes, "edges": edges})
+            # 带上服务端算的签名。前端拿它和 /api/notes/version 的返回值比，
+            # 两边必须是同一个值 —— 否则版本端点永远认为"变了"，每 10 秒
+            # 照旧拉一次全量（第一版就踩了这个，改善完全没生效）。
+            self.send_json({
+                "notes": notes,
+                "edges": edges,
+                "signature": self.vault.signature(),
+            })
             return
         if path == "/api/papers":
             self.vault.refresh()
