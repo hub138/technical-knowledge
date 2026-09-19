@@ -134,6 +134,30 @@ class AuthenticationTests(unittest.TestCase):
         self.assertEqual(_gzip.decompress(packed), plain,
                          "解压后的字节必须和未压缩逐字节相同")
 
+    def test_cache_headers_differ_by_kind(self) -> None:
+        """静态资源可缓存，API 不缓存。
+
+        曾经所有响应一律 no-store，包括 base.css 和 mermaid.min.js ——
+        那些文件每次访问都重新下载。这类退化没有任何功能症状，
+        只有网络面板能看出来，所以用它守住。
+        """
+        css = self.request("GET", "/site/base.css")
+        if css[0] != 200:
+            css = self.request("GET", "/static/base.css")
+        if css[0] == 200:
+            self.assertIn("max-age", css[1].get("Cache-Control", ""),
+                          "静态资源应该可缓存")
+
+        api = self.request("GET", "/api/notes")
+        self.assertEqual(api[0], 200)
+        self.assertIn("no-store", api[1].get("Cache-Control", ""),
+                      "API 不该被缓存")
+
+        page = self.request("GET", "/")
+        self.assertEqual(page[0], 200)
+        self.assertIn("no-cache", page[1].get("Cache-Control", ""),
+                      "HTML 要重新验证")
+
     def test_external_knowledge_is_public_but_tool_launch_requires_authentication(self) -> None:
         page = self.request("GET", "/?domain=%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD")
         api = self.request("GET", "/api/notes")

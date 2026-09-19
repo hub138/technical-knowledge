@@ -1479,6 +1479,18 @@ class Handler(BaseHTTPRequestHandler):
         tag = f'<meta name="tk-local-client" content="{local}">'.encode("utf-8")
         return payload.replace(b"<head>", b"<head>" + tag, 1)
 
+    def _is_static(self) -> bool:
+        """是不是按路径提供的静态资源（css/js/mermaid 等）。
+
+        判断依据是路径前缀，不是 MIME —— 同一个 text/javascript 既可能是
+        /static 下的库，也可能是动态生成的脚本。
+        """
+        path = (self.path or "").split("?", 1)[0]
+        return path.startswith(("/static/", "/vendor/", "/assets/")) or (
+            path.endswith((".css", ".js", ".woff2", ".svg"))
+            and not path.startswith("/api/")
+        )
+
     def _wants_gzip(self) -> bool:
         """客户端是否接受 gzip。"""
         return "gzip" in (self.headers.get("Accept-Encoding", "")).lower()
@@ -1504,7 +1516,22 @@ class Handler(BaseHTTPRequestHandler):
             self.send_header("Content-Encoding", "gzip")
             self.send_header("Vary", "Accept-Encoding")
         self.send_header("Content-Length", str(len(payload)))
-        self.send_header("Cache-Control", "no-store")
+        # 缓存策略分三类。
+        #
+        # 以前所有响应一律 no-store，包括 base.css / i18n.js / mermaid.min.js。
+        # 那些文件很少变，却每次访问都重新下载一次 —— 本地网络快，看不出来，
+        # 但那是纯粹的白给。
+        #
+        #   静态资源  1 小时。它们是按路径提供的内容，同名即同内容。
+        #   HTML      必须每次问（内容随数据变），用 no-cache 让浏览器
+        #              重新验证，而不是完全不缓存。
+        #   API       仍然 no-store —— 笔记和反馈随时在变，不该被缓存。
+        if self._is_static():
+            self.send_header("Cache-Control", "public, max-age=3600")
+        elif content_type.startswith("text/html"):
+            self.send_header("Cache-Control", "no-cache")
+        else:
+            self.send_header("Cache-Control", "no-store")
         # Baseline browser hardening. These were dropped once and nothing failed
         # loudly — a page missing CSP still renders, so the loss was invisible
         # until a test asserted the headers. Keep them here, in the one place
