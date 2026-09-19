@@ -1380,3 +1380,84 @@ class FeedTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+BESTBLOGS_SPEC = importlib.util.spec_from_file_location(
+    "knowledge_site_bestblogs", ROOT / "site" / "bestblogs.py"
+)
+BESTBLOGS_MODULE = importlib.util.module_from_spec(BESTBLOGS_SPEC)
+assert BESTBLOGS_SPEC.loader is not None
+BESTBLOGS_SPEC.loader.exec_module(BESTBLOGS_MODULE)
+
+
+class BestBlogsRequestTests(unittest.TestCase):
+    """BestBlogs 的请求参数必须和文档一致。
+
+    这类 bug 的代价在于**它是静默的**：服务端对无效取值不报错，直接忽略，
+    于是返回的是默认排序的旧内容 —— 表面看"接口通了、有数据"，实际拿到的
+    是错的数据。
+
+    实测踩过：type=ARTICLE 和 language=zh_CN 都是无效值（文档规定小写
+    article、zh/en/all）。两者都被忽略，结果那批数据多数是 2024-2025 的，
+    看起来就像"这个 API 捞不到新文章"，而真正的原因是参数从没生效过。
+    排查时试遍了排序和时间窗参数，方向完全错了。
+
+    所以这里用假的请求函数把**实际发出的参数**截下来断言，不打网络。
+    """
+
+    def setUp(self) -> None:
+        if not BESTBLOGS_MODULE.api_key():
+            self.skipTest("未配置 bestblogs.key")
+        self.calls: list[tuple[str, dict]] = []
+        self._orig_get = BESTBLOGS_MODULE._get
+        self._orig_save = BESTBLOGS_MODULE._save_cache
+        self._orig_save_brief = BESTBLOGS_MODULE._save_brief_cache
+        # 不打网络，也不写盘。
+        BESTBLOGS_MODULE._get = lambda path, params: (
+            self.calls.append((path, dict(params))) or ([], "")
+        )
+        BESTBLOGS_MODULE._save_cache = lambda: None
+        BESTBLOGS_MODULE._save_brief_cache = lambda: None
+
+    def tearDown(self) -> None:
+        BESTBLOGS_MODULE._get = self._orig_get
+        BESTBLOGS_MODULE._save_cache = self._orig_save
+        BESTBLOGS_MODULE._save_brief_cache = self._orig_save_brief
+
+    def test_resources_uses_documented_enum_values(self) -> None:
+        BESTBLOGS_MODULE.digest(limit=3, force=True)
+        calls = [c for c in self.calls if c[0] == "resources"]
+        self.assertTrue(calls, "应当请求过 /openapi/v2/resources")
+        for _, params in calls:
+            self.assertEqual(params.get("type"), "article",
+                             "type 必须是小写 article；大写 ARTICLE 是无效值，会被静默忽略")
+            self.assertEqual(params.get("language"), "zh",
+                             "language 必须是 zh/en/all；zh_CN 是无效值，会被静默忽略")
+
+    def test_resources_sends_a_time_window(self) -> None:
+        """time 必须是文档列的取值之一，否则同样被忽略。"""
+        allowed = {"24h", "3d", "1w", "1m", "all"}
+        BESTBLOGS_MODULE.digest(limit=3, force=True)
+        calls = [c for c in self.calls if c[0] == "resources"]
+        self.assertTrue(calls)
+        for _, params in calls:
+            self.assertIn(params.get("time"), allowed)
+
+    def test_brief_sends_iso_date_and_language(self) -> None:
+        BESTBLOGS_MODULE.brief(force=True)
+        calls = [c for c in self.calls if c[0] == "brief"]
+        self.assertTrue(calls, "应当请求过 /openapi/v2/brief")
+        for _, params in calls:
+            self.assertRegex(params.get("date", ""), r"^\d{4}-\d{2}-\d{2}$")
+            self.assertIn(params.get("language"), {"zh", "en"})
+
+    def test_brief_date_candidates_skip_sunday(self) -> None:
+        """文档写明没有周日版（no Sunday edition），候选日期不能含周日。"""
+        import datetime as _dt
+        days = BESTBLOGS_MODULE._candidate_dates(days=8)
+        self.assertTrue(days, "至少要有一个候选日期")
+        for day in days:
+            parsed = _dt.date.fromisoformat(day)
+            self.assertNotEqual(parsed.weekday(), 6, f"{day} 是周日，没有早报")
+        # 覆盖足够多天时，应当包含最近的那几天（跳过周日）
+        self.assertGreaterEqual(len(days), 6)

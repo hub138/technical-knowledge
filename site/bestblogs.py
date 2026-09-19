@@ -81,6 +81,36 @@ _CACHE_FILE = pathlib.Path(
     or pathlib.Path(__file__).resolve().parent.parent / "data" / "bestblogs-cache.json"
 )
 
+# 早报缓存。同样落盘：早报一天一版，一天只该抓一次。
+_BRIEF_TTL = 86400
+_BRIEF_CACHE_FILE = pathlib.Path(
+    pathlib.Path(__file__).resolve().parent.parent / "data" / "bestblogs-brief.json"
+)
+_brief_cache: dict[str, object] = {"at": 0.0, "payload": {}}
+
+
+def _load_brief_cache() -> None:
+    try:
+        raw = json.loads(_BRIEF_CACHE_FILE.read_text(encoding="utf-8"))
+        if isinstance(raw, dict) and isinstance(raw.get("payload"), dict):
+            _brief_cache["at"] = float(raw.get("at") or 0.0)
+            _brief_cache["payload"] = raw["payload"]
+    except (OSError, ValueError):
+        pass
+
+
+def _save_brief_cache() -> None:
+    try:
+        _BRIEF_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _BRIEF_CACHE_FILE.write_text(
+            json.dumps(_brief_cache, ensure_ascii=False), encoding="utf-8"
+        )
+    except OSError:
+        pass
+
+
+_load_brief_cache()
+
 
 def _load_cache() -> None:
     """启动时把上次抓的结果读回来。读不到或坏了就当没有。"""
@@ -321,10 +351,23 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
     # 串行进行不阻塞访客，但它会拖住同一批里的其它源。10 个请求之间没依赖，
     # 并行是对的：实测 10 页从 ~100 秒降到 ~15 秒。
     def fetch_page(page: int) -> list[dict]:
+        # 参数取值必须以文档为准（bestblogs.dev/docs/api/endpoints）：
+        #
+        #   type      article / podcast / video / tweet / newsletter   ← 小写
+        #   language  zh / en / all                                   ← 不是 zh_CN
+        #   time      24h / 3d / 1w / 1m / all
+        #   limit     默认 20，最大 100
+        #
+        # 第一版写的是 type=ARTICLE 和 language=zh_CN —— 两个都是无效值。
+        # 服务端不报错，直接忽略，于是返回的是**默认排序**的内容：那批数据
+        # 整体偏旧（多数 2024-2025），看起来就像"这个 API 捞不到新文章"。
+        # 参数写错却看不出来，是因为无效值被静默忽略而不是报错。
         data, err = _get("resources", {
-            "type": "ARTICLE",
-            "language": "zh_CN",
-            "limit": "20",
+            "type": "article",
+            "language": "zh",
+            "time": hours if hours in ("24h", "3d", "1w", "1m") else "1m",
+            "qualified": "true",
+            "limit": "50",
             "page": str(page),
         })
         if err:
@@ -400,9 +443,81 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
     return {"status": "ok" if items else "empty", "items": items, "fetched_at": int(now), "cached": False}
 
 
+def _candidate_dates(days: int = 4) -> list[str]:
+    """往前找最近有早报的日期。
+
+    文档明确写了 **no Sunday edition** —— 周日没有早报。今天正好是周日时
+    直接问今天会拿到空结果，所以按日期往前找，跳过周日。
+    """
+    today = datetime.date.today()
+    out = []
+    for i in range(days):
+        day = today - datetime.timedelta(days=i)
+        if day.weekday() == 6:  # 6 = 周日
+            continue
+        out.append(day.isoformat())
+    return out
+
+
+def brief(date: str = "", force: bool = False) -> dict:
+    """某一天的早报。
+
+    端点：GET /openapi/v2/brief?date=YYYY-MM-DD&language=zh
+
+    早报就是站上「我的早报 / 今日精选」那块内容 —— 按天更新的推荐，
+    比 resources 那条精选流新鲜得多。它要登录才能在网页上看，
+    但 OpenAPI 这条路径用 API key 就能读。
+
+    结果按天缓存：同一天只抓一次，且落盘，服务重启不重抓。
+    """
+    now = time.time()
+    if not force and _brief_cache.get("at") and \
+            now - float(_brief_cache["at"]) < _BRIEF_TTL and _brief_cache.get("payload"):
+        return {**_brief_cache["payload"], "cached": True}
+
+    key = api_key()
+    if not key:
+        return {"status": "unconfigured", "items": [], "date": ""}
+
+    for day in ([date] if date else _candidate_dates()):
+        data, error = _get("brief", {"date": day, "language": "zh"})
+        if error:
+            # 配额耗尽（429）时不要继续试后面的日期 —— 试一次就是一次调用。
+            if error in ("quota", "unreachable:HTTPError") or error.startswith("http_"):
+                break
+            continue
+        rows = data if isinstance(data, list) else (
+            (data or {}).get("dataList") or (data or {}).get("list")
+            or (data or {}).get("resources") or []
+        )
+        if not rows:
+            continue
+        items = [_normalise(r) for r in rows if isinstance(r, dict)]
+        items = [i for i in items if i.get("title")]
+        if not items:
+            continue
+        payload = {
+            "status": "ok",
+            "date": day,
+            "items": items,
+            "fetched_at": int(now),
+            "cached": False,
+        }
+        _brief_cache.update({"at": now, "payload": payload})
+        _save_brief_cache()
+        return payload
+
+    # 一天都没拿到。记下时间，免得每次都重试一遍（每次都是好几次调用）。
+    payload = {"status": "empty", "date": "", "items": [], "fetched_at": int(now), "cached": False}
+    _brief_cache.update({"at": now, "payload": payload})
+    _save_brief_cache()
+    return payload
+
+
 def sources(limit: int = 60) -> dict:
     """公共订阅源目录 —— 就是公众号列表。"""
-    data, error = _get("sources", {"language": "zh_CN", "limit": str(limit), "page": "1"})
+    # 同上：language 的有效取值是 zh / en / all。
+    data, error = _get("sources", {"language": "zh", "limit": str(limit), "page": "1"})
     if error:
         return {"status": error, "items": []}
     rows = data if isinstance(data, list) else (

@@ -791,7 +791,19 @@ def _fetch_bestblogs(source: dict) -> tuple[list[dict], str]:
         import bestblogs
     except ImportError:
         return [], "module_missing"
-    result = bestblogs.digest(limit=int(source.get("limit") or 12))
+
+    # 早报优先，拿不到再退回精选流。
+    #
+    # 两者是不同端点、不同更新节奏：
+    #
+    #   /openapi/v2/brief       某一天的早报，按天更新 —— 这才是"今天该读什么"
+    #   /openapi/v2/resources   精选流，按评分排，库存里多数是 2024-2025 的
+    #
+    # 早报只要 1 次调用（一天一版，且落盘），比翻几页精选还省配额，
+    # 内容却新鲜得多。所以它排第一。
+    result = bestblogs.brief()
+    if (result.get("status") or "") != "ok" or not (result.get("items") or []):
+        result = bestblogs.digest(limit=int(source.get("limit") or 12))
     status = result.get("status") or ""
     if status == "unconfigured":
         return [], "no_key"
