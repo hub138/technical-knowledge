@@ -20,7 +20,7 @@ window.TK_SOURCES = {
     {
       key: "reading",
       title: "文章",
-      note: "写完的完整文章。适合从头读到尾，也适合挑一节查。",
+      note: "各家技术团队的成篇长文，讲的是一个系统怎么设计、怎么踩坑。",
       items: [
         {
           key: "bestblogs",
@@ -59,7 +59,7 @@ window.TK_SOURCES = {
     {
       key: "papers",
       title: "论文",
-      note: "论文原文。结论最可靠，但得自己判断值不值得信。",
+      note: "论文原文，直接来自 arXiv 和顶会。看的是方法本身，不是二手解读。",
       items: [
         {
           key: "papernotes",
@@ -115,7 +115,7 @@ window.TK_SOURCES = {
     {
       key: "news",
       title: "资讯",
-      note: "行业动态。用来看方向，不适合当知识记住。",
+      note: "当天发生的事 —— 谁发了什么、哪个方向在动。看趋势用，不用记。",
       items: [
         {
           key: "readhub",

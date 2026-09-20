@@ -458,7 +458,7 @@
   .tk-shell { max-width: 1600px; }
   .src-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 268px;
+    grid-template-columns: minmax(0, 1fr) 300px;
     column-gap: 36px;
     align-items: start;
   }
@@ -509,7 +509,7 @@
     <div class="tk-shell">
       <section class="hero">
         <h1>优质好文</h1>
-        <p>几个值得常看的好文章网站，下面直接列出它们最新的文章，点标题去原站读。</p>
+        <p>这些站点每天产出值得花时间的技术内容。这里按月聚合它们的最新文章，标题、摘要、来源一目了然 —— 不用逐个站点翻。</p>
       </section>
 
       <div class="src-layout">
@@ -853,7 +853,6 @@
         // 完整标题留在 title 属性里，鼠标停一下就能看全。
         if (listParts.length) {
           parts.push(`<section class="src-toc-card">
-            <h3>${esc(tr("文章列表"))}</h3>
             ${listParts.join("")}
           </section>`);
         }

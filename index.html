@@ -12,7 +12,18 @@
 <style>
 *{box-sizing:border-box}body{margin:0;background:var(--color-bg);color:var(--color-ink);font:var(--text-md)/var(--leading-normal) var(--font-sans)}button,input{font:inherit}button{cursor:pointer}.app{display:block;min-height:100vh}.sidebar{background:var(--color-surface);border-right:1px solid var(--color-line);padding:21px 15px;position:sticky;top:0;height:100vh;overflow:auto}.brand{display:flex;align-items:center;gap:11px;padding:0 8px 21px;border-bottom:1px solid var(--color-line)}.mark{width:34px;height:34px;border:1px solid var(--color-accent);border-radius:9px;display:grid;place-items:center;color:var(--color-accent);font-weight:800}.brand strong{display:block;font-size:var(--text-md)}.brand small{display:block;color:var(--color-muted);font-size:var(--text-xs)}.nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:14px 0}.nav-actions button,.nav-section button{border:1px solid transparent;background:transparent;color:var(--color-ink-soft);text-align:left;border-radius:6px;padding:8px 10px}.nav-actions button:hover,.nav-actions button.active,.nav-section button:hover,.nav-section button.active{background:var(--color-accent-soft);border-color:var(--color-accent-line);color:var(--color-accent)}
 .nav-section{border-top:1px solid var(--color-line);padding:12px 0}.nav-section h3{font-size:var(--text-xs);color:var(--color-muted);font-weight:700;margin:2px 9px 6px;text-transform:uppercase;letter-spacing:.08em}.nav-section button{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;font-size:var(--text-h3)}.nav-section button .count{flex:none;padding-top:2px}.count{font-size:var(--text-xs);color:var(--color-muted)}
-.count,.fact-stars,.fact-open,.fact-live,.fact-key,.fact-none{font-variant-numeric:tabular-nums}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:13px 30px;background:var(--color-bg-veil);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);backdrop-filter:blur(10px)}.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--color-line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--color-panel);outline:0}.search input:focus{border-color:var(--color-accent);box-shadow:0 0 0 3px #1a365d1a}.search span{position:absolute;left:13px;top:8px;color:var(--color-muted)}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h2{font-size:var(--text-3xl);line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--color-ink-soft);margin:0}.hero-promise{max-width:760px;color:var(--color-ink-soft);margin:6px 0 0;font-size:var(--text-base)}
+.count,.fact-stars,.fact-open,.fact-live,.fact-key,.fact-none{font-variant-numeric:tabular-nums}.main{min-width:0}.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:13px 30px;background:var(--color-bg-veil);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);backdrop-filter:blur(10px)}.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}.search{flex:1;position:relative}.search input{width:100%;border:1px solid var(--color-line);border-radius:7px;padding:10px 13px 10px 35px;background:var(--color-panel);outline:0}.search input:focus{border-color:var(--color-accent);box-shadow:0 0 0 3px #1a365d1a}/* 搜索图标用 flex 居中，不写死 top。
+ *
+ * 原来用 position:absolute + top:8px/9px，而那个字形（⌕）在它的行盒里
+ * 本身是偏下的 —— 于是图标看起来坐在输入框偏下的位置，怎么调 top 都对不齐。
+ * 改成绝对定位 + inset 上下拉满 + flex 居中：居中的是**盒子的中线**，
+ * 不依赖字形基线，换任何图标都不会歪。
+ */
+.search span{
+  position:absolute;left:13px;top:0;bottom:0;
+  display:flex;align-items:center;
+  color:var(--color-muted);pointer-events:none;
+}.hero{display:flex;justify-content:space-between;gap:30px;align-items:flex-end;margin-bottom:27px}.hero h1{font-size:var(--text-3xl);line-height:1.25;margin:0 0 7px}.hero p{max-width:760px;color:var(--color-ink-soft);margin:0}.hero-promise{max-width:760px;color:var(--color-ink-soft);margin:6px 0 0;font-size:var(--text-base)}
 .hero-promise b{
   display:inline-block;margin:3px 6px 0 0;padding:2px 9px;font-weight:var(--weight-medium);
   border:1px solid var(--color-line);border-radius:var(--radius-xs);
@@ -527,7 +538,7 @@
    选择器带 .shell 是为了压过文件后面定义的同名基础规则。 */
 body .kbd-hint{display:none}}
 /* 打印：去掉所有悬浮件和导航，只留文章本身 */
-@media print{.tk-sidebar,.topbar,.kbd-hint,.tk-fab,.tk-fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:var(--color-panel)}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}@media(max-width:1100px){.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}/* 侧边栏本身在 base.css 里变成顶部横条。域树在主站是第二层导航，手机上收进「目录」后面，免得把首屏挤满。 */.tk-mobile-menu{display:block;border:1px solid var(--color-line);background:var(--color-panel);border-radius:6px;padding:6px 9px;color:var(--color-accent)}#tk-sidebar.collapsed #domains{display:none}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.hero{display:block}.hero h2{font-size:var(--text-2xl)}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:var(--text-2xl)}}
+@media print{.tk-sidebar,.topbar,.kbd-hint,.tk-fab,.tk-fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:var(--color-panel)}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}@media(max-width:1100px){.entry-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}/* 侧边栏本身在 base.css 里变成顶部横条。域树在主站是第二层导航，手机上收进「目录」后面，免得把首屏挤满。 */.tk-mobile-menu{display:block;border:1px solid var(--color-line);background:var(--color-panel);border-radius:6px;padding:6px 9px;color:var(--color-accent)}#tk-sidebar.collapsed #domains{display:none}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.hero{display:block}.hero h1{font-size:var(--text-2xl)}.hero-meta{margin-top:11px}.domain-grid,.entry-grid{grid-template-columns:1fr}.directory-head,.graph-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2,.graph-head h2{font-size:var(--text-2xl)}}
 
 body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leading-normal)}
 
@@ -568,11 +579,26 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .topbar h1{font-size:var(--text-md);font-weight:var(--weight-semibold);color:var(--color-muted)}
 .search{max-width:880px}
 .search input{height:44px;border-radius:7px;padding-left:38px;box-shadow:0 1px 2px rgba(20,42,35,.02)}
-.search span{top:9px;font-size:var(--text-lg)}
+.search span{font-size:var(--text-lg)}
 .content{padding:42px calc(40px + var(--float-lane)) calc(var(--float-lane) + 48px) 40px;max-width:1320px;margin:0 auto;width:100%}
 /* The page head itself is defined once in base.css (it is shared with every
    companion page). Only the parts unique to this page live here. */
-.hero{align-items:flex-end;margin:0 0 30px;padding:0 0 30px}
+/* 首页的 hero 不再自带一套间距。
+ *
+ * 这里原来写着 `.hero{margin:0 0 30px;padding:0 0 30px}` —— 覆盖了
+ * base.css 里那个统一的 26/18。结果首页标题距顶 0、其它页距顶 26，
+ * 同一个组件在两个地方差 26px 的留白，页面之间切换时会跳。
+ *
+ * 只保留这一页独有的部分：hero 右侧的信息条（.hero-meta），
+ * 以及 flex 的对齐方式。间距交给 base.css。 */
+/* 首页的根容器是 .app（不是 .tk-shell），所以 base.css 里
+ * `.tk-shell .hero:first-child` 那条拿不到 —— hero 的上下留白会是 0。
+ * 这里补上同一组值，并且**只补间距**：字号、字重、下划线都来自 base.css
+ * 或上面那条共享规则。
+ *
+ * 值和 base.css 保持一致（26/18）。改一处要改两处是这个结构的代价 ——
+ * 更彻底的做法是把首页也换成 .tk-shell，那是结构改造，另说。 */
+.hero{align-items:flex-end;padding:26px 0 18px;margin:0}
 .hero-meta{padding:6px 11px;background:var(--color-surface);border:1px solid var(--color-line);border-radius:20px;color:var(--color-muted);font-size:var(--text-small);font-variant-numeric:tabular-nums;white-space:nowrap}
 
 .section{margin-top:34px}.section h2{font-size:var(--text-xl)}.section>p{margin-bottom:17px}
@@ -616,7 +642,7 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .visual-tabs button{padding:7px 11px}
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
 @media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}.content{padding-left:28px;padding-right:calc(28px + var(--float-lane))}}
-@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:var(--color-bg-veil)}.content{padding:26px calc(15px + var(--float-lane)) calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding-bottom:22px}.hero h2{font-size:var(--text-3xl)}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
+@media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:var(--color-bg-veil)}.content{padding:26px calc(15px + var(--float-lane)) calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding-bottom:22px}.hero h1{font-size:var(--text-3xl)}.hero-meta{display:inline-block;margin-top:13px}.domain-grid,.entry-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.entry,.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.graph-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.visual-tabs{margin-top:13px;overflow-x:auto;flex-wrap:nowrap;padding-bottom:3px}.visual-tabs button{white-space:nowrap}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
 /* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
 .app-alert{position:fixed;right:22px;bottom:22px;z-index:var(--z-fab);max-width:min(420px,calc(100vw - 30px));padding:11px 14px;border:1px solid #e8c6a8;border-left:3px solid var(--color-warm);border-radius:7px;background:#fff9f2;color:#704823;box-shadow:0 12px 30px rgba(35,45,40,.14);font-size:var(--text-base);display:none}
 .app-alert.open{display:block}
@@ -1110,7 +1136,7 @@ function homeQuotes(){
     <ul class="claim-list claim-list--tight">${list}</ul>`;
 }
 
-function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const sourceCount=state.notes.reduce((n,x)=>n+((x.sources||[]).length),0);const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero hero--display"><div><h2>把技术原理读到能上手用</h2><p><span>工程知识，覆盖 AI 系统、后端、数据、系统性能与软件构建。</span></p>
+function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'),knowledgeCount=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings').length;const sourceCount=state.notes.reduce((n,x)=>n+((x.sources||[]).length),0);const descriptions={'AI系统':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测。','后端与分布式系统':'请求、并发、消息、复制、一致性、故障恢复和基础设施。','数据系统':'建模、SQL、事务、索引、CDC、流处理、治理和恢复。','计算机系统与性能':'进程、CPU、GPU、内存、I/O、网络、观测和容量。','软件构建与质量':'架构、语言运行时、依赖、测试、CI/CD、发布和调试。'};$('#home').innerHTML=`<section class="hero hero--display"><div><h1>把技术原理读到能上手用</h1><p><span>工程知识，覆盖 AI 系统、后端、数据、系统性能与软件构建。</span></p>
       <p class="hero-promise">每篇讲清三件事：<b>思路从哪来</b><b>机制怎么跑</b><b>什么时候别用</b></p></div><div class="hero-meta">${knowledgeCount} 篇 · ${sourceCount} 条来源</div></section><section class="claim-row"><section class="claim"><p class="claim-lead">看完能判断：这东西适不适合你</p><p class="claim-sub">工程知识讲的是：一个机制怎么运作、代价在哪、什么人该用。读完能自己判断适不适合手上的活。</p><ul class="claim-list"><li><b>它为什么出现</b><i>——</i><span>之前卡在哪，没它的时候怎么办</span></li><li><b>它怎么运作</b><i>——</i><span>机制是什么，关键那一步发生了什么</span></li><li><b>思路怎么来的</b><i>——</i><span>为什么这样设计，换了什么假设</span></li><li><b>什么时候不该用它</b><i>——</i><span>代价是什么，边界在哪</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱 →</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间排。Agent 相关的内容归在 AI 系统下，和上下文、检索、质量放在一起。</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="打开 ${esc(d)}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${state.notes.filter(n=>n.category===d&&n.topic!=='归档').length} 篇 →</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>评估与工程</h2><p>自研的评估项目回答"到底有没有变好"；开源的工程流程提供能直接照做的做法。</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>自研 Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">自研 · 原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试</span></div><div class="io-row"><b>产出</b><span>当前是设计契约与静态原型；真实执行、Trace 接入和证据投影待开发</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看自研项目</a><a href="/?path=${encodeURIComponent('工程知识/AI系统/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>需求对齐、研究、规格、TDD、代码审查和架构改进</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>架构图和源码用来查清一个东西和其它东西的关系：它依赖什么、被谁依赖。需要的时候打开，不需要就跳过。</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图。</p><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法。</p><a href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口 →</a></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识。</p><a href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史 ↗</a><a href="/learn/history">查看收录方式 →</a></article></div></section><div class="notice">想先看懂一个领域，从下面的卡片进去。想动手练，用学习工具。想知道系统到底有没有变好，看 Agent 评估。</div>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});renderAtlas();applyHomeStatus();retranslate();loadDigest()}
 function bindSourceToggle(){
   const btn=document.querySelector('.source-toggle');
@@ -1766,295 +1792,5 @@ window.renderMermaid=async function(){
 };
 </script>
 
-<script>
-(function(){
-  function label(el){
-    var cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/)[0] : '';
-    return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
-  }
 
-  var out = {};
-
-
-  /* Measure only once the sidebar exists.
-     --dump-dom snapshots after parsing, which is before the sidebar's
-     DOMContentLoaded handler builds the nav. Taking the numbers synchronously
-     records the skeleton — the first run of this script reported "0 nav" on
-     eight pages and called them clean. So the wait comes first and the
-     measurement happens inside it. */
-  var waited = 0;
-  (function settle(){
-    var hasNav = document.querySelectorAll('.tk-nav a').length > 0;
-    var hasSidebar = !!document.querySelector('.tk-sidebar');
-    var exhausted = waited > 120;
-    if((hasNav || (!hasSidebar && exhausted)) && waited > 2){ done(); return; }
-    if(exhausted){ done(); return; }
-    waited++;
-    setTimeout(settle, 40);
-  })();
-
-  function done(){ document.title = '@@' + JSON.stringify(measure()); }
-
-  function measure(){
-    var out = {};
-  /* 1. No horizontal overflow. Elements inside a deliberate scroller — a wide
-        table, the mobile nav strip — are excluded: they are meant to scroll. */
-  var offenders = [];
-  document.querySelectorAll('*').forEach(function(el){
-    var r = el.getBoundingClientRect();
-    if(r.width < 1 || r.right <= innerWidth + 1) return;
-    var n = el.parentElement, inScroller = false;
-    while(n){
-      var s = getComputedStyle(n);
-      if(s.overflowX === 'auto' || s.overflowX === 'scroll'){ inScroller = true; break; }
-      n = n.parentElement;
-    }
-    if(!inScroller) offenders.push(label(el));
-  });
-  out.overflow = {
-    docScrollWidth: document.documentElement.scrollWidth,
-    innerWidth: innerWidth,
-    offenders: Array.from(new Set(offenders)).slice(0, 6)
-  };
-
-  /* 2. The floating feedback button must not sit on text a reader needs. */
-  var fab = document.querySelector('.tk-fab');
-  var covered = [];
-  if(fab){
-    var fr = fab.getBoundingClientRect();
-    document.querySelectorAll('*').forEach(function(el){
-      if(el === fab || fab.contains(el)) return;
-      if(el.querySelector && el.querySelector('.tk-fab')) return;
-      var b = el.getBoundingClientRect();
-      if(b.width < 8 || b.height < 8) return;
-      if(b.right < fr.left || b.left > fr.right || b.bottom < fr.top || b.top > fr.bottom) return;
-      var st = getComputedStyle(el);
-      if(st.visibility === 'hidden' || st.display === 'none' || +st.opacity < 0.1) return;
-      var ownText = [].some.call(el.childNodes, function(n){
-        return n.nodeType === 3 && n.textContent.trim();
-      });
-      if(ownText) covered.push(label(el));
-    });
-  }
-  out.fabCovers = fab ? Array.from(new Set(covered)).slice(0, 6) : null;
-
-  /* 3. The floating controls must not overlap each other. */
-  var boxes = [];
-  [['fab', '.tk-fab'], ['theme', '.tk-theme-toggle'],
-   ['kbd', '#kbd-hint'], ['lang', '.tk-lang-toggle']].forEach(function(pair){
-    var el = document.querySelector(pair[1]);
-    if(!el) return;
-    var r = el.getBoundingClientRect();
-    if(r.width < 1) return;
-    boxes.push({name: pair[0], x: r.x, y: r.y, w: r.width, h: r.height});
-  });
-  var clashes = [];
-  for(var i = 0; i < boxes.length; i++){
-    for(var j = i + 1; j < boxes.length; j++){
-      var a = boxes[i], b = boxes[j];
-      var overlap = !(a.x + a.w <= b.x || b.x + b.w <= a.x ||
-                      a.y + a.h <= b.y || b.y + b.h <= a.y);
-      if(overlap) clashes.push(a.name + '+' + b.name);
-    }
-  }
-  out.controlClashes = clashes;
-
-  /* 4. The sidebar must be where the page expects it. */
-  var sb = document.querySelector('.tk-sidebar');
-  if(sb){
-    var sr = sb.getBoundingClientRect();
-    out.sidebar = {
-      position: getComputedStyle(sb).position,
-      x: Math.round(sr.x),
-      width: Math.round(sr.width),
-      navItems: document.querySelectorAll('.tk-nav a').length
-    };
-  } else {
-    out.sidebar = null;
-  }
-
-  /* 5. The nav must be complete on the first paint, not grown afterwards.
-        A bar that reads four items and then five is the flicker this checks. */
-  out.navItems = document.querySelectorAll('.tk-nav a').length;
-
-  /* 6. Text clipped by a fixed-height ancestor. */
-  var clipped = [];
-  document.querySelectorAll('*').forEach(function(el){
-    var st = getComputedStyle(el);
-    if(st.overflowY === 'auto' || st.overflowY === 'scroll' || st.overflowY === 'visible') return;
-    if(el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 4) clipped.push(label(el));
-  });
-  out.clipped = Array.from(new Set(clipped)).slice(0, 6);
-
-    return out;
-  }
-})();
-</script>
-
-<script>
-(function(){
-  function label(el){
-    var cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/)[0] : '';
-    return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
-  }
-
-  var out = {};
-
-
-  /* Measure only once the sidebar exists.
-     --dump-dom snapshots after parsing, which is before the sidebar's
-     DOMContentLoaded handler builds the nav. Taking the numbers synchronously
-     records the skeleton — the first run of this script reported "0 nav" on
-     eight pages and called them clean. So the wait comes first and the
-     measurement happens inside it. */
-  var waited = 0;
-  (function settle(){
-    var hasNav = document.querySelectorAll('.tk-nav a').length > 0;
-    var hasSidebar = !!document.querySelector('.tk-sidebar');
-    var exhausted = waited > 120;
-    if((hasNav || (!hasSidebar && exhausted)) && waited > 2){ done(); return; }
-    if(exhausted){ done(); return; }
-    waited++;
-    setTimeout(settle, 40);
-  })();
-
-  function done(){ document.title = '@@' + JSON.stringify(measure()); }
-
-  function measure(){
-    var out = {};
-  /* 1. No horizontal overflow. Elements inside a deliberate scroller — a wide
-        table, the mobile nav strip — are excluded: they are meant to scroll. */
-  var offenders = [];
-  document.querySelectorAll('*').forEach(function(el){
-    var r = el.getBoundingClientRect();
-    if(r.width < 1 || r.right <= innerWidth + 1) return;
-    var n = el.parentElement, inScroller = false;
-    while(n){
-      var s = getComputedStyle(n);
-      if(s.overflowX === 'auto' || s.overflowX === 'scroll'){ inScroller = true; break; }
-      n = n.parentElement;
-    }
-    if(!inScroller) offenders.push(label(el));
-  });
-  out.overflow = {
-    docScrollWidth: document.documentElement.scrollWidth,
-    innerWidth: innerWidth,
-    offenders: Array.from(new Set(offenders)).slice(0, 6)
-  };
-
-  /* 2. The floating feedback button must not sit on text a reader needs.
-   *
-   * 只看**当前视口里真的可见**的元素。
-   *
-   * getBoundingClientRect 给的是元素在它滚动容器里的位置 —— 横向滚动列表
-   * 里被划到屏幕外的卡片，矩形仍然算在那条轨道上（实测 x=5376），于是
-   * 检测说"按钮压住了卡片标题"，而屏幕上根本没有那张卡片。
-   * 这不是布局问题，是检测没有把滚动偏移算进来。
-   *
-   * 判据换成：元素的矩形要落在视口内，而且没有被祖先的横向滚动推到外面。
-   */
-  var fab = document.querySelector('.tk-fab');
-  var covered = [];
-  if(fab){
-    var fr = fab.getBoundingClientRect();
-    document.querySelectorAll('*').forEach(function(el){
-      if(el === fab || fab.contains(el)) return;
-      if(el.querySelector && el.querySelector('.tk-fab')) return;
-      var b = el.getBoundingClientRect();
-      if(b.width < 8 || b.height < 8) return;
-      // 只算视口内的：滑到屏幕外的内容不构成遮挡。
-      if(b.right <= 0 || b.left >= innerWidth) return;
-      if(b.bottom <= 0 || b.top >= innerHeight) return;
-      if(b.right < fr.left || b.left > fr.right || b.bottom < fr.top || b.top > fr.bottom) return;
-      var st = getComputedStyle(el);
-      if(st.visibility === 'hidden' || st.display === 'none' || +st.opacity < 0.1) return;
-      /* 横向滚动容器里的元素不算 —— 它们在被划到之前不在屏幕上。
-       *
-       * 一个横向滚动的轨道，未滚到的卡片矩形落在轨道右侧（实测 x=5376），
-       * 恰好经过浮动按钮那块区域，于是被报成"按钮压住标题"。但读者
-       * 看不到那张卡片，也点不到它 —— 它不是遮挡。
-       *
-       * 反过来说：真正要防的是**静止内容**被压住，比如正文、表格、
-       * 纵向列表。那些不在滚动容器里，这条排除不影响它们被检测到。 */
-      var n = el.parentElement, inScroller = false;
-      while(n){
-        var ps = getComputedStyle(n);
-        if(ps.overflowX === 'auto' || ps.overflowX === 'scroll'){ inScroller = true; break; }
-        n = n.parentElement;
-      }
-      if(inScroller) return;
-      var ownText = [].some.call(el.childNodes, function(n){
-        return n.nodeType === 3 && n.textContent.trim();
-      });
-      if(ownText) covered.push(label(el));
-    });
-  }
-  out.fabCovers = fab ? Array.from(new Set(covered)).slice(0, 6) : null;
-
-  /* 3. The floating controls must not overlap each other. */
-  var boxes = [];
-  [['fab', '.tk-fab'], ['theme', '.tk-theme-toggle'],
-   ['kbd', '#kbd-hint'], ['lang', '.tk-lang-toggle']].forEach(function(pair){
-    var el = document.querySelector(pair[1]);
-    if(!el) return;
-    var r = el.getBoundingClientRect();
-    if(r.width < 1) return;
-    boxes.push({name: pair[0], x: r.x, y: r.y, w: r.width, h: r.height});
-  });
-  var clashes = [];
-  for(var i = 0; i < boxes.length; i++){
-    for(var j = i + 1; j < boxes.length; j++){
-      var a = boxes[i], b = boxes[j];
-      var overlap = !(a.x + a.w <= b.x || b.x + b.w <= a.x ||
-                      a.y + a.h <= b.y || b.y + b.h <= a.y);
-      if(overlap) clashes.push(a.name + '+' + b.name);
-    }
-  }
-  out.controlClashes = clashes;
-
-  /* 4. The sidebar must be where the page expects it. */
-  var sb = document.querySelector('.tk-sidebar');
-  if(sb){
-    var sr = sb.getBoundingClientRect();
-    out.sidebar = {
-      position: getComputedStyle(sb).position,
-      x: Math.round(sr.x),
-      width: Math.round(sr.width),
-      navItems: document.querySelectorAll('.tk-nav a').length
-    };
-  } else {
-    out.sidebar = null;
-  }
-
-  /* 5. The nav must be complete on the first paint, not grown afterwards.
-        A bar that reads four items and then five is the flicker this checks. */
-  out.navItems = document.querySelectorAll('.tk-nav a').length;
-
-  /* 6. Text clipped by a fixed-height ancestor. */
-  var clipped = [];
-  document.querySelectorAll('*').forEach(function(el){
-    var st = getComputedStyle(el);
-    if(st.overflowY === 'auto' || st.overflowY === 'scroll' || st.overflowY === 'visible') return;
-    /* 多行截断（-webkit-line-clamp）是有意的排版：摘要限定两行，
-       超出部分隐去。它必然让 scrollHeight 大于 clientHeight，但这
-       不是缺陷 —— 是设计。用 data-clamp 显式声明，审计跳过。
-       这个属性同时也是一份记录：写明"这里是有意截断的"，
-       避免后来者以为是 bug 去修。 */
-    if(el.hasAttribute('data-clamp')) return;
-    /* object-fit: cover 同理 —— 封面图按容器比例裁切是有意的，
-       必然让图片的固有尺寸和显示盒不一致。用 data-crop 声明。 */
-    if(el.hasAttribute('data-crop')) return;
-    /* KaTeX 会给每个公式额外输出一份 MathML —— 那是给屏幕阅读器和
-       复制粘贴用的，kaTEX 自己的 CSS 就把它 clip 成 1×1 并绝对定位。
-       它必然"溢出"（内容比 1px 的盒子大得多），但那是标准做法，
-       不是排版问题。按类名跳过：这个类由 KaTeX 生成，没法给它加属性。 */
-    if(el.classList.contains('katex-mathml')) return;
-    if(el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 4) clipped.push(label(el));
-  });
-  out.clipped = Array.from(new Set(clipped)).slice(0, 6);
-
-    return out;
-  }
-})();
-</script>
 </body></html>

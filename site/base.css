@@ -398,7 +398,16 @@ body.tk-host::before {
   padding-bottom: calc(96px + 40px);
 }
 
-.tk-shell > .hero:first-child {
+/* hero 的间距不按"shell 的直接子元素"来判定。
+ *
+ * 原来写的是 `.tk-shell > .hero:first-child` —— 直接子选择器。首页和
+ * 优质好文页的 hero 是 shell 的直接子元素，拿到了 26/18 的内边距；
+ * 论文页的 hero 包在 .tl-main 里（那页是两栏布局），匹配不上，
+ * 于是标题一路顶到 21px，而别的页是 47px。
+ *
+ * 同一个组件在两页差了 26px 的留白，就是这样来的：样式跟着 DOM 结构
+ * 而不是组件本身走。改成后代选择器，hero 到哪都长一样。 */
+.tk-shell .hero:first-child {
   margin: 0;
   /* 42/28 → 26/18。实测 hero 高 277px 里，上下 padding 70px + 内部两个
      间隔 49px = 119px 是纯空白，占了 43%。标题、说明、按钮三块内容
@@ -412,7 +421,7 @@ body.tk-host::before {
    rule in a printed book does. A rule that spans the full width reads as a
    table border; one that stops reads as a decision. Implemented as a background
    gradient rather than a border so the gap is on the right only. */
-.tk-shell > .hero:first-child {
+.tk-shell .hero:first-child {
   border-bottom: 0;
   background-image: linear-gradient(to right, var(--ink-rule) 0, var(--ink-rule) calc(100% - var(--rule-gutter)), transparent calc(100% - var(--rule-gutter)));
   background-repeat: no-repeat;
@@ -712,7 +721,19 @@ body.tk-host button {
   padding: 0 11px;
   border: 1px solid var(--color-line);
   border-radius: 10px;
-  background: var(--color-panel);
+  /* 控件自带一层"玻璃"底，不依赖底下是不是顶栏。
+   *
+   * 首页有 69px 的粘性顶栏（半透明白 + 模糊），控件落在它上面；
+   * /sources、/papers 这些没有顶栏，控件直接浮在正文上 —— 同一组控件、
+   * 同一个边框，在两处的观感却不同：有衬底的显得是"浮起的控件"，
+   * 没衬底的像一块贴在字上的方块。
+   *
+   * 给它自己加半透明底 + 模糊，两处就一样了。不透明底不行 —— 那会挡住
+   * 底下滚过的内容，反而更糟。 */
+  background: color-mix(in srgb, var(--color-panel) 82%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.04);
   color: var(--color-muted);
   font-size: 14px;
   line-height: 1;
@@ -1055,7 +1076,7 @@ body.tk-host button {
     padding: var(--space-4) calc(var(--space-4) + var(--float-lane)) calc(var(--float-lane) + var(--space-8)) var(--space-4);
   }
 
-  .tk-shell > .hero:first-child { padding: 30px 0 23px; }
+  .tk-shell .hero:first-child { padding: 30px 0 23px; }
   /* 只有首页的主张句在手机上要单独收一档。其余页面走 --text-3xl，
      它在小屏本来就够小（clamp 的下界 26px），不用再覆盖。 */
   .hero--display h1 { font-size: 29px; line-height: 1.22; }

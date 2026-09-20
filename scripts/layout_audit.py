@@ -240,7 +240,24 @@ def sample(url: str, width: int, target: Path | None = None) -> dict | None:
     if target is not None:
         original = target.read_text(encoding="utf-8")
         restore = (target, original)
-        target.write_text(original.replace("</body>", PROBE + "</body>", 1), encoding="utf-8")
+        # 注入前先摘掉上一次可能残留的探针。
+        #
+        # 原来直接 replace("</body>", PROBE + "</body>") —— 如果上一次运行
+        # 崩溃或被中断，文件里已经有一份探针；这次再注入就变成两份，
+        # 而恢复时写回的是"两份"的那个版本，于是**残留会累积**。
+        # 实测 index.html 里积了两份、共 10871 字符的探测代码，一直在
+        # 每个访客的浏览器里跑。
+        #
+        # 现在：先按标记清干净，再注入一份。注入和恢复都是幂等的。
+        cleaned = re.sub(
+            r"<script>\s*\n?\(function\(\)\{\s*\n?\s*function label\(el\).*?</script>",
+            "", original, flags=re.S,
+        )
+        seeded = cleaned.replace("</body>", PROBE + "</body>", 1)
+        if seeded == cleaned:
+            # 没有 </body> 就注不进去 —— 说出来，别静默地什么都没测。
+            print(f"警告: {target} 里没有 </body>，探针注入失败", file=sys.stderr)
+        target.write_text(seeded, encoding="utf-8")
 
     try:
         with tempfile.TemporaryDirectory() as profile:
