@@ -375,6 +375,11 @@
     "时间线": { en: "Timeline" },
     "正在读取…": { en: "Loading…" },
     "优质好文": { en: "Good reads" },
+    // 首页那两栏的标题。词典按整串匹配，新短语要各自列一条，
+    // 否则英文界面下会原样显示中文。
+    "看完能判断：这东西适不适合你": { en: "See whether it fits what you're building" },
+    "不用读完论文，也知道它值不值得读": { en: "Whether a paper is worth reading, without the read" },
+    "每篇讲清三件事：": { en: "Three things, on every one:" },
     // 首页那块横滑区的标题。词典是整串匹配的，所以要单独列一条 ——
     // 只写「优质好文」的话，「每日优质好文」整串查不到，英文界面下会
     // 原样显示中文。
