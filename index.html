@@ -124,7 +124,31 @@
   background:linear-gradient(to right, transparent, var(--color-bg));
 }
 .digest-fade[hidden]{display:none}
+/* 「去 BestBlogs 看今天的早报」入口。
+ *
+ * 这块内容是 BestBlogs 的，读者想看的更多（今天完整的早报、按自己关注源
+ * 的推荐）只能去原站。没有这个入口，这 12 张卡就是死路 —— 点进去是单篇，
+ * 出不来。
+ *
+ * 位置在标题行右侧、箭头按钮左边：它和箭头同属"这块区域的操作"，
+ * 但不抢箭头的位 —— 箭头是翻这一行，它是离开这一页。
+ */
+/* 两个出口，右对齐，站外的排最后。
+ *
+ * 一块内容通常有两个"出去"的方向：站内看全部来源，站外去原始站看今天
+ * 完整的早报。两个都写成链接、并列靠右，读者一眼分清去向；挤在标题旁边
+ * 会让人以为它们都是这块的翻页操作。
+ *
+ * 站外的那个用 ↗ —— 那是"会离开这个站"的通用标记。 */
+.digest-origin{
+  color:var(--color-accent);font-size:var(--text-small);
+  font-weight:var(--weight-semibold);text-decoration:none;white-space:nowrap;
+}
+.digest-origin:hover{text-decoration:underline}
+/* 箭头紧跟标题和说明 —— 它是"翻这一行"的操作，作用范围就是紧挨着的卡片，
+   所以位置要贴着这块内容，不要推到屏幕最右边。 */
 .digest-nav{display:flex;gap:4px;margin-left:auto}
+.digest-all{font-size:var(--text-small)}
 .digest-arrow{
   width:28px;height:28px;display:grid;place-items:center;
   border:1px solid var(--color-line);border-radius:var(--radius-xs);
@@ -815,6 +839,7 @@ function renderDigest(items, status) {
       box.innerHTML = `<div class="digest-head">
         <h2>近三天优质好文</h2>
         <span class="digest-note">配好 BestBlogs 的 API Key 后，这里会列出它最近三天的早报</span>
+        <a class="digest-origin" href="https://www.bestblogs.dev/reading/brief" target="_blank" rel="noopener noreferrer">先去 BestBlogs 看看 ↗</a>
       </div>
       <p class="digest-setup">
         去 bestblogs.dev 的「设置 → API Key」生成一个，存到
@@ -854,14 +879,22 @@ function renderDigest(items, status) {
       </span>
     </a>`;
   }).join('');
+  // 说明里给出真实的条数和覆盖的日期范围。
+  //
+  // 之前只写"滚动三天"，读者会以为这里只有三条（或者三天各一条）。
+  // 实际是按 id 去重、按发布时间卡窗后剩下的那些 —— 报出条数和日期，
+  // "为什么只有这么几条"就不用猜了。
+  const dayCount = new Set(items.map((i) => String(i.published || "").slice(0, 10))).size;
+  const facts = `${items.length} 篇 · ${dayCount} 天`;
   box.innerHTML = `<div class="digest-head">
       <h2>近三天优质好文</h2>
-      <span class="digest-note">BestBlogs 早报，滚动三天</span>
+      <span class="digest-note">BestBlogs 人工精审 + 评分排序 · ${esc(facts)}</span>
       <span class="digest-nav">
         <button type="button" class="digest-arrow" data-dir="-1" aria-label="往前">‹</button>
         <button type="button" class="digest-arrow" data-dir="1" aria-label="往后">›</button>
       </span>
-      <a class="digest-all" href="/sources">全部 →</a>
+      <a class="digest-all" href="/sources">全部来源 →</a>
+      <a class="digest-origin" href="https://www.bestblogs.dev/reading/brief" target="_blank" rel="noopener noreferrer">BestBlogs 今日早报 ↗</a>
     </div>
     <div class="digest-viewport">
       <div class="digest-row">${cards}</div>
@@ -905,7 +938,12 @@ async function loadDigest() {
   const box = $('#home-digest');
   if (!box) return;
   try {
-    const response = await fetch('/api/digest?limit=12', { cache: 'no-store' });
+    // 取全部（服务端按天交错后最多几十条）。
+    //
+    // 原来是 12 —— 横滑区只放 12 个位置，导致实际有 22 篇时后面 10 篇
+    // 读者永远看不到，而说明里写着"22 篇"。现在把全部取回来，
+    // 横滑本来就能划到底。
+    const response = await fetch('/api/digest?limit=60', { cache: 'no-store' });
     if (!response.ok) throw new Error('unavailable');
     digestCache = await response.json();
   } catch {
