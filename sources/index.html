@@ -56,21 +56,10 @@
         font-size: var(--text-h2);
         font-weight: var(--weight-bold);
       }
-      .src-group-count {
-        order: 3;
-        padding: 2px 9px;
-        border-radius: var(--radius-xs);
-        background: var(--color-surface);
-        color: var(--color-ink-soft);
-        font-size: var(--text-small);
-        font-weight: var(--weight-medium);
-      }
       /* 标题后面不再拉一条横线过去。
          一屏里原本有四五种线：分组标题的下划线、卡片的边框、目录的分隔线、
          每条 feed 的 border-top —— 线太多反而看不出层级。改为只靠留白和
          字号分区，这也是参考站的做法。 */
-      /* 计数的样式移到 .src-group-count（上面）。原来靠 `h2 span` 命中，
-         现在标题外面多了一层 .src-group-head，选择器要跟着改。 */
       /* 站名 → 说明 → 卡片，是一个连续的阅读序列：先看到"这是什么"，
          再看"最近有什么"。所以三者之间用同一档间距（10-12px），
          不用 16px 那种跨层次的间隔。 */
@@ -205,9 +194,7 @@
         color: var(--color-on-accent);
         font-weight: var(--weight-semibold);
       }
-      .src-rich-chip b { color: var(--color-muted); font-weight: var(--weight-normal); font-variant-numeric: tabular-nums; }
-      .src-rich-chip[aria-pressed="true"] b { color: var(--color-on-accent); opacity: 0.85; }
-
+            
       .src-rich { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); align-items: stretch; }
       @media (max-width: 1100px) { .src-rich { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
       @media (max-width: 700px) { .src-rich { grid-template-columns: minmax(0, 1fr); } }
@@ -368,7 +355,123 @@
       /* 单列。原来右侧挂了一个目录，但它列的分类和站名在正文里
          （分类标题 + 每张卡片的站名）已经各出现一次 —— 同一个清单
          在屏幕上一份、右边又一份，看着像两套导航。删掉。 */
-      .src-layout { display: block; }
+      /* 窄屏单栏（目录藏在下面没有意义，所以不显示）；
+   宽屏变两栏，目录钉在右侧。
+   断点 1180px 和全站一致 —— 这一页的卡片网格也是这个宽度换列数。 */
+      /* 右侧信息栏。
+       *
+       * 定位不是"文章标题的索引树"—— 那是第一版，73 条长标题堆成一列，
+       * 又长又难扫。参考 arxivdaily 和 BestBlogs 的右栏：那边放的是
+       * **信息**（今日热点、热门订阅），读者扫一眼就想点。
+       *
+       * 这里两块，各带浅底卡片，不飘在空白里：
+       *   来源速览   几个站、各多少篇，整行可点跳过去
+       *   分类列表   按大类折叠，文章标题一行一条
+       */
+      .src-toc { display: grid; gap: 14px; align-content: start; }
+      .src-toc-card {
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-sm);
+        background: var(--color-panel);
+        padding: 12px 13px 13px;
+      }
+      .src-toc-card > h3 {
+        margin: 0 0 9px; padding: 0 0 8px;
+        border-bottom: 1px solid var(--color-line);
+        color: var(--color-muted);
+        font-size: var(--text-xs); font-weight: var(--weight-bold);
+        letter-spacing: 0.05em;
+      }
+      /* 来源速览：圆点 + 站名 + 条数，整行可点。 */
+      .src-toc-sites { margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; }
+      .src-toc-sites a {
+        display: flex; align-items: center; gap: 8px;
+        padding: 5px 6px; border-radius: var(--radius-xs);
+        color: var(--color-ink-soft); text-decoration: none; line-height: 1.45;
+      }
+      .src-toc-sites a:hover { background: var(--color-accent-soft); color: var(--color-accent); }
+      .src-toc-dot {
+        flex: none; width: 5px; height: 5px; border-radius: 50%;
+        background: var(--color-accent-line);
+      }
+      .src-toc-sites a:hover .src-toc-dot { background: var(--color-accent); }
+      .src-toc-name {
+        flex: 1; min-width: 0;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .src-toc-num {
+        flex: none; color: var(--color-faint);
+        font-size: var(--text-2xs); font-variant-numeric: tabular-nums;
+      }
+      /* 分类折叠：一行文字 + 细箭头。第一版做成了带边框的方块按钮，
+         视觉重量比它承载的信息大得多 —— 一个折叠开关不该看起来像个主按钮。 */
+      .src-toc-group { border: 0; margin: 0; padding: 0; background: none; }
+      .src-toc-group + .src-toc-group { margin-top: 3px; }
+      .src-toc-toggle {
+        display: flex; align-items: center; gap: 5px;
+        width: 100%; padding: 4px 2px;
+        border: 0; background: none; cursor: pointer; text-align: left;
+        color: var(--color-ink);
+        font-size: var(--text-small); font-weight: var(--weight-semibold);
+        font-family: inherit;
+      }
+      .src-toc-toggle:hover { color: var(--color-accent); }
+      .src-toc-caret {
+        flex: none; color: var(--color-faint); font-size: 9px;
+        transition: transform var(--duration-fast) var(--ease-out);
+      }
+      .src-toc-group[data-open="false"] .src-toc-caret { transform: rotate(-90deg); }
+      .src-toc-group[data-open="false"] .src-toc-body { display: none; }
+      /* 文章条目：圆点紧贴文字。
+         第一版缩进 18px，圆点和文字之间空了一大截，看着像两列错位。 */
+      .src-toc-items { margin: 1px 0 2px; padding: 0; list-style: none; display: grid; }
+      .src-toc-items a {
+        display: block; position: relative;
+        padding: 3px 6px 3px 13px;
+        border-radius: var(--radius-xs);
+        color: var(--color-muted); line-height: 1.5; text-decoration: none;
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      }
+      .src-toc-items a::before {
+        content: ""; position: absolute; left: 5px; top: 50%;
+        width: 3px; height: 3px; margin-top: -1.5px;
+        border-radius: 50%; background: var(--color-faint);
+      }
+      .src-toc-items a:hover { background: var(--color-accent-soft); color: var(--color-ink); }
+      .src-toc-items a:hover::before { background: var(--color-accent); }
+      .src-toc-items a.is-current { color: var(--color-accent-ink); font-weight: var(--weight-medium); }
+      .src-toc-items a.is-current::before { background: var(--color-accent); }
+      /* 从目录跳过去的目标闪一下，让读者知道"到了就是这里"。 */
+      [data-toc-flash] { animation: toc-flash 1.3s var(--ease-out); }
+      @keyframes toc-flash {
+        0%, 40% { background: var(--color-accent-soft); }
+        100% { background: transparent; }
+      }
+
+.src-layout { display: block; }
+.src-toc { display: none; }
+/* 这一页的信息密度比别的页高（六个源 × 十几篇文章），
+   全站默认的 1260px 在这里会把右侧挤窄、目录那块显得空。
+   放开到 1600：宽屏上卡片能多排一列，右侧也放得下信息块。
+   窄屏不受影响 —— 那个断点本来就是单栏。 */
+@media (min-width: 1180px) {
+  .tk-shell { max-width: 1600px; }
+  .src-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 268px;
+    column-gap: 36px;
+    align-items: start;
+  }
+  .src-toc {
+    display: block;
+    position: sticky;
+    top: 96px;
+    max-height: calc(100vh - 132px);
+    overflow: auto;
+    font-size: var(--text-small);
+    scrollbar-width: thin;
+  }
+}
 
       /* 分类目录：全部 / 文章 / 论文 / 资讯。
          用过滤而不是滚动定位 —— 进这一页要回答的是「这儿有什么」，
@@ -413,9 +516,13 @@
         <div class="src-main">
           <div id="src-groups"></div>
         </div>
-        <!-- 右侧目录。它是这一页的索引：有哪些分类、每类下有哪些站。
-             用 <aside> 是因为它确实是附属的 —— 读正文不需要它，
-             但它回答「这里有什么」，而这正是进这一页的第一个问题。 -->
+        <!-- 右侧目录。它是这一页的索引：有哪些分类、每类下有哪些站、
+             每个站下有哪些文章。用 <aside> 是因为它确实是附属的 ——
+             读正文不需要它，但它回答「这里有什么」，
+             而这正是进这一页的第一个问题。
+
+             内容由 renderToc() 在数据到达后构建，不另存一份结构。 -->
+        <aside class="src-toc" id="src-toc" aria-label="本页目录"></aside>
       </div>
     </div>
 
@@ -471,7 +578,6 @@
       /* 计数后缀按语言直接取。走词典会有个坑：中文的「个」是个量词，
          英文里没有对应词（"3 sources" 里 sources 已经由前面的名词承担了）。
          硬塞进词典只会得到一个别扭的英文句子，所以这里显式分支。 */
-      const countSuffix = () => (lang() === "en" ? "" : " 个");
 
       /* 当前分类。空字符串 = 全部。 */
       let activeGroup = "";
@@ -492,7 +598,7 @@
         $("#src-groups").innerHTML = shown.map((group) => `
           <section class="src-group">
             <div class="src-group-head">
-              <h2>${esc(tr(group.title))}<span class="src-group-count">${group.items.length}${countSuffix()}</span></h2>
+              <h2>${esc(tr(group.title))}</h2>
             </div>
             <p class="src-note">${esc(tr(group.note))}</p>
             <div class="src-list">${group.items.map((item) => card(item, group.key === "news")).join("")}</div>
@@ -583,9 +689,9 @@
           const cats = [...new Set(items.map((i) => i.category).filter(Boolean))];
           const bar = cats.length > 1
             ? `<div class="src-rich-filter">
-                 <button type="button" class="src-rich-chip" data-cat="" aria-pressed="true">${esc(tr("全部"))} <b>${items.length}</b></button>
+                 <button type="button" class="src-rich-chip" data-cat="" aria-pressed="true">${esc(tr("全部"))}</button>
                  ${cats.map((c) => `<button type="button" class="src-rich-chip" data-cat="${esc(c)}"
-                   aria-pressed="false">${esc(c)} <b>${items.filter((i) => i.category === c).length}</b></button>`).join("")}
+                   aria-pressed="false">${esc(c)}</button>`).join("")}
                </div>`
             : "";
           // 一行"这批数据有多新"。放在筛选芯片上面，读者先看到它。
@@ -649,6 +755,158 @@
           </li>`).join("")}</ul>`;
       }
 
+      /* 右侧目录。
+       *
+       * 三层：分类（阅读/动态/论文）→ 站（BestBlogs、阮一峰…）→ 文章标题。
+       *
+       * 为什么给文章标题这一层：这一页是"六个站的最新文章"，
+       * 长文标题扫起来很费劲。目录把标题收成一行行的索引，
+       * 找某篇时先在这里扫一遍，比在卡片区滚半天快。
+       *
+       * 折叠默认展开：目录的价值就是"一眼看全有什么"，
+       * 默认收起等于要读者先点一遍才看到内容。展开的那几个
+       * （分类层）可以点收回，站点层也可以 —— 文章多了页面会很长。
+       *
+       * 结构从**已渲染的 DOM** 构建，不另存一份：
+       * 两份结构迟早不一致，而读者看到的永远是渲染后的那一份。
+       * 这条和论文页 buildToc 是同一个判断。
+       */
+      function renderToc() {
+        const toc = $("#src-toc");
+        if (!toc) return;
+        const groups = [...document.querySelectorAll("#src-groups .src-group")];
+        if (!groups.length) { toc.innerHTML = ""; return; }
+
+        // 层级是三层：分组 → 源 → 文章。
+        //
+        //   .src-group
+        //     └ .src-list
+        //         └ .src-card          一个源（BestBlogs、阮一峰…）
+        //             └ .src-rich
+        //                 └ .src-rich-card   一篇文章（可点击）
+        //
+        // 第一版少看了一层，直接找 .src-list 的子元素，只捞到 2 个源、
+        // 7 条文章。层级假设错了，选择器再对也拿不到东西。
+        // 来源速览：一行一个站，右边写它有几篇。
+        //
+        // 参考 arxivdaily 右栏的"热门订阅" —— 读者先想知道"这里有哪几个站"，
+        // 再决定看哪个。整行可点，跳到那个站的卡片。
+        const sites = [];
+        groups.forEach((group, gi) => {
+          [...group.querySelectorAll(".src-list > .src-card")].forEach((card, si) => {
+            const link = card.querySelector(".src-head a");
+            const name = (link ? link.textContent : "").trim();
+            if (!name) return;
+            const id = card.id || `src-site-${gi}-${si}`;
+            card.id = id;
+            sites.push({
+              name,
+              id,
+              count: card.querySelectorAll(".src-rich-card, .src-feed-list a").length,
+            });
+          });
+        });
+
+        const parts = [];
+        // 第一块：来源速览。标题直接说它是什么，不用"本页目录"这种废话 ——
+        // 读者看着右边一列站名，本来就知道那是目录。
+        if (sites.length) {
+          parts.push(`<section class="src-toc-card">
+            <h3>${esc(tr("内容来源"))}</h3>
+            <ul class="src-toc-sites">${sites.map((s) => `
+              <li><a href="#${s.id}" title="${esc(s.name)}">
+                <i class="src-toc-dot" aria-hidden="true"></i>
+                <span class="src-toc-name">${esc(s.name)}</span>
+                <span class="src-toc-num">${s.count}</span>
+              </a></li>`).join("")}</ul>
+          </section>`);
+        }
+
+        // 第二块：按分类折叠的文章列表。
+        const listParts = [];
+        groups.forEach((group, gi) => {
+          const groupTitle = ((group.querySelector("h2") || {}).textContent || "").trim();
+          const sources = [...group.querySelectorAll(".src-list > .src-card")];
+          if (!sources.length) return;
+
+          const rows = [];
+          sources.forEach((card, si) => {
+            [...card.querySelectorAll(".src-rich-card, .src-feed-list a")].forEach((item, ii) => {
+              const titleEl = item.querySelector(".src-rich-title")
+                || item.querySelector(".src-feed-title") || item;
+              const text = (titleEl.textContent || "").trim();
+              if (!text) return;
+              item.id = item.id || `src-item-${gi}-${si}-${ii}`;
+              rows.push(`<li><a href="#${item.id}" title="${esc(text)}">${esc(text)}</a></li>`);
+            });
+          });
+          if (!rows.length) return;
+
+          listParts.push(`<section class="src-toc-group" data-open="true">
+            <button type="button" class="src-toc-toggle" aria-expanded="true">
+              <span class="src-toc-caret" aria-hidden="true">▾</span>${esc(groupTitle)}
+            </button>
+            <div class="src-toc-body"><ul class="src-toc-items">${rows.join("")}</ul></div>
+          </section>`);
+        });
+        // 文章标题不再截断成 28 字 —— 用 CSS 的 ellipsis 让它按容器宽度自己截，
+        // 完整标题留在 title 属性里，鼠标停一下就能看全。
+        if (listParts.length) {
+          parts.push(`<section class="src-toc-card">
+            <h3>${esc(tr("文章列表"))}</h3>
+            ${listParts.join("")}
+          </section>`);
+        }
+
+        toc.innerHTML = parts.join("");
+
+        // 折叠。
+        toc.querySelectorAll(".src-toc-toggle").forEach((btn) => {
+          btn.onclick = () => {
+            const box = btn.closest(".src-toc-group");
+            const open = box.dataset.open === "true";
+            box.dataset.open = open ? "false" : "true";
+            btn.setAttribute("aria-expanded", String(!open));
+          };
+        });
+
+        // 跳转：滚动留出顶栏高度，否则目标会被盖住。
+        // 目标是文章卡片时要滚到它所在的位置；给个短暂的底色闪一下作为
+        // "到这儿了"的反馈，否则页面突然滚到中间读者不确定跳没跳对。
+        toc.querySelectorAll('a[href^="#"]').forEach((a) => {
+          a.onclick = (event) => {
+            const target = document.getElementById(a.getAttribute("href").slice(1));
+            if (!target) return;
+            event.preventDefault();
+            const top = target.getBoundingClientRect().top + window.scrollY - 92;
+            window.scrollTo({ top, behavior: "smooth" });
+            target.setAttribute("data-toc-flash", "1");
+            setTimeout(() => target.removeAttribute("data-toc-flash"), 1400);
+          };
+        });
+
+        // 滚动时标出当前读到哪一条。用 IntersectionObserver 而不是监听
+        // scroll 事件 —— 后者每帧都要重算所有目标的位置。
+        if (tocObserver) tocObserver.disconnect();
+        tocObserver = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            toc.querySelectorAll("a.is-current").forEach((x) => x.classList.remove("is-current"));
+            const link = toc.querySelector(`a[href="#${CSS.escape(entry.target.id)}"]`);
+            if (link) {
+              link.classList.add("is-current");
+              link.scrollIntoView({ block: "nearest" });
+            }
+          });
+        }, { rootMargin: "-92px 0px -65% 0px", threshold: 0 });
+        toc.querySelectorAll('a[href^="#"]').forEach((a) => {
+          const target = document.getElementById(a.getAttribute("href").slice(1));
+          if (target) tocObserver.observe(target);
+        });
+      }
+
+      let tocObserver = null;
+
       function paintFeeds() {
         const payload = feedState.payload;
         if (!payload) return;
@@ -703,6 +961,13 @@
             if (box) box.remove();
           }, { once: true });
         });
+
+        // 目录必须在**文章内容填完之后**构建。
+        //
+        // 第一版把它放在 render() 里（那时只是把卡片骨架写进 #src-groups），
+        // 文章标题还没 innerHTML 进去，于是目录只捞到 7 个源、0 篇文章 ——
+        // 选择器没问题，是时机不对。paintFeeds 的末尾才是内容齐全的时刻。
+        renderToc();
         const updated = $("#src-updated");
         if (updated && payload.fetched_at) {
           // 刚刷新完时 RelativeTimeFormat 会给出「现在」，「更新于 现在」读起来很别扭。

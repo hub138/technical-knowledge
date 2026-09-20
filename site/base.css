@@ -378,9 +378,24 @@ body.tk-host::before {
   max-width: 1260px;
   margin-left: auto;
   margin-right: auto;
+  /* 右侧给悬浮按钮让出的通道。**要有，但要窄。**
+   *
+   * 一个 52×52 的固定角标，任何滚到它那一行的正文都会被压住 —— 这不是
+   * 它挡了多少的问题，而是它固定在那里。所以通道是必要的。
+   *
+   * 但原来的 86px（--float-lane）是拍出来的，比按钮实际需要的宽得多：
+   *   按钮 52px + 距右边 22px + 一点呼吸 = 约 74px 就够
+   * 多出来的十几像素 × 每页每行，就是白白挤窄内容。85→74 收掉 12px。
+   *
+   * 底部仍然单独留：滚到底时不能让按钮压住最后一行的内容。 */
   padding-left: clamp(18px, 2.4vw, 30px);
-  padding-right: calc(clamp(18px, 2.4vw, 30px) + var(--float-lane));
-  padding-bottom: calc(var(--float-lane) + 40px);
+  /* 通道宽度按**最宽的那个按钮状态**给，不按当前断点猜：
+     按钮 52px + 距右 22px + 呼吸 0px = 74px。
+     原来写 44px，是只算了按钮本身 —— 768px 视口下（这个宽度用的是桌面
+     规则，因为窄屏断点是 max-width:760px）内容右边界 694.6、按钮左边界
+     683，正文被压了 11.6px，布局审计报的 papers@768。 */
+  padding-right: calc(clamp(18px, 2.4vw, 30px) + 74px);
+  padding-bottom: calc(96px + 40px);
 }
 
 .tk-shell > .hero:first-child {
@@ -1031,10 +1046,11 @@ body.tk-host button {
 
   .tk-shell,
   .content {
-    /* The floating buttons shrink on a narrow screen (48px at right:14px), so
-       the lane is smaller here. It still applies: the feedback button overlaps
-       a phone-width column just as readily as a desktop one. */
-    --float-lane: 62px;
+    /* 窄屏按钮也缩小（48px，距右 14px），但通道**不能跟着缩小**：
+       实测 768px 下 62px 的通道不够 —— 内容右边界 694.6，按钮左边界 683，
+       正文被压住 11.6px（布局审计报的 papers@768）。
+       按最宽的情况给：按钮 52px + 距右 22px + 呼吸 = 74px。 */
+    --float-lane: 74px;
     max-width: none;
     padding: var(--space-4) calc(var(--space-4) + var(--float-lane)) calc(var(--float-lane) + var(--space-8)) var(--space-4);
   }
