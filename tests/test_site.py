@@ -1452,13 +1452,58 @@ class BestBlogsRequestTests(unittest.TestCase):
         for _, params in calls:
             self.assertIn(params.get("time"), allowed)
 
-    def test_brief_sends_iso_date_and_language(self) -> None:
+    def test_brief_uses_the_briefs_public_today_endpoint(self) -> None:
+        """早报走 /openapi/v2/briefs/public/today。
+
+        文档把它写成 `GET /openapi/v2/brief` 加 `date` 参数 —— 那个路径是
+        404。真实路径多一层 `briefs/public/`，且日期在路径里。三者都试过：
+
+            briefs/public/today        ✅ 200
+            briefs/public?date=...     ❌ 404
+            brief?date=...&language=zh ❌ 404
+
+        所以断言实际请求的 path，别让谁"照着文档改回去"。
+        """
+        self.respond_with({"candidates": []}, "")
         BESTBLOGS_MODULE.brief(force=True)
-        calls = [c for c in self.calls if c[0] == "brief"]
-        self.assertTrue(calls, "应当请求过 /openapi/v2/brief")
-        for _, params in calls:
-            self.assertRegex(params.get("date", ""), r"^\d{4}-\d{2}-\d{2}$")
-            self.assertIn(params.get("language"), {"zh", "en"})
+        paths = [c[0] for c in self.calls]
+        self.assertIn("briefs/public/today", paths,
+                      "早报必须走 briefs/public/today（文档里的 /brief 是 404）")
+
+    def test_brief_fetches_details_by_batch(self) -> None:
+        """早报候选只有 id，完整字段要再批量取一次。
+
+        候选里没有发布日期，而页面要按时间排、要显示日期 —— 所以这次
+        补取不是可选的。用两次调用换全部字段，比翻四页精选省。
+        """
+        self.respond_with(
+            {"candidates": [{"resourceId": "RAW_a"}, {"resourceId": "RAW_b"}]}, ""
+        )
+        # 第二次（batch-meta）返回两条完整记录
+        original = BESTBLOGS_MODULE._batch_meta
+        seen: list[list[str]] = []
+
+        def fake_batch(ids: list[str]) -> list[dict]:
+            seen.append(list(ids))
+            return [
+                {"id": "RAW_a", "title": "甲", "readUrl": "https://x.test/a",
+                 "publishDateTimeStr": "2026-09-19 10:00:00",
+                 "publishTimeStamp": 1789794000000},
+                {"id": "RAW_b", "title": "乙", "readUrl": "https://x.test/b",
+                 "publishDateTimeStr": "2026-09-18 10:00:00",
+                 "publishTimeStamp": 1789707600000},
+            ]
+
+        BESTBLOGS_MODULE._batch_meta = fake_batch
+        try:
+            result = BESTBLOGS_MODULE.brief(force=True)
+        finally:
+            BESTBLOGS_MODULE._batch_meta = original
+        self.assertEqual(result.get("status"), "ok")
+        self.assertEqual(len(result.get("items") or []), 2)
+        self.assertEqual(seen, [["RAW_a", "RAW_b"]], "应当把候选 id 一次批量传过去")
+        # 按发布时间倒序
+        self.assertEqual([i["title"] for i in result["items"]], ["甲", "乙"])
 
     def test_a_failed_fetch_is_not_cached_for_a_whole_day(self) -> None:
         """抓失败只能锁一小段时间，不能锁一天。
@@ -1497,7 +1542,9 @@ class BestBlogsRequestTests(unittest.TestCase):
         BESTBLOGS_MODULE._brief_cache.clear()
         BESTBLOGS_MODULE._brief_cache.update({"at": 0.0, "payload": {}, "ttl": 0.0})
         result = BESTBLOGS_MODULE.brief(force=True)
-        self.assertEqual(result.get("status"), "empty")
+        # 报真实原因（quota），不要谎报成"没有内容" —— 这两件事在页面上
+        # 是不同的提示，混淆会让人往错的方向排查。这条断言踩过一次。
+        self.assertEqual(result.get("status"), "quota")
         self.assertLessEqual(
             float(BESTBLOGS_MODULE._brief_cache.get("ttl") or 0), retry,
             "早报抓失败后写入的 ttl 也必须是短档",
@@ -1505,35 +1552,24 @@ class BestBlogsRequestTests(unittest.TestCase):
         BESTBLOGS_MODULE._brief_cache.clear()
         BESTBLOGS_MODULE._brief_cache.update(brief_cache_backup)
 
-    def test_quota_error_stops_trying_more_dates(self) -> None:
-        """配额耗尽时不要为每个候选日期各试一次。
-
-        每次试探都是一次调用，而配额已经没了 —— 继续试只是白烧。
-        这条用错误注入来验：如果停止逻辑失效，调用次数会等于候选日期数。
-        """
-        self.respond_with(None, "quota")
-        brief_cache_backup = dict(BESTBLOGS_MODULE._brief_cache)
-        BESTBLOGS_MODULE._brief_cache.clear()
-        BESTBLOGS_MODULE._brief_cache.update({"at": 0.0, "payload": {}, "ttl": 0.0})
-        BESTBLOGS_MODULE.brief(force=True)
-        brief_calls = [c for c in self.calls if c[0] == "brief"]
-        self.assertEqual(
-            len(brief_calls), 1,
-            f"配额错误应当立即停止，实际问了 {len(brief_calls)} 个日期",
-        )
-        BESTBLOGS_MODULE._brief_cache.clear()
-        BESTBLOGS_MODULE._brief_cache.update(brief_cache_backup)
-
     def test_a_successful_fetch_is_cached_long(self) -> None:
         """抓成功之后锁一天 —— 别把长短两档也搞反了。"""
-        self.respond_with(
-            [{"id": "art_1", "title": "标题", "url": "https://example.test/a",
-              "readUrl": "https://example.test/a", "publishDateStr": "2026-09-19"}], ""
-        )
+        # 走真实的链路：候选（只有 id）→ batch-meta（完整字段）
+        self.respond_with({"candidates": [{"resourceId": "RAW_a"}]}, "")
+        original = BESTBLOGS_MODULE._batch_meta
+        BESTBLOGS_MODULE._batch_meta = lambda ids: [{
+            "id": "RAW_a", "title": "标题",
+            "url": "https://example.test/a", "readUrl": "https://example.test/a",
+            "publishDateTimeStr": "2026-09-19 10:00:00",
+            "publishTimeStamp": 1789794000000,
+        }]
         brief_cache_backup = dict(BESTBLOGS_MODULE._brief_cache)
         BESTBLOGS_MODULE._brief_cache.clear()
         BESTBLOGS_MODULE._brief_cache.update({"at": 0.0, "payload": {}, "ttl": 0.0})
-        result = BESTBLOGS_MODULE.brief(force=True)
+        try:
+            result = BESTBLOGS_MODULE.brief(force=True)
+        finally:
+            BESTBLOGS_MODULE._batch_meta = original
         self.assertEqual(result.get("status"), "ok")
         self.assertEqual(
             float(BESTBLOGS_MODULE._brief_cache.get("ttl") or 0),
@@ -1543,13 +1579,4 @@ class BestBlogsRequestTests(unittest.TestCase):
         BESTBLOGS_MODULE._brief_cache.clear()
         BESTBLOGS_MODULE._brief_cache.update(brief_cache_backup)
 
-    def test_brief_date_candidates_skip_sunday(self) -> None:
-        """文档写明没有周日版（no Sunday edition），候选日期不能含周日。"""
-        import datetime as _dt
-        days = BESTBLOGS_MODULE._candidate_dates(days=8)
-        self.assertTrue(days, "至少要有一个候选日期")
-        for day in days:
-            parsed = _dt.date.fromisoformat(day)
-            self.assertNotEqual(parsed.weekday(), 6, f"{day} 是周日，没有早报")
-        # 覆盖足够多天时，应当包含最近的那几天（跳过周日）
-        self.assertGreaterEqual(len(days), 6)
+

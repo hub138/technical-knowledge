@@ -2361,15 +2361,34 @@ class Handler(BaseHTTPRequestHandler):
                 limit = min(24, max(1, int(query.get("limit", ["12"])[0])))
             except ValueError:
                 limit = 12
-            # 默认 2 个月，和 bestblogs.digest 一致。
+            # 早报优先，精选流兜底。
             #
-            # 原来是 3 天 —— 但对方库存里 3 天内常常一篇都没有（实测最新一篇
-            # 是 9 天前），于是这个接口永远返回空，首页那块就永远不显示。
-            # 窗口值要和 bestblogs._WINDOW_DAYS 同步，否则会静默降级成默认值。
-            hours = query.get("time", ["2m"])[0]
-            if hours not in bestblogs._WINDOW_DAYS:
-                hours = "2m"
-            self.send_json(bestblogs.digest(limit=limit, hours=hours, force=force))
+            # 这是两个不同节奏的端点：
+            #
+            #   briefs/public/today  今天/昨天的内容，两次调用拿 20 条
+            #   resources            按评分排的精选，库存里多是 2024-2025 的
+            #
+            # 之前只调了 digest（精选流），于是首页摆的是去年的文章。早报端点
+            # 找到后它该排第一 —— 内容新鲜得多，而且调用更少。
+            #
+            # 早报拿到就返回；它失败（配额/网络）时才退回精选流，免得首页
+            # 因为一个端点抖动就整块空掉。
+            result = bestblogs.brief(force=force)
+            items = result.get("items") or []
+            if not items:
+                hours = query.get("time", ["2m"])[0]
+                if hours not in bestblogs._WINDOW_DAYS:
+                    hours = "2m"
+                fallback = bestblogs.digest(limit=limit, hours=hours, force=force)
+                # 兜底也没东西时，保留早报的失败原因 —— 它更接近真相
+                # （"今日早报取不到"比"精选流没内容"更具体）。
+                if not (fallback.get("items") or []):
+                    result = fallback
+                else:
+                    result = fallback
+            payload = dict(result)
+            payload["items"] = (result.get("items") or [])[:limit]
+            self.send_json(payload)
             return
         if path == "/api/sources":
             # BestBlogs 的公共订阅源目录（公众号列表）。

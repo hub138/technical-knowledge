@@ -49,7 +49,17 @@ import urllib.request
 # www，www 上返回 404 —— 三个域名里只有 api. 是真的服务端点。
 # 这是实测出来的：同样一个 key，www 上 /me 也 404，api 上返回账号信息。
 API_BASE = "https://api.bestblogs.dev/openapi/v2"
-TIMEOUT = 12.0
+# 单次请求超时。**这个值要够大。**
+#
+# 实测这台机器到这个域名的 TLS 握手经常要 15-25 秒才完成，偶尔直接超时。
+# 原来写 12 秒，于是大部分请求在握手中途就被自己掐掉，表现为
+# `unreachable:TimeoutError` —— 看起来像对方挂了，其实是本地等得不够久。
+# 同样的 URL 用 curl 打（默认无超时）能通，这一点是判断依据。
+TIMEOUT = 30.0
+
+# 失败重试次数。TLS 抖动是间歇性的，实测连续重试 3 次里通常有 1-2 次能过。
+# 抓取跑在后台，多等几秒没成本；抓不到则整块内容消失。
+ATTEMPTS = 5
 
 USER_AGENT = (
     "technical-knowledge/1.0 (personal reading digest; "
@@ -213,7 +223,7 @@ def _get(path: str, params: dict[str, str]) -> tuple[object, str]:
     body = ""
     content_type = ""
     last_error = ""
-    for attempt in range(3):
+    for attempt in range(ATTEMPTS):
         if attempt:
             time.sleep(0.8 * attempt)
         try:
@@ -294,7 +304,18 @@ def _normalise(item: dict) -> dict:
         "source_icon": str(item.get("sourceImage") or ""),
         "cover": str(item.get("cover") or item.get("enclosureUrl") or ""),
         "url": url,
-        "published": str(item.get("publishDateStr") or ""),
+        # published 优先给"真实日期"，不要相对词。
+        #
+        # 早报接口的 publishDateStr 返回的是「今天」「昨天」这种相对描述 ——
+        # 直接显示的话，卡片上的日期会写着"昨天"，而这一页是要归档给人看的，
+        # 过几天再看就不成立了。有时间戳就从它推日期；没有才退回原字符串。
+        "published": (
+            datetime.datetime.fromtimestamp(
+                (item.get("publishTimeStamp") or 0) / 1000
+            ).strftime("%Y-%m-%d")
+            if item.get("publishTimeStamp")
+            else str(item.get("publishDateTimeStr") or item.get("publishDateStr") or "")[:10]
+        ),
         # 毫秒时间戳 + 由它推出的完整日期。
         #
         # 接口的 publishDateStr 有两种格式："2025-04-17" 和 "04-24"。
@@ -477,81 +498,139 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
     return {"status": "ok" if items else "empty", "items": items, "fetched_at": int(now), "cached": False}
 
 
-def _candidate_dates(days: int = 4) -> list[str]:
-    """往前找最近有早报的日期。
+def brief(force: bool = False) -> dict:
+    """今日早报 —— 站上「我的早报 / 今日精选」那块内容。
 
-    文档明确写了 **no Sunday edition** —— 周日没有早报。今天正好是周日时
-    直接问今天会拿到空结果，所以按日期往前找，跳过周日。
-    """
-    today = datetime.date.today()
-    out = []
-    for i in range(days):
-        day = today - datetime.timedelta(days=i)
-        if day.weekday() == 6:  # 6 = 周日
-            continue
-        out.append(day.isoformat())
-    return out
+    两个端点，两次调用拿全部：
 
+        GET  /openapi/v2/briefs/public/today        今天的候选（id + 评分 + 推荐理由）
+        POST /openapi/v2/resources/batch-meta       按 id 批量取完整字段
 
-def brief(date: str = "", force: bool = False) -> dict:
-    """某一天的早报。
+    这才是这个源的正常用法，比翻 `resources` 精选流靠谱得多：
+    两次调用 vs 翻四页，内容却是今天/昨天的。
 
-    端点：GET /openapi/v2/brief?date=YYYY-MM-DD&language=zh
+    ## 路径是试出来的，文档写得不完整
 
-    早报就是站上「我的早报 / 今日精选」那块内容 —— 按天更新的推荐，
-    比 resources 那条精选流新鲜得多。它要登录才能在网页上看，
-    但 OpenAPI 这条路径用 API key 就能读。
+    文档的 Endpoints 页把早报写成 `GET /openapi/v2/brief`，参数 `date`。
+    照那个路径打过去是 404 —— 真实路径多了一层 `briefs/public/`，而且
+    日期是路径的一部分（`/today`），不是查询参数：
 
-    结果按天缓存：同一天只抓一次，且落盘，服务重启不重抓。
+        /openapi/v2/briefs/public/today       ✅ 200
+        /openapi/v2/briefs/public?date=...    ❌ 404
+        /openapi/v2/brief?date=...&language=zh ❌ 404
+        /openapi/v2/brief/public/today        ❌ 404
+
+    怎么找到真的：装了官方 CLI（`npm i -g @bestblogs/cli`），跑
+    `bestblogs discover today --json`，它的错误信息里带着实际请求的 URL。
+    以后这类"文档描述和真实路径对不上"的情况，用官方 CLI 反查比猜快得多。
+
+    ## 为什么日期不用自己算
+
+    早报端点只有 `/today` 一个入口，不像文档说的能按 date 取历史。
+    周日没有早报这件事由服务端处理：它自己会给最近一版。
     """
     now = time.time()
-    # TTL 和 digest 同理：失败用短的那档。
     ttl = float(_brief_cache.get("ttl") or _BRIEF_TTL)
     if not force and _brief_cache.get("at") and \
             now - float(_brief_cache["at"]) < ttl and _brief_cache.get("payload"):
         return {**_brief_cache["payload"], "cached": True}
 
-    key = api_key()
-    if not key:
+    if not api_key():
         return {"status": "unconfigured", "items": [], "date": ""}
 
-    for day in ([date] if date else _candidate_dates()):
-        data, error = _get("brief", {"date": day, "language": "zh"})
-        if error:
-            # 配额耗尽（429）时不要继续试后面的日期 —— 试一次就是一次调用。
-            if error in ("quota", "unreachable:HTTPError") or error.startswith("http_"):
-                break
-            continue
-        rows = data if isinstance(data, list) else (
-            (data or {}).get("dataList") or (data or {}).get("list")
-            or (data or {}).get("resources") or []
-        )
-        if not rows:
-            continue
-        items = [_normalise(r) for r in rows if isinstance(r, dict)]
-        items = [i for i in items if i.get("title")]
-        if not items:
-            continue
-        payload = {
-            "status": "ok",
-            "date": day,
-            "items": items,
-            "fetched_at": int(now),
-            "cached": False,
-        }
-        _brief_cache.update({"at": now, "payload": payload, "ttl": _BRIEF_TTL})
-        _save_brief_cache()
-        return payload
+    data, error = _get("briefs/public/today", {})
+    if error:
+        _remember_brief_failure(now, error)
+        return {"status": error, "items": [], "date": "", "error": error}
 
-    # 一天都没拿到。记下时间，免得每次都重试一遍（每次都是好几次调用）。
+    # 字段名是 `contentItems`，不是 `candidates`。
     #
-    # 但**只锁一小时**，不是一天：这里多半是配额耗尽或网络不通，属于暂时
-    # 状态。锁满一天的话，配额中午恢复、页面要空到第二天 —— 缓存把"这次
-    # 没抓到"当成了"确认没有"，这两件事不一样。
-    payload = {"status": "empty", "date": "", "items": [], "fetched_at": int(now), "cached": False}
-    _brief_cache.update({"at": now, "payload": payload, "ttl": _RETRY_TTL})
+    # `candidates` 是官方 CLI 的输出格式 —— 它把这份响应用自己的一套类型
+    # 重新包了一层。我照着 CLI 的 --json 输出写解析，于是拿到的永远是空：
+    # 请求成功、err 也是空，只是键名对不上，静默变成"今天没有内容"。
+    #
+    # 教训：CLI 的输出**不是**原始 API 的形状。要写解析就用 curl 打原始
+    # 端点，别拿 CLI 的 --json 当契约。
+    candidates = data if isinstance(data, list) else (
+        (data or {}).get("contentItems") or (data or {}).get("candidates")
+        or (data or {}).get("dataList") or []
+    )
+    ids = [str(c.get("resourceId") or c.get("id") or "")
+           for c in candidates if isinstance(c, dict)]
+    ids = [i for i in ids if i][:40]
+    if not ids:
+        _remember_brief_failure(now, "empty")
+        return {"status": "empty", "items": [], "date": ""}
+
+    # 批量取详情。候选里没有发布日期（没有 publishDateTimeStr 这类字段），
+    # 而页面要按时间排、要显示日期 —— 必须补这一次。
+    rows = _batch_meta(ids)
+    if not rows:
+        _remember_brief_failure(now, "empty")
+        return {"status": "empty", "items": [], "date": ""}
+
+    items = [_normalise(row) for row in rows if isinstance(row, dict)]
+    items = [i for i in items if i.get("title") and i.get("url")]
+    items.sort(key=lambda item: item.get("published_ts") or 0, reverse=True)
+
+    payload = {
+        "status": "ok",
+        # 早报自己的日期字段（briefDate），比从条目里取第一篇更准。
+        "date": (data or {}).get("briefDate") or (items[0].get("published", "") if items else ""),
+        "items": items,
+        "fetched_at": int(now),
+        "cached": False,
+    }
+    _brief_cache.update({"at": now, "payload": payload, "ttl": _BRIEF_TTL})
     _save_brief_cache()
     return payload
+
+
+def _batch_meta(ids: list[str]) -> list[dict]:
+    """按 id 批量取完整元数据。
+
+    POST 而不是 GET，body 是 `{"ids": [...]}`。一次最多几十个 id ——
+    早报一次给 20 个，一个请求就够，省下的配额留给别的。
+    """
+    key = api_key()
+    if not key:
+        return []
+    body = json.dumps({"ids": ids}).encode("utf-8")
+    request = urllib.request.Request(
+        f"{API_BASE}/resources/batch-meta",
+        data=body,
+        headers={
+            "X-API-KEY": key,
+            "User-Agent": USER_AGENT,
+            "Accept": "application/json",
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    for attempt in range(ATTEMPTS):
+        if attempt:
+            time.sleep(0.8 * attempt)
+        try:
+            with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+                payload = json.loads(response.read().decode("utf-8", errors="replace"))
+        except Exception:
+            continue
+        data = payload.get("data")
+        if isinstance(data, list):
+            return [r for r in data if isinstance(r, dict)]
+        return []
+    return []
+
+
+def _remember_brief_failure(now: float, status: str) -> None:
+    """记下失败，但只锁一小时。
+
+    这里和 digest 是同一个教训：把"这次没抓到"当成"确认没有"会把
+    暂态问题锁成一整天的空白。配额和网络都是几小时就恢复的。
+    """
+    payload = {"status": status, "date": "", "items": [], "fetched_at": int(now), "cached": False}
+    _brief_cache.update({"at": now, "payload": payload, "ttl": _RETRY_TTL})
+    _save_brief_cache()
 
 
 def sources(limit: int = 60) -> dict:

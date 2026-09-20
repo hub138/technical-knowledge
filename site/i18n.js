@@ -375,6 +375,11 @@
     "时间线": { en: "Timeline" },
     "正在读取…": { en: "Loading…" },
     "优质好文": { en: "Good reads" },
+    // 首页那块横滑区的标题。词典是整串匹配的，所以要单独列一条 ——
+    // 只写「优质好文」的话，「每日优质好文」整串查不到，英文界面下会
+    // 原样显示中文。
+    "每日优质好文": { en: "Daily good reads" },
+    "BestBlogs 每天更新的早报": { en: "BestBlogs' daily brief" },
     "资源目录": { en: "Source index" },
     "追踪新论文": { en: "Tracking new papers" },
     "追踪新论文和解析": { en: "New papers, with write-ups" },
