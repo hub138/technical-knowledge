@@ -1382,6 +1382,34 @@ if __name__ == "__main__":
     unittest.main()
 
 
+    def test_homepage_samples_across_days(self) -> None:
+        """首页的条目要跨天交替，不能全落在最新那一天。
+
+        数据是"近三天"的，按发布时间倒序。直接取前 N 条的话，最新一天条数
+        够多就会占满名额 —— 首页 12 张卡全是同一天的，"近三天"这个标题就
+        不成立了。所以服务端按天轮流抽。
+        """
+        items = (
+            [{"published": "2026-09-18", "title": f"a{i}"} for i in range(10)]
+            + [{"published": "2026-09-17", "title": f"b{i}"} for i in range(8)]
+            + [{"published": "2026-09-16", "title": f"c{i}"} for i in range(2)]
+        )
+        out = SERVER_MODULE._interleave_by_day(items, 6)
+        self.assertEqual(len(out), 6)
+        days = [i["published"] for i in out]
+        self.assertEqual(days[0], "2026-09-18", "最新的排最前")
+        self.assertEqual(len(set(days)), 3, "六条应当覆盖全部三天")
+        # 顺序是轮流来，不是按天分块
+        self.assertNotEqual(days, sorted(days, reverse=True))
+
+    def test_interleave_handles_missing_days(self) -> None:
+        """某天没内容时不能卡住或重复。"""
+        items = [{"published": "2026-09-18", "title": f"a{i}"} for i in range(3)]
+        out = SERVER_MODULE._interleave_by_day(items, 10)
+        self.assertEqual(len(out), 3, "只有 3 条就返回 3 条，不补空")
+        self.assertEqual(SERVER_MODULE._interleave_by_day(items, 0), [])
+        self.assertEqual(SERVER_MODULE._interleave_by_day([], 5), [])
+
 BESTBLOGS_SPEC = importlib.util.spec_from_file_location(
     "knowledge_site_bestblogs", ROOT / "site" / "bestblogs.py"
 )
@@ -1452,23 +1480,42 @@ class BestBlogsRequestTests(unittest.TestCase):
         for _, params in calls:
             self.assertIn(params.get("time"), allowed)
 
-    def test_brief_uses_the_briefs_public_today_endpoint(self) -> None:
-        """早报走 /openapi/v2/briefs/public/today。
+    def test_brief_uses_the_briefs_public_path(self) -> None:
+        """早报走 /openapi/v2/briefs/public/<date>。
 
-        文档把它写成 `GET /openapi/v2/brief` 加 `date` 参数 —— 那个路径是
-        404。真实路径多一层 `briefs/public/`，且日期在路径里。三者都试过：
+        文档把它写成 `GET /openapi/v2/brief` 加 `date` 查询参数 —— 那个是
+        404。真实路径多一层 `briefs/public/`，日期在路径段里。都试过：
 
-            briefs/public/today        ✅ 200
-            briefs/public?date=...     ❌ 404
-            brief?date=...&language=zh ❌ 404
+            briefs/public/today          ✅ 200
+            briefs/public/2026-09-19     ✅ 200（历史日期也能取）
+            briefs/public?date=...       ❌ 404
+            brief?date=...&language=zh   ❌ 404
+            briefs/public/yesterday      ❌ 400（只认 ISO 日期或 today）
 
-        所以断言实际请求的 path，别让谁"照着文档改回去"。
+        断言实际请求的 path，免得谁"照文档改回去"。
         """
-        self.respond_with({"candidates": []}, "")
+        self.respond_with({"contentItems": []}, "")
         BESTBLOGS_MODULE.brief(force=True)
         paths = [c[0] for c in self.calls]
-        self.assertIn("briefs/public/today", paths,
-                      "早报必须走 briefs/public/today（文档里的 /brief 是 404）")
+        self.assertTrue(paths, "应当请求过早报端点")
+        for path in paths:
+            self.assertTrue(path.startswith("briefs/public/"),
+                            f"{path} 不在 briefs/public/ 下（文档里的 /brief 是 404）")
+            tail = path.split("/")[-1]
+            self.assertTrue(
+                tail == "today" or re.fullmatch(r"\d{4}-\d{2}-\d{2}", tail),
+                f"{path} 的最后一段既不是 today 也不是 ISO 日期",
+            )
+
+    def test_brief_covers_three_days(self) -> None:
+        """早报要覆盖近几天，不是只取今天。
+
+        只取今天的话，今天没更新（或周日没有早报）时整块就是空的。
+        """
+        self.respond_with({"contentItems": []}, "")
+        BESTBLOGS_MODULE.brief(force=True)
+        days = [c[1] for c in self.calls if c[0].startswith("briefs/public/")]
+        self.assertGreaterEqual(len(days), 2, "应当请求多天的早报")
 
     def test_brief_fetches_details_by_batch(self) -> None:
         """早报候选只有 id，完整字段要再批量取一次。

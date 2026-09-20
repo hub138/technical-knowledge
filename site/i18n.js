@@ -378,8 +378,11 @@
     // 首页那块横滑区的标题。词典是整串匹配的，所以要单独列一条 ——
     // 只写「优质好文」的话，「每日优质好文」整串查不到，英文界面下会
     // 原样显示中文。
-    "每日优质好文": { en: "Daily good reads" },
-    "BestBlogs 每天更新的早报": { en: "BestBlogs' daily brief" },
+    "近三天优质好文": { en: "Good reads, last three days" },
+    "BestBlogs 早报，滚动三天": { en: "BestBlogs' brief, rolling three days" },
+    "配好 BestBlogs 的 API Key 后，这里会列出它最近三天的早报": {
+      en: "Once BestBlogs' API key is configured, its briefs for the last three days appear here.",
+    },
     "资源目录": { en: "Source index" },
     "追踪新论文": { en: "Tracking new papers" },
     "追踪新论文和解析": { en: "New papers, with write-ups" },

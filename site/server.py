@@ -1686,6 +1686,39 @@ def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes
     return document.encode("utf-8")
 
 
+def _interleave_by_day(items: list[dict], limit: int) -> list[dict]:
+    """把条目按发布日期轮流抽取，凑够 limit 条。
+
+    输入是按时间倒序的（近三天的内容），直接截取会全落在同一天。这里按天
+    分组后轮流各取一条 —— 三天都有内容时，前三张就是三天各一张。
+
+    分组顺序仍然按日期倒序，所以取出来的整体还是"新的在前"。
+    """
+    if limit <= 0:
+        return []
+    buckets: dict[str, list[dict]] = {}
+    for item in items:
+        day = str(item.get("published") or "")[:10]
+        buckets.setdefault(day, []).append(item)
+    # 日期倒序
+    days = sorted(buckets, reverse=True)
+    out: list[dict] = []
+    index = 0
+    while len(out) < limit:
+        picked = False
+        for day in days:
+            bucket = buckets[day]
+            if index < len(bucket):
+                out.append(bucket[index])
+                picked = True
+                if len(out) >= limit:
+                    break
+        if not picked:
+            break
+        index += 1
+    return out
+
+
 class Handler(BaseHTTPRequestHandler):
     server_version = "KnowledgeSite/1.0"
 
@@ -2387,7 +2420,15 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result = fallback
             payload = dict(result)
-            payload["items"] = (result.get("items") or [])[:limit]
+            # 按天交错取样，而不是简单取前 N 条。
+            #
+            # 数据是"近三天"的（按发布时间倒序）。直接 [:limit] 的话，最新那
+            # 一天条数够多时就会把名额占满 —— 首页 12 张卡全是同一天的，
+            # 那"近三天"这个标题就不成立。
+            #
+            # 交替各取一条：第一天、第二天、第三天、第一天…… 一屏里能看到
+            # 不同天的内容，标题和内容才对得上。
+            payload["items"] = _interleave_by_day(result.get("items") or [], limit)
             self.send_json(payload)
             return
         if path == "/api/sources":

@@ -91,6 +91,12 @@ _CACHE_TTL = 86400
 # 缓存把"抓失败"当成了"确认没有"，而它俩完全不是一回事。
 _RETRY_TTL = 3600
 
+# 早报抓几天、留几天。
+#
+# 3 天是个折中：一天的量太少（今天没更新就空着），再长就失去"最近"的
+# 意义了。每天抓一次时它会把窗口内每一天都取一遍，重复的按 id 去掉。
+_BRIEF_DAYS = 3
+
 # 落盘。
 #
 # 原来只放内存 —— 服务一重启缓存就没了，重启一次就要重新抓一次。
@@ -498,6 +504,23 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
     return {"status": "ok" if items else "empty", "items": items, "fetched_at": int(now), "cached": False}
 
 
+def _recent_days(days: int) -> list[str]:
+    """最近 N 天的日期，从今天往前。跳过周日（那天没有早报）。
+
+    周日不必"补一天别的" —— 往前多取一天就是了，窗口自然覆盖到周六。
+    """
+    today = datetime.date.today()
+    out: list[str] = []
+    offset = 0
+    while len(out) < days and offset < days + 3:
+        day = today - datetime.timedelta(days=offset)
+        offset += 1
+        if day.weekday() == 6:      # 周日没有早报
+            continue
+        out.append(day.isoformat())
+    return out
+
+
 def brief(force: bool = False) -> dict:
     """今日早报 —— 站上「我的早报 / 今日精选」那块内容。
 
@@ -538,32 +561,61 @@ def brief(force: bool = False) -> dict:
     if not api_key():
         return {"status": "unconfigured", "items": [], "date": ""}
 
-    data, error = _get("briefs/public/today", {})
-    if error:
-        _remember_brief_failure(now, error)
-        return {"status": error, "items": [], "date": "", "error": error}
+    # 抓最近 3 天，不是只有今天。
+    #
+    # 端点支持按日期取：`/briefs/public/2026-09-19`（`today` 是它的一个
+    # 特殊值）。这样一天抓一次、攒够三天，读者看到的是连续三天的内容 ——
+    # 而不是"今天没更新就空着"。
+    #
+    # 周日没有早报，那一天取回来是空的。不必特别处理：跳过它继续往前取，
+    # 三天窗口自然会覆盖到周六和周五。
+    all_rows: list[dict] = []
+    seen_ids: set[str] = set()
+    any_ok = False
+    last_error = ""
+    brief_date = ""
 
-    # 字段名是 `contentItems`，不是 `candidates`。
-    #
-    # `candidates` 是官方 CLI 的输出格式 —— 它把这份响应用自己的一套类型
-    # 重新包了一层。我照着 CLI 的 --json 输出写解析，于是拿到的永远是空：
-    # 请求成功、err 也是空，只是键名对不上，静默变成"今天没有内容"。
-    #
-    # 教训：CLI 的输出**不是**原始 API 的形状。要写解析就用 curl 打原始
-    # 端点，别拿 CLI 的 --json 当契约。
-    candidates = data if isinstance(data, list) else (
-        (data or {}).get("contentItems") or (data or {}).get("candidates")
-        or (data or {}).get("dataList") or []
-    )
-    ids = [str(c.get("resourceId") or c.get("id") or "")
-           for c in candidates if isinstance(c, dict)]
-    ids = [i for i in ids if i][:40]
-    if not ids:
+    for day in _recent_days(_BRIEF_DAYS):
+        data, error = _get(f"briefs/public/{day}", {})
+        if error:
+            last_error = error
+            # 配额耗尽时立刻停 —— 继续试后面两天只是白烧调用。
+            if error == "quota" or error.startswith("http_4"):
+                break
+            continue
+        any_ok = True
+        # 字段名是 `contentItems`，不是 `candidates`。
+        #
+        # `candidates` 是官方 CLI 的输出格式 —— 它把响应按自己的一套类型
+        # 重新包了一层。照着 CLI 的 --json 写解析，结果永远是空：请求成功、
+        # err 也是空，只是键名对不上，静默变成"今天没有内容"。
+        # 教训：CLI 的输出**不是** API 的形状，解析要对着原始端点写。
+        candidates = data if isinstance(data, list) else (
+            (data or {}).get("contentItems") or (data or {}).get("candidates")
+            or (data or {}).get("dataList") or []
+        )
+        if not brief_date:
+            brief_date = str((data or {}).get("briefDate") or "") if isinstance(data, dict) else ""
+        for c in candidates:
+            if not isinstance(c, dict):
+                continue
+            rid = str(c.get("resourceId") or c.get("id") or "")
+            if rid and rid not in seen_ids:
+                seen_ids.add(rid)
+                all_rows.append(c)
+
+    if not any_ok and last_error:
+        _remember_brief_failure(now, last_error)
+        return {"status": last_error, "items": [], "date": "", "error": last_error}
+
+    if not all_rows:
         _remember_brief_failure(now, "empty")
         return {"status": "empty", "items": [], "date": ""}
 
-    # 批量取详情。候选里没有发布日期（没有 publishDateTimeStr 这类字段），
-    # 而页面要按时间排、要显示日期 —— 必须补这一次。
+    # 批量取详情。候选里没有发布日期，而页面要按时间排、要显示日期 ——
+    # 这次补取不是可选的。
+    ids = [str(c.get("resourceId") or c.get("id") or "") for c in all_rows]
+    ids = [i for i in ids if i][:120]
     rows = _batch_meta(ids)
     if not rows:
         _remember_brief_failure(now, "empty")
@@ -571,12 +623,24 @@ def brief(force: bool = False) -> dict:
 
     items = [_normalise(row) for row in rows if isinstance(row, dict)]
     items = [i for i in items if i.get("title") and i.get("url")]
+
+    # 按发布时间卡进窗口，不只是按"出现在哪一天的早报里"。
+    #
+    # 一天的早报除了当天的推荐，还夹带更早的文章 —— 实测取 3 天回来 60 条，
+    # 日期从 9-14 到 9-18 都有。不卡的话首页会冒出四天前的旧文，
+    # 而这一块叫"近三天"。
+    #
+    # 用发布时间戳而不是早报日期：有些文章是当天被推荐、但几天前就发了，
+    # 读者要看的是"文章什么时候发的"。
+    if _BRIEF_DAYS:
+        cutoff = now - _BRIEF_DAYS * 86400
+        items = [i for i in items if (i.get("published_ts") or 0) / 1000 >= cutoff]
     items.sort(key=lambda item: item.get("published_ts") or 0, reverse=True)
 
     payload = {
         "status": "ok",
-        # 早报自己的日期字段（briefDate），比从条目里取第一篇更准。
-        "date": (data or {}).get("briefDate") or (items[0].get("published", "") if items else ""),
+        # 最新那天的 briefDate。它标的是"这批里最新的一天"。
+        "date": brief_date or (items[0].get("published", "") if items else ""),
         "items": items,
         "fetched_at": int(now),
         "cached": False,

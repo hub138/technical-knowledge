@@ -75,7 +75,7 @@
 .hero p b{font-weight:var(--weight-semibold);font-variant-numeric:tabular-nums}
 .hero p span{font-weight:inherit}
 
-/* ── 每日优质好文：横向滚动 ────────────────────────────────────────────
+/* ── 近三天优质好文：横向滚动 ────────────────────────────────────────────
  *
  * 卡片照 arXivDaily 的做法：封面在上、标题加粗、摘要在下、来源和时间做脚注。
  * 横向滚动而不是网格 —— 这一块是"扫一眼有什么新东西"，一行摆开比四行网格
@@ -781,7 +781,7 @@ function renderAtlas(){
  * 摆在首页当论据是误导。
  *
  * 整块按当前语言渲染，不是翻译 DOM —— 语言切换必须重跑 renderHome。 */
-/* ── 每日优质好文（横向滚动）─────────────────────────────────────────────
+/* ── 近三天优质好文（横向滚动）─────────────────────────────────────────────
  *
  * 数据来自 BestBlogs 的 OpenAPI（见 site/bestblogs.py）—— 它返回的是
  * 人工精审过的 Featured 内容，比"抓一堆标题"有用得多。
@@ -794,7 +794,7 @@ function renderAtlas(){
  */
 let digestCache = null;
 
-/* 每日优质好文。
+/* 近三天优质好文。
  *
  * 数据来自 BestBlogs 的 OpenAPI（site/bestblogs.py），每条带：
  * 公众号名 + 头像、封面、一句话总结、字数 / 阅读时长、金句、评分。
@@ -813,8 +813,8 @@ function renderDigest(items, status) {
     if (status === "unconfigured") {
       box.hidden = false;
       box.innerHTML = `<div class="digest-head">
-        <h2>每日优质好文</h2>
-        <span class="digest-note">配好 BestBlogs 的 API Key 后，这里会列出它每天更新的早报</span>
+        <h2>近三天优质好文</h2>
+        <span class="digest-note">配好 BestBlogs 的 API Key 后，这里会列出它最近三天的早报</span>
       </div>
       <p class="digest-setup">
         去 bestblogs.dev 的「设置 → API Key」生成一个，存到
@@ -855,8 +855,8 @@ function renderDigest(items, status) {
     </a>`;
   }).join('');
   box.innerHTML = `<div class="digest-head">
-      <h2>每日优质好文</h2>
-      <span class="digest-note">BestBlogs 每天更新的早报</span>
+      <h2>近三天优质好文</h2>
+      <span class="digest-note">BestBlogs 早报，滚动三天</span>
       <span class="digest-nav">
         <button type="button" class="digest-arrow" data-dir="-1" aria-label="往前">‹</button>
         <button type="button" class="digest-arrow" data-dir="1" aria-label="往后">›</button>
