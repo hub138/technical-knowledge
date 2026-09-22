@@ -724,10 +724,19 @@
  * 又不能抢节点的视线（权重）。现在用较细的线宽 + 中等透明度：
  * 单条线在浅色底上清楚，几十条交叠时仍然是背景层，节点依然是最重的元素。
  */
-.edge--cross{stroke:var(--color-muted);stroke-width:1;stroke-opacity:.34}
+/* 2026-09-22 再调（用户反馈：缩小视图后线浅得看不见，太深又压节点）：
+ * ① 提一档对比度——inner 从 slate-200 升到 slate-300（1px 的 slate-200 在
+ *   浅底上对比度只有约 1.2:1，缩小后直接消失），透明度 .3→.38、.34→.42；
+ * ② 线宽改由 vector-effect 定死为屏幕像素（见下方规则），不再随缩放衰减——
+ *   这是「缩到 60% 线就没了」的直接原因，与「调深调浅」无关。 */
+.edge--cross{stroke:var(--color-muted);stroke-width:1.15;stroke-opacity:.42}
 /* 同领域引用：只在列内离得够远时才画。它们补充的是"这个主题的两头有联系"，
    权重再低一档，不参与跨领域的视觉竞争。 */
-.edge--inner{stroke:var(--color-line);stroke-width:.9;stroke-opacity:.3}
+.edge--inner{stroke:var(--color-line-strong);stroke-width:1;stroke-opacity:.38}
+/* 描边不随 world 缩放衰减：边线/圆/进度环/轴线一并生效。缩小时线保持
+ * 屏幕宽度不再细成发丝，放大时也不会糊成粗管。CSS 属性在旧浏览器上可能
+ * 不认，边线在 JS 创建处另设了同名 attribute 兜底。 */
+.edge,.node circle,.topic-node circle,.topic-progress,.axis-line{vector-effect:non-scaling-stroke}
 /* 连线的可见度调过两次，第一次调过头了。
  *
  * 最初是 .8px / .5：一百多条线叠在一起像一团脏网。我把它压到 .7px / .22，
@@ -745,7 +754,18 @@
  *
  * 保留它们但仍然画出来，是因为悬停某个笔记时 .focused 会把这一条提起来，
  * 那时它有意义（"这篇被谁引用"）。默认状态安静，交互时才说话。 */
-.edge.focused{stroke:var(--color-warm);stroke-width:2.6;stroke-opacity:1}.topic-link{stroke:var(--color-line-strong);stroke-width:.9;stroke-opacity:.55}.domain-label{font-size:var(--text-body);color:var(--color-ink);font-weight:750;letter-spacing:var(--tracking-h2)}.domain-head{font:750 var(--text-small)/1.3 var(--font-sans);color:var(--color-ink);text-align:center;overflow-wrap:anywhere}.domain-head span{display:block;margin-top:2px;font-size:var(--text-micro);font-weight:600;color:var(--color-muted);font-variant-numeric:tabular-nums;letter-spacing:0}.domain-count{font-size:var(--text-xs);fill:var(--color-muted);font-weight:600;font-variant-numeric:tabular-nums}.topic-name{font-size:var(--text-small);fill:var(--color-ink-soft);font-weight:650;pointer-events:none}.topic-count{font-size:var(--text-xs);fill:var(--color-ink);font-weight:750;pointer-events:none;font-variant-numeric:tabular-nums}.node circle{stroke:var(--color-panel);stroke-width:1.5;cursor:pointer}.node text,.topic-node text{font-size:var(--text-2xs);fill:var(--color-muted);pointer-events:none}.topic-node circle{cursor:pointer;stroke-width:2}.graph-note{font-size:var(--text-sm);fill:var(--color-muted)}.axis-line{stroke:var(--color-line-strong);stroke-width:1.5}.axis-label{font-size:var(--text-base);fill:var(--color-muted)}.empty{background:var(--color-panel);border:1px dashed var(--color-line);padding:30px;text-align:center;color:var(--color-muted);border-radius:7px}
+.edge.focused{stroke:var(--color-warm);stroke-width:2.6;stroke-opacity:1}.topic-link{stroke:var(--color-line-strong);stroke-width:.9;stroke-opacity:.55}.domain-label{font-size:var(--text-body);color:var(--color-ink);font-weight:750;letter-spacing:var(--tracking-h2)}.domain-head{font:750 var(--text-small)/1.3 var(--font-sans);color:var(--color-ink);text-align:center;overflow-wrap:anywhere}.domain-head span{display:block;margin-top:2px;font-size:var(--text-micro);font-weight:600;color:var(--color-muted);font-variant-numeric:tabular-nums;letter-spacing:0}.domain-count{font-size:var(--text-xs);fill:var(--color-muted);font-weight:600;font-variant-numeric:tabular-nums}.topic-name{font-size:var(--text-small);fill:var(--color-ink-soft);font-weight:650;pointer-events:none}/* 2026-09-22 缩放可读性（用户反馈「压缩的字体都看不到」）：
+ * ① 文字描边面板色光晕（paint-order:stroke 让描边垫在字下）——文字压在
+ *   连线交叉处时不再被线「吃掉」，缩小视图里这是主要不可读因素；
+ * ② 缩小态字号补偿：world 整体 scale 的直接后果是文字跟着缩没。缩小越多
+ *   补偿越多（60% 时约 1.67 倍），屏幕上的字面尺寸保持接近原始大小；放大态
+ *   不补偿——放大本就是为了看更大的字。--graph-comp 由 JS 在缩放时写入。
+ * domain-head 用 foreignObject 装 HTML，不在同一补偿链路，单独用 zoom。 */
+.topic-count{font-size:var(--text-xs);fill:var(--color-ink);font-weight:750;pointer-events:none;font-variant-numeric:tabular-nums}
+.node text,.topic-node text{font-size:calc(var(--text-2xs) * var(--graph-comp,1));fill:var(--color-ink-soft);paint-order:stroke;stroke:var(--color-panel);stroke-width:2.5px;stroke-linejoin:round;pointer-events:none}
+#graph-world .domain-head{zoom:var(--graph-comp,1)}
+.node circle{stroke:var(--color-panel);stroke-width:1.5;cursor:pointer}
+.topic-node circle{cursor:pointer;stroke-width:2}.graph-note{font-size:var(--text-sm);fill:var(--color-muted)}.axis-line{stroke:var(--color-line-strong);stroke-width:1.5}.axis-label{font-size:var(--text-base);fill:var(--color-muted)}.empty{background:var(--color-panel);border:1px dashed var(--color-line);padding:30px;text-align:center;color:var(--color-muted);border-radius:7px}
 /* 搜索命中高亮：说明这篇为什么被搜出来 */
 .note-row mark.hit{background:#fdf0c8;color:inherit;border-radius:3px;padding:0 2px;font-weight:700}
 :root[data-theme="dark"] .note-row mark.hit{background:var(--color-star-line);color:#f0e2b0}
@@ -2331,6 +2351,9 @@ function renderNetwork(){
       d:`M ${a.x} ${a.y} Q ${cxp} ${cyp} ${b.x} ${b.y}`,
       class:crossDomain?'edge edge--cross':'edge edge--inner',
       fill:'none',
+      /* 属性层兜底 vector-effect：CSS 规则在部分旧内核不生效，属性直接写在
+       * 元素上最稳。线宽从此按屏幕像素计，缩小视图线不再细成发丝。 */
+      'vector-effect':'non-scaling-stroke',
     });
     line.dataset.source=e.source; line.dataset.target=e.target;
     if(focusEdges&&focusEdges.has(e))line.classList.add('focused');
@@ -2481,7 +2504,20 @@ function bindGraph(){const svg=$('#graph');let drag=null;
   $('#graph-zoom-in').onclick=()=>{state.zoom=clampZoom(state.zoom*1.18);applyTransform()};
   $('#graph-zoom-out').onclick=()=>{state.zoom=clampZoom(state.zoom/1.18);applyTransform()};
   $('#graph-reset').onclick=()=>{state.zoom=1;state.pan={x:0,y:0};applyTransform()}}
-function applyTransform(){const world=$('#graph-world');if(world)world.setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`);const label=$('#graph-zoom-value');if(label)label.textContent=Math.round(state.zoom*100)+'%'}
+function applyTransform(){
+  const world=$('#graph-world');
+  if(world){
+    world.setAttribute('transform',`translate(${state.pan.x} ${state.pan.y}) scale(${state.zoom})`);
+    /* 2026-09-22 文字缩放补偿：world 整体 scale 会把文字一起缩没（用户实测
+     * 「压缩的字体都看不到」）。只在缩小态反向放大字号（1/zoom），屏幕上的
+     * 字面尺寸保持接近 100% 时的观感；放大态不补偿（放大就是要看更大的字）。
+     * CSS 端 .node text/.topic-node text 与 .domain-head 消费 --graph-comp。 */
+    const comp=state.zoom<1 ? Math.min(1/state.zoom,1.8) : 1;
+    world.style.setProperty('--graph-comp',comp.toFixed(3));
+  }
+  const label=$('#graph-zoom-value');
+  if(label)label.textContent=Math.round(state.zoom*100)+'%'
+}
 
 function loadHome(push=false){clearSearch();state.domain='all';state.topic='all';state.selected=null;renderDomains();renderHome();show('home');if(push)history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'})}
 function selectFromUrl(){const params=new URLSearchParams(location.search),path=params.get('path'),domain=params.get('domain'),topic=params.get('topic');if(path==='知识库首页.md'||path==='知识库首页'||domain==='总览'||topic==='首页'){history.replaceState({},'','/');loadHome(false)}else if(path)openNote(path,false);else if(params.get('view')==='panorama'){state.domain=domain||'all';state.topic=topic||'all';if(params.get('tab')==='stack')state.panoTab='stack';showPanorama(false)}else if(params.get('view')==='graph')showGraph(false);else if(params.get('view')==='progress'){state.panoTab='mine';history.replaceState({},'','/?view=panorama&tab=mine');showPanorama(false)}else if(domain)select(domain,topic||'all',false);else loadHome(false)}
