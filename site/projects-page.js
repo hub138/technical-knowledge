@@ -11,18 +11,22 @@
       hero.prepend(learn);
     }
     const copy = document.querySelector("#access-copy");
+    /* 【反复迭代后结果·rt18】此句由 fetch 回调晚于 translateDOM 写入，EN 态残留中文
+       （同 learning 页 rt17 问题）。经 TKI18N.t() 渲染，词条见 i18n.js rt18 批次。 */
+    const tr = (s) => (window.TKI18N ? window.TKI18N.t(s) : s);
     fetch("/api/access", { cache: "no-store" })
       .then((response) => response.json())
       .then((access) => {
         if (!copy) return;
         copy.textContent = access.local_client
-          ? "当前是本机访问：知识库公开可读，启动教学工具自动使用已配置凭据。"
-          : "当前是其他设备访问：知识库公开可读；启动教学工具前需要输入访问密码。";
+          ? tr("当前是本机访问：知识库公开可读，启动教学工具自动使用已配置凭据")
+          : tr("当前是其他设备访问：知识库公开可读；启动教学工具前需要输入访问密码");
       })
       .catch(() => {
         if (copy)
-          copy.textContent =
-            "访问状态暂时无法确认；知识库仍可阅读，启动教学工具时会按需要求授权。";
+          copy.textContent = tr(
+            "访问状态暂时无法确认；知识库仍可阅读，启动教学工具时会按需要求授权",
+          );
       });
   });
 })();

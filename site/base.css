@@ -74,7 +74,9 @@ body.tk-host::before {
   width: var(--sidebar-width);
   padding: 21px 15px 20px;
   display: flex;
+  /* 域多起来之后一屏放不下——不滚动的话底部的域永远够不着。 */
   flex-direction: column;
+  overflow-y: auto;
   background: var(--color-panel);
   border-right: 1px solid var(--color-line);
 }
@@ -100,6 +102,20 @@ body.tk-host::before {
   margin-top: 16px;
 }
 
+/* ── 导航项几何：全站唯一来源 ────────────────────────────────────────────
+ * 侧边栏导航项的几何只在这里定义一次。
+ *
+ * 别再把这份规则复制到别处：site/tokens.css 曾经也有一份 .tk-nav a，
+ * font-weight 写 --weight-semibold，这里写 --weight-medium。两份都命中同一个
+ * 元素，谁在后面加载谁赢，结果同一个导航项在不同页面粗细不一样。
+ * 现在那边只剩一句指回这里的注释。
+ *
+ * 字号写死 px 而不是引用 --text-body：那个变量在深色主题下被重定义过，
+ * 导航项会跟着主题变字号。15px 是用户确认的档位（"导航栏字体有点小，
+ * 加大一号"）：比正文 16px 低半档留出层级，比次级 13px 高——侧栏是
+ * 主级导航，点击目标不该比正文小两档。行高必须显式给，否则不同页面的
+ * 行盒高度差 1-2px，整列看起来忽疏忽密。
+ */
 .tk-nav a {
   display: flex;
   align-items: center;
@@ -109,7 +125,8 @@ body.tk-host::before {
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--color-ink-soft);
-  font-size: var(--text-body);
+  font-size: 15px;
+  line-height: 1.45;
   font-weight: var(--weight-medium);
   text-decoration: none;
   transition:
@@ -170,8 +187,8 @@ body.tk-host::before {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 24px;
+  width: 17px;
+  height: 22px;
   font-size: 1em;
   line-height: 1;
   color: currentColor;
@@ -191,7 +208,93 @@ body.tk-host::before {
  * second way to browse knowledge. The left rail and indent are what make them
  * read as children; without it the smaller type just looked like shrunken
  * siblings. The main site deliberately does not render this level.
+ *
+ * 【2026-09-22 子项折叠】子项默认收起，点父项行或行尾箭头展开：
+ * - .tk-subnav-toggle 是行尾的小箭头按钮（▸ 收起 / ▾ 展开，由
+ *   aria-expanded 驱动旋转），绝对定位贴着父项行右缘，不占链接内空间；
+ * - .tk-subnav-group 是子项容器（shell.js 渲染时默认 hidden），展开后
+ *   子项沿用 缩进+左线 的从属视觉语言；
+ * - 展开状态存 localStorage，由 shell.js 切换，CSS 只管形状。
+ * 下面的旧 .tk-subnav 规则保留：样式语言被本版承接，移动端横排布局也仍
+ * 引用它；等旧容器确认无消费方后再清。
  */
+.tk-nav a.has-children {
+  position: relative;
+  padding-right: 30px;
+}
+
+/* 箭头按钮：盖在父项行右缘。透明背景无边框，整行看着仍是一个导航项。 */
+.tk-subnav-toggle {
+  position: absolute;
+  right: 6px;
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-muted);
+  font-size: var(--arrow-size);
+  line-height: 1;
+  cursor: pointer;
+  /* ▸ 收起态；aria-expanded=true 时旋成 ▾（▸/▾ 语义分工见 tokens.css） */
+  transition: transform var(--duration-fast) var(--ease-out);
+}
+
+.tk-subnav-toggle::before {
+  content: "\25B8";
+}
+
+.tk-subnav-toggle[aria-expanded="true"]::before {
+  transform: rotate(90deg);
+}
+
+.tk-subnav-toggle:hover {
+  color: var(--color-accent);
+}
+
+/* 子项容器：展开后的从属视觉（缩进 + 左线 + 比主项小一号）。 */
+.tk-subnav-group {
+  display: grid;
+  gap: 2px;
+  margin: 1px 0 3px 15px;
+  padding: 2px 0 2px 11px;
+  border-left: 2px solid var(--color-line);
+}
+
+.tk-subnav-group[hidden] {
+  display: none;
+}
+.tk-subnav-inline {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 1px 0 3px 15px;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--color-muted);
+  font-size: 14px;
+  font-weight: 650;
+  text-decoration: none;
+  transition:
+    background var(--duration-fast) var(--ease-out),
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out);
+}
+
+.tk-subnav-inline:hover,
+.tk-subnav-inline[aria-current="page"] {
+  border-color: var(--color-accent-line);
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+/* 旧「常展开箭头」规则已删（2026-09-22 子项折叠改造）：::after 的 ▾ 换成
+ * 可点的 .tk-subnav-toggle（▸/▾ 旋转态），否则行尾出现两个箭头。 */
+
 .tk-subnav {
   display: grid;
   gap: 2px;
@@ -205,7 +308,7 @@ body.tk-host::before {
   margin: 0 0 4px;
   padding-left: 10px;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -218,7 +321,7 @@ body.tk-host::before {
   border: 1px solid transparent;
   border-radius: 6px;
   color: var(--color-muted);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 650;
   text-decoration: none;
   transition:
@@ -232,6 +335,28 @@ body.tk-host::before {
   border-color: var(--color-accent-line);
   background: var(--color-accent-soft);
   color: var(--color-accent);
+}
+
+/* 分组小标题。
+ *
+ * 不要做成可折叠：这三个视图是并列的视角，不是上下级。折叠会让人以为
+ * 点开才能用，而实际上它们和「知识库」一样是并排的入口。
+ * 上间距比下间距大，视觉上把它归给自己下面的那几项。 */
+.tk-nav-group-label {
+  margin: 14px 0 4px;
+  padding: 0 10px;
+  color: var(--color-muted);
+  /* 13px = --text-small 档。站外英文体系（ALF/AntD）分组标签 11-12px 是
+   * 上沿，但中文笔画密、同字号视觉更小；站内阶梯里 11px 明确不做文字、
+   * 12px 又落在档位缝隙。层级靠 700 字重 + letter-spacing + muted 色拉开，
+   * 不单靠字号，13px 不会与 15px 的导航项混淆。 */
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.tk-nav-group-label:first-child {
+  margin-top: 0;
 }
 
 /* ── Sidebar footer: where am I, and how do I leave ─────────────────────── */
@@ -297,6 +422,14 @@ body.tk-host::before {
 
 .tk-domain:hover {
   border-left-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* 全景视图下矩阵随域切换（tk:pano-domain 广播同步），当前域用实色左边线
+   + 主题色文字标出，与 hover 态区分开。 */
+.tk-domain.active {
+  border-left-color: var(--color-accent);
+  border-left-width: 2px;
   color: var(--color-accent);
 }
 
@@ -375,61 +508,299 @@ body.tk-host::before {
 .tk-shell,
 .content {
   width: 100%;
-  max-width: 1260px;
+  /* 全站唯一的内容宽度。曾经十个页面各自覆盖（1160/1240/1260/1320/1440/1600
+   * 六种值），2026-09-20 收到这里，页面级覆盖全部删除。
+   *
+   * 1400 的依据：1440 视口减 260 侧边栏剩 1180，这个值在当前主流屏上恰好
+   * 被视口吃满、两侧不留死白；更宽的屏（≥1660）开始由它接管，行宽封顶在
+   * 1400 − 左右内边距，正文不再随窗口无限拉长。1600 那种值只在超宽屏生效、
+   * 生效即产生一侧 139px 的死白，不如不要。 */
+  max-width: 1400px;
   margin-left: auto;
   margin-right: auto;
-  /* 右侧给悬浮按钮让出的通道。**要有，但要窄。**
+  /* 左右同一基准内边距；右侧再加一条只够悬浮按钮的通道（--float-lane）。
    *
-   * 一个 52×52 的固定角标，任何滚到它那一行的正文都会被压住 —— 这不是
-   * 它挡了多少的问题，而是它固定在那里。所以通道是必要的。
+   * 通道**要有，但要窄**：一个 52×52 的固定角标，任何滚到它那一行的正文
+   * 都会被压住 —— 这不是它挡了多少的问题，而是它固定在那里。
+   * 74px 的算式：按钮 52px + 距右 22px。曾写 44px 是只算了按钮本身 ——
+   * 768px 视口下内容右边界 694.6、按钮左边界 683，正文被压 11.6px。
+   * tokens 里曾写 86px，比需要宽 12px × 每页每行，2026-09-20 收到 74。
    *
-   * 但原来的 86px（--float-lane）是拍出来的，比按钮实际需要的宽得多：
-   *   按钮 52px + 距右边 22px + 一点呼吸 = 约 74px 就够
-   * 多出来的十几像素 × 每页每行，就是白白挤窄内容。85→74 收掉 12px。
-   *
-   * 底部仍然单独留：滚到底时不能让按钮压住最后一行的内容。 */
-  padding-left: clamp(18px, 2.4vw, 30px);
-  /* 通道宽度按**最宽的那个按钮状态**给，不按当前断点猜：
-     按钮 52px + 距右 22px + 呼吸 0px = 74px。
-     原来写 44px，是只算了按钮本身 —— 768px 视口下（这个宽度用的是桌面
-     规则，因为窄屏断点是 max-width:760px）内容右边界 694.6、按钮左边界
-     683，正文被压了 11.6px，布局审计报的 papers@768。 */
-  padding-right: calc(clamp(18px, 2.4vw, 30px) + 74px);
-  padding-bottom: calc(96px + 40px);
+   * 底部单独留：滚到底时不能让按钮压住最后一行。 */
+  --gutter: clamp(20px, 2.2vw, 40px);
+  padding-left: var(--gutter);
+  padding-right: calc(var(--gutter) + var(--float-lane));
+  padding-bottom: calc(var(--float-lane) + var(--space-8));
 }
 
-/* hero 的间距不按"shell 的直接子元素"来判定。
+/* ── 页面头部契约（全站唯一真源，改头部节奏先读这里）──────────────────────
  *
+ * bug1 的本质：两套头部组件（.view-head 与 .hero）各有一份几何，九个
+ * hero 版页面又各写一份本地覆盖 —— 45/46/47px 的顶距、21/22/23px 的
+ * 首块距、35/36px 的标题字号。用户逐页对比 /sources 与 /projects 抓到
+ * "对顶部的空白不一样"：数字根源是 .hero h1 没写 margin（带浏览器
+ * 默认 21px 上边距，叠加 26px 顶部留白变成 47px），而 .view-head h1
+ * 有 margin: 0 0 7px（顶部就是 26px）。2026-09-22 起收成本契约。
+ *
+ * 三种形态、两套几何。形态是语义分工；几何按「身份头 vs 标注头」分两套：
+ *   .view-head                 标注头（紧凑）：标题+说明+右侧操作区，底部
+ *                              全宽细线。给功能视图用 —— 图谱/全景/进度
+ *                              这些视图是主站的子面板，头部只需标注「现在
+ *                              看的是什么」，任务是不占行高、让内容尽快
+ *                              出现。几何：顶 26 / 标题下距 7 / 底距 20。
+ *   .tk-shell .hero:first-child 身份头（宽松）：标题+说明+链接行
+ *                              （.hero-links）或工具栏（.page-toolbar），
+ *                              底部书页式收口线。给整页身份用 —— projects、
+ *                              learning 系列、insights、papers、sources
+ *                              这些页面点进来先要回答「这是什么地方」，
+ *                              宽松留白是仪式感的一部分（Refactoring UI:
+ *                              start with too much white space）。
+ *                              几何：顶 40 / 标题下距 16 / 底距 32。
+ *   首页 hero（.app 根容器）   同款身份头。首页根容器是 .app 不是
+ *                              .tk-shell，上面两条选择器都抓不到 ——
+ *                              由 index.html 写契约镜像（几何同值，真源
+ *                              仍在此总表）。曾长期停在旧统一值 26/20，
+ *                              2026-09-22 修正对齐。
+ *   .topbar + .hero            同款身份头，但页顶先有一条面包屑
+ *                              顶栏（openmaic）—— 它不是 shell 的
+ *                              first-child，旧选择器抓不到，2026-09-22 收编，
+ *                              此后不许再写本地覆盖。
+ *
+ * 几何（两形态各自成套，改动在「几何总表」里同步）：
+ *   顶部留白  hero 40px / view-head 26px（≤760px 折算 hero 32 / view-head 26）
+ *   标题下距  hero h1 margin 0 0 16px / view-head h1 margin 0 0 7px
+ *   说明排版  两形态同款：margin 0 / 76ch / --text-note / 1.6 / ink-soft
+ *             （.view-head p 与 .hero p 合并成下面一条规则）
+ *   底部内距  两形态同 16px，线画在 padding 底（hero 收口线 / view-head
+ *             全宽线，形态语义见各规则注释）
+ *   头部底距  hero 32px / view-head 20px —— 「头部结束到内容开始」
+ *             （≤760px 折算 hero 28 / view-head 20，见移动端块）。
+ *             首个内容块的 margin-top 一律 0 —— 各页历史遗留的
+ *             22/23px（.purpose/.panel-primary/.grid）2026-09-22 已
+ *             全部清除，间距只从头部这侧给；.purpose 的 14px 是例外
+ *             （它是 hero 的补充说明条，从属关系需要贴近，真源在
+ *             base.css 的 Purpose strip 区，不在页面里）。
+ *
+ * 为什么 hero 宽松、view-head 紧凑（2026-09-22 用户抓到的回归）：
+ *   统一之初曾把两形态压成同一套紧凑值（26/7/20），结果 projects 等
+ *   hero 页「和上面的空白变小了、标题和说明的间隔也变紧了」—— 变丑。
+ *   本质：hero 是身份头，宽松是它语义的一部分；把它压成标注头的紧凑，
+ *   等于把门厅的层高压成储物间。形态统一（同一套代码、同一处真源），
+ *   几何分工（两套值、一处的「几何总表」里对照）。40/32/16 全在 8pt
+ *   网格上，hero 行距 16 = token --space-4。
+ *
+ * 搜索框页 vs 无搜索框页：hero 里带 .page-toolbar（搜索/筛选）时，
+ * 工具栏行通过 .hero .page-toolbar 的 margin-top: 16px 与说明句分组；
+ * hero 里没有工具栏时（纯入口页 projects/learning），说明句直接收尾，
+ * 不留空档。有没有工具栏是内容差异，不是几何差异 —— 不另立形态。
+ *
+ * 新页面接入：列表/视图页写 <section class="view-head">；带操作链接的
+ * 入口页写 <section class="hero">。不要在新页面写任何 .hero/.view-head
+ * 的 padding/margin/字号覆盖 —— 本地覆盖会被这里 0,3,0 的特异性压成
+ * 死代码（projects 曾留着一条 45px 的假 padding 半年没人发现），或
+ * 同特异性时在内联样式里悄悄赢（intuition 的 36px 标题），两种都会
+ * 让"页面开头"在不同页忽高忽低。头部的事只在这里改。
+ *
+ * hero 的间距不按"shell 的直接子元素"来判定。
  * 原来写的是 `.tk-shell > .hero:first-child` —— 直接子选择器。首页和
- * 优质好文页的 hero 是 shell 的直接子元素，拿到了 26/18 的内边距；
+ * 优质好文页的 hero 是 shell 的直接子元素，拿到了统一内边距；
  * 论文页的 hero 包在 .tl-main 里（那页是两栏布局），匹配不上，
  * 于是标题一路顶到 21px，而别的页是 47px。
- *
  * 同一个组件在两页差了 26px 的留白，就是这样来的：样式跟着 DOM 结构
  * 而不是组件本身走。改成后代选择器，hero 到哪都长一样。 */
-.tk-shell .hero:first-child {
-  margin: 0;
-  /* 42/28 → 26/18。实测 hero 高 277px 里，上下 padding 70px + 内部两个
-     间隔 49px = 119px 是纯空白，占了 43%。标题、说明、按钮三块内容
-     加起来才 137px。收掉一半之后三块的间隔仍然是 16px 上下，
-     视觉上仍分得开，但不再像中间塞了空气。 */
-  padding: 26px 0 18px;
-  border-bottom: 1px solid var(--ink-rule);
-}
-
-/* The rule does not run to the edge of the column. It stops short, the way a
-   rule in a printed book does. A rule that spans the full width reads as a
-   table border; one that stops reads as a decision. Implemented as a background
-   gradient rather than a border so the gap is on the right only. */
-.tk-shell .hero:first-child {
+.tk-shell .hero:first-child,
+.topbar + .hero {
+  /* 身份头几何（宽松套）：顶 40 / 底距 32 —— 与 view-head（紧凑套
+     26/20）成对照，为什么两套值见上方契约「为什么 hero 宽松」。
+     40/32 在 8pt 网格上；统一之初压成 26/20 曾让 projects 变丑
+     （用户 2026-09-22 抓到的回归），恢复宽松但用显式值，不靠
+     h1 的浏览器默认 margin 撑出 47px（那是 bug 不是设计）。 */
+  margin: 0 0 32px;
+  padding: 40px 0 16px;
   border-bottom: 0;
+  /* 书页式收口线：不跑满整列，像印刷书籍里的决定线；用背景渐变而非
+     border 实现，让缺口只在右侧。为什么 hero 用收口线而 view-head
+     用全宽线：收口线配操作链接行（"这里是入口"），全宽线配列表
+     （"标题区到此为止，下面是内容"）。形态语义，见契约注释。 */
   background-image: linear-gradient(to right, var(--ink-rule) 0, var(--ink-rule) calc(100% - var(--rule-gutter)), transparent calc(100% - var(--rule-gutter)));
   background-repeat: no-repeat;
   background-position: 0 100%;
   background-size: 100% 1px;
 }
 
+/* 说明句两形态共用一条（单一真源，不许再分成两份）。
+ * 56ch 时代曾把列表页的说明卡在 600px 而容器有 1034px —— 76ch 放到
+ * 容器宽度，短句一行放得下就一行；长段落不至于在 1400px 列里横贯。
+ * 2026-09-22 起无例外：曾给首页 .hero--display p 单独留 56ch，把
+ * 45 字导语强制折成两行（用户抓到的换行），已删，见下方注释。 */
+.view-head p,
+.hero p {
+  margin: 0;
+  max-width: 76ch;
+  font-size: var(--text-note);
+  line-height: var(--leading-normal);
+  color: var(--color-ink-soft);
+  /* 2026-09-22：说明句断行教训（三轮实测，勿再走 CSS 断行这条路）：
+   * 起因：图谱页操作句 58 字折成 51+7，「双击笔记进原文」7 字孤悬第二行，
+   * 右侧空约 600px——用户抓到的丑折行。根源：76ch 按西文 0 宽计，中文
+   * 一字≈2ch，76ch 只装 38 汉字，58 字句必然折行（行长合理，不放宽）。
+   * 第一轮 text-wrap: pretty：computed 确认生效，但 Chrome 的 pretty 只救
+   * 西文孤词，对中文 51+7 实测不动（逐字 probe 量行位置验证）。
+   * 第二轮 text-wrap: balance：图谱页 51+7 → 28+30 均衡了，但全站量测
+   * 发现它在 home/graph/projects/sources 四页全部把断点切进词中间
+   * （机制怎么|运作、只|看、可视|化是、的|最新）——中文没有空格，
+   * 宽度均衡算法读不到词界，切词比孤行更伤阅读。两案皆废，撤回。
+   * 正解：语义块分行。长句拆成语义段、每段独立行（span display:block，
+   * 如 .graph-method-note），断点落在「；」「。」语义边界而非宽度边界。
+   * 已在图谱页操作句落地（.graph-focus-hint 改 block）。此规则今后只管
+   * 行长与颜色，不管断行。 */
+}
+
 .tk-pagebar { position: relative; }
+/* ── 页面工具栏（.page-toolbar）：搜索框等过滤件的唯一真源 ─────────────
+ * 为什么收进 base.css：papers 的 .paper-toolbar 和 sources 页各写过
+ * 一份同款搜索框（2026-09-22 查实），样式各维护一份 —— 「每页自己
+ * 维护一份」的又一例。全站凡是「头部下面那行搜索/筛选」，一律用：
+ *   <div class="page-toolbar"><input type="search" …></div>
+ * 不要在新页面私写 toolbar 样式；字号、内距、圆角、焦点环全部在这。
+ * 头部（.view-head/.hero）与首个内容块的间距由头部 margin-bottom
+ * 20px 给出，工具栏自身 margin 一律 0，不再叠间距。 */
+.page-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin: 0;
+}
+
+/* hero 内的工具栏（搜索/筛选行）：与说明句之间 16px 分组。
+ * 为什么单独一条：Atlassian/GCS 的 page header 都把 search bar 归为
+ * 头部的 interaction area —— 搜索属于头部，不是正文第一块。
+ * 有工具栏的 hero（papers/sources）与没有的（projects/learning）
+ * 区分就在这 16px：有则成行，无则不留空档。这是「内容差异决定
+ * 几何增量」，不是另立形态。页面直接把 .page-toolbar 写进 hero，
+ * 不写任何间距 —— 间距只从这里给。 */
+.hero .page-toolbar {
+  margin-top: var(--space-4);
+}
+.page-toolbar input[type="search"] {
+  flex: 1 1 240px;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font: var(--weight-normal) var(--text-body) / 1.4 var(--font-sans);
+}
+.page-toolbar input[type="search"]:focus {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-ring);
+  outline: none;
+}
+
+/* ── 搜索框皮肤（.tk-search）：全站搜索框的唯一真源 ────────────────────
+ * 为什么收进 base.css：2026-09-22 查实两套皮肤并存 —— 主页/图谱顶栏的
+ * .search（44px、放大镜图标、⌘K 提示、focus 伸长）写在 index.html 本地
+ * 两段；sources/papers 走 .page-toolbar 的裸 input（无图标、无 ⌘K、矮一
+ * 截、9px 内距）。同一个「搜索」动作，站内出现两种长相、两处维护 —— 与
+ * 页面头部间隔问题是同族：每写一个新页面就自己维护一份搜索框。
+ *
+ * 结构（全站统一，一个字符都不许页面私改）：
+ *   <label class="tk-search">
+ *     <span><svg …放大镜…/></span>
+ *     <input type="search" id="…" placeholder="…" autocomplete="off">
+ *     <kbd class="tk-search-kbd">⌘K</kbd>   ← 可选；页面没接 ⌘K 快捷键就省略
+ *   </label>
+ *
+ * 放置规则（尺寸/伸缩/位置）不在这 —— 那是页面的差异部分：
+ *   · 顶栏形态：放进 .topbar，页面用 flex-basis 控制宽窄与 focus 伸长
+ *     （见 index.html 顶栏区的放置规则，全站唯一允许写 focus 伸长的地方）
+ *   · 页面工具栏形态：直接放进 <div class="page-toolbar">，input 自适应
+ *     填满 —— .page-toolbar 本身只管放置（flex/gap/margin:0），不管皮肤
+ *
+ * 分工：皮肤（几何、图标、kbd、焦点环）= 这里的契约；放置（宽度、伸缩、
+ * 挂哪）= 页面的 .page-toolbar 或顶栏。新页面要搜索框：复制上面结构，
+ * 换 id 和 placeholder，不写任何样式。 */
+.tk-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+/* 放大镜图标：绝对定位 + inset 上下拉满 + flex 居中 —— 居中的是盒子
+ * 中线，不依赖字形基线，换任何图标都不会歪。16px 描边风格与右上角
+ * 控件同源（lucide 风格）。 */
+.tk-search span {
+  position: absolute;
+  left: 12px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  color: var(--color-muted);
+  pointer-events: none;
+}
+.tk-search span svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+.tk-search input[type="search"] {
+  width: 100%;
+  height: 44px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: 0 12px 0 38px;
+  background: var(--color-panel);
+  color: var(--color-ink);
+  font: var(--weight-normal) var(--text-body) / 1.4 var(--font-sans);
+  box-shadow: 0 1px 2px rgba(20, 42, 35, 0.02);
+  outline: 0;
+}
+/* 2026-09-22 改进 10：恢复原生清除钮（sources 页改进 9 的空状态提示
+ * 让用户知道要"清空看全部"，但长查询没有一键清除的出口）。WebKit 下
+ * 显式声明可见性 + 指针，避免皮肤链路里 appearance 被吃掉。 */
+.tk-search input[type="search"]::-webkit-search-cancel-button {
+  -webkit-appearance: searchfield-cancel-button;
+  cursor: pointer;
+}
+.tk-search input[type="search"]:focus {
+  border-color: var(--color-accent);
+  box-shadow: var(--shadow-ring);
+  outline: none;
+}
+/* ⌘K 提示：贴输入框右缘内侧；聚焦后隐藏（已在输入框里，提示完成
+ * 使命）。窄屏隐藏避免挤压占位符。页面没接 ⌘K 快捷键就不要这个 kbd。 */
+.tk-search-kbd {
+  position: absolute;
+  right: 9px;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  padding: 2px 7px;
+  border: 1px solid var(--color-line);
+  border-radius: 5px;
+  background: var(--color-surface);
+  color: var(--color-muted);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1;
+  pointer-events: none;
+  transition: opacity var(--duration-fast) var(--ease-out), visibility var(--duration-fast) var(--ease-out);
+}
+.tk-search:focus-within .tk-search-kbd {
+  opacity: 0;
+  visibility: hidden;
+}
+@media (max-width: 760px) {
+  .tk-search-kbd { display: none; }
+}
+
+
 
 /* Links in content carry no underline. The global rule in tokens.css colours
    them; this only removes the decoration, which the dense layouts do not want. */
@@ -447,13 +818,19 @@ body.tk-host a:hover { text-decoration: none; }
  *   .hero h1/h2     页面主标题，用 --text-3xl（32px），和首页的
  *                   「把技术原理读到能上手用」同一个量级。列表页、导航页
  *                   用它 —— 一个标题占半屏是错的，屏幕该留给内容。
- *   .hero--display  只给首页的主张句用。--text-display 是 clamp(38px,5.2vw,66px)，
- *                   全站只有这一处出现。原来这条规则套在所有 .hero 上，
- *                   结果 /papers、/sources、/projects 的标题全是 66px，
- *                   比首页还大 —— 把「唯一的最大字号」变成了默认值。
+ *   .hero--display  只给首页的主张句用。2026-09-21 起为 --text-3xl（26-32px），
+ *                   与全站标题同档 —— 用户反馈 66px 太大且把 hero 撑成半屏。
+ *                   --text-display 时代它曾套在所有 .hero 上，把
+ *                   /papers、/sources、/projects 的标题也变成 66px。
  */
 .hero h1,
 .hero h2 {
+  /* 身份头标题下距 16px（--space-4）：标题/说明/工具栏是一组身份信息，
+   * 组内 16px 让三块分得开又不散（Refactoring UI：组间距 > 组内距，
+   * 组内距要「够呼吸但不拆组」）。view-head 是 7px —— 紧凑套。
+   * bug1 的数字根源曾是这条缺失导致 h1 带 21px 浏览器默认上边距；
+   * 现在显式声明，两形态各自成套。 */
+  margin: 0 0 16px;
   max-width: 30ch;
   font-size: var(--text-3xl);
   line-height: 1.25;
@@ -463,35 +840,138 @@ body.tk-host a:hover { text-decoration: none; }
 
 .hero--display h1,
 .hero--display h2 {
-  font-size: var(--text-display);
-  line-height: var(--leading-display);
-  letter-spacing: var(--tracking-display);
+  /* 2026-09-21 降档：原 --text-display（clamp 38-66px）用户实测"字体太大"，
+   * 66px 把带导语和 meta 的 hero 撑成半屏。降到 --text-3xl（26-32px）
+   * 与全站标题同档，首页主张句不再特殊。 */
+  font-size: var(--text-3xl);
+  line-height: 1.25;
 }
 
-/* 说明段落的宽度分两档。
+/* ── 视图标题头 ──────────────────────────────────────────────────────────
+ * 全站页面/视图标题的唯一几何来源，与 /papers「追踪新论文和解析」同一档：
+ * 标题 --text-3xl（clamp 26–32px）、说明 --text-note、底部一条细线。
  *
- * 56ch 是给首页那句主张配的（短句，窄行更好读）。套到列表页的说明上
- * 就错了：实测 /papers 的段落被卡在 600px，而容器有 1034px，
- * 右边空着 434px 还把「点标题回原站看完整解读」的「点」挤到了下一行 ——
- * 明明有地方却不给用。
+ * 重构前这里有多套并行规则，同一个侧边栏点过去标题大小各不相同：
+ *   .graph-head   h2 用 --text-2xl(22px)，无下边框
+ *   .progress-head h2 用 --text-2xl，多 26px 上间距 + 下边框
+ *   .hero h1      index.html 里定义了 4 次，--text-2xl 与 --text-3xl 混用，
+ *                 媒体查询里还有一份 22px 的
+ *   知识全景      借用了图谱的 .graph-head，于是跟着图谱变
  *
- * 默认放到容器宽度（列表页的说明都短，一行放得下就一行）；
- * 只有首页那句长说明才收窄，那是有意的排版。
+ * 现在这些全部废弃，标题只有 .view-head 一个真源。改标题样式只改这里。
+ * 首页主张句 .hero--display 与此同档 —— 2026-09-21 起同为 --text-3xl
+ * （降档史见上面 .hero--display 的注释），全站标题一个量级，无例外。
+ *
+ * 两种形态：
+ *   默认      标题 + 说明，右侧可放操作区
+ *   .view-head--plain  不带下边框，用于标题下方直接接工具栏的视图（图谱）
+ *
+ * ── 改这里之前请先读完，别把已经修好的问题改回去 ──────────────────
+ * 1. 字号必须是 --text-3xl（= --text-h1 = clamp(26px,2.6vw,32px)）。
+ *    不要改成 --text-2xl（固定 22px）。用户确认的基准是 /papers 的
+ *    「追踪新论文和解析」，那是 32px 档；改成 22px 各视图标题会明显缩水。
+ *    h1 与 h2 必须共用这一条 —— 分开写就会一个 32 一个 22。
+ * 2. 不要再新增 .graph-head / .progress-head / .pano-head 之类的单视图类。
+ *    它们就是上次标题大小不一的来源（三套规则 + 媒体查询里各压一次）。
+ *    新视图一律套 .view-head。
+ * 3. index.html 的媒体查询里曾有一条 `.reader h2,.view-head h2{font-size:
+ *    var(--text-2xl)}`，把这里压回 22px。已拆成只留 .reader h2。
+ *    以后写合并选择器时不要把 .view-head 和别的选择器串在一起。
+ * 4. 下边框不要去掉：它是「标题区结束、内容开始」的分界。
+ *    掌握进度曾经没有这条线，看起来和下面的筛选器粘在一起。
+ * 5. 头部几何（顶 26/底 16/头部底距 20/标题下距 7）与 hero 形态同值
+ *    同源 —— 全部约定见上方「页面头部契约」。首个内容块的
+ *    margin-top 一律 0，间距只从头部这侧给。
  */
-.hero p {
-  max-width: none;
-  /* 24px → 16px。标题、说明、按钮是同一组信息的三行，
-     间隔 24px 把它们读成了三段独立内容。 */
-  margin: var(--space-4) 0 0;
-  color: var(--color-muted);
-  font-size: var(--text-note);
-  line-height: var(--leading-normal);
+.view-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  /* 顶部留白 26px，与 .hero 的 padding-top 同值同源。
+   * view-head 挂在无 padding-top 的容器（主站 .content / 子页 .tk-shell）下，
+   * 曾经这里 margin-top 是 0 —— 图谱/全景/进度紧贴 sticky 顶栏，
+   * papers/sources 紧贴视口顶，而 projects 等用 .hero 的页有 26px。
+   * 同一个"页面开头"在不同页忽高忽低，就是用户抓到的 bug1。
+   * 统一规则：头部距顶一律 26px，真源在此，别处不许再覆盖。 */
+  margin-top: 0;
+  padding-top: 26px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-line);
+  /* 顶 26 / 底 16 / 头部底距 20 —— 与 hero 形态同值同源，五值契约
+   * 见上方「页面头部契约」注释。改几何只改契约区，两形态同步。 */
 }
 
-/* 首页的主张句配窄行宽。别的页面不设上限。 */
-.hero--display p {
-  max-width: 56ch;
+.view-head h1,
+.view-head h2 {
+  margin: 0 0 7px;
+  /* 标题一行表达完：全景/图谱/进度的标题是「域名 · 视图名」，
+   * 中文域名本身就 20+ 字。原先 max-width:30ch 会让它必然折行
+   * （用户抓到的 bug）。去掉人为限宽，标题在内容列内自然单行；
+   * 极端超长的英文串用省略号兜底，不挤爆布局。 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--text-3xl);
+  line-height: 1.25;
+  font-weight: var(--weight-bold);
 }
+
+/* 说明段 p 的排版已并入上面的 .view-head p, .hero p 合并规则（唯一真源）。 */
+
+.view-head--plain {
+  padding-top: 26px; /* 与主定义同源，见上。--plain 只免去下边框，不免顶部留白。 */
+  padding-bottom: 0;
+  border-bottom: 0;
+  margin-bottom: 14px;
+}
+
+/* 标题右侧的操作区（图谱缩放、进度筛选器）自己对齐，不被拉伸 */
+.view-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: none;
+}
+
+/* ── 全站统一空态/加载态 ──────────────────────────────────────────────
+ * 图谱、全景、进度、目录在"数据未到"时共用这一种提示。曾经全景用
+ * .pano-empty、目录用 .skeleton、图谱和进度什么都没有 —— 同一状态
+ * 四种长相。样式真源在此；DOM 由 shell.js 的 tkEmptyState() 生成。 */
+.view-empty {
+  margin: 30px 0;
+  color: var(--color-faint);
+  font-size: 13px;
+}
+
+/* 移动端：标题与操作区各占一行，说明不再限宽 */
+@media (max-width: 760px) {
+  .view-head {
+    display: block;
+    gap: 10px;
+  }
+  .view-head-actions { margin-top: 11px; }
+  .view-head p { max-width: none; }
+  /* 桌面端的 nowrap 只服务长域名标题；窄屏内容列放不下时
+     省略号会吞掉半个标题，宁可折行。 */
+  .view-head h1,
+  .view-head h2 {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
+
+/* 说明段落的排版（margin/字号/行高/限宽）已并入上面的
+ * .view-head p, .hero p 合并规则 —— 那是唯一真源，这里不再留副本。
+ *
+ * 曾有的 .hero--display p{max-width:56ch} 已删：导语是两句话的单行
+ * 流式（中点分隔），45 个字被 56ch（约 37 个汉字宽）强制折成两行 ——
+ * 用户抓到的"不应该换行"。删除后导语行宽与全站说明句同走合并真源
+ * 的 76ch，短句自然单行；真到超长时折行是内容问题，不是样式问题。 */
 
 /* The eyebrow is a label, not a sentence: uppercase, tracked out, small. It
    names the section the page sits in, so it gets the accent colour. */
@@ -611,7 +1091,9 @@ body.tk-host button {
      但"动作类"按钮（刷新这类，作用于当前页而不是跳转）要额外空开一档 ——
      否则它看起来像第三个导航项。 */
   /* gap 保持 0，间距由 .action 单独给 */
-  /* 同 .hero p：24 → 16，让标题/说明/按钮读成一组。 */
+  /* 按钮行与说明句的关系：说明句的排版见上面 .view-head p, .hero p
+   * 合并规则；按钮行的 margin-top 用 --space-4，让标题/说明/按钮
+   * 读成一组，但组内又分得开。 */
   margin-top: var(--space-4);
 }
 
@@ -704,18 +1186,21 @@ body.tk-host button {
  */
 .tk-controls {
   position: fixed;
-  top: 18px;
+  /* top 18→16px：搜索框高 44px，其中心线在视口 top 13px（顶栏 padding）下
+   * 22px 处，即 y=35px；控件高 38px，中心线要对齐 y=35 就得 top:16px。
+   * 原来差 2px，肉眼能看出不共线。 */
+  top: 16px;
   right: 22px;
   z-index: var(--z-fab);
   display: flex;
   align-items: center;
   gap: 8px;
 }
-
 .tk-control {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   min-width: 38px;
   height: 38px;
   padding: 0 11px;
@@ -742,6 +1227,15 @@ body.tk-host button {
     border-color var(--duration-fast) var(--ease-out),
     color var(--duration-fast) var(--ease-out),
     background var(--duration-fast) var(--ease-out);
+}
+/* lucide 线条图标：24 网格缩到 16px，描边随 currentColor，
+ * 主题（太阳/月亮）与语言（地球）按钮共用同一尺寸，视觉上才是一组。 */
+.tk-control-icon,
+.tk-control svg {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  display: block;
 }
 
 .tk-control:hover {
@@ -1049,6 +1543,11 @@ body.tk-host button {
   .tk-nav::-webkit-scrollbar { display: none; }
   .tk-nav a { flex: 0 0 auto; min-height: 34px; padding: 7px 9px; font-size: 12px; }
 
+  /* 横排导航里分组小标题没有落脚点——它会变成滚动条里的一个孤立
+     flex 项，把视角三项和其余项硬隔开。移动端本来就靠横向滚动看全部，
+     分组信息让位给可达性，直接隐藏（与 .tk-subnav-label 同一待遇）。 */
+  .tk-nav-group-label { display: none; }
+
   .tk-subnav {
     display: flex;
     gap: 4px;
@@ -1061,6 +1560,32 @@ body.tk-host button {
   .tk-subnav::-webkit-scrollbar { display: none; }
   .tk-subnav-label { display: none; }
   .tk-subnav a { flex: 0 0 auto; padding: 5px 8px; font-size: 12px; }
+
+  /* 【2026-09-22 子项折叠】横排下的折叠组件适配：
+   * - .tk-subnav-group 解除 grid 改入横排 flex 流（hidden 仍生效），
+   *   子项与主项并排滚动；左线/缩进是竖排从属语言，横排里去掉；
+   * - .tk-subnav-toggle 箭头改随文档流（absolute 在横排滚动容器里
+   *   会钉在错误位置），尺寸缩小贴行。 */
+  .tk-subnav-group {
+    display: contents;
+  }
+  .tk-subnav-group[hidden] {
+    display: none;
+  }
+  .tk-subnav-group .tk-subnav-inline {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+  .tk-nav a.has-children { padding-right: 9px; }
+  .tk-subnav-toggle {
+    position: static;
+    width: 16px;
+    height: 34px;
+    margin-left: -6px;
+    flex: 0 0 auto;
+  }
 
   .tk-context,
   .tk-sidebar-footer { display: none; }
@@ -1076,7 +1601,15 @@ body.tk-host button {
     padding: var(--space-4) calc(var(--space-4) + var(--float-lane)) calc(var(--float-lane) + var(--space-8)) var(--space-4);
   }
 
-  .tk-shell .hero:first-child { padding: 30px 0 23px; }
+  /* 头部移动端统一：两形态各自成套（桌面契约见上面的「页面头部契约」）。
+   * hero（身份头）顶 32 / 底距 28 —— 桌面 40/32 的移动端折算（屏幕
+   * 小、留白同比收窄但保持宽松语义）；view-head（标注头）顶 26 /
+   * 底距 20 沿用桌面值（移动端无覆盖）。页面级的移动端 .hero 覆盖（31/25、32/25、34 等）
+   * 已全部删除，只留这一条。改几何在契约「几何总表」里同步两形态。 */
+  .tk-shell .hero:first-child {
+    margin-bottom: 28px;
+    padding: 32px 0 16px;
+  }
   /* 只有首页的主张句在手机上要单独收一档。其余页面走 --text-3xl，
      它在小屏本来就够小（clamp 的下界 26px），不用再覆盖。 */
   .hero--display h1 { font-size: 29px; line-height: 1.22; }
@@ -1106,4 +1639,44 @@ body.tk-host button {
   .tk-fb-overlay,
   .tk-theme-toggle { display: none !important; }
   body.tk-host { padding-left: 0; background: #fff; }
+}
+
+/* ── 收藏星标（首页优质好文 + 优质好文页） ─────────────────────────────
+ *
+ * 位置约定：评分角标在封面右上，「我的收藏」在左上——两边各管一件事。
+ * 底色必须不透明：封面常有黑底大字图，半透明角标整个融进去，实测不可辨。
+ * 已收藏实心 accent 星，未收藏描边星——状态靠字形与颜色，不靠文字。 */
+.tk-fav-btn {
+  /* 位置在卡片底部的 meta 行末尾（margin-left:auto 推到最右）——
+   * 不压封面：封面常有黑底大字图，角标浮在上面看不见，实测成立。 */
+  position: static; margin-left: auto; flex: none;
+  width: 26px; height: 26px; display: inline-grid; place-items: center;
+  border: 1px solid var(--color-line-strong); border-radius: 50%;
+  background: var(--color-raised); color: var(--color-ink-soft);
+  font-size: 13px; line-height: 1; cursor: pointer; padding: 0;
+  transition: color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+.tk-fav-btn:hover { color: var(--color-accent); border-color: var(--color-accent-line); transform: scale(1.08); }
+.tk-fav-btn.is-fav { color: var(--color-accent); border-color: var(--color-accent-line); }
+.tk-fav-panel { max-width: 420px; }
+.tk-fav-text { color: var(--color-ink-soft); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+.tk-fav-overlay .tk-fav-confirm { border-color: var(--color-accent-line); background: var(--color-accent); color: var(--color-on-accent); }
+.tk-fav-overlay .tk-fav-confirm:hover { filter: brightness(1.08); }
+/* 日期行 = flex 一行：字数/日期文本可省略，星标永远钉在同一行行尾。
+ * 之前按钮是独立的 flex 项，长日期时被挤到下一行单独站着（实测成立）。 */
+.digest-facts, .src-rich-facts {
+  display: flex; align-items: center; gap: 6px;
+  min-width: 0; flex: 1 1 100%;
+}
+.digest-facts-text, .src-rich-facts-text {
+  min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.tk-fav-btn { flex: none; }
+/* 确认按钮 hover：反馈按钮的通用 hover 会把字色改成 accent——
+   压在 accent 底上就是字凭空消失（实测）。这里钉死反色字。 */
+.tk-fav-overlay .tk-fb-actions button.tk-fav-confirm:hover {
+  color: var(--color-on-accent);
+  filter: brightness(1.1);
 }

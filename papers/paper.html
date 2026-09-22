@@ -36,7 +36,21 @@
 
       .p-head { border-bottom: 1px solid var(--color-line); padding-bottom: var(--space-5); }
       .p-head h1 { margin: 0 0 var(--space-3); font-size: var(--text-3xl); line-height: 1.25; }
-      .p-meta { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; color: var(--color-muted); font-size: var(--text-small); }
+      .p-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; color: var(--color-muted); font-size: var(--text-small); }
+      /* 元信息徽章化：日期 / ID / 分类 / 页数各自成 chip，扫读比逗号分隔快。
+         chip 底色用 surface，与 p-meta code 同语言。 */
+      .p-meta .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 2px 9px;
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-full);
+        background: var(--color-surface);
+        color: var(--color-ink-soft);
+      }
+      .p-meta .chip svg { width: 12px; height: 12px; opacity: .7; }
+      .p-meta .chip--id { font-family: var(--font-mono); }
       .p-meta code {
         padding: 1px 6px;
         border: 1px solid var(--color-line);
@@ -44,7 +58,7 @@
         background: var(--color-surface);
         font-family: var(--font-mono);
       }
-      .p-authors { color: var(--color-ink-soft); }
+      .p-authors { display: block; margin-top: var(--space-2); color: var(--color-ink-soft); }
       .p-links { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-4) 0 0; }
       .p-links a {
         padding: 7px 14px;
@@ -124,9 +138,45 @@
         border-radius: var(--radius-md);
         background: var(--color-surface);
       }
-      .p-todo h3 { margin: 0 0 var(--space-3); font-size: var(--text-body); color: var(--color-ink); }
+      .p-todo h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 var(--space-3);
+        font-size: var(--text-body);
+        color: var(--color-ink);
+      }
+      .p-todo h3 svg { width: 16px; height: 16px; flex: none; color: var(--color-muted); }
       .p-todo p { margin: 0 0 var(--space-3); color: var(--color-ink-soft); font-size: var(--text-small); line-height: 1.75; }
-      .p-todo ol { margin: 0; padding-left: 20px; color: var(--color-ink-soft); font-size: var(--text-small); line-height: 1.9; }
+      /* 八模块两列勾选清单：每个模块前一个空复选框，暗示"待补"，
+         比平铺数字列表更像可执行的 checklist。 */
+      .p-todo ol {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 6px var(--space-4);
+      }
+      .p-todo li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--color-ink-soft);
+        font-size: var(--text-small);
+      }
+      .p-todo li::before {
+        content: "";
+        flex: none;
+        width: 13px;
+        height: 13px;
+        border: 1.5px solid var(--color-line-strong);
+        border-radius: 3px;
+        background: var(--color-panel);
+      }
+      @media (max-width: 640px) {
+        .p-todo ol { grid-template-columns: 1fr; }
+      }
       .p-todo code {
         padding: 1px 5px;
         border: 1px solid var(--color-line);
@@ -502,7 +552,7 @@
         const l2 = p.has_deep_read && p.deep_read ? `
           <div class="p-deep">${deepBlock(p.deep_read)}</div>` : `
           <div class="p-todo">
-            <h3>${esc(tr("这篇还没有深度解读"))}</h3>
+            <h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg>${esc(tr("这篇还没有深度解读"))}</h3>
             <p>${esc(tr("上面是 L1，来自论文自己的摘要。深度解读（L2）要把全文读完才能写：摘要里没有消融实验、超参设置、失败案例和复现步骤，靠摘要拼出来的解读每一句都可能是错的。"))}</p>
             <p>${esc(tr("按追踪方法论的 L2 规范，需要补这八个模块："))}</p>
             <ol>${MODULES.map(([name]) => `<li>${esc(tr(name))}</li>`).join("")}</ol>
@@ -514,9 +564,10 @@
           <header class="p-head">
             <h1>${esc(titleOf(p) || p.id)}</h1>
             <p class="p-meta">
-              <span>${esc(p.published)}</span>
-              <code>arXiv:${esc(p.id)}</code>
-              ${p.primary ? `<span>${esc(p.primary)}</span>` : ""}
+              <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>${esc(p.published)}</span>
+              <span class="chip chip--id">#${esc(p.id)}</span>
+              ${p.primary ? `<span class="chip">${esc(p.primary)}</span>` : ""}
+              ${p.comment ? `<span class="chip">${esc(p.comment)}</span>` : ""}
             </p>
             <p class="p-meta p-authors" style="margin-top:6px">${esc(authors)}</p>
             <div class="p-links">
@@ -538,6 +589,10 @@
           ${evidence}
         `;
         $("#shell").innerHTML = body;
+        // 标签页标题跟着论文走。不改的话开多篇论文时每个标签页都叫
+        // 「论文追踪」，浏览器历史记录也一样，无法区分 —— 标题是读者
+        // 唯一不切回页面就能看到的定位信息。
+        document.title = `${titleOf(p) || p.id} · ${tr("论文追踪")}`;
         // 公式必须在 DOM 建好之后渲染。KaTeX 是 defer 加载的，
         // 首次渲染时可能还没就位 —— renderMath 里有兜底，不吞原文。
         renderMath($("#shell"));

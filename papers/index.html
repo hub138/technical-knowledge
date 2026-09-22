@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>论文追踪 · technical-knowledge</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/base.css" />
     <script src="/static/nav.js"></script>
@@ -42,28 +43,11 @@
       }
       .method-link:hover { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-panel); }
 
-      .paper-toolbar {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: center;
-        gap: var(--space-3);
-        margin: var(--space-6) 0 var(--space-3);
-      }
-      .paper-toolbar input[type="search"] {
-        flex: 1 1 240px;
-        min-width: 0;
-        padding: 9px 12px;
-        border: 1px solid var(--color-line);
-        border-radius: var(--radius-sm);
-        background: var(--color-panel);
-        color: var(--color-ink);
-        font: var(--weight-normal) var(--text-body) / 1.4 var(--font-sans);
-      }
-      .paper-toolbar input[type="search"]:focus {
-        border-color: var(--color-accent);
-        box-shadow: var(--shadow-ring);
-        outline: none;
-      }
+      /* 搜索框样式已收编进 base.css 的 .page-toolbar（全站搜索框
+         唯一真源，2026-09-22）。本地这份与真源逐字相同 —— 同款
+         组件两处维护正是「间隔不一样」的同族问题，删。
+         原来 toolbar 自带 margin（space-6/0/space-3）：头部
+         margin-bottom 20 已给首块间距，工具栏自身不再叠间距。 */
       /* 年份筛选：追踪页最常用的切分维度就是"哪一年"。 */
       .paper-count {
         color: var(--color-muted);
@@ -136,32 +120,92 @@
       /* 展开后的第一个年份标题不要再顶一大段空白，否则看起来像断成两截。 */
       .paper-past-body > .paper-year:first-child { margin-top: var(--space-4); }
 
-      .paper-list { display: grid; gap: var(--space-3); }
+      /* 卡片的边界靠 1px 边框自己撑：--color-line-strong 对白卡实测 1.485:1，
+       * 在暖白底上分得出来。曾经在这里（和下面 .pn-list）铺过一块 12% 的
+       * 下沉灰板来加强对比，2026-09-20 撤掉 —— 读者不要成块的阴影底，
+       * 边框加 16px 的卡片间距已经足够把"一张是一条"撑住。
+       * 间距依据：卡片高约 218px，12px 只占 5.5%，参考站约 8-10%，最近档是 16。 */
+      .paper-list {
+        display: grid;
+        /* 单列 → 双列。媒体查询在宽屏强制两列（见下方 @media (min-width: 1200px)），
+           这里保底单列。列宽下限的取舍：中文摘要 35-45 字/行为宜，600px ≈ 40 字。 */
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+
+      /* 宽屏双列。侧边栏 + 内边距后内容区约 1050px，两列各约 520px；
+         1200px 断点以上才开两列，避免列宽跌破可读下限。 */
+      @media (min-width: 1200px) {
+        .paper-list { grid-template-columns: 1fr 1fr; }
+      }
 
       .paper {
         display: grid;
-        gap: var(--space-3);
-        padding: var(--space-4) var(--space-5);
-        border: 1px solid var(--color-line);
-        border-radius: var(--radius-md);
+        gap: var(--space-4);
+        /* 两列后卡内空间变紧，内边距 20/24 回到 16/20，密度和呼吸感平衡。 */
+        padding: var(--space-5) var(--space-5);
+        /* 边框 --color-line → --color-line-strong，实测 1.233:1 → 1.485:1。
+           1px 的线要靠它自己被看见，浅一档等于没画。这是让卡片显形最强的一招，
+           比阴影和衬底都直接（阴影 --shadow-xs 的 alpha 只有 0.04，本来就看不见）。 */
+        border: 1px solid var(--color-line-strong);
+        border-radius: var(--radius-lg);
         background-color: var(--color-panel);
         background-image: var(--wash-panel);
-        box-shadow: var(--hairline-top), var(--shadow-xs);
-        transition: border-color var(--duration-fast) var(--ease-out);
+        box-shadow: var(--hairline-top), var(--shadow-sm);
+        /* transform 也进过渡：hover 要上浮，不写这条会瞬移。 */
+        transition:
+          border-color var(--duration-base) var(--ease-out),
+          box-shadow var(--duration-base) var(--ease-out),
+          transform var(--duration-base) var(--ease-out);
       }
-      .paper:hover { border-color: var(--color-accent-line); }
+      /* 悬停三层一起动：边框收到 accent、阴影升一档、上浮 2px。
+         和 index.html 里 .domain-card 的动作完全一致 —— 站内已有的语言，不新造。 */
+      .paper:hover {
+        border-color: var(--color-accent-line);
+        box-shadow: var(--hairline-top), var(--shadow-md);
+        transform: translateY(-2px);
+      }
       .paper[data-href] { cursor: pointer; }
       .paper[data-href]:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
       /* 有手写深度解读的，是真正被读过的，值得一个视觉标记。 */
       .paper.read { border-left: 3px solid var(--color-accent); }
 
-      .paper-head { display: flex; align-items: baseline; gap: var(--space-3); }
+      /* 入场：卡片从下方 6px 淡入，组内错峰 20ms。
+       *
+       * 用 --ease-spring 而不是 --ease-out：弹簧曲线结尾有一点回弹，是"卡片落下"
+       * 的手感。--duration-slow(0.28s) 在 0.3s 的感知阈值内。
+       *
+       * 用 backwards 而不是 both：both 的 fill 会把 transform 锁在结束帧，
+       * 和 .paper:hover 的 translateY(-2px) 打架，悬停就不动了。
+       * backwards 只在动画开始前应用起始帧，结束后 transform 交回 CSS 规则。
+       *
+       * 只给前 8 张加延迟：再往后读者已经滚过去了，44 张全加延迟会让靠后的卡片
+       * 迟到得很离谱。
+       *
+       * prefers-reduced-motion 由 tokens.css 的全局规则压成 0.01ms，不用另写。 */
+      @keyframes paper-in {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: none; }
+      }
+      .enter .paper { animation: paper-in var(--duration-slow) var(--ease-spring) backwards; }
+      .enter .paper:nth-child(2) { animation-delay: 20ms; }
+      .enter .paper:nth-child(3) { animation-delay: 40ms; }
+      .enter .paper:nth-child(4) { animation-delay: 60ms; }
+      .enter .paper:nth-child(5) { animation-delay: 80ms; }
+      .enter .paper:nth-child(6) { animation-delay: 100ms; }
+      .enter .paper:nth-child(7) { animation-delay: 120ms; }
+      .enter .paper:nth-child(8) { animation-delay: 140ms; }
+
+      /* gap 12 → 16，与卡片内其它块间距同档，内外一致。 */
+      .paper-head { display: flex; align-items: baseline; gap: var(--space-4); }
       .paper h3 {
         margin: 0;
         flex: 1;
         min-width: 0;
         font-size: var(--text-h3);
-        line-height: 1.35;
+        /* 1.35 → 1.4：标题占两行时上下不再贴在一起。
+           字号不动 —— 18px 已经是 tokens 的卡片标题档。 */
+        line-height: 1.4;
       }
       .paper h3 a { color: var(--color-ink); }
       .paper h3 a:hover { color: var(--color-accent); }
@@ -187,17 +231,21 @@
        * 字段缺哪条就不显示哪行，不为表格完整去填占位内容。 */
       .l1 {
         display: grid;
-        gap: 7px;
-        margin: var(--space-3) 0 0;
-        padding: var(--space-3) var(--space-4);
+        gap: var(--space-2);
+        /* 上间距 12 → 16：它是卡内"可读内容"和"元数据"的分界，
+           要比其它块间距大一档才读得出分区。 */
+        margin: var(--space-4) 0 0;
+        padding: var(--space-4) var(--space-5);
         border: 1px solid var(--color-summary-line);
-        border-radius: var(--radius-sm);
+        /* 6 → 8，和外卡片圆角同族，层次才收得住。 */
+        border-radius: var(--radius-md);
         background: var(--color-summary-bg);
       }
+      /* 行间距 10 → 12：三行（问题/做法/结果）之间要比行内更松。 */
       .l1 div {
         display: grid;
         grid-template-columns: 68px minmax(0, 1fr);
-        gap: 10px;
+        gap: var(--space-3);
         align-items: baseline;
       }
       .l1 dt {
@@ -217,20 +265,24 @@
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: var(--space-3);
-        padding-top: var(--space-3);
+        gap: var(--space-4);
+        padding-top: var(--space-4);
         border-top: 1px solid var(--color-line);
       }
       .paper-tag {
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        padding: 3px 9px;
+        padding: 4px 10px;
         border: 1px solid var(--color-line);
         border-radius: var(--radius-full);
         background: var(--color-surface);
         color: var(--color-muted);
-        font-size: var(--text-micro);
+        /* 11px → 13px。tokens.css 明写 --text-micro"只用于图形/角标，不做文字"，
+           这里是标签文字，用 11px 违反了自己定的规则。
+           对比度：--color-muted 对 --color-surface 浅色 7.21:1、暗色 7.2:1，
+           13px 非粗体需 4.5:1，都通过。 */
+        font-size: var(--text-small);
       }
       .paper-tag.evidence { border-color: var(--color-accent-line); background: var(--color-accent-soft); color: var(--color-accent); }
       .paper-more {
@@ -444,59 +496,68 @@
          数量本来就会换行，所以不限制行数，只保证左对齐整齐。 */
       .pn-filter-chips { display: flex; flex-wrap: wrap; gap: 5px; }
 
+      /* 芯片走"文字流"语言（2026-09-22 视觉改造第 2 轮）。
+       *
+       * 原来静止态是带边框的方盒：分类 8 个 + 会议 10 个，一屏 18 个框，
+       * 加上选中态的实心块，首屏读起来全是盒子 —— 和优质好文页
+       * "卡中卡"摊平解决的是同族问题（一屏框过多）。
+       *
+       * 静止态去边框去底：纯文字 + 计数，靠字色（ink-soft）保持可读。
+       * 悬停给一层淡衬底提示可点，选中才用实心主色块 —— 视觉重量
+       * 全部留给"当前选中的是什么"这一件事。
+       * min-height/padding 保留：可点区域不变小，只是不画盒子。 */
       .pn-chip {
-        /* 和 .pn-cat 同高（32px）。两行里放的是不同类的芯片，
-           高度不一致时标签没法同时对齐两行 —— 实测一个 32px 一个 25px，
-           差 7px，这就是"歪"的来源。
-           用 flex 居中而不是靠 padding 上下对称，文字才落在盒子正中。 */
         display: inline-flex;
         align-items: center;
         gap: 5px;
         min-height: 32px;
         padding: 0 11px;
-        border: 1px solid var(--color-line);
+        border: none;
         border-radius: var(--radius-xs);
-        background: var(--color-panel);
+        background: transparent;
         color: var(--color-ink-soft);
         font-size: var(--text-small);
         font-weight: var(--weight-medium);
         cursor: pointer;
         white-space: nowrap;
+        transition: background var(--duration-fast) var(--ease-out),
+                    color var(--duration-fast) var(--ease-out);
       }
-      .pn-chip:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      .pn-chip:hover { background: var(--color-surface); color: var(--color-ink); }
       .pn-chip[aria-pressed="true"] {
-        border-color: var(--color-accent);
-        background: var(--color-accent-soft);
-        color: var(--color-accent-ink);
+        background: var(--color-accent);
+        color: var(--color-on-accent);
         font-weight: var(--weight-semibold);
       }
-      .pn-chip b { color: var(--color-muted); font-weight: var(--weight-normal); }
-      .pn-chip[aria-pressed="true"] b { color: var(--color-accent-ink); }
+      .pn-chip b { color: var(--color-muted); font-weight: var(--weight-normal); font-variant-numeric: tabular-nums; }
+      .pn-chip[aria-pressed="true"] b { color: var(--color-on-accent); opacity: 0.85; }
 
       /* 大类芯片比子领域芯片重一档 —— 它是第一层的选择，
-         视觉上要能一眼看出和下面那排不是同级。 */
+         视觉上要能一眼看出和下面那排不是同级。
+         与 .pn-chip 同一套静音语言，字重和字号仍然高它一档。 */
       .pn-cat {
         display: inline-flex;
         align-items: center;
         gap: 5px;
         min-height: 32px;
         padding: 0 13px;
-        border: 1px solid var(--color-line);
+        border: none;
         border-radius: var(--radius-sm);
-        background: var(--color-panel);
+        background: transparent;
         color: var(--color-ink);
         font-size: var(--text-small);
         font-weight: var(--weight-semibold);
         cursor: pointer;
         white-space: nowrap;
+        transition: background var(--duration-fast) var(--ease-out),
+                    color var(--duration-fast) var(--ease-out);
       }
-      .pn-cat:hover { border-color: var(--color-accent-line); }
+      .pn-cat:hover { background: var(--color-surface); }
       .pn-cat[aria-pressed="true"] {
-        border-color: var(--color-accent);
         background: var(--color-accent);
         color: var(--color-on-accent);
       }
-      .pn-cat b { color: var(--color-muted); font-weight: var(--weight-normal); }
+      .pn-cat b { color: var(--color-muted); font-weight: var(--weight-normal); font-variant-numeric: tabular-nums; }
       .pn-cat[aria-pressed="true"] b { color: var(--color-on-accent); opacity: 0.85; }
 
       @media (max-width: 760px) {
@@ -504,9 +565,32 @@
         .pn-filter-row { grid-template-columns: 1fr; gap: 4px; }
       }
 
-      .pn-list { display: grid; gap: 1px; margin-top: var(--space-3); }
-      /* 外部论文一条只有标题+标签，用紧排的列表而不是卡片 ——
-         卡片适合"有内容要展开"的条目，这里一屏看二十条才有意义。 */
+      /* 每条是一张卡片，坐在一块下沉的板上 —— 和下面「已精读」那套同一个读法。
+       *
+       * 原来 gap 只有 1px、每条只靠一条 border-bottom 分隔，整页读起来是
+       * "一整块文字被细线切开"。反馈原话是"挤得很，每个论文的间隔不够，
+       * 也没有那种边框的感觉"。而且 1px 缝看不出"一条是一条"，
+       * 扫读时容易把上下两条的标签看成一家的。
+       *
+       * 没有走卡片 + 大间距那种排法：这一栏一屏看十几条才有意义（见下面
+       * .pn-summary 的注释）—— 大间距会让一屏只剩四五条，那是牺牲了这栏的
+       * 功能去换好看。这里改成"卡片 + 8px 缝"：每条有自己的边界，排得仍然紧。
+       *
+       * 卡片边界同样只靠边框（--color-line-strong，对白卡 1.485:1）。
+       * 这里也铺过一块灰板，2026-09-20 和上面的 .paper-list 一起撤了 ——
+       * 成块的阴影底不是读者要的。 */
+      .pn-list {
+        display: grid;
+        /* 双列提升密度：1440 视口内容区 1043px，两列各约 500px。
+           中文摘要 500px ≈ 33 字/行，仍在 30-45 字可读区间内；
+           三行截断的总结在窄列里仍够用。窄屏回单列。 */
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-2);
+        margin-top: var(--space-3);
+      }
+      @media (max-width: 1100px) {
+        .pn-list { grid-template-columns: 1fr; }
+      }
       /* 一句话总结 —— 参照 arxivdaily 的排法。
        *
        * 第一版是 13px 细体 + 淡蓝底块。读者反馈：字太小，而且一个色块
@@ -537,14 +621,32 @@
         color: var(--color-summary-label); font-weight: var(--weight-bold);
         margin-right: 6px;
       }
-      /* 每条之间的间距也收紧：一屏能多看几条。 */
-      .pn-row { padding-bottom: 14px; }
-
+      /* 每条是一张白卡。原来这里只有一条 border-bottom，没有底色 ——
+       * 条目和页面底同色，读者只看到分隔线，看不出"这是一条"。
+       *
+       * 内边距从 12px 0 提到 14px 18px：左右原来贴到 0，标题和标签的起点
+       * 和板边缘齐平，卡片感出不来。
+       * 行内 gap 从 3px 提到 8px：标题、中文名、标签行、总结四块原来挤在一起。
+       *
+       * 边框用 --color-line-strong 而不是 --color-line：1px 的线要自己站得住，
+       * 浅一档在白卡上只有 1.23:1，等于没画（--color-line-strong 是 1.49:1）。 */
       .pn-row {
         display: grid;
-        gap: 3px;
-        padding: var(--space-3) 0;
-        border-bottom: 1px solid var(--color-line);
+        gap: var(--space-2);
+        padding: 14px 18px;
+        border: 1px solid var(--color-line-strong);
+        border-radius: var(--radius-lg);
+        background: var(--color-panel);
+        transition:
+          border-color var(--duration-base) var(--ease-out),
+          box-shadow var(--duration-base) var(--ease-out),
+          transform var(--duration-base) var(--ease-out);
+      }
+      /* 和「已精读」的 .paper:hover 同一套动作，站内一致。 */
+      .pn-row:hover {
+        border-color: var(--color-accent-line);
+        box-shadow: var(--shadow-sm);
+        transform: translateY(-1px);
       }
       .pn-row a {
         color: var(--color-ink);
@@ -578,37 +680,43 @@
        * （蓝色 cs.AI、橙色「新提交」），一眼能分出哪类是哪类。
        *
        * 会议用主色的淡底，子领域用中性底，标签最轻 —— 三级层次靠底色
-       * 而不是靠字号，这样都在 12px 也能分清。
-       */
+       * 而不是靠字号，所以三种芯片同字号也能分清。
+       *
+       * 字号 11px(--text-xs) → 13px(--text-small)：11px 是 tokens 里留给
+       * 图形角标的那一档，拿来排标签文字偏小，反馈里"字太小"是同一件事。
+       * 三种芯片一起提，保持底色分工、字号统一。 */
       .pn-conf {
-        padding: 2px 8px;
+        padding: 3px 9px;
         border-radius: var(--radius-xs);
         background: var(--color-accent-soft);
         color: var(--color-accent-ink);
-        font-size: var(--text-xs);
+        font-size: var(--text-small);
         font-weight: var(--weight-semibold);
         white-space: nowrap;
       }
       .pn-sub {
-        padding: 2px 8px;
+        padding: 3px 9px;
         border-radius: var(--radius-xs);
         background: var(--color-surface);
         color: var(--color-ink-soft);
-        font-size: var(--text-xs);
+        font-size: var(--text-small);
         font-weight: var(--weight-medium);
         white-space: nowrap;
       }
       .pn-tag {
-        padding: 2px 8px;
-        border: 1px solid var(--color-line);
+        padding: 3px 9px;
+        border: 1px solid var(--color-line-strong);
         border-radius: var(--radius-xs);
         color: var(--color-muted);
-        font-size: var(--text-xs);
+        font-size: var(--text-small);
         white-space: nowrap;
       }
       .pn-meta { margin-top: 1px; }
 
-      .pn-more {
+      /* display 不写死 block：hidden 属性要靠 UA 的 [hidden]{display:none}
+         生效。写死后空结果（0/0）时按钮照样露出来，截图实测抓到过。
+         需要块级行为用 [hidden]:not() 组合选择器，hidden 时交给 UA 隐藏。 */
+      .pn-more:not([hidden]) {
         display: block;
         width: 100%;
         margin-top: var(--space-4);
@@ -631,6 +739,8 @@
         .l1 div { grid-template-columns: 1fr; gap: 1px; }
         .paper { padding: var(--space-4); }
         .pn-filter-label { min-width: 0; }
+        /* 双列网格在窄屏强制回到单列。 */
+        .paper-list { grid-template-columns: 1fr; }
       }
     </style>
     <link rel="stylesheet" href="/static/katex.min.css">
@@ -640,11 +750,26 @@
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
     <div class="tk-shell tl-layout">
       <div class="tl-main">
+      <!-- 头部形态=hero（身份头，宽松几何）：真源在 base.css「页面头部
+           契约」。这页点进来先回答「这是什么页」—— 两万三千篇论文的
+           解读库；搜索是头部的 interaction area（Atlassian/GCS page
+           header 同款解剖），随身份一起给，不放正文。 -->
       <section class="hero">
         <h1>追踪新论文和解析</h1>
         <!-- 句子在锚点处断开是必须的：i18n 按文本节点查词典，
              把链接包进整句会让英文界面下段落外的部分翻不过来。 -->
         <p><span>两万三千篇顶会论文解读，来自</span> <a href="https://papernotes.org/" target="_blank" rel="noopener noreferrer">papernotes.org</a><span>，按论文自己的分类组织。点标题回原站看完整解读。</span></p>
+        <!-- 搜索框：两个视图（外部收录/已精读）共用一个 —— 皮肤走
+             base.css 的 .tk-search 契约，放置走 hero 内的 .page-toolbar
+             （间距由 .hero .page-toolbar 的 margin-top 统一给，页面零
+             间距规则）。切标签时 JS 换 placeholder。 -->
+        <div class="page-toolbar">
+          <label class="tk-search">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
+            <input type="search" id="pn-search" placeholder="搜标题或方向" autocomplete="off" />
+            <kbd class="tk-search-kbd" title="Cmd/Ctrl+K">⌘K</kbd>
+          </label>
+        </div>
       </section>
 
       <div class="pn-bar">
@@ -657,25 +782,25 @@
           </button>
         </div>
         <span class="pn-stat" id="pn-stat"></span>
+        <!-- 已精读视图的筛选计数徽章（原来在 view-read 的工具栏里，
+             工具栏并入 hero 后移到这里 —— 跟视图切换按钮同一行，
+             「点哪个标签、筛出多少」一眼可读）。 -->
+        <span class="paper-count" id="paper-count" hidden></span>
         <span id="method-slot"></span>
       </div>
 
-      <!-- 外部收录视图 -->
+      <!-- 外部收录视图。搜索框在 hero 头部里（两视图共用），
+           这里不再放工具栏 —— 同一个动作不放两份入口。 -->
       <div id="view-external">
-        <div class="paper-toolbar">
-          <input type="search" id="pn-search" placeholder="搜标题或方向" autocomplete="off" />
-        </div>
         <div class="pn-filters" id="pn-filters"></div>
         <div class="pn-list" id="pn-list"></div>
         <button type="button" class="pn-more" id="pn-more" hidden></button>
       </div>
 
-      <!-- 已精读视图：本地那 44 篇，保留原有的 L1 展示 -->
+      <!-- 已精读视图：本地那 44 篇，保留原有的 L1 展示。搜索框在 hero
+           头部里（id=paper-search 已并入 pn-search，两视图共用一个框），
+           计数徽章移到 .pn-bar 里显示。 -->
       <div id="view-read" hidden>
-        <div class="paper-toolbar">
-          <input type="search" id="paper-search" placeholder="搜标题、作者、arXiv 编号" autocomplete="off" />
-          <span class="paper-count" id="paper-count"></span>
-        </div>
         <div id="paper-list"></div>
       </div>
       </div>
@@ -791,8 +916,16 @@
              + `<div class="paper-list">${items.map(card).join("")}</div>`;
       }
 
+      /* 入场动画是否已播过。见 render() 里挂 .enter 的那段。 */
+      let firstPaint = true;
+      /* 已精读视图是否被真正显示过。默认 tab 是外部收录，第一次 render() 发生在
+         隐藏容器里，动画要留给读者切过来的那一次。见 #tab-read 的 onclick。 */
+      let everShownRead = false;
+
       function render() {
-        const q = $("#paper-search").value.trim().toLowerCase();
+        /* 搜索框在 hero 头部里与外部收录共用（#pn-search）—— 两视图
+         同一个框，取词来源只有这一处。 */
+      const q = $("#pn-search").value.trim().toLowerCase();
         const filtered = all.filter((p) => {
           if (!q) return true;
           return [p.title, p.id, (p.authors || []).join(" "), p.primary,
@@ -823,6 +956,30 @@
           </details>`;
         }
         list.innerHTML = out;
+        /* 入场动画只在第一次渲染放一次。
+         *
+         * 每次搜索都会重写上面的 innerHTML。这里有个反直觉的点：光在首屏加一次
+         * .enter 是不够的 —— .enter 留在容器上，之后每次重写 innerHTML 插进去的
+         * 新 .paper 仍然匹配 `.enter .paper`，于是每打一个字全列表重播一遍淡入。
+         * 实测：加完类再搜一次，有 11 个 paper-in 动画在同时跑。
+         *
+         * 所以动画播完就把类摘掉，让它真的只发生一次。用 animationend 而不是
+         * setTimeout：时长改了不用回来改这里的数字，也不会在标签页切到后台、
+         * 动画被暂停时提前摘掉。 */
+        if (firstPaint) {
+          firstPaint = false;
+          list.classList.add("enter");
+          /* 摘类用定时器，不用 animationend。
+           *
+           * 试过盯最后一张卡的 animationend，不成立：屏幕外的卡片浏览器根本不会
+           * 启动它的动画（实测 44 张里只有 7 张真的 animateend 过），所以那个
+           * 监听永远等不到，类会一直留在容器上，反而回到"每次搜索都重播"。
+           *
+           * 300ms 是最慢那几张的时长（--duration-slow 0.28s）加最小的错峰余量。
+           * 摘早了会打断正在播的卡，摘晚了就是在一次搜索里多挂一小会儿 —— 两边
+           * 都不严重，取整到 300。 */
+          setTimeout(() => list.classList.remove("enter"), 300);
+        }
         /* 整块可点：解析是这一页的主线动作，读者不该被要求瞄准右下角那个
            小链接。卡内已有的链接保持自己的跳转，不重复处理。 */
         list.querySelectorAll(".paper").forEach((card) => {
@@ -901,8 +1058,10 @@
           ${/* 一句话总结。PaperNotes 每篇正文开头都有，是"这篇讲了什么、
                值不值得读"最直接的依据 —— 比标题有用得多。
                它是模型读完论文写的，不是作者原话，所以照站内统一的
-               「AI总结」标记来渲染（和 /sources 那套同一个视觉）。 */""}
-          ${paper.summary ? `<p class="pn-summary" data-clamp><b class="pn-summary-label">AI总结</b><span>${renderSummary(paper.summary)}</span></p>` : ""}
+               「AI总结」标记来渲染（和 /sources 那套同一个视觉）。
+               2026-09-22 i18n 修复（勿删）：标签文案套 tr() 查词表（→ AI summary），
+               与 /sources 正文卡同一翻译路径。 */""}
+                ${paper.summary ? `<p class="pn-summary" data-clamp><b class="pn-summary-label">${esc(tr("AI总结"))}</b><span>${renderSummary(paper.summary)}</span></p>` : ""}
         </article>`;
       }
 
@@ -1078,10 +1237,17 @@
           if (pn.cat) parts.push(pn.cat);
           if (pn.sub) parts.push(pn.sub);
           if (pn.conf) parts.push(pn.conf);
-          // 没筛选时 total 就等于 grand，再说一遍是重复。
+          // 没筛选时 total 就等于 grand，tab 上已经有「外部收录 23,802」，
+          // 这里再说一遍是同屏重复。改为报索引抓取时间（数据新鲜度）——
+          // 读者更关心「这批论文截止到什么时候」，总量 tab 已经说了。
+          const fetchedText = payload.fetched_at
+            ? (() => { try { return new Date(payload.fetched_at).toLocaleDateString(); } catch { return ""; } })()
+            : "";
           const head = (pn.cat || pn.sub || pn.conf || pn.q)
             ? `${tr("筛出")} ${parts.join(" · ")}`
-            : `${tr("外部收录")} ${pn.grand.toLocaleString()} ${tr("篇")}`;
+            : fetchedText
+              ? `${tr("索引抓取于")} ${fetchedText}`
+              : `${tr("外部收录")} ${pn.grand.toLocaleString()} ${tr("篇")}`;
           const scope = (pn.cat || pn.sub || pn.conf || pn.q) ? ` / ${tr("总计")} ${pn.grand.toLocaleString()} ${tr("篇")}` : "";
           $("#pn-stat").textContent = head + scope;
         } catch (error) {
@@ -1095,17 +1261,38 @@
       /* 搜索防抖：每敲一个字就发一次请求会打满后端，而且结果闪烁。
          250ms 是打字停顿和响应感之间的折中。 */
       let pnTimer = null;
+      /* 一个框服务两个视图：输入在哪个视图就筛哪个 —— 外部收录走
+         loadExternal（请求后端），已精读走 render（本地过滤）。
+         共用 250ms 防抖，不重复造第二套。 */
       $("#pn-search").oninput = (event) => {
         clearTimeout(pnTimer);
         const value = event.currentTarget.value;
         pnTimer = setTimeout(() => {
-          pn.q = value.trim();
-          pn.offset = 0;
-          $("#pn-list").innerHTML = "";
-          loadExternal();
+          const inRead = !$("#view-read").hidden;
+          if (inRead) {
+            render();
+          } else {
+            pn.q = value.trim();
+            pn.offset = 0;
+            $("#pn-list").innerHTML = "";
+            loadExternal();
+          }
         }, 250);
       };
       $("#pn-more").onclick = () => loadExternal(true);
+
+      /* ⌘K 聚焦搜索 —— 与主页同款键位（主页 bindKeyboard 的平移）。
+       * 主页有、子页没有，键盘用户换了页就断习惯。macOS 的 Cmd+K
+       * 原生无占用，Chrome 的 Ctrl+K 跳地址栏可被 preventDefault
+       * 拦下（主页注释里实测过，此处同结论）。 */
+      document.addEventListener("keydown", (event) => {
+        if ((event.metaKey || event.ctrlKey) && (event.key === "k" || event.key === "K")) {
+          event.preventDefault();
+          const box = $("#pn-search");
+          box.focus();
+          box.select();
+        }
+      });
 
       /* 两个视图切换。外部收录是默认 —— 它是这页的主内容，
          一个想看新论文的人不该先看到本地那 44 篇。 */
@@ -1115,9 +1302,27 @@
         $("#timeline").hidden = show;
         $("#tab-external").setAttribute("aria-selected", String(show));
         $("#tab-read").setAttribute("aria-selected", String(!show));
+        /* hero 头部共用搜索框随视图换语境：placeholder 告诉读者
+           这一框此刻筛的是什么；已精读的计数徽章（pn-bar 里）只在
+           该视图显示。搜索框值不动 —— 切视图不清词，读者换个口径
+           继续筛是常见路径。 */
+        $("#pn-search").placeholder = show
+          ? "搜标题或方向"
+          : "搜标题、作者、arXiv 编号";
+        $("#paper-count").hidden = show;
       }
       $("#tab-external").onclick = () => pnShowExternal(true);
-      $("#tab-read").onclick = () => pnShowExternal(false);
+      $("#tab-read").onclick = () => {
+        pnShowExternal(false);
+        /* 外部收录是默认 tab，render() 在它显示时就跑过一遍了 —— 那一遍是在
+         * 隐藏容器里，入场动画白白放掉，等读者切过来什么也看不到。
+         * 这里把标志复位再画一次，让动画落在真正被看到的那一刻。 */
+        if (!everShownRead) {
+          everShownRead = true;
+          firstPaint = true;
+          render();
+        }
+      };
       // 初始状态显式设一次。只靠 onclick 的话首屏是"两个视图都显示"的
       // 默认状态 —— 外部列表和时间线同时在，而时间线列的是本地旧论文。
       pnShowExternal(true);
@@ -1140,7 +1345,9 @@
         render();
       }
 
-      $("#paper-search").oninput = render;
+      /* 已精读的过滤也挂到 hero 头部共用框（#pn-search）的防抖上：
+         输入即筛，不另立输入框、不另立防抖 —— 一个动作一个入口。 */
+      /* （绑定合并见下方 pnTimer 段 —— render 已是其中一支。） */
       /* 这一页的正文全部由 JS 生成，translateDOM 走的是静态 markup，
          够不到这些节点，所以语言切换后要自己重画一遍。 */
       document.addEventListener("tk:lang", () => {

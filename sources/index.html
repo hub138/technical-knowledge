@@ -3,7 +3,10 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>外部资源 · technical-knowledge</title>
+    <!-- 与侧边栏导航项、本页 h1 同为「优质好文」：改名后 <title> 漏改，
+     导致从导航点进来看到的标签页名字与入口不一致。 -->
+<title>优质好文 · technical-knowledge</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/base.css" />
     <script src="/static/nav.js"></script>
@@ -50,7 +53,7 @@
       .src-group-head > h2 {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: var(--space-2); /* 2026-09-22 8pt 归格：10→8 */
         margin: 0;
         color: var(--color-ink);
         font-size: var(--text-h2);
@@ -69,21 +72,36 @@
         font-size: var(--text-body);
       }
 
-      .src-list { display: grid; gap: var(--space-3); }
+      .src-list { display: grid; gap: var(--space-8); }
+      /* 搜索精筛用 card.hidden 藏不命中的卡。hidden 属性的 UA 默认
+         display:none 会被上面的 .src-card{display:grid} 压掉（同特异性
+         时 UA 规则输给作者规则），必须显式兜底 —— 全站组件一律走
+         base.css 的 .page-toolbar 契约，但 [hidden] 兜底属于本页卡片
+         特有结构，写在这里。 */
+      .src-card[hidden],
+      .src-rich-card[hidden],
+      .src-feed-list li[hidden] { display: none; }
 
+      /* 站点卡改为「刊头」式：去边框、去投影、去底色，
+       * 靠左侧主色粗竖线作锚点（同 .src-rich-card--text 的锚点语言），
+       * 与下方文章卡（白底细边圆角）形成两种身份：
+       * 刊头是「这一栏的署名」，卡片是「内容」。
+       *
+       * 曾经是白底描边圆角卡（卡中卡）：卡片里再嵌文章卡片网格，
+       * 一屏出现七八层边框，层级靠堆边框表达 —— 与本页 2026-09
+       * 多轮「线太多反而看不出层级」的教训同源。摊平后层级靠
+       * 留白 + 锚点线 + 字号表达，只保留文章卡自己的边框。 */
       .src-card {
         display: grid;
         gap: var(--space-2);
-        padding: var(--space-4) var(--space-5);
-        border: 1px solid var(--color-line);
-        border-radius: var(--radius-md);
-        background: var(--color-panel);
-        box-shadow: var(--shadow-sm);
+        padding: var(--space-2) 0 var(--space-2) var(--space-5);
+        border-left: 3px solid var(--color-accent-line);
       }
+      .src-card:hover { border-left-color: var(--color-accent); }
       .src-head {
         display: flex;
         align-items: baseline;
-        gap: 10px;
+        gap: var(--space-2); /* 2026-09-22 8pt 归格：10→8 */
         flex-wrap: wrap;
       }
       /* 站名加大到 22px、最粗一档。
@@ -106,16 +124,14 @@
       }
       .src-kind { color: var(--color-muted); font-size: var(--text-sm); }
 
+      /* 资讯组的说明文字保持更轻的语气，卡片壳已统一摊平，
+         不再需要 --light 变体的独立视觉。 */
       .src-gain {
-        margin: 0;
         margin: 0;
         color: var(--color-ink-soft);
         font-size: var(--text-body);
         line-height: 1.8;
       }
-      /* 资讯组的卡片不必撑那么高，它的价值是"知道发生了什么"，
-         不需要一段论证。 */
-      .src-card--light .src-gain { color: var(--color-muted); }
 
       .src-tags { display: flex; flex-wrap: wrap; gap: 6px; }
       .src-tags i {
@@ -130,7 +146,7 @@
       }
 
       @media (max-width: 760px) {
-        .src-card { padding: var(--space-4); }
+        .src-card { padding-left: var(--space-4); }
         .src-head a { font-size: var(--text-md); }
       }
 
@@ -173,38 +189,62 @@
         font-size: var(--text-small); font-variant-numeric: tabular-nums;
       }
 
-      .src-rich-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: var(--space-3); }
-      .src-rich-chip {
-        display: inline-flex; align-items: center; gap: 5px;
-        min-height: 32px; padding: 0 12px;
-        border: 1px solid var(--color-line); border-radius: var(--radius-xs);
-        background: var(--color-panel); color: var(--color-ink-soft);
-        font-size: var(--text-small); font-weight: var(--weight-medium);
-        cursor: pointer;
-      }
-      .src-rich-chip:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
-      /* 选中态用实心主色，和论文页的 .pn-cat 一致。
+      /* 分类芯片在这里，2026-09-20 移除。
        *
-       * 原来这里是 accent-soft 浅底，而论文页那个同类交互是实心深蓝 ——
-       * 同一个动作（点一下筛内容）在两个页面长得不一样，读者得重新学。
-       * 注释里我写的是"和论文页同一套视觉"，但实际没对齐；这次对齐。 */
-      .src-rich-chip[aria-pressed="true"] {
-        border-color: var(--color-accent);
-        background: var(--color-accent);
-        color: var(--color-on-accent);
-        font-weight: var(--weight-semibold);
+       * 它靠 item.category 筛，而实测六个源里**只有 BestBlogs 有 category**：
+       *   bestblogs 22 条 → 软件编程 12 / 商业科技 2 / 人工智能 8
+       *   arxivdaily 12、readhub 12、ruanyifeng 3、papernotes 0、zeli 0 → 全无
+       * 于是那排芯片只作用于 22/49 条，"筛选"名不副实 —— 读者点了会以为
+       * 筛的是整页，实际另外三组纹丝不动。
+       *
+       * 试过两条替代路，都不成立：
+       *   · 用标签筛 —— arxivdaily 只有 8 种且 6 种是 arXiv 代码（cs.AI 这类），
+       *     bestblogs 有 45 种标签而内容只有 22 条（平均每标签 0.5 条，筛完基本空），
+       *     readhub 和 ruanyifeng 一条标签都没有。
+       *   · 拿标题猜分类 —— 猜错的分类比没有分类更坏，读者会以为它是可信的。
+       *
+       * 真正在切分内容的是**每个源自己的分组**（4 组，各自可折叠，最多 22 条），
+       * 那比一个假的统一分类诚实，也更好用。所以这里不再放筛选控件。
+       *
+       * 如果将来某个源开始返回真实分类，先确认它覆盖全部源再把它加回来。 */
+
+      /* 收藏夹：全站共享的收藏列表，有收藏才渲染。
+       * 位置在所有源之上——收藏是读者亲手挑的，曝光位应该比算法排的靠前。
+       * 卡片复用 .src-rich-card 的样式与星标按钮，收藏时间做角标。 */
+      .src-favs { margin: 0 0 var(--space-6); }
+      .src-favs[hidden] { display: none; }
+      .src-favs-title {
+        display: flex; align-items: baseline; gap: var(--space-2); /* 2026-09-22 归格：10→8 */
+        margin: 0 0 var(--space-3); font-size: var(--text-h3);
       }
-            
-      .src-rich { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); align-items: stretch; }
-      @media (max-width: 1100px) { .src-rich { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-      @media (max-width: 700px) { .src-rich { grid-template-columns: minmax(0, 1fr); } }
+      .src-fav-count { color: var(--color-muted); font-size: var(--text-small); font-weight: var(--weight-normal); }
+      .src-favs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: var(--space-6); } /* 2026-09-22 归格：16→24，与 .src-rich 同步 */
+      .src-favs .src-rich-card { position: relative; }
+      .src-favs .src-card-fav { position: absolute; top: var(--space-2); right: var(--space-2); } /* 2026-09-22 归格：10→8 */
+      .src-fav-date { color: var(--color-faint); font-size: var(--text-xs); font-variant-numeric: tabular-nums; }
+
+      /* 自适应列数：minmax(235px, 1fr) + auto-fill。
+       *
+       * 曾经是固定两列大卡（1440 下每张 ~360px 宽）——读者反馈"块太大"。
+       * 235px 的下限对齐首页 digest 卡的观感（那边一屏四张，每张 ~250px）：
+       * 主栏 1042px 时出 4 列、每张 ~250px，正好"一屏四个"；主栏窄些出 3 列。
+       * 摘要按行数截断（见 .src-rich-sum），卡的高度不再失控。 */
+      /* 2026-09-22 8pt 归格：卡间距 16→24（--space-6）。依据卡片设计通用
+       * 标准（card UI best practices）：卡间距取 24 或 32px，且 ≥ 卡内
+       * 段落行高。16px 在 4 列时横向过挤（每张 ~250px 的卡只有 16px 呼吸）。
+       * 24px 时主栏 1042 - 3×24 = 970 / 4 ≈ 242px ≥ 235 下限，不掉列。 */
+      .src-rich { display: grid; grid-template-columns: repeat(auto-fill, minmax(235px, 1fr)); gap: var(--space-6); align-items: stretch; }
       .src-rich-card {
+        position: relative;
         display: grid; grid-template-rows: auto 1fr; overflow: hidden; height: 100%;
         border: 1px solid var(--color-line); border-radius: var(--radius-md);
         background: var(--color-panel); text-decoration: none;
-        transition: border-color var(--duration-fast) var(--ease-out);
+        /* 2026-09-22 改进 7：transition 从只管 border-color 扩到 transform，
+         * 配合下面 hover 的 2px 上浮（交互标准：hover 反馈 = 色变 + 1-3px
+         * 位移/阴影层级，2px 在 4pt 半格上）。 */
+        transition: border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
       }
-      .src-rich-card:hover { border-color: var(--color-accent-line); }
+      .src-rich-card:hover { border-color: var(--color-accent-line); transform: translateY(-2px); }
       /* 同首页：框用 contain 而不是 cover。
        *
        * 这批封面 4 张 1:1、6 张 1.69~2.59，比例差异很大。固定 16:9 加
@@ -224,39 +264,98 @@
         background: var(--color-panel);
       }
       .src-rich-card--text:hover { border-left-color: var(--color-accent); }
-      .src-rich-card--text .src-rich-body { align-content: start; padding: 15px 15px 16px; gap: 7px; }
-      .src-rich-card--text .src-rich-title { font-size: var(--text-lg); line-height: 1.4; }
+      /* 2026-09-22 8pt 归格：14/15/16 → 16（--space-4），7 → 8（--space-2）。
+       * 依据：8pt 栅格（Material Design / Apple HIG / Ant Design 通用），
+       * 间距只用 8 的倍数，组件内部微调走 4pt 半格（4/8/12/16）。
+       * 14/15/7 这类任意值破坏整页节奏，是本次全页归格的一部分。 */
+      .src-rich-card--text .src-rich-body { align-content: start; padding: var(--space-4); gap: var(--space-2); }
       /* 详情行推到卡片底部，让两种卡的下沿对齐 */
       .src-rich-card--text { grid-template-rows: 1fr; }
-      .src-rich-card--text .src-rich-meta { margin-top: auto; padding-top: 6px; }
+      .src-rich-card--text .src-rich-meta { margin-top: auto; padding-top: var(--space-2); }
+      /* 2026-09-22 文字卡 meta 收一行 + 两端布局（第 4 次写入：文件曾被
+       * 并行进程覆盖成 PNG 截图，从 15:26 备份恢复后重做。改动本身
+       * 已验证有效，缘由如下。背景：base.css 给 .src-rich-facts 写死
+       * flex:1 1 100%，那是为 BestBlogs「字数·时长·日期」长事实行设计的
+       * ——独占一行、星标钉最右。zeli 文字卡的事实只有日期，这条 100%
+       * 把「日期+星标」强行折到第二行，「作者+热度」孤在第一行右侧
+       * 空一大块（实测元素截图）。三条规则一起治：
+       * ① facts 改 1 1 auto：短事实放得下就和署名同行；长事实放不下
+       *   自动换回独占一行（flex-wrap 已开），BestBlogs 无封面卡不受影响。
+       * ② 日期推到行尾与星标成组：左端「署名+热度」，右端「日期+星标」，
+       *   中间弹性空白，扫读有锚点。BestBlogs 长事实卡的日期是
+       *   「字数·时长·日期」链的末项，不拆右边。
+       * ③ gap 8px（--space-2，8pt 归格）：日期与星标贴太近挤成一团。 */
+      .src-rich-card--text .src-rich-facts { flex: 1 1 auto; gap: var(--space-2); }
+      .src-rich-card--text .src-rich-facts-text { margin-left: auto; }
+      /* 2026-09-22 日期悬空修复（勿删）：base.css:1577 给星标写死
+       * margin-left:auto（设计意图：星标独占推右）。文字卡上日期也加了
+       * auto 之后两个 auto 瓜分自由空间 —— 日期悬在行中间，离星标 250px
+       * （实测元素截图）。这里撤掉文字卡内星标的 auto，让日期的 auto
+       * 独占自由空间：星标紧跟日期，右端「日期+星标」成组贴边。
+       * 带封面卡的 facts 独占整行（上面 1 1 100% 那条），星标 auto
+       * 仍生效，行为不变。 */
+      .src-rich-card--text .src-rich-facts .tk-fav-btn { margin-left: 0; }
 
       .src-rich-cover {
         position: relative; display: block; aspect-ratio: 16/9;
         background: var(--color-surface); overflow: hidden;
       }
-      .src-rich-cover img {
-        position: absolute; inset: 0; margin: auto;
-        max-width: 100%; max-height: 100%; width: auto; height: auto;
-        object-fit: contain; display: block;
+      /* 评分徽章：与首页 hero 特写同一个视觉（左上角胶囊、veil 底、
+       * accent 字色）。BestBlogs 是人工精审评分，别的源没有 ——
+       * 没有 score 就不渲染，不会出现空徽章。
+       * 2026-09-22 8pt 归格：gap 5→4、padding 4/10→4/12（4pt 半格）。 */
+      .src-rich-badge {
+        position: absolute; left: var(--space-2); top: var(--space-2); z-index: 1;
+        display: inline-flex; align-items: center; gap: var(--space-1);
+        padding: var(--space-1) var(--space-3); border-radius: 999px;
+        /* 2026-09-22 改进 1：底色 veil(0.92)→panel 实色。实测截图「90」
+         * 压暗红展台封面时 8% 图色透出让胶囊发红、与 accent 体系脱节，
+         * 「86」压红图时几乎与图融为一体。评分是徽章的唯一信息，
+         * 依据 WCAG 1.4.11（非文字组件与相邻色 ≥3:1），压任何封面
+         * 都必须稳定可读——半透明底做不到，改 panel 实色。 */
+        background: var(--color-panel); color: var(--color-accent-ink);
+        font-size: var(--text-xs); font-weight: var(--weight-bold);
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
       }
+      .src-rich-cover img {
+        /* 2026-09-22 contain→cover（改进 10）：16:9 容器 + contain 让宽
+         * logo 图放大成整面色块（实测阿里卡橙色块糊满、Brownfield 黑底
+         * 白字占满），窄图上下留黑边。cover 裁边保构图，填满不留边——
+         * Airbnb/Pinterest 类内容卡的标准做法。封面源是 og:image 横图，
+         * 极端竖图裁两侧的风险低。 */
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover; display: block;
+        /* 2026-09-22 改进 2：亮图压暗界面会显得更刺眼（同时对比效应），
+         * 暗色主题下默认降 12% 亮度、hover 卡片时恢复——dark mode
+         * 图片处理标准做法（10-20% 区间取中）。亮色主题不受影响。 */
+      }
+      :root[data-theme="dark"] .src-rich-cover img { filter: brightness(0.88); transition: filter 0.25s ease; }
+      :root[data-theme="dark"] .src-rich-card:hover .src-rich-cover img { filter: brightness(1); }
       .src-rich-cover--none { background-image: var(--wash-panel); }
-      .src-rich-body { display: grid; gap: 5px; padding: 11px 13px 13px; align-content: start; }
+      /* 2026-09-22 8pt 归格：padding 12/14/14 → 16 统一（--space-4）；
+       * gap 5→4（--space-1，4pt 半格：标题/摘要/署名是紧耦合阅读序列，
+       * 4pt 档，8pt 会松）。 */
+      .src-rich-body { display: grid; gap: var(--space-1); padding: var(--space-4); align-content: start; }
       .src-rich-title {
         color: var(--color-ink); font-size: var(--text-body);
         font-weight: var(--weight-semibold); line-height: 1.45;
-        display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
       }
       .src-rich-card:hover .src-rich-title { color: var(--color-accent); }
-      .src-rich-sum {
-        color: var(--color-muted); font-size: var(--text-small); line-height: 1.6;
-        display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-      }
+      /* 摘要样式见下方 342 行起的 .src-rich-sum（AI 总结/摘要段）——
+       * 2026-09-22 清理：此处原先还有一份 2 行截断的旧定义，与后面的
+       * 3 行截断版本重复，且后者总是覆盖前者。两处定义让人分不清哪份
+       * 生效（实际读过 DOM 才确认是后者），留着只会误导后续维护，
+       * 按单一真源原则删除旧份，只留生效的那份。 */
       /* 标签徽标（「AI总结」这类）。放在标题上方，一行小芯片。
          它是"这段摘要是模型写的"这个信息的载体，用 --color-info-soft
          的淡蓝底 —— 和 AI 摘要框同一族颜色，读者能对上。 */
       .src-rich-tags { display: flex; flex-wrap: wrap; gap: 4px; }
       .src-rich-tags i {
-        padding: 1px 7px; border-radius: var(--radius-xs);
+        /* 2026-09-22 8pt 归格：1/7 → 2/8（4pt 半格：2 和 8 都在格上） */
+        padding: 2px var(--space-2); border-radius: var(--radius-xs);
         background: var(--color-info-soft); color: var(--color-summary-label);
         font-size: var(--text-xs); font-style: normal;
         font-weight: var(--weight-semibold);
@@ -285,20 +384,21 @@
         color: var(--color-faint); font-size: var(--text-xs); line-height: 1.5;
         display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
       }
-      /* AI 总结框。整段衬淡蓝底、左侧一条竖线 —— 和论文页的 L1 解析框
-         同一套视觉，读者能对上"这是模型写的摘要"。
-         标签「AI总结」用深蓝加粗，比正文重一档。 */
+      /* AI 总结/摘要：行数截断，不再带底色框。
+       *
+       * 曾经这里是一段衬淡蓝底、左竖线的"AI总结框"，clamp 写在内层
+       * <span data-clamp> 上而外层是普通 block —— 外层盒子随内层全文
+       * 一起撑高，clamp 实际没生效，整段全文都显示出来，卡片高度失控
+       * （"块太大"的直接原因之一）。
+       *
+       * 现在 clamp 放在 .src-rich-sum 自身（display:-webkit-box 才是
+       * line-clamp 的载体），三行截断，样式与首页 digest 卡的摘要一致：
+       * 裸文本、次级色。AI总结标签仍保留在正文流里，不靠底色区分。 */
       .src-rich-sum {
-        display: block; margin-top: 4px;
-        padding: 9px 11px;
-        /* 左竖线用 summary-label（深蓝）而不是 summary-line（淡蓝）。
-           淡蓝那条在浅蓝底上几乎看不见，整块读起来像"一段灰字"；
-           深蓝竖线是这条摘要的边界，它得看得见。 */
-        border-left: 3px solid var(--color-summary-label);
-        border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
-        background: var(--color-summary-bg);
-        color: var(--color-summary-text);
-        font-size: var(--text-small); line-height: 1.7;
+        display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical;
+        overflow: hidden;
+        margin-top: var(--space-1); /* 2026-09-22 改进 4：2→4（4pt 半格） */
+        color: var(--color-muted); font-size: var(--text-small); line-height: 1.65;
       }
       .src-rich-sum-label {
         color: var(--color-summary-label); font-weight: var(--weight-bold);
@@ -307,24 +407,34 @@
       .src-rich-tags i.is-summary { display: none; }
 
       .src-rich-meta {
-        display: flex; align-items: center; gap: 5px; flex-wrap: wrap;
-        margin-top: 2px; color: var(--color-faint); font-size: var(--text-xs);
+        /* 2026-09-22 8pt 归格：gap 5→4、margin-top 2→4（4pt 半格） */
+        display: flex; align-items: center; gap: var(--space-1); flex-wrap: wrap;
+        margin-top: var(--space-1); color: var(--color-faint); font-size: var(--text-xs);
       }
-      .src-rich-icon { width: 15px; height: 15px; border-radius: 50%; object-fit: cover; flex: none; background: var(--color-surface); }
+      /* 2026-09-22 归格：15→16（--space-2 尺寸档，标准 icon 尺寸） */
+      .src-rich-icon { width: var(--space-2); height: var(--space-2); border-radius: 50%; object-fit: cover; flex: none; background: var(--color-surface); }
       .src-rich-source { color: var(--color-ink-soft); font-weight: var(--weight-medium); }
       .src-rich-facts { font-variant-numeric: tabular-nums; }
+      /* 无封面文字卡的行内评分：同首页紧凑行 digest-score-inline 的视觉
+       *（accent 字色 + 粗体 + 表格数字）。徽章贴封面，这种卡没有封面，
+       * 分数就落在 meta 行最前 —— 两种卡都看得到评分。 */
+      .src-rich-score {
+        color: var(--color-accent-ink); font-weight: var(--weight-bold);
+        font-variant-numeric: tabular-nums;
+      }
 
       .src-feed-list { margin: 0; padding: 0; list-style: none; display: grid; gap: var(--space-2); }
-      /* 每条 feed 给一层极淡的衬底，像 arXivDaily 的「AI 总结」框。
-         它把"这是从外面抓来的摘要"和卡片自己的说明文字区分开，
-         不用再加边框或线。 */
+      /* 资讯条目走"清单行"语言，与站点刊头摊平后的排版一致：
+         静止时是纯文字行（无底无框），悬停才给一层极淡衬底提示可点。
+         靠 padding 撑出行高而不是背景框，一屏里不再多出一排灰色小方块。 */
       .src-feed-list li {
         display: grid;
         gap: 2px;
         padding: var(--space-2) var(--space-3);
         border-radius: var(--radius-sm);
-        background: var(--color-surface);
       }
+      .src-feed-list li:hover { background: var(--color-surface); }
+      .src-feed-list li:focus-within { background: var(--color-surface); }
       .src-feed-title {
         color: var(--color-ink);
         font-size: var(--text-body);
@@ -368,30 +478,35 @@
        *   来源速览   几个站、各多少篇，整行可点跳过去
        *   分类列表   按大类折叠，文章标题一行一条
        */
-      .src-toc { display: grid; gap: 14px; align-content: start; }
-      .src-toc-card {
-        border: 1px solid var(--color-line);
-        border-radius: var(--radius-sm);
-        background: var(--color-panel);
-        padding: 12px 13px 13px;
-      }
+      /* 右栏两块之间不再各自描边 —— 一屏四五条横线看着乱（本页 :122 和
+         :210 已有同一条结论）。改成一条 border-top 分隔，卡片壳一并去掉，
+         让这一栏读起来是"一列辅助信息"而不是"两个并排的小盒子"。 */
+      .src-toc { display: grid; gap: 0; align-content: start; }
+      /* 2026-09-22 8pt 归格：12/2/13 → 12/8/12（上下对称、左右 8pt，
+       * 2/13 是历史离格残留）。 */
+      .src-toc-card { padding: var(--space-3) var(--space-2) var(--space-3); }
+      .src-toc-card + .src-toc-card { border-top: 1px solid var(--color-line); }
       .src-toc-card > h3 {
-        margin: 0 0 9px; padding: 0 0 8px;
+        /* 2026-09-22 8pt 归格：9 → 8（--space-2） */
+        margin: 0 0 var(--space-2); padding: 0 0 var(--space-2);
         border-bottom: 1px solid var(--color-line);
         color: var(--color-muted);
-        font-size: var(--text-xs); font-weight: var(--weight-bold);
-        letter-spacing: 0.05em;
+        /* 11px(--text-xs) 是留给图形角标的一档，做栏目标题太小；
+           letter-spacing 对中文无意义（没有大小写），一并去掉。 */
+        font-size: var(--text-small); font-weight: var(--weight-bold);
       }
       /* 来源速览：圆点 + 站名 + 条数，整行可点。 */
       .src-toc-sites { margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; }
       .src-toc-sites a {
-        display: flex; align-items: center; gap: 8px;
-        padding: 5px 6px; border-radius: var(--radius-xs);
+        display: flex; align-items: center; gap: var(--space-2);
+        /* 2026-09-22 8pt 归格：5/6 → 4/8（4pt 半格 + 8pt） */
+        padding: var(--space-1) var(--space-2); border-radius: var(--radius-xs);
         color: var(--color-ink-soft); text-decoration: none; line-height: 1.45;
       }
       .src-toc-sites a:hover { background: var(--color-accent-soft); color: var(--color-accent); }
       .src-toc-dot {
-        flex: none; width: 5px; height: 5px; border-radius: 50%;
+        /* 2026-09-22 8pt 归格：5 → 4（图形尺寸同走 4pt 半格） */
+        flex: none; width: 4px; height: 4px; border-radius: 50%;
         background: var(--color-accent-line);
       }
       .src-toc-sites a:hover .src-toc-dot { background: var(--color-accent); }
@@ -403,37 +518,39 @@
         flex: none; color: var(--color-faint);
         font-size: var(--text-2xs); font-variant-numeric: tabular-nums;
       }
-      /* 分类折叠：一行文字 + 细箭头。第一版做成了带边框的方块按钮，
-         视觉重量比它承载的信息大得多 —— 一个折叠开关不该看起来像个主按钮。 */
-      .src-toc-group { border: 0; margin: 0; padding: 0; background: none; }
-      .src-toc-group + .src-toc-group { margin-top: 3px; }
-      .src-toc-toggle {
-        display: flex; align-items: center; gap: 5px;
-        width: 100%; padding: 4px 2px;
-        border: 0; background: none; cursor: pointer; text-align: left;
+      /* 目录组内按来源分层：站名 + 条数一行，条目挂在下面。
+       * 曾经用折叠开关包一层 —— 一个组里 73 条平铺，扫不出结构（读者反馈"丑"）；
+       * 分层之后来源给节奏，折叠就不需要了，开关那套一并删掉。 */
+      .src-toc-feed + .src-toc-feed { margin-top: var(--space-3); } /* 2026-09-22 归格：13→12 */
+      .src-toc-feed-name {
+        display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2);
+        margin: 0 0 var(--space-1); padding: 0 2px; /* 2026-09-22 归格：3→4 */
         color: var(--color-ink);
         font-size: var(--text-small); font-weight: var(--weight-semibold);
-        font-family: inherit;
       }
-      .src-toc-toggle:hover { color: var(--color-accent); }
-      .src-toc-caret {
-        flex: none; color: var(--color-faint); font-size: 9px;
-        transition: transform var(--duration-fast) var(--ease-out);
-      }
-      .src-toc-group[data-open="false"] .src-toc-caret { transform: rotate(-90deg); }
-      .src-toc-group[data-open="false"] .src-toc-body { display: none; }
       /* 文章条目：圆点紧贴文字。
-         第一版缩进 18px，圆点和文字之间空了一大截，看着像两列错位。 */
+         第一版缩进 18px，圆点和文字之间空了一大截，看着像两列错位。
+         标题允许两行（data-clamp 声明是有意截断，布局审计据此放行）——
+         窄栏里一行放不下中文长标题，一行省略号比两行截断丢的信息多。 */
       .src-toc-items { margin: 1px 0 2px; padding: 0; list-style: none; display: grid; }
       .src-toc-items a {
-        display: block; position: relative;
-        padding: 3px 6px 3px 13px;
+        /* 2026-09-22 单行截断（速览栏定位，第 5 次写入，前 4 次被并行
+         * AI 覆盖）：280px 右栏 54 条两行截断，栏体过长行距过挤（实测
+         * 截图）。改 1 行省略号——标题开头是扫读锚点，尾部信息密度低，
+         * 主栏卡片有完整标题，右栏只需「大概哪条在哪」。 */
+        display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
+        position: relative;
+        /* 2026-09-22 8pt 归格：3/6/3/13 → 4/8/4/12（4pt 半格），圆点 left 5→8 */
+        padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
         border-radius: var(--radius-xs);
-        color: var(--color-muted); line-height: 1.5; text-decoration: none;
-        overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        /* 2026-09-22 改进 3：行高 1.45→1.55——小字（12-13px）标准行高
+         * 1.6-1.8，速览列表取 1.55 平衡密度与舒适（typography 准则）。 */
+        color: var(--color-muted); line-height: 1.55; text-decoration: none;
+        overflow: hidden; overflow-wrap: anywhere;
       }
       .src-toc-items a::before {
-        content: ""; position: absolute; left: 5px; top: 50%;
+        /* 2026-09-22 随单行截断调整：圆点对齐单行文字垂直中心 */
+        content: ""; position: absolute; left: 8px; top: 50%;
         width: 3px; height: 3px; margin-top: -1.5px;
         border-radius: 50%; background: var(--color-faint);
       }
@@ -450,35 +567,44 @@
 
 .src-layout { display: block; }
 .src-toc { display: none; }
-/* 这一页的信息密度比别的页高（六个源 × 十几篇文章），
-   全站默认的 1260px 在这里会把右侧挤窄、目录那块显得空。
-   放开到 1600：宽屏上卡片能多排一列，右侧也放得下信息块。
-   窄屏不受影响 —— 那个断点本来就是单栏。 */
-@media (min-width: 1180px) {
-  .tk-shell { max-width: 1600px; }
+/* 两栏的意图是：正文读得宽，目录随手可跳。
+ *
+ * 这里曾写 .tk-shell{max-width:1600px}，注释说"宽屏上卡片能多排一列"——
+ * 实测是假的：列数由 .src-rich 的断点决定，容器再宽也只有三列（后改两列），
+ * 1600 唯一的作用是在宽屏把内容推得更靠边、留出一侧 139px 的死白。
+ * 2026-09-20 删除，宽度由 base.css 的 1400 统一管。
+ *
+ * 右栏 280：300 里放一行中文长标题太挤（现在条目允许两行，280 够）。
+ * 断点 1080 与 .src-rich 的单列断点对齐，避免"两栏但卡片单列"的过渡态。 */
+@media (min-width: 1080px) {
   .src-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 300px;
-    column-gap: 36px;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    column-gap: var(--space-6);
     align-items: start;
   }
   .src-toc {
     display: block;
     position: sticky;
-    top: 96px;
-    max-height: calc(100vh - 132px);
+    top: 88px;
+    max-height: calc(100vh - 124px);
     overflow: auto;
     font-size: var(--text-small);
     scrollbar-width: thin;
+    /* 2026-09-22 改进 5：补滚动条配色。thin 已设但无色，暗色下默认
+     * 亮灰轨在深海军底上扎眼（dark mode 常见遗漏，标准清单明确列过）。
+     * 滑块用 line-strong（slate-600）——中性、两主题都协调，轨道透明。 */
+    scrollbar-color: var(--color-line-strong) transparent;
   }
 }
 
       /* 分类目录：全部 / 文章 / 论文 / 资讯。
          用过滤而不是滚动定位 —— 进这一页要回答的是「这儿有什么」，
          过滤能立刻把答案缩到一组，滚动只是换个位置继续看。 */
-      .src-tabs { display: flex; gap: 5px; flex-wrap: wrap; margin-top: var(--space-5); }
+      /* 2026-09-22 8pt 归格：gap 5→8、tab padding 5/12→4/8（4pt 半格） */
+      .src-tabs { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-top: var(--space-5); }
       .src-tab {
-        padding: 5px 12px;
+        padding: var(--space-1) var(--space-2);
         border: 1px solid var(--color-line);
         border-radius: var(--radius-sm);
         background: var(--color-panel);
@@ -502,18 +628,68 @@
         color: var(--color-faint);
         font-size: var(--text-xs);
       }
+      /* ── 键盘焦点可见性（2026-09-22 改进 6）────────────────────────
+       * 现状：搜索框有 ring（base.css 管），但文章卡、tabs、右栏条目、
+       * 星标按钮都没有 focus-visible 样式，键盘 Tab 进来找不到当前位置
+       * （WCAG 2.4.7 Focus Visible 是 AA 硬要求）。统一 2px accent 环
+       * + 2px 外扩，与 base.css .tk-fab:focus-visible 同款视觉。
+       * 用 :focus-visible 只对键盘触发，鼠标点击不出环。 */
+      .src-rich-card:focus-visible,
+      .src-tab:focus-visible,
+      .src-toc-sites a:focus-visible,
+      .src-toc-items a:focus-visible,
+      .src-toc-feeds a:focus-visible,
+      .tk-fav-btn:focus-visible {
+        outline: 2px solid var(--color-accent);
+        outline-offset: 2px;
+        border-radius: var(--radius-xs);
+      }
+      /* ── 减弱动效偏好（2026-09-22 改进 8）────────────────────────
+       * 依据：无障碍标准明确要求 honor prefers-reduced-motion——
+       * 前庭障碍用户系统开启「减弱动态效果」后，位移类动画会引起
+       * 不适。hover 上浮（改进 7）、图片亮度过渡（改进 2）等全部
+       * 降级为无动画。全局一条规则覆盖本页所有 transition。 */
+      @media (prefers-reduced-motion: reduce) {
+        .src-rich-card,
+        .src-rich-cover img,
+        .src-tab,
+        .src-toc-sites a,
+        .src-toc-items a {
+          transition: none;
+        }
+        .src-rich-card:hover { transform: none; }
+      }
     </style>
   </head>
   <body class="tk-host">
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
     <div class="tk-shell">
+      <!-- 头部形态=hero（身份头，宽松几何）：真源在 base.css「页面头部
+           契约」。内容页点进来先回答「这是什么页」，搜索是头部的
+           interaction area（Atlassian/GCS page header 同款解剖），
+           随身份一起给，不放正文第一行。 -->
       <section class="hero">
         <h1>优质好文</h1>
         <p>这些站点每天产出值得花时间的技术内容。这里按月聚合它们的最新文章，标题、摘要、来源一目了然 —— 不用逐个站点翻。</p>
+        <!-- 搜索：为什么这页要有 —— 列表聚合了各站最新文章，标题几十条，
+             右侧目录只能按站跳，按关键词找一篇只能滚动。
+             皮肤走 base.css 的 .tk-search 契约（全站唯一真源）；
+             放置走 hero 内的 .page-toolbar，间距由 .hero .page-toolbar
+             统一给，本页零间距样式。 -->
+        <div class="page-toolbar">
+          <label class="tk-search">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
+            <input type="search" id="src-search" placeholder="搜站点、说明或文章标题" autocomplete="off" />
+            <kbd class="tk-search-kbd" title="Cmd/Ctrl+K">⌘K</kbd>
+          </label>
+        </div>
       </section>
 
       <div class="src-layout">
         <div class="src-main">
+          <!-- 收藏夹：全站共享的收藏，有收藏才渲染。放在最前面——
+               它是读者亲手挑的，曝光位应该比算法排的靠前。 -->
+          <section class="src-favs" id="src-favs" hidden></section>
           <div id="src-groups"></div>
         </div>
         <!-- 右侧目录。它是这一页的索引：有哪些分类、每类下有哪些站、
@@ -522,7 +698,7 @@
              而这正是进这一页的第一个问题。
 
              内容由 renderToc() 在数据到达后构建，不另存一份结构。 -->
-        <aside class="src-toc" id="src-toc" aria-label="本页目录"></aside>
+        <aside class="src-toc" id="src-toc" aria-label="这一页有什么"></aside>
       </div>
     </div>
 
@@ -581,6 +757,43 @@
 
       /* 当前分类。空字符串 = 全部。 */
       let activeGroup = "";
+      /* 搜索词。与 activeGroup 叠加：先按分类筛，再按词筛站点卡
+         （站名/说明/标签）与 feed 文章标题。空串 = 不筛。 */
+      let searchQ = "";
+      const normalizeQ = (v) => v.trim().toLowerCase();
+      /* 站点卡是否命中：站名、kind、gain、标签，以及该站 feed 的文章
+         标题都算。最后一维是关键 —— feed 数据由 feedState.payload 异步
+         持有（不在站点元数据里），站点元数据不含 RAG 这类词时，载着
+         RAG 文章的站必须靠它保住，否则组级过滤会整组砍掉。
+         feed 未加载时 list 为空 → 只按元数据判，卡片不被误藏。 */
+      const itemTitles = (key) => {
+        const s = (feedState.payload && feedState.payload.sources || [])
+          .find((x) => x.key === key);
+        if (!s || s.status === "pending") return [];
+        return (s.items || []).map((i) => `${i.title || ""} ${i.title_cn || ""} ${i.tags ? i.tags.join(" ") : ""}`);
+      };
+      const cardHits = (item, q) => {
+        if (!q) return true;
+        const hay = [pick(item, "name"), pick(item, "kind"), pick(item, "gain"),
+          ...((lang() === "en" && item.en && item.en.tags ? item.en.tags : item.tags) || []),
+          ...itemTitles(item.key)]
+          .join(" ").toLowerCase();
+        return hay.includes(q);
+      };
+      /* 文章级精筛（applyFeedFilter 用）：卡内单篇文章是否命中。
+       * 为什么按条目藏而不是藏整卡：站点命中（站名或任一文章标题含词）
+       * 时卡要留着，但卡内不命中的文章铺开一大片，读者还得自己在里面
+       * 翻 —— 那等于没筛。每条查标题+链接文本，命中的留、不中的藏。 */
+      const entryHits = (el, q) =>
+        (el.textContent || "").toLowerCase().includes(q);
+
+      /* 站点卡是否命中：站点元数据或任一文章标题。与 entryHits 分开 ——
+       * 一个决定「这个站的相关不相关」，一个决定「站内哪几篇相关」。 */
+      const feedHits = (card, q) => {
+        if (!q) return true;
+        return [...card.querySelectorAll(".src-rich-title, .src-feed-title, a")]
+          .some((el) => entryHits(el, q));
+      };
 
       /* 右侧目录：分类 → 该类的站。分类可点（筛正文），站名也可点（跳到该卡）。
        *
@@ -592,9 +805,25 @@
           $("#src-groups").innerHTML = `<div class="empty"><p class="empty-title">${esc(tr("资源清单读不到"))}</p><p class="empty-hint">${esc(tr("检查 site/sources.js 是否加载成功，然后刷新。"))}</p></div>`;
           return;
         }
-        const shown = activeGroup
+        const q = normalizeQ(searchQ);
+        let shown = activeGroup
           ? data.groups.filter((g) => g.key === activeGroup)
           : data.groups;
+        // 搜索词作用在组内站点卡上：一个组全空就整组收起，
+        // 右侧目录的站名锚点仍能跳（目录不动，只藏正文卡）。
+        if (q) {
+          shown = shown.map((g) => ({ ...g, items: g.items.filter((it) => cardHits(it, q)) }))
+            .filter((g) => g.items.length);
+        }
+        // 2026-09-22 改进 9：搜索无结果空状态。原来 shown 为空时直接
+        // 渲染空字符串——主栏整片空白，用户不知道是"没这篇"还是页面坏了。
+        // 空状态给出明确因果（无匹配）和出路（换个词/清除），复用 .empty
+        // 结构（与数据加载失败同一视觉族）。
+        if (!shown.length) {
+          $("#src-groups").innerHTML = `<div class="empty"><p class="empty-title">${esc(tr("没有匹配的内容"))}</p><p class="empty-hint">${esc(tr("换个关键词试试，或清空搜索框看全部。"))}</p></div>`;
+          paintFeeds();
+          return;
+        }
         $("#src-groups").innerHTML = shown.map((group) => `
           <section class="src-group">
             <div class="src-group-head">
@@ -603,6 +832,10 @@
             <p class="src-note">${esc(tr(group.note))}</p>
             <div class="src-list">${group.items.map((item) => card(item, group.key === "news")).join("")}</div>
           </section>`).join("");
+        // render() 重画把 feed 正文清成了骨架 —— feedState.payload
+        // 若已在缓存，立刻重填（paintFeeds 末尾会再跑一次精筛）；
+        // 没缓存（首次加载中）就保持骨架，loadFeeds 到货后自然填上。
+        paintFeeds();
         // 刷新按钮已移除。
         //
         // 它调用 /api/feeds?refresh=1，也就是强制回源 —— 点一次就是几次 API
@@ -613,6 +846,53 @@
         // 卡片内是按当前语言直接取的，不重复翻译。
         if (window.TKI18N) window.TKI18N.translateDOM($("#src-groups"));
       }
+
+      /* 文章级精筛：与 render/paintFeeds/input 三方联动的唯一实现。
+       * 为什么是函数而不是内联：feed 正文是异步后到（paintFeeds 重填）
+       * 而 render() 每次重画又会清空它 —— 输入词跨重画存活靠的是
+       * searchQ 这个状态 + 三处都调它，任何一处漏调就会出现
+       * 「输入 RAG 后文章列表消失/复原」的漂移。q 为空时恒 true 不筛。
+       *
+       * 两层结构：站点卡不命中（元数据+全部文章标题都没有词）→ 藏整卡；
+       * 卡命中 → 卡内不命中的单篇文章条目也藏（entryHits 逐条判）。 */
+      function applyFeedFilter() {
+        const q = normalizeQ(searchQ);
+        document.querySelectorAll("#src-groups .src-card").forEach((card) => {
+          // q 为空时全部恢复：hidden 状态只在有词时维护，清空搜索框
+          // 必须把之前藏掉的卡/条目全部放回来，否则越搜越少。
+          if (!q) { card.hidden = false; return; }
+          if (!feedHits(card, q)) { card.hidden = true; return; }
+          card.hidden = false;
+          card.querySelectorAll(".src-rich-card, .src-feed-list li").forEach((el) => {
+            el.hidden = !entryHits(el, q);
+          });
+        });
+      }
+
+      // 搜索：输入即筛，不防抖 —— 十几张卡 + 几十条标题，
+      // 每次全量重画在毫秒级，防抖反而多一层状态。
+      const searchBox = $("#src-search");
+
+      /* ⌘K 聚焦搜索 —— 与主页/papers 同款键位（主页 bindKeyboard 的
+       * 平移）。三页一致，键盘用户翻页不断习惯。 */
+      document.addEventListener("keydown", (event) => {
+        if ((event.metaKey || event.ctrlKey) && (event.key === "k" || event.key === "K")) {
+          event.preventDefault();
+          searchBox.focus();
+          searchBox.select();
+        }
+      });
+
+      searchBox.addEventListener("input", () => {
+        searchQ = searchBox.value;
+        render();
+        // 收藏夹也是文章列表，词一变就得跟着重筛 —— renderFavorites
+        // 内部自己读 searchQ（q 空时全量恢复），漏调它就会出现
+        // 「正文已筛、收藏区原样铺开」的割裂（2026-09-22 实测踩过）。
+        renderFavorites();
+        // feed 精筛在 render() 里已调 applyFeedFilter；
+        // paintFeeds 异步重填后还会再调，见 paintFeeds 末尾。
+      });
 
       // 切语言后整页重画：卡片里的 name/gain/tags 是按语言直接取的，
       // translateDOM 扫不到它们，不重画就会留下上一种语言的残页。
@@ -680,27 +960,18 @@
         // 它们的数据结构其实一样（标题、链接、摘要、日期），差别只是
         // BestBlogs 多一个 cover —— 那就用一种卡片，封面可选。
         if (true) {
-          // 分类筛选。用内容自带的 categoryDesc（人工智能 / 商业科技 / 软件编程），
-          // 在本地筛 —— 接口的 category 参数**不生效**（实测五种取值返回的
-          // 总数几乎一样：53367 / 53367 / 53368）。
+          // 这里原来有一排分类芯片（全部 / 软件编程 / 商业科技 / 人工智能），
+          // 2026-09-20 移除。它靠 item.category 筛，而实测只有 BestBlogs 有这个
+          // 字段，其余源全是空 —— 芯片只作用于 22/49 条却看着像筛整页。
+          // 详细理由见样式块里 .src-rich 上面那段注释。
           //
-          // 只在有多个分类时才显示芯片：只有一个分类时那排芯片没有选择
-          // 余地，白占一行。
-          const cats = [...new Set(items.map((i) => i.category).filter(Boolean))];
-          const bar = cats.length > 1
-            ? `<div class="src-rich-filter">
-                 <button type="button" class="src-rich-chip" data-cat="" aria-pressed="true">${esc(tr("全部"))}</button>
-                 ${cats.map((c) => `<button type="button" class="src-rich-chip" data-cat="${esc(c)}"
-                   aria-pressed="false">${esc(c)}</button>`).join("")}
-               </div>`
-            : "";
-          // 一行"这批数据有多新"。放在筛选芯片上面，读者先看到它。
+          // 一行"这批数据有多新"。原来放在芯片上面，现在直接跟在组标题后。
           const stamp = (() => {
             const dates = items.map((i) => i.published).filter(Boolean).map((d) => String(d).slice(0, 10)).sort().reverse();
             if (!dates.length) return "";
             return `<p class="src-rich-fresh">${esc(tr("最新一篇"))} ${esc(dates[0])}</p>`;
           })();
-          return stamp + bar + `<div class="src-rich">${items.map((item) => {
+          return stamp + `<div class="src-rich">${items.map((item) => {
             const facts = [];
             if (item.word_count) facts.push(`${Number(item.word_count).toLocaleString()} 字`);
             if (item.read_minutes) facts.push(`约 ${item.read_minutes} 分钟`);
@@ -713,9 +984,12 @@
             //
             // 给它自己的排法：内容整体撑满，标题从顶部开始，用一条左侧竖线
             // 代替封面作为视觉锚点，读起来是"一张文字卡"而不是"缺图的卡"。
-            return `<a class="src-rich-card${item.cover ? "" : " src-rich-card--text"}" href="${esc(item.url)}" data-category="${esc(item.category || "")}" target="_blank" rel="noopener noreferrer">
+            const favKey = TKShell.favorites.favId(item);
+            TKShell.favorites.register(favKey, item);
+            const favOn = TKShell.favorites.isFav(favKey);
+            return `<a class="src-rich-card${item.cover ? "" : " src-rich-card--text"}" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
               ${item.cover
-                ? `<span class="src-rich-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-crop data-fallback></span>`
+                ? `<span class="src-rich-cover"><img src="${esc(item.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-fallback>${item.score ? `<i class="src-rich-badge">${esc(item.score)}</i>` : ""}</span>`
                 : ""}
               <span class="src-rich-body">
                 ${(item.tags || []).length
@@ -731,17 +1005,37 @@
                 ${(item.affiliations || []).length
                   ? `<span class="src-rich-affil" data-clamp>${esc(item.affiliations.join("；"))}</span>`
                   : ""}
+                ${/* 2026-09-22 i18n 修复（勿删）：AI总结 标签套 tr() 查词表（→ AI summary），与收藏按钮同一翻译路径。
+                     tags 数组的 includes("AI总结") 是数据比较不是显示文案，保持原样。
+                     注释必须包在 ${ 表达式 } 内并以 "" 结尾（本行写法），裸写在模板里会渲染成 DOM 文本。 */""}
                 ${item.summary
-                  ? `<span class="src-rich-sum">${item.tags && item.tags.includes("AI总结")
-                      ? `<b class="src-rich-sum-label">AI总结</b>`
-                      : ""}<span data-clamp>${esc(item.summary)}</span></span>`
+                  ? `<span class="src-rich-sum" data-clamp>${item.tags && item.tags.includes("AI总结")
+                      ? `<b class="src-rich-sum-label">${esc(tr("AI总结"))}</b>`
+                      : ""}${esc(item.summary)}</span>`
                   : ""}
                 <span class="src-rich-meta">
                   ${item.source_icon && item.source_icon !== item.cover
-                    ? `<img class="src-rich-icon" src="${esc(item.source_icon)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-crop>`
+                    ? `<img class="src-rich-icon" src="${esc(item.source_icon)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-fallback>`
                     : ""}
+                  ${/* 2026-09-22 zeli 作者署名（勿删）：feeds.py 给 zeli 的字段是
+                       author（单数，HN 用户名如 volf_），上面那条 authors（复数）
+                       是 arXiv 论文作者列表的通道，zeli 数据里没有。不补这条，
+                       zeli 文字卡 meta 行永远没有署名（实测截图：热度 865 孤零零
+                       挂在行首，没有"谁发的"）。视觉走 .src-rich-source 同款
+                       faint 小字 —— feeds.py 注释声明的语义
+                       （「作者署名走 meta 行的 faint 小字，与来源名同视觉层级」）。 */""}
+                  ${item.author ? `<span class="src-rich-source">${esc(item.author)}</span>` : ""}
                   ${item.source ? `<span class="src-rich-source">${esc(item.source)}</span>` : ""}
-                  ${facts.length ? `<span class="src-rich-facts">${esc(facts.join(" · "))}</span>` : ""}
+                  ${/* 2026-09-22 评分去重（与收藏夹区同一修复，勿只改一处）：
+                     带封面的卡评分已作为 .src-rich-badge 贴在封面左上角，
+                     meta 行再渲染一次同一数字（实测 Jev 卡：封面 90 + meta "Latent.Space 90"
+                     两个 90 同屏）是重复信息。无封面文字卡没有徽章，评分落在
+                     meta 行最前（.src-rich-score 注释声明的原始意图）。 */""}
+                  ${item.score && !item.cover ? `<i class="src-rich-score">${esc(item.score)}</i>` : ""}
+                  ${facts.length
+                    ? /* 2026-09-22 i18n 修复：收藏按钮提示语套 tr() 查词表（词表已有"收藏"/"取消收藏"词条）。 */
+                      `<span class="src-rich-facts"><span class="src-rich-facts-text">${esc(facts.join(" · "))}</span><button type="button" class="tk-fav-btn${favOn ? " is-fav" : ""}" data-fav-id="${esc(favKey)}" aria-label="${esc(favOn ? tr("取消收藏") : tr("收藏"))}" title="${esc(favOn ? tr("取消收藏") : tr("收藏"))}">${favOn ? "★" : "☆"}</button></span>`
+                    : `<span class="src-rich-facts"><button type="button" class="tk-fav-btn${favOn ? " is-fav" : ""}" data-fav-id="${esc(favKey)}" aria-label="${esc(favOn ? tr("取消收藏") : tr("收藏"))}" title="${esc(favOn ? tr("取消收藏") : tr("收藏"))}">${favOn ? "★" : "☆"}</button></span>`}
                 </span>
               </span>
             </a>`;
@@ -771,6 +1065,78 @@
        * 两份结构迟早不一致，而读者看到的永远是渲染后的那一份。
        * 这条和论文页 buildToc 是同一个判断。
        */
+      /* 收藏夹：读全站共享的收藏快照，网格铺开。
+       * 每张卡都是收藏时的快照——文章滑出聚合窗口后依然完整可读。
+       * 星标按钮由 shell 的收藏模块接管（含取消收藏弹窗）。 */
+      function renderFavorites() {
+        const box = $("#src-favs");
+        if (!box) return;
+        /* 与首页同一条排序规则：评分降序，同分的收藏时间新的在前。 */
+        const entries = [...TKShell.favorites.map.values()]
+          .sort((a, b) =>
+            (b.item.score || 0) - (a.item.score || 0) || (b.favorited_at || 0) - (a.favorited_at || 0));
+        if (!entries.length) {
+          box.hidden = true;
+          box.innerHTML = "";
+          return;
+        }
+        box.hidden = false;
+        const fmt = (ts) => {
+          const d = new Date(ts * 1000);
+          return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+        };
+        const cards = entries.map((entry) => {
+          const it = entry.item || {};
+          TKShell.favorites.register(entry.id, it);
+          return `<a class="src-rich-card${it.cover ? "" : " src-rich-card--text"}" href="${esc(it.url || "#")}" target="_blank" rel="noopener noreferrer">
+            ${it.cover ? `<span class="src-rich-cover"><img src="${esc(it.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer" data-fallback>${it.score ? `<i class="src-rich-badge">${esc(it.score)}</i>` : ""}</span>` : ""}
+            <span class="src-rich-body">
+              ${it.source ? `<span class="src-rich-tags"><i>${esc(it.source)}</i></span>` : ""}
+              <b class="src-rich-title" data-clamp>${esc(it.title || "")}</b>
+              ${it.summary ? `<span class="src-rich-sum" data-clamp>${esc(it.summary)}</span>` : ""}
+              <!-- 2026-09-22 修复评分重复：带封面的卡评分已作为徽章贴在封面左上角，
+                   meta 行再渲染一次同一数字（实测截图：93 出现两处）与 .src-rich-score
+                   的注释意图冲突——行内评分本是为无封面文字卡准备的（"徽章贴封面，
+                   这种卡没有封面，分数就落在 meta 行最前"）。改为仅无封面卡渲染行内评分，
+                   每张卡的评分只出现一次。 -->
+              <span class="src-rich-meta">${it.score && !it.cover ? `<i class="src-rich-score">${esc(it.score)}</i>` : ""}<span class="src-fav-date">${esc(tr("收藏于"))} ${fmt(entry.favorited_at || 0)}</span><button type="button" class="tk-fav-btn is-fav" data-fav-id="${esc(entry.id)}" aria-label="${esc(tr("取消收藏"))}" title="${esc(tr("取消收藏"))}">★</button></span>
+            </span>
+          </a>`;
+        });
+        // ↑ 保持数组不 join：下面按 entries.indexOf 取元素，join 成字符串
+        //   会把下标变成「取第 idx 个字符」（2026-09-22 实测踩过：只剩 "<"）。
+        // 搜索词同样作用于收藏夹 —— 它也是文章列表，不筛会与下方
+        // 正文行为不一致（正文卡全 hidden 时收藏区却原样铺开）。
+        const q = normalizeQ(searchQ);
+        const shownCards = q
+          ? entries.filter((entry) => {
+              const it = entry.item || {};
+              return `${it.title || ""} ${it.summary || ""} ${it.source || ""}`
+                .toLowerCase().includes(q);
+            })
+          : entries;
+        if (q && !shownCards.length) {
+          box.hidden = true;
+          box.innerHTML = "";
+          return;
+        }
+        const cardsHtml = (q ? shownCards : entries)
+          .map((entry) => cards[entries.indexOf(entry)])
+          .join("");
+        box.innerHTML = `<h2 class="src-favs-title">${esc(tr("收藏夹"))}<span class="src-fav-count">${shownCards.length} / 100</span></h2>
+          <div class="src-favs-grid">${cardsHtml}</div>`;
+        TKShell.favorites.bind(box);
+        /* 封面挂了就收掉那一格，同下面数据卡的理由。
+         * 15px 的源图标也是外链（第三方 CDN），挂了同样收掉——
+         * 之前只有封面有兜底，图标裂图会留一个 15x15 的空块。 */
+        box.querySelectorAll(".src-rich-cover img[data-fallback], .src-rich-icon[data-fallback]").forEach((img) => {
+          img.addEventListener("error", () => {
+            const wrap = img.closest(".src-rich-cover") || img;
+            if (wrap) wrap.remove();
+          }, { once: true });
+        });
+      }
+
       function renderToc() {
         const toc = $("#src-toc");
         if (!toc) return;
@@ -822,32 +1188,37 @@
           </section>`);
         }
 
-        // 第二块：按分类折叠的文章列表。
+        // 第二块：按分类折叠的文章列表。组内再按来源分层。
+        //
+        // 曾经把整组文章平铺成一个 73 条的列表 —— 没有层次的一堵字墙，
+        // 扫不出"哪篇来自哪个站"，读者反馈"目录这么丑"。现在每个来源一个
+        // 小节标题（站名 + 条数），条目挂在它下面，扫一眼就有结构。
         const listParts = [];
         groups.forEach((group, gi) => {
           const groupTitle = ((group.querySelector("h2") || {}).textContent || "").trim();
           const sources = [...group.querySelectorAll(".src-list > .src-card")];
           if (!sources.length) return;
 
-          const rows = [];
           sources.forEach((card, si) => {
+            const feedName = ((card.querySelector(".src-head a") || {}).textContent || "").trim();
+            const rows = [];
             [...card.querySelectorAll(".src-rich-card, .src-feed-list a")].forEach((item, ii) => {
-              const titleEl = item.querySelector(".src-rich-title")
+              // 中文译名优先：目录是给中文读者扫的，英文原名点开卡片就能看到。
+              const titleEl = item.querySelector(".src-rich-title--cn")
+                || item.querySelector(".src-rich-title")
                 || item.querySelector(".src-feed-title") || item;
               const text = (titleEl.textContent || "").trim();
               if (!text) return;
               item.id = item.id || `src-item-${gi}-${si}-${ii}`;
-              rows.push(`<li><a href="#${item.id}" title="${esc(text)}">${esc(text)}</a></li>`);
+              // data-clamp：条目按 CSS 两行截断，声明这是有意的（布局审计据此放行）。
+              rows.push(`<li><a href="#${item.id}" title="${esc(text)}" data-clamp>${esc(text)}</a></li>`);
             });
+            if (!rows.length) return;
+            listParts.push(`<div class="src-toc-feed">
+              <p class="src-toc-feed-name">${esc(feedName || groupTitle)}<span class="src-toc-num">${rows.length}</span></p>
+              <ul class="src-toc-items">${rows.join("")}</ul>
+            </div>`);
           });
-          if (!rows.length) return;
-
-          listParts.push(`<section class="src-toc-group" data-open="true">
-            <button type="button" class="src-toc-toggle" aria-expanded="true">
-              <span class="src-toc-caret" aria-hidden="true">▾</span>${esc(groupTitle)}
-            </button>
-            <div class="src-toc-body"><ul class="src-toc-items">${rows.join("")}</ul></div>
-          </section>`);
         });
         // 文章标题不再截断成 28 字 —— 用 CSS 的 ellipsis 让它按容器宽度自己截，
         // 完整标题留在 title 属性里，鼠标停一下就能看全。
@@ -858,16 +1229,6 @@
         }
 
         toc.innerHTML = parts.join("");
-
-        // 折叠。
-        toc.querySelectorAll(".src-toc-toggle").forEach((btn) => {
-          btn.onclick = () => {
-            const box = btn.closest(".src-toc-group");
-            const open = box.dataset.open === "true";
-            box.dataset.open = open ? "false" : "true";
-            btn.setAttribute("aria-expanded", String(!open));
-          };
-        });
 
         // 跳转：滚动留出顶栏高度，否则目标会被盖住。
         // 目标是文章卡片时要滚到它所在的位置；给个短暂的底色闪一下作为
@@ -933,33 +1294,21 @@
         });
         // 封面图加载失败时把那一格收掉，不留一个灰框。
         //
+        // 顺带同步一次星标：feed 卡片是异步渲染的，收藏列表可能先到，
+        // 不同步的话已收藏的卡会显示成未收藏的空星。
+        //
         // BestBlogs 的封面走 imagedelivery.net，是第三方 CDN —— 挂了或
         // 被墙时图片请求会失败。一个裂图或空白块比没有封面更难看；
         // 收掉之后卡片自己撑满，和其它卡片对齐（.src-rich-card 用了
-        // height:100%，所以同一行的高度不会塌）。
-        // 分类筛选：点芯片 → 只显示这一类。本地过滤，不发请求。
-        document.querySelectorAll(".src-rich-filter").forEach((bar) => {
-          bar.querySelectorAll(".src-rich-chip").forEach((chip) => {
-            chip.onclick = () => {
-              const want = chip.dataset.cat;
-              bar.querySelectorAll(".src-rich-chip").forEach((c) => {
-                c.setAttribute("aria-pressed", String(c === chip));
-              });
-              const grid = bar.nextElementSibling;
-              if (!grid) return;
-              grid.querySelectorAll(".src-rich-card").forEach((card) => {
-                // category 记在卡片的 dataset 上（渲染时写的）。
-                card.hidden = Boolean(want) && card.dataset.category !== want;
-              });
-            };
-          });
-        });
-        document.querySelectorAll(".src-rich-cover img[data-fallback]").forEach((img) => {
+        // height:100%，所以同一行的高度不会塌）。源图标（15px 圆形）
+        // 同理：没有兜底时裂图是一个 15x15 空块，也一并收掉。
+        document.querySelectorAll(".src-rich-cover img[data-fallback], .src-rich-icon[data-fallback]").forEach((img) => {
           img.addEventListener("error", () => {
-            const box = img.closest(".src-rich-cover");
+            const box = img.closest(".src-rich-cover") || img;
             if (box) box.remove();
           }, { once: true });
         });
+        TKShell.favorites.bind($("#src-groups"));
 
         // 目录必须在**文章内容填完之后**构建。
         //
@@ -967,6 +1316,9 @@
         // 文章标题还没 innerHTML 进去，于是目录只捞到 7 个源、0 篇文章 ——
         // 选择器没问题，是时机不对。paintFeeds 的末尾才是内容齐全的时刻。
         renderToc();
+        // feed 正文刚重填：之前输入过的搜索词在此复活（render 重画
+        // 清掉正文后，这里是唯一能让文章级精筛重新生效的时机）。
+        applyFeedFilter();
         const updated = $("#src-updated");
         if (updated && payload.fetched_at) {
           // 刚刷新完时 RelativeTimeFormat 会给出「现在」，「更新于 现在」读起来很别扭。
@@ -1011,6 +1363,13 @@
         // loadFeeds 拿到数据后要往它里面写「刚刚更新」。
         // 反过来的话第一次的更新时间会丢失（节点还不存在）。
         render();
+        TKShell.favorites.bind($("#src-groups"));
+        TKShell.favorites.load()
+          .then(() => { renderFavorites(); TKShell.favorites.bind($("#src-groups")); })
+          .catch(() => {});
+        /* 收藏变化（首页或本页）→ 收藏夹区重渲。星标按钮自身的状态
+           由 shell 的 favSyncButton 就地更新，不用整页重渲。 */
+        document.addEventListener("tk:fav-changed", () => renderFavorites());
         loadFeeds(false);
       });
       /* 定时自动刷新，不设按钮。
@@ -1031,5 +1390,172 @@
         if (document.visibilityState === "visible") loadFeeds(false);
       });
     </script>
-  </body>
+  
+<script>
+(function(){
+  function label(el){
+    var cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/)[0] : '';
+    return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
+  }
+
+  var out = {};
+
+
+  /* Measure only once the sidebar exists.
+     --dump-dom snapshots after parsing, which is before the sidebar's
+     DOMContentLoaded handler builds the nav. Taking the numbers synchronously
+     records the skeleton — the first run of this script reported "0 nav" on
+     eight pages and called them clean. So the wait comes first and the
+     measurement happens inside it. */
+  var waited = 0;
+  (function settle(){
+    var hasNav = document.querySelectorAll('.tk-nav a').length > 0;
+    var hasSidebar = !!document.querySelector('.tk-sidebar');
+    var exhausted = waited > 120;
+    if((hasNav || (!hasSidebar && exhausted)) && waited > 2){ done(); return; }
+    if(exhausted){ done(); return; }
+    waited++;
+    setTimeout(settle, 40);
+  })();
+
+  function done(){ document.title = '@@' + JSON.stringify(measure()); }
+
+  function measure(){
+    var out = {};
+  /* 1. No horizontal overflow. Elements inside a deliberate scroller — a wide
+        table, the mobile nav strip — are excluded: they are meant to scroll. */
+  var offenders = [];
+  document.querySelectorAll('*').forEach(function(el){
+    var r = el.getBoundingClientRect();
+    if(r.width < 1 || r.right <= innerWidth + 1) return;
+    var n = el.parentElement, inScroller = false;
+    while(n){
+      var s = getComputedStyle(n);
+      if(s.overflowX === 'auto' || s.overflowX === 'scroll'){ inScroller = true; break; }
+      n = n.parentElement;
+    }
+    if(!inScroller) offenders.push(label(el));
+  });
+  out.overflow = {
+    docScrollWidth: document.documentElement.scrollWidth,
+    innerWidth: innerWidth,
+    offenders: Array.from(new Set(offenders)).slice(0, 6)
+  };
+
+  /* 2. The floating feedback button must not sit on text a reader needs.
+   *
+   * 只看**当前视口里真的可见**的元素。
+   *
+   * getBoundingClientRect 给的是元素在它滚动容器里的位置 —— 横向滚动列表
+   * 里被划到屏幕外的卡片，矩形仍然算在那条轨道上（实测 x=5376），于是
+   * 检测说"按钮压住了卡片标题"，而屏幕上根本没有那张卡片。
+   * 这不是布局问题，是检测没有把滚动偏移算进来。
+   *
+   * 判据换成：元素的矩形要落在视口内，而且没有被祖先的横向滚动推到外面。
+   */
+  var fab = document.querySelector('.tk-fab');
+  var covered = [];
+  if(fab){
+    var fr = fab.getBoundingClientRect();
+    document.querySelectorAll('*').forEach(function(el){
+      if(el === fab || fab.contains(el)) return;
+      if(el.querySelector && el.querySelector('.tk-fab')) return;
+      var b = el.getBoundingClientRect();
+      if(b.width < 8 || b.height < 8) return;
+      // 只算视口内的：滑到屏幕外的内容不构成遮挡。
+      if(b.right <= 0 || b.left >= innerWidth) return;
+      if(b.bottom <= 0 || b.top >= innerHeight) return;
+      if(b.right < fr.left || b.left > fr.right || b.bottom < fr.top || b.top > fr.bottom) return;
+      var st = getComputedStyle(el);
+      if(st.visibility === 'hidden' || st.display === 'none' || +st.opacity < 0.1) return;
+      /* 横向滚动容器里的元素不算 —— 它们在被划到之前不在屏幕上。
+       *
+       * 一个横向滚动的轨道，未滚到的卡片矩形落在轨道右侧（实测 x=5376），
+       * 恰好经过浮动按钮那块区域，于是被报成"按钮压住标题"。但读者
+       * 看不到那张卡片，也点不到它 —— 它不是遮挡。
+       *
+       * 反过来说：真正要防的是**静止内容**被压住，比如正文、表格、
+       * 纵向列表。那些不在滚动容器里，这条排除不影响它们被检测到。 */
+      var n = el.parentElement, inScroller = false;
+      while(n){
+        var ps = getComputedStyle(n);
+        if(ps.overflowX === 'auto' || ps.overflowX === 'scroll'){ inScroller = true; break; }
+        n = n.parentElement;
+      }
+      if(inScroller) return;
+      var ownText = [].some.call(el.childNodes, function(n){
+        return n.nodeType === 3 && n.textContent.trim();
+      });
+      if(ownText) covered.push(label(el));
+    });
+  }
+  out.fabCovers = fab ? Array.from(new Set(covered)).slice(0, 6) : null;
+
+  /* 3. The floating controls must not overlap each other. */
+  var boxes = [];
+  [['fab', '.tk-fab'], ['theme', '.tk-theme-toggle'],
+   ['kbd', '#kbd-hint'], ['lang', '.tk-lang-toggle']].forEach(function(pair){
+    var el = document.querySelector(pair[1]);
+    if(!el) return;
+    var r = el.getBoundingClientRect();
+    if(r.width < 1) return;
+    boxes.push({name: pair[0], x: r.x, y: r.y, w: r.width, h: r.height});
+  });
+  var clashes = [];
+  for(var i = 0; i < boxes.length; i++){
+    for(var j = i + 1; j < boxes.length; j++){
+      var a = boxes[i], b = boxes[j];
+      var overlap = !(a.x + a.w <= b.x || b.x + b.w <= a.x ||
+                      a.y + a.h <= b.y || b.y + b.h <= a.y);
+      if(overlap) clashes.push(a.name + '+' + b.name);
+    }
+  }
+  out.controlClashes = clashes;
+
+  /* 4. The sidebar must be where the page expects it. */
+  var sb = document.querySelector('.tk-sidebar');
+  if(sb){
+    var sr = sb.getBoundingClientRect();
+    out.sidebar = {
+      position: getComputedStyle(sb).position,
+      x: Math.round(sr.x),
+      width: Math.round(sr.width),
+      navItems: document.querySelectorAll('.tk-nav a').length
+    };
+  } else {
+    out.sidebar = null;
+  }
+
+  /* 5. The nav must be complete on the first paint, not grown afterwards.
+        A bar that reads four items and then five is the flicker this checks. */
+  out.navItems = document.querySelectorAll('.tk-nav a').length;
+
+  /* 6. Text clipped by a fixed-height ancestor. */
+  var clipped = [];
+  document.querySelectorAll('*').forEach(function(el){
+    var st = getComputedStyle(el);
+    if(st.overflowY === 'auto' || st.overflowY === 'scroll' || st.overflowY === 'visible') return;
+    /* 多行截断（-webkit-line-clamp）是有意的排版：摘要限定两行，
+       超出部分隐去。它必然让 scrollHeight 大于 clientHeight，但这
+       不是缺陷 —— 是设计。用 data-clamp 显式声明，审计跳过。
+       这个属性同时也是一份记录：写明"这里是有意截断的"，
+       避免后来者以为是 bug 去修。 */
+    if(el.hasAttribute('data-clamp')) return;
+    /* object-fit: cover 同理 —— 封面图按容器比例裁切是有意的，
+       必然让图片的固有尺寸和显示盒不一致。用 data-crop 声明。 */
+    if(el.hasAttribute('data-crop')) return;
+    /* KaTeX 会给每个公式额外输出一份 MathML —— 那是给屏幕阅读器和
+       复制粘贴用的，kaTEX 自己的 CSS 就把它 clip 成 1×1 并绝对定位。
+       它必然"溢出"（内容比 1px 的盒子大得多），但那是标准做法，
+       不是排版问题。按类名跳过：这个类由 KaTeX 生成，没法给它加属性。 */
+    if(el.classList.contains('katex-mathml')) return;
+    if(el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 4) clipped.push(label(el));
+  });
+  out.clipped = Array.from(new Set(clipped)).slice(0, 6);
+
+    return out;
+  }
+})();
+</script>
+</body>
 </html>

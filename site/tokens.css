@@ -102,7 +102,8 @@
   /* 右下角悬浮控件（反馈按钮 52px + 右边距 22px）或右上角主题按钮要占的宽度。
      内容列右侧留出这条通道，否则浮动按钮会压在正文上 —— 实测压住过状态徽标、
      小节标题和反馈正文。移动端按钮缩小，用下面的媒体查询覆盖。 */
-  --float-lane: 86px;
+  /* 74 = 反馈按钮 52px + 距右 22px。曾写 86，比需要宽 12px × 每页每行。 */
+  --float-lane: 74px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -154,6 +155,16 @@
    * 字距是配套的：字号越大，默认字距越显松，所以要收紧。见 --tracking-*。 */
   --text-display: clamp(38px, 5.2vw, 66px);
   --text-note: clamp(15px, 1.25vw, 17px);
+
+  /* ── 箭头图标 ─────────────────────────────────────────────────────────
+   * 2026-09-22 建立。此前全站箭头没有统一来源：.digest-chip--out i 写
+   * 11px + opacity:.7，.digest-chip--refresh i 又写一遍 11px，正文里的 →
+   * 干脆裸着跟在文字后面 —— 同一个"出门"手势，三处三个尺寸三个透明度。
+   * 收成两个 token：尺寸统一（箭头是手势不是内容，不该有字号级差），
+   * 静息不透明统一（0.7 在深底上偏虚，0.85 才读得出是个箭头）。
+   * 语义分工保留在字符本身：→ 站内跳转，↗ 出站，↻ 刷新，▸/▾ 折叠。 */
+  --arrow-size: 12px;
+  --arrow-opacity: 0.85;
 
   /* 旧名保留为别名，迁移期用；改完可删。 */
   --text-2xs: var(--text-micro);
@@ -211,6 +222,7 @@
   /* A 1px top highlight reads as a lit edge on an otherwise flat card. */
   --hairline-top: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   --grain-opacity: 0.028;
+
 
   /* ── Paper ──────────────────────────────────────────────────────────────
    * The one thing a screen cannot do that paper can: sit behind the words
@@ -313,7 +325,8 @@
   /* 右下角悬浮控件（反馈按钮 52px + 右边距 22px）或右上角主题按钮要占的宽度。
      内容列右侧留出这条通道，否则浮动按钮会压在正文上 —— 实测压住过状态徽标、
      小节标题和反馈正文。移动端按钮缩小，用下面的媒体查询覆盖。 */
-  --float-lane: 86px;
+  /* 74 = 反馈按钮 52px + 距右 22px。曾写 86，比需要宽 12px × 每页每行。 */
+  --float-lane: 74px;
 
   --space-1: 4px;
   --space-2: 8px;
@@ -529,6 +542,7 @@
   --hairline-top: inset 0 1px 0 rgba(255, 255, 255, 0.045);
   --grain-opacity: 0.05;
 
+
   /* Paper, dark. The rule lifts rather than stays put: --color-line is only
    * 1.6:1 against the panel here, which reads as a smudge instead of a rule. */
   --ink-rule: #33413c;
@@ -652,29 +666,14 @@ a:hover {
  * 字号还不一样，同一个导航项在两个页面相差 3.7px。现在只有一套 .tk-nav。
  * 图标必须参与行盒计算，所以这里把它压到与文字同高。
  */
-.nav-item,
-.tk-nav a {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  min-height: 38px;
-  padding: var(--space-2) 10px;
-  border: 1px solid transparent;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-base);
-  font-weight: var(--weight-semibold);
-  line-height: 1.5;
-  text-decoration: none;
-}
-
-.nav-item-icon,
-.tk-nav-icon {
-  flex: none;
-  width: 18px;
-  /* 与文字同字号：大一号会把行盒撑高，导航项就跟着变高。 */
-  font-size: 1em;
-  line-height: 1;
-  text-align: center;
-  color: currentColor;
-}
+/* ── 这里不要再定义导航项几何 ────────────────────────────────────────────
+ * .tk-nav a 的几何只在 site/base.css 定义一次，改导航样式去改那里。
+ *
+ * 这份原本在这里也有一份，font-weight 写 --weight-semibold，而 base.css 写
+ * --weight-medium。两份规则都命中同一个元素，谁后加载谁赢，于是同一个导航项
+ * 在两个页面粗细不一样。已按单一真源删除。
+ * .nav-item 是工作台的旧类名，现在没有页面用它，一并去掉。
+ *
+ * 本文件只负责定义变量，不负责给具体组件写几何。
+ */
 
