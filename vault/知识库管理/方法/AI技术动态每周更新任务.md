@@ -25,27 +25,30 @@ sources:
 
 ## 调度配置
 
-用系统 crontab 触发（示例为每周一 09:00）：
+用系统 crontab 触发（示例为每周一 09:00，实际路径以部署位置为准）：
 
 ```
-0 9 * * 1 cd /path/to/technical-knowledge && python3 -m agent_foundation.cli_update --prompt-file scripts/radar_weekly_prompt.md >> logs/radar_weekly.log 2>&1
+0 9 * * 1 cd /data/code/AIagent/skills/knowledge-site/technical-knowledge && codebuddy -p "$(cat scripts/radar_weekly_prompt.md)" --permission-mode acceptEdits >> logs/radar_weekly.log 2>&1
 ```
 
-不依赖 cron 的环境里，用 `agent_foundation.ProcessSupervisor` 包一层超时与重试：
+`codebuddy -p` 是非交互模式，实测可用；`--permission-mode acceptEdits` 让文件编辑自动放行，高风险操作仍会询问（定时任务无人值守，日志里要能看到被拦下的操作）。提示词里的 `{date}` 由执行前替换，也可以在提示词里省略——Agent 会读系统日期。
+
+不依赖 shell 的环境里，用 `agent_foundation.ProcessSupervisor` 包一层超时与进程组回收：
 
 ```python
 from agent_foundation import ProcessSpec, ProcessSupervisor
 
 result = ProcessSupervisor().run(
     ProcessSpec(
-        ["your-agent-command", "--prompt-file", "scripts/radar_weekly_prompt.md"],
+        ["codebuddy", "-p", prompt_text, "--permission-mode", "acceptEdits"],
+        cwd="/data/code/AIagent/skills/knowledge-site/technical-knowledge",
         hard_timeout_seconds=1800,
         idle_timeout_seconds=300,
     )
 )
 ```
 
-`agent_foundation` 只负责进程存活、超时回收、transcript 脱敏和指数退避；提示词在 `scripts/radar_weekly_prompt.md`，由各 Agent 适配器自行读取。
+`agent_foundation` 只负责进程存活、超时回收、心跳与进程组回收；命令构造、结果解码和重试边界由调用方适配器决定。`result.termination` 不是 `EXITED` 时按 `recovery` 的指数退避重试一次。
 
 ## 完整提示词
 
