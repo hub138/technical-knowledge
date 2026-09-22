@@ -2304,6 +2304,12 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/learning/openmaic-jobs":
             self.send_json({"jobs": openmaic_generation_jobs()})
             return
+        if path == "/api/hot":
+            # 热门文章聚合（供知识全景给高频阅读的文章画高亮圈）。
+            # 只回路径/标题/阅读次数——不含 IP、UA 等任何身份信息；
+            # Pages 静态镜像没有这个数据，前端取不到就自动无高亮。
+            self.send_json({"hot": insights_pages(limit=12)})
+            return
         if path == "/insights":
             try:
                 payload = PUBLIC_INSIGHTS.read_bytes()
@@ -2567,10 +2573,20 @@ class Handler(BaseHTTPRequestHandler):
                 if topic == "归档":
                     continue
                 counts[category] = counts.get(category, 0) + 1
+            # 领域展示顺序：缺陷分析钉首位（用户指定的高频阅读域），其余按
+            # 篇数降序。与 index.html 的 PINNED_FIRST 保持同一规则——侧栏
+            # 知识树、首页领域卡、知识地形都吃这份顺序。
+            pinned = ("缺陷分析：从个案到体系",)
+            ranked = sorted(
+                counts.items(),
+                key=lambda kv: (
+                    pinned.index(kv[0]) if kv[0] in pinned else len(pinned),
+                    -kv[1],
+                ),
+            )
             self.send_json({
                 "domains": [
-                    {"name": name, "count": count}
-                    for name, count in sorted(counts.items(), key=lambda kv: -kv[1])
+                    {"name": name, "count": count} for name, count in ranked
                 ]
             })
             return
@@ -3085,9 +3101,18 @@ class Handler(BaseHTTPRequestHandler):
             return
         rel = unquote(str(body.get("path") or "")).strip().lstrip("/")
         note = self.vault.note(rel) if rel else None
+        # view:* 是前端视图页的合成路径（知识全景/图谱的进入打点），不是
+        # vault 里的文件——保留原样进日志，中台才能看到"有人看过全景"。
+        # 其他不存在的 path 仍归一为空串（title 兜底可读）。
+        if note:
+            record_path = str(note["path"])
+        elif rel.startswith("view:"):
+            record_path = rel
+        else:
+            record_path = ""
         record = {
             "ts": time.time(),
-            "path": str(note["path"]) if note else "",
+            "path": record_path,
             "title": str(note["title"]) if note else str(body.get("title") or "")[:120],
             "referrer": str(self.headers.get("Referer") or "")[:200],
             "screen": str(body.get("screen") or "")[:20],

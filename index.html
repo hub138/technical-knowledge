@@ -642,8 +642,7 @@
 .tk-subtopic:first-child{border-top:0}
 .tk-subtopic:hover{color:var(--color-accent);border-left-color:var(--color-accent);background:var(--color-accent-soft)}
 .tk-subtopic--all{color:var(--color-accent);font-weight:var(--weight-semibold)}
-.tk-radar-pin{display:grid}
-.tk-subtopics .radar-card{margin:4px 0 4px 14px;width:calc(100% - 14px);max-width:calc(100% - 14px)}
+.tk-radar-pin{display:contents}
 .tk-subtopic .count{font-size:var(--text-2xs);color:var(--color-muted);font-variant-numeric:tabular-nums}
 .pg-domain-block{margin-bottom:24px}
 .pg-domain-block h3{font-size:var(--text-lg);margin:0 0 10px;display:flex;align-items:baseline;gap:10px}
@@ -836,14 +835,17 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .nav-section .topic-button{margin-left:13px;width:calc(100% - 13px);padding:6px 10px;font-size:var(--text-base);color:var(--color-muted)}
 /* 时效性文章（type: radar）置顶在领域标题下方、主题列表之上。
    橙色边框 + 阴影 + ⚡，让"这份动态有没有更新"在侧边栏就能一眼看到。 */
-.radar-card,.nav-section .radar-card{display:flex;align-items:center;gap:6px;box-sizing:border-box;margin:4px 0 4px 13px;width:calc(100% - 13px);max-width:calc(100% - 13px);padding:7px 10px;min-height:35px;border:1px solid var(--color-warm-line);border-radius:6px;background:var(--color-warm-soft);box-shadow:inset 3px 0 0 var(--color-warm);cursor:pointer;text-align:left;color:var(--color-warm-ink);font-size:var(--text-sm);line-height:1.4;transition:box-shadow var(--duration-fast) var(--ease-out)}
-.radar-card:hover{box-shadow:var(--shadow-sm);border-color:var(--color-warm)}
-.radar-card[aria-current="page"]{background:var(--color-warm);color:var(--color-panel)}
-.radar-card .radar-icon{flex:none;font-size:var(--text-base);line-height:1}
+/* 雷达卡（每周更新入口）：收敛版。原为琥珀大卡（用户反馈太抢眼、
+   点击被引得畸形），现与 tk-subtopic 行同构——同缩进、同左线、同字号，
+   仅以小 ⚡ 与浅灰「每周更新」后缀区分；hover/current 走子主题同款
+   accent 语言。时效入口的功能保留，视觉音量归位。 */
+.radar-card,.nav-section .radar-card{display:flex;align-items:center;gap:6px;box-sizing:border-box;margin:0;padding:5px 8px 5px 26px;border:0;border-left:1px solid var(--color-line);border-radius:0;background:transparent;box-shadow:none;cursor:pointer;text-align:left;color:var(--color-ink-soft);font-size:var(--text-small);line-height:1.4;transition:color var(--duration-fast) var(--ease-out),border-color var(--duration-fast) var(--ease-out),background var(--duration-fast) var(--ease-out)}
+.tk-subtopics .radar-card:hover,.nav-section .radar-card:hover{color:var(--color-accent);border-left-color:var(--color-accent);background:var(--color-accent-soft);box-shadow:none}
+.radar-card[aria-current="page"]{color:var(--color-accent);background:var(--color-accent-soft);border-left-color:var(--color-accent)}
+.radar-card .radar-icon{flex:none;font-size:var(--text-2xs);line-height:1;opacity:.75}
 .radar-card .radar-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex:1 1 auto}
-.radar-card .radar-text strong{font-size:var(--text-small);font-weight:var(--weight-semibold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0}
-.radar-card .radar-text small{font-size:var(--text-micro);font-weight:600;opacity:.75;white-space:nowrap;flex:0 1 auto;overflow:hidden;min-width:0}
-.radar-card[aria-current="page"] .radar-text small{opacity:.92}
+.radar-card .radar-text strong{font-size:var(--text-small);font-weight:var(--weight-medium);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0;color:inherit}
+.radar-card .radar-text small{font-size:var(--text-2xs);font-weight:var(--weight-normal);color:var(--color-muted);white-space:nowrap;flex:0 1 auto;overflow:hidden;min-width:0}
 :root[data-theme="dark"] .radar-card{box-shadow:0 3px 10px rgba(0,0,0,.4)}
 :root[data-theme="dark"] .radar-card:hover{box-shadow:0 5px 14px rgba(0,0,0,.5)}
 /* 归档：维护资料，不是知识主题。视觉上比正常主题轻一档。 */
@@ -1153,7 +1155,7 @@ a:hover { text-decoration: none; }
 <script>
 const $=s=>document.querySelector(s),state={notes:[],edges:[],papers:[],domain:'all',topic:'all',expandedDomains:new Set(),query:'',sort:'title',selected:null,graphFocus:null,panoTab:'matrix',zoom:1,pan:{x:0,y:0},view:'home',notesSignature:'',learningStatus:null};/* 这张表现在只用于图谱配色、domainRank 这类要给领域一个稳定编号的场合，
    不再参与排序（排序统一走 ordered，按篇数降序）。 */
-const order=['总览','AI 系统工程：从模型能力到生产能力','缺陷分析：从个案到体系','后端系统：在并发、失败与变化中维持服务','数据系统：在并发与故障中保存事实','性能工程：从用户等待到资源瓶颈','软件构建：让变化可以理解、验证与交付','Clippings'],topicOrder={'AI 系统工程：从模型能力到生产能力':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端系统：在并发、失败与变化中维持服务':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统：在并发与故障中保存事实':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'性能工程：从用户等待到资源瓶颈':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建：让变化可以理解、验证与交付':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付'],'缺陷分析：从个案到体系':['概览','影响判断','复现与回归','稳定性','正确性','并发','配置与可操作','安全','资源与容量','兼容与升级']},colors=['#1a365d','#d97706','#0284c7','#7c3aed','#059669','#dc2626','#64748b'];const esc=TKShell.esc;/* 领域排序：篇数降序，与侧边栏（/api/domains）同源。
+const order=['总览','缺陷分析：从个案到体系','AI 系统工程：从模型能力到生产能力','后端系统：在并发、失败与变化中维持服务','数据系统：在并发与故障中保存事实','性能工程：从用户等待到资源瓶颈','软件构建：让变化可以理解、验证与交付','Clippings'],topicOrder={'AI 系统工程：从模型能力到生产能力':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端系统：在并发、失败与变化中维持服务':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统：在并发与故障中保存事实':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'性能工程：从用户等待到资源瓶颈':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建：让变化可以理解、验证与交付':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付'],'缺陷分析：从个案到体系':['概览','影响判断','复现与回归','稳定性','正确性','并发','配置与可操作','安全','资源与容量','兼容与升级']},colors=['#1a365d','#d97706','#0284c7','#7c3aed','#059669','#dc2626','#64748b'];const esc=TKShell.esc;/* 领域排序：篇数降序，与侧边栏（/api/domains）同源。
  *
  * 原先这里是一张硬编码名次表：数据系统(41)、性能工程(39) 被排在
  * 软件构建(56) 前面，而侧边栏按篇数降序把 56 放在 41 之前 —— 同一屏
@@ -1162,7 +1164,7 @@ const order=['总览','AI 系统工程：从模型能力到生产能力','缺陷
  * 改成按真实篇数排：新增领域自动归位，不必再维护一张会过期的表。
  * 数量之外还有两条语义要保留，所以置顶与垫底单独处理：
  *   总览是入口，永远第一；Clippings 与知识库管理是归档和元文档，垫底。 */
-const PINNED_FIRST=['总览'],PINNED_LAST=['Clippings','知识库管理'];
+const PINNED_FIRST=['总览','缺陷分析：从个案到体系'],PINNED_LAST=['Clippings','知识库管理'];/* 缺陷分析钉首：用户指定（数据里它是高频阅读域），其余仍按篇数降序；侧边栏（/api/domains）同规则。 */
 const ordered=a=>[...a].sort((x,y)=>{
   const fx=PINNED_FIRST.indexOf(x),fy=PINNED_FIRST.indexOf(y);
   if(fx>=0||fy>=0)return (fx<0?99:fx)-(fy<0?99:fy)||x.localeCompare(y,'zh-CN');
@@ -1189,7 +1191,14 @@ function alertUser(message){const box=$('#app-alert');box.textContent=message;bo
 /* Re-translate after each view change: the SPA builds its markup in JS, so the
    strings the i18n walk saw at load are not the strings on screen now. */
 function retranslate(){window.TKI18N?.translateDOM()}
-function show(view){state.view=view;$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
+let viewVisitKey='';/* 视图进入打点去重：同一次页面加载里反复切视图只记一次。 */
+const VIEW_TITLES={home:'首页',directory:'目录视图',graph:'知识图谱（视图）',panorama:'知识全景（视图）'};
+function show(view){state.view=view;
+  /* 视图进入监控（用户要求：访问任何页面都打点）。home/directory/graph/
+     panorama 每次页面加载各记一次；reader 不在此记——文章阅读由
+     openNote 的 reportVisit 记到具体篇目，粒度更细，避免一行文章两条
+     记录。同 load 内反复切回同一视图去重。 */
+  if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:feedbackUi?.name()||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
 function renderDomains(){
   /* 域列表的骨架（竖线风格）由 shell 渲染（tk:domains-rendered 广播后到达）。
      这里做主站才有的增强：点域 = 展开该域的主题子列表（再点收起），

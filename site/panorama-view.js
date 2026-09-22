@@ -31,6 +31,17 @@
    * render(host, notes) 由 index.html 在进入全景页 / 数据刷新时调用。 */
   var R = window.TK_PANORAMA_RULES;
   var DATA = null;
+  /* 热门文章：/api/hot 只回 路径→阅读次数 的聚合（无任何身份信息）。
+   * 命中的叶子圆画 accent 高亮圈，悬停提示带阅读次数。接口取不到
+   * （Pages 静态镜像）时 HOT 保持空，全景照常渲染、无高亮。 */
+  var HOT = {};
+  fetch("/api/hot", { cache: "no-store" })
+    .then(function (r) { return r.ok ? r.json() : {}; })
+    .then(function (d) {
+      (d.hot || []).forEach(function (h) { HOT[h.path] = h.visits; });
+      applyHot();
+    })
+    .catch(function () {});
   var NS = "http://www.w3.org/2000/svg";
   var W = 1000, H = 700;
   var RMAX = 172;
@@ -258,8 +269,9 @@
     });
 
     leaves.forEach(function (p) {
-      var g = svg("g", { class: "pano-node", "data-layer": p.layer.id });
-      g.appendChild(svg("title", null, p.item.t + "（" + p.item.l + " 行）"));
+      var hotN = HOT[p.item.p];
+      var g = svg("g", { class: "pano-node" + (hotN ? " hot" : ""), "data-layer": p.layer.id, "data-path": p.item.p });
+      g.appendChild(svg("title", null, p.item.t + "（" + p.item.l + " 行" + (hotN ? " · 🔥 " + hotN + " 次阅读" : "") + "）"));
       g.appendChild(svg("circle", {
         cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: p.r.toFixed(1),
         fill: p.g.col, "fill-opacity": 0.7,
@@ -280,6 +292,22 @@
     });
 
     host.appendChild(root);
+    applyHot();
+  }
+
+  /* 热门高亮补丁：数据晚于首次绘制到达时，给已画好的叶子补圈。
+   * 只动命中的节点，其余叶子一个属性都不碰。 */
+  function applyHot() {
+    if (!root) return;
+    var nodes = root.querySelectorAll(".pano-node[data-path]");
+    for (var i = 0; i < nodes.length; i++) {
+      var n = nodes[i], v = HOT[n.getAttribute("data-path")];
+      if (!v) continue;
+      if (n.classList.contains("hot")) continue;
+      n.classList.add("hot");
+      var t = n.querySelector("title");
+      if (t) t.textContent += " · 🔥 " + v + " 次阅读";
+    }
   }
 
   /* ── 缩放：点父圆进去，再点同一个圆退回（toggle），点空白也出来 ── */
