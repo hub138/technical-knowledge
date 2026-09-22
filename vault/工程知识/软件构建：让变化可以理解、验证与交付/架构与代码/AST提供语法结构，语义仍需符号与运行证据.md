@@ -1,0 +1,79 @@
+---
+title: AST 提供语法结构，语义仍需符号与运行证据
+type: concept
+status: active
+updated: 2026-08-31
+review_after: 2027-02-28
+change_rate: medium
+confidence: high
+tags:
+  - software/ast
+  - software/static-analysis
+  - ai/coding-agents
+sources:
+  - "https://docs.python.org/3/library/ast.html"
+  - "https://tree-sitter.github.io/tree-sitter/"
+  - "https://microsoft.github.io/language-server-protocol/"
+---
+
+# AST 提供语法结构，语义仍需符号与运行证据
+
+它解决的是用文本匹配代码结构时误改注释、同名符号或嵌套语法的问题。核心机制是 AST 保留语法节点和层级，符号表、类型检查与运行 trace 再补足跨文件语义；收益是结构化重构更稳，代价是解析器、构建上下文和多语言适配成本增加。用真实动态派发、反射和配置开关样本对照静态结论与运行覆盖。
+
+抽象语法树（AST）把源代码的语法结构表示为节点和关系，忽略大部分空白和表面格式。它适合需要理解“这是函数/调用/类型/作用域”的任务；正则适合边界明确的文本匹配。两者不是 AI，也不是互相完全替代。
+
+## 代码表示层次
+
+```text
+bytes/text -> tokens -> concrete syntax tree -> AST
+         -> name/type/control/data-flow graph -> semantic model
+```
+
+AST 能表达语法节点和嵌套，但通常不能仅凭自己回答跨文件符号解析、动态派发、运行时反射和真实数据流；这些需要 symbol table、type checker、CFG/DFG、构建系统或运行证据。
+
+## 选择方法
+
+| 任务 | 优先方法 | 原因 |
+| --- | --- | --- |
+| 查固定日志字符串/配置行 | 文本/正则 | 简单、快、无需完整语法 |
+| 重命名符号、修改调用参数 | AST/CST + 符号解析 | 避免误改注释和同名文本 |
+| 保留格式的代码重写 | CST/专用 codemod | AST unparse 可能改变格式/注释 |
+| 多语言结构搜索 | Tree-sitter/语言服务器 | 增量解析和统一查询接口 |
+| 判断测试是否经过目标代码 | 静态调用图 + runtime coverage/trace | 静态可达不等于运行时执行 |
+| 安全/污点分析 | AST + CFG/DFG + 规则/类型 | 需要控制流和数据传播 |
+
+## 最小 Python 示例
+
+```python
+import ast
+
+tree = ast.parse(source)
+for node in ast.walk(tree):
+    if isinstance(node, ast.Call):
+        print(ast.dump(node.func), node.lineno, node.col_offset)
+```
+
+解析时记录语言、语法版本、文件编码和构建条件。Python AST 节点随版本演进；生成代码前用对应版本 parse/compile/test 回归。
+
+## 可靠代码变更
+
+1. 用语法/符号条件定位目标，不只依赖行号。
+2. 给候选节点计算结构指纹，同时保留文件 revision 和上下文。
+3. 生成最小 edit，检测目标是否唯一；多匹配或零匹配立即停止。
+4. 重新 parse/type-check/compile，并运行覆盖目标行为的测试。
+5. 比较 diff，保证注释、格式和无关区域没有意外改变。
+
+“结构指纹”只能帮助重新定位，不能证明语义等价。代码移动、重载、宏、生成代码和动态语言都会产生歧义。
+
+## AI 编码 Agent 的边界
+
+AI 适合理解任务、选择 AST/文本/语言服务器、生成迁移和解释失败；框架必须验证目标 revision、实际 patch、编译/测试/coverage 和产物。AST 找到调用不代表测试真正执行到它；代码仓库的完整索引、探索和增量更新模型见 [[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/代码智能体需要结构索引、任务探索与运行证据]]，事实约束见 [[工程知识/AI 系统工程：从模型能力到生产能力/安全与治理/执行证据必须独立于AI结论]]。
+
+## 反模式
+
+- 用正则解析任意嵌套语法，再通过堆叠例外修补。
+- 仅凭 AST 节点名称判断跨文件语义。
+- 代码重写后只检查文件能保存，不重新解析和测试。
+- 把具体行号当作稳定身份，不绑定 revision 和结构上下文。
+
+关联：[[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/AI辅助研发必须形成证据闭环]]、[[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/代码智能体需要结构索引、任务探索与运行证据]]、[[工程知识/软件构建：让变化可以理解、验证与交付/软件构建：让变化可以理解、验证与交付]]、[[工程知识/软件构建：让变化可以理解、验证与交付/测试与交付/测试策略从风险选择证据]]。
