@@ -5,7 +5,7 @@
  *
  * 字段：
  *   key         与 site/feeds.py 的 FEEDS[].key 对齐；有 key 才会有「最新几条」窗口。
- *               播客没有可抓的文字列表，所以 key 留空。
+ *               播客的单集列表从页面 __NEXT_DATA__ 抓取（ai-paper-podcast）。
  *   name        站名（中文界面显示这个）
  *   url         地址，新标签页打开
  *   kind        一句话性质，灰色小字
@@ -20,7 +20,7 @@ window.TK_SOURCES = {
     {
       key: "reading",
       title: "文章",
-      note: "各家技术团队的成篇长文，讲的是一个系统怎么设计、怎么踩坑。",
+      note: "各家技术团队的成篇长文，讲的是一个系统怎么设计、怎么踩坑",
       items: [
         {
           key: "bestblogs",
@@ -28,13 +28,13 @@ window.TK_SOURCES = {
           url: "https://www.bestblogs.dev/reading/follow",
           kind: "中文技术公众号聚合",
           gain:
-            "把散在几十个技术公众号里的文章聚到一处，按方向筛。今天更新了什么、哪几篇值得点开，扫一遍标题就知道。",
+            "把散在几十个技术公众号里的文章聚到一处，按方向筛。今天更新了什么、哪几篇值得点开，扫一遍标题就知道",
           tags: ["公众号聚合", "今日更新", "自选订阅", "速看标题"],
           en: {
             name: "BestBlogs",
             kind: "Chinese tech writing, aggregated",
             gain:
-              "Writing from dozens of Chinese tech accounts, gathered by what you follow. A scan of the titles tells you what is new today and what is worth opening, without visiting each one.",
+              "Writing from dozens of Chinese tech accounts, gathered by what you follow. A scan of the titles tells you what is new today and what is worth opening, without visiting each one",
             tags: ["Aggregated", "Daily", "Self-selected", "Skimmable"],
           },
         },
@@ -44,13 +44,13 @@ window.TK_SOURCES = {
           url: "https://www.ruanyifeng.com/blog/index.html",
           kind: "个人技术博客",
           gain:
-            "每周一期，把一周里值得看的科技内容挑出来讲。写得慢、讲得透，适合当周末的固定读物。",
+            "每周一期，把一周里值得看的科技内容挑出来讲。写得慢、讲得透，适合当周末的固定读物",
           tags: ["周刊", "长期更新", "讲透"],
           en: {
             name: "Ruan Yifeng's blog",
             kind: "Personal tech blog",
             gain:
-              "A weekly digest that picks out what was worth reading in tech that week. Written slowly and explained properly — a good standing weekend read.",
+              "A weekly digest that picks out what was worth reading in tech that week. Written slowly and explained properly — a good standing weekend read",
             tags: ["Weekly", "Long-running", "Explains fully"],
           },
         },
@@ -59,7 +59,7 @@ window.TK_SOURCES = {
     {
       key: "papers",
       title: "论文",
-      note: "论文原文，直接来自 arXiv 和顶会。看的是方法本身，不是二手解读。",
+      note: "论文原文，直接来自 arXiv 和顶会。看的是方法本身，不是二手解读",
       items: [
         {
           key: "papernotes",
@@ -67,13 +67,13 @@ window.TK_SOURCES = {
           url: "https://papernotes.org/",
           kind: "AI 顶会论文解读",
           gain:
-            "两万多篇 AI 顶会论文的中文解读，每篇五分钟读完核心思想。按会议和子领域组织，找某个方向的工作比翻 arXiv 快。",
+            "两万多篇 AI 顶会论文的中文解读，每篇五分钟读完核心思想。按会议和子领域组织，找某个方向的工作比翻 arXiv 快",
           tags: ["2.3 万篇", "五分钟一篇", "按会议分类"],
           en: {
             name: "PaperNotes",
             kind: "AI conference paper notes",
             gain:
-              "Chinese write-ups of 23,000+ AI conference papers, five minutes each. Organised by venue then subfield; the latest additions are listed below. Faster than arXiv when you are looking for work in a specific area.",
+              "Chinese write-ups of 23,000+ AI conference papers, five minutes each. Organised by venue then subfield; the latest additions are listed below. Faster than arXiv when you are looking for work in a specific area",
             tags: ["23k papers", "5 min each", "By venue"],
           },
         },
@@ -83,7 +83,7 @@ window.TK_SOURCES = {
           url: "https://www.arxivdaily.com/",
           kind: "每日 arXiv 速递",
           gain:
-            "每天新提交的 arXiv 论文，带中文摘要和作者机构。它不替你判断哪篇重要，但保证不漏掉今天出了什么。",
+            "每天新提交的 arXiv 论文，带中文摘要和作者机构。它不替你判断哪篇重要，但保证不漏掉今天出了什么",
           tags: ["每日更新", "中文摘要", "按机构筛"],
           en: {
             name: "arXivDaily",
@@ -94,19 +94,20 @@ window.TK_SOURCES = {
           },
         },
         {
-          // 播客没有可抓的文字列表，所以不配 feed 槽。
-          key: "",
+          // 小宇宙页面是服务端渲染，最新几期可以从 __NEXT_DATA__ 里抓回来
+          // （feeds.py 的 _fetch_podcast）。不再是"只有一个入口的空卡"。
+          key: "ai-paper-podcast",
           name: "每日 AI 论文速递（播客）",
           url: "https://www.xiaoyuzhoufm.com/podcast/667d1ecfc13b46d76c3f64b8",
           kind: "播客 · HuggingFace 出品",
           gain:
-            "同一批论文的音频版，每期十来分钟。通勤、走路时能跟上进度，不占用眼睛。",
+            "同一批论文的音频版，每期十来分钟。通勤、走路时能跟上进度，不占用眼睛",
           tags: ["音频", "每期十分钟", "通勤可用"],
           en: {
             name: "Daily AI Paper Digest (podcast)",
             kind: "Podcast by HuggingFace",
             gain:
-              "An audio version of the same stream, about ten minutes an episode. Keeps you current while commuting or walking — it frees your eyes, so it runs alongside reading.",
+              "An audio version of the same stream, about ten minutes an episode. Keeps you current while commuting or walking — it frees your eyes, so it runs alongside reading",
             tags: ["Audio", "10 minutes", "Commute-friendly"],
           },
         },
@@ -115,7 +116,7 @@ window.TK_SOURCES = {
     {
       key: "news",
       title: "资讯",
-      note: "当天发生的事 —— 谁发了什么、哪个方向在动。看趋势用，不用记。",
+      note: "当天发生的事 —— 谁发了什么、哪个方向在动。看趋势用，不用记",
       items: [
         {
           key: "readhub",
@@ -123,7 +124,7 @@ window.TK_SOURCES = {
           url: "https://readhub.cn/hot",
           kind: "科技新闻聚合",
           gain:
-            "当天科技新闻压成一句话一条，扫一眼就知道发生了什么。用来不漏掉大事。",
+            "当天科技新闻压成一句话一条，扫一眼就知道发生了什么。用来不漏掉大事",
           tags: ["24 小时热榜", "一句话一条"],
           en: {
             name: "ReadHub",
@@ -139,13 +140,13 @@ window.TK_SOURCES = {
           url: "https://zeli.app/zh",
           kind: "资讯聚合",
           gain:
-            "偏 Hacker News 一线的资讯聚合。和 ReadHub 一起看，能同时覆盖中英文两边在关注什么。",
+            "偏 Hacker News 一线的资讯聚合。和 ReadHub 一起看，能同时覆盖中英文两边在关注什么",
           tags: ["Hacker News", "中英两边"],
           en: {
             name: "zeli",
             kind: "News aggregator",
             gain:
-              "Aggregated news from the Hacker News side. Read alongside ReadHub it covers what both the Chinese and English halves of the industry are paying attention to.",
+              "Aggregated news from the Hacker News side. Read alongside ReadHub it covers what both the Chinese and English halves of the industry are paying attention to",
             tags: ["Hacker News", "EN + ZH"],
           },
         },
