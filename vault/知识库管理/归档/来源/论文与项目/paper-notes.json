@@ -28,7 +28,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
      "title": "Token、Embedding 与表示学习连接数据和模型",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -65,7 +65,7 @@
    "key_result": "In this work, we address these challenges and finally realize the promise of conditional computation, achieving greater than 1000x improvements in model capacity with only minor losses in computational efficiency on modern GPU clusters.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
      "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -103,35 +103,35 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/AI系统工程：把模型能力变成生产能力.md",
+     "path": "工程知识/AI 系统工程/AI系统工程：把模型能力变成生产能力.md",
      "title": "AI 系统工程：把模型能力变成生产能力",
      "domain": "",
      "topic": "",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型基础与训练/Transformer如何把序列建模成可扩展计算.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/Transformer如何把序列建模成可扩展计算.md",
      "title": "Transformer 如何把序列建模成可扩展计算",
      "domain": "AI系统",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/位置编码和长上下文限制有效利用.md",
      "title": "位置编码和长上下文限制有效利用",
      "domain": "AI系统",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md",
+     "path": "工程知识/AI 系统工程/模型与上下文/模型提出候选，系统定义正确性.md",
      "title": "模型提出候选，系统定义正确性",
      "domain": "AI系统",
      "topic": "模型与上下文",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "path": "工程知识/AI 系统工程/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
      "title": "预训练、后训练、RAG 与工具改变不同层次",
      "domain": "AI系统",
      "topic": "模型与上下文",
@@ -174,7 +174,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/解码采样决定生成行为而不是知识本身.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/解码采样决定生成行为而不是知识本身.md",
      "title": "解码采样决定生成行为而不是知识本身",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -206,7 +206,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
      "title": "Token、Embedding 与表示学习连接数据和模型",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -240,7 +240,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/分布式训练与并行策略如何切分模型.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/分布式训练与并行策略如何切分模型.md",
      "title": "分布式训练与并行策略如何切分模型",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -280,14 +280,14 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
      "title": "Scaling Law 把训练预算分配成可测量假设",
      "domain": "AI系统",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型基础与训练/预训练数据决定模型能力上限.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/预训练数据决定模型能力上限.md",
      "title": "预训练数据决定模型能力上限",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -327,7 +327,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
+     "path": "工程知识/AI 系统工程/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
      "title": "混合检索、重排与查询改写各自解决什么问题",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -377,35 +377,35 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/AI系统工程：把模型能力变成生产能力.md",
+     "path": "工程知识/AI 系统工程/AI系统工程：把模型能力变成生产能力.md",
      "title": "AI 系统工程：把模型能力变成生产能力",
      "domain": "",
      "topic": "",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/知识与检索/RAG数据管道从文档到可引用证据.md",
+     "path": "工程知识/AI 系统工程/知识与检索/RAG数据管道从文档到可引用证据.md",
      "title": "RAG 数据管道从文档到可引用证据",
      "domain": "AI系统",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/知识与检索/RAG的核心是选择可引用证据.md",
+     "path": "工程知识/AI 系统工程/知识与检索/RAG的核心是选择可引用证据.md",
      "title": "RAG 的核心是选择可引用证据",
      "domain": "AI系统",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI系统",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "path": "工程知识/AI 系统工程/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
      "title": "预训练、后训练、RAG 与工具改变不同层次",
      "domain": "AI系统",
      "topic": "模型与上下文",
@@ -427,7 +427,7 @@
    "problem_zh": "但模型访问和精确操纵知识的能力仍然有限，因此在知识密集型任务上，表现落后于为任务专门设计的架构。",
    "approach_zh": "提出 RAG 模型：参数记忆是一个预训练的 seq2seq 模型，非参数记忆是一个维基百科稠密向量索引，通过预训练的神经检索器访问。",
    "result_zh": "",
-   "deep_read": "# RAG：把参数记忆和非参数记忆拼起来\n\n> **这份解读是不完整的，缺的部分明确标出来了。**\n> 下面每个模块都注明它来自摘要还是正文。标 `[待读全文]` 的段落我还没有\n> 拿到全文，不替它编内容 —— 摘要里没有消融设置、超参和失败案例，\n> 凭摘要补出来的每一句都可能是错的，而读者分辨不出来。\n\n## 1 背景与问题\n\n**动机。** 大规模预训练语言模型把事实知识存在参数里，在各类下游任务上微调后\n能达到当时的最高水平。但**它们访问和精确操纵知识的能力仍然有限** —— 在知识密集型\n任务上，表现反而落后于为任务专门设计的架构。此外，为模型决策提供出处、\n以及更新模型的世界知识，都还是未解决的问题。\n\n**核心问题。** 能不能把\"存在参数里的记忆\"和\"存在外部索引里的记忆\"结合起来，\n让模型既能生成流畅文本，又能在需要事实时取用可更新的外部证据？\n\n**直觉洞见。** 参数记忆像\"训练时记住的东西\"，非参数记忆像\"手边可以翻的资料\"。\n前者稳定但难更新、难追溯；后者可更新、可给出处，但本身不会说话。\n把两者接在一起，就是在生成时让模型边写边查。\n\n一个已知的相关尝试是\"带可微访问机制的预训练模型\"，但它此前**只在抽取式任务上\n被研究过**，没有做成通用方案。\n\n## 2 核心方法\n\n摘要能确认的设计决策有三条：\n\n1. **两种记忆的组合方式。** 参数记忆是一个预训练的 seq2seq 模型；\n   非参数记忆是一个用预训练神经检索器访问的**维基百科稠密向量索引**。\n   注意非参数那一侧选的是维基百科索引，而不是任意文档 —— 这决定了它的\n   知识边界是\"维基百科覆盖的\"，也决定了更新方式是重建索引。\n\n2. **两种 RAG 形式，区别在检索结果的复用粒度。**\n   - 一种在**整个生成序列**上条件于同一批检索到的段落；\n   - 另一种**每个 token** 都可以用不同的段落。\n   这是这篇论文里最值得注意的设计分歧：前者更稳，后者更灵活，\n   代价是训练的复杂度和推理时的检索开销。\n\n3. **通用微调配方。** 论文的定位是\"通用配方\"，即 RAG 不是为某个任务定制的\n   架构，而是在预训练模型上做的可迁移改造。\n\n`[待读全文]` 检索器与被检索索引的具体结构、段落如何切分与编码、\n两种形式各自的训练目标与损失、训练时检索结果是否参与梯度回传，\n这些摘要里都没有。它们决定了这套方法能不能被复现，必须在正文里确认。\n\n## 3 技术细节\n\n`[待读全文]` 摘要没有给出任何公式、超参或算法步骤。这一节在此论文上依赖正文，\n现在留空。\n\n## 4 实验与结果\n\n摘要明确报告了三件事：\n\n| 结论 | 摘要原文依据 |\n|---|---|\n| 在三个开放域问答任务上达到当时最高水平 | \"set the state-of-the-art on three open domain QA tasks\" |\n| 优于纯参数的 seq2seq 模型 | \"outperforming parametric seq2seq models\" |\n| 优于任务专用的「检索-抽取」架构 | \"task-specific retrieve-and-extract architectures\" |\n| 生成质量更具体、更多样、更符合事实 | \"generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline\" |\n\n**关键发现的性质**：这里是**方向性结论**（超过、优于、更具体），\n摘要里**没有给出具体数值**。三个任务各提升了多少、用的是哪些数据集、\n生成质量的\"更符合事实\"怎么量化，都要回正文。\n\n这对使用这篇论文是有影响的：它足以支撑\"RAG 这条路线值得走\"这个判断，\n**不足以支撑\"RAG 在你的场景能提升多少\"这个判断**。后者必须自己测。\n\n`[待读全文]` 三件套的具体名称、指标定义、对比基线版本、消融结果、\n超参设置。\n\n## 5 局限性\n\n摘要自述的边界（可直接引用）：\n\n1. **非参数记忆是维基百科稠密向量索引** —— 意味着知识覆盖受限于该索引，\n   且更新一次的成本取决于重建索引的代价，不是改一行数据。\n2. **当时只在通用配方层面验证** —— 论文说这是\"通用配方的探索\"，\n   在具体领域的迁移效果需要单独验证。\n\n从摘要可以推理、但需要正文确认的：\n\n3. **两条检索路径都会有失败模式** —— 检索不到正确证据时，模型仍会生成流畅的\n   错误内容。这是后来 RAG 评测里要分离\"检索质量\"和\"生成质量\"的原因。\n4. **每个 token 用不同段落的方案** 推理开销更高，长生成任务上尤其明显。\n\n`[待读全文]` 论文自己列出的局限性章节、失败案例分析、以及作者对\n\"什么时候不该用 RAG\"的说明。\n\n## 6 复现指南\n\n`[待读全文]` 摘要未提供环境、代码骨架和步骤。这篇论文有公开实现，\n补这一节时应当以官方仓库为准，而不是从摘要推断。\n\n---\n\n## 依赖这篇论文的知识\n\n本库有 5 篇知识把这篇论文作为论据：\n\n- [[工程知识/AI系统/知识与检索/RAG的核心是选择可引用证据]]\n- [[工程知识/AI系统/知识与检索/RAG数据管道从文档到可引用证据]]\n- [[工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取]]\n- [[工程知识/AI系统/模型与上下文/预训练、后训练、RAG与工具改变不同层次]]\n- [[工程知识/AI系统/AI系统工程：把模型能力变成生产能力]]\n\n这些页面引用的是本文第 4 节那条\"方向性结论\"。如果后续读全文发现\n具体数值与这些页面的表述有出入，以论文为准，并回来更新这几页。\n\n## 怎么把这份解读补全\n\n按 [[知识库管理/方法/论文怎么追踪怎么解析]] 的 L2 规范，缺的是第 2、3、4 节的\n正文级细节。补齐时需要：\n\n1. 读全文（arXiv 上有 PDF）\n2. 找到论文自述的局限性章节，替换第 5 节的推理部分\n3. 从正文抄出三件套名称与指标数值，回填第 4 节的表格\n4. 把 `status: partial` 改成 `status: complete`，并把 `confidence` 提到 high"
+   "deep_read": "# RAG：把参数记忆和非参数记忆拼起来\n\n> **这份解读是不完整的，缺的部分明确标出来了。**\n> 下面每个模块都注明它来自摘要还是正文。标 `[待读全文]` 的段落我还没有\n> 拿到全文，不替它编内容 —— 摘要里没有消融设置、超参和失败案例，\n> 凭摘要补出来的每一句都可能是错的，而读者分辨不出来。\n\n## 1 背景与问题\n\n**动机。** 大规模预训练语言模型把事实知识存在参数里，在各类下游任务上微调后\n能达到当时的最高水平。但**它们访问和精确操纵知识的能力仍然有限** —— 在知识密集型\n任务上，表现反而落后于为任务专门设计的架构。此外，为模型决策提供出处、\n以及更新模型的世界知识，都还是未解决的问题。\n\n**核心问题。** 能不能把\"存在参数里的记忆\"和\"存在外部索引里的记忆\"结合起来，\n让模型既能生成流畅文本，又能在需要事实时取用可更新的外部证据？\n\n**直觉洞见。** 参数记忆像\"训练时记住的东西\"，非参数记忆像\"手边可以翻的资料\"。\n前者稳定但难更新、难追溯；后者可更新、可给出处，但本身不会说话。\n把两者接在一起，就是在生成时让模型边写边查。\n\n一个已知的相关尝试是\"带可微访问机制的预训练模型\"，但它此前**只在抽取式任务上\n被研究过**，没有做成通用方案。\n\n## 2 核心方法\n\n摘要能确认的设计决策有三条：\n\n1. **两种记忆的组合方式。** 参数记忆是一个预训练的 seq2seq 模型；\n   非参数记忆是一个用预训练神经检索器访问的**维基百科稠密向量索引**。\n   注意非参数那一侧选的是维基百科索引，而不是任意文档 —— 这决定了它的\n   知识边界是\"维基百科覆盖的\"，也决定了更新方式是重建索引。\n\n2. **两种 RAG 形式，区别在检索结果的复用粒度。**\n   - 一种在**整个生成序列**上条件于同一批检索到的段落；\n   - 另一种**每个 token** 都可以用不同的段落。\n   这是这篇论文里最值得注意的设计分歧：前者更稳，后者更灵活，\n   代价是训练的复杂度和推理时的检索开销。\n\n3. **通用微调配方。** 论文的定位是\"通用配方\"，即 RAG 不是为某个任务定制的\n   架构，而是在预训练模型上做的可迁移改造。\n\n`[待读全文]` 检索器与被检索索引的具体结构、段落如何切分与编码、\n两种形式各自的训练目标与损失、训练时检索结果是否参与梯度回传，\n这些摘要里都没有。它们决定了这套方法能不能被复现，必须在正文里确认。\n\n## 3 技术细节\n\n`[待读全文]` 摘要没有给出任何公式、超参或算法步骤。这一节在此论文上依赖正文，\n现在留空。\n\n## 4 实验与结果\n\n摘要明确报告了三件事：\n\n| 结论 | 摘要原文依据 |\n|---|---|\n| 在三个开放域问答任务上达到当时最高水平 | \"set the state-of-the-art on three open domain QA tasks\" |\n| 优于纯参数的 seq2seq 模型 | \"outperforming parametric seq2seq models\" |\n| 优于任务专用的「检索-抽取」架构 | \"task-specific retrieve-and-extract architectures\" |\n| 生成质量更具体、更多样、更符合事实 | \"generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline\" |\n\n**关键发现的性质**：这里是**方向性结论**（超过、优于、更具体），\n摘要里**没有给出具体数值**。三个任务各提升了多少、用的是哪些数据集、\n生成质量的\"更符合事实\"怎么量化，都要回正文。\n\n这对使用这篇论文是有影响的：它足以支撑\"RAG 这条路线值得走\"这个判断，\n**不足以支撑\"RAG 在你的场景能提升多少\"这个判断**。后者必须自己测。\n\n`[待读全文]` 三件套的具体名称、指标定义、对比基线版本、消融结果、\n超参设置。\n\n## 5 局限性\n\n摘要自述的边界（可直接引用）：\n\n1. **非参数记忆是维基百科稠密向量索引** —— 意味着知识覆盖受限于该索引，\n   且更新一次的成本取决于重建索引的代价，不是改一行数据。\n2. **当时只在通用配方层面验证** —— 论文说这是\"通用配方的探索\"，\n   在具体领域的迁移效果需要单独验证。\n\n从摘要可以推理、但需要正文确认的：\n\n3. **两条检索路径都会有失败模式** —— 检索不到正确证据时，模型仍会生成流畅的\n   错误内容。这是后来 RAG 评测里要分离\"检索质量\"和\"生成质量\"的原因。\n4. **每个 token 用不同段落的方案** 推理开销更高，长生成任务上尤其明显。\n\n`[待读全文]` 论文自己列出的局限性章节、失败案例分析、以及作者对\n\"什么时候不该用 RAG\"的说明。\n\n## 6 复现指南\n\n`[待读全文]` 摘要未提供环境、代码骨架和步骤。这篇论文有公开实现，\n补这一节时应当以官方仓库为准，而不是从摘要推断。\n\n---\n\n## 依赖这篇论文的知识\n\n本库有 5 篇知识把这篇论文作为论据：\n\n- [[工程知识/AI 系统工程/知识与检索/RAG的核心是选择可引用证据]]\n- [[工程知识/AI 系统工程/知识与检索/RAG数据管道从文档到可引用证据]]\n- [[工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取]]\n- [[工程知识/AI 系统工程/模型与上下文/预训练、后训练、RAG与工具改变不同层次]]\n- [[工程知识/AI 系统工程/AI系统工程：把模型能力变成生产能力]]\n\n这些页面引用的是本文第 4 节那条\"方向性结论\"。如果后续读全文发现\n具体数值与这些页面的表述有出入，以论文为准，并回来更新这几页。\n\n## 怎么把这份解读补全\n\n按 [[知识库管理/方法/论文怎么追踪怎么解析]] 的 L2 规范，缺的是第 2、3、4 节的\n正文级细节。补齐时需要：\n\n1. 读全文（arXiv 上有 PDF）\n2. 找到论文自述的局限性章节，替换第 5 节的推理部分\n3. 从正文抄出三件套名称与指标数值，回填第 4 节的表格\n4. 把 `status: partial` 改成 `status: complete`，并把 `confidence` 提到 high"
   },
   "2101.03961": {
    "id": "2101.03961",
@@ -447,7 +447,7 @@
    "key_result": "Finally, we advance the current scale of language models by pre-training up to trillion parameter models on the \"Colossal Clean Crawled Corpus\" and achieve a 4x speedup over the T5-XXL model.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
      "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -489,7 +489,7 @@
    "key_result": "Our approach allows us to perform training iterations on a model with 1 trillion parameters at 502 petaFLOP/s on 3072 GPUs with achieved per-GPU throughput of 52% of theoretical peak.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/分布式训练与并行策略如何切分模型.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/分布式训练与并行策略如何切分模型.md",
      "title": "分布式训练与并行策略如何切分模型",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -526,7 +526,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/质量与运营/RAG评测要分离检索质量与生成质量.md",
+     "path": "工程知识/AI 系统工程/质量与运营/RAG评测要分离检索质量与生成质量.md",
      "title": "RAG 评测要分离检索质量与生成质量",
      "domain": "AI系统",
      "topic": "质量与运营",
@@ -562,7 +562,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/位置编码和长上下文限制有效利用.md",
      "title": "位置编码和长上下文限制有效利用",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -612,21 +612,21 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/后训练对齐与微调改变行为边界.md",
      "title": "后训练对齐与微调改变行为边界",
      "domain": "AI系统",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型与上下文/模型提出候选，系统定义正确性.md",
+     "path": "工程知识/AI 系统工程/模型与上下文/模型提出候选，系统定义正确性.md",
      "title": "模型提出候选，系统定义正确性",
      "domain": "AI系统",
      "topic": "模型与上下文",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "path": "工程知识/AI 系统工程/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
      "title": "预训练、后训练、RAG 与工具改变不同层次",
      "domain": "AI系统",
      "topic": "模型与上下文",
@@ -662,7 +662,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/数据与MLOps/数据集、特征与模型版本必须可追溯.md",
+     "path": "工程知识/AI 系统工程/数据与MLOps/数据集、特征与模型版本必须可追溯.md",
      "title": "数据集、特征与模型版本必须可追溯",
      "domain": "AI系统",
      "topic": "数据与MLOps",
@@ -714,14 +714,14 @@
    "key_result": "As a highlight, Chinchilla reaches a state-of-the-art average accuracy of 67.5% on the MMLU benchmark, greater than a 7% improvement over Gopher.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
      "title": "Scaling Law 把训练预算分配成可测量假设",
      "domain": "AI系统",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型基础与训练/预训练数据决定模型能力上限.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/预训练数据决定模型能力上限.md",
      "title": "预训练数据决定模型能力上限",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -761,7 +761,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
+     "path": "工程知识/AI 系统工程/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
      "title": "混合检索、重排与查询改写各自解决什么问题",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -833,7 +833,7 @@
    "key_result": "On two interactive decision making benchmarks (ALFWorld and WebShop), ReAct outperforms imitation and reinforcement learning methods by an absolute success rate of 34% and 10% respectively, while being prompted with only one or two in-context examples.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型与上下文/上下文工程是在有限预算内构造决策现场.md",
+     "path": "工程知识/AI 系统工程/模型与上下文/上下文工程是在有限预算内构造决策现场.md",
      "title": "上下文工程是在有限预算内构造决策现场",
      "domain": "AI系统",
      "topic": "模型与上下文",
@@ -1014,7 +1014,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/安全与治理/提示注入和工具越权是不同威胁.md",
+     "path": "工程知识/AI 系统工程/安全与治理/提示注入和工具越权是不同威胁.md",
      "title": "提示注入和工具越权是不同威胁",
      "domain": "AI系统",
      "topic": "安全与治理",
@@ -1050,7 +1050,7 @@
    "key_result": "For example, Reflexion achieves a 91% pass@1 accuracy on the HumanEval coding benchmark, surpassing the previous state-of-the-art GPT-4 that achieves 80%.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/Agent与工作流/反思要有外部锚点.md",
+     "path": "工程知识/AI 系统工程/Agent与工作流/反思要有外部锚点.md",
      "title": "反思要有外部锚点，否则只是自我说服",
      "domain": "AI系统",
      "topic": "Agent与工作流",
@@ -1084,7 +1084,7 @@
    "key_result": "When fine-tuned on Science QA, the synergy of LLaVA and GPT-4 achieves a new state-of-the-art accuracy of 92.53%.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
      "title": "多模态模型把不同输入映射到共同推理接口",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -1123,7 +1123,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -1159,7 +1159,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/后训练对齐与微调改变行为边界.md",
      "title": "后训练对齐与微调改变行为边界",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -1205,7 +1205,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/后训练对齐与微调改变行为边界.md",
      "title": "后训练对齐与微调改变行为边界",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -1288,7 +1288,7 @@
    "key_result": "Our results reveal that strong LLM judges like GPT-4 can match both controlled and crowdsourced human preferences well, achieving over 80% agreement, the same level of agreement between humans.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/Agent与工作流/反思要有外部锚点.md",
+     "path": "工程知识/AI 系统工程/Agent与工作流/反思要有外部锚点.md",
      "title": "反思要有外部锚点，否则只是自我说服",
      "domain": "AI系统",
      "topic": "Agent与工作流",
@@ -1343,7 +1343,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/位置编码和长上下文限制有效利用.md",
      "title": "位置编码和长上下文限制有效利用",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -1387,14 +1387,14 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/Agent与工作流/任务分解的质量决定Agent的上限.md",
+     "path": "工程知识/AI 系统工程/Agent与工作流/任务分解的质量决定Agent的上限.md",
      "title": "任务分解的质量决定 Agent 的上限",
      "domain": "AI系统",
      "topic": "Agent与工作流",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/Agent与工作流/多智能体只在能并行或需要独立上下文时才值得.md",
+     "path": "工程知识/AI 系统工程/Agent与工作流/多智能体只在能并行或需要独立上下文时才值得.md",
      "title": "多智能体只在能并行或需要独立上下文时才值得",
      "domain": "AI系统",
      "topic": "Agent与工作流",
@@ -1433,7 +1433,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
      "title": "多模态模型把不同输入映射到共同推理接口",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -1472,21 +1472,21 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/AI系统工程：把模型能力变成生产能力.md",
+     "path": "工程知识/AI 系统工程/AI系统工程：把模型能力变成生产能力.md",
      "title": "AI 系统工程：把模型能力变成生产能力",
      "domain": "",
      "topic": "",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/推理服务与平台/批处理、KV缓存、量化与并行如何改变服务容量.md",
+     "path": "工程知识/AI 系统工程/推理服务与平台/批处理、KV缓存、量化与并行如何改变服务容量.md",
      "title": "批处理、KV 缓存、量化与并行如何改变服务容量",
      "domain": "AI系统",
      "topic": "推理服务与平台",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md",
+     "path": "工程知识/AI 系统工程/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md",
      "title": "推理服务的核心矛盾是延迟、吞吐、显存与质量",
      "domain": "AI系统",
      "topic": "推理服务与平台",
@@ -1528,7 +1528,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/质量与运营/RAG评测要分离检索质量与生成质量.md",
+     "path": "工程知识/AI 系统工程/质量与运营/RAG评测要分离检索质量与生成质量.md",
      "title": "RAG 评测要分离检索质量与生成质量",
      "domain": "AI系统",
      "topic": "质量与运营",
@@ -1563,7 +1563,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -1627,14 +1627,14 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
      "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
      "domain": "AI系统",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/模型基础与训练/预训练数据决定模型能力上限.md",
+     "path": "工程知识/AI 系统工程/模型基础与训练/预训练数据决定模型能力上限.md",
      "title": "预训练数据决定模型能力上限",
      "domain": "AI系统",
      "topic": "模型基础与训练",
@@ -1673,7 +1673,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/向量数据库不是RAG本身.md",
+     "path": "工程知识/AI 系统工程/知识与检索/向量数据库不是RAG本身.md",
      "title": "向量数据库不是 RAG 本身",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -1707,7 +1707,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -1751,14 +1751,14 @@
    "key_result": "On question-answering tasks that involve complex, multi-step reasoning, we show state-of-the-art results; for example, by coupling RAPTOR retrieval with the use of GPT-4, we can improve the best performance on the QuALITY benchmark by 20% in absolute accuracy.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
+     "path": "工程知识/AI 系统工程/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
      "title": "GraphRAG 适合关系与全局问题但成本更高",
      "domain": "AI系统",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -1801,7 +1801,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -1841,14 +1841,14 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
+     "path": "工程知识/AI 系统工程/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
      "title": "GraphRAG 适合关系与全局问题但成本更高",
      "domain": "AI系统",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI系统",
      "topic": "知识与检索",
@@ -1882,7 +1882,7 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI系统/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI系统",
      "topic": "知识与检索",

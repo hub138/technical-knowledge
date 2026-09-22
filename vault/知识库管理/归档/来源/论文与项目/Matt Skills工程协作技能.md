@@ -33,11 +33,11 @@ Matt Pocock 的 Skills 仓库把软件工程中最容易被 Agent 跳过的环�
 
 ## 在本知识库中的位置
 
-这些技能属于“工程工作方式”，不应取代 AI 系统、后端、数据或性能等知识主题。它们的抽象价值是：把 Agent 的语义决策放在清楚的上下文中，把测试、运行结果和审查保留为外部证据。相关原则见 [[工程知识/AI系统/安全与治理/AI可以做语义决策，系统必须守住事实边界]]。
+这些技能属于“工程工作方式”，不应取代 AI 系统、后端、数据或性能等知识主题。它们的抽象价值是：把 Agent 的语义决策放在清楚的上下文中，把测试、运行结果和审查保留为外部证据。相关原则见 [[工程知识/AI 系统工程：从模型能力到生产能力/安全与治理/AI可以做语义决策，系统必须守住事实边界]]。
 
 ## 本地安装
 
-本机副本：`/Users/leoqqian/Developer/knowledge-tools/mattpocock-skills`  
+本机副本：`~/Developer/knowledge-tools/mattpocock-skills`  
 上游：<https://github.com/mattpocock/skills>  
 当前版本以仓库 `main` 的提交为准，Codex/Agent Skills 使用 `~/.agents/skills` 与 `~/.codex/skills`，Cursor 使用 `~/.cursor/skills`。
 
@@ -47,4 +47,4 @@ Matt Pocock 的 Skills 仓库把软件工程中最容易被 Agent 跳过的环�
 
 - [[知识库管理/归档/学习工具使用与调用成本.md]]
 - [[知识库管理/归档/来源注册表.md]]
-- [[工程知识/软件构建与质量/架构与代码/架构组织高成本决策与演进边界]]
+- [[工程知识/软件构建：让变化可以理解、验证与交付/架构与代码/架构组织高成本决策与演进边界]]
