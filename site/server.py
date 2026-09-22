@@ -54,6 +54,13 @@ HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*#*\s*$")
 UL_RE = re.compile(r"^\s*[-*+]\s+(.+)$")
 OL_RE = re.compile(r"^\s*\d+[.)]\s+(.+)$")
 AUTH_COOKIE = "knowledge_site_access"
+# 运营者中台的第二把钥匙：env KNOWLEDGE_OPERATOR_PASSWORD。
+# 本机判定（client_is_local）在反代/别名架构下无法表达"这个访客是运营者
+# 本人"——所有经代理进来的流量目的地址都一样。运营者密码补上这一维：
+# 在登录框输入它即换发签名 cookie，中台从任何域名可看。不配置（Mac 本机
+# 场景）时行为退回纯本机判定，桌面环境本来就有物理信任。
+OPERATOR_COOKIE = "knowledge_site_operator"
+OPERATOR_PASSWORD = os.environ.get("KNOWLEDGE_OPERATOR_PASSWORD") or ""
 AUTH_SERVICE = "knowledge-site-access"
 AUTH_MAX_AGE = 60 * 60 * 24 * 14
 AUTH_FAILURE_WINDOW = 5 * 60
@@ -1899,7 +1906,11 @@ class Handler(BaseHTTPRequestHandler):
         if "text/html" not in content_type or b"<head>" not in payload:
             return payload
         local = "1" if self.client_is_local() else "0"
-        tag = f'<meta name="tk-local-client" content="{local}">'.encode("utf-8")
+        operator = "1" if self.client_is_operator() else "0"
+        tag = (
+            f'<meta name="tk-local-client" content="{local}">'
+            f'<meta name="tk-operator" content="{operator}">'
+        ).encode("utf-8")
         return payload.replace(b"<head>", b"<head>" + tag, 1)
 
     def _is_static(self) -> bool:
@@ -2023,8 +2034,25 @@ class Handler(BaseHTTPRequestHandler):
             destination = ""
         return origin_is_local(self.client_address[0], destination)
 
-    def is_authenticated(self) -> bool:
+    def client_is_operator(self) -> bool:
+        """运营者判定：真本机，或持有运营者密码签的 cookie。
+
+        别名判定（client_is_local）负责挡未授权的代理流量；这条负责在
+        "代理流量"里认出运营者本人。未配置运营者密码时退回本机判定。
+        """
         if self.client_is_local():
+            return True
+        if not OPERATOR_PASSWORD:
+            return False
+        cookies = self.headers.get("Cookie", "")
+        token = next(
+            (part.strip().split("=", 1)[1] for part in cookies.split(";") if part.strip().startswith(f"{OPERATOR_COOKIE}=")),
+            None,
+        )
+        return valid_auth_cookie(token, OPERATOR_PASSWORD)
+
+    def is_authenticated(self) -> bool:
+        if self.client_is_operator():
             return True
         cookies = self.headers.get("Cookie", "")
         token = next(
@@ -2128,7 +2156,7 @@ class Handler(BaseHTTPRequestHandler):
         # 用户"也算已认证，于是任何拿到密码的人都能读到中台的 403/401 之前
         # 就被放行。这里按来源地址直接拒绝，密码不再能解锁。
         if path == "/insights" or path.startswith("/api/insights/"):
-            if not self.client_is_local():
+            if not self.client_is_operator():
                 self.send_json(
                     {"error": "insights is only available from this machine"}, 403
                 )
@@ -2142,6 +2170,7 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(
                 {
                     "local_client": self.client_is_local(),
+                    "operator": self.client_is_operator(),
                     "knowledge_public": True,
                     "tool_launch_requires_auth": not self.is_authenticated(),
                 }
@@ -2873,8 +2902,8 @@ class Handler(BaseHTTPRequestHandler):
             self.handle_visit()
             return
         if path == "/api/insights/feedback/status":
-            # 改反馈状态也是运营者操作，同样只认本机。
-            if not self.client_is_local():
+            # 改反馈状态也是运营者操作，同样只认本机/运营者。
+            if not self.client_is_operator():
                 self.send_json(
                     {"error": "insights is only available from this machine"}, 403
                 )
@@ -2892,15 +2921,24 @@ class Handler(BaseHTTPRequestHandler):
         if not self.server.allow_login_attempt(self.client_address[0]):  # type: ignore[attr-defined]
             self.send_json({"error": "too many attempts"}, 429)
             return
-        if not password or not hmac.compare_digest(password, self.site_password):
+        matched_site = bool(password) and hmac.compare_digest(password, self.site_password)
+        matched_operator = bool(password and OPERATOR_PASSWORD) and hmac.compare_digest(password, OPERATOR_PASSWORD)
+        if not matched_site and not matched_operator:
             self.send_json({"error": "invalid password"}, 401)
             return
         self.server.clear_login_attempts(self.client_address[0])  # type: ignore[attr-defined]
         self.send_response(204)
+        # 站点 cookie 两种密码都发（运营者本就该有完整权限；签名用站点
+        # 密码，浏览器端无感知）。运营者密码登录额外多发中台 cookie。
         self.send_header(
             "Set-Cookie",
             f"{AUTH_COOKIE}={auth_cookie(self.site_password)}; Max-Age={AUTH_MAX_AGE}; Path=/; HttpOnly; SameSite=Lax",
         )
+        if matched_operator:
+            self.send_header(
+                "Set-Cookie",
+                f"{OPERATOR_COOKIE}={auth_cookie(OPERATOR_PASSWORD)}; Max-Age={AUTH_MAX_AGE}; Path=/; HttpOnly; SameSite=Lax",
+            )
         self.send_header("Cache-Control", "no-store")
         self.end_headers()
 

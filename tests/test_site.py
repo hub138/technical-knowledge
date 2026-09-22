@@ -275,6 +275,86 @@ class AuthenticationTests(unittest.TestCase):
             SERVER_MODULE.is_local_client = original_local
             SERVER_MODULE.read_keychain_secret = original_secret
 
+    def test_operator_login_sets_both_cookies(self) -> None:
+        """运营者密码登录：站点 cookie + 中台 cookie 一起发。"""
+        original = SERVER_MODULE.OPERATOR_PASSWORD
+        SERVER_MODULE.OPERATOR_PASSWORD = "op-secret"
+        try:
+            connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+            connection.request(
+                "POST", "/auth/login",
+                json.dumps({"password": "op-secret"}),
+                {"Content-Type": "application/json"},
+            )
+            response = connection.getresponse()
+            status = response.status
+            set_cookies = response.msg.get_all("Set-Cookie") or []
+            response.read()
+            connection.close()
+            self.assertEqual(status, 204)
+            joined = " | ".join(set_cookies)
+            self.assertIn("knowledge_site_access=", joined)
+            self.assertIn("knowledge_site_operator=", joined)
+        finally:
+            SERVER_MODULE.OPERATOR_PASSWORD = original
+
+    def test_operator_cookie_unlocks_insights(self) -> None:
+        """带运营者 cookie：中台页面与接口放行（本机判定为 False 的环境）。"""
+        original = SERVER_MODULE.OPERATOR_PASSWORD
+        SERVER_MODULE.OPERATOR_PASSWORD = "op-secret"
+        try:
+            connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+            connection.request(
+                "POST", "/auth/login",
+                json.dumps({"password": "op-secret"}),
+                {"Content-Type": "application/json"},
+            )
+            response = connection.getresponse()
+            set_cookies = response.msg.get_all("Set-Cookie") or []
+            response.read()
+            connection.close()
+            operator = next(
+                c.split(";")[0] for c in set_cookies if c.startswith("knowledge_site_operator=")
+            )
+            self.assertEqual(self.request("GET", "/insights", headers={"Cookie": operator})[0], 200)
+            self.assertEqual(
+                self.request("GET", "/api/insights/visitors", headers={"Cookie": operator})[0], 200
+            )
+            access = self.request("GET", "/api/access", headers={"Cookie": operator})
+            self.assertTrue(json.loads(access[2])["operator"])
+        finally:
+            SERVER_MODULE.OPERATOR_PASSWORD = original
+
+    def test_insights_stays_403_without_operator_cookie(self) -> None:
+        original = SERVER_MODULE.OPERATOR_PASSWORD
+        SERVER_MODULE.OPERATOR_PASSWORD = "op-secret"
+        try:
+            self.assertEqual(self.request("GET", "/insights")[0], 403)
+            login = self.request(
+                "POST", "/auth/login",
+                json.dumps({"password": "test-password-only"}),
+                {"Content-Type": "application/json"},
+            )
+            site_cookie = login[1]["Set-Cookie"].split(";", 1)[0]
+            # 站点密码只解锁工具启动，不解锁中台——两把钥匙不同权。
+            self.assertEqual(self.request("GET", "/insights", headers={"Cookie": site_cookie})[0], 403)
+        finally:
+            SERVER_MODULE.OPERATOR_PASSWORD = original
+
+    def test_operator_login_rejected_when_not_configured(self) -> None:
+        """未配置运营者密码时，任何密码都只按站点密码比对。"""
+        original = SERVER_MODULE.OPERATOR_PASSWORD
+        SERVER_MODULE.OPERATOR_PASSWORD = ""
+        try:
+            response = self.request(
+                "POST", "/auth/login",
+                json.dumps({"password": "op-secret"}),
+                {"Content-Type": "application/json"},
+            )
+            self.assertEqual(response[0], 401)
+        finally:
+            SERVER_MODULE.OPERATOR_PASSWORD = original
+
     def test_legacy_home_aliases_canonicalize(self) -> None:
         for path in (
             "/index.html",

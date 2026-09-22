@@ -227,19 +227,25 @@
    * the old behaviour and the right fallback.
    */
   const stamped = document.querySelector('meta[name="tk-local-client"]');
+  const operatorStamped = document.querySelector('meta[name="tk-operator"]');
   const accessState = {
     /* The server stamps this into the HTML, so it is readable before any
        fetch — which is what removes the 4-then-5 flicker. The fetch below
        remains as the fallback for a page served without the stamp (an old
-       cached copy, or a file opened off disk). */
+       cached copy, or a file opened off disk). local 在这里的意思是
+       "能看到运营者条目"：真本机，或持运营者 cookie（反代架构下运营者
+       从任何域名访问都算，服务端已验证签名）。 */
     known: stamped !== null,
-    local: stamped ? stamped.getAttribute("content") === "1" : false,
+    local: stamped
+      ? stamped.getAttribute("content") === "1" ||
+        Boolean(operatorStamped && operatorStamped.getAttribute("content") === "1")
+      : false,
   };
   const accessReady = fetch("/api/access", { cache: "no-store" })
     .then((response) => (response.ok ? response.json() : {}))
     .then((access) => {
       accessState.known = true;
-      accessState.local = Boolean(access && access.local_client);
+      accessState.local = Boolean(access && (access.local_client || access.operator));
       return accessState.local;
     })
     .catch(() => {
