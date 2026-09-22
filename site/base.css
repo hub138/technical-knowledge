@@ -150,6 +150,12 @@ body.tk-host::before {
   font-weight: var(--weight-semibold);
 }
 
+/* ── 常驻推荐位：站长钉选的导航项（nav.js pinned: true，当前为知识全
+   景）。暖橙 = 雷达卡遗产色（数据证明这个入口有效），音量降到导航项
+   级别：一条暖色导航项，不是当年的大黄卡。与当前位置（实底框）两套
+   语义各自成立；悬停加深不写下划线。 */
+.tk-nav a.tk-nav-pinned{background:var(--color-warm-soft);border-color:var(--color-warm-line);color:var(--color-warm-ink)}
+.tk-nav a.tk-nav-pinned:hover{background:var(--color-warm);border-color:var(--color-warm);color:var(--color-panel)}
 .tk-nav a[aria-current="page"]::before {
   content: "";
   position: absolute;
@@ -1712,3 +1718,8 @@ body.tk-host button {
   color: var(--color-on-accent);
   filter: brightness(1.1);
 }
+
+/* 导航首位的「每周更新」入口（type: radar 文章）：常驻高亮框。
+   侧栏当前态（aria-current）同款 accent 语言，但永远亮着——它不是
+   位置状态，是站长放在门口的引导位（数据证明高亮导航项就是引流位）。
+   深浅主题走 token 自适应；雷达文章不存在时入口不渲染。 */

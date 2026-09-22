@@ -142,10 +142,3 @@
    * 同页两 tab 的说明句在桌面与移动端都必须同档（用户抓的「字体
    * 差异这么大」），降档规则制造了 15px vs 13px 的第二处不同档。 */
 }
-
-/* ── 热门高亮：/api/hot 命中的文章（近段时间被反复阅读）。
-   accent 描边圈出、底色略实一档；不加动画——全景的视觉语言里
-   静态的圈就是"被选中"，动效反而会变成第二个琥珀雷达卡。
-   Pages 静态镜像无 /api/hot，此处规则自然不触发。 */
-.pano-node.hot circle{stroke:var(--color-accent);stroke-width:1.8;fill-opacity:.92}
-.pano-node.hot:hover circle{stroke-width:2.4}

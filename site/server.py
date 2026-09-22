@@ -2304,12 +2304,6 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/learning/openmaic-jobs":
             self.send_json({"jobs": openmaic_generation_jobs()})
             return
-        if path == "/api/hot":
-            # 热门文章聚合（供知识全景给高频阅读的文章画高亮圈）。
-            # 只回路径/标题/阅读次数——不含 IP、UA 等任何身份信息；
-            # Pages 静态镜像没有这个数据，前端取不到就自动无高亮。
-            self.send_json({"hot": insights_pages(limit=12)})
-            return
         if path == "/insights":
             try:
                 payload = PUBLIC_INSIGHTS.read_bytes()
@@ -3045,6 +3039,10 @@ class Handler(BaseHTTPRequestHandler):
         message = str(body.get("message") or "").strip()
         if not message:
             self.send_json({"error": "请先写下反馈内容"}, 400)
+        # 运营者会话的反馈是自测，不入库也不打扰群机器人。
+        if self.client_is_operator():
+            self.send_json({"ok": True, "skipped": "operator"})
+            return
             return
         if len(message) > FEEDBACK_MAX_CHARS:
             self.send_json(
@@ -3098,6 +3096,11 @@ class Handler(BaseHTTPRequestHandler):
         body, error = self.read_json_body(4 * 1024)
         if body is None:
             self.send_json({"error": "invalid request"}, error)
+            return
+        # 运营者本人的浏览不进监控：中台数据只反映真实访客。判定凭
+        # 运营者 cookie（client_is_operator），与访问来自哪个设备无关。
+        if self.client_is_operator():
+            self.send_json({"ok": True, "skipped": "operator"})
             return
         rel = unquote(str(body.get("path") or "")).strip().lstrip("/")
         note = self.vault.note(rel) if rel else None

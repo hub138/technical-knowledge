@@ -42,6 +42,7 @@ window.TK_NAV = {
     {
       key: "panorama",
       label: "知识全景",
+      pinned: true,
       href: "/?view=panorama",
       icon: "▥",
       group: "views",

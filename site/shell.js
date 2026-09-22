@@ -321,8 +321,11 @@
        a sub-nav, not the primary list; the localOnly ones are held back here
        and appended below only once /api/access confirms this is the owner's
        machine. */
+    /* pinned 项（站长钉选，当前为知识全景）常驻高亮：与当前态同一套
+       视觉语言但永远亮着——它回答"从哪开始看"，不是"你在哪"。
+       暖橙底色即推荐标记，与当前位置（实底框）两套语义互不混淆。 */
     const link = (item, current, extraClass = "") => `
-      <a href="${item.href}"${item.key === current ? ' aria-current="page"' : ""}
+      <a href="${item.href}" class="${item.pinned ? "tk-nav-pinned" : ""}"${item.key === current ? ' aria-current="page"' : ""}
          title="${item.title || item.label}">${
            `<span class="tk-nav-icon${extraClass}" aria-hidden="true">${item.icon}</span>`
          }<span>${item.label}</span></a>`;

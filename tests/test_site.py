@@ -359,6 +359,38 @@ class AuthenticationTests(unittest.TestCase):
         finally:
             SERVER_MODULE.OPERATOR_PASSWORD = original
 
+    def test_operator_activity_not_recorded(self) -> None:
+        """运营者会话的访问与反馈不进监控（中台数据只反映真实访客）。"""
+        original = SERVER_MODULE.OPERATOR_PASSWORD
+        SERVER_MODULE.OPERATOR_PASSWORD = "op-secret"
+        captured = []
+        original_append = SERVER_MODULE._append_jsonl
+        SERVER_MODULE._append_jsonl = lambda path, record, **kw: captured.append((str(path), record))
+        try:
+            connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+            connection.request(
+                "POST", "/auth/login",
+                json.dumps({"password": "op-secret"}),
+                {"Content-Type": "application/json"},
+            )
+            response = connection.getresponse()
+            set_cookies = response.msg.get_all("Set-Cookie") or []
+            response.read()
+            connection.close()
+            operator = "; ".join(c.split(";")[0] for c in set_cookies)
+            for api, payload in (
+                ("/api/visit", {"path": "工程知识/x.md", "title": "x"}),
+                ("/api/feedback", {"message": "运营者自测反馈"}),
+            ):
+                r = self.request("POST", api, json.dumps(payload),
+                                 {"Content-Type": "application/json", "Cookie": operator})
+                self.assertEqual(r[0], 200)
+                self.assertEqual(json.loads(r[2]).get("skipped"), "operator")
+            self.assertEqual(captured, [])
+        finally:
+            SERVER_MODULE._append_jsonl = original_append
+            SERVER_MODULE.OPERATOR_PASSWORD = original
+
     def test_legacy_home_aliases_canonicalize(self) -> None:
         for path in (
             "/index.html",
