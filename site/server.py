@@ -2157,6 +2157,12 @@ class Handler(BaseHTTPRequestHandler):
         # 就被放行。这里按来源地址直接拒绝，密码不再能解锁。
         if path == "/insights" or path.startswith("/api/insights/"):
             if not self.client_is_operator():
+                # 中台页面：完全未登录的访客引导去登录页（输入运营者密码
+                # 的地方）；已持站点密码的同事给 403 说明（重定向会死循环：
+                # 站点密码永远换不来运营者 cookie）。API 路径保持 JSON。
+                if path == "/insights" and not self.is_authenticated():
+                    self.redirect("/auth/login?next=%2Finsights")
+                    return
                 self.send_json(
                     {"error": "insights is only available from this machine"}, 403
                 )

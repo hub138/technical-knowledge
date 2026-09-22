@@ -329,7 +329,10 @@ class AuthenticationTests(unittest.TestCase):
         original = SERVER_MODULE.OPERATOR_PASSWORD
         SERVER_MODULE.OPERATOR_PASSWORD = "op-secret"
         try:
-            self.assertEqual(self.request("GET", "/insights")[0], 403)
+            # 完全未登录：中台页面引导去登录页（运营者密码的输入处）
+            no_cookie = self.request("GET", "/insights")
+            self.assertEqual(no_cookie[0], 302)
+            self.assertIn("/auth/login", no_cookie[1]["Location"])
             login = self.request(
                 "POST", "/auth/login",
                 json.dumps({"password": "test-password-only"}),
@@ -337,6 +340,7 @@ class AuthenticationTests(unittest.TestCase):
             )
             site_cookie = login[1]["Set-Cookie"].split(";", 1)[0]
             # 站点密码只解锁工具启动，不解锁中台——两把钥匙不同权。
+            # 已登录但非运营者给 403 而非再跳登录（否则死循环）。
             self.assertEqual(self.request("GET", "/insights", headers={"Cookie": site_cookie})[0], 403)
         finally:
             SERVER_MODULE.OPERATOR_PASSWORD = original
