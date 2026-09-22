@@ -2774,25 +2774,17 @@ function renderMatrixView(){const host=$('#panorama-body');if(!host||!window.TKM
  /* 口径句尾注独立成段：原来整句 900px 下「笔记」两字孤悬尾行（实测）。
   * 「元知识与研究笔记」的语义与「带 meta/ skill/ research 标签」重叠，
   * 砍掉不损失信息，句子变短后自然一行收住。 */
- const scopeNote=(engTotal&&engTotal>inm)?("矩阵口径比首页更严："+engTotal+" 篇工程知识里，"+inm+" 篇进技术矩阵，另 "+(engTotal-inm)+" 篇带 meta/ skill/ research 标签"):"";
- const scopeNoteEn=(engTotal&&engTotal>inm)?("Stricter than the home count: of "+engTotal+" engineering notes, "+inm+" enter this matrix; the other "+(engTotal-inm)+" carry meta/ skill/ research tags."):"";
  if(pickDomain&&inm===0){
    intro.innerHTML=window.TKI18N?.lang==='en'?'<p>Notes in “'+esc(pickDomain)+'” do not enter the matrix (meta notes and clippings are excluded). Try another domain.</p>':'<p>「'+esc(pickDomain)+'」的文章不进技术矩阵（元知识与剪藏被排除），换个域试试</p>';
    host.appendChild(intro);return}
  const layered=items.filter(i=>!i.excluded&&i.layer&&i.kind).length;
  const unlayered=items.filter(i=>!i.excluded&&!i.layer).length;
- intro.innerHTML=window.TKI18N?.lang==='en'?'<p>Each <b>row</b> is a system layer (where the problem lives), each <b>column</b> is a kind of knowledge (which kind you hold at that layer).</p><p>Because the two axes are orthogonal, <b>an empty cell is a real gap</b> — one axis only tells you a category is thin, never which direction is missing.</p>'+(pickDomain?'<p>Current domain: <b>'+esc(pickDomain)+'</b>, only its notes are counted.</p>':'')+'<p><b>'+layered+'</b> notes in the matrix. Click a <b>header</b> to read a whole row or column, a <b>cell</b> for the notes at that crossing.</p>'+(unlayered?'<p>'+unlayered+' notes do not fit any layer yet — they are counted in the library but not in the grid.</p>':'')+(scopeNoteEn?'<p>'+scopeNoteEn+'</p>':''):'<p>每行是一个<b>系统层次</b>（问题出在哪一层），每列是一种<b>知识类型</b>（这一层我懂的是哪种知识）</p><p>两轴正交，<b>空格子才是真的漏</b>：一维只说得出哪一类少，说不出哪个方向空</p>'+(pickDomain?'<p>当前域：<b>'+esc(pickDomain)+'</b>，只统计该域文章。</p>':'')+'<p>共 <b>'+layered+'</b> 篇入矩阵。点<b>表头</b>按行/列通读一类，点<b>格子</b>看交叉点的文章。</p>'+(unlayered?'<p>另有 '+unlayered+' 篇分不出系统层次，计入知识库总数但未入格</p>':'')+(scopeNote?'<p>'+scopeNote+'</p>':'');
+ intro.innerHTML=window.TKI18N?.lang==='en'?'<p>Each <b>row</b> is a system layer (where the problem lives), each <b>column</b> is a kind of knowledge (which kind you hold at that layer).</p><p>Because the two axes are orthogonal, <b>an empty cell is a real gap</b> — one axis only tells you a category is thin, never which direction is missing.</p>'+(pickDomain?'<p>Current domain: <b>'+esc(pickDomain)+'</b>, only its notes are counted.</p>':'')+'':'<p>每行是一个<b>系统层次</b>（问题出在哪一层），每列是一种<b>知识类型</b>（这一层我懂的是哪种知识）</p><p>两轴正交，<b>空格子才是真的漏</b>：一维只说得出哪一类少，说不出哪个方向空</p>'+(pickDomain?'<p>当前域：<b>'+esc(pickDomain)+'</b>，只统计该域文章。</p>':'')+'';
   host.appendChild(intro);
  window.TKMatrixView.renderKindPills(host,items);
  const cells=window.TKMatrixView.render(host,items);
  window.TKMatrixView.renderGaps(host,cells,items);
  window.TKMatrixView.openFromHash(cells);
- const foot=document.createElement('p');foot.className='mx-foot';
- const g=items.filter(i=>!i.excluded&&i.guessed).length;
- const tagged=items.filter(i=>!i.excluded&&(i.tags||[]).length).length;
- const unlay=items.filter(i=>!i.excluded&&!i.layer).length;
- foot.textContent=window.TKI18N?.lang==='en'?'Classified by frontmatter tags and type ('+tagged+' of '+inm+' carry at least one tag — tagged does not mean placed in a cell). '+g+' notes have their layer guessed from keywords — marked in the list, treat those cells as indicative only'+(unlay?' '+unlay+' notes match no layer and stay out of the grid':''):'分类依据：frontmatter 的 tags 与 type（'+tagged+'/'+inm+' 篇至少有一个标签，有标签不等于入了格）。层次靠关键词推断的有 '+g+' 篇，在文章列表里标出，这些格子的数字请当参考'+(unlay?'另有 '+unlay+' 篇匹配不到任何层次，未入格':'');
- host.appendChild(foot);
  window.TKI18N?.translateDOM(host)}
 function setMobileSidebar(collapsed){const sidebar=$('#tk-sidebar'),button=$('#mobile-menu');if(!sidebar||!button)return;sidebar.classList.toggle('collapsed',collapsed);button.setAttribute('aria-expanded',String(!collapsed));button.setAttribute('aria-label',collapsed?'打开目录':'收起目录')}
 function collapseMobileSidebar(){setMobileSidebar(true)}
