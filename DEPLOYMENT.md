@@ -1,12 +1,22 @@
 # 部署说明
 
-## 本机守护进程（已于 2026-09-22 下线，唯一服务在 dev）
+## 本机入口（2026-09-22 起：转发隧道，唯一服务在 dev）
 
-Mac 的 knowledge-site LaunchAgent 已停用（plist 改名 .retired 备查）——
-全站只跑 dev 一份，Mac 浏览器直接访问内网地址。vault 仍在 Mac 上编辑
-并 push（dev 每 5 分钟自动拉取），这条创作流程不变。Mac 的历史访问
-数据已合并进 dev 的 data/visits.jsonl。需要临时起本机站时把 plist
-改回原名再 bootstrap 即可。手动启动使用：
+Mac 的 knowledge-site 进程已停用；8787 端口由
+`com.leoqqian.knowledge-forward` LaunchAgent 接管——SSH 本地转发
+`-L 0.0.0.0:8787:127.10.0.1:28787`，把 localhost:8787 与
+macbook-pro-2.local:8787 的请求送到 dev 的站点。URL 不变，内容与
+数据统一落在 dev（含中台，运营者密码登录一次管 14 天）。Mac 断网
+或 dev 重启时隧道自动重连（KeepAlive）。
+
+vault 仍在 Mac 上编辑并 push（dev 每 5 分钟自动拉取），创作流程不变。
+Mac 的历史访问数据已合并进 dev 的 data/visits.jsonl。
+OpenMAIC/DeepTutor 两个学习工具仍跑在 Mac（各自独立 LaunchAgent），
+从转发站点的"创建课堂"跳转 `localhost:3100/3782` 可直达；
+经 dev 签发的启动 cookie 在 Mac 工具上的适配尚待打通。
+
+需要临时起本机站时：先 bootout 转发隧道腾出 8787，再把 knowledge-site
+的 plist 改回原名 bootstrap。手动启动使用：
 
 ```bash
 ./run-site.sh
