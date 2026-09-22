@@ -1,0 +1,144 @@
+/* 知识全景视图（/?view=panorama）
+ *
+ * 配色取 tokens.css 变量，不写死颜色 —— 站点有深浅两套主题。
+ * 例外是缺口红：它在两套主题里都必须是告警色，写死才不会丢语义。
+ *
+ * 2026-09-22（问题 2）字号同样不写死 px：全景页曾自成一套 14.5/12.5/12/11/10px
+ * 私有字号，与全站标尺（tokens.css --text-*）对不上 —— 用户抓到的
+ * 「字体和其他页不统一」。现在全部挂标尺：
+ *   说明正文   --text-note（15-17px，与 .view-head p 同档）
+ *   小节标题   --text-body + 加粗（16px，卡片标题档）
+ *   图例/角标  --text-small（13px）/ --text-micro（11px，图形内标签档） */
+
+.pano-intro { margin: 0 0 16px; }
+/* 段间距 4px：导语是「一组说明」（规则/警示/操作），段间 4px 保持整体感，
+ * 与 matrix.css .mx-intro p 的段距同一档。 */
+.pano-intro p {
+  margin: 0 0 4px; font-size: var(--text-note); line-height: 1.75; color: var(--color-ink-soft);
+  max-width: 70ch;
+}
+.pano-intro p:last-child { margin-bottom: 0; }
+.pano-intro b { color: var(--color-ink); font-weight: 700; }
+/* 英文模式补丁（:lang(en) 限定，中文不受影响）：英文导语句比中文长
+ * （实测首句 118 字符 > 70ch），自然折行会在尾部出孤行（「stack.」6 字）。
+ * 英文有空格词界，balance 均衡行宽且断点全落词界；中文无词界、balance
+ * 会切词（2026-09-22 全站撤回的教训），所以用 :lang(en) 锁定语言。
+ * 与 index.html 图谱页的 :lang(en) .graph-focus-hint 同一决策链。 */
+:lang(en) .pano-intro p { text-wrap: balance; }
+/* 操作句独立成段：2026-09-22 与八层栈导语拆段配套（panorama-view.js 同
+ * 日期注释）。加粗 + 强调色，与图谱页 .graph-focus-hint 同词汇——
+ * 「点哪里发生什么」是操作说明，视觉上要和前面的规则陈述分得开。
+ * 段间距 2px：两段都是说明句，间距大了会像两块内容。 */
+.pano-intro p.pano-focus-hint { margin-top: 2px; color: var(--color-accent); font-weight: var(--weight-semibold); }
+/* pano-hint-seg：操作句内部按「，」拆的段。桌面 inline 连排一行；≤720px
+ * 内容列窄（390px 实测整句折行把「空白处」切开成「点空|白处退回」），
+ * 拆段 block 后每段是完整语义单元各自成行。与 index.html 图谱页
+ * .graph-focus-hint .hint-seg 的拆法同一决策链（2026-09-22）。 */
+@media (max-width: 720px) {
+  .pano-intro p.pano-focus-hint .pano-hint-seg { display: block; }
+}
+
+.pano-sec {
+  font-size: var(--text-body); font-weight: 700; color: var(--color-ink);
+  margin: 30px 0 12px; letter-spacing: .2px;
+}
+.pano-legend {
+  margin: 10px 0 0; font-size: var(--text-small); color: var(--color-muted); line-height: 1.7;
+}
+
+/* ── 图谱舞台 ──────────────────────────────────────────────────── */
+.pano-stage {
+  border: 1px solid var(--color-line); border-radius: 14px;
+  background:
+    radial-gradient(circle at 50% 50%, var(--color-panel) 0%, var(--color-bg) 78%);
+  padding: 8px; overflow: hidden;
+}
+.pano-map { width: 100%; height: auto; display: block; }
+
+.pano-node { cursor: pointer; transition: opacity .18s; }
+.pano-node circle { transition: r .14s; }
+.pano-node:hover circle { stroke: var(--color-ink); stroke-width: 1.6; }
+
+.pano-g-name {
+  /* SVG 文字真源：fill 走 --color-ink（双主题都 ≥7:1），不再是 JS 写死的
+     LAYER 深色 —— 黑夜下 #1a365d 贴 #0f172a 就是「看不见字」。
+     每层身份色由组圆 fill 表达，文字只承担"读得出"的职责。 */
+  fill: var(--color-ink); font-size: var(--text-small); font-weight: 700; font-family: inherit;
+  /* 【ui-iter·组名可读性】组名常压在子圆上（小圆分支 ty=y+r+16，
+     大圆分支 ty=y-r+21 也会被自己的子圆顶到）。加 paint-order 描边
+     halo：stroke 取页面底色 var(--color-bg)，先画 stroke 再画 fill，
+     等效给文字一圈"底色晕"，压在彩色子圆上也能读。比加 rect 衬底轻：
+     不动 JS 布局，双主题自动跟随，也不遮挡子圆 hover。 */
+  paint-order: stroke fill;
+  stroke: var(--color-bg);
+  stroke-width: 4px;
+  stroke-linejoin: round;
+}
+.pano-g-n { fill: var(--color-muted); font-size: var(--text-micro); font-family: inherit; font-weight: 600;
+  /* 【ui-iter】与 .pano-g-name 同理：篇数行也会压在子圆上，同款 halo。 */
+  paint-order: stroke fill; stroke: var(--color-bg); stroke-width: 3.2px; stroke-linejoin: round; }
+.pano-g-tech { fill: var(--color-muted); font-size: var(--text-micro); font-family: inherit;
+  /* 【ui-iter】技术栈副行字最小、最先被子圆吃掉，同款 halo（描边稍细）。 */
+  paint-order: stroke fill; stroke: var(--color-bg); stroke-width: 3.2px; stroke-linejoin: round; }
+/* 【ui-iter·标签衬底】组标签胶囊：近似实底（0.92），双主题跟随
+   --color-panel；不接鼠标事件，点击穿透到组圆/子圆。 */
+.pano-g-pill {
+  fill: var(--color-panel); fill-opacity: .92;
+  stroke: var(--color-line); stroke-width: 1;
+  pointer-events: none;
+}
+.pano-grp { transition: opacity .18s; }
+.pano-grp:hover circle { stroke-width: 2.6; }
+
+/* ── 层筛选条 ──────────────────────────────────────────────────── */
+.pano-focusbar {
+  display: none; margin: 0 0 12px; padding: 9px 14px;
+  border: 1px solid var(--color-line); border-left: 4px solid var(--color-accent);
+  border-radius: 9px; background: var(--color-panel);
+  font-size: var(--text-small); color: var(--color-ink-soft);
+}
+.pano-focusbar.on { display: block; }
+.pano-focusbar b { color: var(--color-ink); font-weight: 700; }
+.pano-focusbar span { color: var(--color-faint); }
+.pano-clear { color: var(--color-accent); text-decoration: none; margin-left: 4px; }
+/* toggle 提示（「再点一次圆圈退回全图」）：与 .pano-focusbar span 同款弱化，
+   靠左留 6px 间距即可，不抢 focusbar 主文案的视觉。 */
+.pano-toggle-hint { color: var(--color-faint); font-size: 11px; margin-left: 6px; }
+
+/* ── 悬浮提示 ──────────────────────────────────────────────────── */
+.pano-tip {
+  position: fixed; z-index: 60; pointer-events: none; opacity: 0;
+  transition: opacity .12s; max-width: 280px;
+  background: var(--color-panel); border: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 8px; padding: 8px 11px;
+  box-shadow: 0 6px 22px rgba(15, 23, 42, .14);
+}
+.pano-tip.on { opacity: 1; }
+.pano-tip b {
+  display: block; font-size: var(--text-small); color: var(--color-ink);
+  line-height: 1.45; font-weight: 600;
+}
+.pano-tip span { display: block; font-size: var(--text-micro); color: var(--color-muted); margin-top: 3px; }
+
+/* ── 结论 ──────────────────────────────────────────────────────── */
+.pano-note-list { margin: 0; padding-left: 18px; }
+.pano-note-list li {
+  font-size: var(--text-small); color: var(--color-ink-soft); line-height: 1.85;
+}
+.pano-foot {
+  margin: 24px 0 0; padding-top: 14px; border-top: 1px solid var(--color-line);
+  font-size: var(--text-micro); color: var(--color-faint); line-height: 1.75;
+}
+.pano-foot b { color: var(--color-muted); }
+.pano-empty { font-size: 13px; color: var(--color-faint); }
+
+@media (max-width: 720px) {
+  .pano-stage { padding: 4px; border-radius: 10px; }
+  .pano-lab-n { display: none; }  /* 窄屏层名下的篇数放不下 */
+  /* 2026-09-22 删掉 .pano-intro p 的移动端降档（--text-small 13px）：
+   * 它是旧字号体系的残留。现在导语走 --text-note，其 clamp(15px…17px)
+   * 本身就是响应式——窄屏自动落 15px 下限，与矩阵 tab 导语同档。
+   * 同页两 tab 的说明句在桌面与移动端都必须同档（用户抓的「字体
+   * 差异这么大」），降档规则制造了 15px vs 13px 的第二处不同档。 */
+}

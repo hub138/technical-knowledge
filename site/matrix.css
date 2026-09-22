@@ -1,0 +1,342 @@
+/* 覆盖矩阵的样式。深浅分档而不是连续色阶：多数格子只有 1~10 篇，
+ * 连续色阶在这个区间肉眼分不出来，分档才能一眼看出“有/薄/厚”。
+ *
+ * 2026-09-22 视觉改造（用户问题「不好看、好随意」）：对照 heatmap 业界
+ * 最佳实践（单色相亮度渐变、色阶图例、空格单信号、合计格独立视觉层、
+ * tooltip 精确值）重做。核心原则：色是编码不是装饰。
+ *
+ * 主题色见下方 token 区注释：通用色指全站 --color-*（tokens.css），
+ * 只有蓝阶（lv1-lv4）与缺口红是本文件私有的图表语义色。 */
+
+/* ── 主题 token ──────────────────────────────────────────────────
+ * 只保留两类私有 token（图表语义色，全站没有对应物）：
+ *   lv1-lv4 蓝阶   —— 矩阵「越厚越深」的分档色，双主题各一套；
+ *   danger/warn 系 —— 缺口警示色，红色语义需要双主题保真。
+ * 表面色映射：衬底块用 --color-surface，hover 与合计格用 --color-panel。 */
+:root {
+  --mx-text: var(--color-ink);
+  --mx-text-dim: var(--color-muted);
+  --mx-border: var(--color-line);
+  --mx-border-strong: var(--color-line-strong);
+  --mx-surface: var(--color-surface);
+  --mx-surface-2: var(--color-surface);
+  --mx-surface-hover: var(--color-panel);
+  --mx-link: var(--color-accent);
+  /* 蓝阶 v2：单色相（蓝 217°）亮度渐变，业界标准做法。
+   * 旧阶 lv1 #eef4ff → lv4 #3d6db5 色值断档（lv2→lv3 跳跃生硬），
+   * 新阶从近白蓝到深蓝 4 档，亮度连续、每档可辨认。 */
+  --mx-lv1-bg: #f0f5fc; --mx-lv1-fg: #33507c;
+  --mx-lv2-bg: #d6e5f9; --mx-lv2-fg: #26467a;
+  --mx-lv3-bg: #a9c8f2; --mx-lv3-fg: #14325e;
+  --mx-lv4-bg: #4a79c9; --mx-lv4-fg: #ffffff;
+  --mx-empty-hatch: #fdf0f0;
+  --mx-danger: #c92a2a;
+  --mx-danger-bg: #fdecec;
+  --mx-danger-ink: #b03030;
+  --mx-danger-surface: #fffafa;
+  --mx-warn: #9a5610;
+  --mx-warn-border: #f0d6ae;
+}
+:root[data-theme="dark"] {
+  --mx-text: var(--color-ink);
+  --mx-text-dim: var(--color-muted);
+  --mx-border: var(--color-line);
+  --mx-border-strong: var(--color-line-strong);
+  --mx-surface: var(--color-surface);
+  --mx-surface-2: var(--color-surface);
+  --mx-surface-hover: var(--color-panel);
+  --mx-link: var(--color-accent);
+  /* 暗底蓝阶：底色向 slate 靠拢、前景提亮，保住“越厚越深”的语义。 */
+  --mx-lv1-bg: #1e2f4d; --mx-lv1-fg: #b8d2f5;
+  --mx-lv2-bg: #2a4770; --mx-lv2-fg: #ccdff8;
+  --mx-lv3-bg: #3d68a8; --mx-lv3-fg: #e8f2fd;
+  --mx-lv4-bg: #2f63d6; --mx-lv4-fg: #ffffff;
+  --mx-empty-hatch: #33201c;
+  --mx-danger: #f87171;
+  --mx-danger-bg: #33201c;
+  --mx-danger-ink: #fca5a5;
+  --mx-danger-surface: #241417;
+  --mx-warn: #fbbf24;
+  --mx-warn-border: #5c451a;
+}
+
+/*"有/薄/厚"。 */
+/* 2026-09-22 字号升档 --text-small(13px) → --text-note(15-17px)：用户抓到
+ * 「八层技术栈 tab 的说明字大、矩阵的说明字小」——同一页两个 tab 视图的
+ * 导语差两档字号，视觉上像两个站点。说明句档位全站契约是 --text-note
+ * （tokens.css「页头专用」注释 + panorama.css .pano-intro p + base.css
+ * .view-head p 同档），矩阵导语原来私用 13px 是历史遗留。图例/角标仍按
+ * 契约用 --text-small / --text-micro（micro 只做图形角标不做文字）。 */
+.mx-intro {
+  font-size: var(--text-note); line-height: 1.75; color: var(--mx-text-dim);
+  max-width: 900px; margin: 0 0 14px;
+}
+.mx-intro b { color: var(--mx-text); }
+/* 导语段落间距：四句说明各成一个 <p>，语义分段（系统层次/正交意义/
+ * 入矩阵数/口径差异），段间 4px 保持「一组说明」的整体感。 */
+.mx-intro p { margin: 0 0 4px; }
+.mx-intro p:last-child { margin-bottom: 0; }
+/* 英文模式补丁（:lang(en) 限定，中文不受影响）：英文导语句比中文长，
+ * 900px 容器下自然折行会在句尾出孤行（实测「layer).」「tags.」）。
+ * 英文有空格词界，balance 均衡行宽且断点全落词界；中文无词界 balance
+ * 会切词（2026-09-22 全站撤回的教训），所以 :lang(en) 锁定语言。
+ * 与 panorama.css 八层栈导语的 :lang(en) .pano-intro p 同一决策链。 */
+:lang(en) .mx-intro p { text-wrap: balance; }
+.mx-foot {
+  font-size: var(--text-small); color: var(--mx-text-dim);
+  margin-top: 14px; line-height: 1.7; max-width: 900px;
+}
+.mx-wrap { overflow-x: auto; margin: 8px 0 4px; padding: 10px; background: var(--color-panel); border-radius: 9px; }
+
+.mx-grid {
+  display: grid;
+  grid-template-columns: 176px repeat(6, minmax(104px, 1fr)) 64px;
+  gap: 3px;
+  min-width: 940px;
+}
+
+.mx-corner, .mx-col-head, .mx-row-head,
+.mx-row-total-head, .mx-col-total-head {
+  font-size: var(--text-small);
+  color: var(--mx-text-dim);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 6px 4px;
+}
+/* 轴指示：上面一行指列（知识类型），下面一行指行（系统层次）。 */
+.mx-corner {
+  font-size: var(--text-small); justify-content: flex-end;
+  color: var(--mx-text);
+  line-height: 1.6; gap: 1px;
+}
+.mx-corner-col { font-weight: 600; }
+.mx-corner-row { font-weight: 600; }
+
+.mx-kind-name, .mx-layer-name {
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--mx-text);
+  line-height: 1.35;
+}
+.mx-row-head { text-align: left; }
+.mx-row-head:hover, .mx-col-head:hover { background: var(--mx-surface-hover); }
+/* 表头是入口（点开整行/整列清单）：hover 时给名字加下划线，
+   把"能点"直接画出来，而不是只靠小手光标暗示。 */
+.mx-col-head:hover .mx-kind-name, .mx-row-head:hover .mx-layer-name { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; text-decoration-color: var(--mx-layer-color, var(--mx-border-strong)); }
+.mx-col-head, .mx-row-head { border-radius: 5px; transition: background var(--duration-fast, .12s) var(--ease-out, ease-out); }
+/* 整行/整列清单的方向行：比标题低一档，说明清单口径。 */
+.mx-axis-anchor {
+  font-size: var(--text-micro);
+  color: var(--mx-text-dim);
+  margin: -4px 0 8px;
+}
+.mx-kind-hint, .mx-layer-hint {
+  font-size: var(--text-micro);
+  color: var(--mx-text-dim);
+  line-height: 1.4;
+  margin-top: 3px;
+}
+.mx-row-head {
+  border-right: 2px solid var(--mx-border);
+  padding-right: 8px;
+}
+.mx-col-head { text-align: center; align-items: center; padding-bottom: 8px; background: var(--color-panel); border-radius: 5px 5px 0 0; }
+
+/* ── 层身份色条：行头左侧 3px 竖条，与圆堆积图的层色系统一致 ── */
+.mx-row-head { position: relative; padding-left: 12px; }
+.mx-row-head::before {
+  content: ""; position: absolute; left: 0; top: 15%; height: 70%;
+  width: 3px; border-radius: 2px;
+  background: var(--mx-layer-color, var(--mx-border-strong));
+}
+
+/* ── 格子：数据格、空格、合计格三层视觉 ── */
+.mx-cell {
+  min-height: 62px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.mx-clickable { cursor: pointer; }
+.mx-clickable:hover {
+  transform: scale(1.05);
+  box-shadow: 0 3px 14px rgba(0,0,0,.16);
+  z-index: 2;
+}
+
+.mx-n { font-size: 19px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.mx-words { font-size: var(--text-micro); opacity: .72; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.mx-cell.lv4 .mx-words { opacity: 1; }
+
+/* 分档配色：越厚越深。空格子两信号：极淡红底 + 虚线框（斜纹已删，
+ * 三信号是噪音——一档信息一个视觉通道足够）。 */
+.mx-lv0, .mx-cell.lv0 {
+  background: var(--mx-empty-hatch);
+  border: 1px dashed rgba(214, 69, 69, .45);
+}
+/* 空格子 hover：缺口被“点亮”的隐喻——底色加深、虚线框加浓，
+ * 引导用户点进去看漏了什么。 */
+.mx-cell.lv0.mx-clickable:hover {
+  background: color-mix(in srgb, var(--mx-empty-hatch) 60%, var(--mx-danger) 10%);
+  border-color: var(--mx-danger);
+  box-shadow: 0 3px 14px rgba(214, 69, 69, .22);
+}
+.mx-cell.lv0 .mx-zero { transition: color .12s ease; }
+.mx-cell.lv0.mx-clickable:hover .mx-zero { color: var(--mx-danger); }
+.mx-cell.lv1 { background: var(--mx-lv1-bg); color: var(--mx-lv1-fg); }
+.mx-cell.lv2 { background: var(--mx-lv2-bg); color: var(--mx-lv2-fg); }
+.mx-cell.lv3 { background: var(--mx-lv3-bg); color: var(--mx-lv3-fg); }
+.mx-cell.lv4 { background: var(--mx-lv4-bg); color: var(--mx-lv4-fg); }
+
+.mx-zero { font-size: var(--text-micro); color: var(--mx-danger); font-weight: 600; }
+
+/* ── 合计格：独立视觉层，比数据格低一档存在感 ── */
+.mx-row-total, .mx-col-total, .mx-grand-total {
+  display: flex; align-items: center; justify-content: center;
+  background: var(--mx-surface-2);
+  border-radius: 5px;
+  border: 1px solid var(--mx-border);
+}
+.mx-row-total { flex-direction: column; }
+.mx-row-total .mx-n, .mx-col-total .mx-n { font-size: 15px; color: var(--mx-text); font-weight: 600; }
+.mx-grand-total {
+  background: var(--color-panel);
+  border-color: var(--mx-border-strong);
+}
+.mx-grand-total .mx-n { font-size: 17px; color: var(--mx-text); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* ── 色阶图例：业界反复强调 color without legend is decoration ── */
+.mx-legend {
+  display: flex; align-items: center; grid-gap: 6px; gap: 6px;
+  font-size: var(--text-micro); color: var(--mx-text-dim);
+  margin: 10px 0 0;
+}
+.mx-legend .mx-leg-chip {
+  width: 18px; height: 12px; border-radius: 3px;
+  display: inline-block;
+}
+.mx-legend .mx-leg-sep { color: var(--mx-border-strong); margin: 0 2px; }
+.mx-legend .mx-leg-label { margin-right: 8px; }
+.mx-legend .mx-leg-gap { margin-left: 10px; }
+
+/* ── 类型速览胶囊：全景页顶部的“按知识类型通读”入口 ──────────────
+ * 设计取态：不用矩阵蓝阶（lv1-lv4 是格子“厚度”的编码，胶囊不是数据格，
+ * 借色阶会让读者误读为“薄/厚”信号）；中性底色 + hover 才亮 accent，
+ * 与 digest-chip、pano-tab 的语言一致。篇数用 tabular-nums 对齐。 */
+.mx-kind-pills {
+  display: flex; flex-wrap: wrap; align-items: center;
+  gap: 8px; margin: 0 0 14px;
+}
+.mx-kind-pills-label {
+  font-size: var(--text-small); color: var(--mx-text-dim);
+  margin-right: 2px;
+}
+.mx-kind-pill {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 12px; border-radius: 999px;
+  font-size: var(--text-small); font-family: inherit;
+  color: var(--mx-text);
+  background: var(--mx-surface);
+  border: 1px solid var(--mx-border);
+  cursor: pointer;
+  transition: border-color var(--duration-fast, .12s) var(--ease-out, ease-out),
+              color var(--duration-fast, .12s) var(--ease-out, ease-out),
+              background var(--duration-fast, .12s) var(--ease-out, ease-out);
+}
+.mx-kind-pill:hover {
+  color: var(--mx-link);
+  border-color: var(--mx-link);
+  background: var(--color-panel);
+}
+.mx-kind-pill-name { font-weight: 600; line-height: 1.3; }
+.mx-kind-pill-n {
+  font-size: var(--text-micro); color: var(--mx-text-dim);
+  font-variant-numeric: tabular-nums;
+  background: var(--color-panel);
+  border-radius: 999px; padding: 1px 7px;
+}
+.mx-kind-pill:hover .mx-kind-pill-n { color: var(--mx-link); }
+
+/* 缺口清单 */
+.mx-gaps { margin: 22px 0 6px; }
+.mx-gaps-title {
+  font-size: var(--text-small); font-weight: 600; color: var(--mx-text);
+  margin-bottom: 8px;
+}
+.mx-gaps-sub { margin-top: 16px; font-size: var(--text-small); }
+.mx-gaps-list { display: flex; flex-direction: column; gap: 5px; }
+.mx-gap-row {
+  display: flex; align-items: baseline; gap: 9px;
+  padding: 7px 10px; border-radius: 5px; font-size: var(--text-small);
+  background: var(--mx-surface-2);
+}
+.mx-gap-row.mx-clickable { cursor: pointer; }
+.mx-gap-row.mx-clickable:hover { background: var(--mx-surface-hover); }
+.mx-gap-empty { background: var(--mx-danger-bg); }
+.mx-gap-mark { font-weight: 700; width: 12px; }
+.mx-gap-empty .mx-gap-mark { color: var(--mx-danger); }
+.mx-gap-thin .mx-gap-mark { color: var(--mx-warn); }
+.mx-gap-text { font-weight: 600; color: var(--mx-text); }
+.mx-gap-why { font-size: var(--text-micro); color: var(--mx-text-dim); }
+
+/* 格子详情 */
+.mx-detail {
+  margin-top: 16px; padding: 13px 15px;
+  border: 1px solid var(--mx-border); border-radius: 7px;
+  background: var(--mx-surface);
+}
+.mx-detail-head {
+  display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px;
+}
+.mx-detail-title { font-size: var(--text-small); font-weight: 600; }
+.mx-detail-sub { font-size: var(--text-micro); color: var(--mx-text-dim); flex: 1; }
+.mx-close {
+  font-size: var(--text-micro); padding: 3px 10px; cursor: pointer;
+  border: 1px solid var(--mx-border-strong); border-radius: 4px;
+  background: transparent; color: var(--mx-text-dim);
+}
+.mx-detail-list { display: flex; flex-direction: column; gap: 4px; }
+.mx-detail-row {
+  display: flex; align-items: baseline; gap: 9px;
+  padding: 5px 7px; border-radius: 4px; font-size: var(--text-small);
+}
+.mx-detail-row:hover { background: var(--mx-surface-2); }
+.mx-detail-link {
+  color: var(--mx-link); text-decoration: none; flex: 1;
+}
+.mx-detail-link:hover { text-decoration: underline; }
+.mx-detail-words { font-size: var(--text-micro); color: var(--mx-text-dim); }
+.mx-guess {
+  font-size: var(--text-micro); color: var(--mx-warn);
+  border: 1px solid var(--mx-warn-border); border-radius: 3px; padding: 1px 5px;
+}
+
+.mx-detail-empty-body { font-size: var(--text-small); line-height: 1.75; color: var(--mx-text); }
+.mx-detail--empty { border-color: var(--mx-danger); background: var(--mx-danger-surface); }
+.mx-detail-empty-hint { color: var(--mx-danger-ink); }
+
+/* ── 悬浮提示：hover 格子看精确值 ── */
+.mx-tip {
+  position: fixed; z-index: 50;
+  max-width: 320px; padding: 8px 11px;
+  border-radius: 6px;
+  border: 1px solid var(--mx-border-strong);
+  background: var(--mx-surface-2);
+  box-shadow: 0 4px 16px rgba(0,0,0,.18);
+  font-size: var(--text-micro); line-height: 1.6;
+  color: var(--mx-text);
+  pointer-events: none;
+}
+.mx-tip b { display: block; margin-bottom: 2px; }
+.mx-tip .mx-tip-sub { color: var(--mx-text-dim); }
+
+@media (max-width: 720px) {
+  .mx-grid { grid-template-columns: 128px repeat(6, minmax(88px, 1fr)) 52px; }
+  .mx-cell { min-height: 54px; }
+  .mx-n { font-size: 16px; }
+}

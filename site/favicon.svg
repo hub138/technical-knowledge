@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
+  <!-- 与 shell.js 的 tk-brand-mark 同源：主色实心底 + 白色三层堆叠矩形。
+       favicon 尺寸小，笔画相对加粗（1.5 -> 2），第三层保持实心。 -->
+  <rect width="24" height="24" rx="5.5" fill="#2f6fed"/>
+  <rect x="8.2" y="3.8" width="12" height="12" rx="2.6"
+        stroke="#ffffff" stroke-width="2" opacity="0.38"/>
+  <rect x="6" y="6" width="12" height="12" rx="2.6"
+        stroke="#ffffff" stroke-width="2" opacity="0.66"/>
+  <rect x="3.8" y="8.2" width="12" height="12" rx="2.6" fill="#ffffff"/>
+</svg>
