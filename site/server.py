@@ -540,6 +540,23 @@ def is_local_client(address: str) -> bool:
     return normalized in local_addresses()
 
 
+# SSH 反向隧道（com.leoqqian.knowledge-tunnel）把公网访客送到本机这个回环
+# 别名上：`-R 127.0.0.1:28787:127.10.0.1:8787`。隧道流量的 TCP 源地址是
+# 127.0.0.1（本机 ssh 客户端发起），与本机进程无法从来源区分——只看来源
+# 会把公网访客全放成本机（实测公网可开 /insights、免密启动工具）。
+# 连接的**目的地址**是内核级事实，伪造不了：本机进程走 127.0.0.1/::1，
+# 隧道流量落在这个别名上。改隧道转发目标时必须同步这里和测试。
+TUNNEL_LOOPBACK_ALIASES = frozenset({"127.10.0.1"})
+
+
+def origin_is_local(source: str, destination: str) -> bool:
+    """按「来源 + 目的」判定是否本机请求，隧道流量不算本机。"""
+    destination = destination[7:] if destination.startswith("::ffff:") else destination
+    if destination in TUNNEL_LOOPBACK_ALIASES:
+        return False
+    return is_local_client(source)
+
+
 LOGIN_HTML = r'''<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>工程知识库 · 登录</title>
@@ -1881,7 +1898,7 @@ class Handler(BaseHTTPRequestHandler):
         """
         if "text/html" not in content_type or b"<head>" not in payload:
             return payload
-        local = "1" if is_local_client(self.client_address[0]) else "0"
+        local = "1" if self.client_is_local() else "0"
         tag = f'<meta name="tk-local-client" content="{local}">'.encode("utf-8")
         return payload.replace(b"<head>", b"<head>" + tag, 1)
 
@@ -1994,8 +2011,20 @@ class Handler(BaseHTTPRequestHandler):
     def site_password(self) -> str:
         return self.server.site_password  # type: ignore[attr-defined]
 
+    def client_is_local(self) -> bool:
+        """本机判定入口：来源地址 + 连接目的地址一起看。
+
+        目的地址取自 socket（内核级事实），不是浏览器可伪造的头。隧道
+        流量的目的落在 TUNNEL_LOOPBACK_ALIASES 上，直接判非本机。
+        """
+        try:
+            destination = self.connection.getsockname()[0]
+        except OSError:
+            destination = ""
+        return origin_is_local(self.client_address[0], destination)
+
     def is_authenticated(self) -> bool:
-        if is_local_client(self.client_address[0]):
+        if self.client_is_local():
             return True
         cookies = self.headers.get("Cookie", "")
         token = next(
@@ -2099,7 +2128,7 @@ class Handler(BaseHTTPRequestHandler):
         # 用户"也算已认证，于是任何拿到密码的人都能读到中台的 403/401 之前
         # 就被放行。这里按来源地址直接拒绝，密码不再能解锁。
         if path == "/insights" or path.startswith("/api/insights/"):
-            if not is_local_client(self.client_address[0]):
+            if not self.client_is_local():
                 self.send_json(
                     {"error": "insights is only available from this machine"}, 403
                 )
@@ -2112,7 +2141,7 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/access":
             self.send_json(
                 {
-                    "local_client": is_local_client(self.client_address[0]),
+                    "local_client": self.client_is_local(),
                     "knowledge_public": True,
                     "tool_launch_requires_auth": not self.is_authenticated(),
                 }
@@ -2792,7 +2821,19 @@ class Handler(BaseHTTPRequestHandler):
         store what they type and never pretend it is verified.
         """
         address = self.client_address[0]
-        local = is_local_client(address)
+        try:
+            destination = self.connection.getsockname()[0]
+        except OSError:
+            destination = ""
+        destination = destination[7:] if destination.startswith("::ffff:") else destination
+        local = origin_is_local(address, destination)
+        if destination in TUNNEL_LOOPBACK_ALIASES:
+            # 隧道访客的源地址恒为 127.0.0.1，日志里记不出人。公网 nginx
+            # 对隧道流量覆写 X-Real-IP（客户端伪造的会在代理层被冲掉），
+            # 仅在此处采信它用于**记录**——鉴权仍只看 socket 地址。
+            real_ip = self.headers.get("X-Real-IP", "").strip()
+            if real_ip:
+                address = real_ip
         agent = describe_agent(self.headers.get("User-Agent", ""))
         claimed = str(body.get("name") or "").strip()[:60]
         if claimed:
@@ -2801,9 +2842,12 @@ class Handler(BaseHTTPRequestHandler):
             name, source = local_git_name(), "git"
         else:
             name, source = "", "unknown"
+        kind = "local" if local else "lan"
+        if destination in TUNNEL_LOOPBACK_ALIASES:
+            kind = "tunnel"
         return {
             "ip": address,
-            "host_kind": "local" if local else "lan",
+            "host_kind": kind,
             "agent": agent,
             "name": name,
             "name_source": source,
@@ -2830,7 +2874,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/insights/feedback/status":
             # 改反馈状态也是运营者操作，同样只认本机。
-            if not is_local_client(self.client_address[0]):
+            if not self.client_is_local():
                 self.send_json(
                     {"error": "insights is only available from this machine"}, 403
                 )

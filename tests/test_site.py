@@ -287,6 +287,33 @@ class AuthenticationTests(unittest.TestCase):
                 self.assertEqual(response[1]["Location"], "/")
 
 
+class OriginLocalTests(unittest.TestCase):
+    """本机判定必须认得「隧道送进来的回环流量」。
+
+    SSH 反向隧道把公网访客送到回环别名上，源地址恒为 127.0.0.1——只看
+    来源会把公网访客全放成本机（实测公网可开 /insights、免密启动工具）。
+    判定要同时看连接目的地址（内核级事实，伪造不了）。
+    """
+
+    def test_true_loopback_pair_is_local(self) -> None:
+        self.assertTrue(SERVER_MODULE.origin_is_local("127.0.0.1", "127.0.0.1"))
+        self.assertTrue(SERVER_MODULE.origin_is_local("::1", "::1"))
+
+    def test_tunnel_alias_destination_is_not_local(self) -> None:
+        self.assertFalse(SERVER_MODULE.origin_is_local("127.0.0.1", "127.10.0.1"))
+
+    def test_ipv4_mapped_tunnel_alias_is_not_local(self) -> None:
+        self.assertFalse(SERVER_MODULE.origin_is_local("::ffff:127.0.0.1", "::ffff:127.10.0.1"))
+
+    def test_lan_visitor_is_not_local(self) -> None:
+        self.assertFalse(SERVER_MODULE.origin_is_local("10.1.2.3", "10.95.30.97"))
+
+    def test_own_interface_pair_is_local(self) -> None:
+        # 本机进程走自身网卡地址访问自己（如 curl http://10.95.30.97:8787），
+        # 源与目的都是本机地址 → 本机。
+        self.assertTrue(SERVER_MODULE.origin_is_local("127.0.0.1", "10.95.30.97"))
+
+
 class UiCopyTests(unittest.TestCase):
     """UI 文案规范：标题下的描述类文案不以句号结尾。
 
