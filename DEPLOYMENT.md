@@ -9,7 +9,7 @@ macbook-pro-2.local:8787 的请求送到 dev 的站点。URL 不变，内容与
 数据统一落在 dev（含中台，运营者密码登录一次管 14 天）。Mac 断网
 或 dev 重启时隧道自动重连（KeepAlive）。
 
-vault 仍在 Mac 上编辑并 push（dev 每 5 分钟自动拉取），创作流程不变。
+vault 仍在 Mac 上编辑并 push（dev 每 5 分钟自动拉取），创作流程不变。反向同样成立：在 dev 上开发并 push 后，Mac 侧 com.leoqqian.knowledge-pull（每 60 秒）自动拉取；有未提交改动时 Mac 侧跳过拉取，不搅局。
 Mac 的历史访问数据已合并进 dev 的 data/visits.jsonl。
 OpenMAIC/DeepTutor 两个学习工具仍跑在 Mac（各自独立 LaunchAgent），
 从转发站点的"创建课堂"跳转 `localhost:3100/3782` 可直达；
