@@ -617,7 +617,7 @@
     "TIME_WAIT是连接收尾的代价与设计": { en: "TIME_WAIT is the cost and design of closing connections" },
     "TLS握手与证书链决定连接建立成本": { en: "TLS handshakes and certificate chains decide connection setup cost" },
     "cache分配策略与命中率：LFU与LRU的实证对比": { en: "Cache eviction policies and hit rates: LFU versus LRU, an empirical comparison" },
-    "交付前的网络检查清单": { en: "A pre-delivery network checklist" },
+    "交付前的网络检查清单：二十项逐条过，三项全绿再上线": { en: "A pre-delivery network checklist" },
     "存储 I/O 性能取决于访问模式、队列与持久化语义": { en: "Storage IO performance depends on access pattern, queueing and persistence semantics" },
     "拥塞控制在吞吐与公平之间动态调节": { en: "Congestion control dynamically tunes between throughput and fairness" },
     "端到端网络延迟来自排队、协议、传输与处理": { en: "End-to-end network latency comes from queueing, protocols, transport and processing" },

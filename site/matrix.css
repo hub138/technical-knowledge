@@ -370,8 +370,12 @@
 @media (max-width: 720px) {
   /* 手机内容列 ≈ 330px（390 - 左右 30px 内距 - 62px 悬浮通道 - 表格内距），
      原列宽 88px×6 + 行头 128px 需横向滚动才能看到合计列。收窄到
-     72px 列 + 104px 行头后六列加合计一屏放全，数字 16px 仍清晰。 */
-  .mx-grid { grid-template-columns: 104px repeat(6, minmax(72px, 1fr)) 52px; }
+     72px 列 + 104px 行头后六列加合计一屏放全，数字 16px 仍清晰。
+     min-width 必须一并归零：基础规则的 940px 会顶住收窄后的列宽，
+     格子被拉伸回溢出宽度，收窄等于没做（390px 实测 995px 宽）。 */
+  .mx-grid { grid-template-columns: 104px repeat(6, minmax(72px, 1fr)) 52px; min-width: 0; }
   .mx-cell { min-height: 54px; }
   .mx-n { font-size: 16px; }
+  /* 类型速览胶囊在手机上是主要筛选入口，热区提到 44px 标准。 */
+  .mx-kind-pill { min-height: 44px; }
 }

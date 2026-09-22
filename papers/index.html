@@ -745,6 +745,16 @@
         /* 双列网格在窄屏强制回到单列。 */
         .paper-list { grid-template-columns: 1fr; }
       }
+
+      /* 手机上公式常比内容列宽：公式块自身横向滚动，页面不跟横滚。
+         KaTeX 的 hide-tail 对超宽公式裁掉尾部（实测 7758px 的 path
+         被裁剩 30px 可视），滚动容器里解除裁切让滚动真正可达。 */
+      .math, .math--display { max-width: 100%; }
+      .katex-display { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 4px 2px; }
+      @media (max-width: 760px) {
+        .katex .hide-tail { overflow-x: auto; overflow-y: hidden; }
+        .katex-display > .katex { white-space: normal; }
+      }
     </style>
     <link rel="stylesheet" href="/static/katex.min.css">
   <script src="/static/katex.min.js" defer></script>

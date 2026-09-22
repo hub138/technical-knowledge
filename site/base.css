@@ -1652,7 +1652,16 @@ body.tk-host button {
        226px —— 通道跟本断点的按钮几何走。 */
     --float-lane: 62px;
     max-width: none;
-    padding: var(--space-4) calc(var(--space-4) + var(--float-lane)) calc(var(--float-lane) + var(--space-8)) var(--space-4);
+    padding: var(--space-4) var(--space-4) calc(var(--float-lane) + var(--space-8)) var(--space-4);
+  }
+
+  /* 内容列不再让出右侧 62px 通道（通道内改放半透明悬浮按钮，见下）：
+     390px 上内容列从 298px 回到 358px，全景矩阵、表格、公式不再被压窄。
+     悬浮按钮压住内容时因半透明底 + 毛玻璃仍可辨认文字。 */
+  .tk-fab {
+    background: color-mix(in srgb, var(--color-panel) 82%, transparent);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
   }
 
   /* 头部移动端统一：两形态各自成套（桌面契约见上面的「页面头部契约」）。

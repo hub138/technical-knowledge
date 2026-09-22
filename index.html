@@ -822,6 +822,14 @@
 .reader-body table th,.reader-body table td{white-space:nowrap}
 /* 单元格内的长文本仍可换行，避免窄屏下横向滚动过长。 */
 .reader-body table td{white-space:normal;min-width:120px}
+/* 手机上内容列右侧被悬浮按钮通道压到约 298px，520px 的表格最小宽度
+   必然顶破容器（390px 实测 right=535px）。表格降为随内容自适应并保留
+   自身横向滚动；theads/tbody 的 520px 同步解除，避免再顶出容器。 */
+@media (max-width: 760px) {
+  .reader-body table thead,
+  .reader-body table tbody { min-width: 0; }
+  .reader-body table { max-width: none; }
+}
 /* 侧栏折叠钮（同模块）与关系区折叠钮：裸字符热区 12×16 / 28×28 太小，
    补成 36×36 / 32×32 的图标钮（触控标准 44×44 的近邻取整，控件行放得下）。
    relation-collapse 用两级选择器：单类版本定义在本块之后，同特异性会输。 */
@@ -832,6 +840,11 @@
 .section > p a[target="_blank"]{display:inline-block;padding:6px 10px;margin:2px 0;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel)}
 /* 文章页来源区链接（man7.org 等）：裸文本转胶囊芯片，可点。 */
 .reader-sources .source-list a{display:inline-block;padding:6px 11px;margin:3px 8px 3px 0;border:1px solid var(--color-line);border-radius:999px;background:var(--color-panel)}
+/* 手机上来源行右对齐会把「来源」标签和域名芯片挤成右浮孤行，且与右上
+   主题切换控件视觉打架（390px 实测）。改回左对齐常规流。 */
+@media (max-width: 760px) {
+  .reader-sources .source-line { text-align: left; }
+}
 /* 正文内联互链：竖向内边距把命中区拉到 29px 高。行内元素的竖向
    内边距不影响行盒高度，版面零变化，只有热区变大。 */
 .reader-body p a,.reader-body li a{padding:5px 2px}
@@ -848,7 +861,7 @@
    选择器带 .shell 是为了压过文件后面定义的同名基础规则。 */
 body .kbd-hint{display:none}}
 /* 打印：去掉所有悬浮件和导航，只留文章本身 */
-@media print{.tk-sidebar,.topbar,.kbd-hint,.tk-fab,.tk-fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:var(--color-panel)}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}/* 侧边栏本身在 base.css 里变成顶部横条。域树在主站是第二层导航，手机上收进「目录」后面，免得把首屏挤满。 */.tk-mobile-menu{display:block;border:1px solid var(--color-line);background:var(--color-panel);border-radius:6px;padding:6px 9px;color:var(--color-accent)}#tk-sidebar.collapsed #domains{display:none}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.hero{display:block}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:11px}.domain-grid{grid-template-columns:1fr}.directory-head,.view-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2{font-size:var(--text-2xl)}}
+@media print{.tk-sidebar,.topbar,.kbd-hint,.tk-fab,.tk-fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:var(--color-panel)}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}/* 侧边栏本身在 base.css 里变成顶部横条。域树在主站是第二层导航，手机上收进「目录」后面，免得把首屏挤满。 */.tk-mobile-menu{display:block;border:1px solid var(--color-line);background:var(--color-panel);border-radius:6px;padding:6px 9px;color:var(--color-accent);min-height:44px;box-sizing:border-box}#tk-sidebar.collapsed #domains{display:none}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.hero{display:block}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:11px}.domain-grid{grid-template-columns:1fr}.directory-head,.view-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2{font-size:var(--text-2xl)}}
 
 body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leading-normal)}
 
@@ -1015,11 +1028,11 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .graph-panel{padding:13px;border-radius:7px;box-shadow:0 1px 3px rgba(20,42,35,.03)}
 
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
-@media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}.content{padding-left:28px;padding-right:calc(28px + var(--float-lane))}}
+@media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}.content{padding-left:28px}}
 @media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:var(--color-bg-veil)}/* 移动端头部契约镜像：hero 折算值 顶 32/底距 28（桌面 40/32 的收窄），
    真源在 base.css 移动端块 .tk-shell .hero:first-child —— 首页根容器
    是 .app，那条拿不到，这里镜像。曾写死 26px content 内距与旧 26 顶距
-   时代对不上契约，一并对齐。 */.content{padding:16px calc(15px + var(--float-lane)) calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding:32px 0 16px;margin-bottom:28px}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:13px}.domain-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.view-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
+   时代对不上契约，一并对齐。 */.content{padding:16px 15px calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding:32px 0 16px;margin-bottom:28px}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:13px}.domain-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.view-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
 /* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
 /* 提示框的三个颜色曾是硬编码浅色值（#e8c6a8 / #fff9f2 / #704823），
  * 暗色模式没有对应覆盖 —— 深底上会浮出一块浅橙底配深棕字。
