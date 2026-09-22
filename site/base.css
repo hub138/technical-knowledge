@@ -1806,3 +1806,15 @@ body.tk-host button {
    侧栏当前态（aria-current）同款 accent 语言，但永远亮着——它不是
    位置状态，是站长放在门口的引导位（数据证明高亮导航项就是引流位）。
    深浅主题走 token 自适应；雷达文章不存在时入口不渲染。 */
+
+/* 晕动症/前庭障碍用户在系统里开了「减少动态效果」：关掉全部过渡与动画，
+ * 界面直接呈现最终状态。作用域只在 base.css 管辖的皮肤层。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
