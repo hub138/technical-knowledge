@@ -2288,7 +2288,7 @@
   const stored = () => {
     try {
       return localStorage.getItem(STORAGE_KEY);
-    } catch {
+    } catch (err) {
       return null;
     }
   };
@@ -2418,7 +2418,7 @@
     current = lang;
     try {
       localStorage.setItem(STORAGE_KEY, lang);
-    } catch {
+    } catch (err) {
       /* private mode — the choice just will not persist */
     }
     /* Re-translate the static markup first, then the buttons. The order

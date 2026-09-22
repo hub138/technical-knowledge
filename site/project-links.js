@@ -1,7 +1,7 @@
 (() => {
   const cardByName = (name) =>
     [...document.querySelectorAll(".project")].find(
-      (card) => card.querySelector("h3")?.textContent.trim() === name,
+      (card) => ((card.querySelector("h3") || {}).textContent || "").trim() === name,
     );
 
   document.addEventListener("DOMContentLoaded", () => {

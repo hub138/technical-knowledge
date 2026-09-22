@@ -20,8 +20,8 @@
       }));
       /* 反馈入口与主站是同一个组件，收到的意见进同一个收件箱。 */
       document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
-        where: () => '当前页面：<b>' + (document.querySelector('.tk-context h2')?.textContent.trim() || document.title) + '</b>',
-        title: () => document.querySelector('.tk-context h2')?.textContent.trim() || document.title,
+        where: () => '当前页面：<b>' + (((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title) + '</b>',
+        title: () => ((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title,
       }));
     </script>
     
@@ -495,7 +495,7 @@
            数据（本机生成的课程名），不译。 */
         const tr = (s) => (window.TKI18N ? window.TKI18N.t(s) : s);
         const esc = (value) =>
-          String(value ?? "").replace(/[&<>"']/g, (char) => ({
+          String(value == null ? "" : value).replace(/[&<>"']/g, (char) => ({
             "&": "&amp;",
             "<": "&lt;",
             ">": "&gt;",
@@ -516,7 +516,7 @@
           root.innerHTML = jobs.map((job) => {
             const progress = Number.isFinite(Number(job.progress)) ? `${job.progress}%` : "";
             const scenes = job.totalScenes
-              ? `${tr("场景")} ${job.scenesGenerated ?? 0}/${job.totalScenes}`
+              ? `${tr("场景")} ${(job.scenesGenerated != null ? job.scenesGenerated : 0)}/${job.totalScenes}`
               : "";
             const meta = [progress, scenes].filter(Boolean).join(" · ");
             // Prefer the classroom's own course title; jobs that produced
@@ -564,7 +564,7 @@
             if (!response.ok) throw new Error("job status unavailable");
             const data = await response.json();
             render(Array.isArray(data.jobs) ? data.jobs : []);
-          } catch {
+          } catch (err) {
             root.innerHTML = `<div class="job-empty">${tr("暂时无法读取生成记录；OpenMAIC 课堂本身仍可从上方入口打开。")}</div>`;
           }
         };

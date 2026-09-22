@@ -87,18 +87,21 @@
     },
   ];
 
-  const items = () => window.TK_NAV?.items || [];
+  const items = () => (window.TK_NAV && window.TK_NAV.items) || [];
 
-  const keyForPath = (path) =>
-    PATH_OWNER.find((entry) => entry.match(path))?.key || "knowledge";
+  const keyForPath = (path) => {
+    const owner = PATH_OWNER.find((entry) => entry.match(path));
+    return (owner && owner.key) || "knowledge";
+  };
 
   const metaFor = (key) => {
     const item = items().find((i) => i.key === key);
+    const pageMeta = PAGE_META[key] || {};
     return {
       key,
-      label: item?.label || PAGE_META[key]?.title || key,
-      title: PAGE_META[key]?.title || item?.label || key,
-      description: PAGE_META[key]?.description || "",
+      label: (item && item.label) || pageMeta.title || key,
+      title: pageMeta.title || (item && item.label) || key,
+      description: pageMeta.description || "",
     };
   };
 
@@ -117,7 +120,7 @@
     try {
       const t = new URLSearchParams(location.search).get("theme");
       return t === "dark" || t === "light" ? t : null;
-    } catch {
+    } catch (err) {
       return null;
     }
   })();
@@ -125,7 +128,7 @@
   const storedTheme = () => {
     try {
       return localStorage.getItem(THEME_KEY);
-    } catch {
+    } catch (err) {
       return null;
     }
   };
@@ -162,7 +165,7 @@
     const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
     try {
       localStorage.setItem(THEME_KEY, next);
-    } catch {
+    } catch (err) {
       /* private mode — the choice just will not persist */
     }
     applyTheme(next);
@@ -226,7 +229,7 @@
        paintLangButtons 接管（wireLangToggles 会在切换时重绘），不受影响。 */
     if (window.TKI18N) window.TKI18N.translateDOM(group);
     // 语言按钮走的是全局代理，i18n.js 会接管带这个属性的按钮。
-    if (window.TKI18N?.wireLangToggles) window.TKI18N.wireLangToggles(group);
+    if (window.TKI18N && window.TKI18N.wireLangToggles) window.TKI18N.wireLangToggles(group);
     return group;
   };
 
@@ -701,7 +704,7 @@
     try {
       const saved = localStorage.getItem(FB_NAME_KEY);
       if (saved) name.value = saved;
-    } catch {
+    } catch (err) {
       /* private mode — the name just will not persist */
     }
 
@@ -752,7 +755,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            kind: overlay.querySelector('input[name="tk-kind"]:checked')?.value || "other",
+            kind: (overlay.querySelector('input[name="tk-kind"]:checked') || {}).value || "other",
             message: text,
             title: title(),
             name: name.value.trim(),
@@ -764,7 +767,7 @@
         if (!response.ok) throw new Error(data.error || tr("发送失败"));
         try {
           localStorage.setItem(FB_NAME_KEY, name.value.trim());
-        } catch {
+        } catch (err) {
           /* ignore */
         }
         message.value = "";
@@ -1066,14 +1069,14 @@
           }
         }
         if (moved) this.save();
-      } catch {
+      } catch (err) {
         this.data = { learned: {}, planned: {} };
       }
       return this.data;
     },
     save() {
       try { localStorage.setItem(this.KEY, JSON.stringify(this.data)); }
-      catch { /* 存储满/隐私模式：进度丢就丢，不影响阅读 */ }
+      catch (err) { /* 存储满/隐私模式：进度丢就丢，不影响阅读 */ }
       document.dispatchEvent(new CustomEvent("tk:progress-changed"));
     },
     ensure() { return this.data || this.load(); },

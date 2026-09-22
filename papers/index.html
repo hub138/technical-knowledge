@@ -812,10 +812,10 @@
 
     <script>
       const $ = (s) => document.querySelector(s);
-      const esc = (v) => String(v ?? "").replace(/[&<>"']/g,
+      const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g,
         (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
       const tr = (x) => (window.TKI18N ? window.TKI18N.t(x) : x);
-      const lang = () => (window.TKI18N?.lang || "zh");  // i18n 把它暴露成 getter，不是方法
+      const lang = () => ((window.TKI18N && window.TKI18N.lang) || "zh");  // i18n 把它暴露成 getter，不是方法
       /* 论文标题是专有名词，两种语言各有各的正确写法：
          中文界面显示中文标题，英文界面显示论文原名 ——
          后者才是读者在 arXiv、在别的文章里会看到的那一行。
@@ -1244,7 +1244,7 @@
           // 这里再说一遍是同屏重复。改为报索引抓取时间（数据新鲜度）——
           // 读者更关心「这批论文截止到什么时候」，总量 tab 已经说了。
           const fetchedText = payload.fetched_at
-            ? (() => { try { return new Date(payload.fetched_at).toLocaleDateString(); } catch { return ""; } })()
+            ? (() => { try { return new Date(payload.fetched_at).toLocaleDateString(); } catch (err) { return ""; } })()
             : "";
           const head = (pn.cat || pn.sub || pn.conf || pn.q)
             ? `${tr("筛出")} ${parts.join(" · ")}`

@@ -704,11 +704,11 @@
 
     <script>
       const $ = (s) => document.querySelector(s);
-      const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (m) => (
+      const esc = (v) => String(v == null ? "" : v).replace(/[&<>"']/g, (m) => (
         { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]
       ));
       const tr = (x) => (window.TKI18N ? window.TKI18N.t(x) : x);
-      const lang = () => (window.TKI18N?.lang || "zh");
+      const lang = () => ((window.TKI18N && window.TKI18N.lang) || "zh");
 
       /* 英文界面取 en 里的字段，缺了就回退中文。
          显示中文总好过显示空白 —— 和论文页的 fieldOf 同一条规则。 */
@@ -927,7 +927,7 @@
             if (Math.abs(seconds) >= span) return fmt.format(Math.round(seconds / span), unit);
           }
           return fmt.format(seconds, "second");
-        } catch {
+        } catch (err) {
           return "";
         }
       }
@@ -1335,7 +1335,7 @@
           const response = await fetch(`/api/feeds${force ? "?refresh=1" : ""}`, { cache: "no-store" });
           if (!response.ok) throw new Error("unavailable");
           feedState.payload = await response.json();
-        } catch {
+        } catch (err) {
           // 接口读不到就保持卡片原样，不显示错误 —— 入口本身还能用。
           return;
         }

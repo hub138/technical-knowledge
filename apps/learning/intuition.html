@@ -20,8 +20,8 @@
       }));
       /* 反馈入口与主站是同一个组件，收到的意见进同一个收件箱。 */
       document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
-        where: () => '当前页面：<b>' + (document.querySelector('.tk-context h2')?.textContent.trim() || document.title) + '</b>',
-        title: () => document.querySelector('.tk-context h2')?.textContent.trim() || document.title,
+        where: () => '当前页面：<b>' + (((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title) + '</b>',
+        title: () => ((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title,
       }));
     </script>
     

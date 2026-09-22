@@ -1218,14 +1218,14 @@ async function json(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)th
    JSON body，直接 throw 会显示成 [object Object]。 */
 async function postJson(url,payload){
   const r=await fetch(url,{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  let data=null;try{data=await r.json()}catch{}
+  let data=null;try{data=await r.json()}catch(err){}
   if(!r.ok)throw Error((data&&data.error)||'请求失败');
   return data||{};
 }
 function alertUser(message){const box=$('#app-alert');box.textContent=message;box.classList.add('open');clearTimeout(alertUser.timer);alertUser.timer=setTimeout(()=>box.classList.remove('open'),5200)}
 /* Re-translate after each view change: the SPA builds its markup in JS, so the
    strings the i18n walk saw at load are not the strings on screen now. */
-function retranslate(){window.TKI18N?.translateDOM()}
+function retranslate(){if(window.TKI18N)window.TKI18N.translateDOM()}
 let viewVisitKey='';/* 视图进入打点去重：同一次页面加载里反复切视图只记一次。 */
 const VIEW_TITLES={home:'首页',directory:'目录视图',graph:'知识图谱（视图）',panorama:'知识全景（视图）'};
 function show(view){state.view=view;
@@ -1233,7 +1233,7 @@ function show(view){state.view=view;
      panorama 每次页面加载各记一次；reader 不在此记——文章阅读由
      openNote 的 reportVisit 记到具体篇目，粒度更细，避免一行文章两条
      记录。同 load 内反复切回同一视图去重。 */
-  if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:feedbackUi?.name()||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
+  if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
 function renderDomains(){
   /* 域列表的骨架（竖线风格）由 shell 渲染（tk:domains-rendered 广播后到达）。
      这里做主站才有的增强：点域 = 展开该域的主题子列表（再点收起），
@@ -1295,14 +1295,14 @@ function enhanceDomains(){
       const radarBlock=radars.length?`<div class="tk-radar-pin">${radars.map(n=>`<button type="button" class="radar-card" data-path="${esc(n.path)}" title="${esc(n.title)}（每周更新的时效内容）"><span class="radar-icon" aria-hidden="true">⚡</span><span class="radar-text"><strong>${esc(n.title)}</strong><small>每周更新</small></span></button>`).join('')}</div>`:'';
       const subEl=document.createElement('div');
       subEl.className='tk-subtopics';
-      subEl.innerHTML=`<a class="tk-subtopic tk-subtopic--all" href="/?domain=${encodeURIComponent(name)}">${(window.TKI18N?.lang==='en')?('All ('+inDomain.length+')'):('全部 '+inDomain.length+' 篇')}</a>`
+      subEl.innerHTML=`<a class="tk-subtopic tk-subtopic--all" href="/?domain=${encodeURIComponent(name)}">${(window.TKI18N&&window.TKI18N.lang==='en')?('All ('+inDomain.length+')'):('全部 '+inDomain.length+' 篇')}</a>`
         +radarBlock
         +topics.map(t=>`<a class="tk-subtopic" href="/?domain=${encodeURIComponent(name)}&topic=${encodeURIComponent(t)}"><span>${esc(t)}</span><span class="count">${inDomain.filter(n=>n.topic===t).length}</span></a>`).join('')
         +(archived?`<a class="tk-subtopic" href="/?domain=${encodeURIComponent(name)}&topic=${encodeURIComponent('归档')}"><span>归档</span><span class="count">${archived}</span></a>`:'');
       /* 【rt24】主题子列表是点击时才 innerHTML 的，show() 的 retranslate()
          不会再走到它。渲染完对 subEl 单独重译，让主题名/归档/雷达标签
          走词典（词条已备，见 i18n.js rt24 块）。 */
-      window.TKI18N?.translateDOM(subEl);
+      if(window.TKI18N)window.TKI18N.translateDOM(subEl);
       row.after(subEl);
       /* 雷达卡点击 = 打开文章（SPA），不走目录筛选。 */
       subEl.querySelectorAll('.radar-card').forEach(b=>{b.onclick=()=>openNote(b.dataset.path)});
@@ -1328,7 +1328,7 @@ function renderDirectory(){
   // 命中片段高亮：让"为什么这篇被搜出来"直接可见，而不是只列出标题。
   const q=state.query.trim();
   const mark=text=>{
-    const raw=String(text??'');
+    const raw=String(text==null?'':text);
     if(!q)return esc(raw);
     const at=raw.toLowerCase().indexOf(q.toLowerCase());
     if(at<0)return esc(raw);
@@ -1347,10 +1347,10 @@ function renderDirectory(){
   // 空结果给可执行的下一步，而不是一句"没有匹配内容"就结束。
   const empty=groups.size?'':
     `<div class="empty"><p class="empty-title">没有找到“${esc(q)}”</p><p class="empty-hint">试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
-  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N?.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div><div class="sort"><button data-sort="title" class="${state.sort==='title'?'active':''}">按标题</button><button data-sort="updated" class="${state.sort==='updated'?'active':''}">按更新</button></div></div>${sections}${empty}`;
+  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div><div class="sort"><button data-sort="title" class="${state.sort==='title'?'active':''}">按标题</button><button data-sort="updated" class="${state.sort==='updated'?'active':''}">按更新</button></div></div>${sections}${empty}`;
   const clearDomain=$('#empty-clear-domain');
   if(clearDomain)clearDomain.onclick=()=>select('all','all');
-  document.querySelectorAll('.note-row').forEach(row=>{row.setAttribute('tabindex','0');row.setAttribute('role','button');row.setAttribute('aria-label',row.querySelector('h3')?.textContent||'打开笔记');row.onclick=()=>openNote(row.dataset.path);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(row.dataset.path)}}});
+  document.querySelectorAll('.note-row').forEach(row=>{row.setAttribute('tabindex','0');row.setAttribute('role','button');const h3=row.querySelector('h3');row.setAttribute('aria-label',(h3&&h3.textContent)||'打开笔记');row.onclick=()=>openNote(row.dataset.path);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(row.dataset.path)}}});
   document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;renderDirectory()});
   /* 【rt25】列表是 innerHTML 渲染（标题/主题/计数都走词条），
      渲染后无重译则 EN 态整页不翻（同 rt24 文章页病根）。 */
@@ -1374,7 +1374,7 @@ function renderAtlas(){
   /* 页头说 184 篇（全部非剪藏的笔记），这里只统计 153 篇（已归入领域、进图谱的）。
      两个数都对，但口径不同，所以要把口径写出来，否则看起来像自相矛盾。 */
   const noteLine=$('#atlas-note');
-  if(noteLine)noteLine.textContent=window.TKI18N?.lang==='en'?`${notes.length} notes filed under domains, spread by topic. A bigger dot means more notes. Archived sources and clippings don\'t count.`:`${notes.length} 篇已归入领域的笔记按主题分布。圆越大，主题下的笔记越多。归档来源与剪藏不计入。`;
+  if(noteLine)noteLine.textContent=window.TKI18N&&window.TKI18N.lang==='en'?`${notes.length} notes filed under domains, spread by topic. A bigger dot means more notes. Archived sources and clippings don\'t count.`:`${notes.length} 篇已归入领域的笔记按主题分布。圆越大，主题下的笔记越多。归档来源与剪藏不计入。`;
   box.innerHTML=domains.map((d,di)=>{
     const group=notes.filter(n=>n.category===d);
     const ts=orderedTopics(d,new Set(group.map(n=>n.topic)))
@@ -1385,7 +1385,7 @@ function renderAtlas(){
       const r=Math.round(6+Math.sqrt(item.n)*3.6);
       const size=r*2;
       return `<button type="button" class="atlas-topic" data-domain="${esc(d)}" data-topic="${esc(item.t)}"
-        title="${esc(item.t)} · ${item.n}${(window.TKI18N?.lang==='en')?' notes':' 篇'}"
+        title="${esc(item.t)} · ${item.n}${(window.TKI18N&&window.TKI18N.lang==='en')?' notes':' 篇'}"
         style="--dot:${size}px;--ink:${color}"><i></i><span>${esc(tr(item.t))}</span><b>${item.n}</b></button>`;
     }).join('');
     return `<div class="atlas-row">
@@ -1449,14 +1449,16 @@ async function featureDigest(id) {
     if (!r.ok) return;
     digestCache.featured = id || null;
     renderDigest(digestCache.items, digestCache.status);
-  } catch {}
+  } catch (err) {
+  }
 }
 function renderDigest(items, status) {
   const box = $('#home-digest');
   if (!box) return;
   /* 站长钉选头条：featuredId 命中条目时上特写位；operator = 持运营者
      cookie（meta 由服务端盖章），只有运营者能看到钉选/取消按钮。 */
-  const operator = document.querySelector('meta[name="tk-operator"]')?.getAttribute('content') === '1';
+  const opMeta = document.querySelector('meta[name="tk-operator"]');
+  const operator = opMeta && opMeta.getAttribute('content') === '1';
   const featuredId = digestCache ? digestCache.featured : null;
   if (!items || !items.length) {
     if (status === "unconfigured") {
@@ -1513,15 +1515,15 @@ function renderDigest(items, status) {
   const heroItem = rail[heroIdx];
   const restItems = rail.filter((_, i) => i !== heroIdx);
   const heroFacts = [];
-  if (heroItem.word_count) heroFacts.push(window.TKI18N?.lang==='en'?`${heroItem.word_count.toLocaleString()} words`:`${heroItem.word_count.toLocaleString()} 字`);
-  if (heroItem.read_minutes) heroFacts.push(window.TKI18N?.lang==='en'?`about ${heroItem.read_minutes} min`:`约 ${heroItem.read_minutes} 分钟`);
+  if (heroItem.word_count) heroFacts.push(window.TKI18N&&window.TKI18N.lang==='en'?`${heroItem.word_count.toLocaleString()} words`:`${heroItem.word_count.toLocaleString()} 字`);
+  if (heroItem.read_minutes) heroFacts.push(window.TKI18N&&window.TKI18N.lang==='en'?`about ${heroItem.read_minutes} min`:`约 ${heroItem.read_minutes} 分钟`);
   if (heroItem.published_full) heroFacts.push(heroItem.published_full);
   TKShell.favorites.register(heroItem.__fid, heroItem);
   const hero = `<a class="digest-hero" href="${esc(heroItem.url)}" target="_blank" rel="noopener noreferrer">
       ${heroItem.cover
         ? `<span class="digest-hero-cover">
             <img src="${esc(heroItem.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer">
-            <i class="digest-hero-badge">${manualHero ? TKICON.pin+'站长推荐' : ((heroItem.score ? ((window.TKI18N?.lang==='en')?'Top · ':'Top · ') : '') + esc(heroItem.score || ''))}</i>
+            <i class="digest-hero-badge">${manualHero ? TKICON.pin+'站长推荐' : ((heroItem.score ? ((window.TKI18N&&window.TKI18N.lang==='en')?'Top · ':'Top · ') : '') + esc(heroItem.score || ''))}</i>
           </span>`
         /* 无封面兜底（2026-09-22 补）：原先这里输出空串，BestBlogs 不少条目
          * 没有 cover，结果"本周最高分特写"反而是整块里唯一的纯文字格，
@@ -1529,7 +1531,7 @@ function renderDigest(items, status) {
          * 用评分数字顶上，与紧凑行无图时的首字母块同思路。 */
         : `<span class="digest-hero-cover digest-hero-cover--score" aria-hidden="true">
             <i>${esc(heroItem.score || '—')}</i>
-            <em>${(window.TKI18N?.lang==='en')?'Top score':'本周最高分'}</em>
+            <em>${(window.TKI18N&&window.TKI18N.lang==='en')?'Top score':'本周最高分'}</em>
           </span>`}
       <b class="digest-hero-title">${esc(heroItem.title)}</b>
       ${heroItem.summary ? `<p class="digest-hero-sum" data-clamp="2">${esc(heroItem.summary)}</p>` : ''}
@@ -1545,7 +1547,7 @@ function renderDigest(items, status) {
     </a>`;
   const listRows = restItems.map((item) => {
     const facts = [];
-    if (item.read_minutes) facts.push(window.TKI18N?.lang==='en'?`~${item.read_minutes}m`:`${item.read_minutes} 分钟`);
+    if (item.read_minutes) facts.push(window.TKI18N&&window.TKI18N.lang==='en'?`~${item.read_minutes}m`:`${item.read_minutes} 分钟`);
     if (item.published_full) facts.push(item.published_full.slice(5));
     TKShell.favorites.register(item.__fid, item);
     return `<a class="digest-item" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
@@ -1575,8 +1577,8 @@ function renderDigest(items, status) {
   });
   const favCount = favEntries.length;
   const facts = favCount
-    ? (window.TKI18N?.lang==='en' ? `${favCount} favorites pinned · Top 20 of the week` : `收藏 ${favCount} 篇常驻 · 七天 Top 20`)
-    : (window.TKI18N?.lang==='en' ? 'Top 20 this week · tap the star to pin a favorite up front' : '七天 Top 20 · 点星标收藏，好文章常驻最前');
+    ? (window.TKI18N&&window.TKI18N.lang==='en' ? `${favCount} favorites pinned · Top 20 of the week` : `收藏 ${favCount} 篇常驻 · 七天 Top 20`)
+    : (window.TKI18N&&window.TKI18N.lang==='en' ? 'Top 20 this week · tap the star to pin a favorite up front' : '七天 Top 20 · 点星标收藏，好文章常驻最前');
   /* 2026-09-22 滚动保持修复（勿删）：收藏星标点「确认取消」后会触发本函数
    * 整块 innerHTML 重渲，实测两个问题：①列表展开状态被模板里硬编码的
    * is-collapsed 重置（用户展开的 22 篇塌回 8 篇）；②浏览器滚动锚定失效，
@@ -1608,16 +1610,16 @@ function renderDigest(items, status) {
   }
   box.innerHTML = `<div class="digest-head">
       <h2>近七天优质好文</h2>
-      <span class="digest-note">${(status === "stale" ? (window.TKI18N?.lang==='en' ? "Digest update failed, showing the last successful fetch · " : "早报暂时更新失败，以下为最近一次成功抓取的存量 · ") : "") + (window.TKI18N?.lang==='en' ? "BestBlogs human-reviewed · ranked by score · " : "BestBlogs 人工精审 · 评分排序 · ") + esc(facts)}</span>
+      <span class="digest-note">${(status === "stale" ? (window.TKI18N&&window.TKI18N.lang==='en' ? "Digest update failed, showing the last successful fetch · " : "早报暂时更新失败，以下为最近一次成功抓取的存量 · ") : "") + (window.TKI18N&&window.TKI18N.lang==='en' ? "BestBlogs human-reviewed · ranked by score · " : "BestBlogs 人工精审 · 评分排序 · ") + esc(facts)}</span>
       <a class="digest-chip" href="/sources">全部来源</a>
-      <button type="button" class="digest-chip digest-chip--refresh" id="digest-refresh">${(window.TKI18N?.lang==='en')?'Refresh':'更新'}<i aria-hidden="true">↻</i></button>
+      <button type="button" class="digest-chip digest-chip--refresh" id="digest-refresh">${(window.TKI18N&&window.TKI18N.lang==='en')?'Refresh':'更新'}<i aria-hidden="true">↻</i></button>
 <a class="digest-chip digest-chip--out" href="https://www.bestblogs.dev/reading/brief" target="_blank" rel="noopener noreferrer">BestBlogs 今日早报<i aria-hidden="true">↗</i></a>
     </div>
     <div class="digest-grid">
       ${hero}
       <div class="digest-list is-collapsed">
         ${listRows}
-        <button type="button" class="digest-more" aria-expanded="false"><span>${(window.TKI18N?.lang==='en')?`Show all ${restItems.length}`:`展开全部 ${restItems.length} 篇`}</span><span>${(window.TKI18N?.lang==='en')?'Collapse':'收起'}</span><i aria-hidden="true">▾</i></button>
+        <button type="button" class="digest-more" aria-expanded="false"><span>${(window.TKI18N&&window.TKI18N.lang==='en')?`Show all ${restItems.length}`:`展开全部 ${restItems.length} 篇`}</span><span>${(window.TKI18N&&window.TKI18N.lang==='en')?'Collapse':'收起'}</span><i aria-hidden="true">▾</i></button>
       </div>
     </div>`;
   const list = box.querySelector(".digest-list");
@@ -1662,7 +1664,7 @@ function renderDigest(items, status) {
     if (digestCache) renderDigest(digestCache.items, digestCache.status);
   });
   // digest 的标题/按钮是中文直写的静态串，进 DOM 后走一遍词典翻译。
-  window.TKI18N?.translateDOM(box);
+  if(window.TKI18N)window.TKI18N.translateDOM(box);
   // 封面加载失败就收掉那一格（同 sources 页的理由：第三方 CDN）。
   // 15px 的 digest-icon 也是外链图标，裂图时是一个空块，一并收掉。
   box.querySelectorAll(".digest-hero-cover img, .digest-thumb img, .digest-icon[data-fallback]").forEach((img) => {
@@ -1685,7 +1687,7 @@ async function loadDigest() {
     const response = await fetch('/api/digest?limit=60', { cache: 'no-store' });
     if (!response.ok) throw new Error('unavailable');
     digestCache = await response.json();
-  } catch {
+  } catch (err) {
     box.hidden = true;
     return;
   }
@@ -1714,17 +1716,18 @@ async function loadDigest() {
           /* 收藏快照对齐：刷新回来的新数据里若有已收藏文章（按 URL 匹配），
            * 更新它的评分/摘要/封面——收藏文章不再停留在收藏那一刻的样子，
            * 每次更新都拿到最新字段。 */
-          const updatedFavs = await TKShell.favorites?.refreshItem?.(fresh.items) || 0;
+          const favs = TKShell.favorites;
+          const updatedFavs = (favs && favs.refreshItem ? await favs.refreshItem(fresh.items) : 0) || 0;
           renderDigest(digestCache.items, digestCache.status);
           if (updatedFavs > 0) {
-            TKShell.favorites?.notice((window.TKI18N?.lang==='en') ? `Refreshed · ${updatedFavs} favorite${updatedFavs > 1 ? 's' : ''} updated` : `已更新 · ${updatedFavs} 篇收藏同步了最新内容`,
-              (window.TKI18N?.lang==='en') ? 'Updated' : '已更新');
+            favs.notice((window.TKI18N&&window.TKI18N.lang==='en') ? `Refreshed · ${updatedFavs} favorite${updatedFavs > 1 ? 's' : ''} updated` : `已更新 · ${updatedFavs} 篇收藏同步了最新内容`,
+              (window.TKI18N&&window.TKI18N.lang==='en') ? 'Updated' : '已更新');
           }
         } else {
-          TKShell.favorites?.notice((window.TKI18N?.lang==='en') ? 'No new content for now' : '暂时没有新内容');
+          TKShell.favorites.notice((window.TKI18N&&window.TKI18N.lang==='en') ? 'No new content for now' : '暂时没有新内容');
         }
-      } catch {
-        TKShell.favorites?.notice((window.TKI18N?.lang==='en') ? 'Refresh failed, try later' : '刷新失败，稍后再试');
+      } catch (err) {
+        TKShell.favorites.notice((window.TKI18N&&window.TKI18N.lang==='en') ? 'Refresh failed, try later' : '刷新失败，稍后再试');
       } finally {
         refreshBtn.disabled = false;
         if (label) label.classList.remove('is-spinning');
@@ -1764,7 +1767,7 @@ async function loadDigest() {
  * 读者看不懂 —— 改成它实际做的事情。
  */
 function homeQuotes(){
-  const zh = window.TKI18N?.lang !== 'en';
+  const zh = !(window.TKI18N && window.TKI18N.lang === 'en');
   const t_ = (zhText, enText) => (zh ? zhText : enText);
   // 三条判断，对应 知识库管理/方法/论文怎么追踪怎么解析.md 里的规则，
   // 但用的是读者能懂的说法。
@@ -1874,7 +1877,7 @@ function heroLede(zh){
  * 排除后卡片 6 张、文案 6 个，口径一致。可达性保底：卡片区下方
  * 「辅助理解」区新增「知识库管理」卡（元文档入口从领域区迁到那里），
  * 侧栏搜索仍可命中全部 34 篇元文档。多个 AI 并行优化期间由本注释锁定此决策。 */
-function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'&&d!=='知识库管理');const zhHome=window.TKI18N?.lang!=='en';const t_=(zhText,enText)=>(zhHome?zhText:enText);const lede=heroLede(zhHome);const descriptions={'AI 系统工程：从模型能力到生产能力':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测','后端系统：在并发、失败与变化中维持服务':'请求、并发、消息、复制、一致性、故障恢复和基础设施','缺陷分析：从个案到体系':'从真实上游缺陷学判断、复现、合入与回归，每条案例都有上游 commit 可查','数据系统：在并发与故障中保存事实':'建模、SQL、事务、索引、CDC、流处理、治理和恢复','性能工程：从用户等待到资源瓶颈':'进程、CPU、GPU、内存、I/O、网络、观测和容量','软件构建：让变化可以理解、验证与交付':'架构、语言运行时、依赖、测试、CI/CD、发布和调试','知识库管理':'怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新'};$('#home').innerHTML=`<section class="hero hero--display" data-crop><div><h1>把技术原理读到能上手用</h1><p class="hero-lede"><span>${esc(lede.text)}</span><span class="hero-lede-lead">${esc(lede.lead)}</span></p></div><div class="hero-meta"><span class="hero-meta-item"><b>${engineeringCount().toLocaleString()}</b><i>${esc(t_('篇工程知识','notes'))}</i></span><span class="hero-meta-item"><b>${domainCount().toLocaleString()}</b><i>${esc(t_('个领域','domains'))}</i></span><span class="hero-meta-item"><b>${sourceCount().toLocaleString()}</b><i>${esc(t_('条来源','sources'))}</i></span></div></section><section class="claim-row"><section class="claim"><p class="claim-eyebrow">${esc(t_('知识','Notes'))}</p><p class="claim-lead">${esc(t_('四个问题，读到能自己下判断','Four questions, until you can judge for yourself'))}</p><p class="claim-sub">${esc(t_('每篇都按这套结构写——读的时候知道自己在哪一步，读完知道证据够不够','Every note follows this structure — you always know which question you are on, and whether the evidence is enough'))}</p><ul class="claim-list"><li><b>${esc(t_('它为什么出现','Why it exists'))}</b><i>——</i><span>${esc(t_('之前卡在哪，没它的时候怎么办','What was stuck before'))}</span></li><li><b>${esc(t_('它怎么运作','How it works'))}</b><i>——</i><span>${esc(t_('机制是什么，关键那一步发生了什么','The mechanism, and its key step'))}</span></li><li><b>${esc(t_('思路怎么来的','Where the idea comes from'))}</b><i>——</i><span>${esc(t_('为什么这样设计，换了什么假设','Why this design, and which assumption it traded'))}</span></li><li><b>${esc(t_('什么时候不该用它','When not to use it'))}</b><i>——</i><span>${esc(t_('代价是什么，边界在哪','Cost and limits'))}</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><div id="radar-slot" style="margin-bottom:18px"></div><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间排。Agent 相关的内容归在 AI 系统工程下，和上下文、检索、质量放在一起</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="${esc(t_('打开 '+d,'Open '+d))}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${t_(state.notes.filter(n=>n.category===d&&n.topic!=='归档').length+' 篇',state.notes.filter(n=>n.category===d&&n.topic!=='归档').length)}</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>${t_('从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。','Pick a preset path in the <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">Learning centre</a>, or go straight to a classroom or a tutor. Topics arrive pre-filled; the model is called only after you confirm')}</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><!-- 【反复迭代后结果·rt13】Agent 评估卡产出行重写：原文案与处理行逐字重复「把(模型/Agent 的)判断绑定到命令、日志、产物和测试」，两行信息量等于一行。产出行改为说清产出物本身（评估结论+回归清单），并补 t_ 翻译包裹。 --><section class="section"><h2>评估与工程</h2><p>评估原型回答"到底有没有变好"，把 Agent 的判断绑定到证据；开源的工程流程提供能直接照做的做法</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>${t_('按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试','Choose evaluation dimensions per task, binding model judgement to commands, logs, artifacts and tests')}</span></div><div class="io-row"><b>产出</b><span>${t_('带证据链的评估结论与回归清单；当前是设计契约与静态原型','Evaluation conclusions with evidence chains and regression checklists; currently a design contract and a static prototype')}</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看评估原型</a><a href="/?path=${encodeURIComponent('工程知识/AI 系统工程/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>${t_('需求对齐、研究、规格、TDD、代码审查和架构改进','Requirement alignment, research, specs, TDD, code review and architecture improvements')}</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>架构图和源码用来查清一个东西和其它东西的关系：它依赖什么、被谁依赖。需要的时候打开，不需要就跳过</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图</p><div class="work-actions"><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></div></article><article class="aux-card"><h3>知识库管理</h3><p>维护本站的元文档：怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新</p><div class="work-actions"><a class="wa-open" href="/?domain=${encodeURIComponent('知识库管理')}">打开元文档</a></div></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法</p><div class="work-actions"><a class="wa-open" href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口</a></div></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识</p><div class="work-actions"><a class="wa-open" href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史</a><a class="wa-open" href="/learn/history">查看收录方式</a></div></article></div></section><div class="notice">先看懂一个领域，从知识领域卡片进入；想动手练，用学习工具；想知道系统到底有没有变好，看 Agent 评估</div>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});$('#home-graph')?.addEventListener('click',event=>{event.preventDefault();showGraph()});renderAtlas();applyHomeStatus();retranslate();loadDigest()}
+function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'&&d!=='知识库管理');const zhHome=!(window.TKI18N&&window.TKI18N.lang==='en');const t_=(zhText,enText)=>(zhHome?zhText:enText);const lede=heroLede(zhHome);const descriptions={'AI 系统工程：从模型能力到生产能力':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测','后端系统：在并发、失败与变化中维持服务':'请求、并发、消息、复制、一致性、故障恢复和基础设施','缺陷分析：从个案到体系':'从真实上游缺陷学判断、复现、合入与回归，每条案例都有上游 commit 可查','数据系统：在并发与故障中保存事实':'建模、SQL、事务、索引、CDC、流处理、治理和恢复','性能工程：从用户等待到资源瓶颈':'进程、CPU、GPU、内存、I/O、网络、观测和容量','软件构建：让变化可以理解、验证与交付':'架构、语言运行时、依赖、测试、CI/CD、发布和调试','知识库管理':'怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新'};$('#home').innerHTML=`<section class="hero hero--display" data-crop><div><h1>把技术原理读到能上手用</h1><p class="hero-lede"><span>${esc(lede.text)}</span><span class="hero-lede-lead">${esc(lede.lead)}</span></p></div><div class="hero-meta"><span class="hero-meta-item"><b>${engineeringCount().toLocaleString()}</b><i>${esc(t_('篇工程知识','notes'))}</i></span><span class="hero-meta-item"><b>${domainCount().toLocaleString()}</b><i>${esc(t_('个领域','domains'))}</i></span><span class="hero-meta-item"><b>${sourceCount().toLocaleString()}</b><i>${esc(t_('条来源','sources'))}</i></span></div></section><section class="claim-row"><section class="claim"><p class="claim-eyebrow">${esc(t_('知识','Notes'))}</p><p class="claim-lead">${esc(t_('四个问题，读到能自己下判断','Four questions, until you can judge for yourself'))}</p><p class="claim-sub">${esc(t_('每篇都按这套结构写——读的时候知道自己在哪一步，读完知道证据够不够','Every note follows this structure — you always know which question you are on, and whether the evidence is enough'))}</p><ul class="claim-list"><li><b>${esc(t_('它为什么出现','Why it exists'))}</b><i>——</i><span>${esc(t_('之前卡在哪，没它的时候怎么办','What was stuck before'))}</span></li><li><b>${esc(t_('它怎么运作','How it works'))}</b><i>——</i><span>${esc(t_('机制是什么，关键那一步发生了什么','The mechanism, and its key step'))}</span></li><li><b>${esc(t_('思路怎么来的','Where the idea comes from'))}</b><i>——</i><span>${esc(t_('为什么这样设计，换了什么假设','Why this design, and which assumption it traded'))}</span></li><li><b>${esc(t_('什么时候不该用它','When not to use it'))}</b><i>——</i><span>${esc(t_('代价是什么，边界在哪','Cost and limits'))}</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><div id="radar-slot" style="margin-bottom:18px"></div><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间排。Agent 相关的内容归在 AI 系统工程下，和上下文、检索、质量放在一起</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="${esc(t_('打开 '+d,'Open '+d))}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${t_(state.notes.filter(n=>n.category===d&&n.topic!=='归档').length+' 篇',state.notes.filter(n=>n.category===d&&n.topic!=='归档').length)}</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>${t_('从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。','Pick a preset path in the <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">Learning centre</a>, or go straight to a classroom or a tutor. Topics arrive pre-filled; the model is called only after you confirm')}</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><!-- 【反复迭代后结果·rt13】Agent 评估卡产出行重写：原文案与处理行逐字重复「把(模型/Agent 的)判断绑定到命令、日志、产物和测试」，两行信息量等于一行。产出行改为说清产出物本身（评估结论+回归清单），并补 t_ 翻译包裹。 --><section class="section"><h2>评估与工程</h2><p>评估原型回答"到底有没有变好"，把 Agent 的判断绑定到证据；开源的工程流程提供能直接照做的做法</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>${t_('按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试','Choose evaluation dimensions per task, binding model judgement to commands, logs, artifacts and tests')}</span></div><div class="io-row"><b>产出</b><span>${t_('带证据链的评估结论与回归清单；当前是设计契约与静态原型','Evaluation conclusions with evidence chains and regression checklists; currently a design contract and a static prototype')}</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看评估原型</a><a href="/?path=${encodeURIComponent('工程知识/AI 系统工程/质量与运营/Agent评估系统的设计契约.md')}">设计契约</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>${t_('需求对齐、研究、规格、TDD、代码审查和架构改进','Requirement alignment, research, specs, TDD, code review and architecture improvements')}</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>架构图和源码用来查清一个东西和其它东西的关系：它依赖什么、被谁依赖。需要的时候打开，不需要就跳过</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图</p><div class="work-actions"><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></div></article><article class="aux-card"><h3>知识库管理</h3><p>维护本站的元文档：怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新</p><div class="work-actions"><a class="wa-open" href="/?domain=${encodeURIComponent('知识库管理')}">打开元文档</a></div></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法</p><div class="work-actions"><a class="wa-open" href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口</a></div></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识</p><div class="work-actions"><a class="wa-open" href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史</a><a class="wa-open" href="/learn/history">查看收录方式</a></div></article></div></section><div class="notice">先看懂一个领域，从知识领域卡片进入；想动手练，用学习工具；想知道系统到底有没有变好，看 Agent 评估</div>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});{const homeGraph=$('#home-graph');if(homeGraph)homeGraph.addEventListener('click',event=>{event.preventDefault();showGraph()});}renderAtlas();applyHomeStatus();retranslate();loadDigest()}
 function bindSourceToggle(){
   const btn=document.querySelector('.source-toggle');
   if(!btn)return;
@@ -1885,8 +1888,8 @@ function bindSourceToggle(){
     if(more)more.hidden=open;
     const n=more?more.querySelectorAll('a').length:0;
     btn.textContent=open
-      ?(window.TKI18N?.lang==='en'?('+ '+n+' more'):('还有 '+n+' 个'))
-      :(window.TKI18N?.lang==='en'?'Show fewer':'收起');
+      ?(window.TKI18N&&window.TKI18N.lang==='en'?('+ '+n+' more'):('还有 '+n+' 个'))
+      :(window.TKI18N&&window.TKI18N.lang==='en'?'Show fewer':'收起');
   };
 }
 
@@ -1902,7 +1905,7 @@ function bindSourceToggle(){
  * 其余来源保持原来的紧凑链接串 —— 那些确实只是链接，铺开反而占地方。
  */
 function renderPapers(papers){
-  if(!papers?.length)return'';
+  if(!papers || !papers.length)return'';
   /* 这个文件里 tr 是**按函数局部定义**的（见 renderAtlas / renderNetwork 等），
      没有全局的那一个。少了这一行，renderPapers 一被调用就抛
      ReferenceError，而它包在 reader 的渲染里，表现是"这篇笔记暂时无法打开"
@@ -1925,7 +1928,7 @@ function renderSources(sources,papers){
   // 同 renderPapers：这个文件里 tr 是按函数局部定义的，没有全局那一个。
   const tr=TKShell.tr; // 全站共享（shell.js），不再各函数局部定义
   const block=renderPapers(papers);
-  if(!sources?.length)return block;
+  if(!sources || !sources.length)return block;
   /* 论文已经从 sources 里单独取出来了，这里跳过它们的裸链接，
      否则同一篇论文会在页面上出现两次。 */
   const paperUrls=new Set((papers||[]).map(p=>p.url));
@@ -1960,16 +1963,16 @@ function renderSources(sources,papers){
   const more=rest.length?('<span class="source-more" hidden>'+sep+rest.map(link).join(sep)+'</span><button type="button" class="source-toggle" aria-expanded="false">还有 '+rest.length+' 个</button>'):'';
   return block+'<span class="source-line"><b>'+esc(tr('来源'))+'</b> <span class="source-list">'+shown.map(link).join(sep)+'</span>'+more+'</span>';
 }
-function applyHomeStatus(){const cards=[...document.querySelectorAll('#home .work-card')],classroom=cards.find(card=>card.querySelector('h3')?.textContent==='OpenMAIC'),tutor=cards.find(card=>card.querySelector('h3')?.textContent==='DeepTutor'),status=state.learningStatus;/* The chip carries the state, so its colour has to as well. A service that is
+function applyHomeStatus(){const titleOf=card=>{const h=card&&card.querySelector('h3');return h?h.textContent:null};const cards=[...document.querySelectorAll('#home .work-card')],classroom=cards.find(card=>titleOf(card)==='OpenMAIC'),tutor=cards.find(card=>titleOf(card)==='DeepTutor'),status=state.learningStatus;/* The chip carries the state, so its colour has to as well. A service that is
    down used to render in the same green as one that is up — the text said
    ｜未启动｜ and the styling said ｜正常｜. `tone` is one of ok / warn / unknown
    and each maps to a chip class that exists in the stylesheet. */
-const setStatus=(card,text,tone)=>{const chip=card?.querySelector('.status');if(!chip)return;chip.textContent=window.TKI18N?window.TKI18N.t(text):text;chip.classList.remove('ok','warn','unknown');chip.classList.add(tone)};
-if(classroom){const c=status?.openmaic;setStatus(classroom,c?(c.online&&c.llm?'互动课堂可用':c.online?'服务运行中':'未启动'):'状态未知',c?(c.online&&c.llm?'ok':c.online?'warn':'warn'):'unknown')}
-if(tutor){const t=status?.deeptutor;setStatus(tutor,t?(t.online&&t.llm?'导师可用':'配置不完整'):'状态未知',t?(t.online&&t.llm?'ok':'warn'):'unknown')}}
+const setStatus=(card,text,tone)=>{const chip=card&&card.querySelector('.status');if(!chip)return;chip.textContent=window.TKI18N?window.TKI18N.t(text):text;chip.classList.remove('ok','warn','unknown');chip.classList.add(tone)};
+if(classroom){const c=(status&&status.openmaic)||null;setStatus(classroom,c?(c.online&&c.llm?'互动课堂可用':c.online?'服务运行中':'未启动'):'状态未知',c?(c.online&&c.llm?'ok':c.online?'warn':'warn'):'unknown')}
+if(tutor){const t=(status&&status.deeptutor)||null;setStatus(tutor,t?(t.online&&t.llm?'导师可用':'配置不完整'):'状态未知',t?(t.online&&t.llm?'ok':'warn'):'unknown')}}
 function clearSearch(){state.query='';$('#search').value=''}
 function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}clearSearch();state.domain=domain;state.topic=topic;state.selected=null;if(domain!=='all'&&domain!=='Clippings')state.expandedDomains.add(domain);show('directory');renderDomains();renderDirectory();expandActiveDomain();if(matchMedia('(max-width:760px)').matches)collapseMobileSidebar();if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}
-function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch{return s}}
+function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch(err){return s}}
 /* 侧边栏、主题、反馈三件事都由 site/shell.js 提供，工作台页面调的是同一份。
    这里只负责主站特有的两件事：域树挂在侧边栏里，以及图谱是页内视图要拦下点击。 */
 function renderSharedNav(){
@@ -1988,7 +1991,8 @@ function renderSharedNav(){
   if(!domains){
     domains=document.createElement('div');
     domains.id='domains';
-    aside.querySelector('.tk-nav')?.after(domains);
+    const navAnchor = aside.querySelector('.tk-nav');
+    if (navAnchor) navAnchor.after(domains);
   }
   renderDomains();
   updateSharedNav(state.view);
@@ -2127,7 +2131,7 @@ function renderRelations(note){
     outgoingNodes.forEach((item,index)=>{const y=outputY(index);lines.push(edge(current.x+nodeWidth,current.y+nodeH(note)/2,810,y+nodeH(item)/2));nodes.push(node(item,810,y))});
   }
   root.classList.add('collapsed');
-  root.innerHTML=`<div class="article-relations-head"><div class="article-relations-heading"><h3>知识图谱</h3><span>${(window.TKI18N?.lang==='en')?(incoming.length+' incoming · '+outgoing.length+' outgoing'):(incoming.length+' 条入链 · '+outgoing.length+' 条延伸')}</span><!-- 【rt24】原模板直接拼中文整串，词典按整串匹配永不命中；改为按语言分支拼装。 --></div><button type="button" class="relation-collapse" title="折叠知识图谱" aria-label="折叠知识图谱" aria-expanded="true">▾</button></div><svg class="relation-graph" viewBox="0 0 ${width} ${height}" role="img" aria-label="${(window.TKI18N?.lang==='en')?(esc(window.TKI18N.t(note.title))+' — direct knowledge graph'):(esc(note.title)+' 的直接知识图谱')}"<!-- 【rt26】同修 4。 -->><defs><marker id="relation-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8faea4"></path></marker></defs><text class="relation-label" x="${mobile?35:20}" y="${mobile?15:13}"><!-- 【rt27·加宽】跟随新列位。 -->${(window.TKI18N?.lang==='en')?('Cites this note'+(incoming.length>incomingNodes.length?' · '+incoming.length:'')):('引用当前节点'+(incoming.length>incomingNodes.length?' · '+incoming.length:''))}</text><!-- 【rt24】同计数 span：模板拼数字导致整串永不命中，按语言分支拼装。 --><text class="relation-label" x="${mobile?35:810}" y="${mobile?177:13}"><!-- 【rt27·加宽】跟随新列位。 -->${(window.TKI18N?.lang==='en')?('Extends from this note'+(outgoing.length>outgoingNodes.length?' · '+outgoing.length:'')):('从当前节点延伸'+(outgoing.length>outgoingNodes.length?' · '+outgoing.length:''))}</text>${lines.join('')}${node(note,current.x,current.y,'current')}${nodes.join('')}</svg>`;
+  root.innerHTML=`<div class="article-relations-head"><div class="article-relations-heading"><h3>知识图谱</h3><span>${(window.TKI18N&&window.TKI18N.lang==='en')?(incoming.length+' incoming · '+outgoing.length+' outgoing'):(incoming.length+' 条入链 · '+outgoing.length+' 条延伸')}</span><!-- 【rt24】原模板直接拼中文整串，词典按整串匹配永不命中；改为按语言分支拼装。 --></div><button type="button" class="relation-collapse" title="折叠知识图谱" aria-label="折叠知识图谱" aria-expanded="true">▾</button></div><svg class="relation-graph" viewBox="0 0 ${width} ${height}" role="img" aria-label="${(window.TKI18N&&window.TKI18N.lang==='en')?(esc(window.TKI18N.t(note.title))+' — direct knowledge graph'):(esc(note.title)+' 的直接知识图谱')}"<!-- 【rt26】同修 4。 -->><defs><marker id="relation-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8faea4"></path></marker></defs><text class="relation-label" x="${mobile?35:20}" y="${mobile?15:13}"><!-- 【rt27·加宽】跟随新列位。 -->${(window.TKI18N&&window.TKI18N.lang==='en')?('Cites this note'+(incoming.length>incomingNodes.length?' · '+incoming.length:'')):('引用当前节点'+(incoming.length>incomingNodes.length?' · '+incoming.length:''))}</text><!-- 【rt24】同计数 span：模板拼数字导致整串永不命中，按语言分支拼装。 --><text class="relation-label" x="${mobile?35:810}" y="${mobile?177:13}"><!-- 【rt27·加宽】跟随新列位。 -->${(window.TKI18N&&window.TKI18N.lang==='en')?('Extends from this note'+(outgoing.length>outgoingNodes.length?' · '+outgoing.length:'')):('从当前节点延伸'+(outgoing.length>outgoingNodes.length?' · '+outgoing.length:''))}</text>${lines.join('')}${node(note,current.x,current.y,'current')}${nodes.join('')}</svg>`;
   root.querySelectorAll('[data-note]').forEach(nodeElement=>{nodeElement.onclick=()=>openNote(nodeElement.dataset.note);nodeElement.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openNote(nodeElement.dataset.note)}}});
   /* 与同模块对称：知识图谱默认展开，显式清掉上一篇可能留下的 collapsed。 */
   root.classList.remove('collapsed');
@@ -2405,7 +2409,7 @@ function renderNetwork(){
     headBox.title=fullName;
     headBox.append(document.createTextNode(shortName));
     const headCount=document.createElement('span');
-    headCount.textContent=(window.TKI18N?.lang==='en')?`${group.length} notes · ${ts.length} topics`:`${group.length} 篇 · ${ts.length} 个主题`;
+    headCount.textContent=(window.TKI18N&&window.TKI18N.lang==='en')?`${group.length} notes · ${ts.length} topics`:`${group.length} 篇 · ${ts.length} 个主题`;
     headBox.append(headCount);
     headBox.setAttribute('tabindex','0');
     headBox.setAttribute('role','button');
@@ -2550,9 +2554,9 @@ function renderNetwork(){
      三个语义项（大小/已读/已读环）加 .gl-sem 类：CSS 里给首项前加
      分隔线，与六个域色项隔开。 */
   $('#legend').innerHTML=domains.map((d,i)=>`<span style="color:${colors[i%colors.length]}"><i></i>${esc(tr(d))}</span>`).join('')
-    +`<span class="gl-sem" style="color:var(--color-muted)">${(window.TKI18N?.lang==='en')?'A bigger circle means more notes under the topic':'圆越大，主题下的笔记越多'}</span>`
-    +`<span class="gl-sem" style="color:var(--color-muted)"><i style="background:var(--color-ok)"></i>${(window.TKI18N?.lang==='en')?'Learned':'已读'}</span>`
-    +`<span class="gl-sem" style="color:var(--color-muted)"><i style="width:12px;height:12px;border-radius:50%;display:inline-block;border:3px solid var(--color-ok);border-top-color:transparent;transform:rotate(-45deg);box-shadow:none"></i>${(window.TKI18N?.lang==='en')?'topic mastery ring':'已读环'}</span>`;
+    +`<span class="gl-sem" style="color:var(--color-muted)">${(window.TKI18N&&window.TKI18N.lang==='en')?'A bigger circle means more notes under the topic':'圆越大，主题下的笔记越多'}</span>`
+    +`<span class="gl-sem" style="color:var(--color-muted)"><i style="background:var(--color-ok)"></i>${(window.TKI18N&&window.TKI18N.lang==='en')?'Learned':'已读'}</span>`
+    +`<span class="gl-sem" style="color:var(--color-muted)"><i style="width:12px;height:12px;border-radius:50%;display:inline-block;border:3px solid var(--color-ok);border-top-color:transparent;transform:rotate(-45deg);box-shadow:none"></i>${(window.TKI18N&&window.TKI18N.lang==='en')?'topic mastery ring':'已读环'}</span>`;
 }
 
 
@@ -2692,7 +2696,7 @@ function bindPgnio(){
             }
           }
           TKShell.progress.save();renderProgress();
-        }catch{alertUser('导入失败：文件不是有效的进度 JSON')}
+        }catch(err){alertUser('导入失败：文件不是有效的进度 JSON')}
       };
       reader.readAsText(file);
       impFile.value='';
@@ -2795,11 +2799,11 @@ function renderMatrixView(){const host=$('#panorama-body');if(!host||!window.TKM
  if(pickDomain){
    scoped=state.notes.filter(n=>domainOf(n)===pickDomain);
    const title=$('#pano-title'),sub=$('#pano-subtitle');
-   if(title)title.textContent=pickDomain+(window.TKI18N?.lang==='en'?' · Panorama':' · 知识全景');
-   if(sub)sub.textContent=window.TKI18N?.lang==='en'?'The matrix only counts notes in the “'+pickDomain+'” domain. Use “Overview” or a domain in the sidebar to switch':'当前矩阵只统计「'+pickDomain+'」域的文章，点侧栏「总览」或域名可切换。';
+   if(title)title.textContent=pickDomain+(window.TKI18N&&window.TKI18N.lang==='en'?' · Panorama':' · 知识全景');
+   if(sub)sub.textContent=window.TKI18N&&window.TKI18N.lang==='en'?'The matrix only counts notes in the “'+pickDomain+'” domain. Use “Overview” or a domain in the sidebar to switch':'当前矩阵只统计「'+pickDomain+'」域的文章，点侧栏「总览」或域名可切换。';
  }else{
    const title=$('#pano-title'),sub=$('#pano-subtitle');
-   if(title)title.textContent=window.TKI18N?.lang==='en'?'Panorama':'知识全景';
+   if(title)title.textContent=window.TKI18N&&window.TKI18N.lang==='en'?'Panorama':'知识全景';
  }
  const items=window.TKMatrix.classifyAll(scoped);
  const intro=document.createElement('div');intro.className='mx-intro';
@@ -2812,7 +2816,7 @@ function renderMatrixView(){const host=$('#panorama-body');if(!host||!window.TKM
   * 「元知识与研究笔记」的语义与「带 meta/ skill/ research 标签」重叠，
   * 砍掉不损失信息，句子变短后自然一行收住。 */
  if(pickDomain&&inm===0){
-   intro.innerHTML=window.TKI18N?.lang==='en'?'<p>Notes in “'+esc(pickDomain)+'” do not enter the matrix (meta notes and clippings are excluded). Try another domain.</p>':'<p>「'+esc(pickDomain)+'」的文章不进技术矩阵（元知识与剪藏被排除），换个域试试</p>';
+   intro.innerHTML=window.TKI18N&&window.TKI18N.lang==='en'?'<p>Notes in “'+esc(pickDomain)+'” do not enter the matrix (meta notes and clippings are excluded). Try another domain.</p>':'<p>「'+esc(pickDomain)+'」的文章不进技术矩阵（元知识与剪藏被排除），换个域试试</p>';
    if(intro.innerHTML)host.appendChild(intro);return}
  intro.innerHTML='';
  host.appendChild(intro);
@@ -2820,7 +2824,7 @@ function renderMatrixView(){const host=$('#panorama-body');if(!host||!window.TKM
  const cells=window.TKMatrixView.render(host,items);
  window.TKMatrixView.renderGaps(host,cells,items);
  window.TKMatrixView.openFromHash(cells);
- window.TKI18N?.translateDOM(host)}
+ if(window.TKI18N)window.TKI18N.translateDOM(host)}
 function setMobileSidebar(collapsed){const sidebar=$('#tk-sidebar'),button=$('#mobile-menu');if(!sidebar||!button)return;sidebar.classList.toggle('collapsed',collapsed);button.setAttribute('aria-expanded',String(!collapsed));button.setAttribute('aria-label',collapsed?'打开目录':'收起目录')}
 function collapseMobileSidebar(){setMobileSidebar(true)}
 function bindNavigation(){setMobileSidebar(matchMedia('(max-width:760px)').matches);const menuButton=$('#mobile-menu');if(menuButton)menuButton.onclick=()=>setMobileSidebar(!$('#tk-sidebar').classList.contains('collapsed'));$('#reader-back').onclick=()=>{if(state.domain!=='all')select(state.domain,state.topic);else if(state.query.trim()){show('directory');renderDirectory();$('#search').focus()}else loadHome(true)};$('#search').oninput=event=>{state.query=event.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};
@@ -2837,7 +2841,7 @@ function kbdOverlay(open){
   el.hidden=!open;
   el.classList.toggle('open',open);
   if(open){const close=$('#kbd-close');if(close)close.focus()}
-  else if(document.activeElement&&el.contains(document.activeElement))$('#kbd-hint')?.focus();
+  else if(document.activeElement&&el.contains(document.activeElement)){const kbdHint=$('#kbd-hint');if(kbdHint)kbdHint.focus()}
 }
 function moveSelection(delta){
   const rows=[...document.querySelectorAll('#directory .note-row')];
@@ -2849,7 +2853,7 @@ function moveSelection(delta){
 }
 function toggleThemeFromKeyboard(){
   const next=document.documentElement.dataset.theme==='dark'?'light':'dark';
-  try{localStorage.setItem('tk-theme',next)}catch{}
+  try{localStorage.setItem('tk-theme',next)}catch(err){}
   TKShell.applyTheme(next);
 }
 function bindKeyboard(){
@@ -2861,10 +2865,10 @@ function bindKeyboard(){
      * 里 Cmd+K 原生无占用（地址栏搜索是 Cmd+L / Cmd+F 是页内查找），
      * Chrome 里 Ctrl+K 会跳地址栏，preventDefault 拦得下来，实测有效。 */
     if((event.metaKey||event.ctrlKey)&&(event.key==='k'||event.key==='K')){
-      event.preventDefault();$('#search')?.focus();$('#search')?.select();return;
+      event.preventDefault();{const searchBox=$('#search');if(searchBox){searchBox.focus();searchBox.select()}}return;
     }
     if(event.key==='Escape'){
-      if($('#kbd-overlay')?.classList.contains('open')){kbdOverlay(false);event.preventDefault();return}
+      {const kbdOv=$('#kbd-overlay');if(kbdOv&&kbdOv.classList.contains('open')){kbdOverlay(false);event.preventDefault();return}}
       if(typing&&event.target.id==='search'){event.target.value='';state.query='';loadHome(false);event.preventDefault();return}
       if(state.view==='graph'&&state.graphFocus){state.graphFocus=null;renderGraph();history.replaceState({},'','/?view=graph');event.preventDefault();return}
       /* 全景页 Esc 与图谱页对称：先退格子详情，再退八层栈放大态。
@@ -2880,8 +2884,8 @@ function bindKeyboard(){
     if(typing)return;
     if(event.metaKey||event.ctrlKey||event.altKey)return;
     const key=event.key;
-    if(key==='?'||(key==='/'&&event.shiftKey)){kbdOverlay(!$('#kbd-overlay')?.classList.contains('open'));event.preventDefault();return}
-    if(key==='/'){$('#search')?.focus();event.preventDefault();return}
+    if(key==='?'||(key==='/'&&event.shiftKey)){const kbdOv2=$('#kbd-overlay');kbdOverlay(!!(kbdOv2&&kbdOv2.classList.contains('open')));event.preventDefault();return}
+    if(key==='/'){const searchBox2=$('#search');if(searchBox2)searchBox2.focus();event.preventDefault();return}
     if(key==='t'){toggleThemeFromKeyboard();event.preventDefault();return}
     if(key==='j'||key==='ArrowDown'){moveSelection(1);event.preventDefault();return}
     if(key==='k'||key==='ArrowUp'){moveSelection(-1);event.preventDefault();return}
@@ -2906,7 +2910,7 @@ function bindKeyboard(){
    这里只提供主站才知道的两件事：正在读哪一篇，以及这一篇的标题。 */
 function currentArticle(){
   if(state.view!=='reader'||!state.selected)return {path:'',title:''};
-  return {path:state.selected,title:($('#reader-title')?.textContent||'').trim()};
+  return {path:state.selected,title:(($('#reader-title')||{}).textContent||'').trim()};
 }
 let feedbackUi=null;
 function bindFeedback(){
@@ -2928,7 +2932,7 @@ function reportVisit(){
   lastVisitPath=article.path;
   TKShell.visit({
     path:article.path,title:article.title,
-    name:feedbackUi?.name()||'',
+    name:(feedbackUi&&feedbackUi.name())||'',
     screen:`${screen.width}x${screen.height}`,
   });
 }
@@ -2977,7 +2981,7 @@ async function copyCurrentLink(){
   try{
     await navigator.clipboard.writeText(url);
     alertUser('链接已复制');
-  }catch{
+  }catch(err){
     // 剪贴板在非安全上下文会被拒绝，退回手动选择。
     const input=document.createElement('input');
     input.value=url;document.body.appendChild(input);input.select();
@@ -3109,7 +3113,7 @@ function renderActiveView(){
   else if(state.view==='panorama')renderPanoView();
   else renderDirectory();
 }
-async function refreshApp(){await Promise.allSettled([refreshNotes(),refreshLearningStatus()])}
+async function refreshApp(){await Promise.all([refreshNotes().catch(()=>{}),refreshLearningStatus().catch(()=>{})])}
 initialize();setInterval(refreshApp,10000);
 </script>
 <!-- mermaid 改成按需加载。
