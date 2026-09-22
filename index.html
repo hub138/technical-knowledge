@@ -984,9 +984,17 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
  * 颜色延伸到标题区外的留白里。四条盒边都不可见面：两个渐变的透明终点
  * 收在盒内（上下靠渐变自身 fade），左右由 mask 椭圆在盒边归零兜底；
  * 不用 overflow:hidden 裁切 —— 裁切线会留下可见的直线边缘。
- * 横向出血由 .main 的 overflow-x:clip 拦截，不产生滚动条。
+ * 横向出血由 .main 的 overflow-x:clip 拦截，不产生滚动条；旧内核不支持
+ * clip 时由 html 级 hidden（@supports not (overflow: clip) 分支）接住。
  * 光斑盒向下仍超出 hero 盒（340px 高于 hero 本身），hero.scrollHeight 大于
  * clientHeight，模板上的 data-crop 依此声明"有意出血"，layout_audit 跳过。 */
+/* overflow-x:clip 需要 Chromium 90+。旧内核把 .main 的 clip 整行丢弃后，
+ * 光斑的横向出血（left:-20%）会把整页撑出横向滚动。兜底声明在 html 上：
+ * 视口的横向滚动由根元素 overflow 决定，html 级 hidden 照样裁掉出血，
+ * .main 与 body 保持 visible，topbar 的 position:sticky 不受影响。 */
+@supports not (overflow: clip) {
+  html { overflow-x: hidden; }
+}
 .hero--display{position:relative}
 .hero--display::before{content:"";position:absolute;top:-40%;right:-20%;bottom:auto;left:-20%;height:340px;pointer-events:none;
   background:
