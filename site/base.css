@@ -1568,7 +1568,14 @@ body.tk-host button {
   }
 
   .tk-nav::-webkit-scrollbar { display: none; }
-  .tk-nav a { flex: 0 0 auto; min-height: 34px; padding: 7px 9px; font-size: 12px; }
+  /* 触控热区 44px：原 34px 低于 ui-ux-pro-max `Touch Spacing` 的
+     44×44 标准，手指很难点准。nav 改 flex-wrap 两行排放，横排
+     单行的拥挤与「总览被裁掉一半」（390px 实测）同时解决。 */
+  .tk-nav {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  .tk-nav a { flex: 0 0 auto; min-height: 44px; padding: 10px 12px; font-size: 13px; }
 
   /* 横排导航里分组小标题没有落脚点——它会变成滚动条里的一个孤立
      flex 项，把视角三项和其余项硬隔开。移动端本来就靠横向滚动看全部，
@@ -1586,7 +1593,7 @@ body.tk-host button {
 
   .tk-subnav::-webkit-scrollbar { display: none; }
   .tk-subnav-label { display: none; }
-  .tk-subnav a { flex: 0 0 auto; padding: 5px 8px; font-size: 12px; }
+  .tk-subnav a { flex: 0 0 auto; padding: 12px 10px; font-size: 13px; }
 
   /* 【2026-09-22 子项折叠】横排下的折叠组件适配：
    * - .tk-subnav-group 解除 grid 改入横排 flex 流（hidden 仍生效），
@@ -1628,13 +1635,22 @@ body.tk-host button {
   .tk-context,
   .tk-sidebar-footer { display: none; }
 
+  /* 手机上右上角的 fixed 控件组（语言/主题，right:12px 宽 110px）压在
+     品牌行的「目录」按钮上 —— 目录是域树在手机的唯一入口，被盖住
+     等于手机上打不开知识树（390px 实测完全重叠）。给品牌行预留
+     控件通道：控件左缘 x=268，目录右缘收到 258，留 10px 间隙。 */
+  .tk-brand-row { padding-right: 117px; }
+
   .tk-shell,
   .content {
-    /* 窄屏按钮也缩小（48px，距右 14px），但通道**不能跟着缩小**：
-       实测 768px 下 62px 的通道不够 —— 内容右边界 694.6，按钮左边界 683，
-       正文被压住 11.6px（布局审计报的 papers@768）。
-       按最宽的情况给：按钮 52px + 距右 22px + 呼吸 = 74px。 */
-    --float-lane: 74px;
+    /* 通道与按钮几何配套，两套几何两套值：
+       桌面按钮 52px + 距右 22px = 74px（tokens.css 默认，768px 等中间
+       宽度走桌面值 —— 实测 768px 下 62px 的通道不够，内容右边界 694.6、
+       按钮左边界 683，正文被压住 11.6px，布局审计报的 papers@768）；
+       移动端按钮 48px + 距右 14px = 62px，本块 .tk-fab 就是这个几何。
+       390px 屏上 74px 的通道永久扣掉右侧 89px，全景矩阵内容列被压到
+       226px —— 通道跟本断点的按钮几何走。 */
+    --float-lane: 62px;
     max-width: none;
     padding: var(--space-4) calc(var(--space-4) + var(--float-lane)) calc(var(--float-lane) + var(--space-8)) var(--space-4);
   }

@@ -368,7 +368,10 @@
 .mx-tip .mx-tip-sub { color: var(--mx-text-dim); }
 
 @media (max-width: 720px) {
-  .mx-grid { grid-template-columns: 128px repeat(6, minmax(88px, 1fr)) 52px; }
+  /* 手机内容列 ≈ 330px（390 - 左右 30px 内距 - 62px 悬浮通道 - 表格内距），
+     原列宽 88px×6 + 行头 128px 需横向滚动才能看到合计列。收窄到
+     72px 列 + 104px 行头后六列加合计一屏放全，数字 16px 仍清晰。 */
+  .mx-grid { grid-template-columns: 104px repeat(6, minmax(72px, 1fr)) 52px; }
   .mx-cell { min-height: 54px; }
   .mx-n { font-size: 16px; }
 }
