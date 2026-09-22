@@ -2,7 +2,7 @@
 
 # technical-knowledge
 
-**记机制，不记结论 —— 以及服务这套知识库的站点。**
+**拆真实缺陷、解构论文与好文，把工程知识织成网络。**
 
 [![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen?style=flat-square)](#验证)
 [![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen?style=flat-square)](#验证)
@@ -20,9 +20,7 @@
 
 ---
 
-184 篇工程笔记，覆盖 AI 系统、后端与分布式系统、数据系统、计算机系统与性能、
-软件构建与质量。每页按同一套结构写，读完能说清一个技术**是拿来干什么的**，
-而不只是它叫什么。
+它把上游开源项目的真实缺陷、论文解读、公众号文章和科技公司的工程博客，解构成六大领域的结构化知识，每篇都讲透本质与适用场景。缺陷分析从个案到体系，是这个站最完整的样本。知识全景按 MECE 原则切分层次与类型，象限矩阵照出覆盖缺口，知识图谱把散落的文章织成关联网络。OpenMAIC 互动课堂与 DeepTutor 学习导师接入即用，从读懂到上手练。
 
 每一页回答四个问题：
 
@@ -42,11 +40,11 @@
 
 ```
 vault/                         可直接用 Obsidian 打开
-  工程知识/                     五个技术领域，一个工程问题一页
+  工程知识/                     六大技术领域，一个工程问题一页
   知识库管理/                   来源、更新、质量和维护规则
   Clippings/                   原始剪藏，按要求完整保留
 site/                          站点：单文件 HTTP 服务，无运行时依赖
-apps/agent-evaluation/         自研 Agent 评估：设计契约与原型
+apps/agent-evaluation/         Agent 评估：把判断绑定到证据的设计契约与原型
 packages/agent-foundation/     会话、上下文、记忆、恢复与证据基础包
 projects/                      完整上游源码快照，含各自许可证
   archify/                     架构、流程与关系图
@@ -71,7 +69,7 @@ projects/                      完整上游源码快照，含各自许可证
 | **阅读** | 搜索、按领域索引、文章页含入链与来源列表 |
 | **图谱** | 笔记之间的关联，另有系统分层与选型象限图 |
 | **学习** | 通往课堂与导师工具的引导路径，主题会预填 |
-| **评估** | 自研 Agent 评估项目，与上游第三方工具分开维护 |
+| **评估** | 用于评估 Agent 的原型，把判断绑定到命令、日志、产物和测试 |
 | **访问与反馈** | 只在本机可见的运营视图：谁读了什么、说了什么 |
 
 界面提供**中文（默认）与英文**，在侧边栏切换。知识笔记保持写作时的语言 ——
@@ -95,7 +93,7 @@ HTTP 服务；`site/base.css` 是一份由设计 token 驱动的样式表；唯�
 
 | 检查什么 | 怎么查 |
 |---|---|
-| 行为 | `python3 -m unittest tests/test_site.py` —— 50 个测试 |
+| 行为 | `python3 -m unittest tests.test_site.py` —— 34 个测试 |
 | 布局 | `python3 scripts/layout_audit.py` —— 27 个页面×宽度组合 |
 | 设计 token | `python3 scripts/token_audit.py` —— 无未解析的 `var()` |
 | 可读性 | `python3 scripts/contrast_audit.py` —— 逐页逐主题 WCAG AA |
@@ -112,7 +110,7 @@ python3 scripts/check_all.py --fast   # 跳过需要浏览器的两项
 ## 验证
 
 ```bash
-python3 -m unittest tests/test_site.py        # 50/50
+python3 -m unittest tests.test_site.py        # 34/34
 python3 scripts/contrast_audit.py <url>#dark  # 18/18 页面×主题组合
 python3 scripts/layout_audit.py              # 27/27 页面×宽度组合
 python3 scripts/token_audit.py               # 0 个未定义的自定义属性

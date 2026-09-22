@@ -2,7 +2,7 @@
 
 # technical-knowledge
 
-**A knowledge base that explains mechanisms, not conclusions — with the site that serves it.**
+**Real defects dissected, papers and good writing deconstructed — engineering knowledge woven into a web.**
 
 [![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen?style=flat-square)](#validation)
 [![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen?style=flat-square)](#validation)
@@ -20,9 +20,15 @@
 
 ---
 
-184 engineering notes on AI systems, backend and distributed systems, data
-systems, computer systems, and software construction — written to a fixed
-structure so a reader can tell what a technology is *for*, not just what it is.
+It takes real defects from upstream open-source projects, paper walkthroughs,
+articles from WeChat blogs and engineering blogs of tech companies, and
+deconstructs them into structured knowledge across six domains — every note
+explains the essence and when it applies. Defect analysis, from individual
+cases to a system of patterns, is the most complete sample here. The knowledge
+panorama slices levels and types by the MECE principle, the quadrant matrix
+exposes coverage gaps, and the knowledge graph weaves scattered notes into a
+web. OpenMAIC interactive classroom and the DeepTutor tutor are wired in —
+from reading to practising.
 
 Every note answers four questions:
 
@@ -48,11 +54,11 @@ after checking the official documentation, a paper, or a local run.
 
 ```
 vault/                         open directly in Obsidian
-  工程知识/                     five domains, one note per engineering question
+  工程知识/                     six domains, one note per engineering question
   知识库管理/                   sourcing, updating, quality and maintenance rules
   Clippings/                   raw clippings, kept verbatim
 site/                          the site: one HTTP server, no runtime dependencies
-apps/agent-evaluation/         in-house Agent evaluation: contract and prototype
+apps/agent-evaluation/         Agent evaluation: bind judgments to evidence
 packages/agent-foundation/     sessions, context, memory, recovery, evidence
 projects/                      full upstream source snapshots, each with its licence
   archify/                     architecture, workflow and relation diagrams
@@ -77,7 +83,7 @@ save and refresh. No build step, no export.
 | **Reading** | search, domain index, backlinks and sources on each note |
 | **Graph** | relations between notes, plus system layers and a selection quadrant |
 | **Learning** | guided paths into the classroom and tutor tools, topic pre-filled |
-| **Evaluation** | the in-house Agent evaluation, kept apart from the upstream tools |
+| **Evaluation** | a prototype for evaluating agents, binding judgments to commands, logs, artifacts and tests |
 | **Visits & feedback** | an operator view visible only on this machine |
 
 The interface is available in **Chinese (default) and English**; switch it from
@@ -105,7 +111,7 @@ claims about the site carry a script:
 
 | What | How |
 |---|---|
-| behaviour | `python3 -m unittest tests/test_site.py` — 50 tests |
+| behaviour | `python3 -m unittest tests.test_site.py` — 34 tests |
 | layout | `python3 scripts/layout_audit.py` — 27 page × width combinations |
 | tokens | `python3 scripts/token_audit.py` — no unresolved `var()` |
 | readability | `python3 scripts/contrast_audit.py` — WCAG AA, per page and theme |
@@ -122,7 +128,7 @@ python3 scripts/check_all.py --fast   # skip the two that need a browser
 ## Validation
 
 ```bash
-python3 -m unittest tests/test_site.py        # 50/50
+python3 -m unittest tests.test_site.py        # 34/34
 python3 scripts/contrast_audit.py <url>#dark  # 18/18 page-theme combinations
 python3 scripts/layout_audit.py              # 27/27 page-width combinations
 python3 scripts/token_audit.py               # 0 undefined custom properties
