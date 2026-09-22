@@ -1698,6 +1698,31 @@ body.tk-host button {
 }
 .tk-fav-btn:hover { color: var(--color-accent); border-color: var(--color-accent-line); transform: scale(1.08); }
 .tk-fav-btn.is-fav { color: var(--color-accent); border-color: var(--color-accent-line); }
+/* 13px 圆里放 24 viewBox 的描边星，1em 会细到 0.9px（实测发虚），放大一档 */
+.tk-fav-btn .ic { width: 1.15em; height: 1.15em; }
+/* 站长钉选头条按钮：hero 上是有字胶囊，紧凑行里覆盖成 26px 圆形图标钮——
+ * 与 .tk-fav-btn 同尺寸成对，避免把紧凑行的来源名挤出屏幕（实测裁切）。
+ * 这个按钮此前完全没有样式，走浏览器默认外观。 */
+.digest-feature-btn {
+  display: inline-flex; align-items: center; gap: 4px; flex: none;
+  padding: 2px 9px; border: 1px solid var(--color-line-strong); border-radius: 999px;
+  background: var(--color-raised); color: var(--color-ink-soft);
+  font: inherit; font-size: 12px; line-height: 1.7; cursor: pointer;
+  transition: color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+.digest-feature-btn:hover { color: var(--color-accent); border-color: var(--color-accent-line); }
+.digest-feature-btn .ic { width: 1.05em; height: 1.05em; }
+.digest-item .digest-feature-btn {
+  /* 紧凑行放不下第五个元素（实测：来源名一长就把行尾按钮裁出卡片），
+   * 改成 hover 浮现：不占布局宽，站长工具保持安静（音量原则），
+   * 键盘 focus-within 同样浮现。hero 上仍是有字胶囊。 */
+  position: absolute; right: 10px; bottom: 9px;
+  width: 26px; height: 26px; padding: 0; border-radius: 50%;
+  justify-content: center; opacity: 0; pointer-events: none;
+}
+.digest-item:hover .digest-feature-btn,
+.digest-item:focus-within .digest-feature-btn { opacity: 1; pointer-events: auto; }
 .tk-fav-panel { max-width: 420px; }
 .tk-fav-text { color: var(--color-ink-soft); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
 .tk-fav-overlay .tk-fav-confirm { border-color: var(--color-accent-line); background: var(--color-accent); color: var(--color-on-accent); }

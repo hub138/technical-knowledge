@@ -111,6 +111,17 @@
    */
   const media = window.matchMedia("(prefers-color-scheme: dark)");
 
+  /* ?theme=dark|light 深链：只影响本次视图，不写入 localStorage。
+   * 用途：截图验证两种主题不必手动点开关。显式选择仍以 localStorage 为准。 */
+  const urlTheme = (() => {
+    try {
+      const t = new URLSearchParams(location.search).get("theme");
+      return t === "dark" || t === "light" ? t : null;
+    } catch {
+      return null;
+    }
+  })();
+
   const storedTheme = () => {
     try {
       return localStorage.getItem(THEME_KEY);
@@ -141,7 +152,7 @@
     });
   };
 
-  applyTheme(storedTheme() || (media.matches ? "dark" : "light"));
+  applyTheme(urlTheme || storedTheme() || (media.matches ? "dark" : "light"));
 
   media.addEventListener("change", (event) => {
     if (!storedTheme()) applyTheme(event.matches ? "dark" : "light");
