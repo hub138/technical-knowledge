@@ -1841,7 +1841,7 @@ def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes
 <link rel="stylesheet" href="/static/tokens.css">
 <script src="/static/nav.js"></script>
 <link rel="stylesheet" href="/static/base.css">
-<script src="/static/shell.js"></script>
+<script src="/static/legacy-polyfills.js"></script><script src="/static/shell.js"></script>
 <style>
 /* 项目说明页用 .tk-shell 作为内容列，与站内其他页共用一套框架。 */
 .doc-top{{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:76px;border-bottom:1px solid var(--color-line);color:var(--color-muted);font-size:var(--text-small)}}
@@ -2812,7 +2812,7 @@ class Handler(BaseHTTPRequestHandler):
 <link rel="stylesheet" href="/static/tokens.css">
 <script src="/static/nav.js"></script>
 <link rel="stylesheet" href="/static/base.css">
-<script src="/static/shell.js"></script>
+<script src="/static/legacy-polyfills.js"></script><script src="/static/shell.js"></script>
 <style>
 .nf-body{{margin-top:27px;padding:34px 38px;background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);position:relative;overflow:hidden}}
 /* 数字氛围光：低透明度径向渐变衬在 404 后方，与主页 hero 光斑同一视觉语言。 */

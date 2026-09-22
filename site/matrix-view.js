@@ -59,6 +59,10 @@
 
     var wrap = el("div", "mx-wrap");
     var grid = el("div", "mx-grid");
+    /* 手机上矩阵比屏幕宽，靠左右滑动看完整表格。没有提示的话，
+       滑动入口不可发现（截图确认）。提示只在确实放不下时出现。 */
+    var hint = el("p", "mx-swipe-hint", EN() ? "Swipe left / right to see all columns" : "← 左右滑动查看全部列 →");
+    wrap.appendChild(hint);
 
     /* 表头：左上角是轴指示——每列是一种知识类型，每行是一个系统层次。
      * 旧版「知识类型 → / ↓ 系统层次」箭头式写法被用户反馈"不好看"：

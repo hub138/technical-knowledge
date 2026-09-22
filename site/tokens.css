@@ -143,8 +143,15 @@
   --text-body: 16px;    /* 正文，也是导航与控件的字号 */
   --text-h3: 18px;      /* 卡片标题、小节标题 */
   --text-h2: 22px;      /* 区块标题 */
-  --text-h1: clamp(26px, 2.6vw, 32px);  /* 文章/页面主标题 */
-  --text-hero: clamp(30px, 3.2vw, 38px); /* 首页主张 */
+  /* 回退顺序：clamp() 是 Chromium 79+ 的函数，更旧的 WebView 不认整个声明，
+     会把变量值算成空，标题字号直接失效（继承 body 16px，主标题消失层级）。
+     所以先写桌面/移动各自的固定值，再用 @supports 恢复流式缩放。 */
+  --text-h1: 28px;      /* 文章/页面主标题 */
+  --text-hero: 32px;    /* 首页主张 */
+  @supports (width: clamp(1px, 1vw, 2px)) {
+    --text-h1: clamp(26px, 2.6vw, 32px);  /* 文章/页面主标题 */
+    --text-hero: clamp(30px, 3.2vw, 38px); /* 首页主张 */
+  }
 
   /* 页头专用。hero 每页只出现一次，所以这两档也只会各出现一次：
    * display 是首屏那句话，note 是它下面那条说明。
@@ -153,8 +160,12 @@
    * 否则 390px 宽下会有半屏都在放标题。
    *
    * 字距是配套的：字号越大，默认字距越显松，所以要收紧。见 --tracking-*。 */
-  --text-display: clamp(38px, 5.2vw, 66px);
-  --text-note: clamp(15px, 1.25vw, 17px);
+  --text-display: 44px;
+  --text-note: 16px;
+  @supports (width: clamp(1px, 1vw, 2px)) {
+    --text-display: clamp(38px, 5.2vw, 66px);
+    --text-note: clamp(15px, 1.25vw, 17px);
+  }
 
   /* ── 箭头图标 ─────────────────────────────────────────────────────────
    * 2026-09-22 建立。此前全站箭头没有统一来源：.digest-chip--out i 写
@@ -366,8 +377,15 @@
   --text-body: 16px;    /* 正文，也是导航与控件的字号 */
   --text-h3: 18px;      /* 卡片标题、小节标题 */
   --text-h2: 22px;      /* 区块标题 */
-  --text-h1: clamp(26px, 2.6vw, 32px);  /* 文章/页面主标题 */
-  --text-hero: clamp(30px, 3.2vw, 38px); /* 首页主张 */
+  /* 回退顺序：clamp() 是 Chromium 79+ 的函数，更旧的 WebView 不认整个声明，
+     会把变量值算成空，标题字号直接失效（继承 body 16px，主标题消失层级）。
+     所以先写桌面/移动各自的固定值，再用 @supports 恢复流式缩放。 */
+  --text-h1: 28px;      /* 文章/页面主标题 */
+  --text-hero: 32px;    /* 首页主张 */
+  @supports (width: clamp(1px, 1vw, 2px)) {
+    --text-h1: clamp(26px, 2.6vw, 32px);  /* 文章/页面主标题 */
+    --text-hero: clamp(30px, 3.2vw, 38px); /* 首页主张 */
+  }
 
   /* 页头专用。hero 每页只出现一次，所以这两档也只会各出现一次：
    * display 是首屏那句话，note 是它下面那条说明。
@@ -376,8 +394,12 @@
    * 否则 390px 宽下会有半屏都在放标题。
    *
    * 字距是配套的：字号越大，默认字距越显松，所以要收紧。见 --tracking-*。 */
-  --text-display: clamp(38px, 5.2vw, 66px);
-  --text-note: clamp(15px, 1.25vw, 17px);
+  --text-display: 44px;
+  --text-note: 16px;
+  @supports (width: clamp(1px, 1vw, 2px)) {
+    --text-display: clamp(38px, 5.2vw, 66px);
+    --text-note: clamp(15px, 1.25vw, 17px);
+  }
 
   /* 旧名保留为别名，迁移期用；改完可删。 */
   --text-2xs: var(--text-micro);
@@ -563,6 +585,10 @@
 html,
 body {
   font-family: var(--font-sans);
+  /* 安卓老浏览器的字体自动放大会毁掉整页排版（正文字号被放大 1.4 倍后
+     布局全部错位）；固定 100% 关掉。iOS Safari 需要 -webkit- 前缀。 */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -607,6 +633,9 @@ time,
  * 都会退回浏览器默认蓝 (rgb(0,0,238))，在深色底上几乎看不清。 */
 a {
   color: var(--color-accent);
+  /* color-mix 需要 Chromium 111+，旧内核丢弃声明后回到默认蓝色，
+     先给主题色兜底再让支持的浏览器覆盖成 35% 淡化。 */
+  text-decoration-color: var(--color-accent);
   text-decoration-color: color-mix(in srgb, var(--color-accent) 35%, transparent);
   text-underline-offset: 2px;
 }

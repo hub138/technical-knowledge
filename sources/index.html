@@ -11,7 +11,7 @@
     <link rel="stylesheet" href="/static/base.css" />
     <script src="/static/nav.js"></script>
     <script src="/static/i18n.js"></script>
-    <script src="/static/shell.js"></script>
+    <script src="/static/legacy-polyfills.js"></script><script src="/static/shell.js"></script>
     <script src="/static/sources.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({ page: 'sources' }));
@@ -324,7 +324,7 @@
          * 白字占满），窄图上下留黑边。cover 裁边保构图，填满不留边——
          * Airbnb/Pinterest 类内容卡的标准做法。封面源是 og:image 横图，
          * 极端竖图裁两侧的风险低。 */
-        position: absolute; inset: 0;
+        position: absolute; top: 0; left: 0; right: 0; bottom: 0;
         width: 100%; height: 100%;
         object-fit: cover; display: block;
         /* 2026-09-22 改进 2：亮图压暗界面会显得更刺眼（同时对比效应），

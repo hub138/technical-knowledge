@@ -87,6 +87,11 @@
   margin-top: 14px; line-height: 1.7; max-width: 900px;
 }
 .mx-wrap { overflow-x: auto; margin: 8px 0 4px; padding: 10px; background: var(--color-panel); border-radius: 9px; }
+/* 手机端滑动提示：默认隐藏，矩阵确实放不下时由 media query 显示。 */
+.mx-swipe-hint { display: none; margin: 0 0 8px; color: var(--mx-text-dim); font-size: var(--text-small); text-align: center; }
+@media (max-width: 760px) {
+  .mx-swipe-hint { display: block; }
+}
 
 .mx-grid {
   display: grid;
@@ -182,6 +187,7 @@
 /* 空格子 hover：缺口被“点亮”的隐喻——底色加深、虚线框加浓，
  * 引导用户点进去看漏了什么。 */
 .mx-cell.lv0.mx-clickable:hover {
+  background: var(--mx-empty-hatch);
   background: color-mix(in srgb, var(--mx-empty-hatch) 60%, var(--mx-danger) 10%);
   border-color: var(--mx-danger);
   box-shadow: 0 3px 14px rgba(214, 69, 69, .22);
