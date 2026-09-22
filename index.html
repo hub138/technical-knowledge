@@ -2751,7 +2751,11 @@ function renderMatrixView(){const host=$('#panorama-body');if(!host||!window.TKM
     'all' 保持原样（全网矩阵）。Clippings/知识库管理本就被矩阵排除，
     筛到它们时给出明确提示而不是一张全空矩阵。 */
  const domainOf=n=>n.category||'';
- const pickDomain=state.domain&&state.domain!=='all'?state.domain:null;
+ /* 知识全景 = 全局视角：永远统计全领域。曾按 state.domain 切成单域
+    矩阵——缺陷分析钉到侧栏首位后，用户点域名进来就落在单域视图，
+    其文章全挤在一列，满屏空格像报错（用户截图反馈）。域筛选属于
+    侧栏树/目录页；全景只做全局。 */
+ const pickDomain=null;
  let scoped=state.notes;
  if(pickDomain){
    scoped=state.notes.filter(n=>domainOf(n)===pickDomain);
