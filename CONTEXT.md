@@ -2,7 +2,7 @@
 
 ## Knowledge domain
 
-A stable top-level technical object that can own principles across languages and projects. The canonical domains are AI systems, backend and distributed systems, data systems, computer systems and performance, and software construction and quality.
+A stable top-level technical object that can own principles across languages and projects. The canonical domains are AI systems, backend and distributed systems, data systems, computer systems and performance, software construction and quality, and defect analysis. Defect analysis owns the methodology of triage, reproduction, merging and regression for upstream open-source defects; its cases cite public upstream commits and never describe internal deployments.
 
 ## Topic
 

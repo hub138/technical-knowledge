@@ -1,12 +1,12 @@
 # 项目地图
 
-这个仓库把四类东西放在同一项目中，但职责不同：知识库负责长期理解，网站负责阅读和导航，自研 Agent 评估负责把任务判断转成可验证证据，上游项目负责提供可以运行和研究的实现。
+这个仓库把四类东西放在同一项目中，但职责不同：知识库负责长期理解，网站负责阅读和导航，Agent 评估负责把任务判断转成可验证证据，上游项目负责提供可以运行和研究的实现。
 
 ```mermaid
 flowchart LR
     V[Markdown / Obsidian\n长期知识] --> S[动态知识站\n搜索 · 阅读 · 图谱]
     V --> L[学习入口\nOpenMAIC · DeepTutor]
-    V --> E[自研 Agent 评估\n任务 · Trace · 证据]
+    V --> E[Agent 评估\n任务 · Trace · 证据]
     E --> F[agent-foundation\n会话 · 上下文 · 恢复]
     A[Archify] --> S
     M[Matt Skills] --> E
@@ -21,7 +21,7 @@ flowchart LR
 | 论文、项目、官方文档和实践证据 | `vault/知识库管理/来源` | 保留回链和核验记录，不替代主题页 |
 | 尚未核验的外部变化 | `vault/知识库管理/更新候选` | 完成核验、归并或删除 |
 | 原始剪藏 | `vault/Clippings` | 完整保留，不作为主导航 |
-| 自研评估项目 | `apps/agent-evaluation` | 当前是设计原型；后续接入真实任务、Trace、执行隔离和证据投影 |
+| Agent 评估原型 | `apps/agent-evaluation` | 当前是设计原型；后续接入真实任务、Trace、执行隔离和证据投影 |
 | 上游实现 | `projects/*` | 完整源码快照、许可证、测试和原项目文档 |
 
 ## 当前内容判断

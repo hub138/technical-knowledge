@@ -69,6 +69,42 @@ projects/archify/archify.zip
 /vault/知识库管理/归档/来源/论文与项目/全文/
 
 # Reader feedback and visit logs. This is visitor data collected at runtime,
-# not knowledge: it must never be committed. The directory is created on first
-# write by the server, so a fresh clone simply has no data/.
-/data/
+# not knowledge: it must never be committed — they carry IPs, agents and
+# contact info. The directory is created on first write by the server, so a
+# fresh clone simply has no data/.
+# 忽略 data/ 的内容而不是目录本身——git 规定被排除目录的子项无法用 !
+# 重新收录，收藏数据要跟着仓库走，必须留出反选的余地。
+/data/*
+# 收藏是读者亲手挑的内容（只有文章快照与收藏时间，无任何访客身份信息），
+# 跟着仓库走：换机器、重新 clone，收藏夹不空。
+!/data/favorites.json
+
+# AI 改版过程的 .bak 快照与设计手册：工作现场备份，不是源码，历史由 git 管。
+*.bak
+*.bak-*
+*.bak1
+*.bak2
+*.bak2
+*.bak3
+*.bak4
+*.bak5
+*.bak6
+*.bak7
+*.bak8
+*.bak9
+*.bak-misref
+*.retired
+*.corrupted-*
+vault.bak-*/
+/.design/
+/audit-shots/
+/data/feedback.jsonl.bak-test
+
+# 已并入知识库文章的词汇页残壳（重定向页，保留在盘上避免外链 404）。
+/vocab/
+
+# 点击取证用的临时验证页（页内自标"勿提交"）。
+/site/do-toggle.html
+/site/toggle-state.html
+/site/verify-wrap.html
+/site/insights.html.bak
