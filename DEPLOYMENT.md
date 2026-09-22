@@ -20,6 +20,26 @@ http://MacBook-Pro-2.local:8787/
 
 `192.168.x.x`、`10.x.x.x` 是路由器分配给当前网络接口的地址，切换 Wi-Fi、租约刷新或网络重连后可能变化。Docker 的固定容器地址只在 Docker 私有网络内有意义，不能固定 Mac 在家庭或公司局域网中的地址。需要所有局域网设备都使用稳定数字地址时，在路由器里为这台 Mac 的 Wi-Fi MAC 地址设置 DHCP 保留；需要跨网络访问时，应使用带 TLS 和身份认证的反向代理或 VPN，而不是直接暴露 `8787`。
 
+## 公网入口（dev 实例，21.6.137.121）
+
+公网 `http://21.6.137.121:28788/` 由 **dev 服务器上的独立实例** 服务（不是 Mac）：
+`/data/code/technical-knowledge` 克隆，`knowledge-site.service`（systemd）跑
+`server.py --host 127.10.0.1 --port 28787`，nginx 28788 反代到它；
+`knowledge-update.timer` 每 5 分钟从 GitHub main 拉取。推完代码 5 分钟内自动上线，
+需要立刻生效就手动 `systemctl restart knowledge-site`。
+
+**回环别名约定（2026-09-22 起）**：反代/隧道把外部流量接到 `127.10.0.1`，服务端
+`origin_is_local(源, 目的)` 对落在这个别名上的连接一律判非本机——中台（/insights）、
+工具启动密码门禁都依赖它。只看来源地址会把经代理进来的访客（源恒为 127.0.0.1）
+误判成本机：实测公网可开中台、免密启动工具（白用模型凭据）。改动绑定或代理目标时
+必须保持这个契约。打点对别名流量采信 nginx 覆写的 `X-Real-IP` 记录真实访客 IP
+（仅用于记录，鉴权仍只看 socket 地址）。
+
+Mac 的 `com.leoqqian.knowledge-tunnel`（SSH 反向隧道）已下线：dev 实例接管公网入口
+后，隧道抢不到 28787，留着只会崩溃循环。plist 保留（转发目标已改为
+`127.10.0.1:8787`）备查；若要复活隧道，macOS 需先 `sudo ifconfig lo0 alias 127.10.0.1`
+（Linux 的 127/8 天然可用，macOS 不是）。
+
 ## Docker
 
 容器环境没有 macOS Keychain，必须显式提供密码文件：
