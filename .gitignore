@@ -108,3 +108,6 @@ vault.bak-*/
 /site/toggle-state.html
 /site/verify-wrap.html
 /site/insights.html.bak
+
+# 定时任务运行日志（crontab 追加写入，运行时产物）。
+/logs/
