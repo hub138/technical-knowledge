@@ -262,27 +262,59 @@
 }
 .mx-kind-pill:hover .mx-kind-pill-n { color: var(--mx-link); }
 
-/* 缺口清单 */
+/* 缺口清单：默认收起为一行汇总，展开后按类型/篇数归组。
+   旧版 14 行常驻列表占满页尾，四行「×× × 词汇与词源」讲同一件事。 */
 .mx-gaps { margin: 22px 0 6px; }
-.mx-gaps-title {
-  font-size: var(--text-small); font-weight: 600; color: var(--mx-text);
-  margin-bottom: 8px;
-}
-.mx-gaps-sub { margin-top: 16px; font-size: var(--text-small); }
-.mx-gaps-list { display: flex; flex-direction: column; gap: 5px; }
-.mx-gap-row {
-  display: flex; align-items: baseline; gap: 9px;
-  padding: 7px 10px; border-radius: 5px; font-size: var(--text-small);
+.mx-gaps-head {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 7px 10px; cursor: pointer; text-align: left;
+  font: inherit; font-size: var(--text-small); color: var(--mx-text);
   background: var(--mx-surface-2);
+  border: 1px solid transparent; border-radius: 5px;
 }
-.mx-gap-row.mx-clickable { cursor: pointer; }
-.mx-gap-row.mx-clickable:hover { background: var(--mx-surface-hover); }
-.mx-gap-empty { background: var(--mx-danger-bg); }
-.mx-gap-mark { font-weight: 700; width: 12px; }
-.mx-gap-empty .mx-gap-mark { color: var(--mx-danger); }
-.mx-gap-thin .mx-gap-mark { color: var(--mx-warn); }
-.mx-gap-text { font-weight: 600; color: var(--mx-text); }
-.mx-gap-why { font-size: var(--text-micro); color: var(--mx-text-dim); }
+.mx-gaps-head:hover { background: var(--mx-surface-hover); }
+.mx-gaps-head:focus-visible { border-color: var(--mx-border-strong); outline: none; }
+.mx-gaps-caret {
+  font-size: var(--text-micro); color: var(--mx-text-dim);
+  transition: transform var(--duration-fast, .12s) var(--ease-out, ease-out);
+}
+.mx-gaps-head[aria-expanded="true"] .mx-gaps-caret { transform: rotate(90deg); }
+.mx-gaps-title { font-weight: 600; }
+.mx-gaps-stat { display: flex; align-items: baseline; gap: 8px; margin-left: auto; }
+.mx-gaps-count { font-size: var(--text-micro); font-variant-numeric: tabular-nums; }
+.mx-count-empty { color: var(--mx-danger-ink); }
+.mx-count-thin { color: var(--mx-warn); }
+.mx-gaps-body {
+  margin-top: 8px; display: flex; flex-direction: column; gap: 10px;
+}
+/* hidden 属性靠 UA 样式的 display:none 生效，会被上面的 display:flex 盖掉，
+   必须显式声明，否则收起状态下内容照旧占位。 */
+.mx-gaps-body[hidden] { display: none; }
+.mx-gaps-none { font-size: var(--text-small); color: var(--mx-text-dim); }
+.mx-gaps-group { display: flex; flex-direction: column; gap: 6px; }
+.mx-gaps-group-head {
+  display: flex; align-items: baseline; gap: 9px;
+  font-size: var(--text-small);
+}
+.mx-gaps-mark { font-weight: 700; width: 12px; }
+.mx-mark-empty { color: var(--mx-danger); }
+.mx-mark-thin { color: var(--mx-warn); }
+.mx-gaps-group-name { font-weight: 600; color: var(--mx-text); }
+.mx-gaps-group-note { font-size: var(--text-micro); color: var(--mx-text-dim); }
+.mx-gaps-chips { display: flex; flex-wrap: wrap; gap: 6px; padding-left: 21px; }
+.mx-gap-chip {
+  font: inherit; font-size: var(--text-micro); cursor: pointer;
+  padding: 3px 9px; border-radius: 999px;
+  border: 1px solid var(--mx-border-strong);
+  background: transparent; color: var(--mx-text-dim);
+}
+.mx-gap-chip:hover { color: var(--mx-link); border-color: var(--mx-link); }
+.mx-gap-chip--empty {
+  border-color: var(--mx-danger); color: var(--mx-danger-ink);
+  background: var(--mx-danger-bg);
+}
+.mx-gap-chip--empty:hover { color: var(--mx-danger-ink); border-color: var(--mx-danger); }
+.mx-gap-chip--thin { border-color: var(--mx-warn-border); color: var(--mx-warn); }
 
 /* 格子详情 */
 .mx-detail {

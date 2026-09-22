@@ -395,7 +395,10 @@
     return false;
   }
 
-  /* 缺口清单：直接把空格子念出来，别让读者自己在图上找 */
+/* 缺口清单：把空格子念出来，别让读者自己在图上找。
+   * 原先一条缺口一行、14 行常驻在矩阵下方，其中四行「×× × 词汇与词源」
+   * 讲的是同一件事，页尾比矩阵本身还长。现在折成一行汇总（数字照旧摆在
+   * 眼前），展开后按类型归组：一条类型一行，成员收成标签。 */
   function renderGaps(host, cells, items) {
     var empties = Object.keys(cells).map(function (k) { return cells[k]; })
       .filter(function (c) { return c.n === 0; });
@@ -403,45 +406,96 @@
       .filter(function (c) { return c.n > 0 && c.n <= 2; });
 
     var box = el("div", "mx-gaps");
-    box.appendChild(el("div", "mx-gaps-title", EN() ? "Missing directions" : "漏掉的方向"));
-
-    if (empties.length === 0) {
-      box.appendChild(el("div", "mx-gaps-none", EN() ? "No empty cells" : "没有空格子"));
-    } else {
-      var ul = el("div", "mx-gaps-list");
-      empties.forEach(function (c) {
-        var L = LAYERS.filter(function (x) { return x.id === c.layer; })[0];
-        var k = KINDS.filter(function (x) { return x.id === c.kind; })[0];
-        var row = el("div", "mx-gap-row mx-gap-empty");
-        row.appendChild(el("span", "mx-gap-mark", "✗"));
-        row.appendChild(el("span", "mx-gap-text", lName(L) + " × " + kName(k)));
-        row.appendChild(el("span", "mx-gap-why", EN() ? "Nothing here — " + kHint(k) + " is empty in this direction" : "一篇都没有 —— " + k.hint + "在这个方向是真空"));
-        /* 薄格行早就能点开下钻，空格行却只能干看——同一张清单两种
-         * 行为，读者会以为空格行坏了。点开 showEmptyCell 详情盒，
-         * 与网格里点空格的行为完全一致（含 hash 深链）。 */
-        row.addEventListener("click", function () { showEmptyCell(host, L, k); });
-        row.classList.add("mx-clickable");
-        ul.appendChild(row);
-      });
-      box.appendChild(ul);
+    var head = el("button", "mx-gaps-head");
+    head.type = "button";
+    head.setAttribute("aria-expanded", "false");
+    head.setAttribute("aria-label", EN() ? "Toggle the missing-direction list" : "展开或收起漏掉的方向");
+    head.appendChild(el("span", "mx-gaps-caret", "▸"));
+    head.appendChild(el("span", "mx-gaps-title", EN() ? "Missing directions" : "漏掉的方向"));
+    var stat = el("span", "mx-gaps-stat");
+    if (empties.length) {
+      stat.appendChild(el("span", "mx-gaps-count mx-count-empty",
+        (EN() ? "empty " : "空格 ") + empties.length));
     }
-
     if (thin.length) {
-      box.appendChild(el("div", "mx-gaps-title mx-gaps-sub", EN() ? "Only 1-2 notes (thin — can't carry a direction)" : "只有 1-2 篇（薄，撑不起一个方向）"));
-      var ul2 = el("div", "mx-gaps-list");
-      thin.sort(function (a, b) { return a.n - b.n; }).forEach(function (c) {
-        var L = LAYERS.filter(function (x) { return x.id === c.layer; })[0];
-        var k = KINDS.filter(function (x) { return x.id === c.kind; })[0];
-        var row = el("div", "mx-gap-row mx-gap-thin");
-        row.appendChild(el("span", "mx-gap-mark", "!"));
-        row.appendChild(el("span", "mx-gap-text", lName(L) + " × " + kName(k)));
-        row.appendChild(el("span", "mx-gap-why", c.n + (EN() ? (c.n === 1 ? " note" : " notes") : " 篇")));
-        row.addEventListener("click", function () { showCell(host, L, k, c); });
-        row.classList.add("mx-clickable");
-        ul2.appendChild(row);
-      });
-      box.appendChild(ul2);
+      stat.appendChild(el("span", "mx-gaps-count mx-count-thin",
+        (EN() ? "thin " : "单薄 ") + thin.length));
     }
+    head.appendChild(stat);
+    box.appendChild(head);
+
+    var body = el("div", "mx-gaps-body");
+    body.hidden = true;
+
+    if (empties.length === 0 && thin.length === 0) {
+      body.appendChild(el("div", "mx-gaps-none", EN() ? "No empty cells" : "没有空格子"));
+    }
+
+    /* 空格按类型归组：一个类型一条，层次收成标签。 */
+    if (empties.length) {
+      var byKind = {};
+      empties.forEach(function (c) { (byKind[c.kind] = byKind[c.kind] || []).push(c); });
+      Object.keys(byKind).forEach(function (kid) {
+        var k = KINDS.filter(function (x) { return x.id === kid; })[0];
+        var group = el("div", "mx-gaps-group");
+        var gh = el("div", "mx-gaps-group-head");
+        gh.appendChild(el("span", "mx-gaps-mark mx-mark-empty", "✗"));
+        gh.appendChild(el("span", "mx-gaps-group-name", kName(k)));
+        gh.appendChild(el("span", "mx-gaps-group-note", EN()
+          ? byKind[kid].length + (byKind[kid].length === 1 ? " layer empty" : " layers empty")
+          : byKind[kid].length + " 层全空"));
+        group.appendChild(gh);
+        var chips = el("div", "mx-gaps-chips");
+        byKind[kid].forEach(function (c) {
+          var L = LAYERS.filter(function (x) { return x.id === c.layer; })[0];
+          var chip = el("button", "mx-gap-chip mx-gap-chip--empty", lName(L));
+          chip.type = "button";
+          chip.title = lName(L) + " × " + kName(k) + (EN() ? " — nothing here" : " —— 一篇都没有");
+          /* 点标签进 showEmptyCell 详情盒，与网格里点空格的行为完全一致
+           * （含 hash 深链）。 */
+          chip.addEventListener("click", function () { showEmptyCell(host, L, k); });
+          chips.appendChild(chip);
+        });
+        group.appendChild(chips);
+        body.appendChild(group);
+      });
+    }
+
+    /* 单薄按篇数归组：1 篇一组、2 篇一组，成员需要带上层次名才认得出方向。 */
+    if (thin.length) {
+      var byN = {};
+      thin.forEach(function (c) { (byN[c.n] = byN[c.n] || []).push(c); });
+      Object.keys(byN).sort(function (a, b) { return a - b; }).forEach(function (key) {
+        var num = Number(key);
+        var group = el("div", "mx-gaps-group");
+        var gh = el("div", "mx-gaps-group-head");
+        gh.appendChild(el("span", "mx-gaps-mark mx-mark-thin", "!"));
+        gh.appendChild(el("span", "mx-gaps-group-name", num + (EN() ? (num === 1 ? " note" : " notes") : " 篇")));
+        gh.appendChild(el("span", "mx-gaps-group-note", EN() ? "can't carry a direction" : "撑不起一个方向"));
+        group.appendChild(gh);
+        var chips2 = el("div", "mx-gaps-chips");
+        byN[key].forEach(function (c) {
+          var L = LAYERS.filter(function (x) { return x.id === c.layer; })[0];
+          var k = KINDS.filter(function (x) { return x.id === c.kind; })[0];
+          var chip = el("button", "mx-gap-chip mx-gap-chip--thin", lName(L) + " × " + kName(k));
+          chip.type = "button";
+          chip.title = EN()
+            ? kHint(k) + " at " + lName(L) + " — " + num + (num === 1 ? " note" : " notes") + ", too thin to carry the direction"
+            : k.hint + "在「" + L.name + "」只有 " + num + " 篇，撑不起这个方向";
+          chip.addEventListener("click", function () { showCell(host, L, k, c); });
+          chips2.appendChild(chip);
+        });
+        group.appendChild(chips2);
+        body.appendChild(group);
+      });
+    }
+
+    head.addEventListener("click", function () {
+      var opening = body.hidden;
+      body.hidden = !opening;
+      head.setAttribute("aria-expanded", String(opening));
+    });
+    box.appendChild(body);
     host.appendChild(box);
   }
 
