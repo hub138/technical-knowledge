@@ -1,12 +1,16 @@
 name: pages
 # GitHub Pages（项目页）部署。项目页挂在 /technical-knowledge/ 子路径下，
 # index.html 里的 /static/... 绝对路径会 404（这正是之前「显示不对」的根因）。
-# 这里在构建产物上做路径改写，源 index.html 不动——它还被 Mac/dev 的
-# python 服务原样使用（那边 /static/ 是真路由）。
 #
-# 静态托管的边界：/api/*（早报、文章列表、搜索）没有后端，不可用；
-# 页面能用的是皮肤 + 全景 + 八层栈 + 矩阵图谱（数据都在静态 js 里）。
-# 所有服务器路由链接（/learn、/launch、/?path=... 等）兜底改指 dev 完整站。
+# 本站是 SPA：首页从 /api/notes 拿列表、/api/note?path= 拿单篇。静态托管
+# 没有后端，所以 scripts/export_static.py 先把 vault 渲染成同形状的静态
+# JSON（api/notes.json、notes/<路径>.json 等），再把 index.html 的请求
+# 模板改写到这些静态文件上。源 index.html 不动——Mac/dev 的 python 服务
+# 仍用真路由。
+#
+# 静态托管边界：/api/learning/status 无后端（页面自带降级）；早报没有
+# BestBlogs 数据源（返回空态）；笔记里的图片 /asset 引用的附件不在
+# git（vault 图片被 gitignore），Pages 上不可见。
 on:
   push:
     branches: [main]
@@ -26,21 +30,43 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 组装静态产物
+      - name: 导出静态内容并改写请求
         run: |
           mkdir -p _pages
+          python3 scripts/export_static.py . _pages
           cp index.html _pages/
           cp -r site _pages/site
-          # 1) 静态资源改相对（site/ 就在 index.html 旁边，子路径下天然成立）
+          # 1) 静态资源相对化（site/ 就在 index.html 旁边，子路径下天然成立）
           sed -i \
             -e 's|href="/static/|href="site/|g' \
             -e 's|src="/static/|src="site/|g' \
             -e 's|href="/favicon.svg"|href="site/favicon.svg"|g' \
             _pages/index.html
-          # 2) 兜底：剩下的 href="/..." 全是服务器路由（/learn、/launch、
-          #    /?path=...、/papers...），静态托管没有，统一指去 dev 完整站。
-          #    先跑上面两条，这里才不会误伤已相对化的引用。
+          # 2) API 请求改相对。version 是独立文件名，必须先于通配条目。
+          sed -i "s|'/api/notes/version'|'api/notes-version.json'|g" _pages/index.html
+          sed -i "s|'/api/notes?|'api/notes.json?|g" _pages/index.html
+          sed -i "s|'/api/|'api/|g" _pages/index.html
+          # 3) 单篇取用：静态 JSON 按 vault 目录镜像，拼原始路径
+          sed -i \
+            -e "s|'api/note?path='+encodeURIComponent(path)|'notes/'+path+'.json'|g" \
+            -e "s|'api/note?path='+encodeURIComponent(article.path)|'notes/'+article.path+'.json'|g" \
+            _pages/index.html
+          # 4) 查询类路由（/?path=、/?view=）是 SPA 自己的状态，留在页内
+          sed -i 's|href="/?|href="?|g' _pages/index.html
+          # pushState 的三种书写形态：无空格、逗号后带空格、反引号模板串。
+          # 不改写会跳到域名根（hub138.github.io/?path=...），脱离项目页。
+          sed -i \
+            -e "s|,'/|,'./|g" \
+            -e "s|, '/|, './|g" \
+            -e 's|,`/\?|,`./?|g' \
+            _pages/index.html
+          # 5) 兜底：其余 href="/..." 是真服务器路由（/learn、/launch、
+          #    /papers、/projects），静态托管没有，统一指去 dev 完整站。
           sed -i 's|href="/|href="https://21.6.137.121:28788/|g' _pages/index.html
+          # 6) site/ 内部同样有绝对引用：base.css 的 @import、js 里的 fetch。
+          sed -i 's|url("/static/|url("|g' _pages/site/base.css
+          sed -i -e 's|"/api/|"api/|g' -e "s|'/api/|'api/|g" \
+            _pages/site/*.js
           touch _pages/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
