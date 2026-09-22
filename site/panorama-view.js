@@ -97,7 +97,24 @@
     var placed = [];
     ls.forEach(function (L) {
       var R = Math.max(38, RMAX * Math.sqrt(L.n / maxN));
-      var pos = spiralPlace(R, placed, W / 2, H / 2, Math.max(W, H));
+      /* 候选点绕「已放圆群的质心」螺旋，而不是绕画布固定中心：
+       * 绕固定中心时，第一个圆抢走最内圈，后续圆被越推越远，最后
+       * 整体居中一平移，空隙全挤到一边（「数据与存储」悬在左上角
+       * 即此）。绕群质心则每个新圆贴着已有圆群外缘落位，布局从
+       * 第一个圆起就紧凑。群质心每放一个圆重算一次；首圆的候选点
+       * 直接取画布中心。 */
+      var cx = W / 2, cy = H / 2;
+      if (placed.length) {
+        var sx = 0, sy = 0;
+        placed.forEach(function (o) { sx += o.x; sy += o.y; });
+        cx = sx / placed.length; cy = sy / placed.length;
+        var span = Math.max.apply(null, placed.map(function (o) {
+          return Math.hypot(o.x - cx, o.y - cy) + o.r;
+        }));
+        cx = W / 2 + (cx - W / 2) * (40 / Math.max(span, 40));
+        cy = H / 2 + (cy - H / 2) * (40 / Math.max(span, 40));
+      }
+      var pos = placed.length ? spiralPlace(R, placed, cx, cy, Math.max(W, H)) : { x: W / 2, y: H / 2 };
       var g = { layer: L, r: R, x: pos.x, y: pos.y, col: LAYER[L.id] || "#1a365d", thin: L.n < 10 };
       groups.push(g); placed.push(g);
     });
