@@ -1,0 +1,58 @@
+name: pages
+# GitHub Pages（项目页）部署。项目页挂在 /technical-knowledge/ 子路径下，
+# index.html 里的 /static/... 绝对路径会 404（这正是之前「显示不对」的根因）。
+# 这里在构建产物上做路径改写，源 index.html 不动——它还被 Mac/dev 的
+# python 服务原样使用（那边 /static/ 是真路由）。
+#
+# 静态托管的边界：/api/*（早报、文章列表、搜索）没有后端，不可用；
+# 页面能用的是皮肤 + 全景 + 八层栈 + 矩阵图谱（数据都在静态 js 里）。
+# 所有服务器路由链接（/learn、/launch、/?path=... 等）兜底改指 dev 完整站。
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 组装静态产物
+        run: |
+          mkdir -p _pages
+          cp index.html _pages/
+          cp -r site _pages/site
+          # 1) 静态资源改相对（site/ 就在 index.html 旁边，子路径下天然成立）
+          sed -i \
+            -e 's|href="/static/|href="site/|g' \
+            -e 's|src="/static/|src="site/|g' \
+            -e 's|href="/favicon.svg"|href="site/favicon.svg"|g' \
+            _pages/index.html
+          # 2) 兜底：剩下的 href="/..." 全是服务器路由（/learn、/launch、
+          #    /?path=...、/papers...），静态托管没有，统一指去 dev 完整站。
+          #    先跑上面两条，这里才不会误伤已相对化的引用。
+          sed -i 's|href="/|href="https://21.6.137.121:28788/|g' _pages/index.html
+          touch _pages/.nojekyll
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _pages
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
