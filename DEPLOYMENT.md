@@ -1,8 +1,12 @@
 # 部署说明
 
-## 本机守护进程
+## 本机守护进程（已于 2026-09-22 下线，唯一服务在 dev）
 
-macOS LaunchAgent 已指向仓库中的 `vault/` 和 `site/`。手动启动使用：
+Mac 的 knowledge-site LaunchAgent 已停用（plist 改名 .retired 备查）——
+全站只跑 dev 一份，Mac 浏览器直接访问内网地址。vault 仍在 Mac 上编辑
+并 push（dev 每 5 分钟自动拉取），这条创作流程不变。Mac 的历史访问
+数据已合并进 dev 的 data/visits.jsonl。需要临时起本机站时把 plist
+改回原名再 bootstrap 即可。手动启动使用：
 
 ```bash
 ./run-site.sh
