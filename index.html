@@ -2624,6 +2624,85 @@ function bindPgnio(){
     };
   }
 }
+
+function renderProgress(){
+  TKShell.progress.load();
+  const tr=(x)=>window.TKI18N?window.TKI18N.t(x):x;
+  const notes=state.notes.filter(n=>n.category!=='总览'&&n.category!=='Clippings'&&!n.exclude_from_graph);
+  const domains=ordered(new Set(notes.map(n=>n.category)));
+  const f=state.pgFilter||'all';
+  const stOf=(n)=>TKShell.progress.statusOf(n.path);
+  const passed=(n)=>f==='all'||f===stOf(n)||(f==='todo'&&!stOf(n));
+  const total=notes.length, learned=notes.filter(n=>stOf(n)==='learned').length, planned=notes.filter(n=>stOf(n)==='planned').length;
+  const pct=total?Math.round(learned/total*100):0;
+
+  const domainBars=domains.map((d)=>{
+    const list=notes.filter(n=>n.category===d);
+    const dn=list.filter(n=>stOf(n)==='learned').length;
+    const p=list.length?Math.round(dn/list.length*100):0;
+    return `<a class="pg-domain" href="/?view=graph&focus=${encodeURIComponent(d)}" title="在知识图谱中聚焦 ${esc(d)}">
+      <span class="pg-domain-name">${esc(tr(d))}</span>
+      <span class="pg-domain-track"><i style="width:${p}%"></i></span>
+      <span class="pg-domain-count">${dn}/${list.length}</span></a>`;
+  }).join('');
+
+  const groups=domains.map((d)=>{
+    const list=notes.filter(n=>n.category===d&&passed(n))
+      .sort((a,b)=>(stOf(a)==='learned'?1:0)-(stOf(b)==='learned'?1:0));
+    if(!list.length)return '';
+    const dn=notes.filter(n=>n.category===d&&stOf(n)==='learned').length;
+    const topics=orderedTopics(d,new Set(list.map(n=>n.topic)));
+    const sections=topics.map((t)=>{
+      const rows=list.filter(n=>n.topic===t).map((n)=>{
+        const st=stOf(n);
+        return `<div class="pg-row${st==='learned'?' is-learned':st==='planned'?' is-planned':''}" data-path="${esc(n.path)}">
+          <button type="button" class="pg-check${st==='learned'?' on':''}" data-path="${esc(n.path)}" aria-pressed="${st==='learned'}" title="${st==='learned'?'已读，点击取消':'标记为已读'}">✓</button>
+          <button type="button" class="pg-star${st==='planned'?' on':''}" data-path="${esc(n.path)}" aria-pressed="${st==='planned'}" title="${st==='planned'?'稍后读，点击取消':'加入稍后读'}">★</button>
+          <a class="pg-title" data-path="${esc(n.path)}" role="link" tabindex="0" title="${esc(n.title)}">${esc(n.title)}</a>
+          <span class="pg-topic">${esc(tr(t))}</span>
+        </div>`;
+      }).join('');
+      return `<div class="pg-topic-group"><h4>${esc(tr(t))}</h4>${rows}</div>`;
+    }).join('');
+    return `<section class="pg-domain-block"><h3>${esc(tr(d))}<span class="pg-domain-count">${dn}/${notes.filter(n=>n.category===d).length} 已读</span>
+      <a class="pg-domain-graph" href="/?view=graph&focus=${encodeURIComponent(d)}">图谱聚焦 →</a></h3>${sections}</section>`;
+  }).join('');
+
+  /* 最近读完 + 稍后读队列：标注后的即时反馈。 */
+  const recent=Object.entries(TKShell.progress.ensure().learned)
+    .sort((x,y)=>y[1]-x[1]).slice(0,3)
+    .map(([path])=>state.notes.find(n=>n.path===path))
+    .filter(Boolean);
+  const recentBlock=recent.length?`<div class="pg-recent"><span class="pg-recent-label">最近读完</span>${recent.map(n=>`<a class="pg-recent-item" href="/?path=${encodeURIComponent(n.path)}" data-open>${esc(n.title.length>26?n.title.slice(0,25)+'…':n.title)}</a>`).join('')}</div>`:'';
+  const nextUp=f==='all'||f==='planned'
+    ? Object.entries(TKShell.progress.ensure().planned).sort((x,y)=>x[1]-y[1]).slice(0,3)
+        .map(([path])=>state.notes.find(n=>n.path===path)).filter(Boolean)
+    : [];
+  const nextBlock=nextUp.length?`<div class="pg-next"><span class="pg-next-label">下一步</span>${nextUp.map(n=>`<span class="pg-next-item"><a href="/?path=${encodeURIComponent(n.path)}" data-open>${esc(n.title.length>30?n.title.slice(0,29)+'…':n.title)}</a><button type="button" class="pg-next-done" data-path="${esc(n.path)}" title="标记为已读">✓</button></span>`).join('')}</div>`:'';
+
+  const body=$('#progress-body');
+  if(body)body.innerHTML=`
+    <div class="pg-overall">
+      <div class="pg-overall-num"><b>${learned}</b> / ${total} <span>已读 · ${pct}%</span>${planned?`<span class="pg-planned-num">稍后读 ${planned}</span>`:''}</div>
+      <div class="pg-track pg-track--big"><i style="width:${pct}%"></i></div>
+      <div class="pg-domain-bars">${domainBars}</div>
+    </div>
+    ${nextBlock}
+    ${recentBlock}
+    ${groups||'<div class="empty">这个过滤条件下没有文章。</div>'}`;
+
+  body.querySelectorAll('.pg-check').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();TKShell.progress.toggle(b.dataset.path,'learned')}});
+  body.querySelectorAll('.pg-star').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();TKShell.progress.toggle(b.dataset.path,'planned')}});
+  body.querySelectorAll('.pg-row .pg-title').forEach(a=>{a.onclick=()=>openNote(a.dataset.path)});
+  body.querySelectorAll('.pg-next-item a').forEach(a=>{a.onclick=(e)=>{e.preventDefault();openNote(decodeURIComponent((a.getAttribute('href')||'').replace(/^.*\?path=/,'')))}});
+  body.querySelectorAll('.pg-next-done').forEach(b=>{b.onclick=(e)=>{e.stopPropagation();TKShell.progress.set(b.dataset.path,'learned')}});
+  body.querySelectorAll('.pg-recent-item').forEach(a=>{a.onclick=(e)=>{e.preventDefault();openNote(decodeURIComponent((a.getAttribute('href')||'').replace(/^.*\?path=/,'')))}});
+
+  $('#pg-clear').onclick=()=>{
+    if(!confirm('清除全部阅读标注？这会重置这台浏览器上的所有进度。'))return;
+    TKShell.progress.data={learned:{},planned:{}};TKShell.progress.save();renderProgress();
+  };
+}
 /* 覆盖矩阵：两轴来自标签，所以要等 /api/notes 到齐。
  * state.notes 是页面已有的同一份数据，不另发请求 —— 避免第二套事实源。 */
 function renderMatrixView(){const host=$('#panorama-body');if(!host||!window.TKMatrix)return;host.innerHTML='';
