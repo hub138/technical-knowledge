@@ -63,10 +63,19 @@ jobs:
           # 5) 兜底：其余 href="/..." 是真服务器路由（/learn、/launch、
           #    /papers、/projects），静态托管没有，统一指去 dev 完整站。
           sed -i 's|href="/|href="https://21.6.137.121:28788/|g' _pages/index.html
-          # 6) site/ 内部同样有绝对引用：base.css 的 @import、js 里的 fetch。
+          # 6) site/ 内部同样有绝对引用：base.css 的 @import、js 里的 fetch
+          #    与导航。nav.js/matrix-view.js/shell.js 会生成 "/?view="、
+          #    "/?path="、"/?domain=" 链接和 "/learn" 这类路由——不改写
+          #    就跳到域名根（hub138.github.io/?view=panorama，404）。
           sed -i 's|url("/static/|url("|g' _pages/site/base.css
           sed -i -e 's|"/api/|"api/|g' -e "s|'/api/|'api/|g" \
             _pages/site/*.js
+          # 查询路由留在页内（SPA 自己接），先于兜底执行
+          sed -i 's|"/?|"?|g' _pages/site/*.js
+          # 其余 href="/..." 服务器路由统一指 dev（含 js 动态注入的
+          # 链接赋值，如 projects-page 的 learn.href = "/learn"）
+          sed -i 's|href="/|href="https://21.6.137.121:28788/|g' _pages/site/*.js
+          sed -i 's|\.href = "/|.href = "https://21.6.137.121:28788/|g' _pages/site/*.js
           touch _pages/.nojekyll
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
