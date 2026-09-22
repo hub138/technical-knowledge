@@ -229,10 +229,14 @@ a.has-children {
   padding-right: 30px;
 }
 
-/* 箭头按钮：盖在父项行右缘。透明背景无边框，整行看着仍是一个导航项。 */
+/* 箭头按钮：盖在父项行右缘。透明背景无边框，整行看着仍是一个导航项。
+ * top 必须显式给：absolute 无 top 时取静态位置（父项链接块之后），
+ * 箭头会掉到行下方悬空（用户截图里的游离 ▼）。 */
 .tk-subnav-toggle {
   position: absolute;
+  top: 50%;
   right: 6px;
+  transform: translateY(-50%);
   width: 22px;
   height: 22px;
   display: inline-flex;
@@ -245,7 +249,8 @@ a.has-children {
   font-size: var(--arrow-size);
   line-height: 1;
   cursor: pointer;
-  /* ▸ 收起态；aria-expanded=true 时旋成 ▾（▸/▾ 语义分工见 tokens.css） */
+  /* ▸ 收起态；aria-expanded=true 时旋成 ▾（▸/▾ 语义分工见 tokens.css）。
+   * 旋转在 ::before 上，这里的 transform 专管垂直居中，互不打架。 */
   transition: transform var(--duration-fast) var(--ease-out);
 }
 
@@ -277,7 +282,11 @@ a.has-children {
   display: flex;
   align-items: center;
   gap: 7px;
-  margin: 1px 0 3px 15px;
+  /* 左缩进由 .tk-subnav-group 统一给（margin+padding+左线）；
+   * 这里不再自带 margin-left —— 旧版常展开布局的残留，嵌进 group 后
+   * 变成双重缩进，子项标签比主项深 41px，行左半截全是空白（用户截图
+   * 指出的「左边太空」）。窄屏横排早已 margin:0 覆盖，本条是桌面端补齐。 */
+  margin: 1px 0 3px;
   padding: 6px 10px;
   border: 1px solid transparent;
   border-radius: 6px;
@@ -1585,8 +1594,19 @@ body.tk-host button {
     font-size: 12px;
   }
   .tk-nav a.has-children { padding-right: 9px; }
-  .tk-subnav-toggle {
+  /* 父项行是 flex 子项（a 的 flex:none 管不到这层 span），不锁住会被
+     挤到逐字竖排（实测「项目与教学」竖成一条）。inline-flex 让行尾的
+     折叠箭头留在文字同一行（static 定位下 block a 会把箭头挤到下一行）。
+     选择器必须带 .tk-nav 前缀：桌面规则在 .tk-nav 和 .tk-nav-row 之间
+     隔了一段注释，注释即空格，实为后代选择器，特异性更高，单类写法
+     的 display 会被压回 block（实测）。 */
+  .tk-nav .tk-nav-row { flex: 0 0 auto; display: inline-flex; align-items: center; white-space: nowrap; }
+  .tk-nav .tk-subnav-toggle {
     position: static;
+    /* 桌面端的垂直居中定位（top+transform）在 static 下 top 失效但
+       transform 仍生效，会把箭头抬高半行 —— 这里归零。 */
+    top: auto;
+    transform: none;
     width: 16px;
     height: 34px;
     margin-left: -6px;
