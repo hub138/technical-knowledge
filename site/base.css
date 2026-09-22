@@ -197,10 +197,10 @@ body.tk-host::before {
 /* Quieter than its parent so the nested entry reads as a child rather than
    competing with the destination above it. */
 .tk-nav-icon--sub {
-  width: 16px;
-  height: 20px;
-  font-size: 11px;
-  opacity: 0.75;
+  width: 14px;
+  height: 18px;
+  font-size: 10px;
+  opacity: 0.65;
 }
 
 /* ── Sub-navigation ───────────────────────────────────────────────────────
@@ -266,12 +266,14 @@ a.has-children {
   color: var(--color-accent);
 }
 
-/* 子项容器：展开后的从属视觉（缩进 + 左线 + 比主项小一号）。 */
+/* 子项容器：展开后的从属视觉（缩进 + 左线 + 比主项小一号）。
+ * 行距收紧：子项是目录条目，不是并列导航项——27px 行高对父项 40px，
+ * 一眼读出层级。 */
 .tk-subnav-group {
   display: grid;
-  gap: 2px;
-  margin: 1px 0 3px 15px;
-  padding: 2px 0 2px 11px;
+  gap: 1px;
+  margin: 2px 0 5px 15px;
+  padding: 2px 0 3px 11px;
   border-left: 2px solid var(--color-line);
 }
 
@@ -286,13 +288,16 @@ a.has-children {
    * 这里不再自带 margin-left —— 旧版常展开布局的残留，嵌进 group 后
    * 变成双重缩进，子项标签比主项深 41px，行左半截全是空白（用户截图
    * 指出的「左边太空」）。窄屏横排早已 margin:0 覆盖，本条是桌面端补齐。 */
-  margin: 1px 0 3px;
-  padding: 6px 10px;
+  margin: 0;
+  padding: 3px 8px 3px 10px;
   border: 1px solid transparent;
   border-radius: 6px;
   color: var(--color-muted);
-  font-size: 14px;
-  font-weight: 650;
+  /* 子项是条目不是入口：13px + regular，明显轻于父项（15px/medium）。
+   * 之前 14px/semibold 比父项还重，看着就是缩水的一级导航（用户反馈
+   * 「格式文字都不一样」）。active 态升回 medium 补偿对比度。 */
+  font-size: 13px;
+  font-weight: var(--weight-normal);
   text-decoration: none;
   transition:
     background var(--duration-fast) var(--ease-out),
@@ -305,6 +310,7 @@ a.has-children {
   border-color: var(--color-accent-line);
   background: var(--color-accent-soft);
   color: var(--color-accent);
+  font-weight: var(--weight-medium);
 }
 
 /* 旧「常展开箭头」规则已删（2026-09-22 子项折叠改造）：::after 的 ▾ 换成
