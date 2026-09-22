@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="zh-CN">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <!-- 与 papers/sources/projects/insights 同构：页面名 · technical-knowledge。
      首页无顶栏品牌区，title 是它在标签页与书签里的唯一身份标识。 -->
 <title>工程知识库 · technical-knowledge</title>
@@ -880,6 +880,9 @@ body .kbd-hint{display:none}}
   .tk-control { min-width: 44px; height: 44px; }
   .work-actions a { padding: 11px 12px; } /* 35px 高不达触控标准，补到 44 */
   .tk-domain { padding-top: 10px; padding-bottom: 10px; } /* 40px 行补到 44 */
+  .pg-filter { position: relative; }
+  .pg-filter::before { content: ""; position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px; } /* 筛选 radio 命中区扩到 44 */
+  .pg-io, .pg-clear { padding: 11px 13px; } /* 导出导入钮补到 44 */
   .tk-subnav-toggle { width: 32px; height: 32px; right: 2px; } /* 22px 箭头钮补到 32，外扩后 ≥44 */
   .tk-fav-btn::before { top: -9px; left: -9px; right: -9px; bottom: -9px; } /* 命中区 26→44，视觉圆钮不变 */
 }

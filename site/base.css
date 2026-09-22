@@ -1315,7 +1315,11 @@ body.tk-host button {
 
 /* 窄屏收小一点，别和标题抢位置。 */
 @media (max-width: 760px) {
-  .tk-controls { top: 12px; right: 12px; gap: 6px; }
+  .tk-controls {
+    top: 12px; right: 12px; gap: 6px;
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    right: calc(12px + env(safe-area-inset-right, 0px));
+  }
   .tk-control { min-width: 44px; height: 44px; padding: 0 9px; } /* 34px 不达触控标准，提到 44 */
 }
 
@@ -1385,6 +1389,12 @@ body.tk-host button {
 }
 
 .tk-fb-overlay.open { display: grid; }
+
+/* 小屏：弹层贴边留呼吸感，底部让开小白条。 */
+@media (max-width: 560px) {
+  .tk-fb-overlay { padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); align-items: end; }
+  .tk-fb-panel { max-height: 88vh; padding: 18px 16px; }
+}
 
 .tk-fb-panel {
   width: min(520px, 100%);
@@ -1470,7 +1480,7 @@ body.tk-host button {
   background: var(--color-panel);
   color: var(--color-ink);
   font: inherit;
-  font-size: 13.5px;
+  font-size: 16px; /* <16px 的输入框会让 iOS Safari 聚焦时强制放大整页 */
   outline: 0;
 }
 
@@ -1695,7 +1705,11 @@ body.tk-host button {
     padding: 7px 11px;
   }
 
-  .tk-fab { right: 14px; bottom: 16px; width: 48px; height: 48px; }
+  .tk-fab {
+    right: 14px; bottom: 16px; width: 48px; height: 48px;
+    right: calc(14px + env(safe-area-inset-right, 0px));
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
   .tk-fab-label { display: none; }
 }
 
