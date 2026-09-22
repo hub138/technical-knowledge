@@ -1748,11 +1748,11 @@ body.tk-host button {
 }
 .tk-fav-btn:hover { color: var(--color-accent); border-color: var(--color-accent-line); transform: scale(1.08); }
 .tk-fav-btn.is-fav { color: var(--color-accent); border-color: var(--color-accent-line); }
-/* 手机端热区扩展：视觉仍是 26px 圆钮，透明命中区外扩 5px 补足 36px
- * 触控标准（ui-ux-pro-max Touch Spacing）。桌面无此扩展。 */
+/* 手机端热区扩展：视觉仍是 26px 圆钮，透明命中区外扩 7px 补足 40px
+ * 触控标准（与图谱工具条按钮热区 40px 同一标准）。桌面无此扩展。 */
 @media (pointer: coarse) {
   .tk-fav-btn::before {
-    content: ""; position: absolute; top: -5px; left: -5px; right: -5px; bottom: -5px; border-radius: 50%;
+    content: ""; position: absolute; top: -7px; left: -7px; right: -7px; bottom: -7px; border-radius: 50%;
   }
   .tk-fav-btn { position: relative; }
 }
