@@ -513,7 +513,23 @@
       /* 父项链接也负责展开（不拦跳转）：点「项目与教学」过去时顺手展开，
          符合"这个分类下面有什么"的预期。 */
       const parentLink = mount.querySelector(`.tk-nav a[href="${(items().find((i) => i.key === parentKey) || {}).href}"]`);
-      if (parentLink) parentLink.addEventListener("click", () => setOpen(true));
+      if (parentLink) parentLink.addEventListener("click", (event) => {
+        /* 父项行点击 = 双向 toggle：组已展开且当前就在本组 → 折叠并拦下
+           跳转（不然用户点「项目与教学」永远只能展开、找不到关闭方式——
+           实测反馈）；组收起 → 展开并正常跳转过去。行尾的小箭头按钮保留，
+           作为纯折叠控件。 */
+        const onGroupPage = page === parentKey || childKeys.some((key) => {
+          const child = items().find((i) => i.key === key);
+          return child && child.parent === parentKey && child.key === page;
+        });
+        if (!group.hidden) {
+          event.preventDefault();
+          setOpen(false);
+        } else {
+          setOpen(true);
+          if (onGroupPage) event.preventDefault();
+        }
+      });
     });
 
     /* Re-assert the theme now that the nodes are in the document. See the note

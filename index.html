@@ -733,6 +733,14 @@
 /* 同领域引用：只在列内离得够远时才画。它们补充的是"这个主题的两头有联系"，
    权重再低一档，不参与跨领域的视觉竞争。 */
 .edge--inner{stroke:var(--color-line-strong);stroke-width:1;stroke-opacity:.38}
+/* 2026-09-22 分级可见（用户两轮反馈：先是「挺吓人的」，压到 .12 后又
+ * 「网太浅了不好看」——吓人的源头其实不是网，是标题又大又密）。
+ * 最终分级：同域线隐藏（位置已表达归属）；跨域线 .32 —— 看得见织理、
+ * 不抢节点，深浅两色下都成立；hover/聚焦相关边 .focused 提亮到不透明。
+ * 过渡沿用 682 行已有的 .graph .edge transition。 */
+.graph:not(.has-focus) .edge--inner{opacity:0}
+.graph:not(.has-focus) .edge--cross{opacity:.32}
+.graph:not(.has-focus) .edge.focused{opacity:1}
 /* 描边不随 world 缩放衰减：边线/圆/进度环/轴线一并生效。缩小时线保持
  * 屏幕宽度不再细成发丝，放大时也不会糊成粗管。CSS 属性在旧浏览器上可能
  * 不认，边线在 JS 创建处另设了同名 attribute 兜底。 */
@@ -754,7 +762,12 @@
  *
  * 保留它们但仍然画出来，是因为悬停某个笔记时 .focused 会把这一条提起来，
  * 那时它有意义（"这篇被谁引用"）。默认状态安静，交互时才说话。 */
-.edge.focused{stroke:var(--color-warm);stroke-width:2.6;stroke-opacity:1}.topic-link{stroke:var(--color-line-strong);stroke-width:.9;stroke-opacity:.55}.domain-label{font-size:var(--text-body);color:var(--color-ink);font-weight:750;letter-spacing:var(--tracking-h2)}.domain-head{font:750 var(--text-small)/1.3 var(--font-sans);color:var(--color-ink);text-align:center;overflow-wrap:anywhere}.domain-head span{display:block;margin-top:2px;font-size:var(--text-micro);font-weight:600;color:var(--color-muted);font-variant-numeric:tabular-nums;letter-spacing:0}.domain-count{font-size:var(--text-xs);fill:var(--color-muted);font-weight:600;font-variant-numeric:tabular-nums}.topic-name{font-size:var(--text-small);fill:var(--color-ink-soft);font-weight:650;pointer-events:none}/* 2026-09-22 缩放可读性（用户反馈「压缩的字体都看不到」）：
+.edge.focused{stroke:var(--color-warm);stroke-width:2.6;stroke-opacity:1}.topic-link{stroke:var(--color-line-strong);stroke-width:.9;stroke-opacity:.55}.domain-label{font-size:var(--text-body);color:var(--color-ink);font-weight:750;letter-spacing:var(--tracking-h2)}/* 2026-09-22 域标题降噪（用户反馈「标题的文字太大、太密集」）：
+ * 13px/750 的粗黑标题六列并排是画面里最重的墨块，挤压出拥挤感。
+ * 降到 12px/650，篇数从 11px 降到 10px 并把间距收紧——信息不变，
+ * 视觉重量让给节点与连线。 */
+.domain-head{font:650 12px/1.35 var(--font-sans);color:var(--color-ink);text-align:center;overflow-wrap:anywhere}
+.domain-head span{display:block;margin-top:1px;font-size:10px;font-weight:600;color:var(--color-muted);font-variant-numeric:tabular-nums;letter-spacing:0}.domain-count{font-size:var(--text-xs);fill:var(--color-muted);font-weight:600;font-variant-numeric:tabular-nums}.topic-name{font-size:var(--text-small);fill:var(--color-ink-soft);font-weight:650;pointer-events:none}/* 2026-09-22 缩放可读性（用户反馈「压缩的字体都看不到」）：
  * ① 文字描边面板色光晕（paint-order:stroke 让描边垫在字下）——文字压在
  *   连线交叉处时不再被线「吃掉」，缩小视图里这是主要不可读因素；
  * ② 缩小态字号补偿：world 整体 scale 的直接后果是文字跟着缩没。缩小越多
@@ -1029,9 +1042,11 @@ kbd{display:inline-block;min-width:20px;padding:2px 6px;border:1px solid var(--c
 #graph{touch-action:none}
 .node text{display:none}
 .node:hover text,.node:focus text,.node:focus-within text{display:block}
-/* 聚焦模式下命中笔记的标题常显——「点一串小圆看连到谁」的答案就写在对端
- * 圆点上方，不用逐个悬停。标题截到 20 字与悬停态一致。 */
-.graph.has-focus .node.focused text{display:block}
+/* 2026-09-22 聚焦态不再批量显示标题（用户实测反馈：点开「AI 系统工程」
+ * 后该域 60 篇标题全部同时铺开，叠成一堵字墙，完全不可读）。原设计想
+ * 「点一串小圆看连到谁」，但域级聚焦命中的笔记太多，常显即灾难。改为
+ * 标题一律悬停才显示——聚焦态只负责点亮连线与压暗无关项，读单个标题
+ * 靠悬停。 */
 .graph.has-focus .node.focused.dimmed text{display:none}
 /* 标题 halo：笔记标题与主题标签/连线在同一片区域出现是常态（环上的点
  * 紧挨着邻列主题），描一圈底色描边把标题变成「标签片」，压住的文字
@@ -2297,12 +2312,23 @@ function renderNetwork(){
        高度按实测决定：标题改长后（"AI 系统工程：从模型能力到生产能力"）三行 13px
        换行 ≈ 51px，固定 40 会把第三行连同篇数一起裁掉——上移 y、加高盒子、
        再把第一列主题的 top 相应下移，三处必须一起动，只改盒子会把列顶压住。 */
-    const headBoxLines = Math.ceil(tr(d).length * 13.5 / (colW - 12));
-    const headH = Math.max(40, headBoxLines * 17 + 18);
-    const head=svgEl('foreignObject',{x:cx-colW/2+6,y:top-56-(headH-40),width:colW-12,height:headH});
+    /* 2026-09-22 列头只留短名（用户反馈「标题完全不是人看的」）：完整标题
+     * 14-18 字、换行两三行，六列并排就是一堵字墙。短名取「：」前的部分
+     * （「AI 系统工程」「缺陷分析」），一行放得下；完整名放 title，悬停可见。
+     * 盒高公式随之只按短名估宽——中英文冒号都作分隔。 */
+    const fullName=tr(d);
+    const shortName=fullName.split(/[:：]/)[0];
+    const headBoxLines = Math.ceil(shortName.length * 12.4 / (colW - 12));
+    const headH = Math.max(36, headBoxLines * 16 + 14);
+    const head=svgEl('foreignObject',{x:cx-colW/2+6,y:top-56-(headH-36),width:colW-12,height:headH});
     const headBox=document.createElement('div');
     headBox.className='domain-head';
-    headBox.append(document.createTextNode(tr(d)));
+    /* 2026-09-22 列头最终定稿为短名（用户对比完整名后拍板：长的不好看）。
+     * 取「：」前的领域短名（「AI 系统工程」「缺陷分析」），一行干净利落；
+     * 完整名放 title 属性，悬停仍可查。拥挤的另一来源（聚焦态批量铺文章
+     * 标题）已单独修掉，此处只管列头本身。 */
+    headBox.title=fullName;
+    headBox.append(document.createTextNode(shortName));
     const headCount=document.createElement('span');
     headCount.textContent=(window.TKI18N?.lang==='en')?`${group.length} notes · ${ts.length} topics`:`${group.length} 篇 · ${ts.length} 个主题`;
     headBox.append(headCount);
