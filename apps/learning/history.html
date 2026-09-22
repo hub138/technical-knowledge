@@ -48,10 +48,6 @@
       a:hover {
         text-decoration: none;
       }
-      .tk-shell {
-        max-width: 1160px;
-        margin: auto;
-      }
       .topbar {
         height: 76px;
         display: flex;
@@ -59,30 +55,18 @@
         justify-content: space-between;
         border-bottom: 1px solid var(--color-line);
       }
-      .hero {
-        padding: 46px 0 31px;
-        border-bottom: 1px solid var(--color-line);
-      }
-      .eyebrow {
-        color: var(--color-accent);
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.1em;
-      }
-      .hero p {
-        max-width: 790px;
-        color: var(--color-muted);
-        font-size: 16px;
-        margin: 0;
-      }
-      .purpose {
-        margin-top: 22px;
-      }
+      /* 头部契约（site/base.css）：本页 hero 是 shell 首子，几何全部由
+         契约提供（顶 26/底 16/头部底距 20、说明 76ch/--text-note/ink-soft）。
+         原 .hero 46px padding 死代码、.eyebrow 0 引用、.hero p 的
+         790px/16px 活覆盖、.purpose 的 22px 首块距，2026-09-22 全部删除，
+         契约真源接管。 */
       .grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 14px;
-        margin-top: 23px;
+        /* 第二层内容块间距走 tokens（--space-6），与 intuition/transfer
+           同款；23px 私有值已清。 */
+        margin-top: var(--space-6);
       }
       .panel {
         background: var(--color-panel);
@@ -98,7 +82,8 @@
       /* The classroom list is the reason to visit this page, so it leads and
          gets its own header row with the primary action. */
       .panel-primary {
-        margin-top: 23px;
+        /* 首块间距走契约：头部 margin-bottom 20 已给，原来的 23px
+           margin-top 是「每页自己再叠一层」的残留，删。 */
         border-color: var(--color-accent-line);
       }
       .panel-head {
@@ -217,6 +202,7 @@
         }
       }
       .job {
+        position: relative;
         display: grid;
         grid-template-columns: minmax(0, 1fr) auto;
         gap: 16px;
@@ -229,9 +215,30 @@
           border-color 0.14s ease,
           box-shadow 0.14s ease;
       }
+      /* 左侧状态轨：成功无轨、失败暖色轨，色觉障碍用户靠位置即可分辨（不依赖颜色）。 */
+      .job::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 10px;
+        bottom: 10px;
+        width: 3px;
+        border-radius: 999px;
+        background: transparent;
+      }
+      .job.is-failed {
+        border-color: var(--color-warm-line);
+        background: var(--color-warm-soft);
+      }
+      .job.is-failed::before {
+        background: var(--color-warm);
+      }
       .job:hover {
         border-color: var(--color-accent-line);
         box-shadow: 0 4px 14px #23302b10;
+      }
+      .job.is-failed:hover {
+        border-color: var(--color-warm);
       }
       .job-clickable {
         text-decoration: none;
@@ -290,6 +297,53 @@
         background: var(--color-info-soft);
         color: var(--color-info);
       }
+      /* 失败卡专属：警示图标 + 摘要截断 + 详情展开。色觉障碍用户靠图标形状即可识别失败。 */
+      .job-state.fail::before {
+        content: "!";
+        display: inline-grid;
+        place-items: center;
+        width: 13px;
+        height: 13px;
+        margin-right: 5px;
+        border-radius: 999px;
+        background: var(--color-warm);
+        color: var(--color-warm-soft);
+        font-size: 10px;
+        font-weight: 800;
+        line-height: 1;
+      }
+      .job-err-line {
+        display: block;
+        margin: 6px 0 0;
+        color: var(--color-warm-ink);
+        font-size: 12px;
+        line-height: 1.5;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      .job.is-expanded .job-err-line {
+        white-space: normal;
+        overflow: visible;
+        text-overflow: unset;
+        word-break: break-all;
+      }
+      .job-detail-toggle {
+        display: inline-block;
+        margin-top: 7px;
+        padding: 0;
+        border: 0;
+        background: none;
+        color: var(--color-warm-ink);
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .job-detail-toggle:hover {
+        color: var(--color-warm);
+      }
       .job-link,
       .job-cta {
         display: inline-block;
@@ -314,11 +368,7 @@
         }
       }
       @media (max-width: 900px) {
-        .tk-shell {
-        }
-        .hero {
-          padding: 32px 0 25px;
-        }
+        /* hero 移动端几何由 base.css 契约统一给（30/16），不本地覆盖。 */
         .grid {
           grid-template-columns: 1fr;
         }
@@ -332,7 +382,7 @@
     </style>
   <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}</style>
 <style>:root[data-theme="dark"] .job-state.fail{color:var(--color-warm-ink)!important;color:var(--color-warm-ink);background:var(--color-warm-soft)!important;color:#f0c39a!important;border-color:var(--color-warm-ink)!important}:root[data-theme="dark"] .job-state.ok{background:var(--color-accent-soft)!important;color:var(--color-accent)!important}</style>
-<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] .callout{color:var(--color-ink)!important}:root[data-theme="dark"] .callout b{color:var(--color-ink)!important}</style>
 <style>.job-state.fail{color:var(--color-warm-ink)!important}</style>
 </head>
@@ -357,7 +407,7 @@
             href="/launch/openmaic?next=%2F"
             target="_blank"
             rel="noopener noreferrer"
-            >新建课堂 ↗</a
+            >新建课堂</a
           >
         </div>
         <div id="generation-jobs" class="jobs" aria-live="polite">
@@ -396,8 +446,7 @@
             <div class="stage">
               <strong>收录</strong>
               <p>
-                把稳定结论整理到对应领域的 Markdown
-                主题页，保留来源、版本和待复核项。
+                把稳定结论整理到对应领域的 Markdown 主题页，保留来源、版本和待复核项。
               </p>
             </div>
           </div>
@@ -409,9 +458,7 @@
         <section class="panel">
           <h2>为什么不自动同步</h2>
           <p>
-            当前 OpenMAIC
-            的课堂列表主要由它自己的浏览器存储管理，知识库服务无法安全读取另一个端口的
-            IndexedDB，也不应该绕过你的确认把生成内容写进长期知识。
+            当前 OpenMAIC 的课堂列表主要由它自己的浏览器存储管理，知识库服务无法安全读取另一个端口的 IndexedDB，也不应该绕过你的确认把生成内容写进长期知识。
           </p>
           <ul class="rules">
             <li><b>课堂历史：</b>在上面直接打开，或到 OpenMAIC 首页查看、编辑和继续学习。</li>
@@ -440,6 +487,13 @@
       (() => {
         const root = document.getElementById("generation-jobs");
         if (!root) return;
+        /* 【rt20】静态文案走 translateDOM（加载与语言切换时跑），但本
+           脚本每 5s 重写 innerHTML，translateDOM 不会重跑，EN 态动态
+           卡片全部裸奔中文（DOM 实测残留 18 条）。改为渲染时经
+           TKI18N.t() 查词：t() 在 zh 态原样返回、en 态查 DICT，与
+           learning/index.html 状态行 tr() 先例一致。课程标题是用户
+           数据（本机生成的课程名），不译。 */
+        const tr = (s) => (window.TKI18N ? window.TKI18N.t(s) : s);
         const esc = (value) =>
           String(value ?? "").replace(/[&<>"']/g, (char) => ({
             "&": "&amp;",
@@ -449,39 +503,60 @@
             "'": "&#39;",
           }[char]));
         const statusText = (job) => {
-          if (job.status === "succeeded") return "已生成";
-          if (job.status === "failed") return "失败";
-          if (job.status === "running" || job.status === "pending") return "进行中";
-          return "未知状态";
+          if (job.status === "succeeded") return tr("已生成");
+          if (job.status === "failed") return tr("失败");
+          if (job.status === "running" || job.status === "pending") return tr("进行中");
+          return tr("未知状态");
         };
         const render = (jobs) => {
           if (!jobs.length) {
-            root.innerHTML = '<div class="job-empty">还没有可显示的生成任务。</div>';
+            root.innerHTML = `<div class="job-empty">${tr("还没有可显示的生成任务。")}</div>`;
             return;
           }
           root.innerHTML = jobs.map((job) => {
             const progress = Number.isFinite(Number(job.progress)) ? `${job.progress}%` : "";
             const scenes = job.totalScenes
-              ? `场景 ${job.scenesGenerated ?? 0}/${job.totalScenes}`
+              ? `${tr("场景")} ${job.scenesGenerated ?? 0}/${job.totalScenes}`
               : "";
             const meta = [progress, scenes].filter(Boolean).join(" · ");
             // Prefer the classroom's own course title; jobs that produced
             // nothing fall back to the topic parsed out of the request.
-            const title = (job.title || "").trim() || "未命名的生成任务";
+            const title = (job.title || "").trim() || tr("未命名的生成任务");
             const detail = job.status === "failed"
-              ? `生成未完成 · ${esc(job.error || "未记录具体原因")}`
+              ? `${tr("生成未完成")} · ${esc(job.error || tr("未记录具体原因"))}`
               : job.classroomId
-                ? `${esc(meta)} · 任务 <span class="job-id">${esc(job.id)}</span>`
-                : esc(meta || `任务 ${job.id}`);
+                ? `${esc(meta)} · ${tr("任务")} <span class="job-id">${esc(job.id)}</span>`
+                : esc(meta || `${tr("任务")} ${job.id}`);
             const stateClass = job.status === "succeeded" ? "ok" : job.status === "failed" ? "fail" : "running";
+            // 失败卡：整卡暖色 + 左轨 + 图标，错误原文收进可展开详情（卡片是 <a> 时禁用整卡跳转冲突）。
+            const isFailed = job.status === "failed";
+            const errText = isFailed ? (job.error || tr("未记录具体原因")) : "";
+            const errLine = isFailed ? `<span class="job-err-line" title="${esc(errText)}">${esc(errText)}</span>` : "";
+            const errToggle = isFailed ? `<button type="button" class="job-detail-toggle" aria-expanded="false">${tr("查看原因")}</button>` : "";
             // A nested <a> inside the card link is invalid HTML and makes the
             // browser drop the card's children, so the hint is plain text and
             // the whole card carries the navigation.
-            const inner = `<div><p class="job-title">${esc(title)}</p><p class="job-meta">${detail}</p>${job.classroomId ? '<span class="job-cta">打开课堂 ↗</span>' : ""}</div><span class="job-state ${stateClass}">${statusText(job)}</span>`;
-            return job.classroomId
-              ? `<a class="job job-clickable" href="/launch/openmaic?next=${encodeURIComponent(`/classroom/${job.classroomId}`)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
-              : `<article class="job">${inner}</article>`;
+            // 2026-09-22：「打开课堂 ↗」去 ↗ —— 目标是本机 /launch 服务不是
+            // 出站链接，↗ 的语义（离站）不成立；词条 key 同步换，i18n.js
+            // 同日更新。
+            const inner = `<div><p class="job-title">${esc(title)}</p><p class="job-meta">${detail}</p>${errLine}${errToggle}${job.classroomId ? `<span class="job-cta">${tr("打开课堂")}</span>` : ""}</div><span class="job-state ${stateClass}">${statusText(job)}</span>`;
+            const card = job.classroomId
+              ? `<a class="job job-clickable${isFailed ? " is-failed" : ""}" href="/launch/openmaic?next=${encodeURIComponent(`/classroom/${job.classroomId}`)}" target="_blank" rel="noopener noreferrer">${inner}</a>`
+              : `<article class="job${isFailed ? " is-failed" : ""}">${inner}</article>`;
+            return card;
           }).join("");
+          // 事件委托：展开/收起错误详情。卡片是 <a> 时先阻止跳转再切换。
+          root.querySelectorAll(".job-detail-toggle").forEach((btn) => {
+            btn.addEventListener("click", (ev) => {
+              ev.preventDefault();
+              ev.stopPropagation();
+              const card = btn.closest(".job");
+              card.classList.toggle("is-expanded");
+              const expanded = card.classList.contains("is-expanded");
+              btn.setAttribute("aria-expanded", String(expanded));
+              btn.textContent = expanded ? tr("收起") : tr("查看原因");
+            });
+          });
         };
         const load = async () => {
           try {
@@ -490,7 +565,7 @@
             const data = await response.json();
             render(Array.isArray(data.jobs) ? data.jobs : []);
           } catch {
-            root.innerHTML = '<div class="job-empty">暂时无法读取生成记录；OpenMAIC 课堂本身仍可从上方入口打开。</div>';
+            root.innerHTML = `<div class="job-empty">${tr("暂时无法读取生成记录；OpenMAIC 课堂本身仍可从上方入口打开。")}</div>`;
           }
         };
         load();

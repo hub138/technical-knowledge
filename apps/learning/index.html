@@ -4,6 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>学习中心 · technical-knowledge</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/base.css" />
     <script src="/static/nav.js"></script>
@@ -26,90 +27,31 @@
     </script>
     
     <style>
-      
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        background: var(--color-bg);
-        color: var(--color-ink);
-        font:
-          15px/1.72 -apple-system,
-          BlinkMacSystemFont,
-          "SF Pro Text",
-          "PingFang SC",
-          sans-serif;
-      }
-      a {
-        color: inherit;
-        text-decoration: none;
-      }
-      button,
-      input {
-        font: inherit;
-      }
-      .tk-shell {
-        max-width: 1260px;
-        margin: auto;
-      }
-      .topbar {
-        height: 72px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        border-bottom: 1px solid var(--color-line);
-      }
-      .brand {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        font-weight: 760;
-      }
-      .mark {
-        display: grid;
-        place-items: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 7px;
-        background: var(--color-ok);
-        color: var(--color-panel);
-      }
-      .nav {
-        display: flex;
-        gap: 6px;
-      }
-      .nav a {
-        padding: 7px 10px;
-        border-radius: 5px;
-        color: var(--color-muted);
-        font-size: 13px;
-      }
-      .nav a:hover,
-      .nav a.active {
-        background: var(--color-ok-soft);
-        color: var(--color-ok);
-      }
+      /* 【2026-09-22 学习中心接入全站契约】本页原来内联一套私有排版
+       * （body 15px/1.72、标题 19px、按钮 12px 等），与全站 tokens.css
+       * 标尺脱节——用户抓的「字体好像一直没有优化过、格式脱离」就是这。
+       * 现在只保留本页语义布局（hero 两栏、卡片网格），字号/字重/圆角/
+       * 间距全部走 token；base.css 已有的全局规则（box-sizing、链接色）
+       * 不再重复。 */
       .hero {
         display: grid;
         grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
         gap: 36px;
-        padding: 46px 0 33px;
         align-items: end;
       }
       .topic-box {
         align-self: end;
         background: var(--color-panel);
         border: 1px solid var(--color-line);
-        padding: 16px;
-        border-radius: 7px;
+        padding: var(--space-4);
+        border-radius: var(--radius-md);
         box-shadow: var(--shadow-md);
       }
       .topic-box label {
         display: block;
-        font-size: 12px;
-        font-weight: 720;
-        margin-bottom: 7px;
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        margin-bottom: var(--space-2);
       }
       .topic-row {
         display: flex;
@@ -130,8 +72,9 @@
       .topic-row button {
         border: 0;
         border-radius: 5px;
-        background: var(--color-ok);
-        color: var(--color-panel);
+        /* 白字压亮绿 3.77:1 不达标（门禁实测）——底色用 ok 的暗阶 */
+        background: var(--color-ok-ink);
+        color: #ffffff;
         padding: 9px 13px;
         cursor: pointer;
       }
@@ -146,14 +89,14 @@
         margin-bottom: 14px;
       }
       .section h2 {
-        font-size: 22px;
+        font-size: var(--text-h2); /* 区块标题统一走 tokens 标尺 */
         margin: 0;
         line-height: 1.35;
       }
       .section-head p {
         color: var(--color-ink-soft);
         margin: 3px 0 0;
-        font-size: 13px;
+        font-size: var(--text-small);
       }
       .service-grid {
         display: grid;
@@ -171,17 +114,43 @@
       .service.tutor {
         border-top-color: var(--color-info);
       }
+      /* 图标与标题同排：课堂用舞台隐喻，导师用对话隐喻。 */
+      .service-icon {
+        width: 34px;
+        height: 34px;
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm);
+        background: var(--color-accent-soft);
+        color: var(--color-accent);
+      }
+      .service.tutor .service-icon {
+        background: var(--color-info-soft);
+        color: var(--color-info-ink);
+      }
+      .service-icon svg {
+        width: 18px;
+        height: 18px;
+      }
       .service-head {
         display: flex;
         justify-content: space-between;
         gap: 15px;
       }
+      .service-head-main {
+        display: flex;
+        align-items: flex-start;
+        gap: var(--space-3);
+      }
       .service h3 {
-        font-size: 19px;
+        /* 卡片标题走 --text-h3 档（18px），原来私用 19px 是标尺外的野值 */
+        font-size: var(--text-h3);
         margin: 0 0 3px;
       }
       .service-head p {
-        font-size: 12px;
+        font-size: var(--text-small);
         color: var(--color-muted);
         margin: 0;
       }
@@ -191,9 +160,10 @@
         padding: 3px 7px;
         border-radius: 4px;
         background: var(--color-ok-soft);
-        color: var(--color-ok);
-        font-size: 11px;
-        font-weight: 740;
+        color: var(--color-ok-ink);
+        /* 状态徽章走 --text-micro（11px 图形角标档），原 11px 私值同值收编 */
+        font-size: var(--text-micro);
+        font-weight: var(--weight-semibold);
       }
       .state.warn {
         background: var(--color-warm-soft);
@@ -212,7 +182,8 @@
         gap: 8px;
         border-top: 1px solid var(--color-line);
         padding-top: 7px;
-        font-size: 12px;
+        /* 卡内说明行走 --text-small（13px 次级信息档） */
+        font-size: var(--text-small);
       }
       .fact b {
         color: var(--color-ink-soft);
@@ -233,9 +204,13 @@
         background: var(--color-panel);
         border-radius: 5px;
         padding: 7px 10px;
-        color: var(--color-ok);
-        font-size: 12px;
-        font-weight: 700;
+        /* 12px 小字按钮，--color-ok 白底 3.77:1 不达标（门禁实测），ink 暗阶 */
+        color: var(--color-ok-ink);
+        /* 按钮是控件，字号契约 = --text-body（tokens.css：正文也是导航与
+         * 控件的字号）。原来 12px 比全站控件小一档，是「字体没优化」观感
+         * 的另一个来源。 */
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
       }
       .button.primary {
         background: var(--color-ok-soft);
@@ -244,7 +219,8 @@
       .button.blue {
         background: var(--color-info-soft);
         border-color: var(--color-info-soft);
-        color: var(--color-info);
+        /* 12px 小字，--color-info 在 info-soft 上 3.79:1 不达标（门禁实测） */
+        color: var(--color-info-ink);
       }
       .paths {
         display: grid;
@@ -252,62 +228,109 @@
       }
       .path {
         display: grid;
-        grid-template-columns: 240px minmax(0, 1fr);
+        grid-template-columns: 264px minmax(0, 1fr);
         background: var(--color-panel);
         border: 1px solid var(--color-line);
         border-radius: 7px;
         overflow: hidden;
+        transition: border-color var(--duration-fast) var(--ease-out);
       }
+      .path:hover { border-color: var(--color-accent-line); }
       .path-intro {
         padding: 20px;
         border-right: 1px solid var(--color-line);
       }
       .path-intro small {
-        color: var(--color-ok);
+        /* 13px 小字在面板底上 --color-ok 只有 3.77:1，门禁抓的 */
+        color: var(--color-ok-ink);
         font-weight: 750;
       }
       .path-intro h3 {
-        font-size: 18px;
-        line-height: 1.35;
-        margin: 5px 0 7px;
+        /* 路径标题走 --text-h3 档（18px），原 19px 收编 */
+        font-size: var(--text-h3);
+        line-height: 1.4;
+        letter-spacing: -0.01em;
+        margin: 6px 0 8px;
       }
       .path-intro p {
-        font-size: 12px;
+        font-size: var(--text-small);
         color: var(--color-muted);
         margin: 0;
       }
       .steps {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
+        counter-reset: step;
       }
       .step {
-        padding: 17px;
+        counter-increment: step;
+        padding: 18px 16px 18px 18px;
         position: relative;
+        transition: background var(--duration-fast) var(--ease-out);
       }
+      .step:hover { background: var(--color-raised); }
       .step:not(:last-child) {
         border-right: 1px solid var(--color-line);
       }
+      /* 大编号：路径的方向感全靠它。两位数补零（01…05），
+       * 半透明 accent——够醒目又不抢标题。 */
+      .step::before {
+        content: counter(step, decimal-leading-zero);
+        display: block;
+        font-size: 21px;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.02em;
+        color: var(--color-accent);
+        opacity: 0.32;
+        margin-bottom: 9px;
+      }
+      /* 连接线：从编号延伸到下一格——「路径」的推进感。 */
+      .step:not(:last-child)::after {
+        content: "";
+        position: absolute;
+        top: 29px;
+        right: -7px;
+        width: 14px;
+        height: 1px;
+        background: var(--color-line-strong, var(--color-line));
+        z-index: 1;
+      }
       .step b {
         display: block;
-        font-size: 13px;
+        font-size: var(--text-small);
         margin-bottom: 5px;
       }
       .step p {
-        font-size: 12px;
+        font-size: var(--text-small);
         color: var(--color-muted);
-        line-height: 1.6;
+        line-height: 1.65;
         margin: 0 0 10px;
       }
+      /* 动作链接统一：accent 色 + 箭头 hover 滑入。此前绿/蓝混用、
+       * 有下划线没下划线混用，视觉噪音全在这。 */
       .step a {
-        color: var(--color-ok);
-        font-size: 12px;
-        font-weight: 700;
+        display: inline-block;
+        color: var(--color-accent);
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
       }
+      .step a::after {
+        content: "\2192";
+        display: inline-block;
+        margin-left: 0;
+        opacity: 0;
+        transform: translateX(-4px);
+        transition: opacity var(--duration-fast) var(--ease-out),
+                    transform var(--duration-fast) var(--ease-out);
+      }
+      .step a:hover { text-decoration: underline; text-underline-offset: 3px; }
+      .step a:hover::after { opacity: 0.75; transform: translateX(0); margin-left: 4px; }
       .step .tool {
-        display: block;
-        color: var(--color-info);
+        display: inline-block;
         margin-top: 5px;
       }
+      .step a.tool { margin-right: 10px; }
       .guide {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
@@ -325,36 +348,48 @@
         margin-bottom: 5px;
       }
       .guide p {
-        font-size: 12px;
+        font-size: var(--text-small);
         color: var(--color-muted);
         margin: 0;
       }
       .guide code {
-        font-size: 11px;
-        color: var(--color-ok);
+        font-size: var(--text-micro);
+        /* 门禁实测 3.58 < 4.5：--color-ok 在小字上不达标，用 ink 暗阶 */
+        color: var(--color-ok-ink);
         background: var(--color-ok-soft);
         padding: 2px 4px;
         border-radius: 3px;
       }
+      /* 额度说明是 footnote 不是告警——黄底让整页的收尾变成一块
+       * 警告牌，降为左边线的灰字后信息仍在、戏份归位。 */
       .cost {
-        padding: 15px 17px;
-        background: var(--color-warm-soft);
-        border-left: 3px solid var(--color-warm);
-        font-size: 13px;
-        color: #68462e;
+        padding: 10px 16px;
+        background: none;
+        border-left: 2px solid var(--color-warm);
+        font-size: var(--text-small);
+        line-height: 1.7;
+        color: var(--color-muted);
       }
       .error {
         color: var(--color-danger);
       }
       /* Sits under the topic input so returning learners reach their own
-         classrooms from the same place they start a new one. */
+         classrooms from the same place they start a new one.
+         2026-09-22：margin 10→12px——用户抓「紧贴框」，输入行与这句话之间
+         要有呼吸；字号走 --text-small 档。箭头已删（用户明令全站去箭头，
+         可点性由链接色 + hover 下划线表达）。 */
       .topic-secondary {
-        margin: 10px 0 0;
-        font-size: 12px;
+        margin: 12px 0 0;
+        font-size: var(--text-small);
         color: var(--color-muted);
       }
       .topic-secondary a {
-        font-weight: 700;
+        color: var(--color-accent);
+        font-weight: var(--weight-semibold);
+      }
+      .topic-secondary a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
       }
       @media (max-width: 900px) {
         .hero {
@@ -373,29 +408,24 @@
         .steps {
           grid-template-columns: repeat(2, 1fr);
         }
-        .step:nth-child(2) {
+        .step:nth-child(2n) {
           border-right: 0;
         }
-        .step:nth-child(-n + 2) {
+        .step:nth-child(-n + 4) {
           border-bottom: 1px solid var(--color-line);
+        }
+        .step::after {
+          display: none;
         }
         .guide {
           grid-template-columns: 1fr;
         }
       }
       @media (max-width: 620px) {
-        .tk-shell {
-        }
-        .topbar {
-          height: 62px;
-        }
-        .nav a:nth-child(3) {
-          display: none;
-        }
-        .hero {
-          padding: 31px 0 25px;
-          gap: 23px;
-        }
+        /* 2026-09-22 清理：原来的 .topbar/.nav/.brand 规则是旧版自带头部的
+         * 遗留——本页头部由 base.css tk-shell 契约统一，页内根本没有这三个
+         * 类，全部死代码（.tk-shell {} 还是条空规则）。头部移动端几何由
+         * base.css 移动端契约统一，不再本页覆盖。 */
         .topic-row {
           display: grid;
         }
@@ -414,33 +444,9 @@
         }
       }
     </style>
-    <style>
-      @media (max-width: 620px) {
-        .topbar {
-          gap: 8px;
-        }
-        .nav {
-          gap: 3px;
-          flex: 0 0 auto;
-        }
-        .nav a {
-          padding: 6px 8px;
-          font-size: 12px;
-        }
-        .nav a:nth-child(4) {
-          display: none;
-        }
-        .brand {
-          min-width: 0;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-      }
-    </style>
-  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card{background:var(--color-panel)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] button.primary,:root[data-theme="dark"] .primary{color:var(--color-on-accent)!important}
+  <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card{background:var(--color-panel)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] button.primary,:root[data-theme="dark"] .primary{color:var(--color-on-accent)!important}
 </style>
-<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] .cost{color:var(--color-warm-ink)!important}</style>
 </head>
   <body class="tk-host">
@@ -463,29 +469,32 @@
             /><button type="submit">开始</button>
           </div>
           <p class="topic-secondary">
-            已经生成过课堂？<a href="/learn/history">打开我的课堂 →</a>
+            已经生成过课堂？<a href="/learn/history">打开我的课堂</a>
           </p>
         </form>
       </section>
       <div class="purpose">
         <strong>知识库和这里的区别</strong
         ><span
-          >知识库回答“有哪些知识、它们怎么关联”。这里回答“选一个主题，做点什么才能真的会用”。只想读，回知识库就行。</span
+          >知识库回答“有哪些知识、它们怎么关联”。这里回答“选一个主题，做点什么才能真的会用”。只想读，回知识库就行</span
         >
       </div>
       <section class="section">
         <div class="section-head">
           <div>
             <h2>学习工具</h2>
-            <p>两个工具都已经装好并在运行。右边的小绿标是它们此刻的真实状态。</p>
+            <p>两个工具都已经装好并在运行。右边的小绿标是它们此刻的真实状态</p>
           </div>
         </div>
         <div class="service-grid">
           <article class="service">
             <div class="service-head">
-              <div>
-                <h3>OpenMAIC 互动课堂</h3>
-                <p>适合理解机制、互动练习、测验、模拟和项目任务</p>
+              <div class="service-head-main">
+                <span class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span>
+                <div>
+                  <h3>OpenMAIC 互动课堂</h3>
+                  <p>适合理解机制、互动练习、测验、模拟和项目任务</p>
+                </div>
               </div>
               <span class="state" id="maic-state">检查中</span>
             </div>
@@ -519,15 +528,22 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 >打开已生成示例</a
-              ><a class="button" href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a
+              ><a class="button" href="/learn/openmaic">完整使用指南</a
               ><a class="button" href="/projects#openmaic">查看能力与边界</a>
             </div>
           </article>
+          <!-- 2026-09-22 跳转原则：指向本站页面（/learn/*、/projects#、
+               /?path=）一律同页跳转，与文章阅读一致；只有 /launch/*（启动
+               教学工具进程）和站外 GitHub 保留新标签。用户明令「不是新的
+               页面 就和文章一样 直接同页面跳转」。 -->
           <article class="service tutor">
             <div class="service-head">
-              <div>
-                <h3>DeepTutor 学习导师</h3>
-                <p>适合追问、研究、笔记、掌握路径和长期记忆</p>
+              <div class="service-head-main">
+                <span class="service-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+                <div>
+                  <h3>DeepTutor 学习导师</h3>
+                  <p>适合追问、研究、笔记、掌握路径和长期记忆</p>
+                </div>
               </div>
               <span class="state" id="tutor-state">检查中</span>
             </div>
@@ -562,7 +578,7 @@
         <div class="section-head">
           <div>
             <h2>预置学习路径</h2>
-            <p>每一步都有明确产出，不以“看完”为完成。</p>
+            <p>每一步都有明确产出，不以“看完”为完成</p>
           </div>
         </div>
         <div class="paths">
@@ -578,23 +594,23 @@
             <div class="steps">
               <div class="step">
                 <b>理解本质</b>
-                <p>证据选择为什么比“接一个向量库”更接近 RAG 的核心。</p>
+                <p>证据选择为什么比“接一个向量库”更接近 RAG 的核心</p>
                 <a
-                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2F%E7%9F%A5%E8%AF%86%E4%B8%8E%E6%A3%80%E7%B4%A2%2FRAG%E7%9A%84%E6%A0%B8%E5%BF%83%E6%98%AF%E9%80%89%E6%8B%A9%E5%8F%AF%E5%BC%95%E7%94%A8%E8%AF%81%E6%8D%AE.md"
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%20%E7%B3%BB%E7%BB%9F%E5%B7%A5%E7%A8%8B%EF%BC%9A%E4%BB%8E%E6%A8%A1%E5%9E%8B%E8%83%BD%E5%8A%9B%E5%88%B0%E7%94%9F%E4%BA%A7%E8%83%BD%E5%8A%9B%2F%E7%9F%A5%E8%AF%86%E4%B8%8E%E6%A3%80%E7%B4%A2%2FRAG%E7%9A%84%E6%A0%B8%E5%BF%83%E6%98%AF%E9%80%89%E6%8B%A9%E5%8F%AF%E5%BC%95%E7%94%A8%E8%AF%81%E6%8D%AE.md"
                   >读核心机制</a
                 >
               </div>
               <div class="step">
                 <b>解释演进</b>
-                <p>查询改写、混合检索、重排和状态循环分别暴露了什么旧瓶颈。</p>
+                <p>查询改写、混合检索、重排和状态循环分别暴露了什么旧瓶颈</p>
                 <a
-                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2F%E7%9F%A5%E8%AF%86%E4%B8%8E%E6%A3%80%E7%B4%A2%2FRAG%E5%89%8D%E6%B2%BF%EF%BC%9A%E9%87%8D%E6%8E%92%E3%80%81%E8%87%AA%E5%8A%A8%E4%BC%98%E5%8C%96%E4%B8%8E%E5%BC%80%E6%94%BE%E7%B4%A2%E5%BC%95.md"
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%20%E7%B3%BB%E7%BB%9F%E5%B7%A5%E7%A8%8B%EF%BC%9A%E4%BB%8E%E6%A8%A1%E5%9E%8B%E8%83%BD%E5%8A%9B%E5%88%B0%E7%94%9F%E4%BA%A7%E8%83%BD%E5%8A%9B%2F%E7%9F%A5%E8%AF%86%E4%B8%8E%E6%A3%80%E7%B4%A2%2F%E6%B7%B7%E5%90%88%E6%A3%80%E7%B4%A2%E3%80%81%E9%87%8D%E6%8E%92%E4%B8%8E%E6%9F%A5%E8%AF%A2%E6%94%B9%E5%86%99%E5%90%84%E8%87%AA%E8%A7%A3%E5%86%B3%E4%BB%80%E4%B9%88%E9%97%AE%E9%A2%98.md"
                   >读演进关系</a
                 >
               </div>
               <div class="step">
                 <b>形成直觉</b>
-                <p>让课堂用失败案例、对比和互动题检验你的判断。</p>
+                <p>让课堂用失败案例、对比和互动题检验你的判断</p>
                 <a
                   class="tool launch-maic"
                   data-topic="RAG 为什么从单次向量检索演进到混合检索、重排和有状态证据获取"
@@ -632,23 +648,23 @@
             <div class="steps">
               <div class="step">
                 <b>划清职责</b>
-                <p>模型负责语义决策，运行时负责执行语义、隔离和可恢复状态。</p>
+                <p>模型负责语义决策，运行时负责执行语义、隔离和可恢复状态</p>
                 <a
-                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2FAgent%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%2F%E6%A8%A1%E5%9E%8B%E8%B4%9F%E8%B4%A3%E5%88%A4%E6%96%AD%EF%BC%8C%E8%BF%90%E8%A1%8C%E6%97%B6%E8%B4%9F%E8%B4%A3%E6%89%A7%E8%A1%8C%E8%AF%AD%E4%B9%89.md"
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%20%E7%B3%BB%E7%BB%9F%E5%B7%A5%E7%A8%8B%EF%BC%9A%E4%BB%8E%E6%A8%A1%E5%9E%8B%E8%83%BD%E5%8A%9B%E5%88%B0%E7%94%9F%E4%BA%A7%E8%83%BD%E5%8A%9B%2FAgent%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%2F%E6%A8%A1%E5%9E%8B%E8%B4%9F%E8%B4%A3%E5%88%A4%E6%96%AD%EF%BC%8C%E8%BF%90%E8%A1%8C%E6%97%B6%E8%B4%9F%E8%B4%A3%E6%89%A7%E8%A1%8C%E8%AF%AD%E4%B9%89.md"
                   >读责任边界</a
                 >
               </div>
               <div class="step">
                 <b>组织系统</b>
-                <p>状态机、工具契约、记忆、人工审批与故障恢复如何组合。</p>
+                <p>状态机、工具契约、记忆、人工审批与故障恢复如何组合</p>
                 <a
-                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%E7%B3%BB%E7%BB%9F%2FAgent%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%2F%E6%9E%84%E5%BB%BA%E5%8F%AF%E9%9D%A0Agent%E5%BA%94%E7%94%A8.md"
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2FAI%20%E7%B3%BB%E7%BB%9F%E5%B7%A5%E7%A8%8B%EF%BC%9A%E4%BB%8E%E6%A8%A1%E5%9E%8B%E8%83%BD%E5%8A%9B%E5%88%B0%E7%94%9F%E4%BA%A7%E8%83%BD%E5%8A%9B%2FAgent%E4%B8%8E%E5%B7%A5%E4%BD%9C%E6%B5%81%2F%E6%9E%84%E5%BB%BA%E5%8F%AF%E9%9D%A0Agent%E5%BA%94%E7%94%A8.md"
                   >读系统设计</a
                 >
               </div>
               <div class="step">
                 <b>案例推演</b>
-                <p>以代码 Agent 为例，从任务接收到执行证据完整走一遍。</p>
+                <p>以代码 Agent 为例，从任务接收到执行证据完整走一遍</p>
                 <a
                   class="tool launch-maic"
                   data-topic="设计一个可靠代码 Agent：重点讲状态、工具权限、隔离执行、失败恢复和证据投影"
@@ -685,23 +701,23 @@
             <div class="steps">
               <div class="step">
                 <b>请求路径</b>
-                <p>浏览器、网络、入口、服务和存储如何共同决定一次响应。</p>
+                <p>浏览器、网络、入口、服务和存储如何共同决定一次响应</p>
                 <a
-                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2F%E5%90%8E%E7%AB%AF%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E7%BB%9F%2F%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1%2FHTTP%E8%AF%B7%E6%B1%82%E7%A9%BF%E8%BF%87%E6%B5%8F%E8%A7%88%E5%99%A8%E3%80%81%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%9C%8D%E5%8A%A1%E7%AB%AF%E8%BE%B9%E7%95%8C.md"
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2F%E5%90%8E%E7%AB%AF%E7%B3%BB%E7%BB%9F%EF%BC%9A%E5%9C%A8%E5%B9%B6%E5%8F%91%E3%80%81%E5%A4%B1%E8%B4%A5%E4%B8%8E%E5%8F%98%E5%8C%96%E4%B8%AD%E7%BB%B4%E6%8C%81%E6%9C%8D%E5%8A%A1%2F%E6%9C%8D%E5%8A%A1%E8%AE%BE%E8%AE%A1%2FHTTP%E8%AF%B7%E6%B1%82%E7%A9%BF%E8%BF%87%E6%B5%8F%E8%A7%88%E5%99%A8%E3%80%81%E7%BD%91%E7%BB%9C%E4%B8%8E%E6%9C%8D%E5%8A%A1%E7%AB%AF%E8%BE%B9%E7%95%8C.md"
                   >读请求边界</a
                 >
               </div>
               <div class="step">
                 <b>瓶颈模型</b>
-                <p>等待、排队、CPU、内存、I/O 与锁竞争如何形成尾延迟。</p>
+                <p>等待、排队、CPU、内存、I/O 与锁竞争如何形成尾延迟</p>
                 <a
-                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2F%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E4%B8%8E%E6%80%A7%E8%83%BD%2F%E6%80%A7%E8%83%BD%E5%B7%A5%E7%A8%8B%EF%BC%9A%E4%BB%8E%E7%94%A8%E6%88%B7%E7%AD%89%E5%BE%85%E5%88%B0%E8%B5%84%E6%BA%90%E7%93%B6%E9%A2%88.md"
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86%2F%E6%80%A7%E8%83%BD%E5%B7%A5%E7%A8%8B%EF%BC%9A%E4%BB%8E%E7%94%A8%E6%88%B7%E7%AD%89%E5%BE%85%E5%88%B0%E8%B5%84%E6%BA%90%E7%93%B6%E9%A2%88%2F%E6%80%A7%E8%83%BD%E5%B7%A5%E7%A8%8B%EF%BC%9A%E4%BB%8E%E7%94%A8%E6%88%B7%E7%AD%89%E5%BE%85%E5%88%B0%E8%B5%84%E6%BA%90%E7%93%B6%E9%A2%88.md"
                   >读性能模型</a
                 >
               </div>
               <div class="step">
                 <b>故障演练</b>
-                <p>对一次 P99 抖动构造假设树和最小观测计划。</p>
+                <p>对一次 P99 抖动构造假设树和最小观测计划</p>
                 <a
                   class="tool launch-maic"
                   data-topic="用一个后端服务 P99 延迟突增案例，讲清排队、CPU、GC、IO、锁和下游依赖的诊断顺序"
@@ -713,7 +729,7 @@
               </div>
               <div class="step">
                 <b>证据答辩</b>
-                <p>每提出一个根因，都必须给出能证伪它的指标或实验。</p>
+                <p>每提出一个根因，都必须给出能证伪它的指标或实验</p>
                 <a
                   class="tool launch-tutor"
                   data-topic="给我一个逐步披露证据的后端 P99 延迟故障案例，让我提出假设、选择指标和实验，并在每一步纠正我"
@@ -725,13 +741,60 @@
               </div>
             </div>
           </article>
+          <article class="path">
+            <div class="path-intro">
+              <small>系统工程</small>
+              <h3>真实缺陷解剖：从入门到精通</h3>
+              <p>
+                目标：能对一条真实缺陷独立完成影响判断、复现、合入与回归，并把每一步写成可复核的证据。
+              </p>
+            </div>
+            <div class="steps">
+              <div class="step">
+                <b>认识缺陷</b>
+                <p>两个真实缺陷对照：崩溃的会喊，静默算错的更致命</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86/%E7%BC%BA%E9%99%B7%E5%88%86%E6%9E%90%EF%BC%9A%E4%BB%8E%E4%B8%AA%E6%A1%88%E5%88%B0%E4%BD%93%E7%B3%BB/%E7%BC%BA%E9%99%B7%E5%88%86%E6%9E%90%E7%9A%84%E6%9C%AC%E8%B4%A8%E2%80%94%E2%80%94%E6%9C%9F%E6%9C%9B%E4%B8%8E%E7%8E%B0%E5%AE%9E%E7%9A%84%E5%81%8F%E5%B7%AE.md"
+                  >读缺陷的本质</a
+                >
+              </div>
+              <div class="step">
+                <b>学会判断</b>
+                <p>四种结论加证据分级，决定人力往哪里投</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86/%E7%BC%BA%E9%99%B7%E5%88%86%E6%9E%90%EF%BC%9A%E4%BB%8E%E4%B8%AA%E6%A1%88%E5%88%B0%E4%BD%93%E7%B3%BB/%E5%BD%B1%E5%93%8D%E5%88%A4%E6%96%AD/%E5%BD%B1%E5%93%8D%E5%88%A4%E6%96%AD%E2%80%94%E2%80%94%E8%BF%99%E6%9D%A1%E4%BF%AE%E5%A4%8D%E5%80%BC%E4%B8%8D%E5%80%BC%E5%BE%97%E8%B7%9F.md"
+                  >读影响判断</a
+                >
+              </div>
+              <div class="step">
+                <b>走完证据圈</b>
+                <p>复现、合入、回归三步，每一步都留下可复查的证据</p>
+                <a
+                  href="/?path=%E5%B7%A5%E7%A8%8B%E7%9F%A5%E8%AF%86/%E7%BC%BA%E9%99%B7%E5%88%86%E6%9E%90%EF%BC%9A%E4%BB%8E%E4%B8%AA%E6%A1%88%E5%88%B0%E4%BD%93%E7%B3%BB/%E5%A4%8D%E7%8E%B0%E4%B8%8E%E5%9B%9E%E5%BD%92/%E4%BB%8E%E5%A4%8D%E7%8E%B0%E5%88%B0%E5%9B%9E%E5%BD%92%E2%80%94%E2%80%94%E8%AE%A9%E8%AF%81%E6%8D%AE%E8%B5%B0%E5%AE%8C%E4%B8%80%E5%9C%88.md"
+                  >读复现到回归</a
+                >
+              </div>
+              <div class="step">
+                <b>导师考你</b>
+                <p>拿一条真实缺陷，从影响判断一路考到回归</p>
+                <a
+                  class="tool launch-tutor"
+                  data-topic="用一条真实的后端缺陷考我缺陷分析五步法：影响判断、真实复现、合入与回归，每一步都要我拿出证据"
+                  href="/launch/deeptutor?next=%2Fchat"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >让导师考我</a
+                >
+              </div>
+            </div>
+          </article>
         </div>
       </section>
       <section class="section">
         <div class="section-head">
           <div>
             <h2>第一次使用</h2>
-            <p>无需再找安装命令或猜页面入口。</p>
+            <p>无需再找安装命令或猜页面入口</p>
           </div>
         </div>
         <div class="guide">
@@ -763,6 +826,40 @@
     </div>
     <script>
       const topic = document.querySelector("#topic");
+      /* 【反复迭代后结果·rt17】i18n 的 translateDOM 只覆盖文本节点与
+         placeholder/title/aria-label/alt 属性，input 的 value 不在其列。
+         EN 态下预填主题是中文，对英语读者观感是半成品。监听 tk:lang
+         事件（i18n.setLang 在切换时派发），仅在用户未手动编辑过输入框时
+         把预填值切到对应语言；用户改过就尊重用户输入，不再覆盖。 */
+      const TOPIC_ZH = "RAG 的演进、本质与生产边界";
+      const TOPIC_EN = "RAG: evolution, essence and production boundaries";
+      let topicEdited = false;
+      topic.addEventListener("input", () => {
+        topicEdited = true;
+      });
+      document.addEventListener("tk:lang", (event) => {
+        if (topicEdited) return;
+        if (
+          event.detail?.lang === "en" &&
+          topic.value.trim() === TOPIC_ZH
+        ) {
+          topic.value = TOPIC_EN;
+        } else if (
+          event.detail?.lang === "zh" &&
+          topic.value.trim() === TOPIC_EN
+        ) {
+          topic.value = TOPIC_ZH;
+        }
+      });
+      /* 首次加载即 EN（storage 里已存 en）时事件早已错过，补一次对齐。 */
+      if (
+        window.TKI18N &&
+        window.TKI18N.lang === "en" &&
+        !topicEdited &&
+        topic.value.trim() === TOPIC_ZH
+      ) {
+        topic.value = TOPIC_EN;
+      }
       const encoded = (value) => encodeURIComponent(value.trim());
       const maicUrl = (value) =>
         `/launch/openmaic?next=${encodeURIComponent("/?topic=" + encoded(value))}`;
@@ -774,6 +871,10 @@
       function bindActionLaunch(link, kind) {
         const value = link.dataset.topic || topic.value;
         link.href = kind === "maic" ? maicUrl(value) : tutorUrl(value);
+        /* /launch/* 是启动教学工具进程的入口（OpenMAIC/DeepTutor 是独立
+         * 应用，不是本站页面），保留新标签：课堂开着时学习中心还在，
+         * 读完路径回来不丢位置。站内页面链接已在 HTML 里全部改为同页
+         * 跳转（见上方 actions 区注释）。 */
         link.target = "_blank";
         link.rel = "noopener noreferrer";
       }
@@ -784,7 +885,7 @@
         } else {
           const error = document.createElement("p");
           error.className = "error";
-          error.textContent = "浏览器拦截了新标签，请允许弹出窗口后重试。";
+          error.textContent = "浏览器拦截了新标签，请允许弹出窗口后重试";
           document.querySelector(".topic-box")?.append(error);
         }
       }
@@ -824,19 +925,28 @@
           const maic = document.querySelector("#maic-state"),
             tutor = document.querySelector("#tutor-state"),
             limit = document.querySelector("#tutor-limit");
-          maic.textContent = status.openmaic?.online ? "运行中" : "未启动";
+          /* 【反复迭代后结果·rt17】状态徽章与边界句由 fetch 回调在 DOMContentLoaded
+             之后写入，晚于 i18n.js 的 translateDOM()（它只翻译加载时已存在的文本节点），
+             EN 态因此残留中文。改为经 TKI18N.t() 渲染：t() 在 zh 态原样返回、en 态查
+             词典（词条已补入 site/i18n.js rt17 批次），两种语言都不依赖写入时机。 */
+          const tr = (s) => (window.TKI18N ? window.TKI18N.t(s) : s);
+          maic.textContent = status.openmaic?.online ? tr("运行中") : tr("未启动");
           maic.classList.toggle("warn", !status.openmaic?.online);
           tutor.textContent =
             status.deeptutor?.online && status.deeptutor?.llm
-              ? "导师可用"
-              : "配置不完整";
+              ? tr("导师可用")
+              : tr("配置不完整");
           tutor.classList.toggle(
             "warn",
             !(status.deeptutor?.online && status.deeptutor?.llm),
           );
           limit.textContent = status.deeptutor?.embedding
-            ? `知识库检索已配置 · ${status.deeptutor.knowledge_bases || 0} 个知识库`
-            : "对话、研究、学习路径都能用；读资料提问暂时不行（缺 Embedding），页面上会如实标出来";
+            ? tr("知识库检索已配置 · ") +
+              (status.deeptutor.knowledge_bases || 0) +
+              tr(" 个知识库")
+            : tr(
+                "对话、研究、学习路径都能用；读资料提问暂时不行（缺 Embedding），页面上会如实标出来",
+              );
           limit.classList.toggle("error", !status.deeptutor?.embedding);
         })
         .catch(() => {

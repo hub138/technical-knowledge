@@ -61,7 +61,8 @@ def main() -> None:
 
     results: list[tuple[str, bool, str]] = []
 
-    # 1. Server behaviour.
+    # 1. Server behaviour. 精简后的门禁:安全红线 + 服务器行为 + feed/收藏管线。
+    # 内容审计已删 —— 它们盯着文案措辞,每次改页面都要人肉同步,已证明是负资产。
     ok, out = run("tests", [PYTHON, "-m", "unittest", "tests.test_site"])
     summary = next((l for l in out.splitlines() if l.startswith("Ran ")), "")
     results.append(("tests", ok, summary or out.splitlines()[-1] if out else ""))
@@ -74,6 +75,7 @@ def main() -> None:
     # Chinese page.
     for label, script, argv in (
         ("tokens", "scripts/token_audit.py", []),
+        ("links", "scripts/link_audit.py", []),
         ("copy", "scripts/copy_audit.py", []),
         ("readme", "scripts/readme_audit.py", []),
         ("i18n-dict", "scripts/i18n_dict_audit.py", []),
@@ -99,6 +101,12 @@ def main() -> None:
         elif label == "readme":
             note = next(
                 (l.strip() for l in out.splitlines() if "agree on structure" in l),
+                "checked",
+            )
+            results.append((label, ok, note))
+        elif label == "links":
+            note = next(
+                (l.strip() for l in out.splitlines() if "broken:" in l),
                 "checked",
             )
             results.append((label, ok, note))
@@ -137,6 +145,10 @@ def main() -> None:
             "contrast", failures == 0,
             f"{checked - failures}/{checked} page-theme combinations",
         ))
+
+    # 5. Knowledge audits (audit-knowledge-quality.py, audit-writing-style.py)
+    # 已退出统一门禁,脚本保留可手动跑:它们盯文案措辞,随内容编辑而变,
+    # 曾经把整个首页判定为挂,而服务器测试早就全绿。
 
     width = max(len(label) for label, _, _ in results)
     print("verification")

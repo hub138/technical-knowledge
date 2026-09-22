@@ -37,6 +37,8 @@ ruanyifeng 是 `X-Frame-Options: SAMEORIGIN`，用户最看重的两个站恰好
 from __future__ import annotations
 
 import html
+# 2026-09-22 新增：IncompleteRead 容错需要（见 fetch_one 里的断流处理）。
+import http.client
 import json
 import os
 import re
@@ -99,6 +101,18 @@ FEEDS: list[dict] = [
         "delay": 0.0,
     },
     {
+        # 小宇宙的播客页是服务端渲染，__NEXT_DATA__ 里有全部单集——
+        # 所以"播客没有可抓的文字列表"这个旧判断不成立了，单集就是列表。
+        "key": "ai-paper-podcast",
+        "group": "papers",
+        "kind": "podcast",
+        "url": "https://www.xiaoyuzhoufm.com/podcast/667d1ecfc13b46d76c3f64b8",
+        "link": "https://www.xiaoyuzhoufm.com/podcast/667d1ecfc13b46d76c3f64b8",
+        "ttl": 21600,
+        "limit": 5,
+        "delay": 0.0,
+    },
+    {
         "key": "papernotes",
         "group": "papers",
         "kind": "html",
@@ -138,6 +152,10 @@ FEEDS: list[dict] = [
         "ttl": 900,
         "limit": 12,
         "delay": 0.0,
+        # 2026-09-22 实测 zeli.app 响应要 15 秒左右（curl 探测 15.005s），
+        # 默认 TIMEOUT=8s 必然 unreachable，页面上就一直「这一站暂时读不到」。
+        # 参照上面 sitemap 慢源的处理，给它单独放宽到 45s。
+        "timeout": 45.0,
     },
     {
         # BestBlogs 保留条目但 kind=none。删掉的话前端就不知道有这么个源需要解释，
@@ -738,16 +756,29 @@ def parse_zeli(text: str, base: str) -> tuple[list[dict], str]:
         if isinstance(stamp, (int, float)) and stamp > 0:
             published = _dt.datetime.fromtimestamp(stamp).strftime("%Y-%m-%d")
         score = post.get("score")
+        # 2026-09-22 语义归位（勿回退到 tags）：
+        # tags 在前端渲染成蓝色 info-soft 芯片，而那个芯片的 CSS 注释
+        # 明确写着它是「这段摘要是模型写的」（AI总结）信息的载体。
+        # HN 热度和作者不是那个语义 —— 热度是外部质量信号（与 BestBlogs
+        # 评分同族，前端有 .src-rich-score 的 accent 粗体视觉），作者
+        # 是来源署名（与 .src-rich-source 同族）。放进 tags 让「▲ 764」
+        # 和「cs.AI」「AI总结」长成一个样子，读者无法区分
+        # 「模型生成标记」和「社区热度」。
+        # 所以拆成两个显式字段，前端各走各的语义通道。
         items.append({
             "title": title,
             "url": url,
             # zeli 自己写的摘要，比标题多得多 —— 原来这一格是空的。
             "summary": clean_text(post.get("abstract"), 300),
             "published": published,
-            # 热度和作者做标签。Hacker News 的分数是有意义的信号：
-            # 170 分和 3 分不是同一件事。
-            "tags": ([f"▲ {score}"] if isinstance(score, int) and score > 0 else [])
-                    + ([str(post.get("by"))] if post.get("by") else []),
+            # HN 热度走 meta 行的 accent 粗体（.src-rich-score），
+            # 是质量信号不是内容标签。
+            "score": score if isinstance(score, int) and score > 0 else None,
+            # 作者署名走 meta 行的 faint 小字，与来源名同视觉层级。
+            "author": str(post.get("by")) if post.get("by") else "",
+            # tags 留空：zeli 没有内容分类标签（旧代码把热度/作者塞这里，
+            # 语义错位，已移除）。
+            "tags": [],
         })
         if len(items) >= 40:
             break
@@ -821,6 +852,7 @@ def _fetch_bestblogs(source: dict) -> tuple[list[dict], str]:
             "source": row.get("source", ""),
             "source_icon": row.get("source_icon", ""),
             "cover": row.get("cover", ""),
+            "score": row.get("score") or "",
             "word_count": row.get("word_count") or 0,
             "read_minutes": row.get("read_minutes") or 0,
             "tags": row.get("tags") or [],
@@ -831,10 +863,68 @@ def _fetch_bestblogs(source: dict) -> tuple[list[dict], str]:
     return items, ""
 
 
+def _fetch_podcast(source: dict) -> tuple[list[dict], str]:
+    """小宇宙播客：抓播客主页，从 __NEXT_DATA__ 里取最新几期。
+
+    单集数据齐：标题、eid（拼出单集链接）、发布日期、shownotes。
+    页面约 200KB，一天更一集，6 小时 TTL 足够新鲜。
+    """
+    request = urllib.request.Request(
+        source["url"],
+        headers={"User-Agent": USER_AGENT, "Accept": "text/html;q=0.9, */*;q=0.8"},
+    )
+    try:
+        cap = int(source.get("max_bytes", MAX_BYTES))
+        with urllib.request.urlopen(request, timeout=float(source.get("timeout", TIMEOUT))) as response:
+            raw = response.read(cap + 1)
+            if len(raw) > cap:
+                return [], "too_large"
+        text = raw.decode("utf-8", errors="replace")
+    except urllib.error.HTTPError as error:
+        return [], f"http_{error.code}"
+    except (urllib.error.URLError, OSError, ValueError):
+        return [], "unreachable"
+
+    match = re.search(r'<script id="__NEXT_DATA__"[^>]*>(.*?)</script>', text, re.S)
+    if not match:
+        return [], "selector_missing"
+    try:
+        data = json.loads(match.group(1))
+    except ValueError:
+        return [], "selector_missing"
+    episodes = (
+        (((data.get("props") or {}).get("pageProps") or {}).get("podcast") or {}).get("episodes")
+        or []
+    )
+    items: list[dict] = []
+    for episode in episodes[: int(source.get("limit") or 5)]:
+        if not isinstance(episode, dict):
+            continue
+        eid = str(episode.get("eid") or "").strip()
+        title = str(episode.get("title") or "").strip()
+        if not eid or not title:
+            continue
+        pub = str(episode.get("pubDate") or "")[:10]
+        # shownotes 是 HTML，剥掉标签只留文字，截到 220 字。
+        desc = html.unescape(re.sub(r"<[^>]+>", " ", str(episode.get("description") or "")))
+        desc = re.sub(r"\s+", " ", desc).strip()
+        items.append({
+            "title": title,
+            "url": f"https://www.xiaoyuzhoufm.com/episode/{eid}",
+            "published": pub,
+            "summary": desc[:220],
+        })
+    if not items:
+        return [], "selector_missing"
+    return items, ""
+
+
 def fetch_one(source: dict) -> tuple[list[dict], str]:
     """抓一个源。**绝不抛异常** —— 一个源失败不能影响其余。"""
     if source.get("key") == "bestblogs":
         return _fetch_bestblogs(source)
+    if source.get("key") == "ai-paper-podcast":
+        return _fetch_podcast(source)
     if source.get("kind") == "none":
         return [], ""
     if source.get("delay"):
@@ -855,7 +945,18 @@ def fetch_one(source: dict) -> tuple[list[dict], str]:
         timeout = float(source.get("timeout", TIMEOUT))
         with urllib.request.urlopen(request, timeout=timeout) as response:
             cap = int(source.get("max_bytes", MAX_BYTES))
-            raw = response.read(cap + 1)
+            try:
+                raw = response.read(cap + 1)
+            except http.client.IncompleteRead as partial:
+                # 2026-09-22 新增：zeli 用 chunked 传输且经常提前断流
+                # （实测读到 260935/293694 字节抛 IncompleteRead），
+                # 但已收到的部分足够解析出文章列表 —— zeli 的卡片都在
+                # 页面前部，尾部只是脚本和页脚。读多少用多少，比整体
+                # 报 unreachable 好。旧的 except 链没有这一支，IncompleteRead
+                # 不是 OSError 子类，直接穿透到调用方让整个源失败，
+                # 这是 zeli 一直「这一站暂时读不到」的第二个根因
+                #（第一个是连接就要 15s、默认 8s 超时，已放宽到 45s）。
+                raw = partial.partial
             if len(raw) > cap:
                 return [], "too_large"
             content_type = response.headers.get("Content-Type", "")
@@ -951,6 +1052,13 @@ def _refresh_all() -> None:
                 }
             continue
         items, error = fetch_one(source)
+        # 2026-09-22 新增单源重试：zeli 实测约 1/3 概率 TLS 握手超时
+        # （curl 与 urllib 都偶发，站点或链路波动，正常时 3-7s 就通）。
+        # 旧逻辑一次失败就把 error 固化进缓存，TTL 15 分钟内页面上
+        # 一直「这一站暂时读不到」。失败立即重试一次，成功就当正常。
+        # RSS 源快且稳，不加；只对 kind=html 的慢源重试。
+        if error and source.get("kind") == "html":
+            items, error = fetch_one(source)
         with _CACHE_LOCK:
             _CACHE[key] = {
                 "items": items,
@@ -1059,6 +1167,11 @@ def snapshot(force: bool = False) -> dict:
                     "cover": item.get("cover", ""),
                     "source": item.get("source", ""),
                     "source_icon": item.get("source_icon", ""),
+                    "score": item.get("score") or "",
+                    # 2026-09-22 放行 author：zeli 源的作者署名（parse_zeli
+                    # 语义归位改造新增的标量字段）。纯短字符串不承载 HTML，
+                    # 限长 60 与 affiliations 同级；前端仍走 esc()。
+                    "author": str(item.get("author") or "")[:60],
                     "word_count": item.get("word_count", 0),
                     "read_minutes": item.get("read_minutes", 0),
                     # 标签是字符串数组（「AI总结」这类标记）。仍是标量集合，

@@ -48,10 +48,6 @@
       a:hover {
         text-decoration: none;
       }
-      .tk-shell {
-        max-width: 1160px;
-        margin: auto;
-      }
       .topbar {
         height: 76px;
         display: flex;
@@ -59,33 +55,19 @@
         justify-content: space-between;
         border-bottom: 1px solid var(--color-line);
       }
+      /* 头部契约（site/base.css）：hero 几何（padding/border-bottom/
+         标题字号/说明排版）由契约统一给，不本地维护。这里只保留布局
+         语义：两栏（左文右卡）与栏内防溢出。原 .eyebrow 0 引用已删；
+         .hero h1 的 36px 与 .hero-text p 的 790px/16px 是活覆盖，
+         推离全站基准（--text-3xl / 76ch/--text-note），已删。 */
       .hero {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
         gap: 28px;
         align-items: end;
-        padding: 42px 0 28px;
-        border-bottom: 1px solid var(--color-line);
       }
       .hero > * {
         min-width: 0;
-      }
-      .eyebrow {
-        color: var(--color-accent);
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.1em;
-      }
-      .hero h1 {
-        font-size: 36px;
-        line-height: 1.25;
-        margin: 8px 0 10px;
-      }
-      .hero-text p {
-        max-width: 790px;
-        color: var(--color-muted);
-        font-size: 16px;
-        margin: 0;
       }
       .hero-card {
         padding: 17px;
@@ -108,14 +90,15 @@
       .hero-card .links {
         margin-top: 12px;
       }
-      .purpose {
-        margin-top: 22px;
-      }
+      /* 首块间距走契约：头部 margin-bottom 20 已给，.purpose 的
+         margin-top 22px 是「每页自己再叠一层」的残留，删；真源在
+         base.css 的 .purpose（margin-top 14px）。grid 的 23px 同理，
+         收进 --space-6。 */
       .grid {
         display: grid;
         grid-template-columns: 1.1fr 0.9fr;
         gap: 14px;
-        margin-top: 23px;
+        margin-top: var(--space-6);
       }
       .panel {
         background: var(--color-panel);
@@ -211,14 +194,9 @@
         line-height: 1.6;
       }
       @media (max-width: 900px) {
-        .tk-shell {
-        }
+        /* hero 移动端几何（30/16）由 base.css 契约统一给，只留布局：单栏。 */
         .hero {
           grid-template-columns: 1fr;
-          padding: 32px 0 25px;
-        }
-        .hero h1 {
-          font-size: 29px;
         }
         .grid {
           grid-template-columns: 1fr;
@@ -237,7 +215,7 @@
       }
     </style>
   <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}</style>
-<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article,:root[data-theme="dark"] .tk-shell > section{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 </head>
   <body class="tk-host">
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
@@ -253,7 +231,7 @@
           <strong>这次练习要产出什么</strong>
           <p>你要先预测结果，再说清变量变化为什么改变结论。看解释不算产出。</p>
           <div class="links">
-            <a class="button primary" target="_blank" rel="noopener noreferrer" href="/launch/openmaic?next=%2F">打开课堂 ↗</a>
+            <a class="button primary" target="_blank" rel="noopener noreferrer" href="/launch/openmaic?next=%2F">打开课堂</a>
           </div>
         </aside>
       </section>
@@ -299,9 +277,7 @@
             >打开课堂不会调用模型；点击生成课堂后才会产生模型请求。主题会预填，提交前可以修改。
           </div>
           <p style="margin-top: 15px">
-            生成后的课堂由 OpenMAIC
-            自己保存到它的课堂库/浏览器存储。它不会自动写入本知识库
-            Markdown；需要正式收录时，应把经过核对的稳定结论整理成知识页，并保留课堂作为来源。
+            生成后的课堂由 OpenMAIC 自己保存到它的课堂库/浏览器存储。它不会自动写入本知识库 Markdown；需要正式收录时，应把经过核对的稳定结论整理成知识页，并保留课堂作为来源。
           </p>
           <div class="links">
             <a

@@ -22,6 +22,7 @@ import json
 import mimetypes
 import os
 import pathlib
+import platform
 import posixpath
 import pwd
 import re
@@ -404,7 +405,20 @@ def read_keychain_secret(service: str) -> str:
 
 
 def load_site_password() -> str:
-    """Read or create the shared LAN login password without putting it on disk."""
+    """Read or create the shared LAN login password without putting it on disk.
+
+    优先级：环境变量 KNOWLEDGE_SITE_PASSWORD（Linux/容器部署——那边没有
+    macOS Keychain）→ Keychain 读写（macOS 本机默认）。两者都不可用时报错
+    而不是静默生成：密码是认证的根，悄悄换新值会让所有已发 cookie 失效，
+    且没人知道新密码是什么。"""
+    env_password = (os.environ.get("KNOWLEDGE_SITE_PASSWORD") or "").strip()
+    if env_password:
+        return env_password
+    if platform.system() != "Darwin":
+        raise RuntimeError(
+            "KNOWLEDGE_SITE_PASSWORD is not set; "
+            "the macOS Keychain path only works on Darwin"
+        )
     account = _keychain_account()
     query = subprocess.run(
         ["/usr/bin/security", "find-generic-password", "-a", account, "-s", AUTH_SERVICE, "-w"],
@@ -528,7 +542,8 @@ def is_local_client(address: str) -> bool:
 
 LOGIN_HTML = r'''<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>工程知识库 · 登录</title><style>
+<title>工程知识库 · 登录</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg"><style>
 :root{color-scheme:light;--bg:#f3f5f2;--panel:#fff;--ink:#202826;--muted:#68736f;--line:#d9dfdb;--accent:#137766}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}
 main{width:min(420px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 16px 40px #23302b14}h1{font-size:21px;margin:0 0 7px}p{color:var(--muted);margin:0 0 21px}label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:7px;font:inherit;outline:0}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #13776620}button{width:100%;margin-top:16px;padding:11px 13px;border:0;border-radius:7px;background:var(--accent);color:white;font:600 14px inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.error{min-height:24px;color:#ad3e4f;margin:13px 0 0;font-size:13px}
@@ -594,6 +609,18 @@ def truthy(value: object) -> bool:
     if isinstance(value, str):
         return value.strip().lower() in {"true", "yes", "on", "1"}
     return bool(value)
+
+
+def count_words(body: str) -> int:
+    r"""字数统计：汉字逐字计，英文/数字串按词计。
+
+    以前用 \S+ 切空格分词，中文整段连续汉字只算 1 词，字数展示严重失真
+    （同篇幅中文文章的字数比英文少两个数量级）。中文读者预期「字」= 
+    汉字个数 + 英文单词个数，这样中英混排的文章字数才和直觉一致。
+    """
+    cjk = len(re.findall(r"[\u4e00-\u9fff]", body))
+    latin = len(re.findall(r"[A-Za-z0-9][A-Za-z0-9_.\-/']*", body))
+    return cjk + latin
 
 
 def excerpt(body: str, title: str) -> str:
@@ -670,6 +697,128 @@ def _append_jsonl(path: Path, record: dict[str, object]) -> bool:
     except OSError:
         return False
     return True
+
+
+# ── 收藏 ─────────────────────────────────────────────────────────────────
+#
+# 全站共享的收藏夹：站点没有账号体系，任何访客都能收藏或取消——
+# 与反馈端点同一信任模型。收藏的是**整条快照**而不是文章 id：
+# 文章滑出七天窗口之后，早报接口不会再返回它，快照是"永久显示"的前提。
+#
+# 上限 100：收藏夹是精选，不是仓库。满了就拒绝并让前端提示，
+# 不做自动淘汰——自动清掉用户亲手挑的内容，比"收藏夹满了"更伤。
+
+FAVORITES_CAP = 100
+_FAVORITES_LOCK = threading.Lock()
+
+_FAVORITE_FIELDS = (
+    "title", "url", "summary", "source", "source_icon", "published",
+    "published_full", "cover", "category", "authors",
+)
+_FAVORITE_NUMBERS = ("score", "word_count", "read_minutes")
+
+
+def _favorites_log() -> Path:
+    """每次调用时解析——测试会把 DATA_HOME 换成临时目录，
+    import 时绑死的常量会让读写落到真实数据文件上。"""
+    return DATA_HOME / "favorites.json"
+
+
+def _load_favorites() -> list[dict[str, object]]:
+    try:
+        raw = json.loads(_favorites_log().read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return raw if isinstance(raw, list) else []
+
+
+def _save_favorites(entries: list[dict[str, object]]) -> bool:
+    """整文件原子写：先写临时文件再改名，并发读不会看到半份。"""
+    try:
+        target = _favorites_log()
+        target.parent.mkdir(parents=True, exist_ok=True)
+        tmp = target.with_suffix(".json.tmp")
+        tmp.write_text(json.dumps(entries, ensure_ascii=False), encoding="utf-8")
+        tmp.replace(target)
+        return True
+    except OSError:
+        return False
+
+
+def _favorite_snapshot(item: dict[str, object]) -> dict[str, object]:
+    """只保留渲染需要的字段，字符串裁到 2000 字——快照是永久存储，别让它无限膨胀。"""
+    snap: dict[str, object] = {}
+    for key in _FAVORITE_FIELDS:
+        value = item.get(key)
+        if isinstance(value, str) and value:
+            snap[key] = value[:2000]
+        elif isinstance(value, list) and value:
+            snap[key] = [str(x)[:200] for x in value[:8]]
+    for key in _FAVORITE_NUMBERS:
+        value = item.get(key)
+        if isinstance(value, (int, float)):
+            snap[key] = value
+    return snap
+
+
+def favorites_add(fid: str, item: dict[str, object]) -> tuple[bool, str]:
+    """添加一条收藏。返回 (是否成功, 错误码)。并发安全由锁保证。"""
+    snapshot = _favorite_snapshot(item)
+    if not str(snapshot.get("title") or "") or not str(snapshot.get("url") or ""):
+        return False, "invalid"
+    with _FAVORITES_LOCK:
+        entries = _load_favorites()
+        url = str(snapshot.get("url") or "").strip()
+        if any(e.get("id") == fid or str((e.get("item") or {}).get("url") or "").strip() == url
+               for e in entries):
+            # id 和 url 双重判重：历史上同一篇文章可能以两种 id 存过，
+            # 只按 id 判重会让它再存出第二条。
+            return False, "already_favorited"
+        if len(entries) >= FAVORITES_CAP:
+            return False, "favorites_full"
+        entries.append({"id": fid, "favorited_at": time.time(), "item": snapshot})
+        return (_save_favorites(entries), "")
+
+
+def favorites_remove(fid: str) -> int:
+    """移除一条收藏，返回移除条数（0 = 本来就不存在）。"""
+    with _FAVORITES_LOCK:
+        entries = _load_favorites()
+        kept = [e for e in entries if e.get("id") != fid]
+        removed = len(entries) - len(kept)
+        if removed and not _save_favorites(kept):
+            return -1
+    return removed
+
+
+def favorites_update(fid: str, item: dict[str, object]) -> tuple[bool, str]:
+    """2026-09-22 新增：同 id 收藏的就地更新（评分/摘要/封面等字段刷新）。
+
+    背景：前端 favRefreshItem（shell.js）在早报刷新后会把已收藏文章的
+    最新字段 POST 回来，但 favorites_add 对同 id 一律返回 already_favorited，
+    收藏快照永远停留在收藏那一刻——「收藏的文章后来评分变了」这个用户
+    明确期待的场景实际上更新不了。此函数补上这条链路：
+    - 找到同 id 条目 → 用新快照覆盖 item，favorited_at 保持原值
+      （收藏时间是历史事实，不随内容刷新重写）；
+    - 新旧 URL 不一致 → 拒绝（url_mismatch）。URL 是判重锚点，允许它变
+      等于允许把 A 文章的更新写进 B 文章的收藏里；
+    - 不存在该 id → 返回 not_found，由调用方决定是否走 favorites_add。
+    并发安全与 _save_favorites 原子写和 add/remove 同一套保障。"""
+    snapshot = _favorite_snapshot(item)
+    if not str(snapshot.get("title") or "") or not str(snapshot.get("url") or ""):
+        return False, "invalid"
+    with _FAVORITES_LOCK:
+        entries = _load_favorites()
+        for e in entries:
+            if e.get("id") != fid:
+                continue
+            old_url = str((e.get("item") or {}).get("url") or "").strip()
+            new_url = str(snapshot.get("url") or "").strip()
+            if old_url and new_url and old_url != new_url:
+                return False, "url_mismatch"
+            e["item"] = snapshot
+            return (_save_favorites(entries), "")
+    return False, "not_found"
 
 
 def _read_jsonl(path: Path, limit: int = 2000) -> list[dict[str, object]]:
@@ -1009,6 +1158,18 @@ class Vault:
         return f"{digest}:{edges}"
 
     def refresh(self) -> None:
+        # 浅指纹防抖：分页后前端连发多页请求，每页都全量重读+解析
+        # 721 个 md（实测 ~0.35s/页）是最大的耗时项。先只做 stat
+        # （毫秒级），指纹没变就认为内部缓存仍新鲜，跳过本次扫描。
+        fingerprint = []
+        for p in sorted(self.root.rglob("*.md")):
+            if not p.is_file() or any(part.startswith(".") for part in p.relative_to(self.root).parts):
+                continue
+            st = p.stat()
+            fingerprint.append((str(p), st.st_mtime_ns, st.st_size))
+        if getattr(self, "_fingerprint", None) == fingerprint and self.notes:
+            return
+        self._fingerprint = fingerprint
         notes: dict[str, dict[str, object]] = {}
         for path in sorted(self.root.rglob("*.md")):
             if not path.is_file() or any(part.startswith(".") for part in path.relative_to(self.root).parts):
@@ -1057,7 +1218,10 @@ class Vault:
                 "sources": front.get("sources", []) if isinstance(front.get("sources", []), list) else [],
                 "body": body,
                 "mtime": path.stat().st_mtime_ns,
-                "words": len(re.findall(r"\S+", body)),
+                # 字数 = 汉字逐字数 + 英文/数字按空格词数。纯非空白串分词对中文
+                # 严重失真（一段连续汉字只算 1 个词），列表和矩阵的字数展示
+                # 都依赖这个值。代码块里的内容也算正文工作量，不剔除。
+                "words": count_words(body),
                 "listed": parts[0] in {"工程知识", "Clippings", "知识库管理"} or rel == "知识库首页.md",
             }
         self.notes = notes
@@ -1644,6 +1808,7 @@ def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes
     document = f"""<!doctype html>
 <html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{html.escape(title)} · technical-knowledge</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="stylesheet" href="/static/tokens.css">
 <script src="/static/nav.js"></script>
 <link rel="stylesheet" href="/static/base.css">
@@ -1686,39 +1851,6 @@ def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes
     return document.encode("utf-8")
 
 
-def _interleave_by_day(items: list[dict], limit: int) -> list[dict]:
-    """把条目按发布日期轮流抽取，凑够 limit 条。
-
-    输入是按时间倒序的（近三天的内容），直接截取会全落在同一天。这里按天
-    分组后轮流各取一条 —— 三天都有内容时，前三张就是三天各一张。
-
-    分组顺序仍然按日期倒序，所以取出来的整体还是"新的在前"。
-    """
-    if limit <= 0:
-        return []
-    buckets: dict[str, list[dict]] = {}
-    for item in items:
-        day = str(item.get("published") or "")[:10]
-        buckets.setdefault(day, []).append(item)
-    # 日期倒序
-    days = sorted(buckets, reverse=True)
-    out: list[dict] = []
-    index = 0
-    while len(out) < limit:
-        picked = False
-        for day in days:
-            bucket = buckets[day]
-            if index < len(bucket):
-                out.append(bucket[index])
-                picked = True
-                if len(out) >= limit:
-                    break
-        if not picked:
-            break
-        index += 1
-    return out
-
-
 class Handler(BaseHTTPRequestHandler):
     server_version = "KnowledgeSite/1.0"
 
@@ -1727,7 +1859,10 @@ class Handler(BaseHTTPRequestHandler):
         return self.server.vault  # type: ignore[attr-defined]
 
     def log_message(self, fmt: str, *args: object) -> None:
-        print(f"[{self.log_date_time_string()}] {fmt % args}", flush=True)
+        # 来源 IP：排查外部访问问题时（如"同事打开裸奔"），没有 IP 就分不清
+        # 请求来自本机、局域网还是公网隧道。client_address[0] 即对端地址。
+        client = self.client_address[0] if self.client_address else "-"
+        print(f"[{self.log_date_time_string()}] {client} {fmt % args}", flush=True)
 
     def stamp_client_scope(self, payload: bytes, content_type: str) -> bytes:
         """Tell the page, in the HTML itself, whether this client is the owner.
@@ -1782,6 +1917,13 @@ class Handler(BaseHTTPRequestHandler):
             except Exception:
                 self._gzipped = False
         self.send_response(status)
+        # charset 补齐：text/css 与 text/javascript 过去不带 charset，
+        # 旧内核（企业微信内嵌浏览器等）会按系统 locale（GBK）解码。
+        # 样式表含大量中文注释（base.css 非ASCII字节占 36%），GBK 误解码
+        # 会破坏注释结构导致整表被拒——外部访客页面裸奔、本机 Chrome 正常，
+        # 正是这个差异。此处是全站唯一的 Content-Type 出口，一处生效。
+        if content_type in ("text/css", "text/javascript") and "charset" not in content_type:
+            content_type += "; charset=utf-8"
         self.send_header("Content-Type", content_type)
         if getattr(self, "_gzipped", False):
             self.send_header("Content-Encoding", "gzip")
@@ -1798,7 +1940,14 @@ class Handler(BaseHTTPRequestHandler):
         #              重新验证，而不是完全不缓存。
         #   API       仍然 no-store —— 笔记和反馈随时在变，不该被缓存。
         if self._is_static():
-            self.send_header("Cache-Control", "public, max-age=3600")
+            # js/css 在开发期改动频繁：1 小时缓存会让浏览器拿着旧脚本
+            # 撞上新页面（收藏弹窗那次就是——旧 shell.js 里弹窗永远
+            # 不可见）。这两类改为 no-cache 重新验证；图片/字体才是
+            # 真正值得缓存一小时的东西。
+            if self.path.split("?", 1)[0].endswith((".js", ".css")):
+                self.send_header("Cache-Control", "no-cache")
+            else:
+                self.send_header("Cache-Control", "public, max-age=3600")
         elif content_type.startswith("text/html"):
             self.send_header("Cache-Control", "no-cache")
         else:
@@ -2021,6 +2170,11 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self.send_bytes(payload, "text/html; charset=utf-8")
             return
+        if path in {"/vocab", "/vocab/"}:
+            # 命令词汇页已退役（2026-09-22）：词汇是查询方向，不配独立顶级入口，
+            # 知识本体回归文章与全景维度。老链接重定向到词源总纲。
+            self.redirect("/?path=" + quote("工程知识/软件构建：让变化可以理解、验证与交付/开发工具/词汇即接口：Linux与容器命令的词源与设计.md"))
+            return
         if path in {"/projects", "/projects/"}:
             # 项目入口有自己的一页（projects/index.html），它列出了工具、源码和用法。
             # 以前这里重定向到 总览/项目与工具.md —— 那篇笔记早已不存在，
@@ -2235,12 +2389,20 @@ class Handler(BaseHTTPRequestHandler):
             if not file.is_file():
                 self.send_json({"error": "asset not found"}, 404)
                 return
-            allowed = {".css", ".js", ".mjs", ".map", ".woff2", ".woff"}
+            allowed = {".css", ".js", ".mjs", ".map", ".woff2", ".woff", ".svg"}
             if file.suffix.lower() not in allowed:
                 self.send_json({"error": "asset not found"}, 404)
                 return
             self.send_bytes(file.read_bytes(), mimetypes.guess_type(file.name)[0] or "application/octet-stream")
             return
+        if path == "/favicon.svg":
+            # 浏览器会自动请求 /favicon.ico，但我们用 <link rel="icon"> 显式
+            # 指向 SVG（矢量、一个文件全尺寸、暗色底上不用反转）。ico 那条
+            # 老路径继续 404 —— 站内从没放过 ico，改它没有收益。
+            fav = Path(__file__).resolve().parent / "favicon.svg"
+            if fav.is_file():
+                self.send_bytes(fav.read_bytes(), "image/svg+xml")
+                return
         if path == "/health":
             self.vault.refresh()
             bound_host = self.server.server_address[0]  # type: ignore[attr-defined]
@@ -2270,7 +2432,15 @@ class Handler(BaseHTTPRequestHandler):
                 public["excerpt"] = excerpt(body, str(n["title"]))
                 # The frontend searches over search_text and hashes it to detect
                 # changes, so it stays in the payload until search moves server-side.
-                public["search_text"] = body
+                # 截到 600 字符：全量 body 让 /api/notes 膨胀到 2.3MB，经
+                # 公网传输时在 ~700KB 处被中间设备掐断（实测恒定截断），
+                # 页面拿到残缺 JSON 就变成"暂时读不到"。本地浅搜索 600
+                # 字符足够；深度检索走 /api/search。
+                # 截断长度可由环境变量调：默认 600（本地直连无传输限制，
+                # 浅搜索够用）；公网受限链路上（如办公网对非标端口的字节
+                # 上限）调小让 /api/notes 整体过线，深度检索走 /api/search。
+                cap = int(os.environ.get("KNOWLEDGE_SEARCH_TEXT_CAP") or 600)
+                public["search_text"] = body[:cap]
                 notes.append(public)
             # 图谱与"入链/延伸"的唯一事实源：在服务端一次收口。
             # 前端三个渲染器（关系网络、阅读页关系、目录）都只读这个结果，
@@ -2286,11 +2456,27 @@ class Handler(BaseHTTPRequestHandler):
             # 带上服务端算的签名。前端拿它和 /api/notes/version 的返回值比，
             # 两边必须是同一个值 —— 否则版本端点永远认为"变了"，每 10 秒
             # 照旧拉一次全量（第一版就踩了这个，改善完全没生效）。
-            self.send_json({
-                "notes": notes,
-                "edges": edges,
+            #
+            # 分页：?offset=&limit= 切 notes 列表。dev 机经办公网访问时，
+            # 非标端口（28788）被中间设备按固定字节数掐断连接（实测恒定
+            # 77KB 压缩后），一次性 1.5MB 必然残缺 —— 前端按页循环拉全。
+            # edges 和 signature 只随第一页带（每页重复传是浪费，前端在
+            # 最后一页组装）。无分页参数时行为不变（本机直连一次全量）。
+            try:
+                offset = max(0, int(query.get("offset", ["0"])[0]))
+                limit = max(0, int(query.get("limit", ["0"])[0]))
+            except ValueError:
+                offset, limit = 0, 0
+            page_notes = notes[offset : offset + limit] if limit else notes
+            payload: dict[str, object] = {
+                "notes": page_notes,
+                "total": len(notes),
+                "offset": offset,
                 "signature": self.vault.signature(),
-            })
+            }
+            if offset == 0:
+                payload["edges"] = edges
+            self.send_json(payload)
             return
         if path == "/api/papers":
             self.vault.refresh()
@@ -2386,12 +2572,22 @@ class Handler(BaseHTTPRequestHandler):
                 "papers": _enrich_papers(page),
             })
             return
+        if path == "/api/favorites":
+            # 收藏夹是全站共享的，任何访客可读。
+            with _FAVORITES_LOCK:
+                entries = _load_favorites()
+            entries.sort(key=lambda e: float(e.get("favorited_at") or 0), reverse=True)
+            self.send_json({"items": entries, "cap": FAVORITES_CAP})
+            return
         if path == "/api/digest":
             # BestBlogs 的精选文章。走它的 OpenAPI，不爬页面。
             # 没配 key 时返回 unconfigured，页面照常显示别的源。
             force = query.get("refresh", ["0"])[0] == "1"
             try:
-                limit = min(24, max(1, int(query.get("limit", ["12"])[0])))
+                # 上限 60：更新按钮要拿全量比对收藏快照（24 太小，
+                # 滑出 Top 24 的收藏文章会永远同步不到新评分）。
+                # 仍然只触发早报两次 API 调用，不翻页，不烧配额。
+                limit = min(60, max(1, int(query.get("limit", ["12"])[0])))
             except ValueError:
                 limit = 12
             # 早报优先，精选流兜底。
@@ -2420,15 +2616,20 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result = fallback
             payload = dict(result)
-            # 按天交错取样，而不是简单取前 N 条。
+            # 排序：**评分优先，同分最新**（与库存、收藏区同一条规则）。
             #
-            # 数据是"近三天"的（按发布时间倒序）。直接 [:limit] 的话，最新那
-            # 一天条数够多时就会把名额占满 —— 首页 12 张卡全是同一天的，
-            # 那"近三天"这个标题就不成立。
+            # 曾经为了"标题写近三天"而按天交错轮取，副产品是把评分序打乱成
+            # 90/87/90/91 交替 —— 读者扫一屏看不出"哪几篇最值得读"，而这正是
+            # 这块的用途（实测反馈）。页面按评分排、收藏区按评分排，主体区却
+            # 不按评分排，同一块自相矛盾。
             #
-            # 交替各取一条：第一天、第二天、第三天、第一天…… 一屏里能看到
-            # 不同天的内容，标题和内容才对得上。
-            payload["items"] = _interleave_by_day(result.get("items") or [], limit)
+            # 日期的意义仍在：同分时新的在前；跨天覆盖由"近几天"的取数窗口
+            # 保证，不靠交错来制造。
+            payload["items"] = sorted(
+                result.get("items") or [],
+                key=lambda it: (it.get("score") or 0, it.get("published_ts") or 0),
+                reverse=True,
+            )[:limit]
             self.send_json(payload)
             return
         if path == "/api/sources":
@@ -2503,7 +2704,63 @@ class Handler(BaseHTTPRequestHandler):
                 return
             self.send_bytes(payload, mimetypes.guess_type(file.name)[0] or "application/octet-stream")
             return
-        self.send_json({"error": "not found"}, 404)
+        # 未知页面路径：以前返回裸 JSON {"error":"not found"}，浏览器里就是一行
+        # 没有样式的错误文本。用户敲错 URL 或点失效链接时应得到与全站一致的
+        # 页面，并给回首页/常用入口的路。但 API 前缀的未匹配子路径例外：
+        # 调用方是脚本/前端代码，期望 JSON（改 HTML 会破坏它们对 404 的解析）。
+        # /learn/ 重定向未命中与 /static 资产缺失在上方分支已各自返回 JSON。
+        if path.startswith("/api/") or path == "/api":
+            self.send_json({"error": "not found"}, 404)
+            return
+        self.send_bytes(self.render_404_page(path), "text/html; charset=utf-8", 404)
+
+    def render_404_page(self, path: str) -> bytes:
+        """生成与站点同框架的 404 页面（tk-shell + sidebar + base.css）。"""
+        safe_path = html.escape(path)
+        document = f"""<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>404 · 页面不存在 · technical-knowledge</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="stylesheet" href="/static/tokens.css">
+<script src="/static/nav.js"></script>
+<link rel="stylesheet" href="/static/base.css">
+<script src="/static/shell.js"></script>
+<style>
+.nf-body{{margin-top:27px;padding:34px 38px;background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);box-shadow:var(--shadow-sm);position:relative;overflow:hidden}}
+/* 数字氛围光：低透明度径向渐变衬在 404 后方，与主页 hero 光斑同一视觉语言。 */
+.nf-body::before{{content:"";position:absolute;inset:-60% -30% auto -30%;height:300px;pointer-events:none;background:radial-gradient(55% 65% at 30% 30%,color-mix(in srgb,var(--color-accent) 12%,transparent),transparent 70%);-webkit-mask-image:radial-gradient(120% 100% at 50% 0%,#000 40%,transparent 100%);mask-image:radial-gradient(120% 100% at 50% 0%,#000 40%,transparent 100%)}}
+.nf-code{{font-family:var(--font-mono);font-size:64px;font-weight:700;color:var(--color-accent);line-height:1;position:relative}}
+.nf-title{{margin:14px 0 6px;font-size:22px;position:relative}}
+.nf-desc{{margin:0 0 18px;color:var(--color-ink-soft);position:relative}}
+.nf-path{{padding:2px 6px;border:1px solid var(--color-line);border-radius:4px;background:var(--color-surface);font-family:var(--font-mono);font-size:.9em;color:var(--color-ink-soft);overflow-wrap:anywhere}}
+.nf-links{{display:flex;flex-wrap:wrap;gap:10px;margin:0;padding:0;list-style:none;position:relative}}
+.nf-links a{{display:inline-block;padding:7px 14px;border:1px solid var(--color-line);border-radius:6px;text-decoration:none;color:var(--color-ink);font-size:var(--text-small);background:var(--color-surface)}}
+.nf-links a:hover{{border-color:var(--color-accent);color:var(--color-accent)}}
+/* 首页是 404 后的第一主动作：accent 底色与其他次级入口拉开层级。 */
+.nf-links li:first-child a{{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-on-accent);font-weight:var(--weight-bold)}}
+.nf-links li:first-child a:hover{{background:var(--color-accent-press,var(--color-accent));color:var(--color-on-accent)}}
+@media(max-width:760px){{.nf-body{{margin-top:18px;padding:20px 17px}}.nf-code{{font-size:48px}}}}
+</style></head>
+<body class="tk-host">
+<aside class="tk-sidebar" id="tk-sidebar"></aside>
+<div class="tk-shell">
+<main class="nf-body">
+<div class="nf-code">404</div>
+<h1 class="nf-title">页面不存在</h1>
+<p class="nf-desc">没有这个地址：<code class="nf-path">{safe_path}</code>。可能是链接失效或输错了，从下面的入口继续。</p>
+<ul class="nf-links">
+<li><a href="/">首页</a></li>
+<li><a href="/papers">论文追踪</a></li>
+<li><a href="/sources">优质好文</a></li>
+<li><a href="/projects">项目与教学</a></li>
+</ul>
+</main>
+</div>
+<script>
+  document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({{ page: 'home', auth: true }}));
+</script>
+</body></html>"""
+        return document.encode("utf-8")
 
     def read_json_body(self, limit: int) -> tuple[dict[str, object] | None, int]:
         """Read a JSON body. Returns (body, 0) or (None, http_status).
@@ -2559,6 +2816,12 @@ class Handler(BaseHTTPRequestHandler):
             return
         if not self.require_access():
             return
+        if path == "/api/favorites":
+            self.handle_favorites_add()
+            return
+        if path == "/api/favorites/remove":
+            self.handle_favorites_remove()
+            return
         if path == "/api/feedback":
             self.handle_feedback()
             return
@@ -2604,6 +2867,66 @@ class Handler(BaseHTTPRequestHandler):
             for record in _read_jsonl(FEEDBACK_LOG, limit=200)
             if record.get("ip") == address and float(record.get("ts") or 0) >= cutoff
         )
+
+    def handle_favorites_add(self) -> None:
+        body, error = self.read_json_body(64 * 1024)
+        if body is None:
+            self.send_json({"error": "invalid request"}, error)
+            return
+        item = body.get("item")
+        if not isinstance(item, dict):
+            self.send_json({"error": "缺少文章内容"}, 400)
+            return
+        fid = str(body.get("id") or "").strip()
+        if not fid:
+            url = str(item.get("url") or "")
+            if not url:
+                self.send_json({"error": "缺少标题或链接"}, 400)
+                return
+            fid = "u:" + hashlib.sha1(url.encode("utf-8")).hexdigest()
+        # 2026-09-22：POST /api/favorites 语义扩展为 upsert —— 同 id 已收藏
+        # 就地更新快照（评分/摘要/封面刷新，favorited_at 不动），新 id 才走
+        # 新增。此前对同 id 一律 409 already_favorited，前端 favRefreshItem
+        # 的更新请求全部被拒，收藏永远停留在收藏那一刻的旧数据。
+        ok, err = favorites_update(fid, item)
+        if ok:
+            self.send_json({"ok": True, "updated": True}, 200)
+            return
+        if err == "url_mismatch":
+            self.send_json({"error": err}, 409)
+            return
+        if err == "not_found":
+            ok, err = favorites_add(fid, item)
+            if not ok:
+                status = 409 if err in ("already_favorited", "favorites_full") else 400
+                payload = {"error": err}
+                if err == "favorites_full":
+                    payload["message"] = f"收藏夹已满（上限 {FAVORITES_CAP} 篇），请先取消一些再收藏"
+                self.send_json(payload, status)
+                return
+        elif err == "invalid":
+            self.send_json({"error": err}, 400)
+            return
+        else:
+            # 写盘失败等未知错误：与旧 add 路径一致按 500 处理。
+            self.send_json({"error": err or "write_failed"}, 500)
+            return
+        self.send_json({"ok": True}, 201)
+
+    def handle_favorites_remove(self) -> None:
+        body, error = self.read_json_body(4 * 1024)
+        if body is None:
+            self.send_json({"error": "invalid request"}, error)
+            return
+        fid = str(body.get("id") or "").strip()
+        if not fid:
+            self.send_json({"error": "缺少文章标识"}, 400)
+            return
+        removed = favorites_remove(fid)
+        if removed < 0:
+            self.send_json({"error": "收藏保存失败，请稍后重试"}, 500)
+            return
+        self.send_json({"removed": removed})
 
     def handle_feedback(self) -> None:
         body, error = self.read_json_body((FEEDBACK_MAX_CHARS + 1024) * 4)

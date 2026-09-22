@@ -124,7 +124,10 @@ def measure(url: str, target: Path, width: int = 1512, theme: str = "light") -> 
                 ],
                 capture_output=True,
                 text=True,
-                timeout=120,
+                # /sources 亮色探测偶发超时：99 张外链封面图的真实网络加载
+                # 会顶满 120 秒（文字对比度不受图片影响，等它只是白等），
+                # 放宽到 240 秒，把"页面重"和"真的挂了"区分开。
+                timeout=240,
             )
         dom = proc.stdout
         marker = "<title>@@"

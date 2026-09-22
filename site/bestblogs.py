@@ -95,7 +95,9 @@ _RETRY_TTL = 3600
 #
 # 3 天是个折中：一天的量太少（今天没更新就空着），再长就失去"最近"的
 # 意义了。每天抓一次时它会把窗口内每一天都取一遍，重复的按 id 去掉。
-_BRIEF_DAYS = 3
+# 2026-09-20 应反馈改成 7 天取评分前 20：好的文章不该因为窗口滑过就消失，
+# 前端只展示评分最高的 20 条，窗口加宽不会稀释首页。
+_BRIEF_DAYS = 7
 
 # 落盘。
 #
@@ -107,12 +109,180 @@ _CACHE_FILE = pathlib.Path(
     or pathlib.Path(__file__).resolve().parent.parent / "data" / "bestblogs-cache.json"
 )
 
-# 早报缓存。同样落盘：早报一天一版，一天只该抓一次。
-_BRIEF_TTL = 86400
+# 早报缓存。落盘 + LaunchAgent 每天 09:30/17:30 主动 force 抓两次
+# （早报上午发布；二次是兜底）。TTL 6 小时：定时任务缺席时，页面
+# 惰性刷新也不会让数据隔夜——昨天就因此整页停留在前一天的早报。
+_BRIEF_TTL = 21600
 _BRIEF_CACHE_FILE = pathlib.Path(
     pathlib.Path(__file__).resolve().parent.parent / "data" / "bestblogs-brief.json"
 )
 _brief_cache: dict[str, object] = {"at": 0.0, "payload": {}, "ttl": 0.0}
+
+# 最后一次成功的早报快照。
+#
+# 抓取是要花钱的（当前免费阶段也有配额），失败（配额耗尽/网络抖动/接口改动）
+# 不该把首页清空——那是把"这次没抓到"渲染成"这里没有内容"。快照在每次
+# 成功后落盘，任何失败分支都回退到它，哪怕文章已经超过七天窗口。
+_LAST_GOOD_FILE = pathlib.Path(
+    pathlib.Path(__file__).resolve().parent.parent / "data" / "bestblogs-last-good.json"
+)
+_last_good: dict[str, object] = {"items": [], "date": "", "at": 0.0}
+
+
+def _load_last_good() -> dict[str, object]:
+    try:
+        raw = json.loads(_LAST_GOOD_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return raw if isinstance(raw, dict) else {}
+
+
+def _save_last_good(items: list, date: str, at: float) -> None:
+    try:
+        _LAST_GOOD_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _LAST_GOOD_FILE.write_text(
+            json.dumps(
+                {"items": items, "date": date, "at": at}, ensure_ascii=False
+            ),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+
+
+# ── 30 天库存（archive） ──────────────────────────────────────────────
+#
+# 会员/配额是会到期的。到期后 briefs/public 端点打不开，页面唯一能
+# 依靠的就是提前抓回来的存量。archive 在每次成功抓取后自动并入新增
+# 条目（按 id 去重），并提供一次性回填入口 archive(days=N) —— 会员
+# 到期前把过去一个月的好文章全部落盘，到期后页面从库存兜底。
+_ARCHIVE_FILE = pathlib.Path(
+    pathlib.Path(__file__).resolve().parent.parent / "data" / "bestblogs-archive.json"
+)
+
+
+def _archive_sort_key(item: dict) -> tuple:
+    """库存的统一排序键：**分数优先，同分最新优先**。
+
+    这个库是「到期后靠库存续命」的资产——读者扫列表先看的是
+    这一期最值得读的什么，日期只是并列时的决胜属性。存盘顺序、
+    兜底子集、页面展示都走这一个键（改排序只改这里）。"""
+    return (item.get("score") or 0, item.get("published_ts") or 0)
+
+
+def _load_archive() -> list:
+    try:
+        raw = json.loads(_ARCHIVE_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return raw if isinstance(raw, list) else []
+
+
+def _save_archive(items: list) -> None:
+    try:
+        _ARCHIVE_FILE.parent.mkdir(parents=True, exist_ok=True)
+        _ARCHIVE_FILE.write_text(
+            json.dumps(items, ensure_ascii=False), encoding="utf-8"
+        )
+    except OSError:
+        pass
+
+
+def _merge_archive(new_items: list) -> int:
+    """并入库存：按 id 去重（评分高的同名条目以新数据为准）。返回新增数。"""
+    items = _load_archive()
+    by_id = {str(i.get("id") or ""): i for i in items if isinstance(i, dict)}
+    added = 0
+    for it in new_items:
+        if not isinstance(it, dict):
+            continue
+        key = str(it.get("id") or "")
+        if key and key not in by_id:
+            by_id[key] = it
+            added += 1
+    if added:
+        merged = sorted(by_id.values(), key=_archive_sort_key, reverse=True)
+        _save_archive(merged)
+    return added
+
+
+def archive(days: int = 30, sleep_s: float = 1.5) -> dict:
+    """一次性回填库存：抓过去 N 天的早报全量入库。
+
+    配额有限时这是一次性投入：N 天 ≈ N 次 briefs 调用 + 若干次
+    batch-meta（每 40 id 一块）。每次调用间隔 sleep_s 秒，避免触发
+    429——配额耗尽时立即停，已抓到的部分照常入库。
+    """
+    if not api_key():
+        return {"status": "unconfigured", "added": 0, "total": 0}
+    seen: dict[str, dict] = {}
+    days_list = _recent_days(days)
+    errors: list[str] = []
+    for idx, day in enumerate(days_list):
+        data, error = _get(f"briefs/public/{day}", {})
+        if error:
+            errors.append(f"{day}:{error}")
+            if error == "quota" or error.startswith("http_4"):
+                break
+            continue
+        candidates = data if isinstance(data, list) else (
+            (data or {}).get("contentItems") or (data or {}).get("candidates") or []
+        )
+        for c in candidates:
+            if isinstance(c, dict):
+                rid = str(c.get("resourceId") or c.get("id") or "")
+                if rid and rid not in seen:
+                    seen[rid] = c
+        if idx < len(days_list) - 1:
+            time.sleep(sleep_s)
+
+    ids = list(seen.keys())
+    rows: list[dict] = []
+    for start in range(0, len(ids), 40):
+        chunk = ids[start : start + 40]
+        rows.extend(_batch_meta(chunk))
+        time.sleep(sleep_s)
+
+    items = [_normalise(r) for r in rows if isinstance(r, dict)]
+    items = [i for i in items if i.get("title") and i.get("url")]
+    added = _merge_archive(items)
+    return {
+        "status": "ok" if items else "empty",
+        "added": added,
+        "total": len(_load_archive()),
+        "days": len(days_list),
+        "errors": errors[:5],
+    }
+
+
+def _stale_result(error: str) -> dict:
+    """失败时的兜底返回：有存量就回退存量，真没有才认空。"""
+    last = _load_last_good()
+    if last.get("items"):
+        age_days = round((time.time() - float(last.get("at") or 0)) / 86400, 1)
+        return {
+            "status": "stale",
+            "items": last["items"],
+            "date": str(last.get("date") or ""),
+            "stale_since": float(last.get("at") or 0),
+            "stale_age_days": age_days,
+            "error": error,
+        }
+    # last-good 也没有 → 从 30 天库存里取最近窗口的子集兜底。
+    # 会员到期后 briefs 端点打不开，页面内容全靠库存续命。
+    archived = [i for i in _load_archive() if isinstance(i, dict)]
+    if archived:
+        cutoff = time.time() - _BRIEF_DAYS * 86400
+        recent = [i for i in archived if (i.get("published_ts") or 0) / 1000 >= cutoff]
+        pool = sorted(archived, key=_archive_sort_key, reverse=True)
+        picked = sorted(recent, key=_archive_sort_key, reverse=True) or pool[:20]
+        return {
+            "status": "archive",
+            "items": picked,
+            "date": "",
+            "error": error,
+        }
+    return {"status": error, "items": [], "date": "", "error": error}
 
 
 def _load_brief_cache() -> None:
@@ -468,13 +638,16 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
 
     items = [_normalise(row) for row in rows if isinstance(row, dict)]
     items = [item for item in items if item["title"] and item["url"]]
-    # 按发布时间倒序排。
+    # 排序：**评分优先，同分最新**（_archive_sort_key，与库存同一规则）。
     #
-    # 接口自己的排序**不是**按时间 —— 实测 time=24h/3d/1w/1m 四个窗口返回的
-    # 总数完全一样（52742），第一页的日期从 2024 混到 2025，说明它按评分或
-    # 相关性排。它给的是"精选库里最值得读的"，不是"最近发布的"。
-    # 而这一页要的是后者，所以自己排。
-    items.sort(key=lambda item: item.get("published_ts") or 0, reverse=True)
+    # 接口自己的排序不可依赖 —— 实测 time=24h/3d/1w/1m 四个窗口返回的
+    # 总数完全一样（52742），第一页的日期从 2024 混到 2025。
+    #
+    # 这里曾经按发布时间倒序排，理由是"这一块叫最新优质好文"。实际观感是
+    # 乱的：一屏里 90/87/90/91 交替出现，读者没法判断"本周最值得读的是
+    # 哪几篇"——而这正是这块的用途。评分是 BestBlogs 已经算好的排序信号，
+    # 同一页的收藏区也用它，两处不同排序会让页面自相矛盾（实测反馈）。
+    items.sort(key=_archive_sort_key, reverse=True)
 
     # 本地按时间窗筛。
     #
@@ -606,11 +779,11 @@ def brief(force: bool = False) -> dict:
 
     if not any_ok and last_error:
         _remember_brief_failure(now, last_error)
-        return {"status": last_error, "items": [], "date": "", "error": last_error}
+        return _stale_result(last_error)
 
     if not all_rows:
         _remember_brief_failure(now, "empty")
-        return {"status": "empty", "items": [], "date": ""}
+        return _stale_result("empty")
 
     # 批量取详情。候选里没有发布日期，而页面要按时间排、要显示日期 ——
     # 这次补取不是可选的。
@@ -619,7 +792,7 @@ def brief(force: bool = False) -> dict:
     rows = _batch_meta(ids)
     if not rows:
         _remember_brief_failure(now, "empty")
-        return {"status": "empty", "items": [], "date": ""}
+        return _stale_result("empty")
 
     items = [_normalise(row) for row in rows if isinstance(row, dict)]
     items = [i for i in items if i.get("title") and i.get("url")]
@@ -637,6 +810,11 @@ def brief(force: bool = False) -> dict:
         items = [i for i in items if (i.get("published_ts") or 0) / 1000 >= cutoff]
     items.sort(key=lambda item: item.get("published_ts") or 0, reverse=True)
 
+    # 成功即落盘 last-good 快照 —— 失败分支的兜底全靠它。
+    _save_last_good(items, brief_date or "", now)
+    # 同时并入 30 天库存：库存是"会员到期后的一切"，随每次成功抓取生长。
+    _merge_archive(items)
+
     payload = {
         "status": "ok",
         # 最新那天的 briefDate。它标的是"这批里最新的一天"。
@@ -653,37 +831,42 @@ def brief(force: bool = False) -> dict:
 def _batch_meta(ids: list[str]) -> list[dict]:
     """按 id 批量取完整元数据。
 
-    POST 而不是 GET，body 是 `{"ids": [...]}`。一次最多几十个 id ——
-    早报一次给 20 个，一个请求就够，省下的配额留给别的。
+    POST 而不是 GET，body 是 `{"ids": [...]}`。**一次最多 40 个**——
+    实测 120 个 id 一批会被接口拒绝（重试三次都是非列表返回，静默变空）。
+    早报一天 20 条，三天一批正好；窗口放宽到 7 天后有 140 个候选，
+    必须按 40 个一组分块请求，单块失败跳过、不拖垮整批。
     """
     key = api_key()
     if not key:
         return []
-    body = json.dumps({"ids": ids}).encode("utf-8")
-    request = urllib.request.Request(
-        f"{API_BASE}/resources/batch-meta",
-        data=body,
-        headers={
-            "X-API-KEY": key,
-            "User-Agent": USER_AGENT,
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
-    for attempt in range(ATTEMPTS):
-        if attempt:
-            time.sleep(0.8 * attempt)
-        try:
-            with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
-                payload = json.loads(response.read().decode("utf-8", errors="replace"))
-        except Exception:
-            continue
-        data = payload.get("data")
-        if isinstance(data, list):
-            return [r for r in data if isinstance(r, dict)]
-        return []
-    return []
+    out: list[dict] = []
+    chunks = [ids[i : i + 40] for i in range(0, len(ids), 40)]
+    for chunk in chunks:
+        body = json.dumps({"ids": chunk}).encode("utf-8")
+        request = urllib.request.Request(
+            f"{API_BASE}/resources/batch-meta",
+            data=body,
+            headers={
+                "X-API-KEY": key,
+                "User-Agent": USER_AGENT,
+                "Accept": "application/json",
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        for attempt in range(ATTEMPTS):
+            if attempt:
+                time.sleep(0.8 * attempt)
+            try:
+                with urllib.request.urlopen(request, timeout=TIMEOUT) as response:
+                    payload = json.loads(response.read().decode("utf-8", errors="replace"))
+            except Exception:
+                continue
+            data = payload.get("data")
+            if isinstance(data, list):
+                out.extend([r for r in data if isinstance(r, dict)])
+                break
+    return out
 
 
 def _remember_brief_failure(now: float, status: str) -> None:
