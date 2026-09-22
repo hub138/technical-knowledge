@@ -25,84 +25,74 @@ sources:
 
 ## 调度配置
 
-用系统 crontab 触发（示例为每周一 09:00，实际路径以部署位置为准）：
+用系统 crontab 触发（每周一 09:00，实测通过的命令）：
 
 ```
-0 9 * * 1 cd /data/code/AIagent/skills/knowledge-site/technical-knowledge && codebuddy -p "$(cat scripts/radar_weekly_prompt.md)" --permission-mode acceptEdits >> logs/radar_weekly.log 2>&1
+0 9 * * 1 cd /data/code/AIagent/skills/knowledge-site/technical-knowledge && codebuddy -p "$(cat scripts/radar_weekly_prompt.md)" -y >> logs/radar_weekly.log 2>&1
 ```
 
-`codebuddy -p` 是非交互模式，实测可用；`--permission-mode acceptEdits` 让文件编辑自动放行，高风险操作仍会询问（定时任务无人值守，日志里要能看到被拦下的操作）。提示词里的 `{date}` 由执行前替换，也可以在提示词里省略——Agent 会读系统日期。
+`codebuddy -p` 是非交互模式，默认模型由 `/root/.codebuddy/settings.json` 决定（当前为 echo）。`-y` 自动放行低中危操作（网页访问、文件编辑），高危操作仍会拦截并写入日志。`--allowedTools` 白名单在非交互模式实测不生效，不采用。提示词从系统时间自行取日期，无需占位符替换。
 
-不依赖 shell 的环境里，用 `agent_foundation.ProcessSupervisor` 包一层超时与进程组回收：
-
-```python
-from agent_foundation import ProcessSpec, ProcessSupervisor
-
-result = ProcessSupervisor().run(
-    ProcessSpec(
-        ["codebuddy", "-p", prompt_text, "--permission-mode", "acceptEdits"],
-        cwd="/data/code/AIagent/skills/knowledge-site/technical-knowledge",
-        hard_timeout_seconds=1800,
-        idle_timeout_seconds=300,
-    )
-)
-```
-
-`agent_foundation` 只负责进程存活、超时回收、心跳与进程组回收；命令构造、结果解码和重试边界由调用方适配器决定。`result.termination` 不是 `EXITED` 时按 `recovery` 的指数退避重试一次。
+实测记录（2026-09-23，两轮）：面对过期基线，Agent 能抓全 vLLM v0.29.0/v0.30.0 与 Evals 转只读等增量，逐源给出核验表，无事实编造；无新事实的周直接报告零改动，不产生空更新。单轮耗时约 4 分钟。
 
 ## 完整提示词
 
-以下内容存为 `scripts/radar_weekly_prompt.md`，原样发给执行任务的 Agent：
+以下内容存为 `scripts/radar_weekly_prompt.md`，原样发给执行任务的 Agent（与 scripts 目录里的文件保持同步，改任何一处都要同步另一处）：
 
 ````markdown
 # 任务：更新《AI 技术动态》周度快照
 
-今天是 {date}。你的工作是维护知识库里的雷达页：
+先读系统时间确定今天的日期（YYYY-MM-DD），下文所有「今天」都指这个日期。你的工作是维护知识库里的雷达页：
 vault/工程知识/AI 系统工程：从模型能力到生产能力/生态与选型/AI技术动态.md
 
-## 第一步：检查是否值得更新
+## 第一步：逐源核验（这一步的产出决定后面所有步骤）
 
-先读这篇文章的 frontmatter（updated 字段）和「需要立即复查的事件」清单。
+先读文章的 frontmatter（updated 字段，记为「基线日期」）和「需要立即复查的事件」清单。
 
-逐项检查以下来源，找自上次快照日期之后的新事实：
+逐个访问以下来源，每个来源单独得出结论，禁止跳过、禁止凭印象合并：
 
-1. https://developers.openai.com/api/docs/deprecations —— 是否新增下线日期或迁移条目
-2. https://modelcontextprotocol.io/specification/2026-07-28 与 https://blog.modelcontextprotocol.io —— 规范修订、SDK 大版本、扩展状态变化
-3. https://a2a-protocol.org/latest/ —— 规范版本变化
-4. https://github.com/vllm-project/vllm/releases —— 新版本与破坏性变更
+1. https://developers.openai.com/api/docs/deprecations —— 列出所有下线日期或迁移条目晚于基线日期的行
+2. https://api.github.com/repos/vllm-project/vllm/releases?per_page=10 —— JSON 格式，列出 published_at 晚于基线日期的版本号
+3. https://modelcontextprotocol.io/specification/2026-07-28 与 https://blog.modelcontextprotocol.io —— 规范修订、SDK 大版本、扩展状态变化
+4. https://a2a-protocol.org/latest/ —— 规范版本变化
 5. https://docs.langchain.com/oss/python/langgraph/overview 与 https://learn.microsoft.com/en-us/agent-framework/ —— 框架重大变化
 
-规则：只记录影响工程选择的事实（版本、日期、状态、迁移影响）。新模型名、benchmark 数字、融资新闻、产品宣传不收录。如果一周内没有任何一条满足收录标准，直接结束，不改动文件——空更新比错误更新更有害。
+每个来源在最终报告里必须有一行结论，格式：`来源序号 + 访问结果（成功/失败）+ 新事实数量 + 事实摘要或失败原因`。
+
+反编造硬门：写入文章的每条事实必须能给出你实际访问到的来源 URL，且事实内容与该 URL 页面当前内容一致。记不清、页面没打开、内容是凭训练记忆想起来的——三种情况一律不写。某个来源访问失败时，该来源只能记「未能核验」，禁止下「没有新事实」的结论，报告中写明失败原因。
+
+收录标准：只记录影响工程选择的事实（版本、日期、状态、迁移影响）。新模型名单独停用、benchmark 数字、融资新闻、产品宣传不收录。如果所有来源核验完没有任何一条满足收录标准，直接跳到第三步的报告规则，不改动文件——空更新比错误更新更有害。
 
 ## 第二步：更新文章
 
-对每条新事实：
+对每条通过核验的新事实：
 
 1. 只改对应表格里的那一行：对象、版本、发布日期、状态、迁移影响、一手链接。禁止改写稳定原理段落，禁止调整文章结构。
-2. 表格列口径必须保持：Agent 表是「对象 / 截至 {date} 的状态 / 工程动作」，推理引擎表是「对象 / 截至 {date} 的状态 / 采用时真正要验证」。快照日期变了，表头里的日期跟着变。
+2. 表格列口径必须保持：Agent 表是「对象 / 截至 今天 的状态 / 工程动作」，推理引擎表是「对象 / 截至 今天 的状态 / 采用时真正要验证」。快照日期变了，表头里的日期跟着变。
 3. frontmatter：`updated` 改为今天，`review_after` 改为今天加 30 天，`sources` 只增不删。
 4. 文章开头的快照日期和「下一批已公布的硬时间点」段落同步刷新；已过期的日期从那里移除。
 5. 每条新事实必须带一手链接。二手转述（新闻、博客汇总）只能用来发现线索，不能作为行内事实的依据；无法到达一手来源的事实不写入。
 
 ## 第三步：产出一周增量摘要
 
-更新完成后，把本周变化压缩成不超过 5 条的摘要，每条一行：
+有改动时，把本周变化压缩成不超过 5 条的摘要，每条一行，格式：对象 + 事实 + 工程动作（例如：「vLLM v0.30.0 发布，Fast Start 权重缓存；升级前对比 TTFT/OOM 基准」）。
 
-- 对象 + 事实 + 工程动作（例如：「vLLM v0.30.0 发布，Fast Start 权重缓存；升级前对比 TTFT/OOM 基准」）
+摘要追加到 vault/知识库管理/归档/更新候选/待核验内容.md 的末尾，标题格式为「## 今天 AI技术动态周报」。没有改动就不追加。
 
-摘要追加到 vault/知识库管理/归档/更新候选/待核验内容.md 的末尾，标题格式为「## {date} AI技术动态周报」。没有变化就不追加。
+## 第四步：自检与报告
 
-## 第四步：自检
+有改动时，提交前逐条确认：
 
-提交前逐条确认：
-
-- [ ] 每个改动行都有一手链接
+- [ ] 每个改动行都有一手链接，且链接是你本轮实际访问过的
 - [ ] 表格列口径与前后行一致
 - [ ] frontmatter 的 updated/review_after 已更新
 - [ ] 没有改动任何稳定原理段落
-- [ ] 待核验内容.md 里追加了周报（或确实无变化）
+- [ ] 待核验内容.md 里追加了周报
 
-全部通过后，用一句话报告：更新了几行、新增了哪几条摘要。
+最终报告包含两部分，缺一不可：
+
+1. 逐源核验表：第一步要求的每个来源一行结论。
+2. 一句话总结：更新了几行、新增了哪几条摘要；或者「全部来源核验完成，无满足收录标准的新事实」。
 ````
 
 ## 变化少的那几周怎么办
@@ -111,6 +101,6 @@ vault/工程知识/AI 系统工程：从模型能力到生产能力/生态与选
 
 ## 失败处理
 
-- 来源站点不可达：跳过该来源，在周报末尾标注「{来源} 未核验」，禁止凭记忆补写。
+- 来源站点不可达：该来源在逐源核验表里记「未能核验」并写明失败原因，禁止下「没有新事实」的结论，禁止凭记忆补写。
 - 任务超时：`ProcessSupervisor` 的硬超时回收进程，退避后重试一次；仍失败则本周跳过，下周快照照常滚动。
 - 发现需要立即复查的事件（安全公告、破坏性变更）：不等周更，当次任务直接更新并在摘要里标为紧急。
