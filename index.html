@@ -469,7 +469,7 @@
 .atlas-row:hover .atlas-topic i{opacity:1}
 .atlas-row:hover .atlas-topic{color:var(--color-ink-soft)}
 @media(max-width:1100px){.atlas-row{grid-template-columns:170px minmax(0,1fr)}}
-@media(max-width:760px){.atlas{padding:18px 16px 20px}.atlas-head{display:block}.atlas-open{display:inline-block;margin-top:10px}.atlas-row{grid-template-columns:1fr;gap:8px}}
+@media(max-width:760px){.atlas{padding:18px 16px 20px}.atlas-head{display:block}.atlas-open{display:inline-block;margin-top:10px;padding:9px 14px;border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-panel);white-space:nowrap}.atlas-row{grid-template-columns:1fr;gap:8px}}
 .domain-card{position:relative;display:flex;flex-direction:column;gap:var(--space-3);padding:var(--space-5);background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out)}
 /* 左右两块用同一套卡片样式。
  *
@@ -822,10 +822,28 @@
 .reader-body table th,.reader-body table td{white-space:nowrap}
 /* 单元格内的长文本仍可换行，避免窄屏下横向滚动过长。 */
 .reader-body table td{white-space:normal;min-width:120px}
+/* 侧栏折叠钮（同模块）与关系区折叠钮：裸字符热区 12×16 / 28×28 太小，
+   补成 36×36 / 32×32 的图标钮（触控标准 44×44 的近邻取整，控件行放得下）。
+   relation-collapse 用两级选择器：单类版本定义在本块之后，同特异性会输。 */
+.rail-toggle{width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel)}
+.article-relations-head .relation-collapse{width:32px;height:32px}
+/* 首页「学习与实践」段落里的内联链接（学习中心）：19px 高的裸文本在
+   手机上点不中，补边框与内边距成按钮。桌面不受影响。 */
+.section > p a[target="_blank"]{display:inline-block;padding:6px 10px;margin:2px 0;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel)}
+/* 文章页来源区链接（man7.org 等）：裸文本转胶囊芯片，可点。 */
+.reader-sources .source-list a{display:inline-block;padding:6px 11px;margin:3px 8px 3px 0;border:1px solid var(--color-line);border-radius:999px;background:var(--color-panel)}
+/* 正文内联互链：竖向内边距把命中区拉到 29px 高。行内元素的竖向
+   内边距不影响行盒高度，版面零变化，只有热区变大。 */
+.reader-body p a,.reader-body li a{padding:5px 2px}
 }
 /* 阅读进度：长文读到哪了。贴在顶栏下沿的一条细线。 */
 .progress-bar{position:fixed;left:286px;right:0;top:0;height:2px;z-index:calc(var(--z-fab) + 1);background:var(--color-accent);transform-origin:0 50%;transform:scaleX(0);transition:transform var(--duration-fast) var(--ease-out)}
 @media(max-width:760px){.progress-bar{left:0}}
+/* 领域列表布局保护：note-row 两列网格的内容列（minmax(280px,1.3fr)）
+   缺 min-width:0 时，超长英文文件名会把整行顶出内容列（瞬态实测
+   right=491px）。最小宽度归零 + 长词可断行，网格列宽随之自然收缩。 */
+.note-row{min-width:0}
+.note-row>div,.note-row h3,.note-row .path{min-width:0;overflow-wrap:anywhere}
 @media(max-width:760px){/* 手机上右下角只能放一个悬浮件：键盘提示在触屏上没有意义，隐藏。
    选择器带 .shell 是为了压过文件后面定义的同名基础规则。 */
 body .kbd-hint{display:none}}

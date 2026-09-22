@@ -257,6 +257,11 @@
         font-weight: var(--weight-medium);
         transition: background var(--duration-fast) var(--ease-out);
       }
+      @media (max-width: 760px) {
+        .actions a { font-size: 13px; padding: 9px 12px; }
+        .fusion-item a { font-size: 13px; padding: 8px 10px; display: inline-block; }
+        .analysis-card a { font-size: 13px; padding: 8px 10px; }
+      }
       .actions a:hover {
         background: var(--color-surface);
       }
@@ -412,6 +417,16 @@
       }
       .source-note a {
         margin-right: 9px;
+      }
+      @media (max-width: 760px) {
+        .source-note a {
+          display: inline-block;
+          margin: 3px 8px 3px 0;
+          padding: 6px 11px;
+          border: 1px solid var(--color-line);
+          border-radius: 999px;
+          background: var(--color-panel);
+        }
       }
       @media (max-width: 800px) {
         .tk-shell {
