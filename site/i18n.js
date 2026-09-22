@@ -77,12 +77,13 @@
     // ── Insights page ──
     "访问与反馈 · 工程知识库": { en: "Visits and feedback · engineering knowledge" },
     "访客": { en: "Visitors" },
-    "读得最多的文章": { en: "Most-read notes" },
+    "读得最多的文章与页面": { en: "Most-read notes and pages" },
     /* 2026-09-22 i18n 修复：页面文案已改为无句号（insights.html 350 行），
        原键带句号导致精确匹配失败，英文态残留中文。键去句号对齐页面。 */
-    "只统计能对应到具体文章的访问": {
-      en: "Only visits that resolve to a specific note are counted",
+    "含全景、图谱等视图页；只统计有具体位置的访问": {
+      en: "Includes view pages such as panorama and graph; only visits with a concrete location are counted",
     },
+    "还没有访问记录": { en: "No visits recorded yet" },
     /* 2026-09-22 i18n 修复：insights 页 354 行文案带句号，补带句号版本词条，
        双词条策略兼容两种页面形态（多 AI 并行改动期抗反复）。 */
     "知识图谱": { en: "Graph" },
@@ -1154,7 +1155,6 @@
     "个月前": { en: "mo ago" },
     "个来源": { en: "sources" },
     "还没有访问记录。": { en: "No visits recorded yet." },
-    "还没有按文章的访问记录": { en: "No per-note visits yet" },
     "读不到中台数据：": { en: "Cannot read the insights data: " },
     "确认站点服务在运行，然后刷新": {
       en: "Make sure the site service is running, then refresh",

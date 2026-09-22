@@ -340,10 +340,10 @@
       <div id="visitors"></div>
 
       <div class="section-head">
-        <h2>读得最多的文章</h2>
+        <h2>读得最多的文章与页面</h2>
         <p></p>
       </div>
-      <p class="section-note">只统计能对应到具体文章的访问</p>
+      <p class="section-note">含全景、图谱等视图页；只统计有具体位置的访问</p>
       <div id="pages"></div>
 
       <div class="caveat">
@@ -431,9 +431,10 @@
         box.innerHTML = records
           .map((r) => {
             const who = r.name ? esc(r.name) : esc(r.ip);
-            const where = r.title
-              ? `<a href="/?path=${encodeURIComponent(r.path)}">${esc(r.title)}</a>`
-              : tr("（未指定文章）");
+            const where =
+              r.title && r.path
+                ? `<a href="/?path=${encodeURIComponent(r.path)}">${esc(r.title)}</a>`
+                : r.title || tr("（未指定文章）");
             const rel = ago(r.ts);
             return `<article class="fb" data-status="${esc(r.status)}" data-ts="${esc(r.ts)}">
               <div class="fb-top">
@@ -510,15 +511,15 @@
       function renderPages(records) {
         const box = $("#pages");
         if (!records.length) {
-          box.innerHTML = `<div class="empty-note">${tr("还没有按文章的访问记录")}</div>`;
+          box.innerHTML = `<div class="empty-note">${tr("还没有访问记录")}</div>`;
           return;
         }
         const max = Number(records[0].visits) || 1;
         box.innerHTML = `<div class="table-wrap"><table><thead><tr>
-            <th>${tr("文章")}</th><th class="num">${tr("阅读")}</th><th style="width:22%"></th>
-            <!-- 【rt21】"文章/阅读"是本表表头，DICT 里"文章"已被 sources 页
+            <th>${tr("文章与页面")}</th><th class="num">${tr("阅读")}</th><th style="width:22%"></th>
+            <!-- 【rt21】"文章与页面/阅读"是本表表头，"文章"已被 sources 页
                  占用（=Writing，语义错），故这两键走下方 insights 专属词条
-                 （文章=Note/阅读=Reads），不复用全局键。 -->
+                 （文章与页面=Note/阅读=Reads），不复用全局键。 -->
           </tr></thead><tbody>${records
             .map(
               (p) => `<tr>

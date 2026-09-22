@@ -3259,15 +3259,25 @@ def insights_visitors(limit: int = 60) -> list[dict[str, object]]:
 
 
 def insights_pages(limit: int = 25) -> list[dict[str, object]]:
+    """按文章聚合访问次数，给中台的「读得最多的文章与页面」表。
+
+    访问日志里有两类 path：vault 里的真实笔记，以及 view:* 合成路径
+    （首页/目录/全景/图谱的进入打点）。后者不是文件，放进中台的
+    /?path=… 链接会 404，所以这里只统计真实笔记；视图页的访问量
+    在访客表和总访问数里照常计入。
+    """
     visits = _trim_visits(_read_jsonl(VISIT_LOG, limit=100000))
     counts: dict[str, dict[str, object]] = {}
     for record in visits:
         path = str(record.get("path") or "")
-        if not path:
+        if not path or path.startswith("view:"):
             continue
-        entry = counts.setdefault(
-            path, {"path": path, "title": record.get("title") or path, "visits": 0}
-        )
+        title = str(record.get("title") or "")
+        if not title:
+            # 兜底标题用文件名：完整路径会原样展示给中台读者，不该把
+            # 目录结构暴露出来；文件名和站点文章标题一致，可读。
+            title = Path(path).stem
+        entry = counts.setdefault(path, {"path": path, "title": title, "visits": 0})
         entry["visits"] = int(entry["visits"]) + 1
     return sorted(counts.values(), key=lambda e: int(e["visits"]), reverse=True)[:limit]
 
