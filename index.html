@@ -1405,9 +1405,24 @@ let digestCache = null;
  * 没有 key / 配额用完 / 网络不通时不显示这一块。唯一例外是"没配 key"：
  * 那是读者自己能解决一次的状态，给一行说明（见下面 unconfigured 分支）。
  */
+async function featureDigest(id) {
+  try {
+    const r = await fetch('/api/digest/feature', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: id || '' }),
+    });
+    if (!r.ok) return;
+    digestCache.featured = id || null;
+    renderDigest(digestCache.items, digestCache.status);
+  } catch {}
+}
 function renderDigest(items, status) {
   const box = $('#home-digest');
   if (!box) return;
+  /* 站长钉选头条：featuredId 命中条目时上特写位；operator = 持运营者
+     cookie（meta 由服务端盖章），只有运营者能看到钉选/取消按钮。 */
+  const operator = document.querySelector('meta[name="tk-operator"]')?.getAttribute('content') === '1';
+  const featuredId = digestCache ? digestCache.featured : null;
   if (!items || !items.length) {
     if (status === "unconfigured") {
       box.hidden = false;
@@ -1452,10 +1467,16 @@ function renderDigest(items, status) {
     ...sorted.filter((item) => !favUrls.has(String(item.url || "")))
       .map((item) => ({ ...item, __fav: false, __fid: TKShell.favorites.favId(item) })),
   ];
-  /* 杂志布局：第一篇做 hero 特写，其余做紧凑行。
-   * rail 已按评分降序 —— 第一篇就是本周最高分，当特写名正言顺。 */
-  const heroItem = rail[0];
-  const restItems = rail.slice(1);
+  /* 杂志布局：第一篇做 hero 特写，其余做紧凑行。rail 默认按评分降序；
+   * 站长钉选（featuredId）命中时该篇优先上特写位、从列表剔除——
+   * 掉出七天窗口或未钉选则回退评分自动。 */
+  let heroIdx = 0, manualHero = false;
+  if (featuredId) {
+    const fi = rail.findIndex((i) => i.id === featuredId);
+    if (fi >= 0) { heroIdx = fi; manualHero = true; }
+  }
+  const heroItem = rail[heroIdx];
+  const restItems = rail.filter((_, i) => i !== heroIdx);
   const heroFacts = [];
   if (heroItem.word_count) heroFacts.push(window.TKI18N?.lang==='en'?`${heroItem.word_count.toLocaleString()} words`:`${heroItem.word_count.toLocaleString()} 字`);
   if (heroItem.read_minutes) heroFacts.push(window.TKI18N?.lang==='en'?`about ${heroItem.read_minutes} min`:`约 ${heroItem.read_minutes} 分钟`);
@@ -1465,7 +1486,7 @@ function renderDigest(items, status) {
       ${heroItem.cover
         ? `<span class="digest-hero-cover">
             <img src="${esc(heroItem.cover)}" alt="" loading="lazy" referrerpolicy="no-referrer">
-            ${heroItem.score ? `<i class="digest-hero-badge">${(window.TKI18N?.lang==='en')?'Top · ':''}${esc(heroItem.score)}</i>` : ''}
+            <i class="digest-hero-badge">${manualHero ? '📌 站长推荐' : ((heroItem.score ? ((window.TKI18N?.lang==='en')?'Top · ':'Top · ') : '') + esc(heroItem.score || ''))}</i>
           </span>`
         /* 无封面兜底（2026-09-22 补）：原先这里输出空串，BestBlogs 不少条目
          * 没有 cover，结果"本周最高分特写"反而是整块里唯一的纯文字格，
@@ -1484,6 +1505,7 @@ function renderDigest(items, status) {
         ${heroItem.source ? `<span class="digest-source">${esc(heroItem.source)}</span>` : ''}
         ${heroFacts.length ? `<span class="digest-facts">${esc(heroFacts.join(' · '))}</span>` : ''}
         <button type="button" class="tk-fav-btn${heroItem.__fav ? ' is-fav' : ''}" data-fav-id="${esc(heroItem.__fid)}" aria-label="${heroItem.__fav ? '取消收藏' : '收藏'}" title="${heroItem.__fav ? '取消收藏' : '收藏'}">${heroItem.__fav ? '★' : '☆'}</button>
+        ${operator ? `<button type="button" class="digest-feature-btn" data-feature="${manualHero ? '' : esc(heroItem.url || '')}" title="${manualHero ? '恢复评分自动' : '钉选为头条'}">${manualHero ? '✕ 自动' : '📌 头条'}</button>` : ''}
       </span>
     </a>`;
   const listRows = restItems.map((item) => {
@@ -1502,11 +1524,20 @@ function renderDigest(items, status) {
           ${item.source ? `<span class="digest-source">${esc(item.source)}</span>` : ''}
           ${facts.length ? `<span class="digest-facts">${esc(facts.join(' · '))}</span>` : ''}
           <button type="button" class="tk-fav-btn${item.__fav ? ' is-fav' : ''}" data-fav-id="${esc(item.__fid)}" aria-label="${item.__fav ? '取消收藏' : '收藏'}" title="${item.__fav ? '取消收藏' : '收藏'}">${item.__fav ? '★' : '☆'}</button>
+          ${operator && item.url !== featuredId ? `<button type="button" class="digest-feature-btn" data-feature="${esc(item.url || '')}" title="设为头条">📌 头条</button>` : ''}
         </span>
       </span>
     </a>`;
   }).join('');
   // 说明里给出真实的条数。
+  /* 站长钉选头条：写 /api/digest/feature（运营者会话），成功后本地
+     更新 featured 并整块重渲。失败静默保持原状。 */
+  box.querySelectorAll('.digest-feature-btn').forEach((b) => {
+    b.onclick = (e) => {
+      e.preventDefault(); e.stopPropagation();
+      featureDigest(b.dataset.feature || '');
+    };
+  });
   const favCount = favEntries.length;
   const facts = favCount
     ? (window.TKI18N?.lang==='en' ? `${favCount} favorites pinned · Top 20 of the week` : `收藏 ${favCount} 篇常驻 · 七天 Top 20`)

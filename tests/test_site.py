@@ -345,6 +345,26 @@ class AuthenticationTests(unittest.TestCase):
         finally:
             SERVER_MODULE.OPERATOR_PASSWORD = original
 
+    def test_digest_feature_site_cookie_forbidden(self) -> None:
+        """站点密码持有者可以启动工具，但钉选头条是运营者专属（403）。"""
+        original = SERVER_MODULE.OPERATOR_PASSWORD
+        SERVER_MODULE.OPERATOR_PASSWORD = "op-secret"
+        try:
+            login = self.request(
+                "POST", "/auth/login",
+                json.dumps({"password": "test-password-only"}),
+                {"Content-Type": "application/json"},
+            )
+            site_cookie = login[1]["Set-Cookie"].split(";", 1)[0]
+            r = self.request(
+                "POST", "/api/digest/feature",
+                json.dumps({"id": "bb_x"}),
+                {"Content-Type": "application/json", "Cookie": site_cookie},
+            )
+            self.assertEqual(r[0], 403)
+        finally:
+            SERVER_MODULE.OPERATOR_PASSWORD = original
+
     def test_operator_login_rejected_when_not_configured(self) -> None:
         """未配置运营者密码时，任何密码都只按站点密码比对。"""
         original = SERVER_MODULE.OPERATOR_PASSWORD

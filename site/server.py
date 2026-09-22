@@ -748,6 +748,11 @@ def _favorites_log() -> Path:
     return DATA_HOME / "favorites.json"
 
 
+def _featured_log() -> Path:
+    """站长钉选的早报头条（/api/digest/feature 写入）。运行时解析同上。"""
+    return DATA_HOME / "featured.json"
+
+
 def _load_favorites() -> list[dict[str, object]]:
     try:
         raw = json.loads(_favorites_log().read_text(encoding="utf-8"))
@@ -2690,6 +2695,15 @@ class Handler(BaseHTTPRequestHandler):
                 else:
                     result = fallback
             payload = dict(result)
+            # 站长钉选的头条（/api/digest/feature 写入 featured.json）。
+            # 键用 url：收藏区与 Top20 的 id 存在 RAW_/u: 两种计算形式，
+            # url 才是全站稳定身份。前端优先展示该篇；无钉选按评分自动。
+            try:
+                payload["featured"] = json.loads(
+                    _featured_log().read_text(encoding="utf-8")
+                ).get("url") or None
+            except (OSError, ValueError):
+                payload["featured"] = None
             # 排序：**评分优先，同分最新**（与库存、收藏区同一条规则）。
             #
             # 曾经为了"标题写近三天"而按天交错轮取，副产品是把评分序打乱成
@@ -2910,6 +2924,26 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/favorites/remove":
             self.handle_favorites_remove()
+            return
+        if path == "/api/digest/feature":
+            # 站长钉选早报头条：仅运营者会话。id 空串 = 恢复评分自动。
+            if not self.client_is_operator():
+                self.send_json({"error": "operator only"}, 403)
+                return
+            body, error = self.read_json_body(4 * 1024)
+            if body is None:
+                return
+            furl = str(body.get("url") or "").strip()
+            log = _featured_log()
+            if furl:
+                log.parent.mkdir(parents=True, exist_ok=True)
+                log.write_text(
+                    json.dumps({"url": furl, "ts": time.time()}, ensure_ascii=False),
+                    encoding="utf-8",
+                )
+            elif log.exists():
+                log.unlink()
+            self.send_json({"ok": True, "featured": furl or None})
             return
         if path == "/api/feedback":
             self.handle_feedback()
