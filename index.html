@@ -203,6 +203,7 @@
 .digest-chip{
   display:inline-flex;align-items:center;gap:4px;
   height:28px;padding:0 12px;
+  /* 手机端热区补到 44：box-sizing 保持视觉 28px，命中区上下各外扩 8px。 */
   border:1px solid var(--color-line);border-radius:999px;
   background:var(--color-panel);
   color:var(--color-ink-soft);
@@ -867,6 +868,22 @@
    选择器带 .shell 是为了压过文件后面定义的同名基础规则。 */
 body .kbd-hint{display:none}}
 /* 打印：去掉所有悬浮件和导航，只留文章本身 */
+
+/* ── 手机端触控热区补足（44px 标准，视觉尺寸全部不动）──────────
+ * 依据：design-craft 间距章「点击热区最小 44×44」；相邻可点元素
+ * 之间已有间距的不需要再扩，只补真实的不足项。 */
+@media (max-width: 760px) {
+  .digest-chip { box-sizing: content-box; height: 28px; border-block-width: 8px; padding-top: 0; padding-bottom: 0; }
+  .digest-more { padding: 12px 14px; }
+  .atlas-domain { padding: 11px 0; }
+  .atlas-topic { padding: 10px 0; }
+  .tk-control { min-width: 44px; height: 44px; }
+  .work-actions a { padding: 11px 12px; } /* 35px 高不达触控标准，补到 44 */
+  .tk-domain { padding-top: 10px; padding-bottom: 10px; } /* 40px 行补到 44 */
+  .tk-subnav-toggle { width: 32px; height: 32px; right: 2px; } /* 22px 箭头钮补到 32，外扩后 ≥44 */
+  .tk-fav-btn::before { top: -9px; left: -9px; right: -9px; bottom: -9px; } /* 命中区 26→44，视觉圆钮不变 */
+}
+
 @media print{.tk-sidebar,.topbar,.kbd-hint,.tk-fab,.tk-fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:var(--color-panel)}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}/* 侧边栏本身在 base.css 里变成顶部横条。域树在主站是第二层导航，手机上收进「目录」后面，免得把首屏挤满。 */.tk-mobile-menu{display:block;border:1px solid var(--color-line);background:var(--color-panel);border-radius:6px;padding:6px 9px;color:var(--color-accent);min-height:44px;box-sizing:border-box}#tk-sidebar.collapsed #domains{display:none}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.hero{display:block}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:11px}.domain-grid{grid-template-columns:1fr}.directory-head,.view-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2{font-size:var(--text-2xl)}}
 
 body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leading-normal)}

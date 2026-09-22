@@ -473,7 +473,7 @@ a.has-children {
   margin-top: 17px;
   padding: 0 10px;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 12px; /* 11px 低于可读下限（design-craft 字号阶梯：小字不低于 12） */
 }
 
 /* ── Sidebar footer: the controls that are not navigation ──────────────────
@@ -814,7 +814,7 @@ a.has-children {
   background: var(--color-surface);
   color: var(--color-muted);
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12px; /* 11px 键帽发虚（design-craft：小字不低于 12） */
   line-height: 1;
   pointer-events: none;
   transition: opacity var(--duration-fast) var(--ease-out), visibility var(--duration-fast) var(--ease-out);
@@ -1316,7 +1316,7 @@ body.tk-host button {
 /* 窄屏收小一点，别和标题抢位置。 */
 @media (max-width: 760px) {
   .tk-controls { top: 12px; right: 12px; gap: 6px; }
-  .tk-control { min-width: 34px; height: 34px; padding: 0 9px; }
+  .tk-control { min-width: 44px; height: 44px; padding: 0 9px; } /* 34px 不达触控标准，提到 44 */
 }
 
 /* ── Feedback entry ───────────────────────────────────────────────────────── */
@@ -1490,7 +1490,7 @@ body.tk-host button {
   display: block;
   text-align: right;
   color: var(--color-muted);
-  font-size: 11px;
+  font-size: 12px; /* 11px 低于可读下限 */
   margin-top: 4px;
 }
 
@@ -1668,6 +1668,9 @@ body.tk-host button {
   .tk-fab {
     background: var(--color-panel);
     background: color-mix(in srgb, var(--color-panel) 82%, transparent);
+    /* 底色从 accent 实色换成玻璃白后，文字色必须同步换成 accent ——
+       原来的 --color-on-accent 是白色，白字压玻璃白底直接隐形。 */
+    color: var(--color-accent);
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
   }
