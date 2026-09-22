@@ -394,8 +394,13 @@
               const kids = childrenOf(item.key);
               if (!kids.length) return link(item, page);
               return (
-                link(item, page, " has-children")
+                /* tk-nav-row：箭头按钮的定位锚。toggle 是 a 的兄弟节点，
+                   之前 absolute 相对了整个 nav，箭头飞到「知识库」行右侧
+                   （实测截图）；包一层 relative 行，箭头贴回本行行尾。 */
+                `<span class="tk-nav-row">`
+                + link(item, page, " has-children")
                 + `<button type="button" class="tk-subnav-toggle" data-subgroup="${item.key}" aria-expanded="false" aria-label="展开 ${item.label} 的子项"></button>`
+                + `</span>`
                 + `<span class="tk-subnav-group" id="subgroup-${item.key}" data-subgroup="${item.key}" hidden>${kids
                     .map(
                       (child) =>

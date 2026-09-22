@@ -218,7 +218,13 @@ body.tk-host::before {
  * 下面的旧 .tk-subnav 规则保留：样式语言被本版承接，移动端横排布局也仍
  * 引用它；等旧容器确认无消费方后再清。
  */
-.tk-nav a.has-children {
+.tk-nav /* 父项行容器：子导航箭头按钮（tk-subnav-toggle）的定位锚。
+   没有这层时按钮 relative 到整个 nav，箭头会飞到第一行（实测）。 */
+.tk-nav-row {
+  position: relative;
+  display: block;
+}
+a.has-children {
   position: relative;
   padding-right: 30px;
 }
