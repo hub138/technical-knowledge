@@ -3169,7 +3169,11 @@ async function refreshNotes(initial=false){
    * 循环体只跑一圈，无额外开销。 */
   /* 首页 100 条（带 edges），剩余页**并行**拉（每页 150 条纯 notes）——
      串行 4 页 × 0.35s 的等待在并行下缩成一轮。 */
-  const part0=await json('/api/notes?offset=0&limit=100');
+  /* 首屏 60 条（带 edges）：压缩后约 65KB——受限链路在 77KB 处掐断响应
+     （实测，且 nginx 未开 gzip_proxied 时压缩根本不生效），首屏必须留出
+     余量。edges 只随第一页带，剩余页并行拉纯 notes（每页 150 条 ≈ 72KB，
+     也在余量内）。本机直连一页拉完，循环体只跑一圈。 */
+  const part0=await json('/api/notes?offset=0&limit=60');
   const first=part0;
   let total=typeof part0.total==='number'?part0.total:(part0.notes||[]).length;
   let allNotes=(part0.notes||[]).slice();

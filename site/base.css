@@ -278,18 +278,25 @@ a.has-children {
 .tk-subnav-group {
   display: grid;
   gap: 1px;
-  margin: 2px 0 5px 15px;
-  padding: 2px 0 3px 11px;
+  /* 缩进从 28px 收到 23px：子项左缘离父项太远时，左半行全是空白，
+   * 反而读不出从属关系（2026-09-23 反馈「空隙太大」）。 */
+  margin: 2px 0 4px 12px;
+  padding: 2px 0 2px 9px;
   border-left: 2px solid var(--color-line);
 }
 
 .tk-subnav-group[hidden] {
   display: none;
 }
-.tk-subnav-inline {
+/* 选择器必须带 a：`.tk-subnav-inline`(0,1,0) 压不住 `.tk-nav a`(0,1,1)，
+ * 结果子项跟着父项用了 15px 字号和 40px 行高——看着就是缩水的一级导航，
+ * 不是二级（2026-09-23 实测：子项实测 15px/40px，与父项完全相同）。 */
+.tk-nav a.tk-subnav-inline {
   display: flex;
   align-items: center;
   gap: 7px;
+  /* 二级条目就该比父项矮：28px 行高对父项 40px，一眼分得出层级。 */
+  min-height: 28px;
   /* 左缩进由 .tk-subnav-group 统一给（margin+padding+左线）；
    * 这里不再自带 margin-left —— 旧版常展开布局的残留，嵌进 group 后
    * 变成双重缩进，子项标签比主项深 41px，行左半截全是空白（用户截图
