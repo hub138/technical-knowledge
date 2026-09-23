@@ -1814,7 +1814,7 @@ body.tk-host button {
 @media (pointer: coarse) {
   .digest-feature-btn::before,
   .digest-item .digest-feature-btn::before {
-    content: ""; position: absolute; top: -7px; left: -7px; right: -7px; bottom: -7px; border-radius: 50%;
+    content: ""; position: absolute; top: -9px; left: -9px; right: -9px; bottom: -9px; border-radius: 50%;
   }
   .digest-feature-btn { position: relative; }
 }
