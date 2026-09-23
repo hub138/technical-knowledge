@@ -1584,7 +1584,10 @@ function renderDigest(items, status) {
    * 掉出七天窗口或未钉选则回退评分自动。 */
   let heroIdx = 0, manualHero = false;
   if (featuredId) {
-    const fi = rail.findIndex((i) => i.id === featuredId);
+    /* 钉选键是 url：服务端 featured.json 以 url 为键，条目的 id 有 RAW_ / u:
+     * 两种形式不稳定，不能当主键。只比 id 会让钉选永远不上特写位（实测）。
+     * 仍兼容旧数据里存 id 的情况。 */
+    const fi = rail.findIndex((i) => i.url === featuredId || i.id === featuredId);
     if (fi >= 0) { heroIdx = fi; manualHero = true; }
   }
   const heroItem = rail[heroIdx];
@@ -1642,14 +1645,6 @@ function renderDigest(items, status) {
     </a>`;
   }).join('');
   // 说明里给出真实的条数。
-  /* 站长钉选头条：写 /api/digest/feature（运营者会话），成功后本地
-     更新 featured 并整块重渲。失败静默保持原状。 */
-  box.querySelectorAll('.digest-feature-btn').forEach((b) => {
-    b.onclick = (e) => {
-      e.preventDefault(); e.stopPropagation();
-      featureDigest(b.dataset.feature || '');
-    };
-  });
   const favCount = favEntries.length;
   const facts = favCount
     ? (window.TKI18N&&window.TKI18N.lang==='en' ? `${favCount} favorites pinned · Top 20 of the week` : `收藏 ${favCount} 篇常驻 · 七天 Top 20`)
@@ -1697,6 +1692,17 @@ function renderDigest(items, status) {
         <button type="button" class="digest-more" aria-expanded="false"><span>${(window.TKI18N&&window.TKI18N.lang==='en')?`Show all ${restItems.length}`:`展开全部 ${restItems.length} 篇`}</span><span>${(window.TKI18N&&window.TKI18N.lang==='en')?'Collapse':'收起'}</span><i aria-hidden="true">▾</i></button>
       </div>
     </div>`;
+  /* 站长钉选头条：写 /api/digest/feature（运营者会话），成功后本地
+     更新 featured 并整块重渲。失败静默保持原状。
+     绑定必须在 innerHTML 赋值之后：绑定在旧的 DOM 上，新渲出来的按钮
+     就没有 handler，点击会冒泡到外层 <a> 直接打开文章（2026-09-23 实测）。
+     preventDefault 阻止 a 的导航，stopPropagation 阻止冒泡。 */
+  box.querySelectorAll('.digest-feature-btn').forEach((b) => {
+    b.onclick = (e) => {
+      e.preventDefault(); e.stopPropagation();
+      featureDigest(b.dataset.feature || '');
+    };
+  });
   const list = box.querySelector(".digest-list");
   const moreBtn = box.querySelector(".digest-more");
   if (moreBtn && restItems.length <= 8) {
