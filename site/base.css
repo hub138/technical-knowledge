@@ -1883,3 +1883,21 @@ input:focus-visible,
 textarea:focus-visible {
   outline: none;
 }
+
+/* mermaid 图容器：此前库里没有一条 mermaid 样式，渲染后直接用库的默认
+   尺寸——纵向流程图被拉到 1094px（实测最高），把文章撑得没法读；宽度
+   按内容算（220~473px 参差）且左对齐，看着就是歪的。
+   这里给容器限高，图完整保留、超出部分内部滚动；窄图居中，宽度参差
+   不再突兀。<pre> 还得重置字体，否则等宽字体会污染 svg 内的标签文字。 */
+pre.mermaid{
+  margin:16px 0;
+  padding:14px 12px;
+  background:var(--color-raised);
+  border:1px solid var(--color-line);
+  border-radius:7px;
+  max-height:520px;
+  overflow:auto;
+  font:inherit;
+  text-align:center;
+}
+pre.mermaid svg{max-width:100%;height:auto;display:inline-block}
