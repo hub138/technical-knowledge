@@ -1,31 +1,51 @@
 ---
 name: design-craft
-description: 好设计的成熟规矩——视觉层级、排版尺度、间距栅格、语义色 token、交互五态、信息密度、文案语气、交付自检。用于判断"这个页面好不好"、改布局配色排版、设计高亮与推荐位、美化已有界面。Use when 用户说好看/丑/改版式/配色/字号/间距/高亮/密度/对齐，或要美化、重排、重做某个界面。Do NOT use for 纯内容写作（归 knowledge-governor）、纯前端实现（归 knowledge-site-dev）。
+description: 好设计的成熟规矩——先定位核心资产、再安排优化顺序，视觉层级、排版尺度、间距栅格、语义色 token、交互五态、信息密度、文案语气、交付自检。用于判断"这个页面好不好"、改布局配色排版、设计高亮与推荐位、美化已有界面。Use when 用户说好看/丑/改版式/配色/字号/间距/高亮/密度/对齐，或要美化、重排、重做某个界面。Do NOT use for 纯内容写作（归 knowledge-governor）、纯前端实现（归 knowledge-site-dev）。
 ---
 
 # 好设计的规矩
 
+## 第零步：定位核心资产，再排优化顺序（任何美化任务先做这一步）
+
+动手之前先回答三个问题：
+
+1. **这个站点靠什么产生价值？** 访客打开站点是为了拿到什么？哪一个界面承载这个目的，它就是核心资产。
+2. **核心资产现在什么状况？** 对核心资产先截图、量参数（首屏有什么、主内容从第几屏开始、字号行宽留白是多少），拿到实况再谈优化。
+3. **手上的改动服务谁？** 每一个改动都要能回答"它改善的是核心资产还是周边"。周边界面为核心资产服务，不许反过来挤占它的空间和首屏。
+
+由此得到三条排序规则：
+
+- **空间**：核心资产占版面主体，辅助模块放后面、两侧或折叠，不许把核心资产挤出第一屏。
+- **顺序**：先做核心资产，做到能拿出手，再轮到周边界面，周边不许插队。
+- **审计**：程序化检查优先——拿到源码先读源码，以代码数值为准；没有源码就写脚本量指标，秒级拿到违规清单；截图只拍违规页与代表页；改完重跑同一脚本确认清零。
+
+不同站点的核心资产不同，动手前先判断。例子（仅为例子）：知识库站点读者来读文章，核心资产是文章页；电商站点核心资产是商品详情与下单链路；工具站点核心资产是主操作界面。判断依据是访客的目的，与界面花哨程度无关，并与用户的评价互相印证。
+
+机制细节与常见误判见 `references/asset-priority.md`。
+
 ## 冲突时的裁决顺序
 
-1. **页面目的**：这个页面为什么存在、给谁看（见 `knowledge-governor/references/page-purposes.md`）。
-2. **用户的实际评价**：他说好看就是好看。不许用"信息量大""更现代"反驳。
+1. **页面目的与核心资产**：这个页面为什么存在、给谁看；整站最有价值的界面优先得到空间与打磨。
+2. **用户的实际评价**：他说好看就是好看。不许用"信息量大""更现代"反驳。注意这条裁决的是审美与工作顺序（他说丑就是丑、他说先做什么就先做什么），**不裁决工程底线**：时长、`prefers-reduced-motion`、对比度、热区这类硬约束不因用户喜欢而豁免——用户要的效果照做，约束套着做；用户点名要的纯装饰动效压到最短时长并给降级分支，不拿"炫技"当理由否掉用户的点名要求，但**不得延误阅读起点**：入场动效累计让正文/标题在 300ms 后仍看不全，就换成整体淡入这类不挡阅读的替代形式。
 3. **下面的通用法则**。
 4. 法则之间打架时：**可读性 > 一致性 > 个性**。
 
-## 七条硬规则（任何界面都成立）
+## 硬规则（任何界面都成立）
 
-1. **层级靠三个维度一起拉开**：字号、字重、颜色深浅。只动一个维度等于没层级。（frontend-design 排版章；TDesign M03 字号/行高 Token）
-2. **不靠颜色单独承载信息**：红绿之外必须有图标或文字。（ui-ux-pro-max ux-guidelines `Color Only`）
-3. **正文对比度 ≥ 4.5:1**，灰字压灰底是禁止项。（同库 `Color Contrast` / `Contrast Readability`）
-4. **间距走阶梯**：2/4/8/12/16/24/32/48/64，区块级留白优先 16/24/32/48。（TDesign M03 `--td-size-*`）
-5. **可点元素三件套**：hover 反馈 + `cursor: pointer` + 键盘 focus 可见；过渡 150–300ms，超 500ms 让人不耐烦。（ui-ux-pro-max `Hover States`；frontend-design 动效章）
-6. **不用 emoji 当 UI 图标**：用 SVG，统一 viewBox 24，同一套图标库。（ui-ux-pro-max `No emoji icons`）
-7. **色值一律走 token**，不写死 hex；深浅主题靠 token 自适应，SVG 描边用 `currentColor`。（frontend-design 禁止硬编码色值；本项目实测：写死白描边在深色下刺眼）
+1. **首屏属于核心资产**：主内容上方只放阅读所需的上下文，辅助模块放主内容之后，不得把标题挤出第一屏；标题也不得顶格贴着固定顶栏下缘，框架衔接处留呼吸（细节见 `references/spacing-layout.md` 固定框架的衔接）。
+2. **层级靠三个维度一起拉开**：字号、字重、颜色深浅。只动一个维度等于没层级。（frontend-design 排版章；TDesign M03 字号/行高 Token）
+3. **不靠颜色单独承载信息**：红绿之外必须有图标或文字。（ui-ux-pro-max ux-guidelines `Color Only`）
+4. **正文对比度 ≥ 4.5:1**，灰字压灰底是禁止项。（同库 `Color Contrast` / `Contrast Readability`）
+5. **间距走阶梯**：2/4/8/12/16/24/32/48/64，区块级留白优先 16/24/32/48。（TDesign M03 `--td-size-*`）
+6. **可点元素三件套**：hover 反馈 + `cursor: pointer` + 键盘 focus 可见；过渡 150–300ms，超 500ms 让人不耐烦。（ui-ux-pro-max `Hover States`；frontend-design 动效章）
+7. **不用 emoji 当 UI 图标**：用 SVG，统一 viewBox 24，同一套图标库。（ui-ux-pro-max `No emoji icons`）
+8. **色值一律走 token**，不写死 hex；深浅主题靠 token 自适应，SVG 描边用 `currentColor`。（frontend-design 禁止硬编码色值；本项目实测：写死白描边在深色下刺眼）
 
 ## 按要动的东西加载
 
 | 要动的东西 | 读 |
 |---|---|
+| 定位核心资产 / 排优化顺序 | `references/asset-priority.md` |
 | 字号 / 字重 / 行高 / 行宽 / 字体 | `references/hierarchy-typography.md` |
 | 间距 / 栅格 / 边距 / 对齐 / 密度 / 右栏 | `references/spacing-layout.md` |
 | 配色 / 语义色 / 深浅主题 / 对比度 | `references/color-theme.md` |
@@ -38,15 +58,16 @@ description: 好设计的成熟规矩——视觉层级、排版尺度、间距�
 ## 两条反直觉经验（本项目实测，不是抄来的）
 
 - **引导元素要颜色和位置一起设计**：颜色对但埋没 = 没用；位置对但刺眼 = 反感。音量降到所在容器级别（导航项级，不要大卡级）。历史：大黄卡过重 → 安静小行无引导力 → 实底框位置混淆 → 暖橙导航项可用。
-- **"当前位置"与"推荐"是两套语义**，必须视觉可区分：当前位置 = 实底框（路由决定），推荐 = 暖橙项（人工钉选）。实底框语义神圣，挪用一次导航定位就废。
+- **"当前位置"与"推荐"是两套语义**，必须视觉可区分：当前位置 = 实底框（路由决定），推荐 = 暖橙项（站长指定）。实底框语义神圣，挪用一次导航定位就废。
 
 ## 红线
 
+- 没定位核心资产就动手改界面，等于没做。
 - 判断好坏以用户评价为准，不以"信息量大 / 酷炫 / 现代"自行排序。
-- 删元素必须补位，不留空洞；太空 = 布局错，缩小容器重排，不是只删元素。
+- 删元素必须补位，不留空洞；太空 = 布局错，缩小容器重排。
 - 改完必须截图看，不能只看代码。
 - 站点专属偏好（覆盖矩阵是默认 tab、八层气泡判丑、站长钦定的参考站）在 `knowledge-site-dev/references/design-language.md`，与本技能冲突时以那边为准。
 
 ## 参考文件
 
-`references/hierarchy-typography.md` · `spacing-layout.md` · `color-theme.md` · `states-motion.md` · `wording.md` · `diagrams.md` · `review-checklist.md` · `sources.md`
+`references/asset-priority.md` · `references/hierarchy-typography.md` · `references/spacing-layout.md` · `references/color-theme.md` · `references/states-motion.md` · `references/wording.md` · `references/diagrams.md` · `references/review-checklist.md` · `references/sources.md`

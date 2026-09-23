@@ -111,3 +111,8 @@ vault.bak-*/
 
 # 定时任务运行日志（crontab 追加写入，运行时产物）。
 /logs/
+
+# 全量优化的认领锁：进行中的临时状态不入库（半途中断会留下过期锁）。
+# 完成状态写在文章 frontmatter 的 editorial_pass / editorial_at / editorial_by 里，
+# 那三个字段跟着文章走，是唯一的事实源。
+/.editorial/
