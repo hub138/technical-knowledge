@@ -89,20 +89,23 @@
   }
 
   /* ── 父圆：面积 ∝ 篇数 ─────────────────────────────────────────── */
-  function packParents() {
-    groups = []; seed = 20240921;
+  /* 整包尝试，谁放不下返回 null，由外层等比缩小后重来。
+   * 等比缩放保住"面积 ∝ 篇数"（面积比不变）。此前内容涨到 449 篇后，
+   * 自然半径塞不进画布，spiralPlace 返回 null 无人处理，三个大圆全
+   * 塌到同一点（左上角叠罗汉），幽灵坐标还把整体居中拖偏、出画布被裁。 */
+  function tryPack(scale) {
     var ls = DATA.layers.slice();
     var maxN = Math.max.apply(null, ls.map(function (l) { return l.n; }));
     ls.sort(function (a, b) { return b.n - a.n; });
     var placed = [];
     ls.forEach(function (L) {
-      var R = Math.max(38, RMAX * Math.sqrt(L.n / maxN));
+      if (!placed) return;                  /* 前面已有圆失败：本轮作废 */
+      var r = scale * Math.max(38, RMAX * Math.sqrt(L.n / maxN));
       /* 候选点绕「已放圆群的质心」螺旋，而不是绕画布固定中心：
        * 绕固定中心时，第一个圆抢走最内圈，后续圆被越推越远，最后
-       * 整体居中一平移，空隙全挤到一边（「数据与存储」悬在左上角
-       * 即此）。绕群质心则每个新圆贴着已有圆群外缘落位，布局从
-       * 第一个圆起就紧凑。群质心每放一个圆重算一次；首圆的候选点
-       * 直接取画布中心。 */
+       * 整体居中一平移，空隙全挤到一边。绕群质心则每个新圆贴着
+       * 已有圆群外缘落位，布局从第一个圆起就紧凑。群质心每放一个
+       * 圆重算一次；首圆的候选点直接取画布中心。 */
       var cx = W / 2, cy = H / 2;
       if (placed.length) {
         var sx = 0, sy = 0;
@@ -114,9 +117,27 @@
         cx = W / 2 + (cx - W / 2) * (40 / Math.max(span, 40));
         cy = H / 2 + (cy - H / 2) * (40 / Math.max(span, 40));
       }
-      var pos = placed.length ? spiralPlace(R, placed, cx, cy, Math.max(W, H)) : { x: W / 2, y: H / 2 };
-      var g = { layer: L, r: R, x: pos.x, y: pos.y, col: LAYER[L.id] || "#1a365d", thin: L.n < 10 };
-      groups.push(g); placed.push(g);
+      var pos = placed.length ? spiralPlace(r, placed, cx, cy, Math.max(W, H)) : { x: W / 2, y: H / 2 };
+      if (pos.x == null) { placed = null; return; }
+      placed.push({ layer: L, r: r, x: pos.x, y: pos.y });
+    });
+    return placed;
+  }
+
+  function packParents() {
+    groups = [];
+    var placed = null, scale = 1;
+    /* 总圆面积随 scale 二次方收缩，画布不变，必然存在能放下的 scale；
+     * spiralPlace 首拟合法在面积占比 ≤ 55% 左右必成功，几次内收敛。 */
+    while (!placed) {
+      placed = tryPack(scale);
+      if (!placed) scale *= 0.9;
+    }
+    groups = placed.map(function (g) {
+      return {
+        layer: g.layer, r: g.r, x: g.x, y: g.y,
+        col: LAYER[g.layer.id] || "#1a365d", thin: g.layer.n < 10
+      };
     });
     var minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
     groups.forEach(function (g) {
@@ -124,6 +145,10 @@
       minY = Math.min(minY, g.y - g.r); maxY = Math.max(maxY, g.y + g.r);
     });
     var dx = W / 2 - (minX + maxX) / 2, dy = H / 2 - (minY + maxY) / 2;
+    /* 居中偏移钳在画布内：整体平移不许把任何圆推出 8px 安全边。
+     * spiralPlace 已保证每个圆在界内，包围盒宽 ≤ W-16，钳制总有解。 */
+    dx = Math.max(8 - minX, Math.min(dx, W - 8 - maxX));
+    dy = Math.max(8 - minY, Math.min(dy, H - 8 - maxY));
     groups.forEach(function (g) { g.x += dx; g.y += dy; });
   }
 
@@ -276,7 +301,7 @@
 
     leaves.forEach(function (p) {
       var g = svg("g", { class: "pano-node", "data-layer": p.layer.id });
-      g.appendChild(svg("title", null, p.item.t + "（" + p.item.l + " 行）"));
+      g.appendChild(svg("title", null, p.item.t + "（" + p.item.l + " 字）"));
       g.appendChild(svg("circle", {
         cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: p.r.toFixed(1),
         fill: p.g.col, "fill-opacity": 0.7,
@@ -394,7 +419,7 @@
   var tip;
   function showTip(p) {
     if (!tip) { tip = el("div", "pano-tip"); document.body.appendChild(tip); }
-    var unit = EN() ? ' words' : ' 行';
+    var unit = EN() ? ' words' : ' 字';
     tip.innerHTML = '<b>' + esc(p.item.t) + '</b><span>' + esc(Lname(p.layer)) + '　' + p.item.l + unit + '</span>';
     tip.style.borderLeftColor = p.g.col;
     tip.classList.add("on");
@@ -484,10 +509,10 @@
 
     var lg = el("p", "pano-legend");
     lg.innerHTML = EN()
-      ? 'Big circle area = notes in the layer　·　small circle area = lines per note　·　' +
+      ? 'Big circle area = notes in the layer　·　small circle area = words per note　·　' +
         '<span style="color:#dc2626;font-weight:700">red dashed</span> = gap layer (&lt;10 notes)' +
         (dropped > 0 ? '　·　⚠ ' + dropped + ' not drawn' : '')
-      : '大圆面积 = 该层篇数　·　小圆面积 = 单篇行数　·　' +
+      : '大圆面积 = 该层篇数　·　小圆面积 = 单篇字数　·　' +
         '<span style="color:#dc2626;font-weight:700">红色虚线</span> = 缺口层（&lt;10 篇）' +
         (dropped > 0 ? '　·　⚠ ' + dropped + ' 篇未画出' : '');
     host.appendChild(lg);
