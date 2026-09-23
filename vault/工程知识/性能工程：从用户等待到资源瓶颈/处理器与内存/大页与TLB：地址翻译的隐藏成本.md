@@ -22,7 +22,18 @@ sources:
 
 ## 机制
 
-**页表走查：翻译的完整成本**。x86-64 四级页表（PGD→PUD→PMD→PTE），一次翻译缺 TLB 时最坏 4 次内存访问（每级一次）。x86 用 MMU 缓存（PDE cache 等）缓解中间级，ARM 把中间级缓存在 walk cache。TLB hit 时翻译一两个周期，miss 走查几十到几百周期。**数据访问的延迟里含着翻译延迟**，报表里看不到"TLB miss"单独一行，它藏在 cache miss 的阴影里（一次访存 miss 可能同时是 dTLB miss）。
+**页表走查：翻译的完整成本**。x86-64 四级页表（PGD→PUD→PMD→PTE），一次翻译缺 TLB 时最坏 4 次内存访问（每级一次）。TLB hit 时翻译一两个周期，miss 走查几十到几百周期，缺 TLB 时沿四级页表逐级走查：
+
+```mermaid
+graph TD
+    VA[虚拟地址] --> PGD[查 PGD<br/>第 1 次内存读]
+    PGD --> PUD[查 PUD<br/>第 2 次内存读]
+    PUD --> PMD[查 PMD<br/>第 3 次内存读]
+    PMD --> PTE[查 PTE<br/>第 4 次内存读]
+    PTE --> PA[物理地址]
+```
+
+x86 用 MMU 缓存（PDE cache 等）缓解中间级，ARM 把中间级缓存在 walk cache。**数据访问的延迟里含着翻译延迟**，报表里看不到"TLB miss"单独一行，它藏在 cache miss 的阴影里（一次访存 miss 可能同时是 dTLB miss）。
 
 **大页的两种形态：Hugetlbfs 与 THP**。显式大页（Hugetlbfs / mmap MAP_HUGETLB）：启动时预留 2MB/1GB 物理大页池，应用显式 mmap，翻译项从"每 4KB 一项"降到"每 2MB 一项"，覆盖半径扩大 512 倍。透明大页（THP，Transparent Huge Pages）：内核在缺页时自动尝试用 2MB 页补齐（madvise(MADV_HUGEPAGE) 引导或 always 全局），无需应用改造。两种形态的取舍：显式大页可靠无碎片风险但要预留管理（数据库场景的标准配置，Oracle/PostgreSQL 文档都写明步骤）；THP 零改造但有碎片与延迟代价（分配时 compaction 抓狂、运行中 split/merge 抖动）。
 
