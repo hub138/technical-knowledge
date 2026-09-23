@@ -1696,6 +1696,23 @@ body.tk-host button {
      链接命中区收回到内容端（自适应宽度），底部分隔线不收（视觉不变）。 */
   .tk-sidebar .tk-brand { align-self: flex-start; }
 
+  /* 【2026-09-23 折叠规则全站化】目录按钮的展示与折叠态隐藏域树，原来
+     只写在首页内联样式里，companion 页（papers/sources/evaluation/
+     learning）挂同一 shell 却没有这些规则，移动端域树 451px 把正文顶到
+     499px（首页 239px）。收进 base.css 让所有页面同规则；首页内联那份
+     与此处等价，保留不动。 */
+  .tk-mobile-menu {
+    display: block;
+    border: 1px solid var(--color-line);
+    background: var(--color-panel);
+    border-radius: 6px;
+    padding: 6px 9px;
+    color: var(--color-accent);
+    min-height: 44px;
+    box-sizing: border-box;
+  }
+  .tk-sidebar.collapsed .tk-domains { display: none; }
+
   .tk-shell,
   .content {
     /* 通道与按钮几何配套，两套几何两套值：
@@ -1905,5 +1922,63 @@ pre.mermaid svg{
   width:auto !important;
   height:auto !important;
   max-width:100%;
-  max-height:420px;
 }
+/* 图控件：放大 / 缩小 / 复制 / 拖高度。默认原尺寸（清晰），
+   想一屏看全就点「缩小」——等比缩会变小，所以不默认缩。 */
+.mmd-figure{position:relative;margin:18px 0}
+.mmd-bar{
+  position:absolute;top:6px;right:6px;z-index:2;display:flex;gap:4px;
+  opacity:0;transition:opacity var(--duration-fast) var(--ease-out);
+}
+.mmd-figure:hover .mmd-bar,.mmd-figure:focus-within .mmd-bar{opacity:1}
+.mmd-btn{
+  min-width:26px;height:26px;padding:0 7px;
+  border:1px solid var(--color-line-strong);border-radius:6px;
+  background:var(--color-panel);color:var(--color-ink-soft);
+  font:inherit;font-size:12px;line-height:1;cursor:pointer;
+}
+.mmd-btn:hover{color:var(--color-accent);border-color:var(--color-accent-line)}
+.mmd-grip{
+  height:9px;margin-top:-2px;cursor:ns-resize;
+  border-radius:0 0 8px 8px;
+  background:linear-gradient(var(--color-line) 0 1px,transparent 1px) center/100% 9px no-repeat;
+  opacity:0;transition:opacity var(--duration-fast) var(--ease-out);
+}
+.mmd-figure:hover .mmd-grip,.mmd-figure:focus-within .mmd-grip{opacity:1}
+
+/* ── 键盘跳转正文（skip link）────────────────────────────────────────
+ * 文章页键盘 Tab 要走 25 步才到正文（前 24 步耗在顶栏搜索框与侧栏
+ * 域树上，2026-09-24 实测 audit_tabpath.py），核心资产在键盘路径里
+ * 排最后，与 design-craft「首屏/首路径属于核心资产」冲突。标准解法
+ * 是 skip link，Tab 一步直达 #reader-body，其余场景（鼠标、触屏、
+ * 不用键盘的用户）完全无感。
+ * 位置必须在 <body> 开头、侧栏之前：Tab 顺序按文档序，aside 在
+ * main 之前，放 main 里面第一步仍会先走侧栏（最小复现证实）。
+ * 目标容器 #reader-body 加 tabindex="-1"，回车后焦点真正落进正文，
+ * 不然焦点弹回 BODY，跳转等于没跳。
+ * 默认移出屏幕，聚焦时贴顶栏下缘现身，不与顶栏内容重叠。
+ * 配色走 token，焦点环由全局 :focus-visible 兜底。 */
+.skip-link{
+  position:fixed;
+  top:64px;
+  left:16px;
+  z-index:60;
+  padding:8px 14px;
+  border:1px solid var(--color-accent-line);
+  border-radius:6px;
+  background:var(--color-panel);
+  color:var(--color-accent);
+  font-size:var(--text-sm);
+  font-weight:var(--weight-semibold);
+  box-shadow:var(--shadow-md);
+  transform:translateY(-12px);
+  opacity:0;
+  pointer-events:none;
+  text-decoration:none;
+}
+.skip-link:focus-visible{
+  transform:translateY(0);
+  opacity:1;
+  pointer-events:auto;
+}
+

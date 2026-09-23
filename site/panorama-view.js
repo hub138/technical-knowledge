@@ -196,7 +196,11 @@
   /* 黄金角螺旋找位：第一个不重叠又不越界的点就放下。
      出来的形状就是熟悉的气泡堆积感。 */
   function spiralPlace(r, placed, cx, cy, limit, insideOnly) {
-    var pad = 1.1;
+    /* pad 不能小：组标签胶囊（ty-12 起，最高 51px）画在父圆上缘并向
+       外冒头。间距小于冒头量时，胶囊直接压到相邻圆的气泡上（实测：
+       1.1px 时「应用与架构」胶囊盖住「操作系统与运行时」圆顶）。
+       16px = 画布边距 8 × 2 + 估算余量，标签冒头 ≤10px 时双主题目测干净。 */
+    var pad = 16;
     var maxRad = limit - r - pad;
     if (maxRad < 0) return { x: null, y: null };
     var steps = Math.ceil(Math.pow(maxRad / 1.15, 2)) + 400;

@@ -463,7 +463,7 @@
     mount.className = "tk-sidebar";
     mount.setAttribute("aria-label", "站点导航");
     mount.innerHTML = `
-      ${opts.mobileMenu ? `<div class="tk-brand-row">${brand}<button type="button" class="tk-mobile-menu" id="mobile-menu" aria-label="打开目录">目录</button></div>` : brand}
+      ${opts.mobileMenu !== false ? `<div class="tk-brand-row">${brand}<button type="button" class="tk-mobile-menu" id="mobile-menu" aria-label="打开目录">目录</button></div>` : brand}
       <nav class="tk-nav" id="tk-nav">
         ${navHtml}
       </nav>
@@ -632,6 +632,27 @@
     if (window.TKI18N) {
       window.TKI18N.translateDOM(mount);
       window.TKI18N.wireLangToggles(mount);
+    }
+
+    /* 【2026-09-23 移动端折叠统一】折叠的展示规则（#tk-sidebar.collapsed
+       #domains{display:none} 与按钮 display:block）原来只写在首页的内联
+       样式里，初始折叠也只在首页的 bindNavigation() 里跑，其余页面
+       （papers/sources/evaluation/learning）移动端侧栏永远展开，451px 的
+       域树把正文顶到 499px（首页 239px，实测）。绑定收进 shell：凡挂
+       侧栏的页面移动端都折叠、按钮都能展开收起。 */
+    if (opts.mobileMenu !== false) {
+      const menuButton = mount.querySelector("#mobile-menu");
+      if (menuButton) {
+        const collapsed = window.matchMedia("(max-width: 760px)").matches;
+        mount.classList.toggle("collapsed", collapsed);
+        menuButton.setAttribute("aria-expanded", String(!collapsed));
+        menuButton.onclick = () => {
+          const open = !mount.classList.contains("collapsed");
+          mount.classList.toggle("collapsed", open);
+          menuButton.setAttribute("aria-expanded", String(open));
+          menuButton.setAttribute("aria-label", open ? "收起目录" : "打开目录");
+        };
+      }
     }
 
     return mount;

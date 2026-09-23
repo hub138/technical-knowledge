@@ -61,6 +61,14 @@
   letter-spacing: -0.01em;
 }
 
+/* 英文站名比中文长得多：中文「工程知识库」四字在 17px 侧栏放得下，
+   「Engineering Knowledge」同字号在 260px 侧栏被 ellipsis 截成
+   「Engineering K…」（实测 2026-09-23）。语言钩子在 html[lang]，
+   英文态整块降一档字号换完整显示；字号随语言变化是品牌块的既定取舍，
+   完整站名优先于恒定字号。 */
+html[lang="en"] .tk-brand-text strong { font-size: 12px; letter-spacing: 0; }
+html[lang="en"] .tk-brand-text small { font-size: 11px; letter-spacing: 0; }
+
 .tk-brand-text small {
   margin-top: 3px;
   color: var(--color-muted);
