@@ -25,6 +25,15 @@ sources:
 
 NUMA（Non-Uniform Memory Access，非统一内存访问）的物理拓扑：每个 socket 直连自己的内存控制器（本地内存），socket 之间靠 UPI/Infinity Fabric 互联。跨槽访问一次的成本：
 
+两个槽位各带本地内存、经互联总线相连，跨槽与本地访问走的路径不同：
+
+```mermaid
+graph TD
+    C0[CPU 槽0] -->|本地访存| M0[(槽0 本地内存<br/>70-100ns)]
+    C0 -->|跨槽走 UPI| C1[CPU 槽1]
+    C1 -->|本地访存| M1[(槽1 本地内存<br/>70-100ns)]
+```
+
 | 访问路径 | 相对代价 | 说明 |
 | --- | --- | --- |
 | 本地 DRAM | 1x（基线） | 约 70-100ns |
