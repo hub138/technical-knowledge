@@ -31,52 +31,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: 导出静态内容并改写请求
-        run: |
-          mkdir -p _pages
-          python3 scripts/export_static.py . _pages
-          cp index.html _pages/
-          cp -r site _pages/site
-          # 1) 静态资源相对化（site/ 就在 index.html 旁边，子路径下天然成立）
-          sed -i \
-            -e 's|href="/static/|href="site/|g' \
-            -e 's|src="/static/|src="site/|g' \
-            -e 's|href="/favicon.svg"|href="site/favicon.svg"|g' \
-            _pages/index.html
-          # 2) API 请求改相对。version 是独立文件名，必须先于通配条目。
-          sed -i "s|'/api/notes/version'|'api/notes-version.json'|g" _pages/index.html
-          sed -i "s|'/api/notes?|'api/notes.json?|g" _pages/index.html
-          sed -i "s|'/api/|'api/|g" _pages/index.html
-          # 3) 单篇取用：静态 JSON 按 vault 目录镜像，拼原始路径
-          sed -i \
-            -e "s|'api/note?path='+encodeURIComponent(path)|'notes/'+path+'.json'|g" \
-            -e "s|'api/note?path='+encodeURIComponent(article.path)|'notes/'+article.path+'.json'|g" \
-            _pages/index.html
-          # 4) 查询类路由（/?path=、/?view=）是 SPA 自己的状态，留在页内
-          sed -i 's|href="/?|href="?|g' _pages/index.html
-          # pushState 的三种书写形态：无空格、逗号后带空格、反引号模板串。
-          # 不改写会跳到域名根（hub138.github.io/?path=...），脱离项目页。
-          sed -i \
-            -e "s|,'/|,'./|g" \
-            -e "s|, '/|, './|g" \
-            -e 's|,`/\?|,`./?|g' \
-            _pages/index.html
-          # 5) 兜底：其余 href="/..." 是真服务器路由（/learn、/launch、
-          #    /papers、/projects），静态托管没有，统一指去 dev 完整站。
-          sed -i 's|href="/|href="https://21.6.137.121:28788/|g' _pages/index.html
-          # 6) site/ 内部同样有绝对引用：base.css 的 @import、js 里的 fetch
-          #    与导航。nav.js/matrix-view.js/shell.js 会生成 "/?view="、
-          #    "/?path="、"/?domain=" 链接和 "/learn" 这类路由——不改写
-          #    就跳到域名根（hub138.github.io/?view=panorama，404）。
-          sed -i 's|url("/static/|url("|g' _pages/site/base.css
-          sed -i -e 's|"/api/|"api/|g' -e "s|'/api/|'api/|g" \
-            _pages/site/*.js
-          # 查询路由留在页内（SPA 自己接），先于兜底执行
-          sed -i 's|"/?|"?|g' _pages/site/*.js
-          # 其余 href="/..." 服务器路由统一指 dev（含 js 动态注入的
-          # 链接赋值，如 projects-page 的 learn.href = "/learn"）
-          sed -i 's|href="/|href="https://21.6.137.121:28788/|g' _pages/site/*.js
-          sed -i 's|\.href = "/|.href = "https://21.6.137.121:28788/|g' _pages/site/*.js
-          touch _pages/.nojekyll
+        # 构建规则只在 scripts/build_pages.sh 里维护一份：Actions 与本地
+        # 复现跑同一个脚本，避免两处 sed 规则漂移（漂移过一次，线上和
+        # 本地改写出来的链接不一样）。
+        run: bash scripts/build_pages.sh . _pages
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
