@@ -560,14 +560,14 @@ a.has-children {
   padding-bottom: calc(var(--float-lane) + var(--space-8));
 }
 
-/* ── 页面头部契约（全站唯一真源，改头部节奏先读这里）──────────────────────
+/* ── 页面头部规范（全站唯一真源，改头部节奏先读这里）──────────────────────
  *
  * bug1 的本质：两套头部组件（.view-head 与 .hero）各有一份几何，九个
  * hero 版页面又各写一份本地覆盖 —— 45/46/47px 的顶距、21/22/23px 的
  * 首块距、35/36px 的标题字号。用户逐页对比 /sources 与 /projects 抓到
  * "对顶部的空白不一样"：数字根源是 .hero h1 没写 margin（带浏览器
  * 默认 21px 上边距，叠加 26px 顶部留白变成 47px），而 .view-head h1
- * 有 margin: 0 0 7px（顶部就是 26px）。2026-09-22 起收成本契约。
+* 有 margin: 0 0 7px（顶部就是 26px）。2026-09-22 起收成正式规范。
  *
  * 三种形态、两套几何。形态是语义分工；几何按「身份头 vs 标注头」分两套：
  *   .view-head                 标注头（紧凑）：标题+说明+右侧操作区，底部
@@ -585,7 +585,7 @@ a.has-children {
  *                              几何：顶 40 / 标题下距 16 / 底距 32。
  *   首页 hero（.app 根容器）   同款身份头。首页根容器是 .app 不是
  *                              .tk-shell，上面两条选择器都抓不到 ——
- *                              由 index.html 写契约镜像（几何同值，真源
+*                              由 index.html 写规范镜像（几何同值，真源
  *                              仍在此总表）。曾长期停在旧统一值 26/20，
  *                              2026-09-22 修正对齐。
  *   .topbar + .hero            同款身份头，但页顶先有一条面包屑
@@ -638,7 +638,7 @@ a.has-children {
 .tk-shell .hero:first-child,
 .topbar + .hero {
   /* 身份头几何（宽松套）：顶 40 / 底距 32 —— 与 view-head（紧凑套
-     26/20）成对照，为什么两套值见上方契约「为什么 hero 宽松」。
+*     26/20）成对照，为什么两套值见上方规范「为什么 hero 宽松」。
      40/32 在 8pt 网格上；统一之初压成 26/20 曾让 projects 变丑
      （用户 2026-09-22 抓到的回归），恢复宽松但用显式值，不靠
      h1 的浏览器默认 margin 撑出 47px（那是 bug 不是设计）。 */
@@ -648,7 +648,7 @@ a.has-children {
   /* 书页式收口线：不跑满整列，像印刷书籍里的决定线；用背景渐变而非
      border 实现，让缺口只在右侧。为什么 hero 用收口线而 view-head
      用全宽线：收口线配操作链接行（"这里是入口"），全宽线配列表
-     （"标题区到此为止，下面是内容"）。形态语义，见契约注释。 */
+*     （"标题区到此为止，下面是内容"）。形态语义，见规范注释。 */
   background-image: linear-gradient(to right, var(--ink-rule) 0, var(--ink-rule) calc(100% - var(--rule-gutter)), transparent calc(100% - var(--rule-gutter)));
   background-repeat: no-repeat;
   background-position: 0 100%;
@@ -746,7 +746,7 @@ a.has-children {
  *   · 页面工具栏形态：直接放进 <div class="page-toolbar">，input 自适应
  *     填满 —— .page-toolbar 本身只管放置（flex/gap/margin:0），不管皮肤
  *
- * 分工：皮肤（几何、图标、kbd、焦点环）= 这里的契约；放置（宽度、伸缩、
+* 分工：皮肤（几何、图标、kbd、焦点环）= 这里的规范；放置（宽度、伸缩、
  * 挂哪）= 页面的 .page-toolbar 或顶栏。新页面要搜索框：复制上面结构，
  * 换 id 和 placeholder，不写任何样式。 */
 .tk-search {
@@ -907,7 +907,7 @@ body.tk-host a:hover { text-decoration: none; }
  * 4. 下边框不要去掉：它是「标题区结束、内容开始」的分界。
  *    掌握进度曾经没有这条线，看起来和下面的筛选器粘在一起。
  * 5. 头部几何（顶 26/底 16/头部底距 20/标题下距 7）与 hero 形态同值
- *    同源 —— 全部约定见上方「页面头部契约」。首个内容块的
+*    同源 —— 全部约定见上方「页面头部规范」。首个内容块的
  *    margin-top 一律 0，间距只从头部这侧给。
  */
 .view-head {
@@ -927,8 +927,8 @@ body.tk-host a:hover { text-decoration: none; }
   margin-bottom: 20px;
   padding-bottom: 16px;
   border-bottom: 1px solid var(--color-line);
-  /* 顶 26 / 底 16 / 头部底距 20 —— 与 hero 形态同值同源，五值契约
-   * 见上方「页面头部契约」注释。改几何只改契约区，两形态同步。 */
+/* 顶 26 / 底 16 / 头部底距 20 —— 与 hero 形态同值同源，五值规范
+* 见上方「页面头部规范」注释。改几何只改规范区，两形态同步。 */
 }
 
 .view-head h1,
@@ -1014,6 +1014,9 @@ body.tk-host a:hover { text-decoration: none; }
 /* ── Page rhythm: sections ──────────────────────────────────────────────── */
 
 .section { margin-top: 28px; }
+/* 区块导语与全站说明句同一套行长（.view-head p, .hero p 的 76ch）：
+ * 1440px 下不限宽时一行 65+ 字横贯 1043px（实测），读起来漏行。 */
+.section > p { max-width: 76ch; }
 .section h2,
 .panel h2 { letter-spacing: var(--tracking-h2); }
 
@@ -1127,6 +1130,7 @@ body.tk-host button {
 .hero-links a {
   display: inline-flex;
   align-items: center;
+  min-height: 36px;
   padding: 9px 14px;
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
@@ -1161,6 +1165,9 @@ body.tk-host button {
 /* An action that is a button rather than a link (the insights refresh) sits in
    the same row and must not look like a second filled button. */
 .hero-links button {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
   padding: 9px 14px;
   border: 1px solid var(--color-line);
   background: var(--color-panel);
@@ -1339,10 +1346,19 @@ body.tk-host button {
   font: 700 22px/1 inherit;
   cursor: pointer;
   box-shadow: var(--shadow-md);
+  /* 触屏上按钮永远悬浮在内容上（390px 实测盖住 learning 的「开始」
+     按钮和 projects 的正文行）。触屏没有 hover，静止的实色块对阅读
+     是持续干扰：默认半透明，滚动（页面移动）后完全显形。全站
+     body 都可滚（已验证），不存在永远不显形的死页。 */
   transition:
+    opacity var(--duration-slow) var(--ease-out),
     transform var(--duration-fast) var(--ease-out),
     box-shadow var(--duration-fast) var(--ease-out);
 }
+
+/* 触屏待机态（钩子见 shell.js 的 fab 生成处）：半透明 + 不拦截点击，
+ * 滚动后完全显形。桌面（pointer: fine）不受影响。 */
+.tk-fab.tk-fab--rest { opacity: 0.18; pointer-events: none; }
 
 .tk-fab:hover {
   transform: translateY(-2px);
@@ -1407,12 +1423,12 @@ body.tk-host button {
   box-shadow: var(--shadow-lg);
 }
 
-.tk-fb-panel h2 { margin: 0 0 4px; font-size: 19px; }
+.tk-fb-panel h2 { margin: 0 0 4px; font-size: var(--text-h3); }
 
 .tk-fb-sub {
   margin: 0 0 16px;
   color: var(--color-muted);
-  font-size: 12.5px;
+  font-size: var(--text-small);
   line-height: 1.6;
 }
 
@@ -1423,7 +1439,7 @@ body.tk-host button {
   border-radius: 6px;
   background: var(--color-bg);
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: var(--text-small);
 }
 
 .tk-fb-where b { color: var(--color-ink); }
@@ -1433,12 +1449,13 @@ body.tk-host button {
 .tk-fb-kinds label {
   display: inline-flex;
   align-items: center;
+  min-height: 36px;
   padding: 6px 11px;
   border: 1px solid var(--color-line);
   border-radius: 20px;
   background: var(--color-panel);
   color: var(--color-muted);
-  font-size: 12.5px;
+  font-size: var(--text-small);
   font-weight: 650;
   cursor: pointer;
 }
@@ -1467,7 +1484,7 @@ body.tk-host button {
   display: block;
   margin-bottom: 5px;
   color: var(--color-muted);
-  font-size: 12px;
+  font-size: var(--text-small);
   font-weight: 650;
 }
 
@@ -1647,6 +1664,13 @@ body.tk-host button {
     height: 44px;
     margin-left: 0;
     flex: 0 0 auto;
+    /* 视觉 32px 宽（箭头本来就小），命中区透明外扩到 44px 宽。 */
+    position: relative;
+  }
+  .tk-nav .tk-subnav-toggle::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0; left: -6px; right: -6px;
   }
 
   .tk-context,
@@ -1657,6 +1681,13 @@ body.tk-host button {
      等于手机上打不开知识树（390px 实测完全重叠）。给品牌行预留
      控件通道：控件左缘 x=268，目录右缘收到 258，留 10px 间隙。 */
   .tk-brand-row { padding-right: 117px; }
+
+  /* companion 页没有品牌行（无 mobileMenu 选项），品牌 <a> 自己在
+     flex column 里占满全宽（390px 实测 364px），命中区横到 x=377，
+     盖住语言按钮左缘（x=260 起）——elementFromPoint 实测 x=262 起命中的
+     都是控件，但控件块之间 2px 的缝上命中的是品牌链接，点击会误跳首页。
+     链接命中区收回到内容端（自适应宽度），底部分隔线不收（视觉不变）。 */
+  .tk-sidebar .tk-brand { align-self: flex-start; }
 
   .tk-shell,
   .content {
@@ -1685,11 +1716,11 @@ body.tk-host button {
     backdrop-filter: blur(6px);
   }
 
-  /* 头部移动端统一：两形态各自成套（桌面契约见上面的「页面头部契约」）。
+/* 头部移动端统一：两形态各自成套（桌面规范见上面的「页面头部规范」）。
    * hero（身份头）顶 32 / 底距 28 —— 桌面 40/32 的移动端折算（屏幕
    * 小、留白同比收窄但保持宽松语义）；view-head（标注头）顶 26 /
    * 底距 20 沿用桌面值（移动端无覆盖）。页面级的移动端 .hero 覆盖（31/25、32/25、34 等）
-   * 已全部删除，只留这一条。改几何在契约「几何总表」里同步两形态。 */
+* 已全部删除，只留这一条。改几何在规范「几何总表」里同步两形态。 */
   .tk-shell .hero:first-child {
     margin-bottom: 28px;
     padding: 32px 0 16px;
@@ -1817,4 +1848,25 @@ body.tk-host button {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
   }
+}
+
+/* ── 键盘焦点环（全站兜底） ────────────────────────────────────────────
+ * 各组件都只写了 hover，没写 focus-visible：键盘用户 Tab 到按钮、链接、
+ * 筛选片上时没有任何可见位置（design-craft 交互五态的硬要求）。这里
+ * 一条兜底覆盖全部可点元素；个别组件已有的 focus-visible 规则特异性
+ * 更高或同值，不冲突。输入框聚焦走自己的 box-shadow 焦点环，不套描边。 */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible,
+label:focus-visible,
+select:focus-visible,
+summary:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+input:focus-visible,
+textarea:focus-visible {
+  outline: none;
 }

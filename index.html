@@ -1421,7 +1421,7 @@ function renderDirectory(){
   }).join('');
   // 空结果给可执行的下一步，而不是一句"没有匹配内容"就结束。
   const empty=groups.size?'':
-    `<div class="empty"><p class="empty-title">没有找到“${esc(q)}”</p><p class="empty-hint">试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
+    `<div class="empty">${state.query?`<p class="empty-title">没有找到“${esc(q)}”</p>`:`<p class="empty-title">「${esc(state.domain)}」还没有匹配的内容</p>`}<p class="empty-hint">${state.query?'试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识':'可能是筛选条件太窄，清掉筛选看看全部知识'}</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
   $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div><div class="sort"><button data-sort="title" class="${state.sort==='title'?'active':''}">按标题</button><button data-sort="updated" class="${state.sort==='updated'?'active':''}">按更新</button></div></div>${sections}${empty}`;
   const clearDomain=$('#empty-clear-domain');
   if(clearDomain)clearDomain.onclick=()=>select('all','all');

@@ -4,7 +4,7 @@ type: concept
 status: active
 updated: 2026-09-22
 review_after: 2027-09-22
-change_rate: slow
+change_rate: low
 confidence: high
 tags:
   - systems/memory

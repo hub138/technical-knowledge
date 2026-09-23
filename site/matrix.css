@@ -28,7 +28,7 @@
   --mx-lv1-bg: #f0f5fc; --mx-lv1-fg: #33507c;
   --mx-lv2-bg: #d6e5f9; --mx-lv2-fg: #26467a;
   --mx-lv3-bg: #a9c8f2; --mx-lv3-fg: #14325e;
-  --mx-lv4-bg: #4a79c9; --mx-lv4-fg: #ffffff;
+  --mx-lv4-bg: #3f6cbe; --mx-lv4-fg: #ffffff;
   --mx-empty-hatch: #fdf0f0;
   --mx-danger: #c92a2a;
   --mx-danger-bg: #fdecec;
@@ -63,10 +63,10 @@
 /*"有/薄/厚"。 */
 /* 2026-09-22 字号升档 --text-small(13px) → --text-note(15-17px)：用户抓到
  * 「八层技术栈 tab 的说明字大、矩阵的说明字小」——同一页两个 tab 视图的
- * 导语差两档字号，视觉上像两个站点。说明句档位全站契约是 --text-note
+* 导语差两档字号，视觉上像两个站点。说明句档位全站规范是 --text-note
  * （tokens.css「页头专用」注释 + panorama.css .pano-intro p + base.css
  * .view-head p 同档），矩阵导语原来私用 13px 是历史遗留。图例/角标仍按
- * 契约用 --text-small / --text-micro（micro 只做图形角标不做文字）。 */
+* 规范用 --text-small / --text-micro（micro 只做图形角标不做文字）。 */
 .mx-intro {
   font-size: var(--text-note); line-height: 1.75; color: var(--mx-text-dim);
   max-width: 900px; margin: 0 0 14px;
@@ -175,7 +175,7 @@
 }
 
 .mx-n { font-size: 19px; font-weight: 700; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.mx-words { font-size: var(--text-micro); opacity: .72; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.mx-words { font-size: var(--text-micro); opacity: .88; margin-top: 2px; font-variant-numeric: tabular-nums; }
 .mx-cell.lv4 .mx-words { opacity: 1; }
 
 /* 分档配色：越厚越深。空格子两信号：极淡红底 + 虚线框（斜纹已删，
@@ -226,7 +226,7 @@
   width: 18px; height: 12px; border-radius: 3px;
   display: inline-block;
 }
-.mx-legend .mx-leg-sep { color: var(--mx-border-strong); margin: 0 2px; }
+.mx-legend .mx-leg-sep { color: var(--mx-text-dim); margin: 0 2px; }
 .mx-legend .mx-leg-label { margin-right: 8px; }
 .mx-legend .mx-leg-gap { margin-left: 10px; }
 
@@ -244,6 +244,7 @@
 }
 .mx-kind-pill {
   display: inline-flex; align-items: center; gap: 7px;
+  min-height: 38px;
   padding: 5px 12px; border-radius: 999px;
   font-size: var(--text-small); font-family: inherit;
   color: var(--mx-text);

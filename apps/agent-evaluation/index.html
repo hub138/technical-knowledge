@@ -44,16 +44,16 @@
       a:hover {
         text-decoration: none;
       }
-      /* 头部契约（site/base.css「页面头部契约」）：本页 hero 是 shell
+/* 头部规范（site/base.css「页面头部规范」）：本页 hero 是 shell
          首子，几何（顶 26/底 16/头部底距 20、标题 0 0 7px、说明走
-         76ch/--text-note/ink-soft）全部由契约提供。原 .topbar/.brand/
+         76ch/--text-note/ink-soft）全部由规范提供。原 .topbar/.brand/
          .mark/.topnav/.hero/.eyebrow/.hero p 本地规则 2026-09-22 删除：
          - .topbar/.brand/.mark/.topnav 在 DOM 里 0 引用（侧栏由
            shell.js 渲染），整组死代码；
          - .hero 的 46px padding 与 border-bottom 被 0,3,0 压成死代码；
          - .eyebrow 在 DOM 里 0 引用；
          - .hero p 的 820px/17px/--color-muted 是活覆盖，把说明句推离
-           全站基准，已删，契约真源接管。 */
+全站基准，已删，规范真源接管。 */
       .hero-note {
         margin-top: 12px;
         padding-left: 14px;
@@ -69,7 +69,7 @@
            孤行折下（4+1 折行，DOM 实测 offsetTop 660/693）。
            改 1fr/1.18fr 后证据面板 413px、链 394px、余量 19px 单行
            （面板变窄的历史：旧注释按 419px 面板宽算的 3px gap 7px
-           余量早已是负数）。契约面板 342px 三列 stages 仍成立
+余量早已是负数）。规范面板 342px 三列 stages 仍成立
            （EN 实测）。 */
         grid-template-columns: 1fr 1.18fr;
         gap: 18px;
@@ -304,7 +304,7 @@
         text-decoration: none;
       }
       @media (max-width: 900px) {
-        /* hero 移动端几何由 base.css 契约统一给（30/16），不本地覆盖。 */
+/* hero 移动端几何由 base.css 规范统一给（30/16），不本地覆盖。 */
         .hero p {
           font-size: 15px;
         }
@@ -367,10 +367,10 @@
           这是一个用来评估 Agent 的原型：它把 Agent 的输出判断绑定到命令、日志、产物和测试，让“有没有变好”变成可核验证据，而不是一句主观结论。
         </p>
         <p class="hero-note">
-          当前已经明确任务契约、证据边界、评估维度和实现顺序；尚未接入真实仓库执行、Trace 采集与证据投影，因此页面不会生成或展示虚假的运行评分。
+当前已经明确任务约定、证据边界、评估维度和实现顺序；尚未接入真实仓库执行、Trace 采集与证据投影，因此页面不会生成或展示虚假的运行评分。
         </p>
         <div class="product-status">
-          <span class="current">当前：设计契约与静态原型</span
+          <span class="current">当前：设计约定与静态原型</span
           ><span>已有：agent-foundation 基础包</span
           ><span>待开发：任务接入与隔离执行</span
           ><span>待开发：Trace 与证据投影</span>
@@ -384,13 +384,13 @@
       </div>
       <div class="grid">
         <section class="panel contract">
-          <h2>评估契约</h2>
+<h2>评估约定</h2>
           <p>
             先建立被评测 Agent 的画像，再选择与任务相称的证据。不同任务不共享一张“万能评分表”。
           </p>
           <div class="stages">
             <div class="stage">
-              <b>任务契约</b
+<b>任务约定</b
               ><span>目标、输入、允许副作用、成功条件、失败条件与预算</span
               ><small class="fact">输入事实</small>
             </div>
@@ -490,7 +490,7 @@
       <section class="panel artifacts">
         <h2>计划接入的评估产物</h2>
         <p>
-          下面是实现时的最小数据契约，先固定证据形状，再接入具体 Agent、仓库和任务夹具。
+下面是实现时的最小数据约定，先固定证据形状，再接入具体 Agent、仓库和任务夹具。
         </p>
         <table class="artifact-table">
           <thead>

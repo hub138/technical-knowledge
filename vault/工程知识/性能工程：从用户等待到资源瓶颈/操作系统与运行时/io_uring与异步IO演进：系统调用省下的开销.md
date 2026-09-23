@@ -4,7 +4,7 @@ type: concept
 status: active
 updated: 2026-09-22
 review_after: 2027-09-22
-change_rate: slow
+change_rate: low
 confidence: high
 tags:
   - linux/io
@@ -18,7 +18,7 @@ sources:
 
 ## 要解决的问题
 
-一次 read() 或 write() 要 CPU 从用户态切到内核态再切回来，单次开销约 50-100ns，还要付模式切换的缓存污染。select/poll/epoll 解决了"多 fd 同时等"的复用问题，但每次就绪后仍要逐个调用 read/write，高连接高频率场景 syscall 开销积少成多。问题的本质：**同步阻塞模型把"提交请求"与"等待完成"绑死在一次切换里，epoll 把等待复用了，提交与收割仍是每操作两次穿越**——异步 IO 的目标就是把这两个动作也批量化，让一次切换提交一批、收割一批。
+一次 read() 或 write() 要 CPU 从用户态切到内核态再切回来，单次开销约 50-100ns，还要付模式切换的缓存污染。select/poll/epoll 解决了"多 fd 同时等"的复用问题，但每次就绪后仍要逐个调用 read/write，高连接高频率场景 syscall 开销积少成多。问题的本质：**同步阻塞模型把"提交请求"与"等待完成"绑定在一次切换里，epoll 把等待复用了，提交与收割仍是每操作两次穿越**——异步 IO 的目标就是把这两个动作也批量化，让一次切换提交一批、收割一批。
 
 ## 机制
 
@@ -32,9 +32,9 @@ sources:
 
 ## 背景与代价
 
-思想背景：异步 IO 的概念早于 Linux（Windows IOCP 1990s 就是完成端口模型、FreeBSD kqueue 2000 年前后），Linux 社区长期缺一等公民方案。Jens Axboe（块层维护者）2019 年的 io_uring 从块层 IO 加速需求出发，一年内覆盖全 IO 子系统，成为 Linux 近十年最大的 syscall 级革新。Google 的 FlexSC（2010 前后，系统调用批量化研究）与 SPDK（用户态轮询存储栈）是同一方向的两个先行坐标。
+思想背景：异步 IO 的概念早于 Linux（Windows IOCP 1990s 就是完成端口模型、FreeBSD kqueue 2000 年前后），Linux 社区长期缺一等公民方案。Jens Axboe（块层维护者）2019 年的 io_uring 从块层 IO 加速需求出发，一年内覆盖全 IO 子系统，成为 Linux 近十年最大的 syscall 级革新。Google 的 FlexSC（2010 前后，系统调用批量化研究）与 SPDK（用户态轮询存储路径）是同一方向的两个先行坐标。
 
-最精巧的一笔是**把 syscall 从"操作粒度"改写成"批次粒度"**：传统模型里 API 边界与操作边界重合（一次 read 一次切换），io_uring 用共享内存环把两者解耦，API 边界退到批次尾（一次 enter 提交收割一整批）。syscall 开销从每操作 50-100ns 摊薄到每批几 ns，这跟 SIMD 把指令从标量改批量是同构的批发思路。代价要摆明：**io_uring 的安全与稳定性争议**——共享内存环 + 内核消费的攻击面大（任意地址读写类 CVE 逐年出现，Google Project Zero 曾建议禁用，容器/沙箱环境默认 seccomp 封锁 io_uring syscall，Docker 2023 起默认 mask）；内存开销（SQ/CQ 环常驻，每连接多出环形缓冲）；编程模型复杂（错误处理异步化、调试栈变深，io_uring 上的 bug 释放时机在收割端）。**适用判定与零拷贝同款逻辑：syscall/切换开销占比可观才有账可算**，多数业务服务（几十 QPS 到几千 QPS、大包为主）epoll + 同步读写的开销占比 <1%，迁移收益不抵复杂度。
+最精巧的一笔是**把 syscall 从"操作粒度"改写成"批次粒度"**：传统模型里 API 边界与操作边界重合（一次 read 一次切换），io_uring 用共享内存环把两者解耦，API 边界退到批次尾（一次 enter 提交收割一整批）。syscall 开销从每操作 50-100ns 摊薄到每批几 ns，这跟 SIMD 把指令从标量改批量是同构的批发思路。代价要摆明：**io_uring 的安全与稳定性争议**——共享内存环 + 内核消费的攻击面大（任意地址读写类 CVE 逐年出现，Google Project Zero 曾建议禁用，容器/沙箱环境默认 seccomp 封锁 io_uring syscall，Docker 2023 起默认 mask）；内存开销（SQ/CQ 环常驻，每连接多出环形缓冲）；编程模型复杂（错误处理异步化、调试时调用栈变深，io_uring 上的 bug 释放时机在收割端）。**适用判定与零拷贝同款逻辑：syscall/切换开销占比可观才有账可算**，多数业务服务（几十 QPS 到几千 QPS、大包为主）epoll + 同步读写的开销占比 <1%，迁移收益不抵复杂度。
 
 ## 边界
 

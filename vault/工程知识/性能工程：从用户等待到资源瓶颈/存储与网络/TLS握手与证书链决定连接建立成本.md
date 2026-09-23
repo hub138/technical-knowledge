@@ -39,6 +39,8 @@ TLS 1.2 握手两轮往返：ClientHello → ServerHello+Certificate → 客户�
 
 ## 验证
 
+验证的锚点：建连成本要与握手形态对照对账——预写完整握手与复用会话之间应差出一个完整往返，实测差异与预期对不上就说明度量点选错了位置。
+
 - openssl s_client -connect host:443 -tls1_3 看协商版本、套件、证书链与验证耗时分解。
 - curl -w "%{time_connect} %{time_appconnect}" 分离 TCP 与 TLS 建连时间；弱网模拟（tc netem 加 100ms RTT）对比全握手与 resumption 的 p99。
 - 连续 100 次新建连接统计 time_appconnect 分布，会话复用生效则 p50 显著低于全握手基线。

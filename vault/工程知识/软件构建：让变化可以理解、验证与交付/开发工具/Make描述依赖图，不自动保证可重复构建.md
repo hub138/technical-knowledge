@@ -4,13 +4,14 @@ type: reference
 status: active
 updated: 2026-08-31
 review_after: 2027-02-28
-change_rate: stable
+change_rate: low
 confidence: high
 tags:
   - build/make
   - software/automation
 sources:
   - "https://www.gnu.org/software/make/manual/make.html"
+  - "https://reproducible-builds.org/docs/"
 ---
 
 # Make 描述依赖图，不自动保证可重复构建
@@ -92,3 +93,10 @@ make -j4 target
 - [ ] 构建输出可绑定 revision、工具链和依赖锁。
 
 关联：[[工程知识/软件构建：让变化可以理解、验证与交付/软件构建：让变化可以理解、验证与交付]]、[[工程知识/软件构建：让变化可以理解、验证与交付/测试与交付/测试策略从风险选择证据]]、[[工程知识/AI 系统工程：从模型能力到生产能力/安全与治理/执行证据必须独立于AI结论]]。
+
+验证的锚点：构建可重复性要与两次构建对账——同一 commit 在两台机器各构建一次，产物哈希对账（哈希不一致等于有未声明的依赖源：时间戳、路径、环境变量），对不上的来源逐个显式声明进构建脚本。
+
+## 要解决的问题
+
+把本地常用命令收进 Makefile 之后，构建在干净环境或另一台机器上结果不同，也说不清产物由哪些输入决定。本篇回答：Make 依据什么判断目标是否需要重建、它提供哪些保证、不提供哪些保证、依赖锁定与构建环境隔离分别由谁来承担，以及把命令变成稳定入口之后还需要补什么。
+

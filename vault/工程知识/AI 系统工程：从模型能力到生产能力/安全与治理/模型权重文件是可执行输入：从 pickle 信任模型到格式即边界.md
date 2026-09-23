@@ -7,9 +7,9 @@ review_after: 2026-12-22
 change_rate: medium
 confidence: high
 tags:
+  - ai/platform
   - ai/security
   - ai/supply-chain
-  - serialization
 sources:
   - "https://github.com/huggingface/safetensors"
   - "https://docs.python.org/3/library/pickle.html"
@@ -18,12 +18,12 @@ sources:
 
 # 模型权重文件是可执行输入
 
-## 核心拆解
+## 核心要点
 
 | 维度 | 回答 |
 | --- | --- |
-| 要解决的问题 | 模型文件被当作"被动数据"对待，但 pickle 基格式在加载时执行任意代码，依赖的信任模型与可执行文件相同。明确"格式即信任边界"才能把 AI 供应链治理落到加载路径上。 |
-| 本质 | `.pt/.pth/.bin/.ckpt` 文件本质是 pickle 字节流，内嵌可调用对象在 `torch.load()` 反序列化时执行；不是漏洞而是文档化的设计行为。 |
+| 要解决的问题 | 模型文件被当作"被动数据"对待，但 pickle 基格式在加载时执行任意代码，依赖的信任模型与可执行文件相同。明确"格式即信任边界"才能把 AI 供应链治理贯穿到加载路径上。 |
+| 本质 | `.pt/.pth/.bin/.ckpt` 文件本质是 pickle 字节流，内嵌可调用对象在 `torch.load()` 反序列化时执行；这属于文档化的设计行为，不算漏洞。 |
 | 做法 | 加载侧：默认 safetensors，旧格式加载必须 `weights_only=True`，未验证文件在隔离环境加载；传播侧：发布仓库强制 safetensors，仓库扫描工具仅作辅助。 |
 | 效果与代价 | 效果是攻击面按设计消除而非靠扫描缓解；代价是存量转换成本、多卡分片与自定义代码（`modeling_*.py`）仍需单独治理。 |
 | 边界 | safetensors 只消除了"加载即执行"这条路径，不能证明权重未被投毒（行为篡改藏在数值里），自定义代码、adapter、数据集仍按可执行输入对待。 |

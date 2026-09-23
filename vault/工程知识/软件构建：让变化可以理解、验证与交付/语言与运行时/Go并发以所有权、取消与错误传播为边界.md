@@ -25,7 +25,7 @@ sources:
 
 Go 的工程价值不是“goroutine 很轻”，而是用较小的语言和运行时模型构建可部署、可并发、可观测的服务。真正需要掌握的是所有权、取消、背压、错误传播和版本治理；把每个操作放进 goroutine 并不会自动获得可靠并发。
 
-## 心智模型
+## 机制与心智模型（要解决的问题：并发正确性靠什么边界保证）
 
 ```text
 source -> package/module -> compile/link -> goroutine scheduler
@@ -74,7 +74,7 @@ source -> package/module -> compile/link -> goroutine scheduler
 
 ## 版本与依赖
 
-Go 官方支持窗口会随发行推进，应从 [release history](https://go.dev/doc/devel/release) 选择仍受支持的版本，不把本页写死为长期默认版本。升级时同时检查：
+Go 官方支持窗口会随发行推进，应从 [release history](https://go.dev/doc/devel/release) 选择仍受支持的版本，不把本页固定为长期默认版本。升级时同时检查：
 
 截至 2026-08-31，Go 1.27.0 已于 2026-08-19 发布，Go 1.26.7 也在同日发布。Go 1.27 带来泛型方法、`encoding/json/v2`/`jsontext`、原生 `uuid`、`goroutineleak` profile 和 `go test` 默认 `stdversion` vet 检查；`encoding/json` 的默认实现已由 v2 支撑，但 v1 API 仍兼容。升级前应特别回归 JSON 重复字段/非法 UTF-8 行为、pprof/trace 访问绑定、go.mod/toolchain 和旧平台支持，不要把新特性当作无成本替换。[Go 1.27 release notes](https://go.dev/doc/go1.27)
 
@@ -92,3 +92,8 @@ Go 官方支持窗口会随发行推进，应从 [release history](https://go.de
 - 只以 QPS 为结果，不检查错误率、尾延迟、分配、GC 和结果正确性。
 
 关联：[[工程知识/后端系统：在并发、失败与变化中维持服务/分布式可靠性/部分失败决定分布式系统的设计]]、[[工程知识/性能工程：从用户等待到资源瓶颈/观测与诊断/性能问题定位]]、[[工程知识/软件构建：让变化可以理解、验证与交付/测试与交付/测试策略从风险选择证据]]。
+
+## 效果与代价
+
+所有权模型的收益是并发结构可推理（每个值有唯一写者，泄漏与竞争在结构上被排除），代价是设计期的所有权划分与 channel、context 的传递纪律；共享内存加锁的模型上手快，代价是竞争与死锁排查的长期成本——两套模型的成本支付时点不同，服务型代码的所有权纪律在长期维护里回本。
+

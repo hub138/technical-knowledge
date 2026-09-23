@@ -9,7 +9,7 @@ from __future__ import annotations
   - vault 数据完整性(元数据/链接可达/红线扫描)
   - 收藏夹管线(往返/上限/校验/追踪状态)
   - feed 抓取管线(清洗/编码/解析/失败隔离/快照白名单)
-  - BestBlogs 请求参数契约(枚举值/路径/缓存档位)
+  - BestBlogs 请求参数约定(枚举值/路径/缓存档位)
 
 删除(2026-09-21,用户要求精简):
   - NavigationContractTests 整类 —— 盯 UI 文本和 class 名,每次改页面
@@ -826,7 +826,7 @@ BESTBLOGS_SPEC.loader.exec_module(BESTBLOGS_MODULE)
 
 
 class BestBlogsRequestTests(unittest.TestCase):
-    """BestBlogs 请求参数契约。
+    """BestBlogs 请求参数约定。
 
     这类 bug 是静默的:服务端对无效取值不报错直接忽略,返回默认排序的旧
     内容,看起来"接口通了"实际拿的是错数据。用假请求函数截下实际发出的

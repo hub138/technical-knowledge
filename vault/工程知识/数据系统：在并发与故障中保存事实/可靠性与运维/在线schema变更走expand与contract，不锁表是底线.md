@@ -8,8 +8,7 @@ change_rate: medium
 confidence: high
 tags:
   - database/migration
-  - schema-evolution
-  - operations
+  - database/operations
 sources:
   - "https://www.percona.com/blog/online-schema-change-tools/"
   - "https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-operations.html"
@@ -55,11 +54,17 @@ sources:
 
 ## 验证
 
+验证的锚点：变更安全要与演练测量对账——预写四步各自耗时与主从延迟曲线应在阈值内，超出预期的批次大小要调小重跑，不能带阈值超标上线。
+
 变更演练：在复制了线上数据规模的 staging 表上完整走一遍四步，测量每步耗时与主从延迟曲线。延迟超过阈值的批次大小要调小。
 
 收缩审计验证：删列前开审计（general log 或 performance_schema 的表访问统计）跑一个完整业务周期，确认零访问再执行删除。
 
 回滚验证：对每个 migration 预演回滚路径——expand 阶段的回滚是"停双写删新列"（低成本），contract 阶段的回滚是"重新启用旧列"（要求旧列还没删）。把可回滚窗口的边界写进变更方案。
+
+## 要解决的问题
+
+百万行以上的表执行原生结构变更时长时间持锁，锁住的是线上全部读写，而变更步骤在失败之后难以回退。本篇回答：扩张与收缩两阶段各自做什么、新旧结构并存期间读写怎样兼顾、数据搬迁在不锁表的前提下如何暂停与回滚，以及确认旧读者已消失的依据是什么。
 
 ## 相关
 

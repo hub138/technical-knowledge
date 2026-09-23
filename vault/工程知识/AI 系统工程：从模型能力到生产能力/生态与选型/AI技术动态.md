@@ -4,14 +4,14 @@ status: active
 type: radar
 updated: 2026-09-23
 review_after: 2026-10-23
-change_rate: fast
+change_rate: high
 confidence: high
 tags:
   - ai/radar
   - ai/serving
   - ai/agents
 sources:
-  - "Agent应用工程技术核验（来源层档案，已脱敏）]"
+  - "Agent应用工程技术核验（来源层档案，已脱敏）"
   - "https://developers.openai.com/api/docs/deprecations"
   - "https://developers.openai.com/api/docs/assistants/migration"
   - "https://modelcontextprotocol.io/specification/2026-07-28"
@@ -38,7 +38,7 @@ sources:
 | --- | --- | --- |
 | OpenAI Responses API | 当前新集成主接口；Conversations API 承接会话状态 | 记录实际模型快照；Provider 状态不作为唯一业务状态 |
 | OpenAI Assistants API | 2026-08-26 已下线，端点返回 404；Threads 历史读取同时失效 | 删除残留依赖；提示词、instructions 和工具定义必须有平台外的副本 |
-| OpenAI 弃用时间表 | 09-24 sora-2/Videos API 下线（无官方替代）；09-28 遗留 instruct/completions 模型 → gpt-5.6-terra；10-23 gpt-4/gpt-3.5-turbo/o1/o3-mini/o4-mini/gpt-image-1 及其微调版本 → gpt-5.6 系列；11-30 Evals 平台、Agent Builder、v1/prompts；12-11 gpt-5-2025-08-07 快照与 o3/o3-pro → gpt-5.6 系列 | 清点仓库与配置里写死的模型字符串；10-23 这批波及 2023-2025 年教程代码和全部基于 gpt-4 的微调资产，迁移是重训项目，改字符串解决不了 |
+| OpenAI 弃用时间表 | 09-24 sora-2/Videos API 下线（无官方替代）；09-28 遗留 instruct/completions 模型 → gpt-5.6-terra；10-23 gpt-4/gpt-3.5-turbo/o1/o3-mini/o4-mini/gpt-image-1 及其微调版本 → gpt-5.6 系列；11-30 Evals 平台、Agent Builder、v1/prompts；12-11 gpt-5-2025-08-07 快照与 o3/o3-pro → gpt-5.6 系列 | 清点仓库与配置里固定写下的模型字符串；10-23 这批波及 2023-2025 年教程代码和全部基于 gpt-4 的微调资产，迁移是重训项目，改字符串解决不了 |
 | OpenAI Agents SDK Python | 0.x 快速演进；官方文档持续覆盖 Runner、tools、guardrails、handoffs、sessions、sandbox、tracing 与 testing | 锁定实际版本，回归工具、状态序列化、guardrail、trace 和测试夹具 |
 | MCP | 规范 2026-07-28：无状态核心、MRTR、Mcp-Method/Mcp-Name 路由头；EMA（企业统一授权）扩展已稳定；Roots/Sampling/Logging 弃用，保底 12 个月窗口 | 新实现采用无状态核心；确认错误码变化（缺失资源从 -32002 改为标准 -32602）；不要再在 Roots/Sampling/Logging 上建新功能 |
 | A2A | 已发布规范 1.0.0；协议兼容性使用 1.0，仓库 patch 修订另行核验 | 回归 Agent Card、任务状态、认证、取消与协议绑定 |
@@ -47,7 +47,7 @@ sources:
 | Microsoft Agent Framework Python | 官方提供从 AutoGen 迁移的路径，仍在快速迭代 | 新项目先做能力与兼容性评估；旧 AutoGen 先建立迁移回归集 |
 | OpenTelemetry GenAI 约定 | Development | 内部 schema 保持稳定，在适配层映射实验字段 |
 
-版本和状态的逐项一手来源见 Agent应用工程技术核验（来源层档案，已脱敏）]。
+版本和状态的逐项一手来源见 Agent应用工程技术核验（来源层档案，已脱敏）。
 
 ## 检索与 RAG
 
@@ -117,3 +117,20 @@ RAG 的演进不是组件名称堆叠，而是证据选择、索引生命周期�
 ## 维护方法
 
 每次复查只更新事实行：对象、版本、发布日期、状态、迁移影响和一手链接。影响稳定原理时才修改核心主题页；只影响某个实现时，仅更新本页和对应采用记录。每周例行检查由定时任务执行，扫描来源与更新步骤由维护流程单独维护，不在本文展开。
+
+验证的锚点：动态条目要与原文对账——预写每条动态改变的是协议、接口还是部署方式，复核时与原文对照对不上就撤下该条，不留过期结论。
+
+## 验证
+
+1. 来源核对：每条动态附上规范、发布说明或迁移文档的原文地址，确认结论与原文一致。
+2. 时效核对：核对 review_after 与各条目的变化速率匹配，高变化条目在下一个复核周期内被重新检查。
+3. 影响判断：对每条动态写明它改变的是协议、接口还是部署方式，确认对本库其他文章的引用随之更新。
+
+## 机制与本质
+
+AI 技术动态的机制层：实现状态按发布日期和弃用时间表变化，稳定原理不随之改变，工程判断却必须建立在当前的一手事实上。把事实行与原理分开存放，事实行只记录对象、版本、日期、状态与迁移动作，原理判断留在主题页，任一对象的状态变化都能回溯到具体的发布日期和对应的工程动作。
+
+## 要解决的问题
+
+模型、框架和推理引擎的发布说明只描述宣传性能，真正影响近期工程选择的是弃用时间表、协议版本和默认行为的变更：一个已经下线的端点、一个被移除的运行时版本、一个改变了错误码的协议修订，都会让按旧文档编写的代码在某个日期之后失效。本篇回答：当前快照下哪些对象的状态已经改变、哪些变化有明确日期、每项变化对应什么工程动作、以及哪些能力仍然停留在观察而不足以成为默认架构。
+

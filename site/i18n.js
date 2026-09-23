@@ -347,7 +347,7 @@
     "AI 技术动态": { en: "AI tech radar" },
     "Agent 技术栈选型不是框架排名": { en: "Agent stack selection is not a framework ranking" },
     "MCP与A2A的分工：工具协议与Agent协议不互相替代": { en: "MCP versus A2A: tool protocol and agent protocol do not replace each other" },
-    "MCP 接入必须验证协议、身份与工具契约": { en: "MCP integration must verify protocol, identity, and tool contracts" },
+    "MCP 接入必须验证协议、身份与工具约定": { en: "MCP integration must verify protocol, identity, and tool contracts" },
     "MCP 连接能力，A2A 委托任务": { en: "MCP connects capabilities; A2A delegates tasks" },
     "模型、框架、运行时与协议解决不同问题": { en: "Models, frameworks, runtimes, and protocols answer different questions" },
     "精调与RAG的边界：什么时候微调更划算": { en: "Fine-tuning versus RAG: when tuning pays off" },
@@ -360,7 +360,7 @@
     "检索从一次查询演进为有状态的证据获取": { en: "Retrieval is evolving from one-shot queries to stateful evidence gathering" },
     "混合检索、重排与查询改写各自解决什么问题": { en: "Hybrid retrieval, reranking, and query rewriting: what each one solves" },
     "Agent 的缓存与结果复用": { en: "Agent caching and result reuse" },
-    "Agent评估系统的设计契约": { en: "The design contract of an agent evaluation system" },
+    "Agent评估系统的设计约定": { en: "The design contract of an agent evaluation system" },
     "Agent 评测必须覆盖轨迹，而不只看最终答案": { en: "Agent evaluation must cover trajectories, not just final answers" },
     "RAG 评测要分离检索质量与生成质量": { en: "RAG evaluation must separate retrieval quality from generation quality" },
     "人在环路要设在不可逆的决策点": { en: "Put humans in the loop at irreversible decision points" },
@@ -418,8 +418,8 @@
     "症状到机制的判定树——新缺陷的归类入口": { en: "A symptom-to-mechanism decision tree — the entry point for classifying new defects" },
     "磁盘坏道与静默损坏的检测修复路径": { en: "Detecting and repairing bad sectors and silent corruption" },
     "网卡静默降速与链路劣化：协商、光功率与吞吐基线": { en: "Silent NIC downshift and link degradation: negotiation, optical power, and throughput baselines" },
-    "案例一：垃圾回收线程的死亡——BookKeeper 磁盘写满": { en: "Case 1: death of the garbage-collection thread — BookKeeper with a full disk" },
-    "案例三十六：写被自己的回调堵死——挂起的 add 回调": { en: "Case 36: writes blocked by their own callback — a stuck add callback" },
+    "案例一：垃圾回收线程的终止——BookKeeper 磁盘写满": { en: "Case 1: termination of the garbage-collection thread — BookKeeper with a full disk" },
+  "案例三十六：写被自己的回调堵住——挂起的 add 回调": { en: "Case 36: writes blocked by their own callback — a stuck add callback" },
     "案例二十一：异常路径上没有完成——永不兑现的 future": { en: "Case 21: never completed on the error path — futures that never resolve" },
     "案例二十三：一次抖动变成一次重算——SASL 拉取没有重试": { en: "Case 23: one hiccup becomes a recompute — SASL fetch without retries" },
     "案例二十二：时间也是输入——夏令时让序列生成越界": { en: "Case 22: time is input too — daylight saving pushes sequence generation out of range" },
@@ -448,8 +448,8 @@
     "调度必须同时处理优先级、公平与背压": { en: "Scheduling must handle priority, fairness and backpressure together" },
     "队列和流系统用时间与容量换取解耦": { en: "Queues and stream systems trade time and capacity for decoupling" },
     "限流熔断与隔离控制故障半径": { en: "Rate limiting, circuit breaking and isolation control the failure radius" },
-    "Raft选举与日志复制把共识落到实现": { en: "Raft elections and log replication bring consensus down to implementation" },
-    "Saga把长事务拆成补偿链，代价是失去隔离性": { en: "Saga splits long transactions into compensation chains at the cost of isolation" },
+    "Raft选举与日志复制把共识变成工程实现": { en: "Raft elections and log replication turn consensus into an engineering implementation" },
+    "Saga把长事务变成补偿链，代价是失去隔离性": { en: "Saga turns long transactions into compensation chains at the cost of isolation" },
     "一致性模型与共识解决不同问题": { en: "Consistency models and consensus solve different problems" },
     "健康检查只能提供有时效的失败证据": { en: "Health checks only provide time-limited evidence of failure" },
     "分布式事务的分类与各自失败形态": { en: "A taxonomy of distributed transactions and how each one fails" },
@@ -480,8 +480,8 @@
     "网络命名空间与容器网络：vethbridge与overlay": { en: "Network namespaces and container networking: veth, bridge and overlay" },
     "长连接网关的工程要点：心跳推送与连接迁移": { en: "Engineering essentials of long-connection gateways: heartbeats, push and connection migration" },
     "ACL 把权限挂在资源上": { en: "ACLs attach permissions to resources" },
-    "API 契约定义输入输出和演进边界": { en: "API contracts define inputs, outputs and evolution boundaries" },
-    "HTTP语义的分层：方法、状态码与头部的契约角色": { en: "HTTP semantics in layers: the contract roles of methods, status codes and headers" },
+    "API 接口约定定义输入输出和演进边界": { en: "API contracts define inputs, outputs and evolution boundaries" },
+  "HTTP语义的分层：方法、状态码与头部的约定角色": { en: "HTTP semantics in layers: the contract roles of methods, status codes and headers" },
     "HTTP 请求穿过浏览器、网络与服务端边界": { en: "An HTTP request crosses browser, network and server boundaries" },
     "RPC框架的通用骨架：序列化连接管理与超时传递": { en: "A common skeleton for RPC frameworks: serialisation, connection management and timeout propagation" },
     "事件驱动架构的解耦代价：最终一致与可追溯性": { en: "The decoupling cost of event-driven architecture: eventual consistency and traceability" },
@@ -489,8 +489,8 @@
     "健康检查的三层语义：存活就绪与深度": { en: "Three levels of health-check semantics: liveness, readiness and depth" },
     "分布式限流的四种算法：计数漏桶令牌与滑动窗口": { en: "Four algorithms for distributed rate limiting: counters, leaky buckets, tokens and sliding windows" },
     "容量估算的通用骨架：从峰值QPS到机器数的推导演练": { en: "A general skeleton for capacity estimation: working from peak QPS to machine count" },
-    "微服务拆分的判据：从团队认知到数据边界": { en: "Criteria for splitting microservices: from team cognition to data boundaries" },
-    "服务发现与负载均衡决定请求落到哪里": { en: "Service discovery and load balancing decide where requests land" },
+    "微服务划分的判据：从团队认知到数据边界": { en: "Criteria for partitioning microservices: from team cognition to data boundaries" },
+    "服务发现与负载均衡决定请求发往哪里": { en: "Service discovery and load balancing decide where requests go" },
     "服务降级是有损服务，损什么损多少要变成业务决策": { en: "Service degradation is lossy serving: what to lose and how much must become a business decision" },
     "流量入口只负责路由与连接，不负责业务正确性": { en: "Traffic entry points handle routing and connections, not business correctness" },
     "缓存改变读写路径、一致性与故障模式": { en: "Caches change read/write paths, consistency and failure modes" },
@@ -506,7 +506,7 @@
     "Linux 调查先收集事实再改变状态": { en: "Linux troubleshooting collects facts before changing state" },
     "Make 描述依赖图，不自动保证可重复构建": { en: "Make describes the dependency graph; it does not guarantee reproducible builds" },
     "依赖供应链需要锁定来源与构建输入": { en: "Dependency supply chains need locked sources and build inputs" },
-    "依赖升级按风险分层，兼容性验证跟着层走": { en: "Dependency upgrades are tiered by risk; compatibility verification follows the tiers" },
+    "依赖升级按风险分层：验证阶梯、节奏策略与 CVE 响应": { en: "Dependency upgrades are tiered by risk; compatibility verification follows the tiers" },
     "依赖升级的半衰期策略：跟随与锁定的平衡": { en: "A half-life strategy for dependency upgrades: balancing following and locking" },
     "本地复现环境是修线上问题的第一现场": { en: "A local reproduction environment is the first crime scene for production issues" },
     "维护者信任是供应链信任的地基：贡献者治理与维护者变更审计": { en: "Maintainer trust is the foundation of supply-chain trust: contributor governance and maintainer-change audits" },
@@ -532,12 +532,12 @@
     "错误处理是策略问题，异常只是运输手段": { en: "Error handling is a policy question; exceptions are just transport" },
     "错误处理的分类学：错误类型与恢复策略的映射": { en: "A taxonomy of error handling: mapping error types to recovery strategies" },
     "静态分析发现结构问题但不能证明行为正确": { en: "Static analysis finds structural problems but cannot prove behaviour correct" },
-    "领域建模的落地路径：从事件风暴到聚合边界": { en: "A landing path for domain modelling: from event storming to aggregate boundaries" },
+    "领域建模的实施路径：从事件风暴到聚合边界": { en: "A practical path for domain modelling: from event storming to aggregate boundaries" },
     "AI 做顶级 UI 设计：从创作到验证的完整回路": { en: "AI doing top-tier UI design: a complete loop from creation to verification" },
     "CI 流水线把反馈速度和发布证据连接起来": { en: "CI pipelines connect feedback speed with release evidence" },
     "发布门禁必须绑定真实证据": { en: "Release gates must bind to real evidence" },
     "可观测性断言：把运行时行为写进测试": { en: "Observability assertions: writing runtime behaviour into tests" },
-    "契约测试的适用边界：消费者驱动与提供者验证": { en: "The applicable boundary of contract testing: consumer-driven and provider verification" },
+    "接口约定测试的适用边界：消费者驱动与提供者验证": { en: "The applicable boundary of contract testing: consumer-driven and provider verification" },
     "测试替身按依赖行为而非名字分类": { en: "Test doubles are classified by dependent behaviour, not by name" },
     "测试策略从风险选择证据": { en: "Test strategy selects evidence from risk" },
     "混沌工程验证系统是否真的能处理故障": { en: "Chaos engineering verifies whether the system can really handle failures" },
@@ -664,9 +664,9 @@
     "知识库范围与结构": { en: "Knowledge base scope and structure" },
     "知识更新方法论": { en: "Knowledge update methodology" },
     "知识演化机制": { en: "Knowledge evolution mechanisms" },
-    "知识点写作与教学输出契约": { en: "The writing and teaching contract for knowledge points" },
+    "知识点写作与教学输出规范": { en: "The writing and teaching conventions for knowledge points" },
     "知识质量标准": { en: "Knowledge quality standards" },
-    "面向发布的知识写作文风契约": { en: "The publication-facing style contract for knowledge writing" },
+    "面向发布的知识写作文风规范": { en: "The publication-facing style conventions for knowledge writing" },
     "项目方法反哺机制": { en: "The project-to-method feedback loop" },
     "一篇知识怎么写": { en: "How to write one piece of knowledge" },
     "知识从哪来，怎么更新": { en: "Where knowledge comes from, and how it updates" },
@@ -754,7 +754,7 @@
     "完整使用指南": { en: "Full guide" },
     "实现与边界": { en: "How it works, and its limits" },
     "中文说明": { en: "Chinese README" },
-    "查看写作契约": { en: "Writing contract" },
+    "查看写作规范": { en: "Writing conventions" },
     "查看评估原型": { en: "Open the prototype" },
     "创建课堂": { en: "Create a classroom" },
     "进入学习导师": { en: "Open the tutor" },
@@ -868,8 +868,8 @@
     "原型期": { en: "Prototype" },
     "任务目标、仓库版本、权限、预算和真实执行记录": { en: "A task goal, repo revision, permissions, budget and real execution records" },
     // 【反复迭代后结果·rt13】key 随产出行文案重写同步更新（旧 key「把 Agent 的判断绑定到…」已无引用）。
-    "带证据链的评估结论与回归清单；当前是设计契约与静态原型": { en: "Evaluation conclusions with evidence chains and regression checklists; currently a design contract and a static prototype" },
-    "设计契约": { en: "Design contract" },
+"带证据链的评估结论与回归清单；当前是设计约定与静态原型": { en: "Evaluation conclusions with evidence chains and regression checklists; currently a design convention and a static prototype" },
+    "设计约定": { en: "Design conventions" },
     "工程任务的可复用 Agent 流程": { en: "Reusable agent workflows for engineering tasks" },
     "需求、设计文档、代码库与失败反馈": { en: "Requirements, design docs, a codebase and failure feedback" },
     "边界清楚的实现、测试证据和可进入下一轮的反馈": { en: "A scoped implementation, test evidence and feedback ready for the next round" },
@@ -915,6 +915,7 @@
     "收起目录": { en: "Collapse the contents" },
     "BestBlogs 今日早报": { en: "BestBlogs today's brief" },
     "点域名、主题圆或笔记圆点，": { en: "Click a domain, topic circle or note dot" },
+    "点主题名查看该主题下的全部笔记": { en: "Tap a topic to see all its notes" },
     /* 译文头部空格（勿删）：本 key 与上一 key 在 renderGraph 里是相邻两个
      * span，HTML 模板不留空格（中文靠「，」分隔）。英文两段尾/首都无标点，
      * 无此空格会拼成「dotto」。空格放译文而非模板：中文模式下 inline 的
@@ -1454,7 +1455,7 @@
     "查看 Agent 评估的实现路线与待开发项": { en: "See the evaluation plan and what is still unbuilt" },
     "查看评估原型 →": { en: "See the prototype →" },
     "查看融合记录": { en: "See the integration notes" },
-    "查看评估契约": { en: "See the evaluation contract" },
+    "查看评估约定": { en: "See the evaluation conventions" },
     "检索、研究、记忆、笔记与复习工作区": {
       en: "Retrieval, research, memory, notes and revision in one workspace",
     },
@@ -1589,8 +1590,8 @@
     "模型负责语义决策，运行时负责执行语义、隔离和可恢复状态": {
       en: "The model owns semantic decisions; the runtime owns executing semantics, isolation and recoverable state",
     },
-    "状态机、工具契约、记忆、人工审批与故障恢复如何组合": {
-      en: "How state machines, tool contracts, memory, human approval and failure recovery compose",
+    "状态机、工具约定、记忆、人工审批与故障恢复如何组合": {
+      en: "How state machines, tool conventions, memory, human approval and failure recovery compose",
     },
     "以代码 Agent 为例，从任务接收到执行证据完整走一遍": {
       en: "Walk one code agent end to end, from receiving the task to evidence of execution",
@@ -1741,8 +1742,8 @@
     "用真实结果检验理解；评估运行时完成后，再用于 Agent\n              轨迹和证据审查。": {
       en: "Test understanding against real results; once the evaluation runtime is ready, also for agent traces and evidence review.",
     },
-    "当前完成设计契约、静态原型和基础包；真实任务接入、隔离执行、Trace\n              与证据投影仍待开发。": {
-      en: "Design contract, static prototype and base package are done; real task intake, isolated execution, trace and evidence projection are still to build.",
+    "当前完成设计约定、静态原型和基础包；真实任务接入、隔离执行、Trace\n              与证据投影仍待开发。": {
+      en: "Design conventions, static prototype and base package are done; real task intake, isolated execution, trace and evidence projection are still to build.",
     },
     "识别语言、构建系统、环境、测试入口和成功条件，由 Agent 提出方案。": {
       en: "Identify language, build system, environment, test entry and success criteria; the agent proposes the plan.",
@@ -2086,8 +2087,8 @@
     },
     "SLO + 运营": { en: "SLO and operations" },
     "下一步实现顺序": { en: "What gets built next, in order" },
-    "下面是实现时的最小数据契约，先固定证据形状，再接入具体 Agent、仓库和任务夹具": {
-      en: "The minimal data contract for implementation: pin down the evidence shape first, then wire up specific agents, repos and task fixtures",
+    "下面是实现时的最小数据约定，先固定证据形状，再接入具体 Agent、仓库和任务夹具": {
+      en: "The minimal data conventions for implementation: pin down the evidence shape first, then wire up specific agents, repos and task fixtures",
     },
     "不能把模型文本当作命令已执行": { en: "Model text is not evidence that a command ran" },
     "不能替代": { en: "Does not replace" },
@@ -2105,7 +2106,7 @@
       en: "Artefacts, tests, database state, citations, user goals and reproducible records",
     },
     "任务夹具": { en: "Task fixture" },
-    "任务契约": { en: "Task contract" },
+    "任务约定": { en: "Task conventions" },
     "任务类型、模型、工具、状态、权限、依赖和版本": {
       en: "Task types, models, tools, state, permissions, dependencies and versions",
     },
@@ -2128,10 +2129,10 @@
     },
     "多 Agent 协作": { en: "Multi-agent collaboration" },
     "安全 + 状态": { en: "Safety and state" },
-    "当前已经明确任务契约、证据边界、评估维度和实现顺序；尚未接入真实仓库执行、Trace 采集与证据投影，因此页面不会生成或展示虚假的运行评分": {
-      en: "The task contract, evidence boundaries, evaluation dimensions and build order are settled; real repo execution, trace capture and evidence projection are not wired up yet, so this page shows no fabricated scores",
+    "当前已经明确任务约定、证据边界、评估维度和实现顺序；尚未接入真实仓库执行、Trace 采集与证据投影，因此页面不会生成或展示虚假的运行评分": {
+      en: "The task conventions, evidence boundaries, evaluation dimensions and build order are settled; real repo execution, trace capture and evidence projection are not wired up yet, so this page shows no fabricated scores",
     },
-    "当前：设计契约与静态原型": { en: "Now: design contract and static prototype" },
+    "当前：设计约定与静态原型": { en: "Now: design conventions and a static prototype" },
     "先做任务夹具与 Trace schema，再做执行隔离和证据投影，最后接入模型评审与可视化。每一步都能独立测试和回滚": {
       en: "Task fixtures and the trace schema first, then execution isolation and evidence projection, and finally model review and visualisation. Each step can be tested and rolled back on its own",
     },
@@ -2147,11 +2148,11 @@
     "这是一个用来评估 Agent 的原型：它把 Agent 的输出判断绑定到命令、日志、产物和测试，让“有没有变好”变成可核验证据，而不是一句主观结论。": {
       en: "A prototype for evaluating agents: it ties an agent's output claims to commands, logs, artefacts and tests, so “did it get better” becomes checkable evidence instead of a subjective verdict.",
     },
-    "当前已经明确任务契约、证据边界、评估维度和实现顺序；尚未接入真实仓库执行、Trace 采集与证据投影，因此页面不会生成或展示虚假的运行评分。": {
-      en: "The task contract, evidence boundaries, evaluation dimensions and build order are settled; real repo execution, trace capture and evidence projection are not wired up yet, so this page shows no fabricated scores.",
+    "当前已经明确任务约定、证据边界、评估维度和实现顺序；尚未接入真实仓库执行、Trace 采集与证据投影，因此页面不会生成或展示虚假的运行评分。": {
+      en: "The task conventions, evidence boundaries, evaluation dimensions and build order are settled; real repo execution, trace capture and evidence projection are not wired up yet, so this page shows no fabricated scores.",
     },
-    "下面是实现时的最小数据契约，先固定证据形状，再接入具体 Agent、仓库和任务夹具。": {
-      en: "The minimal data contract for implementation: pin down the evidence shape first, then wire up specific agents, repos and task fixtures.",
+    "下面是实现时的最小数据约定，先固定证据形状，再接入具体 Agent、仓库和任务夹具。": {
+      en: "The minimal data conventions for implementation: pin down the evidence shape first, then wire up specific agents, repos and task fixtures.",
     },
     "先做任务夹具与 Trace schema，再做执行隔离和证据投影，最后接入模型评审与可视化。每一步都能独立测试和回滚。": {
       en: "Task fixtures and the trace schema first, then execution isolation and evidence projection, and finally model review and visualisation. Each step can be tested and rolled back on its own.",
@@ -2216,7 +2217,7 @@
     "证据 + 质量": { en: "Evidence and quality" },
     "证据包": { en: "Evidence bundle" },
     "证据链": { en: "Evidence chain" },
-    "评估契约": { en: "Evaluation contract" },
+    "评估约定": { en: "Evaluation conventions" },
     "输入、环境、成功/失败条件、预算和可重放步骤": {
       en: "Inputs, environment, success/failure conditions, budget and replayable steps",
     },

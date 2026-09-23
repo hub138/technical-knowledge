@@ -79,7 +79,7 @@ window.TK_NAV = {
       href: "/apps/agent-evaluation/index.html",
       icon: "◎",
       title: "把判断绑定到证据",
-      description: "用于评估 Agent 的原型：定义任务契约与证据边界，再接入执行与回归",
+description: "用于评估 Agent 的原型：定义任务约定与证据边界，再接入执行与回归",
     },
     {
       key: "insights",

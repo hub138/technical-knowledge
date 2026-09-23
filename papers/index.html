@@ -35,6 +35,9 @@
          收成一个按钮，放在工具栏右端 —— 位置固定，想找时找得到。 */
       .method-link {
         flex: none;
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
         padding: 8px 15px;
         border: 1px solid var(--color-accent-line);
         border-radius: var(--radius-full);
@@ -513,7 +516,7 @@
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        min-height: 32px;
+        min-height: 36px;
         padding: 0 11px;
         border: none;
         border-radius: var(--radius-xs);
@@ -542,7 +545,7 @@
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        min-height: 32px;
+        min-height: 36px;
         padding: 0 13px;
         border: none;
         border-radius: var(--radius-sm);
@@ -764,7 +767,7 @@
     <div class="tk-shell tl-layout">
       <div class="tl-main">
       <!-- 头部形态=hero（身份头，宽松几何）：真源在 base.css「页面头部
-           契约」。这页点进来先回答「这是什么页」—— 两万三千篇论文的
+规范」。这页点进来先回答「这是什么页」—— 两万三千篇论文的
            解读库；搜索是头部的 interaction area（Atlassian/GCS page
            header 同款解剖），随身份一起给，不放正文。 -->
       <section class="hero">
@@ -773,7 +776,7 @@
              把链接包进整句会让英文界面下段落外的部分翻不过来。 -->
         <p><span>两万三千篇顶会论文解读，来自</span> <a href="https://papernotes.org/" target="_blank" rel="noopener noreferrer">papernotes.org</a><span>，按论文自己的分类组织。点标题回原站看完整解读。</span></p>
         <!-- 搜索框：两个视图（外部收录/已精读）共用一个 —— 皮肤走
-             base.css 的 .tk-search 契约，放置走 hero 内的 .page-toolbar
+base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
              （间距由 .hero .page-toolbar 的 margin-top 统一给，页面零
              间距规则）。切标签时 JS 换 placeholder。 -->
         <div class="page-toolbar">
@@ -1376,5 +1379,176 @@
       load();
       loadExternal();
     </script>
-  </body>
+  
+
+
+
+
+<script>
+(function(){
+  function label(el){
+    var cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/)[0] : '';
+    return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
+  }
+
+  var out = {};
+
+
+  /* Measure only once the sidebar exists.
+     --dump-dom snapshots after parsing, which is before the sidebar's
+     DOMContentLoaded handler builds the nav. Taking the numbers synchronously
+     records the skeleton — the first run of this script reported "0 nav" on
+     eight pages and called them clean. So the wait comes first and the
+     measurement happens inside it. */
+  var waited = 0;
+  (function settle(){
+    var hasNav = document.querySelectorAll('.tk-nav a').length > 0;
+    var hasSidebar = !!document.querySelector('.tk-sidebar');
+    var exhausted = waited > 120;
+    if((hasNav || (!hasSidebar && exhausted)) && waited > 2){ done(); return; }
+    if(exhausted){ done(); return; }
+    waited++;
+    setTimeout(settle, 40);
+  })();
+
+  function done(){ document.title = '@@' + JSON.stringify(measure()); }
+
+  function measure(){
+    var out = {};
+  /* 1. No horizontal overflow. Elements inside a deliberate scroller — a wide
+        table, the mobile nav strip — are excluded: they are meant to scroll. */
+  var offenders = [];
+  document.querySelectorAll('*').forEach(function(el){
+    var r = el.getBoundingClientRect();
+    if(r.width < 1 || r.right <= innerWidth + 1) return;
+    var n = el.parentElement, inScroller = false;
+    while(n){
+      var s = getComputedStyle(n);
+      if(s.overflowX === 'auto' || s.overflowX === 'scroll'){ inScroller = true; break; }
+      n = n.parentElement;
+    }
+    if(!inScroller) offenders.push(label(el));
+  });
+  out.overflow = {
+    docScrollWidth: document.documentElement.scrollWidth,
+    innerWidth: innerWidth,
+    offenders: Array.from(new Set(offenders)).slice(0, 6)
+  };
+
+  /* 2. The floating feedback button must not sit on text a reader needs.
+   *
+   * 只看**当前视口里真的可见**的元素。
+   *
+   * getBoundingClientRect 给的是元素在它滚动容器里的位置 —— 横向滚动列表
+   * 里被划到屏幕外的卡片，矩形仍然算在那条轨道上（实测 x=5376），于是
+   * 检测说"按钮压住了卡片标题"，而屏幕上根本没有那张卡片。
+   * 这不是布局问题，是检测没有把滚动偏移算进来。
+   *
+   * 判据换成：元素的矩形要落在视口内，而且没有被祖先的横向滚动推到外面。
+   */
+  var fab = document.querySelector('.tk-fab');
+  var covered = [];
+  if(fab){
+    var fr = fab.getBoundingClientRect();
+    document.querySelectorAll('*').forEach(function(el){
+      if(el === fab || fab.contains(el)) return;
+      if(el.querySelector && el.querySelector('.tk-fab')) return;
+      var b = el.getBoundingClientRect();
+      if(b.width < 8 || b.height < 8) return;
+      // 只算视口内的：滑到屏幕外的内容不构成遮挡。
+      if(b.right <= 0 || b.left >= innerWidth) return;
+      if(b.bottom <= 0 || b.top >= innerHeight) return;
+      if(b.right < fr.left || b.left > fr.right || b.bottom < fr.top || b.top > fr.bottom) return;
+      var st = getComputedStyle(el);
+      if(st.visibility === 'hidden' || st.display === 'none' || +st.opacity < 0.1) return;
+      /* 横向滚动容器里的元素不算 —— 它们在被划到之前不在屏幕上。
+       *
+       * 一个横向滚动的轨道，未滚到的卡片矩形落在轨道右侧（实测 x=5376），
+       * 恰好经过浮动按钮那块区域，于是被报成"按钮压住标题"。但读者
+       * 看不到那张卡片，也点不到它 —— 它不是遮挡。
+       *
+       * 反过来说：真正要防的是**静止内容**被压住，比如正文、表格、
+       * 纵向列表。那些不在滚动容器里，这条排除不影响它们被检测到。 */
+      var n = el.parentElement, inScroller = false;
+      while(n){
+        var ps = getComputedStyle(n);
+        if(ps.overflowX === 'auto' || ps.overflowX === 'scroll'){ inScroller = true; break; }
+        n = n.parentElement;
+      }
+      if(inScroller) return;
+      var ownText = [].some.call(el.childNodes, function(n){
+        return n.nodeType === 3 && n.textContent.trim();
+      });
+      if(ownText) covered.push(label(el));
+    });
+  }
+  out.fabCovers = fab ? Array.from(new Set(covered)).slice(0, 6) : null;
+
+  /* 3. The floating controls must not overlap each other. */
+  var boxes = [];
+  [['fab', '.tk-fab'], ['theme', '.tk-theme-toggle'],
+   ['kbd', '#kbd-hint'], ['lang', '.tk-lang-toggle']].forEach(function(pair){
+    var el = document.querySelector(pair[1]);
+    if(!el) return;
+    var r = el.getBoundingClientRect();
+    if(r.width < 1) return;
+    boxes.push({name: pair[0], x: r.x, y: r.y, w: r.width, h: r.height});
+  });
+  var clashes = [];
+  for(var i = 0; i < boxes.length; i++){
+    for(var j = i + 1; j < boxes.length; j++){
+      var a = boxes[i], b = boxes[j];
+      var overlap = !(a.x + a.w <= b.x || b.x + b.w <= a.x ||
+                      a.y + a.h <= b.y || b.y + b.h <= a.y);
+      if(overlap) clashes.push(a.name + '+' + b.name);
+    }
+  }
+  out.controlClashes = clashes;
+
+  /* 4. The sidebar must be where the page expects it. */
+  var sb = document.querySelector('.tk-sidebar');
+  if(sb){
+    var sr = sb.getBoundingClientRect();
+    out.sidebar = {
+      position: getComputedStyle(sb).position,
+      x: Math.round(sr.x),
+      width: Math.round(sr.width),
+      navItems: document.querySelectorAll('.tk-nav a').length
+    };
+  } else {
+    out.sidebar = null;
+  }
+
+  /* 5. The nav must be complete on the first paint, not grown afterwards.
+        A bar that reads four items and then five is the flicker this checks. */
+  out.navItems = document.querySelectorAll('.tk-nav a').length;
+
+  /* 6. Text clipped by a fixed-height ancestor. */
+  var clipped = [];
+  document.querySelectorAll('*').forEach(function(el){
+    var st = getComputedStyle(el);
+    if(st.overflowY === 'auto' || st.overflowY === 'scroll' || st.overflowY === 'visible') return;
+    /* 多行截断（-webkit-line-clamp）是有意的排版：摘要限定两行，
+       超出部分隐去。它必然让 scrollHeight 大于 clientHeight，但这
+       不是缺陷 —— 是设计。用 data-clamp 显式声明，审计跳过。
+       这个属性同时也是一份记录：写明"这里是有意截断的"，
+       避免后来者以为是 bug 去修。 */
+    if(el.hasAttribute('data-clamp')) return;
+    /* object-fit: cover 同理 —— 封面图按容器比例裁切是有意的，
+       必然让图片的固有尺寸和显示盒不一致。用 data-crop 声明。 */
+    if(el.hasAttribute('data-crop')) return;
+    /* KaTeX 会给每个公式额外输出一份 MathML —— 那是给屏幕阅读器和
+       复制粘贴用的，kaTEX 自己的 CSS 就把它 clip 成 1×1 并绝对定位。
+       它必然"溢出"（内容比 1px 的盒子大得多），但那是标准做法，
+       不是排版问题。按类名跳过：这个类由 KaTeX 生成，没法给它加属性。 */
+    if(el.classList.contains('katex-mathml')) return;
+    if(el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 4) clipped.push(label(el));
+  });
+  out.clipped = Array.from(new Set(clipped)).slice(0, 6);
+
+    return out;
+  }
+})();
+</script>
+</body>
 </html>

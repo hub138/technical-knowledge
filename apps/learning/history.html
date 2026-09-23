@@ -55,11 +55,11 @@
         justify-content: space-between;
         border-bottom: 1px solid var(--color-line);
       }
-      /* 头部契约（site/base.css）：本页 hero 是 shell 首子，几何全部由
-         契约提供（顶 26/底 16/头部底距 20、说明 76ch/--text-note/ink-soft）。
+/* 头部规范（site/base.css）：本页 hero 是 shell 首子，几何全部由
+         规范提供（顶 26/底 16/头部底距 20、说明 76ch/--text-note/ink-soft）。
          原 .hero 46px padding 死代码、.eyebrow 0 引用、.hero p 的
          790px/16px 活覆盖、.purpose 的 22px 首块距，2026-09-22 全部删除，
-         契约真源接管。 */
+规范真源接管。 */
       .grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -82,7 +82,7 @@
       /* The classroom list is the reason to visit this page, so it leads and
          gets its own header row with the primary action. */
       .panel-primary {
-        /* 首块间距走契约：头部 margin-bottom 20 已给，原来的 23px
+/* 首块间距走规范：头部 margin-bottom 20 已给，原来的 23px
            margin-top 是「每页自己再叠一层」的残留，删。 */
         border-color: var(--color-accent-line);
       }
@@ -368,7 +368,7 @@
         }
       }
       @media (max-width: 900px) {
-        /* hero 移动端几何由 base.css 契约统一给（30/16），不本地覆盖。 */
+/* hero 移动端几何由 base.css 规范统一给（30/16），不本地覆盖。 */
         .grid {
           grid-template-columns: 1fr;
         }

@@ -1,7 +1,7 @@
 ---
 title: FlashAttention是IO感知的精确算法，不是近似
 type: concept
-status: complex
+status: active
 updated: 2026-09-22
 review_after: 2027-03-22
 change_rate: medium
@@ -43,6 +43,26 @@ online softmax 是使能技术：softmax 分母依赖全行 max 与和，分块�
 | 反向重算失衡 | recompute 换显存的代价在高 FLOPs 利用率时变贵 | 训练吞吐下降 |
 | 掩码变体不支持 | causal mask 之外的复杂掩码（文档 mask、block-diagonal）无 kernel | 静默回退标准实现，性能骤降 |
 | 掩码回退后更慢 | 掩码支持不完整时静默回退 | 某版本升级后 p99 上升 |
+
+## 可运行示例与案例回流：IO 感知的账
+
+```text
+标准 Attention 与 FlashAttention 的 IO 差异（通用量级）：
+
+标准实现：
+  读 N×N 注意力矩阵到显存 → 再读回来做 softmax → 再读回来加权
+  中间矩阵反复进出 HBM：IO 量 O(N²·d)，N=4096 时数 GB 级搬运
+
+FlashAttention（分块 + 在线 softmax）：
+  把 Q/K/V 切成块，块内算完注意力与 softmax 的归一化统计量
+中间结果不写入显存（SRAM 里完成），IO 量 O(N²·d²/M)，M 是 SRAM 大小
+  N=4096 时 IO 降一个数量级 → 长序列速度提 2-4 倍，显存 O(N²) 降为 O(N)
+
+精确性：逐块 softmax 的数学结果与全局 softmax 完全一致（在线归一化
+  修正分母），不是近似——这是它与各种近似注意力的本质区别
+```
+
+案例回流：把 FlashAttention 当近似的实录——评审时以精度损失为由拒绝引入，实际它是精确算法，拒绝理由不成立，长上下文场景白白多付数倍显存与延迟；引入前后用同一输入对比输出（余弦相似度 1.0）即可验证精确性。长序列训练的实录——4096 上下文标准实现直接 OOM（N² 中间矩阵），FlashAttention 后同卡可跑 32K（显存线性增长），这是长上下文训练得以普及的工程前提之一。与 [[工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/GPU显存管理决定服务容量上限.md]] 的显存账衔接（激活显存的大头被砍掉）、与 [[工程知识/性能工程：从用户等待到资源瓶颈/处理器与内存/GPU性能取决于计算、访存、并行与通信.md]] 的访存受限判据衔接（IO 感知算法正是访存受限场景的优化范式）。
 
 ## 边界
 

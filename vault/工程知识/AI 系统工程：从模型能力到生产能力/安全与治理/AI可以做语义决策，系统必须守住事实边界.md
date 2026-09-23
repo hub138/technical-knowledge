@@ -7,18 +7,19 @@ change_rate: medium
 confidence: high
 review_after: 2027-03-03
 tags:
+  - agent-engineering/correctness
   - agent-engineering/reliability
-  - agent-engineering/evidence
 sources:
-  - "实践证据档案（已脱敏）]"
+  - "实践证据档案（已脱敏）"
   - "https://www.anthropic.com/research/trustworthy-agents"
+  - "https://arxiv.org/abs/2311.14610"
 ---
 
 # AI 可以做语义决策，系统必须守住事实边界
 
-最能发挥模型能力的设计，不是把规则全部写死，也不是让模型同时担任执行者和裁判。合理边界是：**AI 负责理解未知环境、提出方案和解释证据；确定性系统负责隔离、执行、记录和维护事实一致性。**
+最能发挥模型能力的设计，既不应把规则全部固定写下，也不应让模型同时担任执行者和裁判。合理边界是：**AI 负责理解未知环境、提出方案和解释证据；确定性系统负责隔离、执行、记录和维护事实一致性。**
 
-## 为什么这样分
+## 要解决的问题：语义判断与事实边界为什么必须分层
 
 语义判断的输入空间巨大，而且会随项目、语言和环境变化。为每个仓库硬编码“应该用 Maven 还是 Gradle”“哪条测试适用”既脆弱又昂贵，模型更适合根据上下文判断。执行事实则相反：命令是否存在、退出码是什么、写入绑定哪个 revision，这些必须有唯一、不可伪造的答案，不能由语言模型自由生成。
 

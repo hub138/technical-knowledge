@@ -1,9 +1,9 @@
 ---
 title: Linux常用命令的词源地图
 type: reference
-status: core
+status: active
 status_note: 词源系列核心参考
-updated: 2026-09-29
+updated: 2026-09-23
 confidence: high
 change_rate: low
 review_after: 2028-09-22
@@ -71,7 +71,7 @@ sources:
 | lsof | 1994 | 标准 | 排查"谁开着这个文件"的事实收集标准件 |
 | GNU coreutils 家族 | 2002 整合 | 标准 | --force/--verbose 全家族一致的长参数纪律 |
 
-收益与代价：词源讲清后，新工具的参数可以"按家族猜"（GNU 家族的 --verbose/--force 全家族一致）；年代与状态分档把"哪些要背（遗留）哪些能推（标准）"划开，学习成本从死记降到分类记忆。代价：血统差异（BSD vs System V）造成的同义参数分裂是永久记忆负担，没有逻辑只有历史，接受它。这份地图的取舍：只收高频与难词，all/force/list 这类自解释词不收，完整覆盖交给 man 手册。
+收益与代价：词源讲清后，新工具的参数可以"按家族猜"（GNU 家族的 --verbose/--force 全家族一致）；年代与状态分档把"哪些要背（遗留）哪些能推（标准）"划开，学习成本从机械记忆降到分类记忆。代价：血统差异（BSD vs System V）造成的同义参数分裂是永久记忆负担，没有逻辑只有历史，接受它。这份地图的取舍：只收高频与难词，all/force/list 这类自解释词不收，完整覆盖交给 man 手册。
 
 ## 思想背景与看完能判断什么
 

@@ -76,7 +76,7 @@
       /* 搜索精筛用 card.hidden 藏不命中的卡。hidden 属性的 UA 默认
          display:none 会被上面的 .src-card{display:grid} 压掉（同特异性
          时 UA 规则输给作者规则），必须显式兜底 —— 全站组件一律走
-         base.css 的 .page-toolbar 契约，但 [hidden] 兜底属于本页卡片
+base.css 的 .page-toolbar 规范，但 [hidden] 兜底属于本页卡片
          特有结构，写在这里。 */
       .src-card[hidden],
       .src-rich-card[hidden],
@@ -665,7 +665,7 @@
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
     <div class="tk-shell">
       <!-- 头部形态=hero（身份头，宽松几何）：真源在 base.css「页面头部
-           契约」。内容页点进来先回答「这是什么页」，搜索是头部的
+规范」。内容页点进来先回答「这是什么页」，搜索是头部的
            interaction area（Atlassian/GCS page header 同款解剖），
            随身份一起给，不放正文第一行。 -->
       <section class="hero">
@@ -673,7 +673,7 @@
         <p>这些站点每天产出值得花时间的技术内容。这里按月聚合它们的最新文章，标题、摘要、来源一目了然 —— 不用逐个站点翻。</p>
         <!-- 搜索：为什么这页要有 —— 列表聚合了各站最新文章，标题几十条，
              右侧目录只能按站跳，按关键词找一篇只能滚动。
-             皮肤走 base.css 的 .tk-search 契约（全站唯一真源）；
+皮肤走 base.css 的 .tk-search 规范（全站唯一真源）；
              放置走 hero 内的 .page-toolbar，间距由 .hero .page-toolbar
              统一给，本页零间距样式。 -->
         <div class="page-toolbar">
@@ -1391,6 +1391,12 @@
       });
     </script>
   
+
+
+
+
+
+
 <script>
 (function(){
   function label(el){

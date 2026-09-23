@@ -7,9 +7,9 @@ change_rate: low
 confidence: high
 review_after: 2029-09-23
 tags:
-  - os
-  - observability
-  - defect-analysis
+  - systems/os
+  - systems/memory
+  - diagnosis
 sources:
   - "https://man7.org/linux/man-pages/man1/pmap.1.html"
   - "https://www.brendangregg.com/linuxperf.html"
@@ -17,7 +17,7 @@ sources:
 
 # 应用内存泄漏先用 RSS 曲线定位再谈分析：涨势、归零与平台池
 
-> **一句话总结**：内存泄漏的判定与定位分三步——RSS 曲线确认"真在涨"（区分缓存的平台期与泄漏的斜率）、回落实验确认"泄漏点在哪类分配"（重启归零 + 分模块灰度）、按分配路径选分析工具（运行时分配器缓存是 RSS 不降的主因， jemalloc/tcmalloc 的池开关是第一道验证）；跳过曲线直接上 profiler，分析的往往不是泄漏。
+> **要点**：内存泄漏的判定与定位分三步——RSS 曲线确认"真在涨"（区分缓存的平台期与泄漏的斜率）、回落实验确认"泄漏点在哪类分配"（重启归零 + 分模块灰度）、按分配路径选分析工具（运行时分配器缓存是 RSS 不降的主因， jemalloc/tcmalloc 的池开关是第一道验证）；跳过曲线直接上 profiler，分析的往往不是泄漏。
 
 ## 要解决的问题
 

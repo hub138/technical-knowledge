@@ -7,9 +7,9 @@ change_rate: medium
 confidence: high
 review_after: 2027-03-23
 tags:
-  - hw
-  - observability
-  - defect-analysis
+  - hardware
+  - diagnosis
+  - linux/metrics
 sources:
   - "https://www.kernel.org/doc/html/latest/admin-guide/pm/cpufreq.html"
   - "https://www.intel.com/content/www/us/en/developer/articles/technical/intel-dcm.html"
@@ -17,7 +17,7 @@ sources:
 
 # CPU 降频的三个阀门：温度墙、功耗墙与电流墙
 
-> **一句话总结**：CPU 实际频率由三个限制器取最小值决定——温度墙（结温保护）、功耗墙（TDP/PL 约束）、电流墙（供电与电迁移防护），任何一个触发都让"标称频率"变成纸面数字；性能排查先读 `turbostat`/`cpupower` 的当前频率与限制原因，散热与负载整形是比换 CPU 更先做的两个动作。
+> **要点**：CPU 实际频率由三个限制器取最小值决定——温度墙（结温保护）、功耗墙（TDP/PL 约束）、电流墙（供电与电迁移防护），任何一个触发都让"标称频率"变成纸面数字；性能排查先读 `turbostat`/`cpupower` 的当前频率与限制原因，散热与负载整形是比换 CPU 更先做的两个动作。
 
 ## 要解决的问题：频率是协商的结果，降频原因怎么定位
 

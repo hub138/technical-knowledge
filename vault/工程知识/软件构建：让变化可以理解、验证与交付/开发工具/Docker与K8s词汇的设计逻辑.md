@@ -1,9 +1,9 @@
 ---
 title: Docker与K8s词汇的设计逻辑
 type: reference
-status: core
+status: active
 status_note: 词源系列核心参考
-updated: 2026-09-29
+updated: 2026-09-23
 confidence: high
 change_rate: medium
 review_after: 2028-09-22
@@ -21,7 +21,7 @@ sources:
 
 # Docker与K8s词汇的设计逻辑
 
-`docker run` 是动词直接用，`kubectl get` 是 REST 动词照搬，`kubectl apply` 是声明式语义的入口——容器生态的命令词汇有两套设计哲学打架又融合。要解决的问题：把 Docker 与 Kubernetes 命令词汇的设计逻辑与词源讲清楚，理解"为什么 kubectl 有 get/create/apply 三个看起来重叠的动词"，从此容器命令行可以推理出来，不用死背。
+`docker run` 是动词直接用，`kubectl get` 是 REST 动词照搬，`kubectl apply` 是声明式语义的入口——容器生态的命令词汇有两套设计哲学打架又融合。要解决的问题：把 Docker 与 Kubernetes 命令词汇的设计逻辑与词源讲清楚，理解"为什么 kubectl 有 get/create/apply 三个看起来重叠的动词"，从此容器命令行可以推理出来，不用机械记忆。
 
 ## 机制：两套哲学与动词表
 
@@ -52,7 +52,7 @@ kubectl 动词的 REST 词源表：
 | --- | --- | --- | --- |
 | docker run/stop/kill | 2013（Docker 0.x） | 遗留 | 进程动词直搬，命令式哲学的原点 |
 | docker ps | 2013 | 遗留 | ps 抄 Unix process status，容器=进程的心智模型证据 |
-| kubectl get/create/delete | 2014（K8s 1.0 前） | 标准 | REST 动词照搬，API 客户端哲学的落地 |
+| kubectl get/create/delete | 2014（K8s 1.0 前） | 标准 | REST 动词照搬，API 客户端哲学的具体体现 |
 | kubectl apply | 2015（K8s 1.2，client-side） | 演进 | 声明式入口，last-applied-configuration 注解驱动幂等 |
 | kubectl apply --server-side | 2022（K8s 1.22 GA） | 演进 | 服务端 apply，field ownership 让多控制器协作不用互踩字段 |
 | kubectl edit | 2015 | 标准 | apply 的交互版，编辑器改完即 PATCH 提交 |
@@ -68,7 +68,7 @@ kubectl 动词的 REST 词源表：
 
 ## 思想背景与看完能判断什么
 
-两套哲学的融合史：Docker 的进程动词（2013）先落地，K8s 的 REST 照搬（2014）把它收编进 API 模型——但收编的方式是并存而非替换，kubectl 至今保留 run/create（命令式）与 apply（声明式）两套入口。这不是犹豫，是有意的过渡设计：命令式让人快速上手，声明式让人长期可靠，两套词汇服务两个阶段的使用者。自己的系统要不要留两套接口，这里就是参照。
+两套哲学的融合史：Docker 的进程动词（2013）先成型，K8s 的 REST 照搬（2014）把它收编进 API 模型——但收编的方式是并存而非替换，kubectl 至今保留 run/create（命令式）与 apply（声明式）两套入口。这不是犹豫，是有意的过渡设计：命令式让人快速上手，声明式让人长期可靠，两套词汇服务两个阶段的使用者。自己的系统要不要留两套接口，这里就是参照。
 
 - 手上的活是写部署脚本：用 apply 而非 create，幂等性让重跑无害（CI/CD 里脚本被重试是常态）。
 - 手上的活是多团队共享集群：server-side apply 的 field ownership 直接可用——各团队管各的字段，冲突在字段级暴露而不是整对象互踩。
@@ -92,7 +92,7 @@ docker ps --format '{{.ID}} {{.Status}}' ; ps aux | head -3
 
 ## 边界
 
-本篇讲容器生态命令词汇。方法论总纲见 [[工程知识/软件构建：让变化可以理解、验证与交付/开发工具/词汇即接口：Linux与容器命令的词源与设计.md|词汇即接口：Linux与容器命令的词源与设计]]。Linux 侧命令词源见 [[工程知识/软件构建：让变化可以理解、验证与交付/开发工具/Linux常用命令的词源地图.md|Linux常用命令的词源地图]]。声明式模型的深机制（控制器收敛循环）见 [[工程知识/后端系统：在并发、失败与变化中维持服务/基础设施/容器隔离资源边界与镜像身份.md|容器隔离资源边界与镜像身份]]。资源模型（K8s 把集群当数据库）的设计深度见 [[工程知识/后端系统：在并发、失败与变化中维持服务/服务设计/服务发现与负载均衡决定请求落到哪里.md|服务发现与负载均衡决定请求落到哪里]] 的 Service 部分。
+本篇讲容器生态命令词汇。方法论总纲见 [[工程知识/软件构建：让变化可以理解、验证与交付/开发工具/词汇即接口：Linux与容器命令的词源与设计.md|词汇即接口：Linux与容器命令的词源与设计]]。Linux 侧命令词源见 [[工程知识/软件构建：让变化可以理解、验证与交付/开发工具/Linux常用命令的词源地图.md|Linux常用命令的词源地图]]。声明式模型的深机制（控制器收敛循环）见 [[工程知识/后端系统：在并发、失败与变化中维持服务/基础设施/容器隔离资源边界与镜像身份.md|容器隔离资源边界与镜像身份]]。资源模型（K8s 把集群当数据库）的设计深度见 [[工程知识/后端系统：在并发、失败与变化中维持服务/服务设计/服务发现与负载均衡决定请求发往哪里.md|服务发现与负载均衡决定请求发往哪里]] 的 Service 部分。
 
 ## 相关
 

@@ -1,15 +1,14 @@
 ---
 title: df 与 du 的差值就是被占住的已删文件：磁盘占用异常的三个来源
 status: active
-type: workflow
+type: playbook
 updated: 2026-09-23
 change_rate: low
 confidence: high
 review_after: 2029-09-23
 tags:
-  - os
-  - observability
-  - practice
+  - systems/os
+  - linux/operations
 sources:
   - "https://man7.org/linux/man-pages/man1/df.1.html"
   - "https://man7.org/linux/man-pages/man1/lsof.8.html"
@@ -17,7 +16,7 @@ sources:
 
 # df 与 du 的差值就是被占住的已删文件：磁盘占用异常的三个来源
 
-> **一句话总结**：磁盘"看起来满但找不到大文件"的排查按差值倒推——df 与 du 的差值是被进程握着的已删文件（`lsof | grep deleted` 定位，重启或截断释放）、超大目录是 du 的排序题（`du -x --max-depth=1 | sort -h` 逐层下钻）、特殊挂载与稀疏文件是 df 的虚胖（排除 `-x` 与 `--apparent-size` 两个参数纠偏）；三个来源各有一套标准动作，混合出现时按差值大小定优先级。
+> **要点**：磁盘"看起来满但找不到大文件"的排查按差值倒推——df 与 du 的差值是被进程握着的已删文件（`lsof | grep deleted` 定位，重启或截断释放）、超大目录是 du 的排序题（`du -x --max-depth=1 | sort -h` 逐层下钻）、特殊挂载与稀疏文件是 df 的虚胖（排除 `-x` 与 `--apparent-size` 两个参数纠偏）；三个来源各有一套标准动作，混合出现时按差值大小定优先级。
 
 ## 要解决的问题
 
@@ -25,7 +24,7 @@ sources:
 
 ## 机制：三个来源的判定与释放
 
-**来源一：已删除仍被占用（df/du 差值的主因）**。进程持有已删文件的 fd 时，空间不释放（inode 与数据块仍在，直到最后一个 fd 关闭）——典型现场：日志轮转后服务没重开日志文件（logrotate 的 copytruncate vs postrotate 之差）、临时文件写完就 unlink 继续用。**判定与定位**：`df -h` 与 `du -sh -x /` 的差值即嫌疑量级；`lsof +L1` 或 `lsof | grep deleted` 列出持有者（进程名、pid、大小排序）——**释放动作**按影响定：能重启的服务重启即释放；不能重启的截断文件（`: > /proc/<pid>/fd/<n>`，通过 proc 里的 fd 引用清空内容，空间立回）。**预防**：日志轮转配置里服务 reload 动作与轮转配对（本库"临时文件先写进命名约定"的落位纪律同源：打开-写-关的完整生命周期有人管）。
+**来源一：已删除仍被占用（df/du 差值的主因）**。进程持有已删文件的 fd 时，空间不释放（inode 与数据块仍在，直到最后一个 fd 关闭）——典型现场：日志轮转后服务没重开日志文件（logrotate 的 copytruncate vs postrotate 之差）、临时文件写完就 unlink 继续用。**判定与定位**：`df -h` 与 `du -sh -x /` 的差值即嫌疑量级；`lsof +L1` 或 `lsof | grep deleted` 列出持有者（进程名、pid、大小排序）——**释放动作**按影响定：能重启的服务重启即释放；不能重启的截断文件（`: > /proc/<pid>/fd/<n>`，通过 proc 里的 fd 引用清空内容，空间立回）。**预防**：日志轮转配置里服务 reload 动作与轮转配对（本库"临时文件先写进命名约定"的命名与生命周期纪律同源：打开-写-关的完整生命周期有人管）。
 
 **来源二：挂载点遮挡（du 看不见的目录）**。某目录被挂载后，原目录下的旧文件被"盖住"——du 扫不到、df 算得着。**判定**：`du -x -d1 /`（`-x` 不跨文件系统）与 df 的差值仍然对不上时，逐个挂载点检查：`findmnt` 列出全部挂载，对每个挂载点 `mount --bind / <临时目录>` 后进临时目录 du 原目录（看到被盖住的内容）——**释放动作**：确认无用的旧文件在卸载或 bind 后删除。高频现场：容器镜像层、临时挂载后的残留、快照挂载。
 

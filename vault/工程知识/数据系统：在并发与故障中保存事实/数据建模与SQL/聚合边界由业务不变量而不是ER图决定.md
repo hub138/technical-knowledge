@@ -4,7 +4,7 @@ type: principle
 status: active
 updated: 2026-09-15
 review_after: 2027-03-15
-change_rate: stable
+change_rate: low
 confidence: high
 tags:
   - backend/ddd
@@ -19,7 +19,7 @@ sources:
 
 它解决的是数据库表能分别保存成功，但业务规则在并发更新后被破坏的问题。聚合把必须原子保持的不变量圈进一个写入边界，并只允许外部通过聚合根修改；收益是规则有唯一入口，代价是聚合过大会增加冲突和加载成本。边界不由 ER 图、外键或对象引用数量决定，而由“哪些事实必须同时成立”决定。
 
-## 背景：跟着数据库表设计出来的一团泥
+## 要解决的问题：跟着数据库表设计出来的一团泥（本质）
 
 照着 ER 图建了对象：`Order`、`OrderItem`、`User`、`Address`、`Payment`、`Shipment`，互相都有引用。
 
@@ -48,14 +48,13 @@ repo.SaveItems(order.Items)          // 分别保存
 
 划定边界的唯一依据：**不变量（invariant）**——那些"必须永远成立"的业务规则。
 
-```
-不变量：订单总额 = 所有订单项金额之和
-    ↓
-所以：Order 和 OrderItem 必须在同一个聚合里
-    ↓
-Order 是聚合根，OrderItem 是内部对象
-    ↓
-外部只能通过 Order 改订单项，且 Order 保证总额正确
+```mermaid
+flowchart TB
+    a["不变量：订单总额 = 所有订单项金额之和"]
+    b["Order 与 OrderItem 必须在同一个聚合里"]
+    c["Order 是聚合根，OrderItem 是内部对象"]
+    d["外部只能通过 Order 改订单项，由 Order 保证总额正确"]
+    a -->|"必要约束"| b --> c --> d
 ```
 
 ### 设计规则
@@ -149,7 +148,7 @@ func (o *Order) recalculate() Money {
 
 - **需要识别不变量**：这要和领域专家反复确认，不是看代码能得出的
 - **跨聚合查询变麻烦**：不能 `order.Items` 直接拿了，要单独查询。**通常需要读模型（CQRS）配合**
-- **拆分错误的代价高**：边界划错后重构成本大——因为聚合是领域的核心结构
+- **边界划分错误的代价高**：边界划错后重构成本大——因为聚合是领域的核心结构
 - **团队需要共同理解**：聚合概念需要团队达成共识，否则会退回 ER 图思维
 
 ## 从什么地方做

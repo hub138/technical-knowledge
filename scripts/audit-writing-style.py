@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Audit the published-facing writing style of engineering knowledge pages.
 
-This is the executable half of `vault/知识库管理/归档/面向发布的知识写作文风契约.md`.
+This is the executable half of `vault/知识库管理/归档/面向发布的知识写作文风规范.md`.
 The structural contract (`audit-knowledge-quality.py`) checks that a page has a
 problem, a mechanism and evidence. This one checks that the page *reads* like a
 finished technical document instead of a generation draft: no self-disclosure,

@@ -44,7 +44,7 @@ vault/                         可直接用 Obsidian 打开
   知识库管理/                   来源、更新、质量和维护规则
   Clippings/                   原始剪藏，按要求完整保留
 site/                          站点：单文件 HTTP 服务，无运行时依赖
-apps/agent-evaluation/         Agent 评估：把判断绑定到证据的设计契约与原型
+apps/agent-evaluation/         Agent 评估：把判断绑定到证据的设计约定与原型
 packages/agent-foundation/     会话、上下文、记忆、恢复与证据基础包
 projects/                      完整上游源码快照，含各自许可证
   archify/                     架构、流程与关系图

@@ -659,6 +659,17 @@
     fab.innerHTML = `<span aria-hidden="true">?</span><span class="tk-fab-label">${tr("提意见")}</span>`;
     document.body.appendChild(fab);
 
+    /* 触屏端待机态：390px 实测按钮盖住 learning 的「开始」按钮和
+     * projects 的首屏正文。触屏没有 hover，悬浮块静止时对首屏是持续
+     * 干扰。页面未滚动时按钮降为半透明且不拦截点击（rest 态）；一旦
+     * 滚动，读者进入浏览状态，按钮完全显形并可点。全站页面都可滚
+     * （审计实测），不存在永远停在 rest 态的死页。 */
+    if (window.matchMedia && window.matchMedia("(pointer: coarse)").matches) {
+      const syncFabRest = () => fab.classList.toggle("tk-fab--rest", window.scrollY < 24);
+      syncFabRest();
+      window.addEventListener("scroll", syncFabRest, { passive: true });
+    }
+
     const overlay = document.createElement("div");
     overlay.className = "tk-fb-overlay";
     overlay.id = "tk-fb-overlay";

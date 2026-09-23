@@ -17,7 +17,7 @@ sources:
 
 # 连接建立失败先看内核队列：SYN 队列与 accept 队列是两个瓶颈
 
-> **一句话总结**：三次握手的完成与交给应用是两段队列——SYN 队列装半连接、accept 队列等应用 accept，溢出时新连接被丢弃或重置；建连失败按"哪段队列溢出、溢出时内核动作是什么"取证，缓解按"调队列、加快 accept、挡住突发"三路走。
+> **要点**：三次握手的完成与交给应用是两段队列——SYN 队列装半连接、accept 队列等应用 accept，溢出时新连接被丢弃或重置；建连失败按"哪段队列溢出、溢出时内核动作是什么"取证，缓解按"调队列、加快 accept、挡住突发"三路走。
 
 ## 要解决的问题
 
@@ -35,7 +35,7 @@ sources:
 
 **取证盯两个计数器**：`netstat -s` 的 **SYN cookies sent**（SYN 队列溢出后 Cookies 被触发的次数）与 **listen queue overflow / times the listen queue of a socket overflowed**（accept 队列溢出次数）；配合 `ss -lnt` 的 **Recv-Q/Send-Q**（监听套接字上 Recv-Q 是当前 accept 队列深度，接近 Send-Q 上限即临溢出）。**监控把这两个计数器做成速率曲线**——溢出偶发时按天看累计值，突发时按秒看速率，两者都要有告警。
 
-**缓解按瓶颈分段**：SYN 队列瓶颈（溢出 + Cookies 频繁）——确认 `tcp_max_syn_backlog` 合理（通常 1024+）、确认 SYN Cookies 常开（防护与容量兼得）；accept 队列瓶颈——调大 backlog 与 `somaxconn`（二者取小才生效，**只改应用不改 sysctl 是常见的无效操作**）+ 加快 accept（accept 与业务处理分离、事件循环拆分）+ 挡突发（接入层限连、按来源分摊）。上游 BookKeeper 的一个同类改进是把 Netty 与 ZooKeeper 客户端升到新版本（减少连接层的行为差异），同一原则：**连接层的组件版本也是队列行为的变量**，取证时把组件版本一并记录。
+**缓解按瓶颈分段**：SYN 队列瓶颈（溢出 + Cookies 频繁）——确认 `tcp_max_syn_backlog` 合理（通常 1024+）、确认 SYN Cookies 常开（防护与容量兼得）；accept 队列瓶颈——调大 backlog 与 `somaxconn`（二者取小才生效，**只改应用不改 sysctl 是常见的无效操作**）+ 加快 accept（accept 与业务处理分离、事件循环职责分离）+ 挡突发（接入层限连、按来源分摊）。上游 BookKeeper 的一个同类改进是把 Netty 与 ZooKeeper 客户端升到新版本（减少连接层的行为差异），同一原则：**连接层的组件版本也是队列行为的变量**，取证时把组件版本一并记录。
 
 **压测验证**：用连接型压测工具把并发建连速率拉过队列上限，预期 `netstat -s` 的溢出计数按注入速率增长、默认行为下首包超时、`tcp_abort_on_overflow=1` 下连接被 RST——**压测报告里标注队列参数**，参数不同的两次压测结果不可比。
 

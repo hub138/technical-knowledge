@@ -103,7 +103,7 @@
 .pano-clear { color: var(--color-accent); text-decoration: none; margin-left: 4px; }
 /* toggle 提示（「再点一次圆圈退回全图」）：与 .pano-focusbar span 同款弱化，
    靠左留 6px 间距即可，不抢 focusbar 主文案的视觉。 */
-.pano-toggle-hint { color: var(--color-faint); font-size: 11px; margin-left: 6px; }
+.pano-toggle-hint { color: var(--color-faint); font-size: var(--text-micro); margin-left: 6px; }
 
 /* ── 悬浮提示 ──────────────────────────────────────────────────── */
 .pano-tip {
