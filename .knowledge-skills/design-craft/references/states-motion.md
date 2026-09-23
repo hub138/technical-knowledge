@@ -27,6 +27,7 @@
 - 动效服务于"变化被看见"，不服务于炫技；找不到理由就不加——这是一切动效判断的起点，先过这条再谈具体条款。
 - 时长 150–300ms；超过 500ms 让人不耐烦（frontend-design 动效章）。
 - 必须有 `prefers-reduced-motion` 分支。
+- **reduce 分支拦不住 JS 发起的滚动**：CSS 里的 `animation-duration/transition-duration/scroll-behavior: auto` 只管 CSS 动画，`scrollIntoView/scrollTo` 显式传的 `behavior:'smooth'` 照跑——晕动症用户开了系统开关仍要陪跑整段滚动动画（实测：reduce 模式下 200ms 时页面还在动画中途）。全局滚动行为必须走一个查询点：`const smoothOK=!matchMedia('(prefers-reduced-motion: reduce)').matches`，所有 JS 滚动传 `behavior: smoothOK?'smooth':'auto'`，禁止散写硬编码 `'smooth'`（实测修后：reduce 模式 200ms 内一次跳达落点，normal 模式平滑在途，落点与焦点行为不变）。**判定线索**：grep 全站 `behavior:` 硬编码字符串，凡 JS 文件或内联脚本里出现的都要收编进查询点；CSS 写了 reduce 分支不代表滚动受控，两边要分开核对。
 - 入场动画错峰用 `animation-delay`，别让所有元素一起动。
 - 逐字弹入、逐行飞入这类纯装饰入场动效：先给整体淡入（150–300ms）的克制替代，把选择权交给用户；用户点名坚持才照做，照做时压进 300ms、给 `prefers-reduced-motion` 降级，且不得延误阅读起点。
 
