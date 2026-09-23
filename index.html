@@ -620,7 +620,14 @@
 /* 剪藏的 B 站播放器：16:9 自适应容器，宽随正文列，不撑破行宽。 */
 .video-embed{position:relative;padding-top:56.25%;margin:var(--space-5) 0;border-radius:7px;overflow:hidden;border:1px solid var(--color-line);background:var(--color-surface)}
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
-@media print{.video-embed{display:none}}
+.reader-body :target{scroll-margin-top:calc(70px + var(--space-4))}
+/* 锚点跳转落点预留呼吸：sticky 顶栏高 70px（上下 padding 13×2 + 搜索框 44），
+   不留 scroll-margin 时目标标题正好停在顶栏下缘被盖住，scrollspy 的
+   rootMargin:-96px 已经按顶栏占位算过，跳转处必须同样处理。写在标题元素上
+   而不是只靠 :target 伪类——TOC 点击走 preventDefault+scrollIntoView 不产生
+   :target，元素级 scroll-margin 让两类跳转（目录点击、外链 hash）都生效。
+   +16px 用区块级最小呼吸档（--space-4），与头部规范「不顶格贴固定栏」同源。 */
+#reader-body h2,#reader-body h3,#reader-body h4{scroll-margin-top:calc(70px + var(--space-4))}
 /* 表格是正文的一部分，不是数据报表：行距要够读，
    表头要与正文区分但不用重色。 */
 .reader-body th,.reader-body td{padding:var(--space-3) var(--space-4);border:1px solid var(--color-line);text-align:left;vertical-align:top;line-height:var(--leading-normal)}
@@ -2311,7 +2318,8 @@ function renderReaderRails(note){
      既占位又没有动作，比没有更糟（待核验内容这类短文实测）。 */
   toc.hidden=heads.length===0;
   toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('')+'</ul>';
-  toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{e.preventDefault();const t=document.getElementById(a.getAttribute('href').slice(1));if(t)t.scrollIntoView({behavior:'smooth',block:'start'})});
+  /* 目录跳转后焦点随迁到目标标题（tabindex=-1 仅在缺省时补），键盘用户按 Tab 从正文继续，不再弹回目录区。 */
+  toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{e.preventDefault();const t=document.getElementById(a.getAttribute('href').slice(1));if(t){t.scrollIntoView({behavior:'smooth',block:'start'});if(!t.hasAttribute('tabindex'))t.setAttribute('tabindex','-1');t.focus({preventScroll:true})}});
   /* 【ui4·TOC scrollspy】目录此前只有跳转没有位置反馈：滚到正文中部
      看不出"在读哪一节"。IntersectionObserver 监听各标题，视口上沿
      附近（rootMargin -96px 顶栏高度，-55% 收口带）最后进入的标题即
