@@ -57,6 +57,12 @@ PAGES = [
 PROBE = r"""
 <script>
 (function(){
+  /* 门禁：探针只允许在审计调用（URL 带 __probe=1）时运行。
+     这个探针是注入进生产文件再恢复的——恢复一旦被中断（崩溃、超时、
+     审计途中 commit），残留就会跟着提交，访客的标签页标题会变成
+     @@{"overflow":...}（2026-09-23 实测）。有这道门禁，残留对
+     真实访客是零影响：不测量、不碰 title。 */
+  if(location.search.indexOf('__probe=1') === -1) return;
   function label(el){
     var cls = typeof el.className === 'string' ? el.className.trim().split(/\s+/)[0] : '';
     return el.tagName.toLowerCase() + (cls ? '.' + cls : '');
@@ -296,7 +302,7 @@ def main() -> None:
     for width in widths:
         for name, path, source in PAGES:
             try:
-                data = sample(f"{args.base}{path}", width, ROOT / source)
+                data = sample(f"{args.base}{path}{'&' if '?' in path else '?'}__probe=1", width, ROOT / source)
             except Exception as exc:  # noqa: BLE001
                 print(f"  ?     {name}@{width}: {exc}")
                 continue
