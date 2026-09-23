@@ -3291,6 +3291,73 @@ initialize();setInterval(refreshApp,10000);
      做法：先扫页面有没有 pre.mermaid，有才插 script 标签。
      没图表时这一整个库连请求都不会发出去。 -->
 <script>
+
+/* 图控件：放大 / 缩小 / 复制 / 拖高度。
+ * 默认保持 mermaid 原始尺寸（清晰，纵向长图就靠页面滚动看），
+ * 想一屏看全点「缩小」——等比缩小会让字变小，所以不默认缩
+ * （2026-09-23 反馈：先是不限高太长、再是强行缩到看不见）。 */
+function enhanceMermaid(){
+  document.querySelectorAll('pre.mermaid').forEach((pre) => {
+    if (pre.dataset.mmd) return;
+    pre.dataset.mmd = '1';
+    const svg = pre.querySelector('svg');
+    if (!svg) return;
+    const wrap = document.createElement('figure');
+    wrap.className = 'mmd-figure';
+    pre.parentNode.insertBefore(wrap, pre);
+    wrap.appendChild(pre);
+
+    const bar = document.createElement('div');
+    bar.className = 'mmd-bar';
+    bar.innerHTML =
+      '<button type="button" class="mmd-btn" data-act="out" title="放大">＋</button>' +
+      '<button type="button" class="mmd-btn" data-act="in" title="缩小">－</button>' +
+      '<button type="button" class="mmd-btn" data-act="copy" title="复制图源码">复制</button>';
+    wrap.insertBefore(bar, pre);
+
+    const grip = document.createElement('div');
+    grip.className = 'mmd-grip';
+    grip.title = '拖动调整高度';
+    wrap.appendChild(grip);
+
+    let h = 0;
+    const apply = () => {
+      if (h <= 0) { svg.style.removeProperty('max-height'); }
+      else { svg.style.setProperty('max-height', h + 'px'); }
+    };
+    apply();
+
+    bar.addEventListener('click', (e) => {
+      const b = e.target.closest('button');
+      if (!b) return;
+      const act = b.dataset.act;
+      if (act === 'copy') {
+        const src = pre.getAttribute('data-mermaidSource') || pre.textContent || '';
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(src);
+        b.textContent = '已复制';
+        setTimeout(() => { b.textContent = '复制'; }, 1200);
+        return;
+      }
+      const base = h > 0 ? h : svg.getBoundingClientRect().height;
+      if (act === 'in') h = Math.max(200, Math.round(base * 0.75));
+      else h = Math.min(2400, Math.round((h > 0 ? h : base) * 1.3));
+      apply();
+    });
+
+    let startY = 0, startH = 0;
+    grip.addEventListener('pointerdown', (e) => {
+      startY = e.clientY;
+      startH = h > 0 ? h : svg.getBoundingClientRect().height;
+      grip.setPointerCapture(e.pointerId);
+    });
+    grip.addEventListener('pointermove', (e) => {
+      if (e.buttons !== 1) return;
+      h = Math.max(200, Math.min(2400, Math.round(startH + (e.clientY - startY))));
+      apply();
+    });
+  });
+}
+
 window.renderMermaid=async function(){
   const nodes=[...document.querySelectorAll('pre.mermaid')];
   if(!nodes.length)return;
@@ -3302,10 +3369,27 @@ window.renderMermaid=async function(){
       s.onerror=()=>reject(new Error('mermaid 加载失败'));
       document.head.appendChild(s);
     });
-    window.mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'neutral'});
+    window.mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'base',themeVariables:{
+      /* 图要退到内容的层级上：字号不跟正文抢（正文 15px，图内 14px），
+         节点用白底 + 站点同源的淡蓝边框（--color-accent-line #c3d0e4），
+         不引入站点没有的亮蓝。圆角 8、内边距 16 让节点不挤。 */
+      fontSize:'14px',
+      fontFamily:'inherit',
+      nodePadding:20,
+      borderRadius:8,
+      mainBkg:'#ffffff',
+      nodeBorder:'#7d93af',
+      primaryBorderColor:'#7d93af',
+      primaryTextColor:'#1f2329',
+      lineColor:'#8c8c8c',
+      secondaryColor:'#f4f7f5',
+      tertiaryColor:'#f8faf9',
+      edgeLabelBackground:'#ffffff'
+    },flowchart:{htmlLabels:true,nodeSpacing:50,rankSpacing:60}});
   }
   nodes.forEach((node,index)=>{node.dataset.mermaidSource=node.textContent||'';node.id=node.id||`mermaid-${index}-${Date.now()}`});
   await window.mermaid.run({nodes});
+  if(window.enhanceMermaid)window.enhanceMermaid();
 };
 </script>
 

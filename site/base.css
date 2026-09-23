@@ -1884,20 +1884,48 @@ textarea:focus-visible {
   outline: none;
 }
 
-/* mermaid 图容器：此前库里没有一条 mermaid 样式，渲染后直接用库的默认
-   尺寸——纵向流程图被拉到 1094px（实测最高），把文章撑得没法读；宽度
-   按内容算（220~473px 参差）且左对齐，看着就是歪的。
-   这里给容器限高，图完整保留、超出部分内部滚动；窄图居中，宽度参差
-   不再突兀。<pre> 还得重置字体，否则等宽字体会污染 svg 内的标签文字。 */
+/* mermaid 图容器。走过一段弯路：先做了「限高 520px + 内部滚动」，图确实
+   不再把页面撑长，但读者得在框里下拉才能看全（2026-09-23 反馈「还要下拉」）。
+   滚动是错的解法——图应该整体缩小到一屏能看完。
+   所以这里改成等比缩放：mermaid 会给 svg 写死 style width/height（如
+   style="width:319px"），必须用 !important 覆盖掉，再给 max-height，
+   svg 有 viewBox 就会按原比例缩小，图完整、没有滚动条。 */
 pre.mermaid{
-  margin:16px 0;
-  padding:14px 12px;
+  margin:18px 0;
+  padding:16px;
   background:var(--color-raised);
   border:1px solid var(--color-line);
-  border-radius:7px;
-  max-height:520px;
-  overflow:auto;
+  border-radius:8px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   font:inherit;
-  text-align:center;
 }
-pre.mermaid svg{max-width:100%;height:auto;display:inline-block}
+pre.mermaid svg{
+  width:auto !important;
+  height:auto !important;
+  max-width:100%;
+}
+/* 图控件：放大 / 缩小 / 复制 / 拖高度。默认原尺寸（清晰），
+   想一屏看全就点「缩小」——等比缩会变小，所以不默认缩。 */
+.mmd-figure{position:relative;margin:18px 0}
+.mmd-bar{
+  position:absolute;top:6px;right:6px;z-index:2;display:flex;gap:4px;
+  opacity:0;transition:opacity var(--duration-fast) var(--ease-out);
+}
+.mmd-figure:hover .mmd-bar,.mmd-figure:focus-within .mmd-bar{opacity:1}
+.mmd-btn{
+  min-width:26px;height:26px;padding:0 7px;
+  border:1px solid var(--color-line-strong);border-radius:6px;
+  background:var(--color-panel);color:var(--color-ink-soft);
+  font:inherit;font-size:12px;line-height:1;cursor:pointer;
+}
+.mmd-btn:hover{color:var(--color-accent);border-color:var(--color-accent-line)}
+.mmd-grip{
+  height:9px;margin-top:-2px;cursor:ns-resize;
+  border-radius:0 0 8px 8px;
+  background:linear-gradient(var(--color-line) 0 1px,transparent 1px) center/100% 9px no-repeat;
+  opacity:0;transition:opacity var(--duration-fast) var(--ease-out);
+}
+.mmd-figure:hover .mmd-grip,.mmd-figure:focus-within .mmd-grip{opacity:1}
+
