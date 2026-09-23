@@ -1323,7 +1323,12 @@ const TKICON={
   star:'<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.2l2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8z"/></svg>',
   starOn:'<svg class="ic ic--fill" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.2l2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8z"/></svg>'
 };
-const $=s=>document.querySelector(s),state={notes:[],edges:[],papers:[],domain:'all',topic:'all',expandedDomains:new Set(),query:'',sort:'title',selected:null,graphFocus:null,panoTab:'matrix',zoom:1,pan:{x:0,y:0},view:'home',notesSignature:'',learningStatus:null};/* 这张表现在只用于图谱配色、domainRank 这类要给领域一个稳定编号的场合，
+const $=s=>document.querySelector(s),state={notes:[],edges:[],papers:[],domain:'all',topic:'all',expandedDomains:new Set(),query:'',sort:'title',selected:null,graphFocus:null,panoTab:'matrix',zoom:1,pan:{x:0,y:0},view:'home',notesSignature:'',learningStatus:null};
+/* 晕动症用户在系统开了「减少动态效果」时，JS 发起的平滑滚动（目录跳转、
+   回首页、矩阵键盘跟手）也必须变成立即定位——CSS 的 reduce 分支拦不住
+   scrollIntoView/scrollTo 显式传的 behavior:'smooth'，必须由调用方查。 */
+const smoothOK=!matchMedia('(prefers-reduced-motion: reduce)').matches,scrollBehavior=()=>smoothOK?'smooth':'auto';
+/* 这张表现在只用于图谱配色、domainRank 这类要给领域一个稳定编号的场合，
    不再参与排序（排序统一走 ordered，按篇数降序）。 */
 const order=['总览','缺陷分析：从个案到体系','AI 系统工程：从模型能力到生产能力','后端系统：在并发、失败与变化中维持服务','数据系统：在并发与故障中保存事实','性能工程：从用户等待到资源瓶颈','软件构建：让变化可以理解、验证与交付','Clippings'],topicOrder={'AI 系统工程：从模型能力到生产能力':['概览','模型基础与训练','模型与上下文','知识与检索','Agent与工作流','推理服务与平台','数据与MLOps','质量与运营','安全与治理','生态与选型'],'后端系统：在并发、失败与变化中维持服务':['概览','服务设计','任务与并发','分布式可靠性','基础设施'],'数据系统：在并发与故障中保存事实':['概览','数据建模与SQL','事务与存储','查询与索引','数据管道与流处理','数据治理','可靠性与运维'],'性能工程：从用户等待到资源瓶颈':['概览','操作系统与运行时','处理器与内存','存储与网络','观测与诊断','性能工程'],'软件构建：让变化可以理解、验证与交付':['概览','语言与运行时','算法与数据结构','架构与代码','开发工具','测试与交付'],'缺陷分析：从个案到体系':['概览','影响判断','复现与回归','稳定性','正确性','并发','配置与可操作','安全','资源与容量','兼容与升级']},colors=['#1a365d','#d97706','#0284c7','#7c3aed','#059669','#dc2626','#64748b'];const esc=TKShell.esc;/* 领域排序：篇数降序，与侧边栏（/api/domains）同源。
  *
@@ -2319,7 +2324,7 @@ function renderReaderRails(note){
   toc.hidden=heads.length===0;
   toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('')+'</ul>';
   /* 目录跳转后焦点随迁到目标标题（tabindex=-1 仅在缺省时补），键盘用户按 Tab 从正文继续，不再弹回目录区。 */
-  toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{e.preventDefault();const t=document.getElementById(a.getAttribute('href').slice(1));if(t){t.scrollIntoView({behavior:'smooth',block:'start'});if(!t.hasAttribute('tabindex'))t.setAttribute('tabindex','-1');t.focus({preventScroll:true})}});
+  toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{e.preventDefault();const t=document.getElementById(a.getAttribute('href').slice(1));if(t){t.scrollIntoView({behavior:scrollBehavior(),block:'start'});if(!t.hasAttribute('tabindex'))t.setAttribute('tabindex','-1');t.focus({preventScroll:true})}});
   /* 【ui4·TOC scrollspy】目录此前只有跳转没有位置反馈：滚到正文中部
      看不出"在读哪一节"。IntersectionObserver 监听各标题，视口上沿
      附近（rootMargin -96px 顶栏高度，-55% 收口带）最后进入的标题即
@@ -2829,7 +2834,7 @@ function applyTransform(){
   if(label)label.textContent=Math.round(state.zoom*100)+'%'
 }
 
-function loadHome(push=false){clearSearch();state.domain='all';state.topic='all';state.selected=null;renderDomains();renderHome();show('home');if(push)history.pushState({},'','/');window.scrollTo({top:0,behavior:'smooth'})}
+function loadHome(push=false){clearSearch();state.domain='all';state.topic='all';state.selected=null;renderDomains();renderHome();show('home');if(push)history.pushState({},'','/');window.scrollTo({top:0,behavior:scrollBehavior()})}
 function selectFromUrl(){const params=new URLSearchParams(location.search),path=params.get('path'),domain=params.get('domain'),topic=params.get('topic');if(path==='知识库首页.md'||path==='知识库首页'||domain==='总览'||topic==='首页'){history.replaceState({},'','/');loadHome(false)}else if(path)openNote(path,false);else if(params.get('view')==='panorama'){state.domain=domain||'all';state.topic=topic||'all';if(params.get('tab')==='stack')state.panoTab='stack';showPanorama(false)}else if(params.get('view')==='graph')showGraph(false);else if(params.get('view')==='progress'){state.panoTab='mine';history.replaceState({},'','/?view=panorama&tab=mine');showPanorama(false)}else if(domain)select(domain,topic||'all',false);else loadHome(false)}
 function showGraph(push=true){clearSearch();state.selected=null;
   /* focus 值先按域匹配（category 精确命中），不命中再按「域/主题」拆开匹配

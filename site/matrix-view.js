@@ -238,7 +238,7 @@
    * #cell=层|型；整行/整列清单另一轴是 null，写 #row=层 / #col=型。 */
   function mountDetail(host, box, L, k) {
     host.appendChild(box);
-    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    box.scrollIntoView({ behavior: scrollBehavior(), block: "nearest" });
     try {
       if (L && k) history.replaceState(null, "", "#cell=" + L.id + "|" + k.id);
       else if (L) history.replaceState(null, "", "#row=" + L.id);
