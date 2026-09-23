@@ -693,7 +693,7 @@
  * （四页切词）只适用中文，详见 base.css 的 .view-head p 注释。 */
 :lang(en) .graph-focus-hint{text-wrap:balance}
 /* 方法说明独立成行：混排时「实现」两字会孤零零挂在主句行尾（实测）。 */
-.graph-method-note{display:block;margin-top:4px;color:var(--color-faint);font-size:var(--text-xs)}.graph-panel{background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px;padding:10px}
+.graph-method-note{display:block;margin-top:4px;color:var(--color-faint);font-size:var(--text-small)}.graph-panel{background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px;padding:10px}
 /* 点击聚焦：点域/主题后，无关的线和点淡出——和 hover 高亮同一套词汇，
  * 但有明确的选中态（aria-pressed），点空白或 Esc 取消。 */
 .graph .edge,.graph .node,.graph .topic-node,.graph .domain-head{transition:opacity var(--duration-fast) var(--ease-out)}
@@ -822,10 +822,12 @@
 @media(prefers-reduced-motion:reduce){.skeleton-bar{animation:none}.digest-chip--refresh i.is-spinning{animation:none}}
 @media(max-width:760px){.skeleton-row{display:block}.skeleton-bar.w40{margin-bottom:8px}}
 @media(max-width:760px){
-/* 阅读工具在窄屏排成三行太占地方。按钮等宽平铺，去掉"打印"
-   （手机上打印没意义，长按即可分享）。 */
+/* 阅读工具在窄屏排成两列等宽网格。后序 .reader-tool/.reader-back/
+   .reader-study 规则（1112/1115/1117）会把这里的 padding 压回 6px，
+   所以高度直接钉在按钮上：44px 达触控标准，网格里整齐等高。 */
 .reader-tools{flex-wrap:wrap;gap:6px}
-.reader-tool,.reader-back,.reader-study{flex:1 1 auto;text-align:center;padding:7px 8px;font-size:var(--text-sm)}
+.reader-tool,.reader-back,.reader-study{flex:1 1 auto;text-align:center;font-size:var(--text-sm)}
+.reader-tool,.reader-back,.reader-study{min-height:44px;padding-top:9px;padding-bottom:9px}
 
 /* 宽表格在手机上会把整个页面撑出横向滚动条。让表格自己滚。 */
 .reader-body table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
@@ -846,6 +848,12 @@
    relation-collapse 用两级选择器：单类版本定义在本块之后，同特异性会输。 */
 .rail-toggle{width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel)}
 .article-relations-head .relation-collapse{width:32px;height:32px}
+/* 触屏上折叠钮热区提到 40px（graph-tool 手机档同标准）：宽高直接提到
+   40，视觉仍是同款描边小方钮，不引入透明命中区避免压到下方卡片。 */
+@media (pointer: coarse) {
+  .rail-toggle{width:40px;height:40px}
+  .article-relations-head .relation-collapse{width:40px;height:40px}
+}
 /* 首页「学习与实践」段落里的内联链接（学习中心）：19px 高的裸文本在
    手机上点不中，补边框与内边距成按钮。桌面不受影响。 */
 .section > p a[target="_blank"]{display:inline-block;padding:6px 10px;margin:2px 0;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel)}
@@ -1160,7 +1168,7 @@ kbd{display:inline-block;min-width:20px;padding:2px 6px;border:1px solid var(--c
 .home:empty::before{content:'正在加载知识库...';display:block;padding:48px 0;color:var(--color-muted);font-size:var(--text-md)}
 html[data-lang="en"] .home:empty::before{content:'Loading the library...'}
 .domain-card:focus-visible,.note-row:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
-@media(max-width:760px){.app-alert{right:15px;bottom:15px}.reader-tools{justify-content:flex-start;flex-wrap:wrap}.reader-back,.reader-study,.reader-tool{flex:1 1 150px;text-align:center}/* 下载/标记钮同规则换行，避免一行挤出容器右缘 */}
+@media(max-width:760px){.app-alert{right:15px;bottom:15px}.reader-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}.reader-back,.reader-study,.reader-tool{flex:none;text-align:center}/* 四钮两列等宽网格：返回/学习不再与下载/已读宽度参差，热区随内边距到 44px */}
 @media(max-width:760px){}
 :root[data-theme="dark"] .topbar{background:rgba(19,26,24,.94)!important}
 :root[data-theme="dark"] .reader-body th,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .count,:root[data-theme="dark"] .reader-body .code-block,:root[data-theme="dark"] .reader-body pre.mermaid,:root[data-theme="dark"] .graph-panel svg{background-color:var(--color-surface)!important}
@@ -1210,7 +1218,7 @@ a:hover { text-decoration: none; }
 /* 【rt22b 用户报告修复】文章页"知识图谱/同模块"区：标题原 13px 带 .06em 字距、计数与"同模块"标签原 11px（micro 档，tokens.css 注释明确"只用于图形/角标，不做文字"，属 token 误用）——分别升 --text-body(16px) 与 --text-small(13px)；.article-relations 原上下双 border 夹小字成细线三明治——去 border-top 只留 border-bottom 与下方同模块区共用一条分隔线。备份 .design/backup-index-rt22b.html */.search{max-width:480px;flex:0 1 480px;margin-left:auto;margin-right:118px}.topbar .reader-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none;margin:0 118px 0 12px}@media(max-width:760px){.topbar .reader-tools{margin:0}}/* 手机端无固定钮占位，118px 让位边距会把按钮行顶出容器 */.topbar .reader-back,.topbar .reader-study{white-space:nowrap}.article-relations{border-bottom:1px solid var(--color-line);padding:11px 0 12px;margin:16px 0}.article-relations-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.article-relations-heading{display:flex;align-items:baseline;gap:9px;min-width:0}.article-relations-head h3{margin:0;font-size:var(--text-body)}.article-relations-head span{color:var(--color-muted);font-size:var(--text-small)}.relation-collapse{width:28px;height:28px;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-muted);cursor:pointer;font-size:var(--text-md);line-height:1}.relation-collapse:hover{border-color:var(--color-accent);background:var(--color-accent-soft);color:var(--color-accent)}.relation-graph{display:block;width:100%;height:245px;overflow:visible}/* rt16 高度 205→245：配合两行卡（66px 卡高 + 78 间距）的 viewBox 250，原 205 裁掉三卡纵排底部。 *//* 连线语义就是"分隔线"，用边框 token：暗色下自动换成 #475569，
    不再像硬编码浅灰绿那样在深底上消失。 */
 .relation-edge{stroke:var(--color-line-strong);stroke-width:1.5;fill:none}/* 入链比延伸淡一档，保持两类边的区分。 */
-.relation-edge.incoming{stroke:var(--color-faint)}.relation-node{cursor:pointer}.relation-node rect{fill:var(--color-panel);stroke:var(--color-line);stroke-width:1.2}.relation-node.current rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.5}.relation-node:hover rect,.relation-node:focus rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.8}.relation-node .relation-node-title{fill:var(--color-ink);font-size:var(--text-sm);font-weight:700}.relation-node .relation-node-meta{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:600}.relation-node.current .relation-node-meta{fill:var(--color-accent)}.relation-label{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.04em}.article-relations.collapsed .relation-graph{display:none}.article-relations.collapsed{padding-bottom:10px}@media(max-width:760px){.topbar{flex-wrap:wrap}.topbar .search{order:1;max-width:none;flex:1 0 100%}.topbar .reader-tools{order:2;width:100%;justify-content:space-between}.topbar .reader-back,.topbar .reader-study{flex:1;text-align:center}.relation-graph{height:390px}.article-relations-heading{align-items:flex-start;flex-direction:column;gap:1px}}
+.relation-edge.incoming{stroke:var(--color-faint)}.relation-node{cursor:pointer}.relation-node rect{fill:var(--color-panel);stroke:var(--color-line);stroke-width:1.2}.relation-node.current rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.5}.relation-node:hover rect,.relation-node:focus rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.8}.relation-node .relation-node-title{fill:var(--color-ink);font-size:var(--text-sm);font-weight:700}.relation-node .relation-node-meta{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:600}.relation-node.current .relation-node-meta{fill:var(--color-accent)}.relation-label{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.04em}.article-relations.collapsed .relation-graph{display:none}.article-relations.collapsed{padding-bottom:10px}@media(max-width:760px){.topbar{flex-wrap:wrap}.topbar .search{order:1;max-width:none;flex:1 0 100%}.topbar .reader-tools{order:2;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:8px}.topbar .reader-back,.topbar .reader-study,.topbar .reader-tool{flex:none;text-align:center}.relation-graph{height:390px}.article-relations-heading{align-items:flex-start;flex-direction:column;gap:1px}}
 .topbar .theme-toggle{width:auto;min-width:36px;height:36px;margin:0;padding:0 12px;border:1px solid var(--color-line);border-radius:6px;background:var(--color-panel);color:var(--color-muted);font-size:var(--text-lg);cursor:pointer;flex-shrink:0}.topbar .theme-toggle:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}
 .radar-badge{position:relative;border:2px solid var(--color-warm);background:linear-gradient(135deg,var(--color-warm-soft) 0%,rgba(250,243,232,.3) 100%);border-radius:7px;padding:9px 11px;margin:8px 8px 4px;cursor:pointer;transition:all var(--duration-fast) var(--ease-out);box-shadow:0 2px 8px rgba(168,95,45,.15)}
 .radar-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(168,95,45,.25);border-color:var(--color-warm)}

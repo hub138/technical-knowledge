@@ -1809,6 +1809,15 @@ body.tk-host button {
   width: 26px; height: 26px; padding: 0; border-radius: 50%;
   justify-content: center; margin-left: 0; align-self: center;
 }
+/* 触屏热区扩展：26px 圆钮透明命中区外扩 7px 补到 40px，与 .tk-fav-btn
+   同一机制。hero 有字胶囊文字态同样 26px 高，一并覆盖。 */
+@media (pointer: coarse) {
+  .digest-feature-btn::before,
+  .digest-item .digest-feature-btn::before {
+    content: ""; position: absolute; top: -7px; left: -7px; right: -7px; bottom: -7px; border-radius: 50%;
+  }
+  .digest-feature-btn { position: relative; }
+}
 .tk-fav-panel { max-width: 420px; }
 .tk-fav-text { color: var(--color-ink-soft); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
 .tk-fav-overlay .tk-fav-confirm { border-color: var(--color-accent-line); background: var(--color-accent); color: var(--color-on-accent); }
