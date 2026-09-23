@@ -24,6 +24,12 @@ tags:
 
 任期（term）是逻辑时钟：每个 term 至多一个 leader，term 单调递增。节点随机超时（150-300ms）触发选举：自增 term、投自己一票、广播 RequestVote。获得多数票即任 leader。随机超时把竞选者错开，避免选票分裂的活锁；term 单调保证旧 leader 复辟不可能——它的 term 落后，任何节点见了都拒绝。
 
+leader 被隔离、失去多数派、新 leader 在多数派侧当选的完整过程，etcd 官方文档画成两幅对照：
+
+![etcd 官方文档 Figure 3：leader 被隔离后新 leader 当选](https://etcd.io/docs/v3.5/learning/img/server-learner-figure-03.png)
+
+上图取自 [etcd 官方文档的学习设计页](https://etcd.io/docs/v3.5/learning/design-learner/)：上幅旧 leader 失去 quorum 停止推进，下幅多数派侧选出新 leader，旧 leader 见到更高 term 自动降级，与上文 term 单调的叙述逐条对应。
+
 ## 机制二：日志复制
 
 leader 接收客户端写，本地追加日志，并行发给所有 follower；收到多数派确认后 commit 并应用，随后通知 follower commit。两阶段里 commit 点是关键：日志被多数派持久化才算 committed，leader 崩溃后新 leader 必然包含所有 committed 日志（选举限制：只有最新日志的候选人能赢），这就是已提交数据不丢的机制保证。
@@ -39,6 +45,12 @@ leader -> followers: AppendEntries(term=3, prevLogIndex=6)
 
 - Election Safety：每个 term 至多一个 leader（一票制 + term 单调）。
 - Leader Completeness：新 leader 拥有所有 committed 日志（投票时比较日志新旧，只投给不比自己旧的候选人）。
+
+Raft 论文 Figure 2 把状态字段、两个 RPC 与服务器规则浓缩成一张规范卡，实现时逐条核对用：
+
+![Raft 论文 Figure 2：状态字段、RequestVote 与 AppendEntries 规则浓缩卡](https://cdn.jsdelivr.net/gh/maemual/raft-zh_cn@master/images/raft-图2.png)
+
+上图是 [Raft 论文中文版仓库](https://github.com/maemual/raft-zh_cn)收录的论文 Figure 2，与本地伪代码逐条对应，nextIndex 回退在图的 Followers 规则里。
 
 违反任一不变量的实现 bug 都表现为脑裂或丢数据——这正是 [[工程知识/后端系统：在并发、失败与变化中维持服务/分布式可靠性/一致性模型与共识解决不同问题]] 讲的"共识解决什么"的实现面。
 
