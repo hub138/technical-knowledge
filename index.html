@@ -393,10 +393,10 @@
   color:var(--color-faint);font-size:var(--text-xs);
   white-space:nowrap;overflow:hidden;
 }
-/* 来源名完整显示：它是判断内容质量的信号，flex:none 不收缩，截字母是实测翻车点。
- * 空间压力全部由 facts 承担（先 ellipsis 后消失）；紧凑行里的钉选钮是 26px 圆形
- * 图标钮（见 base.css），不给这行添宽度压力。 */
-.digest-item-meta .digest-source{color:var(--color-ink-soft);font-weight:var(--weight-medium);flex:none}
+/* 来源名吃掉剩余空间（grow），两个按钮成对靠右；超长刊名收缩截尾是
+ * 最后的让位项——按钮完整 > 极端长名的尾巴（实测：仅 22 字符英文刊名
+ * 这一行截尾约 3 字符，其余行完整）。 */
+.digest-item-meta .digest-source{color:var(--color-ink-soft);font-weight:var(--weight-medium);flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .digest-item-meta .digest-facts{flex:0 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .digest-item-meta .digest-facts{font-variant-numeric:tabular-nums}
 .digest-item-meta .digest-score-inline{
@@ -404,7 +404,7 @@
   font-variant-numeric:tabular-nums;
 }
 /* 收藏星标在紧凑行里贴右，不占标题行宽度 */
-.digest-item .tk-fav-btn{flex:none;margin-left:auto;align-self:center}
+.digest-item .tk-fav-btn{flex:none;align-self:center;margin-left:0}
 /* 公众号头像通用：圆角方图 */
 .digest-icon{border-radius:50%;object-fit:cover;flex:none;background:var(--color-surface)}
 .digest-source{color:var(--color-ink-soft);font-weight:var(--weight-medium)}
@@ -1624,9 +1624,9 @@ function renderDigest(items, status) {
       </span>
     </a>`;
   const listRows = restItems.map((item) => {
-    const facts = [];
-    if (item.read_minutes) facts.push(window.TKI18N&&window.TKI18N.lang==='en'?`~${item.read_minutes}m`:`${item.read_minutes} 分钟`);
-    if (item.published_full) facts.push(item.published_full.slice(5));
+    /* 紧凑行不再显示时间/字数：大图上已有完整的字数与阅读时长，这行的
+     * facts 只会把来源名和行尾两个按钮挤出可视区（实测：加常驻钉选钮后
+     * 溢出约 15px，被 overflow:hidden 裁掉半截按钮）。让位给按钮与来源名。 */
     TKShell.favorites.register(item.__fid, item);
     return `<a class="digest-item" href="${esc(item.url)}" target="_blank" rel="noopener noreferrer">
       ${item.cover
@@ -1637,7 +1637,6 @@ function renderDigest(items, status) {
         <span class="digest-item-meta">
           ${item.score ? `<i class="digest-score-inline">${esc(item.score)}</i>` : ''}
           ${item.source ? `<span class="digest-source">${esc(item.source)}</span>` : ''}
-          ${facts.length ? `<span class="digest-facts">${esc(facts.join(' · '))}</span>` : ''}
           <button type="button" class="tk-fav-btn${item.__fav ? ' is-fav' : ''}" data-fav-id="${esc(item.__fid)}" aria-label="${item.__fav ? '取消收藏' : '收藏'}" title="${item.__fav ? '取消收藏' : '收藏'}">${item.__fav ? TKICON.starOn : TKICON.star}</button>
           ${operator && item.url !== featuredId ? `<button type="button" class="digest-feature-btn" data-feature="${esc(item.url || '')}" title="设为头条">${TKICON.pin}</button>` : ''}
         </span>
