@@ -38,6 +38,9 @@
   const DICT = {
     // ── Navigation ──
     "知识库": { en: "Knowledge" },
+    "变化快": { en: "changes fast" },
+    "变化中等": { en: "changes moderately" },
+    "变化慢": { en: "changes slowly" },
 
     // ── Graph controls ──
     "关系网络": { en: "Relations" },
