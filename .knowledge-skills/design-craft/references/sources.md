@@ -12,6 +12,7 @@
 | `theme-factory` | 10 套成套主题（配色 + 字体配对），换风格时从 `themes/` 取成套方案，不要自己单点调色 |
 | `canvas-design` | 视觉哲学的写法（先立意再画），做海报/头图类单幅视觉时用它 |
 | `icon-designer` | 16 条图标规范（统一视角色板、正面视角、禁描边/投影/发光），生成图标时用它 |
+| `archify`（本机与 dev 都装） | 画图判断与验收的来源：五类图路由、主路径唯一、边标签语义、validate→deliver→visual-check 三关验收；工具本体与 schema 归它，本技能 `references/diagrams.md` 只沉淀判断标准 |
 
 `ui-ux-pro-max` 检索示例：
 

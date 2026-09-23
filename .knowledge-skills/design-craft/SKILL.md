@@ -31,6 +31,7 @@ description: 好设计的成熟规矩——视觉层级、排版尺度、间距�
 | 配色 / 语义色 / 深浅主题 / 对比度 | `references/color-theme.md` |
 | hover / focus / 当前态 / 禁用 / 动效 / 加载空错态 | `references/states-motion.md` |
 | 页面文案 / 标语 / 说明文字 | `references/wording.md` |
+| 架构 / 流程 / 时序 / 数据流 / 状态机配图 | `references/diagrams.md`（工具用 archify skill，本篇管判断与验收） |
 | 交付前自检、觉得不对但说不清 | `references/review-checklist.md` |
 | 找外部标杆、查某条规则的出处 | `references/sources.md` |
 
@@ -48,4 +49,4 @@ description: 好设计的成熟规矩——视觉层级、排版尺度、间距�
 
 ## 参考文件
 
-`references/hierarchy-typography.md` · `spacing-layout.md` · `color-theme.md` · `states-motion.md` · `wording.md` · `review-checklist.md` · `sources.md`
+`references/hierarchy-typography.md` · `spacing-layout.md` · `color-theme.md` · `states-motion.md` · `wording.md` · `diagrams.md` · `review-checklist.md` · `sources.md`
