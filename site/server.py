@@ -647,6 +647,16 @@ def count_words(body: str) -> int:
     return cjk + latin
 
 
+def display_label(value: str) -> str:
+    """来源/标签的展示清洗：去掉 Obsidian Templater 占位符等机器痕迹。
+
+    模板笔记的 title 含 {{date:YYYY-MM-DD}} 这类占位符，用文章标题
+    展示时它们是泄漏的机器文本，对读者没有任何含义。截到第一个
+    {{ 处，剩余部分（"每日外部更新"）才是给人看的名字。
+    """
+    return value.split("{{", 1)[0].strip()
+
+
 def excerpt(body: str, title: str) -> str:
     in_fence = False
     for raw in body.splitlines():
@@ -1654,16 +1664,33 @@ def render_inline(source: str, vault: Vault, current: str) -> str:
             label = explicit_label or target
             return token(f'<span class="unresolved">[[{html.escape(label)}]]</span>')
         note = vault.note(resolved) or {}
-        label = explicit_label or str(note.get("title") or Path(resolved).stem)
+        label = explicit_label or display_label(str(note.get("title") or "")) or Path(resolved).stem
         return token(f'<a data-note="{html.escape(resolved, quote=True)}" href="/?path={quote(resolved)}">{html.escape(label)}</a>')
 
     source = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", image, source)
+    source = re.sub(r"`([^`]+)`", lambda m: token(f"<code>{html.escape(m.group(1))}</code>"), source)
     source = WIKILINK_RE.sub(wiki, source)
     source = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", link, source)
-    source = re.sub(r"`([^`]+)`", lambda m: token(f"<code>{html.escape(m.group(1))}</code>"), source)
     escaped = html.escape(source)
     escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
     escaped = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<em>\1</em>", escaped)
+    # 白名单 iframe：剪藏的正文允许嵌 B 站播放器。整段转义后按转义形态识别，
+    # src 必须以 https://player.bilibili.com/ 开头，其余属性全部丢弃重建，
+    # 原文里混不进任何事件属性。CSP frame-src 是第二道闸，两边要对得上。
+    def iframe_token(match: re.Match[str]) -> str:
+        src_match = re.search(r'src=&quot;((?:[^&"]|&(?!quot;))*)&quot;', match.group(0))
+        if not src_match:
+            return match.group(0)
+        src = html.unescape(html.unescape(src_match.group(1)))
+        if not src.startswith("https://player.bilibili.com/"):
+            return match.group(0)
+        return token(
+            f'<div class="video-embed"><iframe src="{html.escape(src, quote=True)}" '
+            'title="Bilibili video player" frameborder="0" allowfullscreen '
+            'loading="lazy"></iframe></div>'
+        )
+
+    escaped = re.sub(r"&lt;iframe\b[^&]*(?:&(?!gt;)[^&]*)*&gt;&lt;/iframe&gt;", iframe_token, escaped)
     for key, value in tokens.items():
         escaped = escaped.replace(html.escape(key), value)
     return escaped
@@ -1998,7 +2025,7 @@ class Handler(BaseHTTPRequestHandler):
             "default-src 'self'; base-uri 'self'; form-action 'self'; "
             "frame-ancestors 'self'; img-src 'self' data: https:; "
             "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; "
-            "connect-src 'self'",
+            "connect-src 'self'; frame-src https://player.bilibili.com",
         )
         if download:
             # 中文文件名不能直接放进头（头是 latin-1），必须用 RFC 5987 的
