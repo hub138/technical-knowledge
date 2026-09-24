@@ -15,8 +15,9 @@
  * 完全不是一个节奏（2026-09-24 用户反馈）。20px 取全站「头部结束到内容
  * 开始」的规范值（base.css .view-head 同值）。 */
 .pano-intro { margin: 32px 0 18px; }
-/* 段间距 4px：导语是「一组说明」（规则/警示/操作），段间 4px 保持整体感，
- * 与 matrix.css .mx-intro p 的段距同一档。 */
+/* 段间距 6px：导语是「一组说明」（规则/警示/操作），段距小于行距，读起来
+ * 是一块而不是四句。原本 4px 是跟 matrix.css .mx-intro p 对齐的档位，
+ * 降到 13px 后四行几乎黏在一起（knot 看图反馈），放到 6px 更透气。 */
 /* 字号 --text-note(17px) → --text-small(13px)：同页两个 tab 差两档字号，
  * 覆盖矩阵那侧的辅助文字（类型筛选标签）是 13px，八层栈却用 17px 铺满
  * 1032px，看起来像另一套页面（2026-09-24 用户反馈「字体差的字号有点多、
@@ -25,7 +26,7 @@
  * 「读长句略吃力」）。放宽行距比加大字号更划算 —— 字号留在规范档，
  * 与矩阵侧的辅助文字同档，块面轻而不挤。 */
 .pano-intro p {
-  margin: 0 0 4px; font-size: var(--text-small); line-height: 1.85; color: var(--color-ink-soft);
+  margin: 0 0 6px; font-size: var(--text-small); line-height: 1.85; color: var(--color-ink-soft);
   max-width: 900px;
 }
 .pano-intro p:last-child { margin-bottom: 0; }
