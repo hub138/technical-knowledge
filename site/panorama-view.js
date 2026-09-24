@@ -35,6 +35,18 @@
   var W = 1000, H = 700;
   var RMAX = 172;
   var GOLD = 2.399963229728653;
+  /* 螺旋采样的步长（相邻候选点的间距，px）与质量回退开关。
+   * 八层栈一次要放 449 个小圆 + 8 个大圆，候选点数 ∝ (搜索半径/步长)²：
+   * 步长写死 1.15 时合计上千万个点，每个都要开方 + 三角函数 + 碰撞检测
+   * —— 2026-09-24 实测点开八层栈同步阻塞 1.6 秒（dev 上单次 render
+   * 687~975ms），CPU profile 里 spiralPlace 独占 21.5%，其余函数全在
+   * 0.1% 以下。圆之间本来留 16px 间隙（pad），1.15px 采样远远过密。
+   *
+   * 所以默认用 2.6 的粗步长（候选点降到约 1/5）。但粗步长会让个别层
+   * 塞不下：这时会退化到"网格兜底"，方形网格的角点落到父圆外面
+   * （实测 12 个小圆散在父圆外 19px）。所以任何一轮铺不下就切回
+   * STEP_FINE（原版取值）重铺 —— 快路径负责快，慢路径保证质量与原版一致。 */
+  var STEP = 1.8, STEP_FINE = 1.15, FINE = false;
 
   /* 八层身份色：只用于圆的 fill（面积身份），不再用于文字 fill。
    * 文字颜色由 panorama.css 的类规则驱动（见 draw() 里 pano-g-* 系注释）。
@@ -88,6 +100,44 @@
     return { layers: layers, total: total };
   }
 
+  /* ── 布局缓存 ─────────────────────────────────────────────────
+   * 圆堆积是纯计算：449 个小圆 × 上万候选点。数据没变时重算纯属浪费 ——
+   * 切走再切回八层栈、切中英文、轮询触发重绘都会再算一遍（实测一次
+   * 四百多毫秒）。这里按「数据签名 + 画布尺寸」缓存一次结果，命中直接复用。 */
+  var packCache = null, cacheSig = "";
+  function dataSig(notes) {
+    var h = 5381, i;
+    for (i = 0; i < notes.length; i++) h = ((h * 33) ^ (notes[i].path || "").length) | 0;
+    return notes.length + ":" + h;
+  }
+  /* 父圆（8 个）与子圆（449 个）分开算：父圆同步完成、立刻可画，
+   * 子圆放到下一帧补。命中缓存时两者一起恢复，跳过全部计算。 */
+  function ensureParents(notes) {
+    cacheSig = dataSig(notes) + ":" + W + "x" + H;
+    if (packCache && packCache.sig === cacheSig) {
+      groups = packCache.groups; leaves = packCache.leaves; dropped = packCache.dropped;
+      return true;
+    }
+    leaves = []; dropped = 0;
+    packParents();
+    return false;
+  }
+  function ensureLeaves() {
+    if (packCache && packCache.sig === cacheSig) return true;
+    packLeaves();
+    packCache = { sig: cacheSig, groups: groups, leaves: leaves, dropped: dropped };
+    return false;
+  }
+  function legendHTML() {
+    return EN()
+      ? 'Big circle area = notes in the layer　·　small circle area = words per note　·　' +
+        '<span style="color:#dc2626;font-weight:700">red dashed</span> = gap layer (&lt;10 notes)' +
+        (dropped > 0 ? '　·　⚠ ' + dropped + ' not drawn' : '')
+      : '大圆面积 = 该层篇数　·　小圆面积 = 单篇字数　·　' +
+        '<span style="color:#dc2626;font-weight:700">红色虚线</span> = 缺口层（&lt;10 篇）' +
+        (dropped > 0 ? '　·　⚠ ' + dropped + ' 篇未画出' : '');
+  }
+
   /* ── 父圆：面积 ∝ 篇数 ─────────────────────────────────────────── */
   /* 整包尝试，谁放不下返回 null，由外层等比缩小后重来。
    * 等比缩放保住"面积 ∝ 篇数"（面积比不变）。此前内容涨到 449 篇后，
@@ -126,13 +176,16 @@
 
   function packParents() {
     groups = [];
+    FINE = false;
     var placed = null, scale = 1;
     /* 总圆面积随 scale 二次方收缩，画布不变，必然存在能放下的 scale；
      * spiralPlace 首拟合法在面积占比 ≤ 55% 左右必成功，几次内收敛。 */
     while (!placed) {
       placed = tryPack(scale);
-      if (!placed) scale *= 0.9;
+      /* 粗步长铺不下就切回精细步长：原版取值下这轮必然成功，循环不会空转 */
+      if (!placed) { scale *= 0.9; if (scale < 0.8) FINE = true; }
     }
+    FINE = false;
     groups = placed.map(function (g) {
       return {
         layer: g.layer, r: g.r, x: g.x, y: g.y,
@@ -165,7 +218,10 @@
       var inner = [], ok = false, guard = 0;
       var k = g.r * Math.sqrt(FILL / sumL);
       var RMIN = 1.9;
+      FINE = false;
       while (!ok && guard++ < 40) {
+        /* 前几轮用粗步长（快）；铺不下就切精细步长，保证不退化到网格兜底 */
+        if (guard > 5) FINE = true;
         inner = []; ok = true;
         for (var i = 0; i < items.length; i++) {
           var r = Math.max(RMIN, Math.sqrt(Math.max(items[i].l, 1)) * k);
@@ -196,12 +252,17 @@
   /* 黄金角螺旋找位：第一个不重叠又不越界的点就放下。
      出来的形状就是熟悉的气泡堆积感。 */
   function spiralPlace(r, placed, cx, cy, limit, insideOnly) {
-    var pad = 1.1;
+    /* pad 不能小：组标签胶囊（ty-12 起，最高 51px）画在父圆上缘并向
+       外冒头。间距小于冒头量时，胶囊直接压到相邻圆的气泡上（实测：
+       1.1px 时「应用与架构」胶囊盖住「操作系统与运行时」圆顶）。
+       16px = 画布边距 8 × 2 + 估算余量，标签冒头 ≤10px 时双主题目测干净。 */
+    var pad = 16;
     var maxRad = limit - r - pad;
     if (maxRad < 0) return { x: null, y: null };
-    var steps = Math.ceil(Math.pow(maxRad / 1.15, 2)) + 400;
+    var step = FINE ? STEP_FINE : STEP;
+    var steps = Math.ceil(Math.pow(maxRad / step, 2)) + 400;
     for (var t = 0; t < steps; t++) {
-      var rad = 1.15 * Math.sqrt(t);
+      var rad = step * Math.sqrt(t);
       if (rad > maxRad) break;
       var ang = t * GOLD;
       var x = cx + Math.cos(ang) * rad, y = cy + Math.sin(ang) * rad;
@@ -216,6 +277,31 @@
       return { x: x, y: y };
     }
     return { x: null, y: null };
+  }
+
+  /* 子圆单独成函数：两阶段渲染时第二帧只补这一层，不必重建整张 SVG。 */
+  function drawLeaves(lWrap) {
+    leaves.forEach(function (p) {
+      var g = svg("g", { class: "pano-node", "data-layer": p.layer.id });
+      g.appendChild(svg("title", null, p.item.t + "（" + p.item.l + " 字）"));
+      g.appendChild(svg("circle", {
+        cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: p.r.toFixed(1),
+        fill: p.g.col, "fill-opacity": 0.7,
+        /* 描边 #fff 写死在黑夜主题是刺眼白圈；currentColor 跟文字前景，
+           双主题下都是"贴色描边"的观感。缺口层描边保持警示红。 */
+        stroke: p.g.thin ? "#dc2626" : "currentColor",
+        "stroke-width": p.g.thin ? 0.9 : 0.55
+      }));
+      g.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        /* 八层栈是主站页内视图：派发给 index 的 SPA 路由打开文章。
+           location.href 整页跳转会冲掉侧栏展开态（子主题实测过）。 */
+        document.dispatchEvent(new CustomEvent("tk:pano-open", { detail: { path: p.item.p } }));
+      });
+      g.addEventListener("mouseenter", function () { showTip(p); });
+      g.addEventListener("mouseleave", hideTip);
+      lWrap.appendChild(g);
+    });
   }
 
   /* ── 绘制 ──────────────────────────────────────────────────────── */
@@ -299,27 +385,7 @@
       gWrap.appendChild(grp);
     });
 
-    leaves.forEach(function (p) {
-      var g = svg("g", { class: "pano-node", "data-layer": p.layer.id });
-      g.appendChild(svg("title", null, p.item.t + "（" + p.item.l + " 字）"));
-      g.appendChild(svg("circle", {
-        cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: p.r.toFixed(1),
-        fill: p.g.col, "fill-opacity": 0.7,
-        /* 描边 #fff 写死在黑夜主题是刺眼白圈；currentColor 跟文字前景，
-           双主题下都是"贴色描边"的观感。缺口层描边保持警示红。 */
-        stroke: p.g.thin ? "#dc2626" : "currentColor",
-        "stroke-width": p.g.thin ? 0.9 : 0.55
-      }));
-      g.addEventListener("click", function (ev) {
-        ev.stopPropagation();
-        /* 八层栈是主站页内视图：派发给 index 的 SPA 路由打开文章。
-           location.href 整页跳转会冲掉侧栏展开态（子主题实测过）。 */
-        document.dispatchEvent(new CustomEvent("tk:pano-open", { detail: { path: p.item.p } }));
-      });
-      g.addEventListener("mouseenter", function () { showTip(p); });
-      g.addEventListener("mouseleave", hideTip);
-      lWrap.appendChild(g);
-    });
+    drawLeaves(lWrap);
 
     host.appendChild(root);
   }
@@ -503,19 +569,24 @@
     var stage = el("div", "pano-stage");
     host.appendChild(stage);
 
-    packParents();
-    packLeaves();
+    /* 两阶段渲染：父圆只有 8 个，几毫秒算完；449 个子圆要算几百毫秒。
+     * 先让浏览器把父圆 + 导语画出来（点开就有图，不是一片空白干等），
+     * 下一帧再算子圆补进去 —— 感知的「打开」快了，总计算量不变。 */
+    var full = ensureParents(notes);
     draw(stage);
 
     var lg = el("p", "pano-legend");
-    lg.innerHTML = EN()
-      ? 'Big circle area = notes in the layer　·　small circle area = words per note　·　' +
-        '<span style="color:#dc2626;font-weight:700">red dashed</span> = gap layer (&lt;10 notes)' +
-        (dropped > 0 ? '　·　⚠ ' + dropped + ' not drawn' : '')
-      : '大圆面积 = 该层篇数　·　小圆面积 = 单篇字数　·　' +
-        '<span style="color:#dc2626;font-weight:700">红色虚线</span> = 缺口层（&lt;10 篇）' +
-        (dropped > 0 ? '　·　⚠ ' + dropped + ' 篇未画出' : '');
+    lg.innerHTML = legendHTML();
     host.appendChild(lg);
+
+    if (!full) {
+      requestAnimationFrame(function () {
+        ensureLeaves();
+        var lWrap = stage.querySelector(".pano-leaves");
+        if (lWrap) drawLeaves(lWrap);
+        lg.innerHTML = legendHTML();   /* 「N 篇未画出」要等子圆算完才知道 */
+      });
+    }
 
     renderNote(host);
     hideTip();
