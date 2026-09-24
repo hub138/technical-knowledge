@@ -1,5 +1,5 @@
 ---
-title: 案例八：承诺没有兑现——Pulsar 里六个永不返回的请求
+title: 承诺没有兑现——Pulsar 里六个永不返回的请求
 status: active
 type: guide
 updated: 2026-09-20

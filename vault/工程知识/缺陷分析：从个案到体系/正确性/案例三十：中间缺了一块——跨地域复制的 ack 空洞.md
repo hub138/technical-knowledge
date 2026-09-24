@@ -1,5 +1,5 @@
 ---
-title: 案例三十：中间缺了一块——跨地域复制的 ack 空洞
+title: 中间缺了一块——跨地域复制的 ack 空洞
 status: active
 type: guide
 updated: 2026-09-21

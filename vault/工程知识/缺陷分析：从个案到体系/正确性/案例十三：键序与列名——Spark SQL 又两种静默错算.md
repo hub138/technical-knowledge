@@ -1,5 +1,5 @@
 ---
-title: 案例十三：键序与列名——Spark SQL 又两种静默错算
+title: 键序与列名——Spark SQL 又两种静默错算
 status: active
 type: guide
 updated: 2026-09-20

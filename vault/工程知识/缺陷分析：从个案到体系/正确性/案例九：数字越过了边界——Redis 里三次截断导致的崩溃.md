@@ -1,5 +1,5 @@
 ---
-title: 案例九：数字越过了边界——Redis 里三次截断导致的崩溃
+title: 数字越过了边界——Redis 里三次截断导致的崩溃
 status: active
 type: guide
 updated: 2026-09-20

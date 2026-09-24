@@ -1,5 +1,5 @@
 ---
-title: 案例十：类型说谎时——静默删数据的 TTL 与算错的比较
+title: 类型说谎时——静默删数据的 TTL 与算错的比较
 status: active
 type: guide
 updated: 2026-09-20

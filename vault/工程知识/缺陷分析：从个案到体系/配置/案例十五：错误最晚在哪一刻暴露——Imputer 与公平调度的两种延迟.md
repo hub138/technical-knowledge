@@ -1,5 +1,5 @@
 ---
-title: 案例十五：错误最晚在哪一刻暴露——Imputer 与公平调度的两种延迟
+title: 错误最晚在哪一刻暴露——Imputer 与公平调度的两种延迟
 status: active
 type: guide
 updated: 2026-09-20

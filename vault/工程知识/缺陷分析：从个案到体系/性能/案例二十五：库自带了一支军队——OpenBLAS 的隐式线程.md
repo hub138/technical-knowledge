@@ -1,5 +1,5 @@
 ---
-title: 案例二十五：库自带了一支军队——OpenBLAS 的隐式线程
+title: 库自带了一支军队——OpenBLAS 的隐式线程
 status: active
 type: guide
 updated: 2026-09-21

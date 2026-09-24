@@ -1,5 +1,5 @@
 ---
-title: 案例六：容量与泄漏——连接泄漏和 SST 堆积
+title: 容量与泄漏——连接泄漏和 SST 堆积
 status: active
 type: guide
 updated: 2026-09-20

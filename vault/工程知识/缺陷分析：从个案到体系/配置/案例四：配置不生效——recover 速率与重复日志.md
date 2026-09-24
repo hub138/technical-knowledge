@@ -1,5 +1,5 @@
 ---
-title: 案例四：配置不生效——recover 速率与重复日志
+title: 配置不生效——recover 速率与重复日志
 status: active
 type: guide
 updated: 2026-09-20

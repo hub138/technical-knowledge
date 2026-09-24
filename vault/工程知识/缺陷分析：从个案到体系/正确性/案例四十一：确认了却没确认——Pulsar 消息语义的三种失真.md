@@ -1,5 +1,5 @@
 ---
-title: 案例四十一：确认了却没确认——Pulsar 消息语义的三种失真
+title: 确认了却没确认——Pulsar 消息语义的三种失真
 status: active
 type: guide
 updated: 2026-09-21

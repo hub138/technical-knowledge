@@ -1,5 +1,5 @@
 ---
-title: 案例十六：数据被自己人删掉——entry log 头里的假账
+title: 数据被自己人删掉——entry log 头里的假账
 status: active
 type: guide
 updated: 2026-09-21

@@ -1,5 +1,5 @@
 ---
-title: 案例三十六：写被自己的回调堵住——挂起的 add 回调
+title: 写被自己的回调堵住——挂起的 add 回调
 status: active
 type: guide
 updated: 2026-09-21

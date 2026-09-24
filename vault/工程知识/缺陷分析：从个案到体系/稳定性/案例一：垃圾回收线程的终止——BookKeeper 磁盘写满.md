@@ -1,5 +1,5 @@
 ---
-title: 案例一：垃圾回收线程的终止——BookKeeper 磁盘写满
+title: 垃圾回收线程的终止——BookKeeper 磁盘写满
 status: active
 type: guide
 updated: 2026-09-20

@@ -1,5 +1,5 @@
 ---
-title: 案例三十九：身份在改写中丢失——RLS 子查询与视图 DEFAULT 的静默失真
+title: 身份在改写中丢失——RLS 子查询与视图 DEFAULT 的静默失真
 status: active
 type: guide
 updated: 2026-09-21

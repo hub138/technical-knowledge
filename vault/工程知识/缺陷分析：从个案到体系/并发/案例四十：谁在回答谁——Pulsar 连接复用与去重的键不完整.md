@@ -1,5 +1,5 @@
 ---
-title: 案例四十：谁在回答谁——Pulsar 连接复用与去重的键不完整
+title: 谁在回答谁——Pulsar 连接复用与去重的键不完整
 status: active
 type: guide
 updated: 2026-09-21

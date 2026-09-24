@@ -1,5 +1,5 @@
 ---
-title: 案例二十一：异常路径上没有完成——永不兑现的 future
+title: 异常路径上没有完成——永不兑现的 future
 status: active
 type: guide
 updated: 2026-09-21

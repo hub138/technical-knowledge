@@ -1,5 +1,5 @@
 ---
-title: 案例二十三：一次抖动变成一次重算——SASL 拉取没有重试
+title: 一次抖动变成一次重算——SASL 拉取没有重试
 status: active
 type: guide
 updated: 2026-09-21

@@ -1,5 +1,5 @@
 ---
-title: 案例十四：一方取消，旁观者陪葬——RocksDB 状态加载的并发陷阱
+title: 一方取消，旁观者陪葬——RocksDB 状态加载的并发陷阱
 status: active
 type: guide
 updated: 2026-09-20

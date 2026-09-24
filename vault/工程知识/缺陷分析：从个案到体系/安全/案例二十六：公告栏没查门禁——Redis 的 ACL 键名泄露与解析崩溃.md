@@ -1,5 +1,5 @@
 ---
-title: 案例二十六：公告栏没查门禁——Redis 的 ACL 键名泄露与解析崩溃
+title: 公告栏没查门禁——Redis 的 ACL 键名泄露与解析崩溃
 status: active
 type: guide
 updated: 2026-09-21

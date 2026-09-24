@@ -1,5 +1,5 @@
 ---
-title: 案例二十四：并行度被自己折叠——repartition 的 2 的幂倾斜
+title: 并行度被自己折叠——repartition 的 2 的幂倾斜
 status: active
 type: guide
 updated: 2026-09-21

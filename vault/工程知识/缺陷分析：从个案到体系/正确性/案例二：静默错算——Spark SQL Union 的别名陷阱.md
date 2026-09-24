@@ -1,5 +1,5 @@
 ---
-title: 案例二：静默错算——Spark SQL Union 的别名陷阱
+title: 静默错算——Spark SQL Union 的别名陷阱
 status: active
 type: guide
 updated: 2026-09-20
