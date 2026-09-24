@@ -66,8 +66,8 @@
     "缩小图谱": { en: "Zoom out of the graph" },
     "重置视图": { en: "Reset the view" },
     "重置缩放与平移": { en: "Reset zoom and pan" },
-    "滚轮缩放 · 拖拽平移 · 点节点打开": {
-      en: "Scroll to zoom · drag to pan · click a node to open",
+    "滚轮或捏合缩放 · 拖拽平移 · 点节点打开": {
+      en: "Scroll or pinch to zoom · drag to pan · click a node to open",
     },
 
     // ── Article rail ──
@@ -960,8 +960,8 @@
     "已聚焦笔记：": { en: "Focused note: " },
     "已聚焦主题：": { en: "Focused topic: " },
     "点空白或 Esc 取消 · 双击笔记圆点进原文": { en: "click empty space or Esc to clear · double-click a note dot to open it" },
-    "滚轮缩放 · 拖拽平移 · 点域、主题或笔记聚焦": {
-      en: "Scroll to zoom · drag to pan · click a domain, topic or note to focus",
+    "滚轮或捏合缩放 · 拖拽平移 · 点域、主题或笔记聚焦": {
+      en: "Scroll or pinch to zoom · drag to pan · click a domain, topic or note to focus",
     },
     "圆越大，主题下的笔记越多": { en: "A bigger circle means more notes under the topic" },
     "已读环": { en: "topic mastery ring" },
