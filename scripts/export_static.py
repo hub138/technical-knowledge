@@ -2,7 +2,7 @@
 
 用法: python3 scripts/export_static.py <仓库根> <输出目录>
 
-只依赖仓库内容与标准库。产物（相对输出目录）：
+使用仓库内容与 requirements.txt 中的渲染依赖。产物（相对输出目录）：
 - api/notes.json        首页文章列表全量（单文件应答所有分页请求）
 - api/notes-version.json 与上面同一个 signature（10 秒轮询不再拉全量）
 - api/digest          优雅降级（静态托管没有 BestBlogs 数据源）

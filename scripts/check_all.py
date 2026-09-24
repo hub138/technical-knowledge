@@ -64,7 +64,7 @@ def main() -> None:
 
     # 1. Server behaviour. 精简后的门禁:安全红线 + 服务器行为 + feed/收藏管线。
     # 内容审计已删 —— 它们盯着文案措辞,每次改页面都要人肉同步,已证明是负资产。
-    ok, out = run("tests", [PYTHON, "-m", "unittest", "tests.test_site"])
+    ok, out = run("tests", [PYTHON, "-m", "unittest", "tests.test_site", "tests.test_article_rendering"])
     summary = next((l for l in out.splitlines() if l.startswith("Ran ")), "")
     results.append(("tests", ok, summary or out.splitlines()[-1] if out else ""))
 

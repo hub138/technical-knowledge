@@ -736,6 +736,11 @@
     // 依据：领域卡迁移到辅助理解区后 EN 态只有标题被词典命中，正文/链接裸奔中文。
     "维护本站的元文档：怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新": { en: "Meta docs for running this site: how notes are written, how completeness is judged, how gaps are filled, how papers are tracked, how sources are refreshed" },
     "打开元文档": { en: "Open the meta docs" },
+    // 【2026-09-24】首页辅助理解区新增剪藏卡（用户反馈剪藏搜得到但导航找不到），
+    // 标题/正文/链接三段按知识库管理卡同款补词条，EN 态不裸奔中文。
+    "Clippings · 网页剪藏": { en: "Clippings · web clippings" },
+    "从网页剪藏收藏的外部好文章，原文完整保留": { en: "External articles clipped from the web, kept in full" },
+    "打开剪藏区": { en: "Open the clippings" },
     /* 总览=panorama 视图的维度标签（panorama-view.js），知识全景=导航项名。
        两者在 EN 态都用 Panorama 会撞车（审计报碰撞）；总览回退 Overview，
        概览已另译 Section overview，无冲突。 */

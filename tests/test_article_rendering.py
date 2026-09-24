@@ -34,6 +34,43 @@ class ArticleRenderingTests(unittest.TestCase):
         self.assertEqual(len({node['id'] for node in headings}), 3)
         self.assertEqual(headings[0]['id'], '机制')
 
+    def test_all_engineering_articles_preserve_structure(self):
+        parser = SERVER_MODULE.MarkdownIt('commonmark', {'html': False}).enable('table')
+        checked = 0
+        for path in self.vault.notes:
+            if not path.startswith('工程知识/'):
+                continue
+            with self.subTest(path=path):
+                note = self.vault.note(path)
+                tokens = parser.parse(note['body'])
+                document = self.render(path)
+                headings = document.select('h1,h2,h3,h4,h5,h6')
+                ids = [heading['id'] for heading in headings]
+                self.assertEqual(len(ids), len(set(ids)))
+                self.assertEqual(len(headings), sum(token.type == 'heading_open' for token in tokens))
+                self.assertEqual(len(document.select('li')), sum(token.type == 'list_item_open' for token in tokens))
+                self.assertEqual(len(document.select('table')), sum(token.type == 'table_open' for token in tokens))
+                depth, expected_depths = 0, []
+                for token in tokens:
+                    if token.type in ('bullet_list_open', 'ordered_list_open'):
+                        depth += 1
+                    elif token.type in ('bullet_list_close', 'ordered_list_close'):
+                        depth -= 1
+                    elif token.type == 'list_item_open':
+                        expected_depths.append(depth)
+                actual_depths = [len(node.find_parents(['ul', 'ol'])) for node in document.select('li')]
+                self.assertEqual(actual_depths, expected_depths)
+                expected_starts = [int(token.attrGet('start') or 1) for token in tokens if token.type == 'ordered_list_open']
+                self.assertEqual([int(node.get('start', 1)) for node in document.select('ol')], expected_starts)
+                self.assertEqual(len(document.select('blockquote,aside.callout')), sum(token.type == 'blockquote_open' for token in tokens))
+                expected_code = [token.content.removesuffix('\n') for token in tokens
+                                 if token.type in ('fence', 'code_block')
+                                 and token.info.split()[:1] != ['mermaid']]
+                self.assertEqual([node.get_text() for node in document.select('.code-block > code')], expected_code)
+                self.assertEqual(document.select('script,[onclick],[onload],[onerror]'), [])
+                checked += 1
+        self.assertGreater(checked, 400)
+
     def test_real_article_tables_and_code_remain_structured(self):
         document = self.render(LIST_NOTE)
         self.assertGreater(len(document.select('.code-block > code')), 0)

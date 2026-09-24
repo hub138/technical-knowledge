@@ -6,8 +6,8 @@
 
 [![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen?style=flat-square)](#验证)
 [![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen?style=flat-square)](#验证)
-[![dependencies](https://img.shields.io/badge/runtime%20deps-none-blue?style=flat-square)](#设计取舍)
-[![python](https://img.shields.io/badge/python-3.8%2B-blue?style=flat-square)](https://www.python.org/)
+[![dependencies](https://img.shields.io/badge/Markdown-markdown--it--py-blue?style=flat-square)](#设计取舍)
+[![python](https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square)](https://www.python.org/)
 [![build](https://img.shields.io/badge/build%20step-none-lightgrey?style=flat-square)](#设计取舍)
 [![notes](https://img.shields.io/badge/notes-184-informational?style=flat-square)](#这里有什么)
 [![license](https://img.shields.io/badge/license-see%20below-lightgrey?style=flat-square)](#许可证)
@@ -43,7 +43,7 @@ vault/                         可直接用 Obsidian 打开
   工程知识/                     六大技术领域，一个工程问题一页
   知识库管理/                   来源、更新、质量和维护规则
   Clippings/                   原始剪藏，按要求完整保留
-site/                          站点：单文件 HTTP 服务，无运行时依赖
+site/                          HTTP 服务与 Markdown 渲染
 apps/agent-evaluation/         Agent 评估：把判断绑定到证据的设计约定与原型
 packages/agent-foundation/     会话、上下文、记忆、恢复与证据基础包
 projects/                      完整上游源码快照，含各自许可证
@@ -56,8 +56,15 @@ projects/                      完整上游源码快照，含各自许可证
 ## 快速开始
 
 ```bash
-./run-site.sh                  # 起在 http://localhost:8787
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -r requirements.txt
+./run-site.sh
 ```
+
+使用 Python 3.10 或更新版本。Linux 通过环境变量提供 `KNOWLEDGE_SITE_PASSWORD`。
+`run-site.sh` 使用当前环境的 `python3`，也可通过 `KNOWLEDGE_PYTHON` 指定解释器。
+浏览器与渲染测试的依赖记录在 `requirements-dev.txt`。
 
 用 Obsidian 打开 `vault/` 即可编辑。站点直接读 Markdown 文件，存盘刷新就行，
 没有构建步骤，也不需要导出。
@@ -80,9 +87,10 @@ projects/                      完整上游源码快照，含各自许可证
 
 三个决定影响了其余一切。
 
-**没有构建步骤，没有运行时依赖。** `site/server.py` 是单文件 Python 标准库
-HTTP 服务；`site/base.css` 是一份由设计 token 驱动的样式表；唯一第三方
-资产是 vendored 的 Mermaid。没有 npm install、没有打包器，也没有需要同步的东西。
+**前端无需构建。** `site/server.py` 使用 Python 标准库 HTTP 服务和
+`markdown-it-py` 解析 Markdown 块结构。运行依赖版本记录在 `requirements.txt`；
+在线文章与静态导出使用同一个渲染器。站内链接和 HTML 转义由原有行内渲染处理。
+`site/base.css` 使用设计 token，Mermaid 随仓库提供，前端无需打包器。
 
 **同一件事只有一个来源。** 导航在 `site/nav.js` 定义一次，由 `site/shell.js`
 渲染一次，所有页面共用。这是有意为之：站点曾经有两套页面系统，各自维护一份

@@ -2,7 +2,7 @@
 title: Agent 系统选型不是框架排名
 status: active
 type: decision
-updated: 2026-09-03
+updated: 2026-09-25
 change_rate: high
 confidence: high
 review_after: 2026-10-03
@@ -14,6 +14,10 @@ sources:
   - "https://github.com/langchain-ai/langgraph"
   - "https://github.com/google/adk-python"
   - "https://github.com/microsoft/agent-framework"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "现状核对：SELFCHECK PASS密度0.32达标0命中，六维信号词与保护项齐全，本轮零改动仅标记"
 ---
 
 # Agent 系统选型不是框架排名

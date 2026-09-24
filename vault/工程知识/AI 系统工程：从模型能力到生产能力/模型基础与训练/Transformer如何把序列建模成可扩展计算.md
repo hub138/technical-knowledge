@@ -2,7 +2,7 @@
 title: Transformer 如何把序列建模成可扩展计算
 type: concept
 status: active
-updated: 2026-09-03
+updated: 2026-09-25
 review_after: 2027-09-03
 change_rate: low
 confidence: high
@@ -13,13 +13,17 @@ tags:
 sources:
   - "https://arxiv.org/abs/1706.03762"
   - "https://nlp.seas.harvard.edu/annotated-transformer/"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味二分对照一处，命中清零，图已达标不动"
 ---
 
 # Transformer 如何把序列建模成可扩展计算
 
 Transformer 解决的是序列关系建模中“逐步处理难以并行、局部状态难以跨距离传递”的问题。它用全局注意力交换位置间的信息，用逐位置前馈网络变换表示；训练阶段适合矩阵并行，生成阶段却受 KV cache、显存和逐 token 依赖限制。
 
-Transformer 的关键不是“有注意力”这一个组件，而是把序列中每个位置的表示，通过可并行的全局内容寻址和逐位置变换反复更新。训练阶段可以并行处理整段序列；自回归生成时则用 KV cache 保存已经计算过的键和值，把每一步的代价从重复处理整个前缀降下来。
+Transformer 的关键设计在于：把序列中每个位置的表示，通过可并行的全局内容寻址和逐位置变换反复更新，注意力只是实现这个寻址的组件。训练阶段可以并行处理整段序列；自回归生成时则用 KV cache 保存已经计算过的键和值，把每一步的代价从重复处理整个前缀降下来。
 
 ## 一层在做什么
 

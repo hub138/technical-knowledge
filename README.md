@@ -6,8 +6,8 @@
 
 [![tests](https://img.shields.io/badge/tests-50%2F50-brightgreen?style=flat-square)](#validation)
 [![a11y](https://img.shields.io/badge/contrast-18%2F18%20WCAG%20AA-brightgreen?style=flat-square)](#validation)
-[![dependencies](https://img.shields.io/badge/runtime%20deps-none-blue?style=flat-square)](#design-notes)
-[![python](https://img.shields.io/badge/python-3.8%2B-blue?style=flat-square)](https://www.python.org/)
+[![dependencies](https://img.shields.io/badge/Markdown-markdown--it--py-blue?style=flat-square)](#design-notes)
+[![python](https://img.shields.io/badge/python-3.10%2B-blue?style=flat-square)](https://www.python.org/)
 [![build](https://img.shields.io/badge/build%20step-none-lightgrey?style=flat-square)](#design-notes)
 [![notes](https://img.shields.io/badge/notes-184-informational?style=flat-square)](#what-is-in-here)
 [![license](https://img.shields.io/badge/license-see%20below-lightgrey?style=flat-square)](#license)
@@ -57,7 +57,7 @@ vault/                         open directly in Obsidian
   工程知识/                     six domains, one note per engineering question
   知识库管理/                   sourcing, updating, quality and maintenance rules
   Clippings/                   raw clippings, kept verbatim
-site/                          the site: one HTTP server, no runtime dependencies
+site/                          HTTP server and Markdown rendering
 apps/agent-evaluation/         Agent evaluation: bind judgments to evidence
 packages/agent-foundation/     sessions, context, memory, recovery, evidence
 projects/                      full upstream source snapshots, each with its licence
@@ -70,8 +70,15 @@ projects/                      full upstream source snapshots, each with its lic
 ## Quick start
 
 ```bash
-./run-site.sh                  # serves http://localhost:8787
+python3 -m venv .venv
+. .venv/bin/activate
+python3 -m pip install -r requirements.txt
+./run-site.sh
 ```
+
+Use Python 3.10 or newer. Supply `KNOWLEDGE_SITE_PASSWORD` through the environment
+on Linux. `run-site.sh` uses the active `python3`; `KNOWLEDGE_PYTHON` can select an
+explicit interpreter. Browser and rendering tests use `requirements-dev.txt`.
 
 Open `vault/` in Obsidian to edit. The site reads the Markdown files directly —
 save and refresh. No build step, no export.
@@ -94,10 +101,11 @@ a note with no English version says so rather than pretending otherwise.
 
 Three decisions shaped everything else.
 
-**No build step, no runtime dependencies.** `site/server.py` is a single-file
-Python standard-library HTTP server; `site/base.css` is one stylesheet driven by
-design tokens; the only third-party asset is a vendored Mermaid. There is no
-`npm install`, no bundler, and nothing to keep in sync.
+**No frontend build step.** `site/server.py` uses Python's standard-library HTTP
+server and `markdown-it-py` for Markdown block structure. Runtime versions are
+pinned in `requirements.txt`; the same renderer serves live articles and static
+exports. Site-specific links and HTML escaping remain in the inline renderer.
+`site/base.css` uses design tokens, and Mermaid is vendored. No frontend bundler is required.
 
 **One source for one thing.** Navigation is defined once in `site/nav.js` and
 rendered once by `site/shell.js`, shared by every page. That was not always

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""A dependency-free knowledge site for this Obsidian vault."""
+# 知识站 HTTP 服务与 Markdown 渲染。
 
 from __future__ import annotations
 
@@ -41,6 +41,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from markdown_it import MarkdownIt
+from markdown_it.token import Token
 
 # 同目录的兄弟模块。用显式路径插入而不是相对导入：server.py 会被
 # `python3 site/server.py` 直接跑，那时它不在包上下文里，相对导入会失败。
@@ -1800,7 +1801,7 @@ def render_markdown(body: str, vault: Vault, current: str) -> str:
         elif block.type == "blockquote_close":
             block.tag = quotes.pop()
         if block.type == "inline":
-            block.type = "knowledge_inline"
+            block.children = [Token("knowledge_inline", "", 0, content=block.content, meta=block.meta)]
 
     def inline_rule(tokens, index, options, env):
         block = tokens[index]

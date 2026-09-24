@@ -2,8 +2,7 @@
 set -eu
 
 repo="$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)"
-python_bin="/opt/homebrew/bin/python3"
-if [ ! -x "$python_bin" ]; then python_bin="/usr/bin/python3"; fi
+python_bin="${KNOWLEDGE_PYTHON:-python3}"
 
 exec "$python_bin" "$repo/site/server.py" \
   --root "$repo/vault" \

@@ -201,6 +201,40 @@ def verify_mermaid(context, base):
     return True
 
 
+def verify_document_structure(context, base, output):
+    page = context.new_page()
+    list_path = '工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/任务分解的质量决定Agent的上限.md'
+    repeated_path = '工程知识/缺陷分析：从个案到体系/安全/案例四十四：投毒不是写错，是写给你看——依赖投毒的三个真实剧本.md'
+    for theme in ('light', 'dark'):
+        page.set_viewport_size({'width': 375, 'height': 900})
+        load(page, f"{base}/?{urlencode({'path': list_path, 'theme': theme})}")
+        nested = page.locator('#reader-body li > ul li').filter(has_text='可并行')
+        assert nested.count() == 1, 'Nested list relation lost'
+        parent = nested.locator('xpath=../..')
+        assert '可恢复' in parent.inner_text(), 'Nested list has wrong parent'
+        geometry = nested.evaluate("el => ({child:el.getBoundingClientRect().left,parent:el.parentElement.parentElement.getBoundingClientRect().left})")
+        assert geometry['child'] >= geometry['parent'] + 20, 'Nested list indentation missing'
+        parent.screenshot(path=str(output / f'{theme}-nested-list.png'))
+        page.set_viewport_size({'width': 1440, 'height': 900})
+        response = page.goto(f"{base}/?{urlencode({'path': repeated_path, 'theme': theme})}", wait_until='domcontentloaded')
+        assert response.status == 200
+        page.wait_for_function("() => [...document.querySelectorAll('#reader-body h3')].filter(h=>h.textContent.trim()==='机制').length === 3")
+        ids = page.locator('#reader-body h3').evaluate_all("els => els.filter(el=>el.textContent.trim()==='机制').map(el=>el.id)")
+        assert len(set(ids)) == 3, 'Repeated headings have duplicate ids'
+        for index, ident in enumerate(ids):
+            page.locator('#reader-toc a').filter(has_text='机制').nth(index).click()
+            page.wait_for_function('id => document.activeElement.id === id && decodeURIComponent(location.hash) === "#"+id', arg=ident)
+            assert page.locator('[id="' + ident + '"]').evaluate('el => el.getBoundingClientRect().top') > 70
+            if index == 2:
+                page.screenshot(path=str(output / f'{theme}-repeated-heading.png'))
+                shared = page.url
+                page.goto('about:blank')
+                page.goto(shared, wait_until='domcontentloaded')
+                page.wait_for_function('id => document.activeElement.id === id', arg=ident)
+    page.close()
+    print('Nested lists and repeated heading navigation: passed', flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description='真实文章链接、键盘、复制与锚点交互检查')
     parser.add_argument('--base', default='http://127.0.0.1:18789')
@@ -227,6 +261,7 @@ def main():
         if not args.baseline:
             context = browser.new_context(reduced_motion='reduce')
             assert verify_mermaid(context, args.base)
+            verify_document_structure(context, args.base, args.out)
             context.close()
             print('Mermaid source clipboard: passed', flush=True)
         browser.close()

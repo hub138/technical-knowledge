@@ -2,7 +2,7 @@
 title: MCP与A2A的分工：工具协议与Agent协议不互相替代
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 review_after: 2027-03-22
 change_rate: medium
 confidence: high
@@ -15,6 +15,10 @@ sources:
   - "https://modelcontextprotocol.io/specification/2026-07-28"
   - "https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/"
   - "https://a2a-protocol.org/v1.0.0/specification/"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "现状核对：SELFCHECK PASS密度0.33达标0命中，两层协议对照表与并存图齐全，本轮零改动仅标记"
 ---
 
 # MCP与A2A的分工：工具协议与Agent协议不互相替代

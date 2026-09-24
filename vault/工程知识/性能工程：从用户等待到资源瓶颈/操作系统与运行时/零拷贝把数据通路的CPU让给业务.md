@@ -25,6 +25,10 @@ sources:
 
 朴素 read+write 路径：内核从磁盘读页缓存（DMA 拷贝 1）、拷到用户缓冲区（CPU 拷贝 2）、write 时拷回 socket 缓冲区（CPU 拷贝 3）、网卡再从 socket 缓冲区 DMA 出去（拷贝 4），伴随 4 次上下文切换。演进路径每一步都消掉一部分：
 
+![传统 read+write 路径的四次拷贝与系统调用往返（取自 SoByte《Zero-copy technology》，https://www.sobyte.net/post/2022-11/zero-copy/）](https://cdn.jsdelivr.net/gh/b0xt/sobyte-images1/2022/11/30/8be724f07a034ca5be182ce0f3610492.png)
+
+这张图把四次拷贝的位置摆出来了：拷贝 1 和 4 由 DMA 完成，CPU 不参与；真正吃 CPU 的是拷贝 2 和 3——数据只是经过用户空间转了一圈，应用并没有改它。两次 CPU 拷贝加上四次系统调用往返，就是后续每一步演进要消掉的账。
+
 | 技术 | 消掉的拷贝 | 消掉的切换 | 约束 |
 | --- | --- | --- | --- |
 | sendfile(2) | 拷贝 2、3 | 2 次 | 文件→socket 单向 |
@@ -32,6 +36,10 @@ sources:
 | splice(2) | 2、3 | 2 次 | 管道中转，两个 fd 间 |
 | mmap+write | 拷贝 2 | 1 次 | 映射管理开销、页错误 |
 | msg_zerocopy | socket 发送缓冲的拷贝 | 0 | 超大包才划算，需回调处理 |
+
+![sendfile 路径：数据全程不进用户空间，四次拷贝降为三次（取自 SoByte《Zero-copy technology》，https://www.sobyte.net/post/2022-11/zero-copy/）](https://cdn.jsdelivr.net/gh/b0xt/sobyte-images1/2022/11/30/6b8f376617044687ab371e6878207623.png)
+
+对照上一张图：用户空间只剩系统调用的进出，数据本身不再绕道用户程序 buffer，拷贝 2、3 合并为内核内的一次 CPU 拷贝；网卡支持 scatter-gather 后这次拷贝也只剩描述符，CPU 拷贝归零。演进不是换了更快的拷贝，是把「数据要经过用户空间」这个结构假设拆掉了。
 
 收益与代价的权衡：CPU 从通路让出、缓存污染减少，但 API 约束变多（sendfile 只能文件到 socket）、对网卡特性有要求、错误处理路径更绕。什么时候不划算：小包高频场景里 syscall 本身的开销占比高，msg_zerocopy 官方文档给出的经验阈值是数据量大于约 10KB 才值得。
 

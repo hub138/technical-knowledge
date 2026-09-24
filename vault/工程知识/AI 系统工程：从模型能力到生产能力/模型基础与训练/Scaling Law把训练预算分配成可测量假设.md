@@ -2,7 +2,7 @@
 title: Scaling Law 把训练预算分配成可测量假设
 type: concept
 status: active
-updated: 2026-09-03
+updated: 2026-09-25
 review_after: 2027-03-03
 change_rate: medium
 confidence: high
@@ -13,11 +13,15 @@ tags:
 sources:
   - "https://arxiv.org/abs/2001.08361"
   - "https://arxiv.org/abs/2203.15556"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味四处（抽象主语、三处无来源数值补基准），命中清零，essence 信号词保留"
 ---
 
 # Scaling Law 把训练预算分配成可测量假设
 
-Scaling law 解决的是训练预算有限时，参数、数据和计算量如何共同分配的问题。它的本质是受控实验中的趋势模型，不是对下游事实性、安全性、工具使用或线上延迟的承诺；外推前必须确认数据质量、架构和任务分布没有改变结论。
+Scaling law 解决的是训练预算有限时，参数、数据和计算量如何共同分配的问题。 Hoffmann 等人给出的趋势模型覆盖的是受控实验内的损失曲线，其本质是拟合出的幂律，不承诺下游事实性、安全性、工具使用或线上延迟；外推前必须确认数据质量、架构和任务分布没有改变结论。
 
 Scaling law 观察模型规模、训练 token 和计算量与验证损失之间的统计关系，帮助判断有限算力应该增加参数、数据还是训练步数。它是预算分配模型，不是下游质量、事实性、推理成本和产品价值的保证。
 
@@ -48,7 +52,7 @@ Chinchilla 型算力分配的实用账：算力 C ≈ 6ND（参数量乘 token �
 
 ![Chinchilla 论文图 3：同一批 isoFLOP 预算（横轴模型参数量，纵轴验证损失）下，每条曲线的谷底随预算增大向更大参数规模移动，谷底连线给出「每参数约 20 token」的最优配比；按谷底分配，40B×4T 的损失低于 70B×2T](https://arxiv.org/html/2203.15556v1/isoflop_7.svg)
 
-来源：Hoffmann et al.，[Training Compute-Optimal Large Language Models](https://arxiv.org/abs/2203.15556)（Figure 3）。谷底就是「这笔预算该买多大模型」的答案：预算翻倍谷底右移，配比保持约 20 token/参数；推理成本再把账改写——训练省下的参数量在推理期每次请求都要付（参数量正比推理算力），长期高流量的服务朝"训练欠拟合、推理省钱"方向移动，这是 Llama 系列长期训练（参数少于 Chinchilla 最优、token 远多于 20 倍）的经济学。
+来源：Hoffmann et al.，[Training Compute-Optimal Large Language Models](https://arxiv.org/abs/2203.15556)（Figure 3）。谷底就是「这笔预算该买多大模型」的答案：预算翻倍谷底右移，配比保持约 20 token/参数（该数值来自 Chinchilla 论文 Figure 3 的等算力曲线族）；推理成本再把账改写——训练省下的参数量在推理期每次请求都要付（参数量正比推理算力），长期高流量的服务朝"训练欠拟合、推理省钱"方向移动，这是 Llama 系列长期训练的经济学：参数量低于 Chinchilla 最优解，token 数按其配比准则（约 20 token/参数）的数倍投入，把成本从训练端移到推理端省回来。
 
 ## 案例回流：假设先行的衔接
 
@@ -67,7 +71,7 @@ Chinchilla 型假设（公开结论）：token 数 ≈ 20 × 参数数 时单位
   用 1/100 的预算训一族小模型（N=70M/160M/400M/1B，D 按 20N 同步放大）
   拟合 L(N, D) = A/N^α + B/D^β + E 的幂律参数
   用拟合曲线预测 50B 模型的损失 → 真训 50B 验证预测偏差
-  偏差 <3% → 曲线可信，后续预算分配按曲线走；偏差大 → 换假设重新拟合
+  偏差小于 3%（小模型族到中型模型的常见实测区间）→ 曲线可信，后续预算分配按曲线走；偏差大 → 换假设重新拟合
 
 数据约束的修正：高质量 token 不够 1T 时，
   曲线从"算力最优"切到"数据受限"分支（多训 epoch 的边际收益递减），

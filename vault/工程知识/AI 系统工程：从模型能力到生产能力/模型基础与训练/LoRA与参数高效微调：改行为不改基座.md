@@ -2,7 +2,7 @@
 title: LoRA与参数高效微调：改行为不改基座
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 review_after: 2027-03-22
 change_rate: medium
 confidence: high
@@ -15,6 +15,10 @@ sources:
   - "https://arxiv.org/abs/2305.18290"
   - "https://huggingface.co/docs/peft"
   - "https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味1处二分对照改直陈；对齐管线为alignment术语保留"
 ---
 
 # LoRA与参数高效微调：改行为不改基座
@@ -71,7 +75,7 @@ LoRA 的参数节省与 rank 的关系，一行的账：
 #   全参：70B × 3 份 × 2 字节 ≈ 420GB；LoRA：0.3% × 420GB ≈ 1.2GB
 ```
 
-跑一遍的收获：LoRA 省的不是模型权重那份显存（权重要全量加载、冻结），是优化器状态与梯度那份——这就是 70B 模型能在单卡 80GB 上微调的数学。rank 的选择：8-32 覆盖大多数适配任务，rank 翻倍的效果提升递减，任务与基座差异越大 rank 需求越高。
+跑一遍的收获：模型权重那份显存要全量加载、冻结，份额不变；LoRA 省下的是优化器状态与梯度那份，它们只跟着可训练参数走——这就是 70B 模型能在单卡 80GB 上微调的数学。rank 的选择：8-32 覆盖大多数适配任务，rank 翻倍的效果提升递减，任务与基座差异越大 rank 需求越高。
 
 ## 量化锚点与案例回流
 

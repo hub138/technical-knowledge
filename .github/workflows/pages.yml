@@ -30,6 +30,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: 安装 Markdown 渲染依赖
+        run: python3 -m pip install -r requirements.txt
       - name: 导出静态内容并改写请求
         # 构建规则只在 scripts/build_pages.sh 里维护一份：Actions 与本地
         # 复现跑同一个脚本，避免两处 sed 规则漂移（漂移过一次，线上和
