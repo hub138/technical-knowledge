@@ -592,5 +592,15 @@
     hideTip();
   }
 
-  window.TKPanorama = { render: render };
+  /* 预热：只算布局写进缓存，不碰 DOM。由 index.html 在停在别的 tab 时
+   * 于空闲时段调用 —— 用户再切到八层栈就直接命中缓存，不用等一次布局
+   * 计算（实测约 600ms）。 */
+  function prewarm(notes) {
+    if (!R || !notes || !notes.length) return;
+    DATA = buildLayers(notes);
+    ensureParents(notes);
+    ensureLeaves();
+  }
+
+  window.TKPanorama = { render: render, prewarm: prewarm };
 })();

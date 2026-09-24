@@ -2823,6 +2823,14 @@ function renderPanoView(){
     bindPgnio();
     renderProgress();
   }else renderMatrixView();
+  /* 预热八层栈：全景页默认停在覆盖矩阵，这时在空闲时段把八层栈的 449 个
+     子圆算好写进缓存 —— 用户点过去直接命中，不用再等一次布局计算
+     （2026-09-24 实测一次约 600ms）。空闲时段跑，不与矩阵渲染抢主线程；
+     Safari 没有 requestIdleCallback，退回 setTimeout。 */
+  if(tab!=='stack'&&window.TKPanorama&&TKPanorama.prewarm&&state.notes.length){
+    const idle=window.requestIdleCallback||(fn=>setTimeout(fn,300));
+    idle(()=>{try{TKPanorama.prewarm(state.notes)}catch(e){}});
+  }
 }
 /* 阅读标注的导出/导入：整包 JSON 下载；导入按「同一路径取较新标注」合并。 */
 function bindPgnio(){
