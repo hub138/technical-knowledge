@@ -818,13 +818,38 @@
   };
 
   /* Records a visit. The main site only reports actual articles, so a homepage
-     refresh does not write a row; companion pages report once per load. */
-  const visit = (payload) =>
+     refresh does not write a row; companion pages report once per load.
+     停留时长：visit() 记住最近一次打点参数与进入时间，页面隐藏或关闭
+     （visibilitychange→hidden / pagehide）时补一条 dwell 上报；服务端
+     把时长合并进最近一条同访客同路径的记录，不另起一行。 */
+  let lastVisitPayload = null;
+  const visit = (payload) => {
+    const enterTs = Date.now() / 1000;
+    lastVisitPayload = { payload, enterTs };
+    return fetch("/api/visit", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...payload, enter_ts: enterTs }),
+    }).catch(() => {});
+  };
+  const reportDwell = () => {
+    if (!lastVisitPayload) return;
+    const { payload, enterTs } = lastVisitPayload;
+    lastVisitPayload = null;
+    const dwell = Math.round(Date.now() / 1000 - enterTs);
+    if (!(dwell > 0)) return;
     fetch("/api/visit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({ ...payload, dwell }),
+      /* keepalive 让关闭标签页时的最后一条请求不被浏览器掐断。 */
+      keepalive: true,
     }).catch(() => {});
+  };
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") reportDwell();
+  });
+  window.addEventListener("pagehide", reportDwell);
 
   /* JS-owned labels are not text nodes in the original markup, so the i18n
      DOM walk cannot reach them. Recompute them on every language change. */

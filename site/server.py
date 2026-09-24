@@ -733,6 +733,40 @@ def _append_jsonl(path: Path, record: dict[str, object]) -> bool:
     return True
 
 
+def _merge_dwell(ip: str, path: str, dwell: int) -> bool:
+    """把离开时补报的停留时长并入最近一条同访客同路径的访问记录。
+
+    离开上报紧跟进入打点，只回看最近 50 条，更早的记录不可能匹配。
+    找不到匹配就返回 False，调用方丢弃这条补报。
+    """
+    recent = _read_jsonl(VISIT_LOG, limit=50)
+    match_ts = None
+    for record in reversed(recent):
+        if str(record.get("ip") or "?") == ip and str(record.get("path") or "") == path:
+            match_ts = record.get("ts")
+            break
+    if match_ts is None:
+        return False
+    full = _read_jsonl(VISIT_LOG, limit=100000)
+    _ensure_data_home()
+    try:
+        with _LOG_LOCK:
+            with VISIT_LOG.open("w", encoding="utf-8") as handle:
+                for record in full:
+                    if (
+                        record.get("ts") == match_ts
+                        and str(record.get("ip") or "?") == ip
+                        and str(record.get("path") or "") == path
+                    ):
+                        record["dwell"] = int(record.get("dwell") or 0) + dwell
+                    handle.write(
+                        json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
+                    )
+    except OSError:
+        return False
+    return True
+
+
 # ── 收藏 ─────────────────────────────────────────────────────────────────
 #
 # 全站共享的收藏夹：站点没有账号体系，任何访客都能收藏或取消——
@@ -2349,6 +2383,8 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/insights/visitors":
             self.send_json({"visitors": insights_visitors()})
+        if path == "/api/insights/visitor-detail":
+            self.send_json({"detail": insights_visitor_detail()})
             return
         if path == "/api/insights/pages":
             self.send_json({"pages": insights_pages()})
@@ -3182,6 +3218,21 @@ class Handler(BaseHTTPRequestHandler):
             "screen": str(body.get("screen") or "")[:20],
             **self.visitor_record(body),
         }
+        # 停留时长：前端在进入页面时带上 enter_ts，离开时补一发含
+        # dwell 的上报。只信"进入时间在过去 24 小时内"的值——更早的
+        # 时间戳要么是时钟漂移要么是重放的旧包，照单全收会污染均值。
+        enter = float(body.get("enter_ts") or 0)
+        dwell = int(body.get("dwell") or 0)
+        if not dwell and 0 < time.time() - enter < 86400:
+            dwell = int(time.time() - enter)
+        if dwell > 0:
+            # 带停留时长的上报是离开补报，并入最近一条同访客同路径的
+            # 记录——另起一行会让"访问次数"翻倍。找不到可并入的记录
+            # （例如日志刚轮转）就直接丢弃，不为它造一条 0 内容的访问。
+            merged = _merge_dwell(str(record["ip"]), record_path, min(dwell, 86400))
+            if merged:
+                self.send_json({"ok": True, "merged": True})
+                return
         _append_jsonl(VISIT_LOG, record)
         self.send_json({"ok": True})
 
@@ -3234,9 +3285,14 @@ def insights_summary() -> dict[str, object]:
     feedback = _read_jsonl(FEEDBACK_LOG, limit=100000)
     today = _day_key(time.time())
     visitors = {str(v.get("ip") or "?") for v in visits}
+    # 按天去重：同一天同一访客反复刷新只算一次，回应"总访问次数
+    # 有没有去重"的口径问题；全局按 IP 去重的访客数是另一格。
+    daily_pairs = {(str(v.get("ip") or "?"), _day_key(float(v.get("ts") or 0))) for v in visits}
     return {
         "visits_total": len(visits),
+        "visits_daily_unique": len(daily_pairs),
         "visitors_total": len(visitors),
+        "dwell_total": sum(int(v.get("dwell") or 0) for v in visits),
         "visits_today": sum(1 for v in visits if _day_key(float(v.get("ts") or 0)) == today),
         "feedback_total": len(feedback),
         "feedback_open": sum(1 for f in feedback if f.get("status") == "open"),
@@ -3259,12 +3315,16 @@ def insights_visitors(limit: int = 60) -> list[dict[str, object]]:
                 "name": "",
                 "name_source": "unknown",
                 "visits": 0,
+                "days": set(),
+                "dwell": 0,
                 "first": float(record.get("ts") or 0),
                 "last": 0.0,
                 "pages": set(),
             },
         )
         entry["visits"] = int(entry["visits"]) + 1
+        entry["days"].add(_day_key(float(record.get("ts") or 0)))
+        entry["dwell"] = int(entry["dwell"]) + int(record.get("dwell") or 0)
         entry["last"] = max(float(entry["last"]), float(record.get("ts") or 0))
         entry["first"] = min(float(entry["first"]), float(record.get("ts") or 0))
         if record.get("name"):
@@ -3275,6 +3335,7 @@ def insights_visitors(limit: int = 60) -> list[dict[str, object]]:
     result = []
     for entry in sorted(grouped.values(), key=lambda e: float(e["last"]), reverse=True)[:limit]:
         entry["pages"] = len(entry["pages"])
+        entry["days"] = len(entry["days"])
         entry["first"] = _day_key(float(entry["first"])) + " " + time.strftime(
             "%H:%M", time.localtime(float(entry["first"]))
         )
@@ -3283,6 +3344,34 @@ def insights_visitors(limit: int = 60) -> list[dict[str, object]]:
         )
         result.append(entry)
     return result
+
+
+def insights_visitor_detail(limit: int = 60) -> dict[str, dict[str, object]]:
+    """按访客分组到文章粒度的明细，给中台访客行的折叠展开。
+
+    只统计有具体位置的访问（真实笔记与 view:* 视图页），与
+    insights_pages 的口径一致；每格带访问次数与累计停留。
+    """
+    visits = _trim_visits(_read_jsonl(VISIT_LOG, limit=100000))
+    grouped: dict[str, dict[str, list[dict[str, object]]]] = {}
+    for record in visits:
+        path = str(record.get("path") or "")
+        if not path:
+            continue
+        ip = str(record.get("ip") or "?")
+        pages = grouped.setdefault(ip, [])
+        slot = next((p for p in pages if p["path"] == path), None)
+        if slot is None:
+            title = str(record.get("title") or "")
+            if not title:
+                title = Path(path).stem if not path.startswith("view:") else path
+            slot = {"path": path, "title": title, "visits": 0, "dwell": 0}
+            pages.append(slot)
+        slot["visits"] = int(slot["visits"]) + 1
+        slot["dwell"] = int(slot["dwell"]) + int(record.get("dwell") or 0)
+    for pages in grouped.values():
+        pages.sort(key=lambda p: (int(p["visits"]), int(p["dwell"])), reverse=True)
+    return {ip: pages[:limit] for ip, pages in grouped.items()}
 
 
 def insights_pages(limit: int = 25) -> list[dict[str, object]]:

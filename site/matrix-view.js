@@ -32,8 +32,11 @@
    * 复制一份而不是 import，因为 panorama-view 是懒加载视图脚本，
    * matrix-view 先执行时它可能还没就位。（两处色表改动要同步，这是
    * 已知的一对一映射，panorama-view.js 头部有反向注释。） */
+  /* 与 panorama-view.js 的 LAYER 同步改（2026-09-24）：hw/net 原用
+   * #dc2626（--color-danger），与八层栈「缺口层」的红色标记撞语义，
+   * 且 hw/net 同色。新的 1~6 号色见 panorama-view.js 的 LAYER。 */
   var LAYER_COLOR = {
-    hw: "#dc2626", os: "#b45309", net: "#dc2626", data: "#0284c7",
+    hw: "#a16207", os: "#b45309", net: "#0e7490", data: "#0284c7",
     dist: "#059669", app: "#7c3aed"
   };
 
@@ -120,13 +123,7 @@
           /* 空格子也给回应：页面承诺「点格子看文章」，点空的没反应等于
              承诺落空。说清这个方向是真空，比沉默好。 */
           cell.classList.add("mx-clickable");
-          cell.setAttribute("tabindex", "0");
-          cell.setAttribute("role", "button");
-          var openEmpty = function () { showEmptyCell(host, L, k); };
-          cell.addEventListener("click", openEmpty);
-          cell.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openEmpty(); }
-          });
+          cell.addEventListener("click", function () { showEmptyCell(host, L, k); });
           cell.addEventListener("mouseenter", function (ev) { showTip(ev, L, k, c); });
           cell.addEventListener("mouseleave", hideTip);
         } else {
@@ -141,13 +138,7 @@
         }
         if (c.n > 0) {
           cell.classList.add("mx-clickable");
-          cell.setAttribute("tabindex", "0");
-          cell.setAttribute("role", "button");
-          var openCell = function () { showCell(host, L, k, c); };
-          cell.addEventListener("click", openCell);
-          cell.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openCell(); }
-          });
+          cell.addEventListener("click", function () { showCell(host, L, k, c); });
         }
         grid.appendChild(cell);
       });
@@ -250,7 +241,7 @@
    * #cell=层|型；整行/整列清单另一轴是 null，写 #row=层 / #col=型。 */
   function mountDetail(host, box, L, k) {
     host.appendChild(box);
-    box.scrollIntoView({ behavior: scrollBehavior(), block: "nearest" });
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
     try {
       if (L && k) history.replaceState(null, "", "#cell=" + L.id + "|" + k.id);
       else if (L) history.replaceState(null, "", "#row=" + L.id);

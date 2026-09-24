@@ -2049,10 +2049,12 @@ function sourceCount(){return state.notes.filter(n=>!NON_ENGINEERING.has(n.categ
  * 有多少 → 每条讲什么 → 能得出什么判断。数字按当前内容算，不写死。
  */
 function heroLede(zh){
-  const n=engineeringCount(), d=domainCount();
+  /* 【ui-iter·rt19】文案里不再报「449 篇、6 个领域」：同一屏右侧
+     hero-meta 已用大数字原样再报一遍这两个值（2026-09-24 截图实测，
+     同一事实在 400px 内出现两次），lede 只留定性句，数字交给 meta。 */
   return zh
-    ?{text:`${n} 篇工程知识，覆盖 ${d} 个领域，每条讲清一个机制怎么运作、代价在哪。`,lead:'写给在真实系统里做决定的工程师'}
-    :{text:`${n} engineering notes across ${d} domains, each spelling out how a mechanism works and what it costs.`,lead:'For engineers making decisions in real systems'};
+    ?{text:'每条讲清一个机制怎么运作、代价在哪。',lead:'写给在真实系统里做决定的工程师'}
+    :{text:'Each note spells out how a mechanism works and what it costs.',lead:'For engineers making decisions in real systems'};
 }
 /* 【反复迭代后结果·rt13】知识领域卡片区排除「知识库管理」。
  * 依据：lede 的 domainCount() 口径排除它（6 个领域），但卡片区此前只排了

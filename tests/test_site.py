@@ -423,6 +423,78 @@ class AuthenticationTests(unittest.TestCase):
                 self.assertEqual(response[1]["Location"], "/")
 
 
+class VisitStatsTests(unittest.TestCase):
+    """访问统计：停留时长合并、按天去重口径、访客文章明细。
+
+    直接调聚合函数，VISIT_LOG 指向临时文件，不碰真实 data/。
+    """
+
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.original_log = SERVER_MODULE.VISIT_LOG
+        SERVER_MODULE.VISIT_LOG = Path(self.tmp.name) / "visits.jsonl"
+
+    def tearDown(self) -> None:
+        SERVER_MODULE.VISIT_LOG = self.original_log
+        self.tmp.cleanup()
+
+    def _append(self, record: dict[str, object]) -> None:
+        SERVER_MODULE._append_jsonl(SERVER_MODULE.VISIT_LOG, record)
+
+    def test_dwell_merges_into_latest_matching_visit(self) -> None:
+        """离开补报并入最近一条同访客同路径记录，不新增行。"""
+        now = time.time()
+        self._append({"ts": now - 60, "ip": "10.0.0.1", "path": "工程知识/a.md", "title": "a"})
+        self._append({"ts": now - 30, "ip": "10.0.0.2", "path": "工程知识/b.md", "title": "b"})
+        self._append({"ts": now, "ip": "10.0.0.1", "path": "工程知识/a.md", "title": "a"})
+        self.assertTrue(SERVER_MODULE._merge_dwell("10.0.0.1", "工程知识/a.md", 120))
+        records = SERVER_MODULE._read_jsonl(SERVER_MODULE.VISIT_LOG, limit=100)
+        self.assertEqual(len(records), 3)
+        merged = [r for r in records if r.get("ip") == "10.0.0.1"]
+        self.assertEqual(len(merged), 2)
+        latest = max(merged, key=lambda r: float(r["ts"]))
+        self.assertEqual(int(latest["dwell"]), 120)
+        other = min(merged, key=lambda r: float(r["ts"]))
+        self.assertNotIn("dwell", other)
+
+    def test_dwell_merge_without_match_is_dropped(self) -> None:
+        """找不到同访客同路径的记录：丢弃补报，不写日志。"""
+        before = SERVER_MODULE._read_jsonl(SERVER_MODULE.VISIT_LOG, limit=100)
+        self.assertFalse(SERVER_MODULE._merge_dwell("10.0.0.9", "工程知识/x.md", 30))
+        self.assertEqual(SERVER_MODULE._read_jsonl(SERVER_MODULE.VISIT_LOG, limit=100), before)
+
+    def test_summary_daily_unique_and_dwell_total(self) -> None:
+        """按天去重：同 IP 同日多条算一次；停留时长全站求和。"""
+        base = time.time() - 3600
+        self._append({"ts": base, "ip": "10.0.0.1", "path": "工程知识/a.md", "dwell": 90})
+        self._append({"ts": base + 10, "ip": "10.0.0.1", "path": "工程知识/b.md", "dwell": 30})
+        self._append({"ts": base + 20, "ip": "10.0.0.2", "path": "工程知识/a.md"})
+        summary = SERVER_MODULE.insights_summary()
+        self.assertEqual(summary["visits_total"], 3)
+        self.assertEqual(summary["visits_daily_unique"], 2)
+        self.assertEqual(summary["dwell_total"], 120)
+
+    def test_visitor_rows_carry_days_and_dwell(self) -> None:
+        """访客行带天数（按天去重）与停留汇总；明细接口按访客分组到文章。"""
+        base = time.time() - 3600
+        self._append({"ts": base, "ip": "10.0.0.1", "path": "工程知识/a.md", "title": "a", "dwell": 60})
+        self._append({"ts": base + 5, "ip": "10.0.0.1", "path": "view:panorama", "title": "全景", "dwell": 45})
+        self._append({"ts": base + 10, "ip": "10.0.0.1", "path": "工程知识/a.md", "title": "a"})
+        visitors = SERVER_MODULE.insights_visitors()
+        self.assertEqual(len(visitors), 1)
+        row = visitors[0]
+        self.assertEqual(row["visits"], 3)
+        self.assertEqual(row["days"], 1)
+        self.assertEqual(row["dwell"], 105)
+        detail = SERVER_MODULE.insights_visitor_detail()
+        pages = detail["10.0.0.1"]
+        self.assertEqual(len(pages), 2)
+        top = pages[0]
+        self.assertEqual(top["path"], "工程知识/a.md")
+        self.assertEqual(int(top["visits"]), 2)
+        self.assertEqual(int(top["dwell"]), 60)
+
+
 class OriginLocalTests(unittest.TestCase):
     """本机判定必须认得「隧道送进来的回环流量」。
 

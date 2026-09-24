@@ -31,7 +31,7 @@
  * 与矩阵侧的辅助文字同档，块面轻而不挤。 */
 .pano-intro p {
   margin: 0 0 6px; font-size: var(--text-small); line-height: 1.85; color: var(--color-ink-soft);
-  max-width: 1014px;   /* = 图的内容宽度：长句也不越过图的右边界 */
+  max-width: 900px;    /* 只让左边缘与图对齐，不拉满到图的右边界 */
 }
 .pano-intro p:last-child { margin-bottom: 0; }
 .pano-intro b { color: var(--color-ink); font-weight: 700; }

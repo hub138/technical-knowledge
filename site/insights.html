@@ -247,6 +247,11 @@
         border-radius: var(--radius-full);
         background: var(--color-accent);
       }
+      /* 第二条是停留占比（暖橙），叠在访问占比条下面同槽显示。 */
+      .bar > i.bar-dwell {
+        background: var(--color-warm);
+        opacity: .55;
+      }
       /* 表内小条：数字 + 比例条同排，悬殊一眼可见。 */
       .bar-sm {
         display: inline-block;
@@ -257,6 +262,32 @@
         background: var(--color-surface);
       }
       .v-num { font-variant-numeric: tabular-nums; }
+
+      /* 访客行折叠展开：行可点，箭头随状态转；明细行底色更浅、缩进，
+         与主行一眼分层。悬停提示"这一行能点开"。 */
+      .visitor-row { cursor: pointer; }
+      .visitor-row:hover { background: var(--color-surface); }
+      .twisty { width: 26px; text-align: center; color: var(--color-muted); }
+      .twisty-mark {
+        display: inline-block;
+        transition: transform var(--duration-fast) var(--ease-out);
+        font-size: var(--text-xs);
+      }
+      .visitor-row[aria-expanded="true"] .twisty-mark { transform: rotate(90deg); }
+      .visitor-detail-row > td {
+        background: var(--color-surface);
+        font-size: var(--text-sm);
+        color: var(--color-ink-soft);
+        padding-top: var(--space-2);
+        padding-bottom: var(--space-2);
+      }
+      .visitor-detail-row a { color: var(--color-accent); }
+      .vd-meta {
+        float: right;
+        color: var(--color-muted);
+        font-size: var(--text-xs);
+        font-variant-numeric: tabular-nums;
+      }
 
       .empty-note {
         padding: var(--space-8);
@@ -348,7 +379,7 @@
 
       <div class="caveat">
         <b>这些数字能说明什么。</b>
-        访问量按 IP 去重：同一台设备换网络会被算成两个人，局域网 NAT 后的多台设备可能共用一个 IP。它是用来发现「哪些内容有人在看、哪些反馈还没处理」的信号，不是精确的用户统计。
+        总访问次数按进入页面的打点逐条累计，同一天反复刷新会累加；「按天去重访问」把同一天同一访客算作一次。停留时长来自页面隐藏或关闭时的一次补报，切后台、断网或直接杀进程时会缺报，所以停留只反映有人守着页面的时间，是信号，不是精确计时。访问量按 IP 去重：同一台设备换网络会被算成两个人，局域网 NAT 后的多台设备可能共用一个 IP。它是用来发现「哪些内容有人在看、哪些反馈还没处理」的信号，不是精确的用户统计。
       </div>
     </div>
 
@@ -390,11 +421,33 @@
         feedback_open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h8"/><path d="M8 13.5h5"/></svg>',
         feedback_total: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 17 0z"/></svg>',
       };
+      function fmtDwell(seconds) {
+        const s = Number(seconds || 0);
+        if (s < 60) return s ? `${s}${tr("秒")}` : "—";
+        const m = Math.round(s / 60);
+        if (m < 60) return `${m}${tr("分钟")}`;
+        const h = Math.floor(m / 60);
+        return `${h}${tr("小时")}${m % 60 ? ` ${m % 60}${tr("分钟")}` : ""}`;
+      }
       function tiles(summary) {
         const items = [
           { n: summary.visits_total, k: "visits_total", l: tr("总访问次数"), tone: "" },
+          {
+            n: summary.visits_daily_unique,
+            k: "visits_total",
+            l: tr("按天去重访问"),
+            tone: "",
+            note: tr("同一天同一访客只算一次"),
+          },
           { n: summary.visitors_total, k: "visitors_total", l: tr("独立访客（按 IP）"), tone: "accent" },
           { n: summary.visits_today, k: "visits_today", l: tr("今日访问"), tone: "" },
+          {
+            n: summary.dwell_total ? fmtDwell(summary.dwell_total) : "—",
+            k: "visits_today",
+            l: tr("总停留时长"),
+            tone: "",
+            note: tr("读者在页面上的累计停留"),
+          },
           {
             n: summary.feedback_open,
             k: "feedback_open",
@@ -406,7 +459,7 @@
         $("#tiles").innerHTML = items
           .map(
             (i) =>
-              `<div class="tile"${i.tone ? ` data-tone="${i.tone}"` : ""}><div class="tile-head">${ICONS[i.k] || ""}<span>${esc(i.l)}</span></div><b>${i.n}</b></div>`,
+              `<div class="tile"${i.tone ? ` data-tone="${i.tone}"` : ""}><div class="tile-head">${ICONS[i.k] || ""}<span>${esc(i.l)}</span></div><b>${i.n}</b>${i.note ? `<span>${esc(i.note)}</span>` : ""}</div>`,
           )
           .join("");
       }
@@ -476,7 +529,7 @@
         });
       }
 
-      function renderVisitors(records) {
+      function renderVisitors(records, detail) {
         const box = $("#visitors");
         if (!records.length) {
           box.innerHTML = `<div class="empty-note">${tr("还没有访问记录。")}</div>`;
@@ -486,12 +539,26 @@
         $("#visitor-summary").textContent = `${records.length} ${tr("个来源")}`;
         const maxVisits = Math.max(...records.map((v) => v.visits), 1);
         box.innerHTML = `<div class="table-wrap"><table><thead><tr>
-            <th>${tr("访客")}</th><th>${tr("来源")}</th><th>${tr("环境")}</th>
-            <th class="num">${tr("访问")}</th><th class="num">${tr("页面")}</th>
+            <th></th><th>${tr("访客")}</th><th>${tr("来源")}</th><th>${tr("环境")}</th>
+            <th class="num">${tr("访问")}</th><th class="num">${tr("天数")}</th>
+            <th class="num">${tr("停留")}</th><th class="num">${tr("页面")}</th>
             <th>${tr("首次")}</th><th>${tr("最近")}</th>
           </tr></thead><tbody>${records
-            .map(
-              (v) => `<tr>
+            .map((v, i) => {
+              const key = v.ip;
+              const rows = detail[key] || [];
+              const detailRows = rows
+                .map(
+                  (p) =>
+                    `<tr class="visitor-detail-row" data-for="${esc(key)}" hidden><td></td><td colspan="9">${
+                      p.path.startsWith("view:")
+                        ? esc(p.title)
+                        : `<a href="/?path=${encodeURIComponent(p.path)}">${esc(p.title)}</a>`
+                    }<span class="vd-meta">${p.visits} ${tr("次")} · ${p.dwell ? tr("停留") + " " + fmtDwell(p.dwell) : tr("无停留数据")}</span></td></tr>`,
+                )
+                .join("");
+              return `<tr class="visitor-row" data-ip="${esc(key)}" aria-expanded="false">
+              <td class="twisty" aria-hidden="true"><span class="twisty-mark">▸</span></td>
               <td><span class="who">${v.name ? esc(v.name) : esc(v.ip)}</span>${
                 v.name
                   ? `<br><span style="color:var(--color-muted);font-size:var(--text-xs)">${esc(v.ip)}</span>`
@@ -500,12 +567,26 @@
               <td><span class="tag tag-${esc(v.host_kind)}">${v.host_kind === "local" ? tr("本机") : tr("局域网")}</span></td>
               <td>${esc(v.agent)}</td>
               <td class="num"><span class="v-num">${v.visits}</span><span class="bar bar-sm"><i style="width:${Math.max(2, Math.round((v.visits / maxVisits) * 100))}%"></i></span></td>
+              <td class="num">${v.days}</td>
+              <td class="num">${v.dwell ? fmtDwell(v.dwell) : "—"}</td>
               <td class="num">${v.pages}</td>
               <td class="when">${esc(v.first)}</td>
               <td class="when">${esc(v.last)}</td>
-            </tr>`,
-            )
+            </tr>${detailRows}`;
+            })
             .join("")}</tbody></table></div>`;
+        box.querySelectorAll(".visitor-row").forEach((row) => {
+          row.onclick = () => {
+            const ip = row.dataset.ip;
+            const open = row.getAttribute("aria-expanded") === "true";
+            row.setAttribute("aria-expanded", String(!open));
+            const mark = row.querySelector(".twisty-mark");
+            if (mark) mark.textContent = open ? "▸" : "▾";
+            box
+              .querySelectorAll(`.visitor-detail-row[data-for="${CSS.escape(ip)}"]`)
+              .forEach((d) => (d.hidden = open));
+          };
+        });
       }
 
       function renderPages(records) {
@@ -515,8 +596,9 @@
           return;
         }
         const max = Number(records[0].visits) || 1;
+        const maxDwell = Math.max(...records.map((p) => Number(p.dwell) || 0), 1);
         box.innerHTML = `<div class="table-wrap"><table><thead><tr>
-            <th>${tr("文章与页面")}</th><th class="num">${tr("阅读")}</th><th style="width:22%"></th>
+            <th>${tr("文章与页面")}</th><th class="num">${tr("阅读")}</th><th class="num">${tr("停留")}</th><th style="width:22%"></th>
             <!-- 【rt21】"文章与页面/阅读"是本表表头，"文章"已被 sources 页
                  占用（=Writing，语义错），故这两键走下方 insights 专属词条
                  （文章与页面=Note/阅读=Reads），不复用全局键。 -->
@@ -525,7 +607,8 @@
               (p) => `<tr>
               <td><a href="/?path=${encodeURIComponent(p.path)}">${esc(p.title)}</a></td>
               <td class="num">${p.visits}</td>
-              <td><span class="bar"><i style="width:${Math.max(4, Math.round((Number(p.visits) / max) * 100))}%"></i></span></td>
+              <td class="num">${p.dwell ? fmtDwell(p.dwell) : "—"}</td>
+              <td><span class="bar"><i style="width:${Math.max(4, Math.round((Number(p.visits) / max) * 100))}%"></i><i class="bar-dwell" style="width:${Math.round(((Number(p.dwell) || 0) / maxDwell) * 100)}%"></i></span></td>
             </tr>`,
             )
             .join("")}</tbody></table></div>`;
@@ -533,15 +616,16 @@
 
       async function load() {
         try {
-          const [summary, feedback, visitors, pages] = await Promise.all([
+          const [summary, feedback, visitors, detail, pages] = await Promise.all([
             api("/api/insights/summary"),
             api("/api/insights/feedback"),
             api("/api/insights/visitors"),
+            api("/api/insights/visitor-detail"),
             api("/api/insights/pages"),
           ]);
           tiles(summary);
           renderFeedback(feedback.feedback || []);
-          renderVisitors(visitors.visitors || []);
+          renderVisitors(visitors.visitors || [], detail.detail || {});
           renderPages(pages.pages || []);
         } catch (error) {
           console.error(error);

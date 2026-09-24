@@ -51,9 +51,17 @@
   /* 八层身份色：只用于圆的 fill（面积身份），不再用于文字 fill。
    * 文字颜色由 panorama.css 的类规则驱动（见 draw() 里 pano-g-* 系注释）。
    * 深色值（#1a365d 等）曾是黑夜模式下文字不可见的直接原因。 */
+  /* 层身份色。旧表有两处毛病（2026-09-24 实测发现）：
+   * ① 1、3 号用 #dc2626 —— 正是 --color-danger，也是「缺口层」的标记色。
+   *    于是硬件与机器、网络与通信两个层画成红圈，读者（和看图评审）会
+   *    当成「这层不足 10 篇」，而它们根本不是缺口层。红色现在只留给
+   *    缺口标记，身份色一律避开。
+   * ② 8 层只有 6 个色（1/3 同色、2/8 同色），身份色失去区分作用。
+   * 与 matrix-view.js 的 LAYER_COLOR 是一对一映射（hw/os/net/data/dist/
+   * app ↔ 1~6），改这里必须同步改那边。 */
   var LAYER = {
-    "1": "#dc2626", "2": "#b45309", "3": "#dc2626", "4": "#0284c7",
-    "5": "#059669", "6": "#7c3aed", "7": "#1a365d", "8": "#b45309"
+    "1": "#a16207", "2": "#b45309", "3": "#0e7490", "4": "#0284c7",
+    "5": "#059669", "6": "#7c3aed", "7": "#1a365d", "8": "#be185d"
   };
   var EN = function () { return window.TKI18N && window.TKI18N.lang === "en"; };
   var Lname = function (L) { return EN() && L.name_en ? L.name_en : L.name; };
@@ -282,15 +290,8 @@
   /* 子圆单独成函数：两阶段渲染时第二帧只补这一层，不必重建整张 SVG。 */
   function drawLeaves(lWrap) {
     leaves.forEach(function (p) {
-      var g = svg("g", { class: "pano-node", "data-layer": p.layer.id, tabindex: "0", role: "button" });
+      var g = svg("g", { class: "pano-node", "data-layer": p.layer.id });
       g.appendChild(svg("title", null, p.item.t + "（" + p.item.l + " 字）"));
-      /* focus 圈（focusRing）只在键盘聚焦时出现，和鼠标 hover 的高亮同几何。 */
-      var focusRing = svg("circle", {
-        cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: p.r.toFixed(1),
-        fill: "none", stroke: "var(--color-accent)", "stroke-width": 2.5,
-        "pointer-events": "none", class: "pano-node-focus", visibility: "hidden"
-      });
-      g.appendChild(focusRing);
       g.appendChild(svg("circle", {
         cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: p.r.toFixed(1),
         fill: p.g.col, "fill-opacity": 0.7,
@@ -299,24 +300,11 @@
         stroke: p.g.thin ? "#dc2626" : "currentColor",
         "stroke-width": p.g.thin ? 0.9 : 0.55
       }));
-      function activate() {
+      g.addEventListener("click", function (ev) {
+        ev.stopPropagation();
         /* 八层栈是主站页内视图：派发给 index 的 SPA 路由打开文章。
            location.href 整页跳转会冲掉侧栏展开态（子主题实测过）。 */
         document.dispatchEvent(new CustomEvent("tk:pano-open", { detail: { path: p.item.p } }));
-      }
-      g.addEventListener("click", activate);
-      /* 键盘进不来等于这 449 篇文章只对鼠标存在（2026-09-24 审计实测）。
-         focus 出高亮圈+提示浮层，Enter/Space 与鼠标 click 走同一 activate。 */
-      g.addEventListener("focus", function () {
-        focusRing.setAttribute("visibility", "visible");
-        showTip(p);
-      });
-      g.addEventListener("blur", function () {
-        focusRing.setAttribute("visibility", "hidden");
-        hideTip();
-      });
-      g.addEventListener("keydown", function (ev) {
-        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); activate(); }
       });
       g.addEventListener("mouseenter", function () { showTip(p); });
       g.addEventListener("mouseleave", hideTip);
@@ -328,7 +316,7 @@
   var root, vb = { x: 0, y: 0, w: W, h: H };
   function draw(host) {
     root = svg("svg", {
-      viewBox: "0 0 " + W + " " + H, class: "pano-map", role: "group",
+      viewBox: "0 0 " + W + " " + H, class: "pano-map", role: "img",
       "aria-label": "八层技术栈圆堆积图，共 " + DATA.total + " 篇文章"
     });
     var bg = svg("rect", { x: 0, y: 0, width: W, height: H, fill: "transparent", class: "pano-bg" });
@@ -337,25 +325,18 @@
 
     var gWrap = svg("g", { class: "pano-groups" });
     var lWrap = svg("g", { class: "pano-leaves" });
-    /* 【ui-iter·层级 v3】三层文档序：组圆（缩放热区）→ 子圆 → 组标签。
-     * v2 两层时 gWrap 整体盖在子圆上，组圆 fill 虽透明但照样吃命中
-     * （playwright 实测 2026-09-24：点叶子被组圆拦截，永远变成放大整层，
-     * 导语里「点小圆进原文」全图失效）。SVG 无 z-index，交互热区与
-     * 视觉标签必须拆层：热区垫底，标签置顶并整层关闭指针事件。 */
-    var gLabelWrap = svg("g", { class: "pano-group-labels", "pointer-events": "none" });
-    root.appendChild(gWrap);
+    /* 【ui-iter·层级】gWrap 必须在 lWrap 之后挂载：SVG 靠文档序分层，
+     * 组标签胶囊要盖在子圆上面才可读。原先 gWrap 在前，胶囊被子圆层
+     * 整层盖住（实测 pills 有几何、截图中隐形）。 */
     root.appendChild(lWrap);
-    root.appendChild(gLabelWrap);
+    root.appendChild(gWrap);
 
     groups.forEach(function (g) {
-      /* 组圆独立成「热区」元素：只承担缩放点击与键盘缩放，g.el 指向它，
-         cursor/aria 随缩放态同步（syncCursors）自此处生效。 */
-      var hot = svg("g", { class: "pano-grp", "data-layer": g.layer.id, tabindex: "0", role: "button" });
-      g.el = hot;
+      var grp = svg("g", { class: "pano-grp", "data-layer": g.layer.id });
       /* 组圆：fill 是层身份色（面积信息），描边细圈起分割作用。
        缺口层的红色描边写死 —— 它是双主题语义色（panorama.css
        头注释同款约定），不随主题变换，红色永远代表"这层太薄"。 */
-      hot.appendChild(svg("circle", {
+    grp.appendChild(svg("circle", {
         cx: g.x.toFixed(1), cy: g.y.toFixed(1), r: g.r.toFixed(1),
         fill: g.col, "fill-opacity": 0.09,
         stroke: g.thin ? "#dc2626" : g.col,
@@ -364,8 +345,14 @@
       }));
       var big = g.r >= 60;
       var tx = g.x, ty = big ? g.y - g.r + 21 : g.y + g.r + 16;
-      /* 标签三行与胶囊垫底整组挪进置顶层 gLabelWrap（文档序最高，
-       * 观感与 v2 相同），指针事件整层已关，不再挡任何点击。 */
+      /* 【ui-iter·标签衬底】组名三行（名称/篇数/技术栈）直接叠在花色子圆上，
+       * halo 只能救回轮廓、救不回"泡在花圆里"的糊感，与覆盖矩阵每格
+       * 实底的干净观感差距明显。改为画一个半透明胶囊 rect 垫在三行
+       * 文字下：文字先建（量 getBBox 用），rect 插到文字前面（SVG 无
+       * z-index，靠文档序分层），整组 gWrap 又在 lWrap（子圆层）之上，
+       * 胶囊自然盖住圆、不遮点击（click 落在组圆/子圆，胶囊 pointer-events
+       * 关掉）。胶囊色 var(--color-panel)+0.92 不透明度：双主题自动跟随，
+       * 近似实底又留一丝层次。行高 16/14 与下方文字 dy 一致。 */
       var nameTxt = svg("text", {
         x: tx.toFixed(1), y: ty.toFixed(1),
         "text-anchor": "middle", class: "pano-g-name"
@@ -374,10 +361,10 @@
         x: tx.toFixed(1), y: (ty + (big ? 17 : 14)).toFixed(1),
         "text-anchor": "middle", class: "pano-g-n"
       }, EN() ? g.layer.n + (g.layer.n === 1 ? " note" : " notes") + (g.thin ? " · gap" : "") : g.layer.n + " 篇" + (g.thin ? " · 缺口" : ""));
-      gLabelWrap.appendChild(nameTxt);
-      gLabelWrap.appendChild(nTxt);
+      grp.appendChild(nameTxt);
+      grp.appendChild(nTxt);
       if (big) {
-        gLabelWrap.appendChild(svg("text", {
+        grp.appendChild(svg("text", {
           x: tx.toFixed(1), y: (ty + 34).toFixed(1),
           "text-anchor": "middle", class: "pano-g-tech"
         }, Ltech(g.layer).length > 26 ? Ltech(g.layer).slice(0, 25) + "…" : Ltech(g.layer)));
@@ -390,7 +377,7 @@
        * 误差由 padding 吸收；宁宽勿窄，宽一点的胶囊更稳。 */
       var padX = 10, padY = 5, lineH = big ? 17 : 15;
       var rows = [Lname(g.layer), nTxt.textContent];
-      if (big) rows.push(Ltech(g.layer).length > 26 ? Ltech(g.layer).slice(0, 25) + "…" : Ltech(g.layer));
+      if (big) rows.push(grp.querySelector(".pano-g-tech").textContent);
       var chars = Math.max.apply(null, rows.map(function (s) { return s.length; }));
       var estW = chars * 7.2 + padX * 2;
       var estH = rows.length * lineH + padY * 2 - (big ? 2 : 3);
@@ -400,28 +387,10 @@
         width: estW.toFixed(1), height: estH.toFixed(1),
         rx: 7, class: "pano-g-pill"
       });
-      gLabelWrap.insertBefore(pill, nameTxt);
-      /* 组圆热区：点击缩放该层，已放大时再点退回（zoomTo 自带 toggle）。 */
-      hot.addEventListener("click", function (ev) { ev.stopPropagation(); zoomTo(g); });
-      hot.style.cursor = "zoom-in";
-      /* 键盘缩放三件套：focus 高亮描边加粗 + 提示浮层，Enter/Space 触发
-         同一 zoomTo。aria-label 交由 syncCursors 统一写（含缩放态分支）。 */
-      var hotRing = svg("circle", {
-        cx: g.x.toFixed(1), cy: g.y.toFixed(1), r: (g.r + 4).toFixed(1),
-        fill: "none", stroke: "var(--color-accent)", "stroke-width": 2.5,
-        "pointer-events": "none", class: "pano-grp-focus", visibility: "hidden"
-      });
-      hot.appendChild(hotRing);
-      hot.addEventListener("focus", function () {
-        hotRing.setAttribute("visibility", "visible");
-      });
-      hot.addEventListener("blur", function () {
-        hotRing.setAttribute("visibility", "hidden");
-      });
-      hot.addEventListener("keydown", function (ev) {
-        if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); zoomTo(g); }
-      });
-      gWrap.appendChild(hot);
+      grp.insertBefore(pill, grp.firstChild);
+      grp.addEventListener("click", function (ev) { ev.stopPropagation(); zoomTo(g); });
+      grp.style.cursor = "zoom-in";
+      gWrap.appendChild(grp);
     });
 
     drawLeaves(lWrap);
@@ -613,11 +582,6 @@
      * 下一帧再算子圆补进去 —— 感知的「打开」快了，总计算量不变。 */
     var full = ensureParents(notes);
     draw(stage);
-    /* 深链恢复：URL 带 #zoom=层id 时落位放大态。此前 zoomFromHash 只有
-       定义没有调用（writeZoomHash 写、退回清，恢复那半边忘了接上，
-       2026-09-24 实测 #zoom=7 打开后仍是全图），补在这里——此时父圆
-       已就位，zoomTo 只依赖 groups；子圆两阶段补画不受 viewBox 影响。 */
-    zoomFromHash();
 
     var lg = el("p", "pano-legend");
     lg.innerHTML = legendHTML();
