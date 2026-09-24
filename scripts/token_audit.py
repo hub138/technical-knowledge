@@ -71,6 +71,10 @@ BUILT_IN = {
 LOCAL = {
     "--dot",  # index.html renderAtlas: topic circle diameter, from note count
     "--ink",  # index.html renderAtlas: the domain's accent colour
+    # index.html applyTransform: SVG 文字缩放补偿（zoom<1 时反向放大字号），
+    # 由 JS world.style.setProperty 写在 #graph-world 元素上，
+    # CSS 端 .node text/.topic-node text/.domain-head 消费
+    "--graph-comp",
 }
 
 

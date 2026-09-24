@@ -767,7 +767,7 @@
     "查看写作规范": { en: "Writing conventions" },
     "查看评估原型": { en: "Open the prototype" },
     "创建课堂": { en: "Create a classroom" },
-    "进入学习导师": { en: "Open the tutor" },
+    "进入学习导师": { en: "Enter the tutor" },
     "打开学习中心": { en: "Open Learning" },
     "查看项目与教学": { en: "See projects and learning" },
     "查看知识图谱": { en: "See the knowledge graph" },
@@ -954,13 +954,6 @@
     "从当前节点延伸": { en: "Extends from this note" },
     "展开知识图谱": { en: "Expand the graph" },
     "折叠知识图谱": { en: "Collapse the graph" },
-    /* shell.js 模板字符串里经 tr() 包裹的动态词条：运行时按展开后的
-       完整中文精确匹配（词典机制无模式匹配，键必须含具体 label 前缀
-       无法穷举——所以 shell.js 改为把整串交给 tr()，键用原型串。
-       实际匹配靠 t() 的精确查找，词条键与模板展开结果一致的场合
-       才命中；这里登记的是审计器抓到的字面量形态。 */
-    "展开 的子项": { en: "Expand the sub-items of " },
-    "看全部 篇": { en: "See all " },
     /* 【rt24】雷达卡（时效内容置顶卡）的 UI 串。卡片标题本身是笔记数据
        （title），但"每周更新"是固定标签。 */
     "每周更新": { en: "Updated weekly" },
@@ -2333,10 +2326,6 @@
     },
     "列出本机生成过的互动课堂，点开即学": {
       en: "Interactive classrooms generated on this machine, open one to continue",
-    },
-    "打开生成过的课堂": { en: "Open your generated classrooms" },
-    "继续打开本机生成过的互动课堂，查看生成状态，并把稳定结论复核后收录进知识库。": {
-      en: "Reopen interactive classrooms generated on this machine, check their status, and fold verified conclusions back into the knowledge base.",
     },
     "打开真实课堂": { en: "Open a real classroom" },
     "阅读本地中文项目说明": { en: "Read the local Chinese project notes" },

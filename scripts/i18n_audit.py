@@ -132,6 +132,10 @@ def html_literals(source: str) -> str:
     for literal in re.findall(r'"([^"\n]*)"', source):
         if HAN.search(literal) and not literal.startswith(("data-", "tk-")):
             chunks.append(literal)
+    # 模板字符串里的 ${...} 表达式体不是读者看到的文案（英文态内联拼装的
+    # 三元分支里，中文分支已有引号串单独被抓到），剔除表达式体避免把
+    # JS 代码本身当词条。
+    chunks = [re.sub(r"\$\{[^}]*\}", " ", c) for c in chunks]
     return "\n".join(chunks)
 
 
