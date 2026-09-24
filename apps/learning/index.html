@@ -874,10 +874,15 @@
         topic.value = TOPIC_EN;
       }
       const encoded = (value) => encodeURIComponent(value.trim());
+      /* 【rt21】空主题不原样放行：清空输入后提交，链接会变成
+         /?topic= 空值直达课堂确认页（实测弹出 URL 可见）。openmaic.html
+         的 buildLaunch 同一场景兜底为默认提示词，两处实现必须同一口径。 */
+      const DEFAULT_TOPIC = "请围绕一个工程主题生成互动课堂";
+      const DEFAULT_PROMPT = "请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握";
       const maicUrl = (value) =>
-        `/launch/openmaic?next=${encodeURIComponent("/?topic=" + encoded(value))}`;
+        `/launch/openmaic?next=${encodeURIComponent("/?topic=" + encoded(value.trim() || DEFAULT_TOPIC))}`;
       const tutorUrl = (value) =>
-        `/launch/deeptutor?next=${encodeURIComponent("/chat?prompt=" + encoded(value))}`;
+        `/launch/deeptutor?next=${encodeURIComponent("/chat?prompt=" + encoded(value.trim() || DEFAULT_PROMPT))}`;
       function bindLaunch(link, kind, value) {
         link.href = kind === "maic" ? maicUrl(value) : tutorUrl(value);
       }
