@@ -19,6 +19,12 @@
       subnav: window.TK_NAV.subitems,
       auth: true,
       }));
+      /* 全站搜索框：放在「我现在想学」表单之后。两者分工不同 —— 表单是选
+         主题去生成课堂，搜索是找已写好的文章，回车带词去主站 /?q=。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.mountSearch({
+        selector: '.hero .page-toolbar',
+        id: 'learn-search',
+      }));
       /* 反馈入口与主站是同一个组件，收到的意见进同一个收件箱。 */
       document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
         where: () => '当前页面：<b>' + (((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title) + '</b>',
@@ -489,6 +495,9 @@
 已经生成过课堂？<a href="/learn/history">打开我的课堂</a>。想按顺序读？<a href="/panorama/reading">进入学习路线</a>
           </p>
         </form>
+        <!-- 全站搜索：与上方「我现在想学」是两件事 —— 那里选主题生成课堂，
+             这里找已经写好的文章。挂点由 TKShell.mountSearch 填充。 -->
+        <div class="page-toolbar"></div>
       </section>
       <div class="purpose">
         <strong>知识库和这里的区别</strong

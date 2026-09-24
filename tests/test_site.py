@@ -117,6 +117,19 @@ class AuthenticationTests(unittest.TestCase):
         self.assertLess(len(packed), len(plain))
         self.assertEqual(_gzip.decompress(packed), plain)
 
+    def test_domains_api_includes_clippings(self) -> None:
+        """侧栏知识树必须包含 Clippings 分类。
+
+        剪藏文章搜得到但侧栏/首页都进不去、打开文章没有所属高亮
+        （2026-09-24 用户反馈）的根因就是这里把它排除了。守住：
+        Clippings 在列表里、排最后（与前端 PINNED_LAST 同规则）。"""
+        response = self.request("GET", "/api/domains")
+        self.assertEqual(response[0], 200)
+        names = [row["name"] for row in json.loads(response[2])["domains"]]
+        self.assertIn("Clippings", names)
+        """垫底组顺序与前端 PINNED_LAST 相同：Clippings 在前、知识库管理最后。"""
+        self.assertEqual(names[-2:], ["Clippings", "知识库管理"])
+
     def test_cache_headers_differ_by_kind(self) -> None:
         """js/css 重新验证,真静态资源可缓存,API/HTML 不缓存。
 

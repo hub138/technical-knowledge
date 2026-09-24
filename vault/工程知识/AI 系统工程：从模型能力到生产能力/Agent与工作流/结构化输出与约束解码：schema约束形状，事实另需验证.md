@@ -15,6 +15,10 @@ sources:
   - "https://arxiv.org/abs/2307.09702"
   - "https://json-schema.org/"
   - "https://modelcontextprotocol.io/specification/2026-07-28"
+editorial_pass: 1
+editorial_at: 2026-09-24
+editorial_by: agent-A
+editorial_note: "基线零命中、密度达标、六维与案例回流齐全，无需改动"
 ---
 
 # 结构化输出与约束解码：schema约束形状，事实另需验证

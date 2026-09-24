@@ -87,6 +87,10 @@
       match: (p) => p.startsWith("/panorama/reading"),
     },
     {
+      key: "path",
+      match: (p) => p.startsWith("/panorama/path"),
+    },
+    {
       key: "learning",
       match: (p) =>
         p.startsWith("/learn") || /^\/apps\/learning\/(index|openmaic|intuition|transfer)/.test(p),
@@ -306,6 +310,54 @@
    *   onNavClick  handler receiving (event, item) so a page can intercept a
    *               link — the main site uses this for the in-page graph view
    */
+  /* ── 全站搜索框（入口页用）──────────────────────────────────────────
+   * 为什么收进 shell：项目页、学习中心这两类入口页此前没有搜索框，读者
+   * 想找文章只能先退回首页。每页各自复制一份结构又会重演「两套搜索框
+   * 长相不一」的老问题（base.css .tk-search 注释里记着），所以挂点由
+   * shell 统一生成，皮肤仍走 base.css 的 .tk-search，页面零样式。
+   *
+   * 行为：回车跳主站 /?q=词（主站 selectFromUrl 已认 q 并直接进结果态）。
+   * 不做本地筛选 —— 这两页都是导航入口，卡片个位数，本地筛价值低于
+   * 「把人带去全站搜索」。 */
+  const mountSearch = (opts = {}) => {
+    const host = opts.mount || document.querySelector(opts.selector || ".page-toolbar");
+    if (!host) return null;
+    const lang = window.TKI18N && window.TKI18N.lang === "en";
+    const placeholder =
+      opts.placeholder || (lang ? "Search all articles" : "搜全站文章，回车跳转");
+    const id = opts.id || "tk-page-search";
+
+    const label = document.createElement("label");
+    label.className = "tk-search";
+    label.innerHTML =
+      `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>` +
+      `<input type="search" id="${id}" placeholder="${placeholder}" autocomplete="off" aria-label="${placeholder}">`;
+    host.appendChild(label);
+
+    const input = label.querySelector("input");
+    /* 回车跳主站。词为空就不跳，免得把人平白送走。 */
+    const go = () => {
+      const q = input.value.trim();
+      if (!q) return;
+      window.location.href = "/?q=" + encodeURIComponent(q);
+    };
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        go();
+      }
+    });
+    /* ⌘K / Ctrl+K 聚焦，与主页、papers、sources 同款键位。 */
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        input.focus();
+        input.select();
+      }
+    });
+    return input;
+  };
+
   const sidebar = (opts = {}) => {
     const page = opts.page || (() => {
       /* 三个视图（graph / panorama / progress）的 pathname 全是 `/`，
@@ -316,11 +368,7 @@
         const view = q.get("view");
         if (view === "graph" || view === "panorama" || view === "progress") return view;
       }
-      /* 学习路线与我的阅读同在 /panorama/reading 一个页面里，靠锚点区分：
-         带 #rd-path 的链接高亮「学习路线」，否则高亮「我的阅读」。 */
-      if (location.pathname.startsWith("/panorama/reading")) {
-        return location.hash === "#rd-path" ? "path" : "reading";
-      }
+      /* 系统阅读路线与我的阅读是各自独立的页面，按路径直接区分。 */
       return keyForPath(location.pathname);
     })();
     const meta = metaFor(page);
@@ -1293,6 +1341,7 @@
 
   window.TKShell = {
     sidebar,
+    mountSearch,
     feedback,
     migratePath,
     progress,

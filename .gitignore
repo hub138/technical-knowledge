@@ -117,3 +117,4 @@ vault.bak-*/
 # 那三个字段跟着文章走，是唯一的事实源。
 /.editorial/
 .agent/tmp/
+.concurrent-guard/

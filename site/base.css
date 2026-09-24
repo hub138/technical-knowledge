@@ -148,6 +148,12 @@ body.tk-host::before {
 .tk-nav a[aria-current="page"] {
   position: relative;
   font-weight: var(--weight-semibold);
+  /* 当前位置要有「已被按下」的实感：内阴影让底色像凹进去一点，
+     外阴影把它从侧栏里抬起来。此前只有底色+左边线，与其它 hover 项
+     区分度不够，读者扫侧栏找不出自己在哪（2026-09-24 反馈）。 */
+  box-shadow:
+    var(--shadow-xs),
+    inset 0 1px 2px rgba(20, 42, 35, 0.06);
 }
 
 /* ── 常驻推荐位：站长钉选的导航项（nav.js pinned: true，当前为知识全
@@ -467,6 +473,17 @@ a.has-children {
   border-left-color: var(--color-accent);
   border-left-width: 2px;
   color: var(--color-accent);
+  /* 当前域：底色 + 竖条 + 阴影三路信号。
+     此前只有一条 2px 左边线，与相邻的未选中域行几乎分不开，
+     模型评审（2026-09-24）实测「阴影几乎看不出来、起作用的是底
+     色和竖条」——底色补上后三层信号各自成立。圆角把整行收成一个
+     色块，与主题子项的方形左线在形状上分开。 */
+  background: var(--color-accent-soft);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding-right: 8px;
+  box-shadow:
+    var(--shadow-sm),
+    inset 0 1px 2px rgba(20, 42, 35, 0.06);
 }
 
 .tk-domain .count {
@@ -719,6 +736,15 @@ a.has-children {
 .hero .page-toolbar {
   margin-top: var(--space-4);
 }
+
+/* 入口页（projects / learning）的搜索框由 TKShell.mountSearch 挂进来，
+   结构与 papers/sources 同款，但那两页工具栏里还有别的过滤件分摊宽度，
+   这里只有搜索一个 —— 不收口会通栏铺满（projects 实测 1043px），
+   与「搜索是头部的一个控件」的分量不符。480px 与首页顶栏搜索同宽。 */
+.hero .page-toolbar .tk-search {
+  flex: 0 1 480px;
+  max-width: 480px;
+}
 .page-toolbar input[type="search"] {
   flex: 1 1 240px;
   min-width: 0;
@@ -793,7 +819,11 @@ a.has-children {
   background: var(--color-panel);
   color: var(--color-ink);
   font: var(--weight-normal) var(--text-body) / 1.4 var(--font-sans);
-  box-shadow: 0 1px 2px rgba(20, 42, 35, 0.02);
+  /* 阴影从 0 1px 2px/.02 提到 --shadow-xs：入口页（projects/learning）
+     的搜索框放在宽松留白的 hero 里，浅底浅描边让它成为整块视觉分量
+     最轻的元素，模型评审（2026-09-24）实测「存在感弱、层次少于同区域
+     卡片」。这是全站真源，提了 papers/sources 一并受益。 */
+  box-shadow: var(--shadow-xs);
   outline: 0;
 }
 /* 2026-09-22 改进 10：恢复原生清除钮（sources 页改进 9 的空状态提示

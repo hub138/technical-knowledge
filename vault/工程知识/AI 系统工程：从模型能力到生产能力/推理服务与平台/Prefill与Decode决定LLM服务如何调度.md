@@ -2,7 +2,7 @@
 title: Prefill 与 Decode 决定 LLM 服务如何调度
 status: active
 type: concept
-updated: 2026-09-03
+updated: 2026-09-25
 change_rate: medium
 confidence: high
 review_after: 2027-03-03
@@ -13,6 +13,10 @@ sources:
   - "https://docs.vllm.ai/en/latest/"
   - "https://docs.nvidia.com/dynamo/latest/architecture/disaggregated_serving.html"
   - "https://arxiv.org/abs/2403.02310"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "清两处英文混入与一处二分对照，图与内容不动"
 ---
 
 # Prefill 与 Decode 决定 LLM 服务如何调度
@@ -22,17 +26,17 @@ Prefill 处理输入上下文，计算密集且可以批量；Decode 逐 token �
 
 ## 两个阶段为何互相干扰
 
-一个长 prompt 的 prefill 混进正在输出的批次时，GPU 时间被它整块占住，所有在途会话的下一次 decode 只能等它算完，用户看到的现象就是 token 流突然停住再恢复。
+一个长输入的 prefill 混进正在输出的批次时，GPU 时间被它整块占住，所有在途会话的下一次 decode 只能等它算完，用户看到的现象就是 token 流突然停住再恢复。
 
 ![不同调度器面对同一批请求的迭代时间线：vLLM 与 Orca 让在途 decode 停摆，FasterTransformer 让新 prefill 饿死，Sarathi-Serve 把 prefill 切块与 decode 交错后两头不停](https://arxiv.org/html/2403.02310v1/sarathi_server_timeline.svg)
 
-上图是同一批请求（A、B 在途 decode，C、D 新进入）在四种调度器下的迭代时间线，取自 [Sarathi-Serve 论文（OSDI 2024）](https://arxiv.org/abs/2403.02310)：vLLM 与 Orca 把整段 prefill 排在 decode 前面，在途用户的 token 间隔被拉长数秒；FasterTransformer 反过来先 decode，新请求的 prefill 一直排不上。两种优先级各牺牲一边，这就是混部队列的两难；Sarathi-Serve 的分块 prefill（图中 Cp1、Cp2）把一次长 prefill 拆进多个迭代与 decode 交错，两头都不停。反过来，如果调度器永远优先 decode，新的长输入可能长期拿不到 prefill 机会，TTFT 恶化。因此调度目标不是简单“填满 GPU”，而是在首 token 和连续输出之间分配有限时间、显存与批次位置。
+上图是同一批请求（A、B 在途 decode，C、D 新进入）在四种调度器下的迭代时间线，取自 [Sarathi-Serve 论文（OSDI 2024）](https://arxiv.org/abs/2403.02310)：vLLM 与 Orca 把整段 prefill 排在 decode 前面，在途用户的 token 间隔被拉长数秒；FasterTransformer 反过来先 decode，新请求的 prefill 一直排不上。两种优先级各牺牲一边，这就是混部队列的两难；Sarathi-Serve 的分块 prefill（图中 Cp1、Cp2）把一次长 prefill 拆进多个迭代与 decode 交错，两头都不停。反过来，如果调度器永远优先 decode，新的长输入可能长期拿不到 prefill 机会，TTFT 恶化。调度目标因此是在首 token 和连续输出之间分配有限时间、显存与批次位置，填满 GPU 只是副产物。
 
 ## 连续批处理与分块 prefill
 
 传统静态批处理等整批请求结束后再换批，短请求会被长请求拖住。连续批处理在序列完成时立即替换新序列，使批次随 decode 步动态变化。
 
-分块 prefill 将长输入切分，在同一调度周期内与 decode token 交错。它可以降低长 prompt 对 ITL 的阻塞，但会增加调度复杂度，chunk 大小也会改变 TTFT、吞吐和 kernel 效率。合理参数必须由真实长度分布和 SLO 决定。
+分块 prefill 将长输入切分，在同一调度周期内与 decode token 交错。它可以降低长输入对 ITL 的阻塞，但会增加调度复杂度，分块大小也会改变 TTFT、吞吐和 kernel 效率。合理参数必须由真实长度分布和 SLO 决定。
 
 ## 是否分离 prefill 与 decode
 

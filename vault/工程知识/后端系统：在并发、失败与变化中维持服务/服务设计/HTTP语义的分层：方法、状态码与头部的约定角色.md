@@ -62,6 +62,14 @@ POST 两者都不保证。它不是"创建"的同义词，而是"语义未定、
 - **追踪**：`traceparent`（W3C Trace Context）与 `request-id`，把一跳一跳的观测串成一条链路；请求穿过各层边界时的观测点见 [[工程知识/后端系统：在并发、失败与变化中维持服务/服务设计/HTTP请求穿过浏览器、网络与服务端边界]]。
 - **逐跳 vs 端到端**：`Connection` 及逐跳头部只作用于相邻一跳，代理不应把它们转发下去；端到端头部才会到达最终服务端。把两者搞混，会出现"本地直连正常、过一层代理就丢头"的现象。
 
+真实报文里头部层长什么样，Cloudflare 学习站贴了两屏 DevTools 截图——请求头一屏、响应头一屏，正文讲的字段都在里面：
+
+![Cloudflare Learning Center 截图：一次对 www.google.com 的 GET 请求的 Request Headers 面板——伪头部 :authority、:method、:path、:scheme（HTTP/2 形态）之后是 accept: text/html、accept-encoding: gzip, deflate, br、accept-language、upgrade-insecure-requests、user-agent 等端到端头部逐行列出](https://www.cloudflare.com/img/learning/ddos/glossary/hypertext-transfer-protocol-http/http-request-headers.png)
+
+![Cloudflare Learning Center 截图：对应的 Response Headers 面板——cache-control: private, max-age=0、content-encoding: br、content-type: text/html; charset=UTF-8、date、status: 200、strict-transport-security: max-age=86400、x-frame-options: SAMEORIGIN 逐行列出，缓存语义与安全策略都通过头部声明](https://www.cloudflare.com/img/learning/ddos/glossary/hypertext-transfer-protocol-http/http-response-headers.png)
+
+来源：Cloudflare Learning Center，[What is HTTP?](https://www.cloudflare.com/learning/ddos/glossary/hypertext-transfer-protocol-http/)。两屏合起来正是"头部是元数据通道"的实物：请求屏的 `accept-encoding` 与响应屏的 `content-encoding: br` 是一次内容协商的两端，响应屏的 `cache-control` 决定中间每一层代理能缓存多久——头部层配错了，图里这两屏的任何一个字段都是故障现场。
+
 ## 边界
 
 - 状态码表达**协议层**结果，不表达业务结果：订单被风控拒绝是 200 还是 422，取决于它是不是协议意义上的失败，实践中按"调用方能否用同一套重试逻辑处理"来划。

@@ -2,7 +2,7 @@
 title: 浏览器与Computer Use Agent：高噪声观察下的受控操作
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-24
 review_after: 2027-03-22
 change_rate: medium
 confidence: high
@@ -14,6 +14,10 @@ tags:
 sources:
   - "https://playwright.dev/docs/intro"
   - "https://owasp.org/www-project-top-ten/"
+editorial_pass: 1
+editorial_at: 2026-09-24
+editorial_by: agent-A
+editorial_note: "清极值判断句一处，图与内容不动"
 ---
 
 # 浏览器与Computer Use Agent：高噪声观察下的受控操作
@@ -77,7 +81,7 @@ assert "订单已创建" in after.dom.text               # 确认文案出现
 
 跑一遍的收获：高噪声观察下可靠性的来源是"结构化锚点 + 动作后验证"——模型负责从截图读出"该点什么"，运行时负责把"点"对应到可验证的 DOM 引用上；职责分开后，噪声只是降低效率，不直接变成错误动作。
 
-三层护栏里真正分出成败的是最后一道。同一个点击，动作之后读不读回状态，走出两条路：
+三层护栏中，验证层决定错误在哪一步被发现。同一个点击，动作之后读不读回状态，走出两条路：
 
 ```mermaid
 graph TD

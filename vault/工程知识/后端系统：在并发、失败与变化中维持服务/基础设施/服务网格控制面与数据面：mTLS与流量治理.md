@@ -27,6 +27,10 @@ sources:
 
 **数据面：sidecar 执行规则**。每个 Pod 里的 sidecar（Envoy）拦截该实例的全部进出流量：出向流量被 iptables 劫持到 sidecar，sidecar 按规则路由到目标 sidecar，再转给目标应用。链路变成 应用→sidecar→sidecar→应用，两跳本地加一跳网络。治理规则（重试、熔断、鉴权）在 sidecar 里执行，应用只管业务逻辑。
 
+![Istio sidecar 模式的控制面与数据面架构](https://istio.io/latest/docs/ops/deployment/architecture/arch.svg)
+
+上图把两块摆在一起：istiod（Pilot、Citadel 等的合并形态）经 xDS 把配置与证书推给每个 Pod 里的 sidecar，自己不在请求路径上；进出应用的流量全部经 sidecar 转发。图取自 [Istio 官方文档架构页](https://istio.io/latest/docs/ops/deployment/architecture/)。
+
 **mTLS：服务间身份的密码学化**。控制面给每个服务（身份来自 Kubernetes ServiceAccount）签发证书，sidecar 之间的连接全部 TLS 加密且双向验证（我要证明我是 order 服务，你也要证明你是 payment 服务）。服务间通信从"IP 可达即可通"升级为"证书身份验证才通"，网络位置不再是信任凭据——Pod 被攻破不能横向移动，内网抓包看不到明文。TLS握手与证书链（见 [[工程知识/后端系统：在并发、失败与变化中维持服务/基础设施/TLS握手与证书链：信任是怎么一层层背书的.md]]）的机制在网格里被控制面自动化了：签发、轮换、验证全部托管，证书有效期短到（24h 级）泄漏窗口小。
 
 ## 背景与代价

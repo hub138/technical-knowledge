@@ -27,9 +27,9 @@ with sync_playwright() as p:
     print("overview_exists:", page.locator('.tk-subnav-overview').count())
     print("overview_text:", page.locator('.tk-subnav-overview').first.inner_text() if page.locator('.tk-subnav-overview').count() else "none")
 
-    print("=== 点学习路线子项 ===")
+    print("=== 点系统阅读路线子项 ===")
     navs.clear()
-    page.locator('.tk-subnav-inline[href="/panorama/reading#rd-path"]').first.click()
+    page.locator('.tk-subnav-inline[href="/panorama/path"]').first.click()
     page.wait_for_timeout(2500)
     print("url:", page.url)
     print("navs:", len(navs))
@@ -38,6 +38,7 @@ with sync_playwright() as p:
         return a ? a.textContent.trim() : 'none';
     }"""))
     print("h1:", page.locator("h1").first.inner_text())
+    print("lp_stages:", page.evaluate("() => document.querySelectorAll('.lp-stage').length"))
 
     print("=== 点我的阅读子项 ===")
     page.goto(BASE + "/panorama/reading", wait_until="domcontentloaded")
@@ -47,6 +48,7 @@ with sync_playwright() as p:
         return a ? a.textContent.trim() : 'none';
     }"""))
     print("h1:", page.locator("h1").first.inner_text())
-    print("rd_reading_top:", page.evaluate("() => Math.round(document.getElementById('rd-reading').getBoundingClientRect().top)"))
-    print("first_section_h2:", page.locator("#rd-reading h2").first.inner_text())
+    print("h1_top:", page.evaluate("() => Math.round(document.querySelector('h1').getBoundingClientRect().top)"))
+    print("first_section_h2:", page.locator(".rd-sec h2").first.inner_text())
+    print("route_card:", page.evaluate("() => !!document.querySelector('.pg-route')"))
     browser.close()

@@ -982,6 +982,11 @@
     "篇 · 主题按知识对象归属": { en: " notes · topics grouped by what they are about" },
     "按标题": { en: "By title" },
     "按更新": { en: "By updated" },
+    /* 目录第三种排序：按文章自己写的 review_after 升序，已过复查日的在最前。
+       条目上的「剩 N 天到期」「已过期 N 天」是拼数字的串，整串不命中词典，
+       在 index.html 里按语言分支拼，这里只收按钮与分组名。 */
+    "按即将到期": { en: "By review due" },
+    "即将到期": { en: "Review due soon" },
     "搜索结果": { en: "Search results" },
     "全部知识": { en: "All notes" },
     "没有找到": { en: "Nothing found for" },
@@ -1127,6 +1132,45 @@
     "次": { en: "×" },
     "无停留数据": { en: "no dwell data" },
     "今日访问": { en: "Today" },
+
+    // ── 中台：知识保鲜（复查台账）──
+    // 数字标签与表头都是独立词条；「在管 452 · 最近一次巡检 …」这类带数字的
+    // 汇总句在 insights.html 里分段拼，不整串进词典。
+    "知识保鲜": { en: "Knowledge freshness" },
+    "到期按文章自己写的 review_after 判定；结论由 review_after.py squash 写回，巡检每天 09:00 自动跑一次": {
+      en: "Due dates come from each note's own review_after; conclusions are written back by review_after.py squash, and the patrol runs daily at 09:00",
+    },
+    "在管": { en: "Tracked" },
+    "最近一次巡检": { en: "Last patrol" },
+    "还没有巡检记录": { en: "No patrol has run yet" },
+    "已过复查日": { en: "Past review date" },
+    "30 天内到期": { en: "Due within 30 days" },
+    "认领中": { en: "Claimed" },
+    "有核验记录": { en: "With a review record" },
+    "近 7 天无变化": { en: "Unchanged, last 7 days" },
+    "近 7 天已更新": { en: "Updated, last 7 days" },
+    "近 7 天缓办": { en: "Deferred, last 7 days" },
+    "近 7 天失败": { en: "Failed, last 7 days" },
+    "认领中的文章": { en: "Claimed notes" },
+    "归属": { en: "Held by" },
+    "任务类型": { en: "Task kind" },
+    "已持有": { en: "Held for" },
+    "编辑优化": { en: "editorial pass" },
+    "没有正在认领的文章": { en: "No note is claimed right now" },
+    "近 7 天的复查结论": { en: "Review conclusions, last 7 days" },
+    "结论": { en: "Conclusion" },
+    "无变化": { en: "Unchanged" },
+    // 「已更新」不能译成 Updated：词典里「更新于」已占这个英文，
+    // 反查时两个中文串会互相串门（i18n_dict_audit 的第二类问题）
+    "已更新": { en: "Content updated" },
+    "缓办": { en: "Deferred" },
+    // 「失败」已在词典上方定义（en: Failed），不重复收录
+    "近 7 天没有写回的复查结论": { en: "No review was written back in the last 7 days" },
+    "还没有带门禁的发布记录": { en: "No gated release has run yet" },
+    "最近一次发布被门禁拦下：": { en: "Last release was blocked by the gate: " },
+    "线上保持旧版本继续服务": { en: "the live site keeps serving the previous version" },
+    "最近一次发布通过门禁": { en: "Last release passed the gate" },
+
     "待处理反馈": { en: "Open feedback" },
     "反馈总数": { en: "Feedback total" },
     "反馈收件箱": { en: "Feedback inbox" },
@@ -1357,6 +1401,10 @@
     "搜站点、说明或文章标题": { en: "Search sites, notes, or article titles" },
     "AI总结": { en: "AI summary" },
     "最新一篇": { en: "Latest piece" },
+    /* 「最近成功抓取 3 天前」的前半句。后半句的相对时间由 Intl.RelativeTimeFormat
+       按当前语言给，所以词典只收前半句，整串不进词典（「约 X 分钟」同坑）。 */
+    "最近成功抓取": { en: "Last fetched" },
+    "还没有成功抓取记录": { en: "No successful fetch yet" },
     "内容来源": { en: "Content source" },
     // 论文页的外部收录
     "外部收录": { en: "External index" },

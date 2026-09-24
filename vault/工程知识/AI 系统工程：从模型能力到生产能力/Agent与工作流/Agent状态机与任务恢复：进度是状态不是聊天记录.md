@@ -15,6 +15,10 @@ sources:
   - "https://modelcontextprotocol.io/specification/2026-07-28"
   - "https://a2a-protocol.org/v1.0.0/specification/"
   - "https://en.wikipedia.org/wiki/Extended_finite-state_machine"
+editorial_pass: 1
+editorial_at: 2026-09-24
+editorial_by: agent-A
+editorial_note: "基线零命中、图密度达标、维度齐全，无需改动"
 ---
 
 # Agent状态机与任务恢复：进度是状态不是聊天记录

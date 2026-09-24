@@ -998,11 +998,14 @@ _CACHE_LOCK = threading.Lock()
 # 会启动多个并发刷新线程，把外部站打穿。
 _REFRESH_LOCK = threading.Lock()
 _LOADED = False
+# 磁盘快照的写入时刻（feeds-cache.json 的 saved_at）。页面上的「更新于」要的是这个，
+# 不是请求时刻——请求时刻恒等于现在，永远显示「刚刚更新」，等于没有告诉读者数据有多旧。
+_SAVED_AT = 0
 
 
 def _load_from_disk() -> None:
     """启动后第一次访问时把上次的快照读进内存，这样重启后的首个访客不用等。"""
-    global _LOADED
+    global _LOADED, _SAVED_AT
     if _LOADED:
         return
     _LOADED = True
@@ -1013,6 +1016,9 @@ def _load_from_disk() -> None:
     sources = payload.get("sources")
     if not isinstance(sources, dict):
         return
+    saved = payload.get("saved_at")
+    if isinstance(saved, (int, float)):
+        _SAVED_AT = int(saved)
     with _CACHE_LOCK:
         for key, entry in sources.items():
             if isinstance(entry, dict) and isinstance(entry.get("items"), list):
@@ -1020,12 +1026,14 @@ def _load_from_disk() -> None:
 
 
 def _save_to_disk() -> None:
+    global _SAVED_AT
     try:
         DATA_HOME.mkdir(parents=True, exist_ok=True)
     except OSError:
         return
     with _CACHE_LOCK:
-        payload = {"saved_at": int(time.time()), "sources": dict(_CACHE)}
+        _SAVED_AT = int(time.time())
+        payload = {"saved_at": _SAVED_AT, "sources": dict(_CACHE)}
     tmp = CACHE_FILE.with_name(CACHE_FILE.name + ".tmp")
     try:
         tmp.write_text(json.dumps(payload, ensure_ascii=False), encoding="utf-8")
@@ -1199,6 +1207,9 @@ def snapshot(force: bool = False) -> dict:
     return {
         "stale": not any(s["items"] for s in sources),
         "fetched_at": int(now),
+        # 磁盘快照写入时刻。fetched_at 是本次请求时刻（页面据它判断要不要重试），
+        # 两者不同：数据有多旧只有 saved_at 能回答
+        "saved_at": _SAVED_AT,
         "sources": sources,
     }
 

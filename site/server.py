@@ -40,6 +40,7 @@ from urllib.parse import parse_qs, quote, unquote, urlsplit
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from markdown_it import MarkdownIt
 
 # 同目录的兄弟模块。用显式路径插入而不是相对导入：server.py 会被
 # `python3 site/server.py` 直接跑，那时它不在包上下文里，相对导入会失败。
@@ -357,6 +358,12 @@ DATA_HOME = Path(
 )
 FEEDBACK_LOG = DATA_HOME / "feedback.jsonl"
 VISIT_LOG = DATA_HOME / "visits.jsonl"
+# 复查台账：knowledge-governor 的 review_after.py 与 freshness_patrol.py 写在这里。
+# 与 DATA_HOME 分开——它跟着仓库走（认领锁、账本、巡检报告都是仓库内的编辑状态），
+# 不是访客数据。目录在 gitignore 里，缺失时中台的知识保鲜板块显示为「还没有巡检记录」
+EDITORIAL_HOME = Path(
+    os.environ.get("KNOWLEDGE_EDITORIAL_HOME") or REPOSITORY_ROOT / ".editorial"
+)
 OPENMAIC_ACCESS_SERVICE = "knowledge-tools-model-access"
 OPENMAIC_JOBS_ROOT = Path(
     os.environ.get("OPENMAIC_HOME") or Path.home() / "Developer" / "knowledge-tools" / "OpenMAIC"
@@ -391,6 +398,7 @@ LEARNING_PAGES: dict[str, Path] = {
 # 旧 /learn/path 链接 308 到新地址，书签与历史记录不失效。
 PANORAMA_PAGES: dict[str, Path] = {
     "/panorama/reading": REPOSITORY_ROOT / "apps" / "panorama" / "reading.html",
+    "/panorama/path": REPOSITORY_ROOT / "apps" / "panorama" / "path.html",
 }
 
 PANORAMA_REDIRECTS: dict[str, str] = {
@@ -1310,6 +1318,12 @@ class Vault:
                 "status": scalar(front.get("status"), "active"),
                 "updated": scalar(front.get("updated"), ""),
                 "review_after": scalar(front.get("review_after"), ""),
+                # review_at 是 review_after.py squash 写回时留下的核验日期。
+                # 现存 452 篇一篇都还没有（复查闭环刚接上），文章页按 updated
+                # 回退显示，不能因为字段缺失就不显示核验日期。
+                # review_by/review_note 不进这里：/api/notes 是全站最大的一笔
+                # 下载，只有文章页与中台用得到的字段不往列表里加
+                "review_at": scalar(front.get("review_at"), ""),
                 "change_rate": scalar(front.get("change_rate"), ""),
                 "confidence": scalar(front.get("confidence"), ""),
                 "tags": tags,
@@ -1756,100 +1770,59 @@ def render_inline(source: str, vault: Vault, current: str) -> str:
 
 
 def render_markdown(body: str, vault: Vault, current: str) -> str:
-    lines = body.replace("\r\n", "\n").split("\n")
-    out: list[str] = []
-    i = 0
+    parser = MarkdownIt("commonmark", {"html": False}).enable("table")
+    blocks = parser.parse(body)
+    heading_ids: set[str] = set()
+    quotes = []
 
-    def is_table_header(index: int) -> bool:
-        return index + 1 < len(lines) and "|" in lines[index] and bool(re.match(r"^\s*\|?\s*:?-{3,}", lines[index + 1]))
+    for index, block in enumerate(blocks):
+        if block.type == "heading_open":
+            text = blocks[index + 1].content
+            base = re.sub(r"[^\w\u4e00-\u9fff-]+", "-", re.sub(r"<[^>]+>", "", text)).strip("-").lower() or "section"
+            ident, suffix = base, 2
+            while ident in heading_ids:
+                ident = f"{base}-{suffix}"
+                suffix += 1
+            heading_ids.add(ident)
+            block.attrSet("id", ident)
+        elif block.type == "th_open":
+            block.attrSet("scope", "col")
+        elif block.type == "blockquote_open":
+            first = blocks[index + 2] if index + 2 < len(blocks) else None
+            marker = re.match(r"^\[!([A-Za-z][A-Za-z0-9_-]*)\][ \t]*", first.content) if first and first.type == "inline" else None
+            if marker:
+                kind = marker.group(1).lower()
+                block.tag = "aside"
+                block.attrSet("class", f"callout {kind}")
+                first.content = first.content[marker.end():]
+                first.meta["callout_title"] = kind.title()
+            quotes.append(block.tag)
+        elif block.type == "blockquote_close":
+            block.tag = quotes.pop()
+        if block.type == "inline":
+            block.type = "knowledge_inline"
 
-    while i < len(lines):
-        line = lines[i]
-        if not line.strip():
-            i += 1
-            continue
-        fence = FENCE_RE.match(line)
-        if fence:
-            marker, lang = fence.groups()
-            code: list[str] = []
-            i += 1
-            while i < len(lines) and not lines[i].lstrip().startswith(marker[0] * len(marker)):
-                code.append(lines[i])
-                i += 1
-            if i < len(lines):
-                i += 1
-            if lang.lower() == "mermaid":
-                out.append(f'<pre class="mermaid">{html.escape(chr(10).join(code))}</pre>')
-                continue
-            klass = f' class="language-{html.escape(lang)}"' if lang else ""
-            out.append(f"<pre class=\"code-block\"><code{klass}>{html.escape(chr(10).join(code))}</code></pre>")
-            continue
-        heading = HEADING_RE.match(line)
-        if heading:
-            level, text = len(heading.group(1)), heading.group(2)
-            ident = re.sub(r"[^\w\u4e00-\u9fff-]+", "-", re.sub(r"<[^>]+>", "", text)).strip("-").lower()
-            out.append(f'<h{level} id="{html.escape(ident)}">{render_inline(text, vault, current)}</h{level}>')
-            i += 1
-            continue
-        if line.startswith("> [!"):
-            callout: list[str] = [line[2:].strip()]
-            i += 1
-            while i < len(lines) and lines[i].startswith(">"):
-                callout.append(lines[i][1:].lstrip())
-                i += 1
-            first = callout[0]
-            match = re.match(r"\[!([^\]]+)\]\s*(.*)", first)
-            kind, first_text = (match.group(1).lower(), match.group(2)) if match else ("note", first)
-            content = "\n".join([first_text] + callout[1:])
-            out.append(f'<aside class="callout {html.escape(kind)}"><strong>{html.escape(kind.title())}</strong><div>{render_inline(content, vault, current)}</div></aside>')
-            continue
-        if line.startswith(">"):
-            quote_lines: list[str] = []
-            while i < len(lines) and lines[i].startswith(">"):
-                quote_lines.append(lines[i][1:].lstrip())
-                i += 1
-            rendered_quote = render_inline("\n".join(quote_lines), vault, current)
-            out.append(f"<blockquote>{rendered_quote}</blockquote>")
-            continue
-        if is_table_header(i):
-            rows: list[list[str]] = []
-            while i < len(lines) and "|" in lines[i] and lines[i].strip():
-                cells = [c.strip() for c in lines[i].strip().strip("|").split("|")]
-                if not (len(rows) == 1 and all(re.match(r"^:?-{3,}:?$", c) for c in cells)):
-                    rows.append(cells)
-                i += 1
-            if rows:
-                head = "".join(f"<th>{render_inline(c, vault, current)}</th>" for c in rows[0])
-                body_rows = "".join("<tr>" + "".join(f"<td>{render_inline(c, vault, current)}</td>" for c in row) + "</tr>" for row in rows[1:])
-                out.append(f'<div class="table-wrap"><table><thead><tr>{head}</tr></thead><tbody>{body_rows}</tbody></table></div>')
-            continue
-        ul = UL_RE.match(line)
-        ol = OL_RE.match(line)
-        if ul or ol:
-            ordered = bool(ol)
-            items: list[str] = []
-            while i < len(lines):
-                match = (OL_RE if ordered else UL_RE).match(lines[i])
-                if not match:
-                    break
-                items.append(f"<li>{render_inline(match.group(1), vault, current)}</li>")
-                i += 1
-            tag = "ol" if ordered else "ul"
-            out.append(f"<{tag}>" + "".join(items) + f"</{tag}>")
-            continue
-        if re.match(r"^\s*((---+)|(\*\s*\*\s*\*))\s*$", line):
-            out.append("<hr>")
-            i += 1
-            continue
-        paragraph: list[str] = [line]
-        i += 1
-        while i < len(lines) and lines[i].strip() and not FENCE_RE.match(lines[i]) and not HEADING_RE.match(lines[i]):
-            if lines[i].startswith((">", "- ", "* ", "+ ")) or OL_RE.match(lines[i]) or is_table_header(i):
-                break
-            paragraph.append(lines[i])
-            i += 1
-        out.append(f"<p>{render_inline(' '.join(x.strip() for x in paragraph), vault, current)}</p>")
-    return "\n".join(out)
+    def inline_rule(tokens, index, options, env):
+        block = tokens[index]
+        title = block.meta.get("callout_title")
+        prefix = f"<strong>{html.escape(title)}</strong> " if title else ""
+        return prefix + render_inline(block.content, vault, current)
+
+    def code_rule(tokens, index, options, env):
+        block = tokens[index]
+        language = block.info.split()[0] if block.info.strip() else ""
+        code = html.escape(block.content.removesuffix("\n"))
+        if language.lower() == "mermaid":
+            return f'<pre class="mermaid">{code}</pre>\n'
+        klass = f' class="language-{html.escape(language, quote=True)}"' if language else ""
+        return f'<pre class="code-block"><code{klass}>{code}</code></pre>\n'
+
+    parser.renderer.rules["knowledge_inline"] = inline_rule
+    parser.renderer.rules["fence"] = code_rule
+    parser.renderer.rules["code_block"] = code_rule
+    parser.renderer.rules["table_open"] = lambda tokens, index, options, env: '<div class="table-wrap"><table>\n'
+    parser.renderer.rules["table_close"] = lambda tokens, index, options, env: '</table></div>\n'
+    return parser.renderer.render(blocks, parser.options, {})
 
 
 def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes:
@@ -2425,6 +2398,9 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/insights/feedback":
             self.send_json({"feedback": insights_feedback()})
             return
+        if path == "/api/insights/freshness":
+            self.send_json(insights_freshness(self.vault))
+            return
         if path.startswith("/projects/"):
             # 上游项目的 README 快照，供"查看技能说明""中文说明"这类链接直接读取。
             # 只放行项目目录下的 Markdown，且必须落在 projects/ 内，
@@ -2671,13 +2647,13 @@ class Handler(BaseHTTPRequestHandler):
             # 领域名 + 篇数。只给侧栏的知识树用。
             #
             # 单独一个轻接口而不是复用 /api/notes：后者 1.7MB（含全部笔记正文），
-            # 侧栏只要五个名字和数字。为一个导航条下载整个知识库不合理。
+            # 侧栏只要分类名和篇数。为一个导航条下载整个知识库不合理。
             self.vault.refresh()
             counts: dict[str, int] = {}
             for note in self.vault.notes.values():
                 category = note.get("category") or ""
                 topic = note.get("topic") or ""
-                if not category or category in {"总览", "Clippings"}:
+                if not category or category == "总览":
                     continue
                 if topic == "归档":
                     continue
@@ -2685,11 +2661,15 @@ class Handler(BaseHTTPRequestHandler):
             # 领域展示顺序：缺陷分析钉首位（用户指定的高频阅读域），其余按
             # 篇数降序。与 index.html 的 PINNED_FIRST 保持同一规则——侧栏
             # 知识树、首页领域卡、知识地形都吃这份顺序。
+            # Clippings 剪藏是外部文章的归档区，与知识库管理同为垫底项
+            # （与 index.html 的 PINNED_LAST 同一规则）。
             pinned = ("缺陷分析：从个案到体系",)
+            last = ("Clippings", "知识库管理")
             ranked = sorted(
                 counts.items(),
                 key=lambda kv: (
                     pinned.index(kv[0]) if kv[0] in pinned else len(pinned),
+                    last.index(kv[0]) if kv[0] in last else -1,
                     -kv[1],
                 ),
             )
@@ -3443,6 +3423,134 @@ def insights_pages(limit: int = 25) -> list[dict[str, object]]:
         entry = counts.setdefault(path, {"path": path, "title": title, "visits": 0})
         entry["visits"] = int(entry["visits"]) + 1
     return sorted(counts.values(), key=lambda e: int(e["visits"]), reverse=True)[:limit]
+
+
+def insights_freshness(vault) -> dict[str, object]:
+    """知识保鲜：到期、认领中、近 7 天复查结论、最近一次巡检与发布门禁。
+
+    三个事实源各答一件事，互不替代：
+    - vault 的 frontmatter 答「现在有多少篇过了复查日」，与 review_after.py list 同口径
+      （draft 与 deprecated 不算，它们不进复查队列）
+    - .editorial/claims 答「有多少篇正被认领」，半途中断的认领会一直留在这里
+    - .editorial/ledger.jsonl 答「近 7 天写回了什么结论」，reports/ 答「上次巡检是哪天」
+    """
+    vault.refresh()
+    today = time.strftime("%Y-%m-%d")
+    horizon = time.strftime("%Y-%m-%d", time.localtime(time.time() + 30 * 86400))
+    due = 0
+    soon = 0
+    reviewed = 0
+    tracked = 0
+    for note in vault.notes.values():
+        if not note.get("listed") or note.get("category") == "知识库管理":
+            continue
+        if str(note.get("status")) in {"draft", "deprecated"}:
+            continue
+        after = str(note.get("review_after") or "")
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", after):
+            continue
+        tracked += 1
+        if note.get("review_at"):
+            reviewed += 1
+        if after < today:
+            due += 1
+        elif after <= horizon:
+            soon += 1
+
+    claims_dir = EDITORIAL_HOME / "claims"
+    claims = []
+    if claims_dir.is_dir():
+        for path in sorted(claims_dir.glob("*.json")):
+            try:
+                record = json.loads(path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+                continue
+            claims.append({
+                "path": str(record.get("path") or ""),
+                "agent": str(record.get("agent") or "?"),
+                "kind": str(record.get("kind") or ""),
+                "held_hours": round((time.time() - float(record.get("ts") or 0)) / 3600.0, 1),
+            })
+
+    cutoff = time.time() - 7 * 86400
+    counts = {"ok": 0, "changed": 0, "skip": 0, "failed": 0}
+    recent: list[dict[str, object]] = []
+    for event in _read_jsonl(EDITORIAL_HOME / "ledger.jsonl", limit=100000):
+        if float(event.get("ts") or 0) < cutoff:
+            continue
+        action = str(event.get("action") or "")
+        result = str(event.get("result") or "")
+        # 结论计数只认 review-squash（人工与巡检写回都经过它），失败计数只认
+        # 巡检自己的判定；两者混在一起会把同一篇算两次
+        if action == "review-squash" and result in counts:
+            counts[result] += 1
+        elif action == "freshness-patrol" and result == "失败":
+            counts["failed"] += 1
+        else:
+            continue
+        recent.append({
+            "path": str(event.get("path") or ""),
+            "result": result,
+            "action": action,
+            "agent": str(event.get("agent") or ""),
+            "note": str(event.get("note") or ""),
+            "time": _day_key(float(event.get("ts") or 0)) + " " + time.strftime(
+                "%H:%M", time.localtime(float(event.get("ts") or 0))),
+        })
+    recent.reverse()
+
+    reports_dir = EDITORIAL_HOME / "reports"
+    patrol_dates = []
+    if reports_dir.is_dir():
+        patrol_dates = sorted(p.stem for p in reports_dir.glob("*.md")
+                              if re.fullmatch(r"\d{4}-\d{2}-\d{2}", p.stem))
+    last_patrol = patrol_dates[-1] if patrol_dates else ""
+    last_patrol_at = ""
+    if last_patrol:
+        stamp = (reports_dir / (last_patrol + ".md")).stat().st_mtime
+        last_patrol_at = _day_key(stamp) + " " + time.strftime("%H:%M", time.localtime(stamp))
+
+    return {
+        "tracked": tracked,
+        "due": due,
+        "soon": soon,
+        "soon_days": 30,
+        "reviewed": reviewed,
+        "claimed": len(claims),
+        "claims": claims[:20],
+        "week": counts,
+        "recent": recent[:20],
+        "last_patrol": last_patrol,
+        "last_patrol_at": last_patrol_at,
+        "patrol_reports": patrol_dates[-7:],
+        "deploy": last_deploy_gate(),
+    }
+
+
+def last_deploy_gate() -> dict[str, object]:
+    """最近一次带门禁的发布：通过还是被拦下，拦下的原因是什么。
+
+    deploy_gate.sh 每次都写两份：给人看的 reports/deploy-<时间>.md，和给页面读的
+    deploy-latest.json。读 json 而不是解析 md——把结论从散文里正则抠出来，
+    迟早会被一句改写的话弄错。
+    """
+    marker = EDITORIAL_HOME / "reports" / "deploy-latest.json"
+    try:
+        record = json.loads(marker.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return {}
+    if not isinstance(record, dict):
+        return {}
+    stamp = float(record.get("ts") or 0)
+    return {
+        "blocked": bool(record.get("blocked")),
+        "stage": str(record.get("stage") or ""),
+        "reason": str(record.get("reason") or ""),
+        "report": str(record.get("report") or ""),
+        "revision": str(record.get("revision") or ""),
+        "time": (_day_key(stamp) + " " + time.strftime("%H:%M", time.localtime(stamp)))
+                if stamp else "",
+    }
 
 
 def insights_feedback(limit: int = 200) -> list[dict[str, object]]:

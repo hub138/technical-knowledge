@@ -31,11 +31,33 @@ sources:
 
 **两段队列的关系**：accept 队列满时新完成握手的连接进不去——**SYN 队列调大解决不了 accept 慢**，两段的瓶颈要分开诊断。应用 accept 速度慢的原因常见三类：事件循环被慢请求占住、线程池饱和、accept 与业务处理在同一循环（处理一笔时新连接全在排队）。
 
+连接从网卡到应用要过两道闸，溢出发生在哪一道，故障形态完全不同：
+
+```mermaid
+graph TD
+    S[客户端 SYN] --> A["SYN 队列（半连接）<br/>syn_backlog 控制"]
+    A -->|握手完成| B["accept 队列<br/>两参数取小"]
+    B -->|应用取走| C[业务处理]
+    A -->|打满| E[新连接被拒]
+    B -->|溢出| F[丢 ACK 或 RST]
+```
+
+上图的归因指向：Cookies 计数上涨是第一道闸的账，listen queue overflow 计数上涨是第二道闸的账，两个计数器各管一段，缓解手段不通用。
+
 ## 看完能判断：取证与缓解
 
 **取证盯两个计数器**：`netstat -s` 的 **SYN cookies sent**（SYN 队列溢出后 Cookies 被触发的次数）与 **listen queue overflow / times the listen queue of a socket overflowed**（accept 队列溢出次数）；配合 `ss -lnt` 的 **Recv-Q/Send-Q**（监听套接字上 Recv-Q 是当前 accept 队列深度，接近 Send-Q 上限即临溢出）。**监控把这两个计数器做成速率曲线**——溢出偶发时按天看累计值，突发时按秒看速率，两者都要有告警。
 
 **缓解按瓶颈分段**：SYN 队列瓶颈（溢出 + Cookies 频繁）——确认 `tcp_max_syn_backlog` 合理（通常 1024+）、确认 SYN Cookies 常开（防护与容量兼得）；accept 队列瓶颈——调大 backlog 与 `somaxconn`（二者取小才生效，**只改应用不改 sysctl 是常见的无效操作**）+ 加快 accept（accept 与业务处理分离、事件循环职责分离）+ 挡突发（接入层限连、按来源分摊）。上游 BookKeeper 的一个同类改进是把 Netty 与 ZooKeeper 客户端升到新版本（减少连接层的行为差异），同一原则：**连接层的组件版本也是队列行为的变量**，取证时把组件版本一并记录。
+
+```mermaid
+graph TD
+    A["netstat -s 计数器"] --> B["SYN cookies 上涨<br/>即 SYN 队列溢出"]
+    B -->|处置| C["调 syn_backlog<br/>Cookies 常开"]
+    B --> D["listen overflow 涨<br/>即 accept 队列满"]
+    D -->|处置| E["两参数取小调大<br/>accept 与业务分离"]
+    D --> F["都平稳<br/>查网络与应用层"]
+```
 
 **压测验证**：用连接型压测工具把并发建连速率拉过队列上限，预期 `netstat -s` 的溢出计数按注入速率增长、默认行为下首包超时、`tcp_abort_on_overflow=1` 下连接被 RST——**压测报告里标注队列参数**，参数不同的两次压测结果不可比。
 

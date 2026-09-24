@@ -377,6 +377,17 @@
       <p class="section-note">含全景、图谱等视图页；只统计有具体位置的访问</p>
       <div id="pages"></div>
 
+      <!-- 知识保鲜：复查台账（.editorial/ledger.jsonl 与 reports/）的运营视图。
+           和访问数据不是一类 —— 那些答「有人读吗」，这一块答「读到的东西还成立吗」。
+           数据只对本机运营者开放，与本页其余板块同一把钥匙（/api/insights/* 按来源
+           地址拒绝，站点密码解不开）。 -->
+      <div class="section-head">
+        <h2>知识保鲜</h2>
+        <p id="fresh-summary"></p>
+      </div>
+      <p class="section-note">到期按文章自己写的 review_after 判定；结论由 review_after.py squash 写回，巡检每天 09:00 自动跑一次</p>
+      <div id="freshness"></div>
+
       <div class="caveat">
         <b>这些数字能说明什么。</b>
         总访问次数按进入页面的打点逐条累计，同一天反复刷新会累加；「按天去重访问」把同一天同一访客算作一次。停留时长来自页面隐藏或关闭时的一次补报，切后台、断网或直接杀进程时会缺报，所以停留只反映有人守着页面的时间，是信号，不是精确计时。访问量按 IP 去重：同一台设备换网络会被算成两个人，局域网 NAT 后的多台设备可能共用一个 IP。它是用来发现「哪些内容有人在看、哪些反馈还没处理」的信号，不是精确的用户统计。
@@ -625,19 +636,98 @@
             .join("")}</tbody></table></div>`;
       }
 
+      /* 知识保鲜板块。
+       *
+       * 四格数字回答四个不同的问题，不能合并：到期是「现在欠着多少」，
+       * 认领中是「有多少篇正被人或巡检占着」（半途中断的认领会一直留在这里），
+       * 近 7 天的三种结论是「查过之后判了什么」，失败是「派出去但没写回」。
+       * 把失败混进结论里会得到一份好看的报告和一个没人复查的知识库。 */
+      const FRESH_RESULT = { ok: "无变化", changed: "已更新", skip: "缓办", 失败: "失败" };
+
+      function renderFreshness(data) {
+        const box = $("#freshness");
+        const week = data.week || {};
+        const claims = data.claims || [];
+        const recent = data.recent || [];
+        const deploy = data.deploy || {};
+        $("#fresh-summary").textContent = [
+          `${tr("在管")} ${data.tracked || 0}`,
+          data.last_patrol
+            ? `${tr("最近一次巡检")} ${data.last_patrol_at || data.last_patrol}`
+            : tr("还没有巡检记录"),
+        ].join(" · ");
+        const cards = [
+          { n: data.due || 0, l: tr("已过复查日"), tone: data.due ? "warn" : "" },
+          { n: data.soon || 0, l: tr("30 天内到期"), tone: "" },
+          { n: data.claimed || 0, l: tr("认领中"), tone: "" },
+          { n: data.reviewed || 0, l: tr("有核验记录"), tone: "accent" },
+          { n: week.ok || 0, l: tr("近 7 天无变化"), tone: "" },
+          { n: week.changed || 0, l: tr("近 7 天已更新"), tone: "" },
+          { n: week.skip || 0, l: tr("近 7 天缓办"), tone: "" },
+          { n: week.failed || 0, l: tr("近 7 天失败"), tone: week.failed ? "warn" : "" },
+        ];
+        /* 发布门禁的结论。被拦下时必须把原因摆在这里 —— 门禁挡住了发布，
+           线上还跑着旧版本，这件事只有运营者看得到。 */
+        let gate;
+        if (!deploy.time) {
+          gate = `<p class="caveat">${tr("还没有带门禁的发布记录")}</p>`;
+        } else if (deploy.blocked) {
+          gate = `<p class="caveat"><b>${tr("最近一次发布被门禁拦下：")}</b>${esc(deploy.reason)}
+            · ${esc(deploy.stage)} · ${esc(deploy.time)} · ${tr("线上保持旧版本继续服务")}</p>`;
+        } else {
+          gate = `<p class="caveat">${tr("最近一次发布通过门禁")} · ${esc(deploy.time)}${deploy.revision ? " · " + esc(deploy.revision) : ""}</p>`;
+        }
+        const claimTable = claims.length
+          ? `<div class="table-wrap"><table><thead><tr>
+              <th>${tr("认领中的文章")}</th><th>${tr("归属")}</th><th>${tr("任务类型")}</th><th class="num">${tr("已持有")}</th>
+            </tr></thead><tbody>${claims
+              .map(
+                (c) => `<tr>
+                  <td>${c.path ? `<a href="/?path=${encodeURIComponent("工程知识/" + c.path)}">${esc(c.path)}</a>` : "—"}</td>
+                  <td>${esc(c.agent)}</td>
+                  <td>${esc(c.kind || tr("编辑优化"))}</td>
+                  <td class="num">${c.held_hours} ${tr("小时")}</td>
+                </tr>`,
+              )
+              .join("")}</tbody></table></div>`
+          : `<div class="empty-note">${tr("没有正在认领的文章")}</div>`;
+        const recentTable = recent.length
+          ? `<div class="table-wrap"><table><thead><tr>
+              <th>${tr("近 7 天的复查结论")}</th><th>${tr("结论")}</th><th>${tr("归属")}</th><th>${tr("时间")}</th>
+            </tr></thead><tbody>${recent
+              .map(
+                (r) => `<tr>
+                  <td>${r.path ? `<a href="/?path=${encodeURIComponent("工程知识/" + r.path)}">${esc(r.path)}</a>` : "—"}</td>
+                  <td>${esc(tr(FRESH_RESULT[r.result] || r.result))}</td>
+                  <td>${esc(r.agent)}</td>
+                  <td>${esc(r.time)}</td>
+                </tr>`,
+              )
+              .join("")}</tbody></table></div>`
+          : `<div class="empty-note">${tr("近 7 天没有写回的复查结论")}</div>`;
+        box.innerHTML = `<section class="tiles" aria-label="${tr("知识保鲜")}">${cards
+          .map(
+            (c) =>
+              `<div class="tile"${c.tone ? ` data-tone="${c.tone}"` : ""}><div class="tile-head"><span>${esc(c.l)}</span></div><b>${c.n}</b></div>`,
+          )
+          .join("")}</section>${gate}${claimTable}${recentTable}`;
+      }
+
       async function load() {
         try {
-          const [summary, feedback, visitors, detail, pages] = await Promise.all([
+          const [summary, feedback, visitors, detail, pages, freshness] = await Promise.all([
             api("/api/insights/summary"),
             api("/api/insights/feedback"),
             api("/api/insights/visitors"),
             api("/api/insights/visitor-detail"),
             api("/api/insights/pages"),
+            api("/api/insights/freshness"),
           ]);
           tiles(summary);
           renderFeedback(feedback.feedback || []);
           renderVisitors(visitors.visitors || [], detail.detail || {});
           renderPages(pages.pages || []);
+          renderFreshness(freshness);
         } catch (error) {
           console.error(error);
           const needLogin = error && error.operatorGate;

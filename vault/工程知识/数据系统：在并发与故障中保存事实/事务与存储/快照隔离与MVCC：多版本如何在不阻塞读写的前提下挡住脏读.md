@@ -32,6 +32,18 @@ sources:
 
 **版本链**：每行带创建它的事务 id 与删除标记（或删除版本号）。修改一行 = 写一个新版本，旧版本通过回滚指针串成链。读操作的可见性判定沿链走：从最新版本开始，逐个检查"创建它的事务在我的快照建立时是否已提交"，直到找到第一个可见版本。**判定规则的三要素——快照建立时机、活跃事务集合、提交状态——决定了读到哪个版本**。
 
+InnoDB 的版本链长这样——最新版本住在聚簇索引里，历史版本挂在 undo 空间，ROLL_PTR 从新指向旧：
+
+![MySQL InnoDB 版本链结构：左侧 B-Tree 索引页指向聚簇索引记录（PK Fields + TRX_ID + ROLL_PTR + 三列的最新值 v1/v3/v2），ROLL_PTR 存 undo 页号与页内偏移，右侧 Undo page 1/2 各存一条 undo record（PK Fields + TRX_ID + ROLL_PTR + 被改列的旧值），底部 Version chain 链条按 New version → Old version 方向串起 Field 1(v1)→Field 3(v2)→Field 3(v1)→Field 2(v2)→Field 2(v1)](https://kernelmaker.github.io/public/images/2026-03-10/5.png)
+
+来源：Zhao Song，[MySQL vs PostgreSQL Internals (Part 2) — MVCC](https://kernelmaker.github.io/mysql-vs-pg-mvcc)。undo record 只存被改列的旧值、不存整行副本，这就是版本存储的"差量"形态；可见性判定不可见时沿 ROLL_PTR 往旧走，方向与新→旧箭头一致。
+
+PostgreSQL 把新旧版本全放在表内（heap），用 HOT 链与快照配合找可见版本：
+
+![PostgreSQL 可见版本查找路径：B-Tree 索引页的两个 index tuple 各带 Heap TID 分别指向 Heap Page 1 与 Heap Page 2 的 HOT 链 V1 到 V3 与 V4 到 V6，编号 1-3 标出 MVCC 搜索顺序：从第一个 index tuple 的 HOT 链开始，链断则跳到同 PK 的下一个 index tuple 继续，底部 Logical Version Chain V1 到 V6 与 Snapshot xmin xids xmax 对照，说明按快照在链上找可见版本](https://kernelmaker.github.io/public/images/2026-03-10/10.png)
+
+来源：同上。与 InnoDB 相反，PG 的版本链从旧指向新（ctid 方向）、历史版本与最新版本混在同一个 heap 里靠 VACUUM 回收——同一篇正文说的"同一隔离级别名字下，可见性的精确起点与旧版本的存放位置是两种工程形态"，这两张图就是那两种形态的并排对照。
+
 **快照的建立时机**：REPEATABLE READ 下快照在整个事务期间不变（InnoDB 首次读时建立，PostgreSQL 首条查询时建立），重复读拿到同一版本，不可重复读消失；READ COMMITTED 下每条语句重新取快照，语句间能看到他人新提交的数据。**隔离级别的差异在 MVCC 实现里就是快照刷新频率的差异**——这是"机制层面的统一解释"，比"锁的范围不同"更准确。
 
 **脏读为什么天然消失**：未提交事务写的版本，创建它的事务必然不在任何其他事务的"已提交"集合里，可见性判定直接跳过——未提交数据对快照不可见，无需任何额外检查。脏读的根因（读到未提交数据）在版本选择这一步就被消除了。

@@ -2,7 +2,7 @@
 title: 模型权重文件是可执行输入：从 pickle 信任模型到格式即边界
 type: playbook
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 review_after: 2026-12-22
 change_rate: medium
 confidence: high
@@ -14,6 +14,10 @@ sources:
   - "https://github.com/huggingface/safetensors"
   - "https://docs.python.org/3/library/pickle.html"
   - "https://jfrog.com"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "L50二分对照改直接陈述（安全主张是让攻击无法表示），命中1到0，三查PASS密度0.52维持2图"
 ---
 
 # 模型权重文件是可执行输入
@@ -67,7 +71,7 @@ pickle 链上每一步都是格式设计好的行为：反序列化即执行，`
 
 ## 格式即边界：safetensors 的信任模型差异
 
-safetensors 的安全主张不是"扫描掉恶意内容"，而是"让攻击无法表示"。文件里只有头部长度、JSON 头和张量字节，加载路径读的是什么，结构图一目了然：
+safetensors 的安全主张是"让攻击无法表示"。文件里只有头部长度、JSON 头和张量字节，加载路径读的是什么，结构图一目了然：
 
 ![safetensors 格式结构：8 字节头长度、JSON 头声明张量名与字节区间、其余为原始张量数据](https://cdn-gcs.ngxson.com/nuiblog2/2025/2/1740665538210_94e230e8.jpg)
 

@@ -2,7 +2,7 @@
 title: ReAct计划执行搜索：三种行动范式的适用边界
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-24
 review_after: 2027-03-22
 change_rate: medium
 confidence: high
@@ -13,6 +13,11 @@ tags:
   - "agent/reliability"
 sources:
   - "https://arxiv.org/abs/2210.03629"
+  - "https://www.anthropic.com/engineering/building-effective-agents"
+editorial_pass: 1
+editorial_at: 2026-09-24
+editorial_by: agent-A
+editorial_note: "补 building-effective-agents 来源过二，无来源倍数改结构事实"
 ---
 
 # ReAct计划执行搜索：三种行动范式的适用边界
@@ -81,7 +86,7 @@ graph TD
 #   适用：明确的一跳任务（"查 X 的当前值"）
 ```
 
-案例回流：范式错配的实录——简单一跳任务用 ReAct，每步都过一遍"思考-行动-观察"的完整循环，token 成本高 5-10 倍、延迟高数倍，产出与单次调用相同；复杂多步调查用单次调用，模型幻觉出"假装调过工具"的答案（没有观察环节兜住，模型编造执行结果）。范式的成本差与 [[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/先用工作流，只有路径无法预先枚举时才使用Agent.md]] 的选型判据同构：确定性路径用流程固化，探索性路径才用循环，循环的每一轮都要有观察证据撑住（见 [[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/反思要有外部锚点.md]]）。
+案例回流：范式错配的实录——简单一跳任务用 ReAct，每步都过一遍"思考-行动-观察"的完整循环，一次模型调用就能完成的任务付出三倍以上的调用与 token，延迟同步放大，产出与单次调用相同；复杂多步调查用单次调用，模型幻觉出"假装调过工具"的答案（没有观察环节兜住，模型编造执行结果）。范式的成本差与 [[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/先用工作流，只有路径无法预先枚举时才使用Agent.md]] 的选型判据同构：确定性路径用流程固化，探索性路径才用循环，循环的每一轮都要有观察证据撑住（见 [[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/反思要有外部锚点.md]]）。
 
 两种错配从同一任务出发各走一条链，结局对照：
 

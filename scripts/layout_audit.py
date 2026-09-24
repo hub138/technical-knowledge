@@ -25,10 +25,11 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
+
+from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -93,8 +94,14 @@ PROBE = r"""
   (function settle(){
     var hasNav = document.querySelectorAll('.tk-nav a').length > 0;
     var hasSidebar = !!document.querySelector('.tk-sidebar');
+    /* fab 待机态有 0.28s opacity 过渡：load 时刻测 computed 值仍是 1，
+       过渡中判定遮挡会把 rest 态当成实色块。等过渡走到终值（或 fab
+       压根不存在）再量。 */
+    var fab = document.querySelector('.tk-fab');
+    var fabSettled = !fab || +getComputedStyle(fab).opacity < 0.2
+      || fab.classList.contains('tk-fab--rest') && +getComputedStyle(fab).opacity < 0.25;
     var exhausted = waited > 120;
-    if((hasNav || (!hasSidebar && exhausted)) && waited > 2){ done(); return; }
+    if((hasNav || (!hasSidebar && exhausted)) && waited > 2 && fabSettled){ done(); return; }
     if(exhausted){ done(); return; }
     waited++;
     setTimeout(settle, 40);
@@ -134,42 +141,57 @@ PROBE = r"""
    * 这不是布局问题，是检测没有把滚动偏移算进来。
    *
    * 判据换成：元素的矩形要落在视口内，而且没有被祖先的横向滚动推到外面。
+   *
+   * fab 是 fixed 沉底元素，长页内容滚动时必然从右下角穿过 —— 相交本身
+   * 不是缺陷（内容会滚走）。构成遮挡的是：当前停留位置压住内容，且
+   * 滚动到底后仍压住同一批内容（无处可躲）。探针先在原位测一遍，再
+   * 滚到底测一遍，取交集。
    */
   var fab = document.querySelector('.tk-fab');
   var covered = [];
   if(fab){
-    var fr = fab.getBoundingClientRect();
-    document.querySelectorAll('*').forEach(function(el){
-      if(el === fab || fab.contains(el)) return;
-      if(el.querySelector && el.querySelector('.tk-fab')) return;
-      var b = el.getBoundingClientRect();
-      if(b.width < 8 || b.height < 8) return;
-      // 只算视口内的：滑到屏幕外的内容不构成遮挡。
-      if(b.right <= 0 || b.left >= innerWidth) return;
-      if(b.bottom <= 0 || b.top >= innerHeight) return;
-      if(b.right < fr.left || b.left > fr.right || b.bottom < fr.top || b.top > fr.bottom) return;
-      var st = getComputedStyle(el);
-      if(st.visibility === 'hidden' || st.display === 'none' || +st.opacity < 0.1) return;
-      /* 横向滚动容器里的元素不算 —— 它们在被划到之前不在屏幕上。
-       *
-       * 一个横向滚动的轨道，未滚到的卡片矩形落在轨道右侧（实测 x=5376），
-       * 恰好经过浮动按钮那块区域，于是被报成"按钮压住标题"。但读者
-       * 看不到那张卡片，也点不到它 —— 它不是遮挡。
-       *
-       * 反过来说：真正要防的是**静止内容**被压住，比如正文、表格、
-       * 纵向列表。那些不在滚动容器里，这条排除不影响它们被检测到。 */
-      var n = el.parentElement, inScroller = false;
-      while(n){
-        var ps = getComputedStyle(n);
-        if(ps.overflowX === 'auto' || ps.overflowX === 'scroll'){ inScroller = true; break; }
-        n = n.parentElement;
-      }
-      if(inScroller) return;
-      var ownText = [].some.call(el.childNodes, function(n){
-        return n.nodeType === 3 && n.textContent.trim();
+    /* 触屏待机态（.tk-fab--rest：opacity .18 + pointer-events none +
+       滚动即显形）是站点有意设计，不构成可读性遮挡，整段跳过。 */
+    var fabRest = fab.classList.contains('tk-fab--rest')
+      && +getComputedStyle(fab).opacity < 0.25;
+    var fabHits = function(){
+      var fr = fab.getBoundingClientRect();
+      var found = [];
+      document.querySelectorAll('*').forEach(function(el){
+        if(el === fab || fab.contains(el)) return;
+        if(el.querySelector && el.querySelector('.tk-fab')) return;
+        var b = el.getBoundingClientRect();
+        if(b.width < 8 || b.height < 8) return;
+        if(b.right <= 0 || b.left >= innerWidth) return;
+        if(b.bottom <= 0 || b.top >= innerHeight) return;
+        if(b.right < fr.left || b.left > fr.right || b.bottom < fr.top || b.top > fr.bottom) return;
+        var st = getComputedStyle(el);
+        if(st.visibility === 'hidden' || st.display === 'none' || +st.opacity < 0.1) return;
+        var n = el.parentElement, inScroller = false;
+        while(n){
+          var ps = getComputedStyle(n);
+          if(ps.overflowX === 'auto' || ps.overflowX === 'scroll'){ inScroller = true; break; }
+          n = n.parentElement;
+        }
+        if(inScroller) return;
+        var ownText = [].some.call(el.childNodes, function(n){
+          return n.nodeType === 3 && n.textContent.trim();
+        });
+        if(ownText) found.push(label(el) + ':' + el.textContent.trim().slice(0, 12));
       });
-      if(ownText) covered.push(label(el));
-    });
+      return found;
+    };
+    if(!fabRest){
+      var here = fabHits();
+      if(here.length){
+        var sx = scrollX, sy = scrollY;
+        scrollTo(document.body.scrollWidth > innerWidth ? document.body.scrollWidth : 0,
+                 document.body.scrollHeight);
+        var atEnd = fabHits();
+        scrollTo(sx, sy);
+        covered = here.filter(function(x){ return atEnd.indexOf(x) !== -1; });
+      }
+    }
   }
   out.fabCovers = fab ? Array.from(new Set(covered)).slice(0, 6) : null;
 
@@ -231,6 +253,13 @@ PROBE = r"""
        它必然"溢出"（内容比 1px 的盒子大得多），但那是标准做法，
        不是排版问题。按类名跳过：这个类由 KaTeX 生成，没法给它加属性。 */
     if(el.classList.contains('katex-mathml')) return;
+    /* 纯图形元素（无直接文本）不裁"阅读"：进度条槽（.bar，5px 高内嵌
+       百分比条）、装饰条这类低矮盒子，scrollHeight 与 clientHeight 差
+       几像素是圆角与边框的度量噪声。本检查管的是读者读不到的文字。 */
+    var ownText = [].some.call(el.childNodes, function(n){
+      return n.nodeType === 3 && n.textContent.trim();
+    });
+    if(!ownText) return;
     if(el.clientHeight > 0 && el.scrollHeight > el.clientHeight + 4) clipped.push(label(el));
   });
   out.clipped = Array.from(new Set(clipped)).slice(0, 6);
@@ -282,27 +311,30 @@ def sample(url: str, width: int, target: Path | None = None) -> dict | None:
             print(f"警告: {target} 里没有 </body>，探针注入失败", file=sys.stderr)
         target.write_text(seeded, encoding="utf-8")
 
+    reading = ""
     try:
-        with tempfile.TemporaryDirectory() as profile:
-            proc = subprocess.run(
-                [
-                    str(CHROME), "--headless", "--disable-gpu", "--no-first-run",
-                    f"--user-data-dir={profile}",
-                    f"--window-size={width},880",
-                    "--virtual-time-budget=9000",
-                    "--dump-dom",
-                    url,
-                ],
-                capture_output=True, text=True, timeout=120,
-            )
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch(
+                executable_path=str(CHROME), args=["--no-sandbox"])
+            ctx = browser.new_context(viewport={"width": width, "height": 880})
+            page = ctx.new_page()
+            page.goto(url, wait_until="load", timeout=30000)
+            # 探针把测量结果写进 document.title（@@json）。等它出现，
+            # 不等 networkidle——站点有持续轮询请求，等不来。
+            # 谓词传函数对象而非字符串：站点 CSP 禁 unsafe-eval，
+            # 字符串形式的等待会在页面侧被 CSP 拦截。
+            page.wait_for_function(
+                "() => document.title.startsWith('@@')", polling=100,
+                timeout=20000)
+            reading = page.title()
+            browser.close()
     finally:
         if restore:
             restore[0].write_text(restore[1], encoding="utf-8")
 
-    match = re.search(r"<title>@@(.*?)</title>", proc.stdout, re.S)
-    if not match:
+    if not reading.startswith("@@"):
         return None
-    return json.loads(match.group(1))
+    return json.loads(reading[2:])
 
 
 def main() -> None:

@@ -2,7 +2,7 @@
 title: 构建可靠 Agent 应用：从模型调用到可运营系统
 status: active
 type: guide
-updated: 2026-09-03
+updated: 2026-09-24
 review_after: 2026-12-03
 change_rate: medium
 confidence: high
@@ -13,6 +13,10 @@ sources:
   - "https://www.anthropic.com/engineering/building-effective-agents"
   - "https://openai.github.io/openai-agents-python/agents/"
   - "实践证据档案（已脱敏）"
+editorial_pass: 1
+editorial_at: 2026-09-24
+editorial_by: agent-A
+editorial_note: "清交付顺序条件句与上线判断二分对照两处，图与内容不动"
 ---
 
 # 构建可靠 Agent 应用：从模型调用到可运营系统
@@ -76,13 +80,13 @@ flowchart LR
 4. **引入外部能力**：只暴露任务需要的最小工具；读操作与写操作采用不同权限和审批策略。
 5. **显式化状态**：定义运行状态、检查点、超时、取消、重试、幂等和停止条件。
 6. **建立评测集**：同时覆盖正常任务、边界任务、攻击输入、依赖失败和恢复场景。
-7. **再决定自治程度**：只有固定流程无法覆盖的决策才交给模型；每增加一次自主循环，都增加预算和观测。
+7. **再决定自治程度**：固定流程无法覆盖的决策交给模型；每增加一次自主循环，都增加预算和观测。
 
 这个顺序的意义是让复杂度由证据驱动。没有失败样本时增加规划器、多 Agent 或长期记忆，只是在扩大未知空间。
 
 ## 判断一个 Agent 是否可以上线
 
-上线问题不是“它聪不聪明”，而是下面这些问题能否得到明确答案：
+上线判断看下面这些问题能否得到明确答案：
 
 - 同一个目标如何被转换成可检查的完成条件？
 - 模型每次决策看到了哪些指令、状态、证据和工具？

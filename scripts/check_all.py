@@ -122,6 +122,18 @@ def main() -> None:
             results.append((label, ok, note))
 
     if not args.fast:
+        ok, out = run("article-typography", [
+            PYTHON, str(ROOT / "scripts/note_verify_shots.py"), "--base", args.base,
+        ])
+        note = next((line for line in out.splitlines()
+                     if "article/theme/width cases" in line), out)
+        results.append(("article-typography", ok, note))
+        ok, out = run("article-interactions", [
+            PYTHON, str(ROOT / "scripts/article_interaction_audit.py"), "--base", args.base,
+        ])
+        note = next((line for line in out.splitlines() if "interaction cases" in line), out)
+        results.append(("article-interactions", ok, note))
+
         # 3. Layout at three widths.
         ok, out = run("layout", [PYTHON, str(ROOT / "scripts/layout_audit.py"),
                                  "--base", args.base])

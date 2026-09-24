@@ -1,0 +1,20 @@
+# 每天 09:00 触发一次知识新鲜度巡检的 systemd 定时器模板。
+#
+# 与 knowledge-freshness-patrol.service 成对安装，安装步骤见那个文件顶部的注释。
+# 09:00 是本机时区的 09:00（OnCalendar 默认按系统时区解释）。
+
+[Unit]
+Description=Run the knowledge base freshness patrol every day at 09:00
+Requires=knowledge-freshness-patrol.service
+
+[Timer]
+Unit=knowledge-freshness-patrol.service
+OnCalendar=*-*-* 09:00:00
+# 机器在 09:00 关着时开机后补跑一次，避免整天没有巡检
+Persistent=true
+# 同一分钟内多台机器同时开始会一起去调 AI，错开 5 分钟
+RandomizedDelaySec=300
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

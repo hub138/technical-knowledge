@@ -3,6 +3,7 @@
 ## 测试门禁
 
 - **必跑**：`pytest tests/test_site.py`，必须全绿才允许发布。
+- **文章排版必查**：修改阅读样式、Markdown 渲染或文章结构后，执行 `scripts/note_verify_shots.py --base <验证地址>`；`check_all.py` 完整模式包含 `article-typography`，`--fast` 跳过浏览器验证，报告必须明确这一范围。断言涵盖真实文章身份、元素数量、文字大小、对比度、表格列边界与滚动，查看全页及局部截图后才能交付。
 5:- **统一巡检入口**：仓库 `scripts/check_all.py` 一条命令跑全部检查（tests、tokens、links、copy、readme、i18n、papers、contrast、layout、skill-drift），输出一张 verdict 表（2026-09-24 自 Harness 工程实践吸收）。发布前按改动面加跑对应子集：改样式/颜色 → contrast 与 tokens，改文案 → copy 与 i18n，改链接/删内容 → links；改了 nav/路由则全跑。skill-drift 管 skill 文档与代码的同步：改了路由、文件名、frontmatter 字段、词表锚点，或改了 skill 文档，跑它确认文档指针没有悬空（含内嵌 `.knowledge-skills/` 与聚合层主副本的同步）。
 6:- **提交钩子兜底**（2026-09-24）：`.githooks/pre-commit` 已随仓库配置（`core.hooksPath .githooks`），按 staged 改动面裁剪检查——skill-drift 永跑，改 vault 才跑 links、改样式才跑 tokens、改文案才跑 i18n、改论文注册表才跑 papers，全绿才放行提交。钩子挡日常，`check_all` 全量在发布流程兜底；`--no-verify` 是逃生门，用了就要在发布前补跑全量。
 7:- **skill 副本晋升**（2026-09-24）：`scripts/sync_skill_copies.py`（`diff | promote | pull | sync`）对账内嵌 `.knowledge-skills/` 与聚合层主副本——promote 把站点侧改动发布到平台侧，pull 反向，sync 按 mtime 双向收敛。改完 skill 文档后先 diff 看差异面，再选方向晋升；晋升后 skill-drift 的副本同步面自动归零。
@@ -37,7 +38,7 @@
 
 ## 回滚与变更纪律
 
-- 动手前工作区干净，任何一步都可 `git checkout` 回退。
+- 动手前读取 `git status` 与相关文件差异，保留其他会话尚未提交的修改。需要恢复本次修改时，使用文件编辑工具恢复相应内容；禁止使用 Git 恢复工作区文件。
 - 大改前后对比清单：路由表 / 接口清单 / 关键文件行号——防止重写时静默删能力（历史上发生过）。
 - 删除能力（功能、区块、文案）前，先确认没有别处引用（grep 全仓），删完再 grep 一次验证归零。
 - 声称"已删除/已修复"必须附验证证据：grep 计数、curl 状态码或截图。

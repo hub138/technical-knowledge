@@ -1,0 +1,35 @@
+# 知识新鲜度巡检（每天一次）的 systemd 服务模板。
+#
+# 这是模板，不是已安装的单元。安装由人来做，脚本不碰系统：
+#   1. 把 <仓库根> 与 <运行用户> 替换成真实值
+#   2. 复制到 /etc/systemd/system/knowledge-freshness-patrol.service
+#   3. 同目录再放 knowledge-freshness-patrol.timer
+#   4. 重新加载 systemd 配置并启用 timer（需要管理员权限，由人执行）
+#
+# 单次手动验证不需要安装单元，直接跑：
+#   KNOWLEDGE_REPO=<仓库根> python3 <仓库根>/../knowledge-governor/scripts/freshness_patrol.py --dry-run
+
+[Unit]
+Description=Knowledge base freshness patrol (review_after due articles)
+Documentation=file://<仓库根>/../knowledge-governor/scripts/freshness_patrol.py
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=<运行用户>
+WorkingDirectory=<仓库根>
+Environment=KNOWLEDGE_REPO=<仓库根>
+Environment=EDITORIAL_AGENT=freshness-patrol
+# 派发命令可换：codebuddy 之外的非交互 CLI 只要接受「最后一个参数是提示词」即可
+Environment=FRESHNESS_AGENT_CMD=codebuddy -p --dangerously-skip-permissions
+ExecStart=/usr/bin/python3 <仓库根>/../knowledge-governor/scripts/freshness_patrol.py --soon-days 14 --limit 3
+# 巡检有失败篇时退出码为 1：报告里已写明失败原因，单元本身不需要重试，
+# 明天的 timer 会再跑一次（失败篇的认领锁已被释放，下一轮可以重新派发）
+SuccessExitStatus=0 1
+TimeoutStartSec=3600
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

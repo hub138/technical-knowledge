@@ -44,6 +44,15 @@ description: 开发 technical-knowledge 知识站（工程知识库网站）。�
 - 布局自检：右边空了要利用（悬浮/入口/目录）；对齐、字号、字重逐项截图核对；按钮大小要可发现。
 - 外部优质源可整站嵌入展示或给入口；抓不到的内容直接不显示。
 
+## 文章排版：开发前与交付前
+
+- 开发前选真实文章覆盖普通文字、列表、引用、行内代码、代码块、两列表格、多列表格和长英文。文章阅读是本站的主要用途，必须在文章页面检查这些元素。
+- 同一阅读层级使用同一字号：正文、列表、引用与表格继承阅读字号；辅助信息才用 `--text-small`。核对 token 的最终数值，逐个读取 `p/li/blockquote/th/td/code` 的 computed style。
+- 表格保留原生 `table/thead/tbody` 布局，由 `.table-wrap` 横向滚动；禁止表头与表体分别设置 `display:table`。长内容换行，多列表格保留可读列宽。
+- 修改样式前检查基础规则、媒体查询和后续覆盖；文章主标题选择器限定头部，正文样式集中维护，删除重复声明。
+- 必跑 `scripts/note_verify_shots.py --base <验证地址>`：默认四种宽度、双主题、真实代表文章，输出字号、对比度、列边界、滚动检查和截图。指定文章用重复的 `--path`；截图必须查看全页和表格局部。
+- 验收报告必须说明实际检查的文章、宽度、主题和元素类型。首页检查、服务测试、截图数量都不能单独证明文章阅读质量。
+
 ## 工作方式
 
 - **脚本化巡检**（2026-09-24 自 Harness 工程实践吸收）：同一验证动作写第二次时就沉淀成 `scripts/` 下的确定性脚本（现成参考：check_all.py 统一门禁、audit_shots.py 全站截图、audit_regression.py 回归三件套），重复操作交给脚本，判断与决策留给 AI；新脚本入口支持 `--base` 参数复用端口约定。
@@ -68,7 +77,7 @@ description: 开发 technical-knowledge 知识站（工程知识库网站）。�
 | 仓库（Mac） | `~/Developer/technical-knowledge` |
 | 线上（唯一） | dev 内网机，nginx 28788 → `127.10.0.1:28787`，systemd `knowledge-site`，5 分钟自动拉取 main |
 | Mac 入口 | `localhost:18787`（SSH 隧道 → dev） |
-| 本地测试 | `KNOWLEDGE_DATA_HOME=/tmp/knowledge-test-data server.py --host 0.0.0.0 --port 18788` |
+| 本地测试 | 临时文件使用仓库内已忽略的 `.agent/tmp/`；`TMPDIR` 与 `KNOWLEDGE_DATA_HOME` 指向该目录的独立子目录，密码由环境变量提供。服务仅监听 `127.0.0.1`；并行验证选择未占用端口并通过 `--base` 显式传入 |
 | **静态资源 URL** | **`/static/`（不是 `/site/`）**——仓库目录是 `site/`，URL 是 `/static/` |
 | 密码 | dev `/etc/knowledge-site.env`（600）；运营者会话豁免监控 |
 | 测试 | `pytest tests/test_site.py`（54 例）；改 nav/路由前后必跑 |

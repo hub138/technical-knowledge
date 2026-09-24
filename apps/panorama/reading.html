@@ -26,51 +26,15 @@
       }));
     </script>
     <style>
-      /* 本页结构：上面「我的阅读」（全库标注视图，数据是 localStorage 的
-         tk-progress-v1），下面「学习路线」（按主题排好的阅读队列）。
-         两个分区共用同一份进度数据，勾选后互相刷新（tk:progress-changed）。
-         字号/字重/圆角/间距全部走 tokens.css 标尺，全局规则由 base.css 提供。 */
-
-      .rd-head h1 {
-        margin: 0 0 4px;
-      }
-      .rd-head-desc {
-        color: var(--color-muted);
-        margin: 0;
-        max-width: 72ch;
-      }
-      /* 分区跳转：本页装了两个导航项，锚点决定当前是哪个。放在页头，
-         读者一眼知道这页有两块，也知道自己在哪一块。 */
-      .rd-jump {
-        display: flex;
-        gap: 8px;
-        margin-top: 14px;
-        flex-wrap: wrap;
-      }
-      .rd-jump a {
-        padding: 5px 12px;
-        border: 1px solid var(--color-line);
-        border-radius: 999px;
-        color: var(--color-muted);
-        font-size: 13px;
-        text-decoration: none;
-        transition:
-          background var(--duration-fast) var(--ease-out),
-          color var(--duration-fast) var(--ease-out),
-          border-color var(--duration-fast) var(--ease-out);
-      }
-      .rd-jump a:hover {
-        border-color: var(--color-accent-line);
-        color: var(--color-accent);
-      }
-      .rd-jump a[aria-current="page"] {
-        background: var(--color-accent-soft);
-        border-color: var(--color-accent-line);
-        color: var(--color-accent);
-        font-weight: var(--weight-medium);
-      }
+      /* 本页是「我的阅读」单页（全库标注视图，数据是 localStorage 的
+         tk-progress-v1）。系统阅读路线已拆成独立页 /panorama/path，
+         两者共用同一份进度，勾选后互相刷新（tk:progress-changed）。
+         头部走 base.css 的 .hero 身份头规范（顶 40 / 底距 32）。
+         此前自造的 .rd-page/.rd-head 没有顶距，h1 直接顶到 0px
+         （2026-09-24 用户反馈「太顶了 顶格」），已归入统一规范。
+         字号/字重/圆角/间距全部走 tokens.css 标尺。 */
       .rd-sec {
-        margin-top: 38px;
+        margin-top: 0;
       }
       .rd-sec h2 {
         font-size: var(--text-h3);
@@ -94,6 +58,20 @@
 
       /* ── 我的阅读：总进度 + 域进度条 ──────────────────────── */
       .pg-overall{margin-bottom:24px}
+      /* 系统阅读路线进度卡：放在总进度与全库清单之间，回答「我现在
+         读到路线哪一篇」；点「继续这条路线」进独立路线页。 */
+      .pg-route{background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-md);padding:18px 20px;margin:0 0 24px}
+      .pg-route-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+      .pg-route-label{font-size:var(--text-xs);color:var(--color-accent);font-weight:var(--weight-bold);letter-spacing:.08em}
+      .pg-route-link{font-size:var(--text-small);color:var(--color-accent);text-decoration:none}
+      .pg-route-link:hover{text-decoration:underline}
+      .pg-route-topic{font-size:var(--text-body);font-weight:var(--weight-semibold);margin-bottom:10px}
+      .pg-route-num{font-size:var(--text-lg);margin-bottom:8px}
+      .pg-route-num b{font-size:var(--text-2xl);font-variant-numeric:tabular-nums}
+      .pg-route-num span{color:var(--color-muted)}
+      .pg-route-next{margin-top:10px;font-size:var(--text-small);color:var(--color-muted)}
+      .pg-route-next a{color:var(--color-accent);text-decoration:none}
+      .pg-route-next a:hover{text-decoration:underline}
       .pg-overall-num{font-size:var(--text-lg);margin-bottom:8px}
       .pg-overall-num b{font-size:var(--text-2xl);font-variant-numeric:tabular-nums}
       .pg-overall-num span{color:var(--color-muted)}
@@ -143,366 +121,17 @@
       .pg-row.is-learned .pg-title{color:var(--color-faint);text-decoration:line-through;text-decoration-color:var(--color-line-strong)}
       .pg-row.is-planned .pg-title{color:var(--color-ink)}
 
-      /* ── 学习路线（从 path.html 迁移，语义布局不变） ──────── */
-      .lp-hero {
-        display: grid;
-        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-        gap: 36px;
-        align-items: end;
-      }
-      .lp-hero p {
-        max-width: 62ch;
-      }
-      .lp-picker {
-        align-self: end;
-        background: var(--color-panel);
-        border: 1px solid var(--color-line);
-        padding: var(--space-4);
-        border-radius: var(--radius-md);
-        box-shadow: var(--shadow-md);
-        display: grid;
-        gap: var(--space-3);
-      }
-      .lp-picker fieldset {
-        border: 0;
-        padding: 0;
-        margin: 0;
-      }
-      .lp-picker legend,
-      .lp-picker label {
-        display: block;
-        font-size: var(--text-small);
-        font-weight: var(--weight-semibold);
-        margin-bottom: var(--space-2);
-      }
-      .lp-select-row select {
-        width: 100%;
-        /* 16px 是 iOS Safari 的分界：小于它聚焦时整页自动放大。 */
-        font-size: 16px;
-        min-height: 44px;
-        border: 1px solid var(--color-line);
-        border-radius: 5px;
-        padding: 8px 10px;
-        outline: 0;
-        background: var(--color-panel);
-        color: var(--color-ink);
-      }
-      .lp-select-row select:focus {
-        border-color: var(--color-ok);
-        box-shadow: 0 0 0 3px #08766316;
-      }
-      .lp-kinds {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px 14px;
-      }
-      .lp-kinds label {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        font-size: var(--text-small);
-        font-weight: var(--weight-normal);
-        margin: 0;
-        cursor: pointer;
-        padding: 4px 0;
-      }
-      .lp-kinds input {
-        margin: 0;
-        accent-color: var(--color-accent);
-        width: 15px;
-        height: 15px;
-        flex: none;
-      }
-      .lp-continue {
-        margin-top: 34px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 13px 24px;
-        align-items: center;
-        background: var(--color-panel);
-        border: 1px solid var(--color-line);
-        border-radius: var(--radius-md);
-        padding: 14px var(--space-4);
-      }
-      .lp-continue .lp-next {
-        flex: 1 1 340px;
-        min-width: 0;
-      }
-      .lp-continue .lp-next small {
-        display: block;
-        font-size: var(--text-micro);
-        color: var(--color-muted);
-        margin-bottom: 4px;
-        font-weight: var(--weight-semibold);
-      }
-      .lp-continue .lp-next a {
-        color: var(--color-accent);
-        font-size: var(--text-body);
-        font-weight: var(--weight-semibold);
-        display: inline-block;
-        max-width: 100%;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        vertical-align: bottom;
-      }
-      .lp-continue .lp-next a:hover {
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-      .lp-continue .lp-next span.lp-done {
-        font-size: var(--text-body);
-        color: var(--color-ink-soft);
-      }
-      .lp-progress {
-        flex: 1 1 220px;
-        min-width: 180px;
-      }
-      .lp-progress small {
-        display: block;
-        font-size: var(--text-micro);
-        color: var(--color-muted);
-        margin-bottom: 5px;
-      }
-      .lp-progress-bar {
-        height: 7px;
-        background: var(--color-line);
-        border-radius: 4px;
-        overflow: hidden;
-      }
-      .lp-progress-fill {
-        height: 100%;
-        background: var(--color-accent);
-        border-radius: 4px;
-        width: 0;
-        transition: width var(--duration-fast) var(--ease-out);
-      }
-      .lp-hide-learned {
-        flex: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        font-size: var(--text-small);
-        cursor: pointer;
-        padding: 4px 0;
-      }
-      .lp-hide-learned input {
-        margin: 0;
-        accent-color: var(--color-accent);
-        width: 15px;
-        height: 15px;
-        flex: none;
-      }
-      .lp-start-btn {
-        flex: none;
-        display: inline-block;
-        background: var(--color-accent);
-        color: var(--color-on-accent);
-        font-size: var(--text-small);
-        font-weight: var(--weight-semibold);
-        padding: 8px 18px;
-        border-radius: var(--radius-full);
-        text-decoration: none;
-        transition: background var(--duration-fast) var(--ease-out);
-      }
-      .lp-start-btn:hover {
-        background: var(--color-accent-hover);
-        text-decoration: none;
-      }
-      .lp-sections {
-        margin-top: 26px;
-        display: grid;
-        gap: 13px;
-      }
-      .lp-stage {
-        background: var(--color-panel);
-        border: 1px solid var(--color-line);
-        border-radius: var(--radius-md);
-        overflow: hidden;
-      }
-      .lp-stage.is-done {
-        border-color: var(--color-ok);
-      }
-      .lp-stage-head {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px 14px;
-        align-items: baseline;
-        padding: 14px var(--space-4) 12px;
-        border-bottom: 1px solid var(--color-line);
-      }
-      .lp-stage-head .lp-stage-no {
-        font-size: 21px;
-        font-weight: 800;
-        font-variant-numeric: tabular-nums;
-        color: var(--color-accent);
-        opacity: 0.32;
-        line-height: 1;
-      }
-      .lp-stage-head h3 {
-        font-size: var(--text-h3);
-        margin: 0;
-      }
-      .lp-stage-head .lp-stage-hint {
-        font-size: var(--text-small);
-        color: var(--color-muted);
-      }
-      .lp-stage-head .lp-stage-count {
-        margin-left: auto;
-        font-size: var(--text-small);
-        color: var(--color-ink-soft);
-        font-variant-numeric: tabular-nums;
-      }
-      .lp-stage-done {
-        margin-left: auto;
-        font-size: var(--text-micro);
-        font-weight: var(--weight-semibold);
-        color: var(--color-ok-ink);
-        background: var(--color-ok-soft);
-        padding: 2px 8px;
-        border-radius: var(--radius-full);
-        flex: none;
-      }
-      .lp-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        min-height: 44px;
-        padding: 8px var(--space-4);
-        border-bottom: 1px solid var(--color-line);
-        transition: background var(--duration-fast) var(--ease-out);
-      }
-      .lp-item:hover {
-        background: var(--color-accent-soft);
-      }
-      .lp-items .lp-item:last-of-type {
-        border-bottom: 0;
-      }
-      .lp-check {
-        flex: none;
-        width: 15px;
-        height: 15px;
-        margin: 0;
-        accent-color: var(--color-accent);
-        cursor: pointer;
-      }
-      .lp-title {
-        min-width: 0;
-        flex: 1;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        color: var(--color-ink);
-        font-size: var(--text-body);
-      }
-      .lp-title:hover {
-        color: var(--color-accent);
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-      .lp-learned-mark {
-        flex: none;
-        font-size: var(--text-micro);
-        color: var(--color-ok-ink);
-        background: var(--color-ok-soft);
-        padding: 1px 6px;
-        border-radius: 4px;
-        font-weight: var(--weight-semibold);
-      }
-      .lp-words {
-        flex: none;
-        font-size: var(--text-small);
-        color: var(--color-muted);
-        font-variant-numeric: tabular-nums;
-        padding-left: var(--space-3);
-        border-left: 1px solid var(--color-line);
-      }
-      .lp-item.is-learned .lp-title {
-        color: var(--color-muted);
-      }
-      .lp-more-row {
-        padding: 8px var(--space-4);
-      }
-      .lp-all-read {
-        padding: 12px var(--space-4);
-        font-size: var(--text-small);
-        color: var(--color-muted);
-      }
-      .lp-more-btn {
-        background: none;
-        border: 0;
-        color: var(--color-accent);
-        font-size: var(--text-small);
-        font-weight: var(--weight-semibold);
-        cursor: pointer;
-        padding: 4px 0;
-      }
-      .lp-more-btn:hover {
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-      .lp-empty,
-      .lp-error {
-        margin-top: 26px;
-        background: var(--color-panel);
-        border: 1px solid var(--color-line);
-        border-radius: var(--radius-md);
-        padding: 26px var(--space-4);
-        color: var(--color-muted);
-        font-size: var(--text-body);
-      }
-      .lp-error {
-        color: var(--color-danger);
-      }
-      .lp-loading {
-        margin-top: 26px;
-        color: var(--color-muted);
-        font-size: var(--text-body);
-      }
-      @media (max-width: 900px) {
-        .lp-hero {
-          grid-template-columns: 1fr;
-        }
-      }
-      @media (max-width: 620px) {
-        .lp-continue {
-          display: grid;
-          gap: 11px;
-        }
-        .lp-hide-learned {
-          align-self: start;
-        }
-      }
-      /* 暗色模式：面板类与主站同款兜底，避免暗色下面板发白。 */
-      :root[data-theme="dark"] .lp-picker,
-      :root[data-theme="dark"] .lp-continue,
-      :root[data-theme="dark"] .lp-stage,
-      :root[data-theme="dark"] .lp-empty,
-      :root[data-theme="dark"] .lp-error,
-      :root[data-theme="dark"] .pg-row,
-      :root[data-theme="dark"] .pg-domain,
-      :root[data-theme="dark"] .pg-next-item,
-      :root[data-theme="dark"] .pg-recent-item,
-      :root[data-theme="dark"] .pg-check,
-      :root[data-theme="dark"] .pg-star {
-        background: var(--color-panel) !important;
-      }
     </style>
   </head>
   <body class="tk-host">
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
     <div class="tk-shell">
-      <article class="rd-page">
-        <div class="rd-head">
-          <h1 id="rd-title">我的阅读</h1>
-          <p class="rd-head-desc" id="rd-desc">标记已读、排稍后读——只保存在这台浏览器上，不会上传</p>
-          <nav class="rd-jump" aria-label="本页分区">
-            <a href="/panorama/reading" data-jump="reading">我的阅读</a>
-            <a href="/panorama/reading#rd-path" data-jump="path">学习路线</a>
-          </nav>
-        </div>
+      <section class="hero">
+        <h1>我的阅读</h1>
+        <p>标记已读、排稍后读——只保存在这台浏览器上，不会上传</p>
+      </section>
 
-        <section id="rd-reading" class="rd-sec">
+      <section id="rd-reading" class="rd-sec">
           <h2>已读与稍后读</h2>
           <p class="rd-sec-intro">全库的已读与稍后读都在这里。与阅读页、学习路线共享同一份进度，任一处勾选、全站同步。</p>
           <div class="progress-actions">
@@ -518,43 +147,6 @@
           <div id="progress-body"></div>
         </section>
 
-        <section id="rd-path" class="rd-sec">
-          <h2>学习路线</h2>
-          <p class="rd-sec-intro">选一个领域和主题，把这一主题的文章排出一条路线：先懂机制，再看怎么观测，认得出故障，学得会修复，最后沉淀成实践。顺序已排好，不用自己挑。换主题即换路线，进度按主题分别显示。</p>
-          <div class="lp-loading" id="lp-loading">正在加载学习路线数据…</div>
-          <form class="lp-picker" id="lp-picker">
-            <div class="lp-select-row">
-              <label for="lp-domain">领域</label>
-              <select id="lp-domain"></select>
-            </div>
-            <div class="lp-select-row">
-              <label for="lp-topic">主题</label>
-              <select id="lp-topic"></select>
-            </div>
-            <fieldset>
-              <legend>要学哪几段</legend>
-              <div class="lp-kinds" id="lp-kinds"></div>
-            </fieldset>
-          </form>
-          <div class="lp-continue" id="lp-continue" hidden>
-            <div class="lp-next">
-              <small id="lp-progress-label">进度</small>
-              <a href="#" id="lp-next-link" hidden></a>
-              <span class="lp-done" id="lp-next-done" hidden>这一主题的勾选段全部读完，可以换下一个主题了</span>
-            </div>
-            <div class="lp-progress">
-              <small>整体进度</small>
-              <div class="lp-progress-bar">
-                <div class="lp-progress-fill" id="lp-progress-fill"></div>
-              </div>
-            </div>
-            <a class="lp-start-btn" id="lp-start" href="#" hidden>开始读</a>
-            <label class="lp-hide-learned"><input type="checkbox" id="lp-hide-learned">隐藏已读</label>
-          </div>
-          <div class="lp-sections" id="lp-sections"></div>
-          <div class="lp-empty" id="lp-empty" hidden></div>
-          <div class="lp-error" id="lp-error" hidden></div>
-        </section>
       </article>
 
       <script>
@@ -580,6 +172,30 @@
               if (la >= 0 || lb >= 0) return (la < 0 ? 99 : la) - (lb < 0 ? 99 : lb) || a.localeCompare(b, "zh-CN");
               return a.localeCompare(b, "zh-CN");
             });
+          }
+
+          /* 系统阅读路线进度卡（2026-09-24 用户要求：我的阅读先显示
+             系统阅读路线的进度，再给全部文章的阅读清单）。
+             路线页把「上次选的领域/主题」存在 tk.learn-path.last，
+             已读状态存在全站共用的进度里，两者合成这条卡。 */
+          var LP_LAST_KEY = "tk.learn-path.last";
+          function routeCard(notes, stOf) {
+            var last = null;
+            try { last = JSON.parse(localStorage.getItem(LP_LAST_KEY) || "null"); } catch (e) { last = null; }
+            if (!last || !last.topic) return "";
+            var list = notes.filter(function (n) { return n.topic === last.topic; });
+            if (!list.length) return "";
+            var done = list.filter(function (n) { return stOf(n) === "learned"; }).length;
+            var pctR = Math.round(done / list.length * 100);
+            var next = list.find(function (n) { return stOf(n) !== "learned"; });
+            return '<div class="pg-route">'
+              + '<div class="pg-route-head"><span class="pg-route-label">系统阅读路线</span>'
+              + '<a class="pg-route-link" href="/panorama/path">继续这条路线 →</a></div>'
+              + '<div class="pg-route-topic">' + esc(last.topic) + '</div>'
+              + '<div class="pg-route-num"><b>' + done + '</b> / ' + list.length + ' <span>篇 · ' + pctR + '%</span></div>'
+              + '<div class="pg-track pg-track--big"><i style="width:' + pctR + '%"></i></div>'
+              + (next ? '<div class="pg-route-next">下一篇：<a href="/?path=' + encodeURIComponent(next.path) + '">' + esc(next.title) + '</a></div>' : '<div class="pg-route-next">这一主题已全部读完。</div>')
+              + '</div>';
           }
 
           function renderProgress() {
@@ -663,6 +279,7 @@
               + '<div class="pg-track pg-track--big"><i style="width:' + pct + '%"></i></div>'
               + '<div class="pg-domain-bars">' + domainBars + '</div>'
               + '</div>'
+              + routeCard(notes, stOf)
               + nextBlock
               + recentBlock
               + (groups || '<div class="pg-empty-hint">这个过滤条件下没有文章。</div>');
@@ -722,405 +339,22 @@
             renderProgress();
           };
 
+          /* 数据加载：与系统阅读路线页共用 /api/notes 与同一份进度。 */
+          function loadNotes(cb) {
+            fetch("/api/notes").then(function (r) { return r.json(); }).then(function (data) {
+              cb(Array.isArray(data) ? data : (data.notes || []));
+            });
+          }
+          loadNotes(function (notes) {
+            state.notes = notes;
+            renderProgress();
+          });
+
           var radios = document.querySelectorAll('input[name="pg-filter"]');
           radios.forEach(function (r) {
             r.onchange = function () { state.pgFilter = r.value; renderProgress(); };
           });
 
-          /* ═══ 第二分区：学习路线（从 path.html 迁移，逻辑不变） ═══ */
-          var LP = { notes: [], domain: "", topic: "", kinds: {}, expanded: {}, hideLearned: false };
-          var LEARN_ORDER = ["mech", "obs", "fail", "fix", "prac", "vocab"];
-          var DEFAULT_ON = { mech: true, obs: true, fail: true, fix: true, prac: true, vocab: false };
-          var EXPAND = 5;
-          var WORDS_PER_MIN = 300;
-          var KINDS = window.TKMatrix.KINDS;
-          var KIND_META = {};
-          if (KINDS) {
-            KINDS.forEach(function (k) { KIND_META[k.id] = { name: k.name, hint: k.hint || "" }; });
-          }
-          var KIND_ORDER = {};
-          LEARN_ORDER.forEach(function (id, i) { KIND_ORDER[id] = i; });
-
-          var LAST_KEY = "tk.learn-path.last";
-
-          for (var k2 in DEFAULT_ON) LP.kinds[k2] = DEFAULT_ON[k2];
-
-          function isLearned(note) {
-            return window.TKShell.progress.statusOf(note.path) === "learned";
-          }
-          function readMinutes(words) {
-            if (!words) return 0;
-            return Math.max(1, Math.round(words / 300));
-          }
-          function visibleNotes() {
-            return LP.notes.filter(function (n) {
-              return n.category !== "总览" && n.category !== "Clippings" && n.topic !== "概览" && !n.exclude_from_graph;
-            });
-          }
-          function domainList(items) {
-            var seen = new Set();
-            var out = [];
-            items.forEach(function (n) {
-              if (!seen.has(n.category)) { seen.add(n.category); out.push(n.category); }
-            });
-            return out.sort(function (a, b) { return a.localeCompare(b, "zh-CN"); });
-          }
-          function topicList(items, domain) {
-            var seen = new Set();
-            var out = [];
-            items.forEach(function (n) {
-              if (n.category !== domain) return;
-              if (!seen.has(n.topic)) { seen.add(n.topic); out.push({ name: n.topic, count: 1 }); }
-              else {
-                for (var i = 0; i < out.length; i++) if (out[i].name === n.topic) out[i].count++;
-              }
-            });
-            return out.sort(function (a, b) { return a.name.localeCompare(b.name, "zh-CN"); });
-          }
-          function kindOf(n) {
-            return window.TKMatrix.classify(n).kind;
-          }
-          function stages() {
-            var items = visibleNotes().filter(function (n) { return n.category === LP.domain && n.topic === LP.topic; });
-            var out = [];
-            LEARN_ORDER.forEach(function (id) {
-              if (!LP.kinds[id]) return;
-              var notes = items.filter(function (n) { return kindOf(n) === id; }).map(function (n) {
-                return { note: n, path: n.path, title: n.title, words: n.words || 0 };
-              }).sort(function (a, b) { return (a.words || 0) - (b.words || 0); });
-              if (!notes.length) return;
-              out.push({ id: id, notes: notes });
-            });
-            return out;
-          }
-          function nextNote(sts) {
-            for (var i = 0; i < sts.length; i++) {
-              var notes = sts[i].notes;
-              for (var j = 0; j < notes.length; j++) {
-                if (!isLearned(notes[j].note)) return notes[j];
-              }
-            }
-            return null;
-          }
-          function renderContinue(sts) {
-            var box = document.getElementById("lp-continue");
-            var link = document.getElementById("lp-next-link");
-            var done = document.getElementById("lp-next-done");
-            var label = document.getElementById("lp-progress-label");
-            var fill = document.getElementById("lp-progress-fill");
-            box.hidden = !sts.length;
-            if (!sts.length) return;
-            var total = 0, read = 0;
-            sts.forEach(function (st) {
-              total += st.notes.length;
-              st.notes.forEach(function (c) { if (isLearned(c.note)) read++; });
-            });
-            var pct = total ? Math.round(read / total * 100) : 0;
-            label.textContent = "进度：" + total + " 篇中已读 " + read + " · " + pct + "%";
-            fill.style.width = pct + "%";
-            var next = nextNote(sts);
-            var start = document.getElementById("lp-start");
-            if (next) {
-              link.hidden = false;
-              done.hidden = true;
-              link.textContent = next.title;
-              link.href = "/?path=" + encodeURIComponent(next.path);
-              start.hidden = false;
-              start.href = link.href;
-            } else {
-              link.hidden = true;
-              done.hidden = false;
-              start.hidden = true;
-            }
-          }
-          function itemRow(c) {
-            var learned = isLearned(c.note);
-            var li = document.createElement("div");
-            li.className = "lp-item" + (learned ? " is-learned" : "");
-            var cb = document.createElement("input");
-            cb.type = "checkbox";
-            cb.className = "lp-check";
-            cb.checked = learned;
-            cb.setAttribute("aria-label", (learned ? "取消已读：" : "标记已读：") + c.title);
-            cb.dataset.path = c.path;
-            li.appendChild(cb);
-            var a = document.createElement("a");
-            a.className = "lp-title";
-            a.href = "/?path=" + encodeURIComponent(c.path);
-            a.textContent = c.title;
-            li.appendChild(a);
-            if (learned) {
-              var mark = document.createElement("span");
-              mark.className = "lp-learned-mark";
-              mark.textContent = "✓ 已读";
-              li.appendChild(mark);
-            }
-            var w = document.createElement("span");
-            w.className = "lp-words";
-            w.textContent = window.TKShell.fmtWords(c.words || 0) + " · 约 " + readMinutes(c.words) + " 分钟";
-            li.appendChild(w);
-            return li;
-          }
-          function renderSections(sts) {
-            var host = document.getElementById("lp-sections");
-            var empty = document.getElementById("lp-empty");
-            host.innerHTML = "";
-            var hasAny = false;
-            sts.forEach(function (st, i) {
-              var meta = KIND_META[st.id];
-              var notes = st.notes;
-              if (LP.hideLearned) {
-                notes = notes.filter(function (c) { return !isLearned(c.note); });
-              }
-              var readCount = 0;
-              st.notes.forEach(function (c) { if (isLearned(c.note)) readCount++; });
-              var allDone = st.notes.length > 0 && readCount === st.notes.length;
-              var card = document.createElement("section");
-              card.className = "lp-stage" + (allDone ? " is-done" : "");
-              var head = document.createElement("div");
-              head.className = "lp-stage-head";
-              var no = document.createElement("span");
-              no.className = "lp-stage-no";
-              no.textContent = String(i + 1).padStart(2, "0");
-              head.appendChild(no);
-              var h3 = document.createElement("h3");
-              h3.textContent = meta ? meta.name : st.id;
-              head.appendChild(h3);
-              var hint = document.createElement("span");
-              hint.className = "lp-stage-hint";
-              hint.textContent = meta ? meta.hint : "";
-              head.appendChild(hint);
-              if (allDone) {
-                var doneBadge = document.createElement("span");
-                doneBadge.className = "lp-stage-done";
-                doneBadge.textContent = "✓ 已读完 " + st.notes.length + " 篇";
-                head.appendChild(doneBadge);
-              } else {
-                var count = document.createElement("span");
-                count.className = "lp-stage-count";
-                count.textContent = readCount + "/" + st.notes.length;
-                head.appendChild(count);
-              }
-              card.appendChild(head);
-              var items = document.createElement("div");
-              items.className = "lp-items";
-              var open = !!LP.expanded[st.id];
-              var shown = open ? notes : notes.slice(0, EXPAND);
-              shown.forEach(function (c) { items.appendChild(itemRow(c)); });
-              if (!shown.length && st.notes.length && LP.hideLearned) {
-                var allread = document.createElement("div");
-                allread.className = "lp-all-read";
-                allread.textContent = "这一段的 " + st.notes.length + " 篇都已读完。";
-                items.appendChild(allread);
-              }
-              if (!open && notes.length > EXPAND) {
-                var more = document.createElement("div");
-                more.className = "lp-more-row";
-                var btn = document.createElement("button");
-                btn.type = "button";
-                btn.className = "lp-more-btn";
-                btn.dataset.stage = st.id;
-                btn.textContent = "展开剩余 " + (notes.length - EXPAND) + " 篇";
-                more.appendChild(btn);
-                items.appendChild(more);
-              }
-              card.appendChild(items);
-              host.appendChild(card);
-              hasAny = true;
-            });
-            empty.hidden = hasAny;
-            if (!hasAny) {
-              empty.textContent = "这个主题里，勾选的段都还没有文章。可以换个主题，或把段勾选补全。";
-            }
-          }
-          function render() {
-            var sts = stages();
-            renderContinue(sts);
-            renderSections(sts);
-          }
-          function renderKinds() {
-            var host = document.getElementById("lp-kinds");
-            host.innerHTML = "";
-            LEARN_ORDER.forEach(function (id) {
-              var meta = KIND_META[id];
-              var label = document.createElement("label");
-              var cb = document.createElement("input");
-              cb.type = "checkbox";
-              cb.checked = LP.kinds[id];
-              cb.dataset.kind = id;
-              label.appendChild(cb);
-              var span = document.createElement("span");
-              span.textContent = meta ? meta.name : id;
-              label.appendChild(span);
-              host.appendChild(label);
-            });
-          }
-          function renderDomains(items) {
-            var sel = document.getElementById("lp-domain");
-            var domains = domainList(items);
-            sel.innerHTML = "";
-            domains.forEach(function (d) {
-              var opt = document.createElement("option");
-              opt.value = d;
-              opt.textContent = d;
-              if (d === LP.domain) opt.selected = true;
-              sel.appendChild(opt);
-            });
-            LP.domain = sel.value;
-          }
-          function renderTopics(items) {
-            var sel = document.getElementById("lp-topic");
-            var topics = topicList(items, LP.domain);
-            sel.innerHTML = "";
-            topics.forEach(function (t) {
-              var opt = document.createElement("option");
-              opt.value = t.name;
-              opt.textContent = t.name + "（" + t.count + " 篇）";
-              if (t.name === LP.topic) opt.selected = true;
-              sel.appendChild(opt);
-            });
-            LP.topic = sel.value;
-          }
-          function syncUrl() {
-            var q = new URLSearchParams();
-            if (LP.domain) q.set("domain", LP.domain);
-            if (LP.topic) q.set("topic", LP.topic);
-            /* 锚点必须留着：#rd-path 是侧栏区分「学习路线 / 我的阅读」的
-               依据，replaceState 把它抹掉会让高亮跳回「我的阅读」。 */
-            history.replaceState({}, "", "/panorama/reading" + (q.toString() ? "?" + q.toString() : "") + location.hash);
-          }
-          function saveLast() {
-            try {
-              localStorage.setItem(LAST_KEY, JSON.stringify({
-                domain: LP.domain,
-                topic: LP.topic,
-                kinds: LP.kinds,
-              }));
-            } catch (e) { /* 存储被禁时静默跳过，不影响页面功能。 */ }
-          }
-
-          document.getElementById("lp-domain").addEventListener("change", function (event) {
-            LP.domain = event.target.value;
-            LP.topic = "";
-            LP.expanded = {};
-            renderTopics(visibleNotes());
-            syncUrl();
-            saveLast();
-            render();
-          });
-          document.getElementById("lp-topic").addEventListener("change", function (event) {
-            LP.topic = event.target.value;
-            LP.expanded = {};
-            syncUrl();
-            saveLast();
-            render();
-          });
-          document.getElementById("lp-kinds").addEventListener("change", function (event) {
-            var id = event.target.dataset.kind;
-            if (!id) return;
-            LP.kinds[id] = event.target.checked;
-            LP.expanded = {};
-            saveLast();
-            render();
-          });
-          document.getElementById("lp-hide-learned").addEventListener("change", function (event) {
-            LP.hideLearned = event.target.checked;
-            render();
-          });
-          document.getElementById("lp-sections").addEventListener("change", function (event) {
-            var path = event.target.dataset && event.target.dataset.path;
-            if (!path) return;
-            window.TKShell.progress.toggle(path, "learned");
-            render();
-          });
-          document.getElementById("lp-sections").addEventListener("click", function (event) {
-            var id = event.target.dataset && event.target.dataset.stage;
-            if (!id) return;
-            LP.expanded[id] = !LP.expanded[id];
-            render();
-          });
-
-          /* URL 预选：?domain=&topic= 进来直接定位；无参数时读上次选择。 */
-          var params = new URLSearchParams(location.search);
-          var last = null;
-          try { last = JSON.parse(localStorage.getItem(LAST_KEY) || "null"); } catch (e) { last = null; }
-          if (params.get("domain")) {
-            LP.domain = params.get("domain");
-            LP.topic = params.get("topic") || "";
-          } else if (last && last.domain) {
-            LP.domain = last.domain;
-            LP.topic = last.topic || "";
-            if (last.kinds) {
-              Object.keys(LP.kinds).forEach(function (kk) {
-                if (typeof last.kinds[kk] === "boolean") LP.kinds[kk] = last.kinds[kk];
-              });
-            }
-          }
-
-          /* 进度变化：两个分区一起刷新。 */
-          document.addEventListener("tk:progress-changed", function () {
-            renderProgress();
-            render();
-          });
-
-          /* 数据加载：一份 notes 两个分区共用。 */
-          function loadNotes(cb) {
-            fetch("/api/notes").then(function (r) { return r.json(); }).then(function (data) {
-              cb(Array.isArray(data) ? data : (data.notes || []));
-            }).catch(function () {
-              var err = document.getElementById("lp-error");
-              err.hidden = false;
-              err.textContent = "学习路线数据加载失败，请刷新重试。";
-            });
-          }
-
-          renderKinds();
-          loadNotes(function (notes) {
-            state.notes = notes;
-            LP.notes = notes;
-            document.getElementById("lp-loading").hidden = true;
-            var items = visibleNotes();
-            renderDomains(items);
-            renderTopics(items);
-            syncUrl();
-            saveLast();
-            renderProgress();
-            render();
-            syncNavHighlight();
-          });
-
-          /* 侧栏高亮：同一个页面承载两个导航项（我的阅读 / 学习路线），
-             区分依据是锚点 #rd-path。侧栏在 DOMContentLoaded 时就渲染完
-             了，锚点变化不会自动回灌，这里手动改 aria-current。 */
-          function syncNavHighlight() {
-            var isPath = location.hash === "#rd-path";
-            var want = isPath ? "/panorama/reading#rd-path" : "/panorama/reading";
-            document.querySelectorAll(".tk-subnav-inline").forEach(function (a) {
-              var href = a.getAttribute("href");
-              if (href !== "/panorama/reading" && href !== "/panorama/reading#rd-path") return;
-              if (href === want) a.setAttribute("aria-current", "page");
-              else a.removeAttribute("aria-current");
-            });
-            document.querySelectorAll(".rd-jump a").forEach(function (a) {
-              var key = a.dataset.jump;
-              if (key === (isPath ? "path" : "reading")) a.setAttribute("aria-current", "page");
-              else a.removeAttribute("aria-current");
-            });
-            var titleEl = document.getElementById("rd-title");
-            var descEl = document.getElementById("rd-desc");
-            if (titleEl) titleEl.textContent = isPath ? "学习路线" : "我的阅读";
-            if (descEl) {
-              descEl.textContent = isPath
-                ? "选一个主题，按机制、观测、故障、修复、实践的顺序读完——只保存在这台浏览器上"
-                : "标记已读、排稍后读——只保存在这台浏览器上，不会上传";
-            }
-            document.title = (isPath ? "学习路线" : "我的阅读") + " · technical-knowledge";
-            if (isPath) {
-              var target = document.getElementById("rd-path");
-              if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
-            }
-          }
-          window.addEventListener("hashchange", syncNavHighlight);
         })();
       </script>
     </div>

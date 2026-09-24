@@ -63,6 +63,12 @@
       page: "projects",
       auth: true,
       }));
+      /* 全站搜索框：挂进 hero 的 .page-toolbar。入口页上没有本地列表可筛，
+         回车直接带词去主站（/?q=），主站 selectFromUrl 会进结果态。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.mountSearch({
+        selector: '.hero .page-toolbar',
+        id: 'proj-search',
+      }));
       /* 反馈入口与主站是同一个组件，收到的意见进同一个收件箱。 */
       document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
         where: () => '当前页面：<b>' + (((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title) + '</b>',
@@ -607,6 +613,10 @@
           ><a href="/apps/agent-evaluation/index.html">查看 Agent 评估原型</a
           ><a href="/?view=graph">查看知识图谱</a>
         </div>
+        <!-- 全站搜索：这页是入口，读者想找文章时得先退回首页。
+             搜索框由 TKShell.mountSearch 挂进来（皮肤走 base.css .tk-search，
+             放置走 .page-toolbar），回车跳主站 /?q=词。 -->
+        <div class="page-toolbar"></div>
       </section>
       <div class="purpose">
         <strong>这里解决什么问题</strong

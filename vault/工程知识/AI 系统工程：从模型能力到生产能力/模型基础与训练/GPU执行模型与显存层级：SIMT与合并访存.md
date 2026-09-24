@@ -2,7 +2,7 @@
 title: GPU执行模型与显存层级：SIMT与合并访存
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 review_after: 2027-09-22
 change_rate: low
 confidence: high
@@ -13,6 +13,10 @@ tags:
 sources:
   - "https://docs.nvidia.com/cuda/"
   - "https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "密度 0.29 偏薄，补 prefill 与 decode 负载形态对位图"
 ---
 
 # GPU执行模型与显存层级：SIMT与合并访存
@@ -36,6 +40,16 @@ graph TD
 ```
 
 **kernel 与主机-设备分工**。GPU 代码（kernel）从 CPU 启动，数据经 PCIe/NVLink 在主机内存与显存间搬运。kernel 内部：grid（全部线程）→ block（每 SM 一个或多个）→ warp（调度单位）→ thread。内存拷贝与 kernel 启动是异步的（流 stream），CPU 发起后可继续干活——但拷贝与计算的流水线重叠要显式设计，否则 GPU 在等数据、CPU 在等 GPU，两边空转。prefill/decode 的性能差异（LLM 场景）根源在这：prefill 是大 batch 矩阵计算（并行宽度大、计算密度高），decode 是逐步小计算反复读权重与 KV cache（访存密集、并行宽度小），两者对 GPU 的压榨方式完全不同。
+
+```mermaid
+graph TD
+    A[prefill 阶段] --> A1[大 batch 矩阵乘<br/>并行宽度大]
+    A1 --> A2[计算单元吃满<br/>瓶颈在算力]
+    B[decode 阶段] --> B1[逐步小计算<br/>反复读权重与 KV cache]
+    B1 --> B2[并行宽度小<br/>瓶颈在访存带宽]
+```
+
+这张图回答为什么同一块卡两个阶段快慢悬殊：两种负载吃的是金字塔里不同的层，prefill 压计算单元、decode 压显存带宽，各自的优化方向随之不同。
 
 ## 背景与代价
 

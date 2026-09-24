@@ -2,7 +2,7 @@
 title: MoE路由的工程问题：负载不均与显存碎片
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 review_after: 2027-09-22
 change_rate: medium
 confidence: high
@@ -14,6 +14,10 @@ sources:
   - "https://arxiv.org/abs/2401.04088"
   - "https://arxiv.org/abs/2101.03961"
   - "https://docs.vllm.ai/en/latest/"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "密度 0.28 偏薄，补热点专家 straggler 链路图"
 ---
 
 # MoE路由的工程问题：负载不均与显存碎片
@@ -31,6 +35,19 @@ MoE（混合专家）模型把前馈层替换为多个专家（FFN），每个 t
 **带宽瓶颈：all-to-all**。token 要发给它的专家所在卡（all-to-all 通信），计算完再收回。batch 大时 all-to-all 的消息量随 batch 线性涨，通信与计算重叠的调度是 MoE 推理的核心工程。deepseek 系（V3 类）的节点内 NVLink + 节点间 InfiniBand 分层设计把 all-to-all 的带宽分层利用。EP 与 TP（张量并行）的复合并行策略决定通信拓扑。
 
 **批处理交互**。批内不同 token 选不同专家，每专家的输入量不均（热点专家吃 3-5 倍 token）。continuous batching（见 [[工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/推理批处理的两难：吞吐与延迟的调度天平.md]]）的调度层如果不管专家负载，热点专家所在卡成为 straggler（长尾卡），整层等待。Expert choice routing（专家反向选 token）与容量因子（capacity factor，超容 token 丢弃或溢出）是均衡手段。
+
+```mermaid
+graph TD
+    A[batch 内全部 token] --> B[路由器选 top-k]
+    B -->|多数 token| C[热点专家所在卡]
+    B -->|少量 token| D[冷门专家所在卡]
+    C --> E[token 排队计算<br/>该卡成为 straggler]
+    D --> F[算完等待<br/>算力闲置]
+    E --> G[all-to-all 收回<br/>整层等最慢的卡]
+    F --> G
+```
+
+图回答为什么单卡变慢全体买单：all-to-all 的收回要等全部专家返回，热点卡的长尾就是整层的延迟，这就是调度层必须按专家负载调批的原因。
 
 ## 背景与代价
 

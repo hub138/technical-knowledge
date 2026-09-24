@@ -2,7 +2,7 @@
 title: FlashAttention是IO感知的精确算法，不是近似
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 review_after: 2027-03-22
 change_rate: medium
 confidence: high
@@ -14,11 +14,15 @@ tags:
 sources:
   - "https://arxiv.org/abs/2205.14135"
   - "https://arxiv.org/abs/2309.06180"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "清开篇虚假精确与二分对照，图与内容不动"
 ---
 
 # FlashAttention是IO感知的精确算法，不是近似
 
-同一个模型同一个序列长度，注意力算子时间能差 3 倍——差的不是数学，是显存读写次数。标准 attention 把 N×N 中间矩阵写进 HBM 再读回来，FlashAttention 用 tiling 从头到尾不物化这个矩阵，是 IO 感知的精确算法，不是近似。要解决的问题：理解为什么显存读写（不是 FLOPs）才是注意力算子的瓶颈，tiling 与 online softmax 怎么消除中间矩阵物化，以及怎么验证它真的数值精确、显存峰值真的降了。
+同一个模型同一个序列长度，注意力算子时间的差距能到倍数级——差距来自显存读写次数。标准 attention 把 N×N 中间矩阵写进 HBM 再读回来，FlashAttention 用 tiling 从头到尾不物化这个矩阵，是 IO 感知的精确算法，不是近似。要解决的问题：理解为什么显存读写（不是 FLOPs）才是注意力算子的瓶颈，tiling 与 online softmax 怎么消除中间矩阵物化，以及怎么验证它真的数值精确、显存峰值真的降了。
 
 本质是算术强度与存储层级的利用。GPU 的算力（TFLOPS）与显存带宽（HBM）的差距逐年拉大，attention 的 FLOPs 是 O(N²d) 而 HBM 读写是 O(N² + Nd)——但常数项里标准实现把 N×N 的 S 矩阵和 P 矩阵写出去再读回来，真实瓶颈是这些中间物化。FlashAttention 的核心：把 QKV 切成小块（tiling），在 SRAM（片上存储）里算完一块的完整 attention，用 online softmax 的缩放技巧逐步归并，全程不把 N×N 矩阵写回 HBM。数学上与标准 attention 逐位等价（浮点结合律差异在 1e-6 级）。
 

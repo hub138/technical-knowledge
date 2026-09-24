@@ -623,7 +623,38 @@
 .reader-siblings{margin:18px 0 0;padding-top:12px;border-top:1px solid var(--color-line)}.reader-siblings .rail-head{margin:0 0 6px;padding:0;border:0;justify-content:flex-start}.reader-siblings .rail-head span{color:var(--color-ink)}.reader-siblings .rail-list{display:grid;gap:2px}.reader-siblings .rail-list a{padding:6px 8px;border:0;border-radius:5px;background:none;white-space:normal;line-height:1.5;font-size:var(--text-sm)}@media(max-width:1199px){.reader-siblings .rail-list{display:flex;flex-wrap:wrap;gap:7px}.reader-siblings .rail-list a{padding:5px 11px;border:1px solid var(--color-line);border-radius:15px;background:var(--color-panel);white-space:nowrap;font-size:15px}}.reader-toc{position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto;font-size:var(--text-sm)}.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--color-line);color:var(--color-ink);font-size:var(--text-body);font-weight:var(--weight-bold)}.rail-toggle{border:0;background:none;color:var(--color-muted);cursor:pointer;padding:0 2px;font-size:var(--text-base);line-height:1}.rail-toggle:hover{color:var(--color-accent)}/* 折叠点击区（2026-09-24 反馈）：箭头钮裸热区 36px 挡不住整行点击，标题行整行接管折叠交互，箭头钮退化为纯指示器（pointer-events:none），标题行 cursor:pointer + 便捷 aria。 */.rail-head:has(.rail-toggle){cursor:pointer}.rail-head .rail-toggle{pointer-events:none}/* 折叠行（同模块/图谱）在悬浮标题行正下方折叠时，标题行底边框与折叠内容之间会出现 1px 透缝，给折叠后的列表容器加白底补缝。 */.rail-list{margin:0;padding:0;list-style:none;display:grid;gap:2px}/* 目录链接的颜色从 --color-muted 提到 --color-ink-soft。
    * 它是一条可点的导航，不是脚注 —— 灰到读不出"这里能点"就等于没有。
    * 悬停时才变主色，用它来表示"当前指向哪一条"。 */
-  .rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--color-ink-soft);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--color-accent-soft);color:var(--color-accent)}.rail-list a[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:var(--text-sm);color:var(--color-muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:var(--text-sm);color:var(--color-muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}/* 悬浮标题行下方透缝补底：折叠行标题与内容衔接处给标题行下沿加投影级背景，滚动中列表项从标题下滑过时不再露出字头。 */.rail-head::after{content:"";position:absolute;left:0;right:0;top:100%;height:6px;background:linear-gradient(var(--color-bg),rgba(254,253,251,0));pointer-events:none}.reader-body{max-width:960px;font-size:var(--text-lg);line-height:1.85}.reader-body h1{font-size:var(--text-3xl)}.reader-body h2{font-size:var(--text-2xl);border-bottom:1px solid var(--color-line);padding-bottom:5px;margin-top:31px}.reader-body h3{font-size:var(--text-xl);margin-top:25px}.reader-body p{margin:14px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:5px 0}.reader-body blockquote{border-left:3px solid var(--color-accent);padding:4px 15px;color:var(--color-muted);background:var(--color-surface)}.reader-body a{color:var(--color-accent)}.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--color-line);border-radius:6px}.reader-body code{background:var(--color-surface);color:var(--color-accent-ink);border:1px solid var(--color-accent-line);border-radius:4px;padding:1px 4px;font-family:var(--font-mono);font-size:.88em}.reader-body .code-block,.reader-body pre.mermaid{background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-ink);border-radius:7px;padding:14px 16px;overflow:auto;font-size:var(--text-base);line-height:1.65}.reader-body .code-block code,.reader-body pre.mermaid code{background:none;border:0;padding:0;color:inherit;font-size:inherit}.reader-body table{border-collapse:collapse;width:100%;margin:var(--space-5) 0;font-size:var(--text-sm)}
+  .rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--color-ink-soft);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--color-accent-soft);color:var(--color-accent)}.rail-list a[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:var(--text-sm);color:var(--color-muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:var(--text-sm);color:var(--color-muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}/* 悬浮标题行下方透缝补底：折叠行标题与内容衔接处给标题行下沿加投影级背景，滚动中列表项从标题下滑过时不再露出字头。 */.rail-head::after{content:"";position:absolute;left:0;right:0;top:100%;height:6px;background:linear-gradient(var(--color-bg),rgba(254,253,251,0));pointer-events:none}
+.reader-body{max-width:740px;min-width:0;font-size:var(--text-lg);line-height:1.75;color:var(--color-ink-soft);overflow-wrap:anywhere}
+.reader-body h1{font-size:var(--text-h1)}
+.reader-body h2{font-size:var(--text-h2);border-bottom:1px solid var(--color-line);padding-bottom:var(--space-2);margin:var(--space-8) 0 var(--space-4)}
+.reader-body h3{font-size:var(--text-h3);margin:var(--space-6) 0 var(--space-3)}
+.reader-body h4{font-size:1em;margin:var(--space-6) 0 var(--space-3)}
+.reader-body h1,.reader-body h2,.reader-body h3,.reader-body h4{color:var(--color-ink);font-weight:var(--weight-bold);line-height:var(--leading-tight)}
+.reader-body p{margin:var(--space-4) 0}
+.reader-body ul,.reader-body ol{padding-left:var(--space-6)}
+.reader-body li{margin:var(--space-2) 0}
+.reader-body blockquote{margin:var(--space-5) 0;border-left:3px solid var(--color-accent);padding:var(--space-1) var(--space-4);color:inherit;background:var(--color-surface)}
+.reader-body a{color:var(--color-accent)}
+.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--color-line);border-radius:var(--radius-sm)}
+.reader-body code{background:var(--color-surface);color:var(--color-accent-ink);border:1px solid var(--color-accent-line);border-radius:var(--radius-xs);padding:1px var(--space-1);font-family:var(--font-mono);font-size:1em}
+.reader-body .code-block,.reader-body pre.mermaid{background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-ink);border-radius:var(--radius-sm);padding:var(--space-4);overflow:auto;font-size:var(--text-body);line-height:1.65;overflow-wrap:normal}
+.reader-body .code-block code,.reader-body pre.mermaid code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
+.reader-body .table-wrap{max-width:100%;overflow-x:auto;overscroll-behavior-x:contain;margin:var(--space-5) 0;border-radius:var(--radius-sm)}
+.reader-body .table-wrap:focus-visible,.reader-body .code-block:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
+.reader-code{margin:var(--space-5) 0;min-width:0}
+.reader-code .code-block{margin:0;border-top-left-radius:0;border-top-right-radius:0}
+.code-tools{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-2) var(--space-3);border:1px solid var(--color-line);border-bottom:0;border-radius:var(--radius-sm) var(--radius-sm) 0 0;background:var(--color-surface);color:var(--color-muted);font-size:var(--text-small);line-height:var(--leading-normal)}
+.code-language{margin-right:auto;font-family:var(--font-mono)}
+.code-copy{min-height:36px;padding:var(--space-1) var(--space-3);border:1px solid var(--color-line);border-radius:var(--radius-xs);background:var(--color-panel);color:var(--color-ink);font:inherit;cursor:pointer;transition:background var(--duration-fast) var(--ease-out),border-color var(--duration-fast) var(--ease-out)}
+.code-copy:hover,.code-copy:focus-visible{background:var(--color-accent-soft);border-color:var(--color-accent)}
+.code-copy:disabled{cursor:not-allowed;opacity:.7}
+.code-copy-status,.mmd-copy-status{font-size:var(--text-small);color:var(--color-muted);overflow-wrap:anywhere}
+@media(pointer:coarse){.code-copy{min-height:44px}}
+@media print{.code-tools{display:none}body.tk-host .reader-layout{display:block}body.tk-host .reader-railcol{display:none}.reader-code .code-block{border-radius:var(--radius-sm);white-space:pre-wrap;overflow-wrap:anywhere}body.tk-host .reader-body .table-wrap{overflow:visible}body.tk-host .reader-body th,body.tk-host .reader-body td{min-width:0;overflow-wrap:anywhere}}
+.reader-body .table-wrap::-webkit-scrollbar{height:var(--space-2)}
+.reader-body .table-wrap::-webkit-scrollbar-track{background:var(--color-surface)}
+.reader-body .table-wrap::-webkit-scrollbar-thumb{background:var(--color-line-strong);border-radius:var(--radius-full)}
+.reader-body table{border-collapse:collapse;width:100%;margin:0;font:inherit;color:inherit}
 /* 剪藏的 B 站播放器：16:9 自适应容器，宽随正文列，不撑破行宽。 */
 .video-embed{position:relative;padding-top:56.25%;margin:var(--space-5) 0;border-radius:7px;overflow:hidden;border:1px solid var(--color-line);background:var(--color-surface)}
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
@@ -635,10 +666,9 @@
    :target，元素级 scroll-margin 让两类跳转（目录点击、外链 hash）都生效。
    +16px 用区块级最小呼吸档（--space-4），与头部规范「不顶格贴固定栏」同源。 */
 #reader-body h2,#reader-body h3,#reader-body h4{scroll-margin-top:calc(70px + var(--space-4))}
-/* 表格是正文的一部分，不是数据报表：行距要够读，
-   表头要与正文区分但不用重色。 */
-.reader-body th,.reader-body td{padding:var(--space-3) var(--space-4);border:1px solid var(--color-line);text-align:left;vertical-align:top;line-height:var(--leading-normal)}
-.reader-body th{background:var(--color-surface);color:var(--color-ink);font-weight:var(--weight-semibold);white-space:nowrap}
+.reader-body th,.reader-body td{min-width:10em;padding:var(--space-3) var(--space-4);border:1px solid var(--color-line);text-align:left;vertical-align:top;line-height:inherit;white-space:normal;overflow-wrap:break-word}
+.reader-body td a,.reader-body td code{overflow-wrap:anywhere}
+.reader-body th{background:var(--color-surface);color:var(--color-ink);font-weight:var(--weight-semibold)}
 .reader-body tbody tr:hover{background:var(--color-surface)}.reader-body .callout{padding:11px 14px;border-left:3px solid var(--color-warm);background:var(--color-warm-soft);color:var(--color-warm-ink)}.graph{display:none}.graph.open{display:block}
 /* ── 学习进度（?view=progress） ────────────────────────────────────────
  * 全部状态来自 localStorage，页面只是这份数据的视图。 */
@@ -694,7 +724,7 @@
 .tk-subtopic{display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:5px 8px 5px 26px;margin-left:14px;border-left:1px solid var(--color-line);color:var(--color-ink-soft);font-size:var(--text-small);text-decoration:none}
 .tk-subtopic:first-child{border-top:0}
 .tk-subtopic:hover{color:var(--color-accent);border-left-color:var(--color-accent);background:var(--color-accent-soft)}
-.tk-subtopic--all{color:var(--color-accent);font-weight:var(--weight-semibold)}.tk-subtopic[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:var(--weight-semibold)}
+.tk-subtopic--all{color:var(--color-accent);font-weight:var(--weight-semibold)}.tk-subtopic[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:var(--weight-semibold);border-left-color:var(--color-accent);border-radius:0 6px 6px 0;margin-right:10px;box-shadow:var(--shadow-sm),inset 0 1px 2px rgba(20, 42, 35, 0.06)}
 .tk-radar-pin{display:contents}
 .tk-subtopic .count{font-size:var(--text-2xs);color:var(--color-muted);font-variant-numeric:tabular-nums}
 .pg-domain-block{margin-bottom:24px}
@@ -928,20 +958,6 @@
 .reader-tool,.reader-back,.reader-study{flex:1 1 auto;text-align:center;font-size:var(--text-sm)}
 .reader-tool,.reader-back,.reader-study{min-height:44px;padding-top:9px;padding-bottom:9px}
 
-/* 宽表格在手机上会把整个页面撑出横向滚动条。让表格自己滚。 */
-.reader-body table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;max-width:100%}
-.reader-body table thead,.reader-body table tbody{display:table;width:100%;min-width:520px}
-.reader-body table th,.reader-body table td{white-space:nowrap}
-/* 单元格内的长文本仍可换行，避免窄屏下横向滚动过长。 */
-.reader-body table td{white-space:normal;min-width:120px}
-/* 手机上内容列右侧被悬浮按钮通道压到约 298px，520px 的表格最小宽度
-   必然顶破容器（390px 实测 right=535px）。表格降为随内容自适应并保留
-   自身横向滚动；theads/tbody 的 520px 同步解除，避免再顶出容器。 */
-@media (max-width: 760px) {
-  .reader-body table thead,
-  .reader-body table tbody { min-width: 0; }
-  .reader-body table { max-width: none; }
-}
 /* 侧栏折叠钮（同模块）与关系区折叠钮：裸字符热区 12×16 / 28×28 太小，
    补成 36×36 / 32×32 的图标钮（触控标准 44×44 的近邻取整，控件行放得下）。
    relation-collapse 用两级选择器：单类版本定义在本块之后，同特异性会输。 */
@@ -1171,7 +1187,7 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .tool-facts .fact-none{color:var(--color-muted);background:transparent;border:0}
 :root[data-theme="dark"] .tool-facts .fact-stars{color:var(--color-star)}
 .secondary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.secondary-card{background:var(--color-panel);border:1px solid var(--color-line);border-radius:7px;padding:18px;min-height:210px}.secondary-card h3{font-size:var(--text-lg);margin:0 0 4px}.secondary-card>p{font-size:var(--text-base);color:var(--color-ink-soft);margin:0 0 12px}.secondary-card .io-grid{margin:8px 0}
-.aux-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.aux-card{background:var(--color-panel);border:1px solid var(--color-line);border-radius:7px;padding:17px 18px;display:flex;flex-direction:column}.aux-card h3{font-size:var(--text-lg);margin:0 0 5px}.aux-card p{font-size:var(--text-base);color:var(--color-ink-soft);margin:0 0 10px}.aux-card .tool-facts{margin-top:auto;margin-bottom:10px}.aux-card .work-actions{margin-top:auto;margin-bottom:0}.aux-card a{font-size:var(--text-sm);font-weight:700;color:var(--color-accent);margin-right:12px}.aux-card .work-actions a{padding:6px 9px;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-accent);font-size:var(--text-sm);font-weight:700;margin-right:0}.aux-card .work-actions a:hover{border-color:var(--color-accent)}
+.aux-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.aux-card{background:var(--color-panel);border:1px solid var(--color-line);border-radius:7px;padding:17px 18px;display:flex;flex-direction:column}.aux-card h3{font-size:var(--text-lg);margin:0 0 5px}.aux-card p{font-size:var(--text-base);color:var(--color-ink-soft);margin:0 0 10px}.aux-card .tool-facts{margin-top:auto;margin-bottom:10px}.aux-card .work-actions{margin-top:auto;margin-bottom:0}.aux-card a{font-size:var(--text-sm);font-weight:700;color:var(--color-accent);margin-right:12px}.aux-card .work-actions a{padding:6px 9px;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-accent);font-size:var(--text-sm);font-weight:700;margin-right:0}.aux-card .work-actions a:hover{border-color:var(--color-accent)}#home-clippings{grid-column:span 2}
 .sidebar-support{margin-top:17px;padding-top:14px;border-top:1px solid var(--color-line)}.sidebar-support p{margin:0 9px 5px;color:var(--color-muted);font-size:var(--text-2xs);font-weight:750;text-transform:uppercase}.sidebar-support button{display:flex;width:100%;justify-content:space-between;border:1px solid transparent;background:transparent;padding:8px 10px;border-radius:6px;color:var(--color-muted);font-size:var(--text-sm)}.sidebar-support button:hover,.sidebar-support button.active{background:var(--color-surface);border-color:var(--color-line);color:var(--color-muted)}
 .directory-head{padding-bottom:20px;margin-bottom:27px}.directory-head h2{font-size:var(--text-3xl)}.directory-head p{font-size:var(--text-base)}
 .sort button{padding:6px 10px;border-radius:5px}
@@ -1179,17 +1195,17 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .note-row{border:1px solid var(--color-line);border-radius:6px!important;padding:14px 16px;background:var(--color-panel);box-shadow:0 1px 2px rgba(20,42,35,.02)}
 .note-row:hover{background:var(--color-panel);border-color:var(--color-accent-line);transform:translateX(2px)}
 .note-row h3{font-size:var(--text-sm)}.note-row .path{color:var(--color-muted)}.note-row p{font-size:var(--text-base)}
-.reader{max-width:1018px;margin:0 auto}/* 容器上限=列宽之和 740+30+248：固定 1240 时多出 222px 全堆在正文与目录之间成空带（2026-09-24 用户截图红框，宽窗口实测 bandW 222+）。 */.reader-head{padding-bottom:22px;margin-bottom:25px}.reader h2{font-size:var(--text-4xl)}.reader-body{max-width:740px;font-size:var(--text-lg);line-height:1.75;color:var(--color-ink-soft)}.reader-body h2{font-size:var(--text-2xl);margin-top:38px}.reader-body h3{font-size:var(--text-xl)}.reader-body blockquote{background:var(--color-surface);border-left-color:var(--color-accent)}.reader-body .code-block,.reader-body pre.mermaid{background:var(--color-surface);border:1px solid var(--color-line)}.reader-body th{background:var(--color-surface)}
+.reader{max-width:1018px;margin:0 auto}/* 容器上限=列宽之和 740+30+248：固定 1240 时多出 222px 全堆在正文与目录之间成空带（2026-09-24 用户截图红框，宽窗口实测 bandW 222+）。 */.reader-head{padding-bottom:22px;margin-bottom:25px}.reader-head h2{font-size:var(--text-4xl)}
 .graph-panel{padding:13px;border-radius:7px;box-shadow:0 1px 3px rgba(20,42,35,.03)}
 
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
 /* 仅读屏可见的补充文案：视觉零占位（1px 裁剪），读屏完整朗读 */
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-@media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}.content{padding-left:28px}}
+@media(max-width:1120px){.domain-grid,.aux-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.aux-card:first-child{grid-column:1/-1}#home-clippings{grid-column:auto}.content{padding-left:28px}}
 @media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:var(--color-bg-veil)}/* 移动端头部规范镜像：hero 折算值 顶 32/底距 28（桌面 40/32 的收窄），
    真源在 base.css 移动端块 .tk-shell .hero:first-child —— 首页根容器
    是 .app，那条拿不到，这里镜像。曾写死 26px content 内距与旧 26 顶距
-时代对不上规范，一并对齐。 */.content{padding:16px 15px calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding:32px 0 16px;margin-bottom:28px}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:13px}.domain-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.view-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-md)}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
+时代对不上规范，一并对齐。 */.content{padding:16px 15px calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding:32px 0 16px;margin-bottom:28px}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:13px}.domain-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.view-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader-head h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-body)}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
 /* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
 /* 提示框的三个颜色曾是硬编码浅色值（#e8c6a8 / #fff9f2 / #704823），
  * 暗色模式没有对应覆盖 —— 深底上会浮出一块浅橙底配深棕字。
@@ -1321,12 +1337,13 @@ html[data-lang="en"] .home:empty::before{content:'Loading the library...'}
 @media(min-width:1200px){#directory>.dir-rail{padding-top:96px}}
 </style>
 <style id="link-polish">
-/* App navigation and action links stay quiet; article links retain a clear
-   hover cue when the reader is deliberately inspecting a source. */
 a { text-decoration: none; }
 a:hover { text-decoration: none; }
-.reader-body a:hover,
-.reader-sources a:hover { text-decoration: underline; }
+@media screen{
+body.tk-host .reader-body a{cursor:pointer;text-decoration:underline;text-decoration-thickness:.06em;text-underline-offset:.2em;text-decoration-color:var(--color-accent-line);transition:color var(--duration-fast) var(--ease-out),text-decoration-color var(--duration-fast) var(--ease-out)}
+body.tk-host .reader-body a:hover,body.tk-host .reader-body a:focus-visible{color:var(--color-accent-hover);text-decoration-color:currentColor}
+body.tk-host .reader-sources a:hover,body.tk-host .reader-sources a:focus-visible{text-decoration:underline}
+}
 .topbar .theme-toggle{width:auto;min-width:36px;height:36px;margin:0;padding:0 12px;border:1px solid var(--color-line);border-radius:6px;background:var(--color-panel);color:var(--color-muted);font-size:var(--text-lg);cursor:pointer;flex-shrink:0}.topbar .theme-toggle:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}
 .radar-badge{position:relative;border:2px solid var(--color-warm);background:linear-gradient(135deg,var(--color-warm-soft) 0%,rgba(250,243,232,.3) 100%);border-radius:7px;padding:9px 11px;margin:8px 8px 4px;cursor:pointer;transition:all var(--duration-fast) var(--ease-out);box-shadow:0 2px 8px rgba(168,95,45,.15)}
 .radar-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(168,95,45,.25);border-color:var(--color-warm)}
@@ -1358,7 +1375,7 @@ a:hover { text-decoration: none; }
 </style>
 <style id="article-relations">
 /* 搜索框在右侧，与右上角的语言/主题控件同一水平带（控件 fixed 定位，右侧留 118px 给它们），左边整块留给内容标题的呼吸空间。 */
-/* 文章页"知识图谱"区在正文之后：标题 16px（--text-body）、计数 13px（--text-small，micro 档只用于图形角标不做文字）；上边框与正文分隔，宽度收口到正文列（max-width 740px）与 .reader-body 一致。备份 .design/backup-index-rt22b.html */.search{max-width:480px;flex:0 1 480px;margin-left:auto;margin-right:118px}.topbar .reader-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none;margin:0 118px 0 12px}@media(max-width:760px){.topbar .reader-tools{margin:0}}/* 手机端无固定钮占位，118px 让位边距会把按钮行顶出容器 */.topbar .reader-back,.topbar .reader-study{white-space:nowrap}.article-relations{border-top:1px solid var(--color-line);padding:14px 0 4px;margin:24px 0 0;max-width:740px}.article-relations-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.article-relations-heading{display:flex;align-items:baseline;gap:9px;min-width:0}.article-relations-head h3{margin:0;font-size:var(--text-body)}.article-relations-head span{color:var(--color-muted);font-size:var(--text-small)}.relation-collapse{width:28px;height:28px;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-muted);cursor:pointer;font-size:var(--text-md);line-height:1}.relation-collapse:hover{border-color:var(--color-accent);background:var(--color-accent-soft);color:var(--color-accent)}.relation-graph{display:block;width:100%;height:245px;overflow:visible}/* rt16 高度 205→245：配合两行卡（66px 卡高 + 78 间距）的 viewBox 250，原 205 裁掉三卡纵排底部。 *//* 连线语义就是"分隔线"，用边框 token：暗色下自动换成 #475569，
+/* 文章页"知识图谱"区在正文之后：标题 16px（--text-body）、计数 13px（--text-small，micro 档只用于图形角标不做文字）；上边框与正文分隔，宽度收口到正文列（max-width 740px）与 .reader-body 一致。备份 .design/backup-index-rt22b.html */.search{max-width:480px;flex:0 1 480px;margin-left:auto;margin-right:118px}.topbar .reader-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none;margin:0 118px 0 12px}@media(max-width:760px){.topbar .reader-tools{margin:0}}/* 手机端无固定钮占位，118px 让位边距会把按钮行顶出容器 */.topbar .reader-back,.topbar .reader-study{white-space:nowrap}.article-relations{border-bottom:1px solid var(--color-line);padding:0 0 16px;margin:0 0 24px;max-width:740px}.article-relations-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.article-relations-heading{display:flex;align-items:baseline;gap:9px;min-width:0}.article-relations-head h3{margin:0;font-size:var(--text-body)}.article-relations-head span{color:var(--color-muted);font-size:var(--text-small)}.relation-collapse{width:28px;height:28px;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-muted);cursor:pointer;font-size:var(--text-md);line-height:1}.relation-collapse:hover{border-color:var(--color-accent);background:var(--color-accent-soft);color:var(--color-accent)}.relation-graph{display:block;width:100%;height:245px;overflow:visible}/* rt16 高度 205→245：配合两行卡（66px 卡高 + 78 间距）的 viewBox 250，原 205 裁掉三卡纵排底部。 *//* 连线语义就是"分隔线"，用边框 token：暗色下自动换成 #475569，
    不再像硬编码浅灰绿那样在深底上消失。 */
 .relation-edge{stroke:var(--color-line-strong);stroke-width:1.5;fill:none}/* 入链比延伸淡一档，保持两类边的区分。 */
 .relation-edge.incoming{stroke:var(--color-faint)}.relation-node{cursor:pointer}.relation-node rect{fill:var(--color-panel);stroke:var(--color-line);stroke-width:1.2}.relation-node.current rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.5}.relation-node:hover rect,.relation-node:focus rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.8}.relation-node .relation-node-title{fill:var(--color-ink);font-size:var(--text-sm);font-weight:700}.relation-node .relation-node-meta{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:600}.relation-node.current .relation-node-meta{fill:var(--color-accent)}.relation-label{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.04em}.article-relations.collapsed .relation-graph{display:none}.article-relations.collapsed{padding-bottom:10px}/* 窄桌面（≤1240px）文章视图：顶栏一行装不下「搜索框+四枚操作按钮+语言+主题」，搜索框 flex-shrink 无下限被压到 36px 只剩 ⌘K 片悬着（1024 实测 input 52px）。改为整行换行：搜索独占第一行，按钮与语言、主题落第二行；换行态搜索行右侧预留 118px 给固定定位的中文/主题控件（882-1002px 实测压在通栏搜索条上）。:has 限定文章视图（操作按钮可见），首页不受影响。 */@media(max-width:1240px){.topbar:has(#reader-actions:not([hidden])){flex-wrap:wrap;row-gap:8px}.topbar:has(#reader-actions:not([hidden])) .search{flex:1 1 100%;max-width:none;margin:0 118px 0 0}.topbar:has(#reader-actions:not([hidden])) .reader-tools{margin:0}}/* 文章页移动端首屏收口（2026-09-23 排版审计）：工具按钮从两列 grid
@@ -1406,7 +1423,7 @@ a:hover { text-decoration: none; }
     </div>
     <button type="button" class="kbd-close" id="kbd-close">关闭</button>
   </div>
-</div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><h2 id="reader-title"></h2><p id="reader-meta" class="reader-meta"></p><div id="reader-sources" class="reader-sources"></div></div><div class="reader-layout"><div class="reader-maincol"><article id="reader-body" class="reader-body" tabindex="-1"></article><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section><section id="reader-pager" class="reader-pager" aria-label="同模块上一篇下一篇"></section><aside id="reader-reward" class="reader-reward" role="status" hidden></aside></div><div class="reader-railcol"><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside><aside class="reader-siblings" id="reader-siblings" aria-label="同模块文章"></aside></div></div><div id="reader-sources-mobile" class="reader-sources"></div></section><section id="graph-view" class="graph"><div class="view-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value" role="status">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大图谱" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮或捏合缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱" tabindex="0"></svg>
+</div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><h2 id="reader-title"></h2><p id="reader-meta" class="reader-meta"></p><div id="reader-sources" class="reader-sources"></div></div><div class="reader-layout"><div class="reader-maincol"><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section><article id="reader-body" class="reader-body" tabindex="-1"></article><section id="reader-pager" class="reader-pager" aria-label="同模块上一篇下一篇"></section><aside id="reader-reward" class="reader-reward" role="status" hidden></aside></div><div class="reader-railcol"><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside><aside class="reader-siblings" id="reader-siblings" aria-label="同模块文章"></aside></div></div><div id="reader-sources-mobile" class="reader-sources"></div></section><section id="graph-view" class="graph"><div class="view-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value" role="status">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大图谱" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮或捏合缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱" tabindex="0"></svg>
 <div id="legend" class="graph-legend"></div></div></section><section id="panorama-view" class="pano-view"><div class="view-head"><div><h2 id="pano-title">知识全景</h2><p id="pano-subtitle" hidden></p></div></div><div class="pano-tabs" role="tablist"><button type="button" class="pano-tab on" id="pano-tab-matrix" role="tab" aria-selected="true">覆盖矩阵</button><button type="button" class="pano-tab" id="pano-tab-stack" role="tab" aria-selected="false">八层技术栈</button><button type="button" class="pano-tab" id="pano-tab-mine" role="tab" aria-selected="false" title="我的阅读已升级为独立页面，点击前往">我的阅读 ↗</button></div><div id="pano-stack-host" hidden></div><div id="panorama-body" class="pano-body"></div><div id="pano-progress" hidden><div class="view-head"><div><h2>我的阅读</h2><p>标记已读、排稍后读——只保存在这台浏览器上，不会上传</p></div><div class="progress-actions"><label class="pg-filter"><input type="radio" name="pg-filter" value="all" checked>全部</label><label class="pg-filter"><input type="radio" name="pg-filter" value="todo">未读</label><label class="pg-filter"><input type="radio" name="pg-filter" value="learned">已读</label><label class="pg-filter"><input type="radio" name="pg-filter" value="planned">稍后读</label><button type="button" class="pg-io" id="pg-export" title="把标注下载成 JSON 文件">导出</button><button type="button" class="pg-io" id="pg-import" title="从 JSON 文件导入标注">导入</button><input type="file" id="pg-import-file" accept=".json,application/json" hidden><button type="button" class="pg-clear" id="pg-clear">清除全部标注</button></div></div><div id="progress-body"></div></div></section></div></main>
 </div>
 <script>
@@ -1473,7 +1490,43 @@ function show(view){state.view=view;
      记录。同 load 内反复切回同一视图去重。 */
   if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';/* 显示时不写死 display：宽屏下目录页是两列 grid（右侧留出「本页主题」
    目录），写死 block 会用内联样式盖掉 CSS 的 grid。这里只负责隐藏。 */
-$('#directory').style.display=view==='directory'?'':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
+$('#directory').style.display=view==='directory'?'':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>{
+  if(state.sort==='updated')return (b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN');
+  /* 「即将到期」按 review_after 升序：已过复查日的排最前，30 天内到期的紧跟其后，
+     没有 review_after 的沉底（用 9999 占位，不参与日期比较也不插到中间）。 */
+  if(state.sort==='due')return (a.review_after||'9999-12-31').localeCompare(b.review_after||'9999-12-31')||a.title.localeCompare(b.title,'zh-CN');
+  return a.title.localeCompare(b.title,'zh-CN');
+})}
+/* 打开文章时把侧栏导航摆到这篇文章的位置（2026-09-24）：
+   所属域展开 → 所属主题标当前态 → 域行标当前域。
+   此前 openNote 只换正文不动 state.domain/topic，读者从文章页看不出
+   「这篇属于哪个域的哪个主题」，侧栏也永远是全收起状态。 */
+function syncNavToNote(note){
+  if(!note||!note.category)return;
+  const domain=note.category, topic=note.topic&&note.topic!=='概览'?note.topic:null;
+  /* 只改导航口径，不重建主区视图：文章正文已经在 reader 里，
+     走 select() 会把文章冲掉。 */
+  state.domain=domain;
+  state.topic=topic||'all';
+  const row=[...document.querySelectorAll('#domains .tk-domain')].find(r=>r.dataset.domain===domain);
+  if(!row)return;
+  /* 未展开就模拟点击一次 —— 主题子列表是点击时才 innerHTML 的，
+     直接改 hidden 拿不到内容（enhanceDomains 的固有行为）。 */
+  if(row.getAttribute('aria-expanded')!=='true')row.click();
+  /* 域行当前态统一走 .active 类（base.css 里带阴影的按下感那条），
+     不再用 aria-current —— 后者在全景视图下被写成 "true"、目录视图下
+     写成 "page"，两套值让 CSS 选择器写不干净（2026-09-24）。 */
+  document.querySelectorAll('#domains .tk-domain').forEach(r=>{
+    if(r.dataset.domain===domain){
+      r.classList.add('active');
+      r.setAttribute('aria-current','page');
+    }else{
+      r.classList.remove('active');
+      r.removeAttribute('aria-current');
+    }
+  });
+  syncSubtopicCurrent();
+}
 function syncSubtopicCurrent(){
   document.querySelectorAll('.tk-subtopics').forEach(sub=>{
     const row=sub.previousElementSibling;
@@ -1482,6 +1535,7 @@ function syncSubtopicCurrent(){
     sub.querySelectorAll('.tk-subtopic').forEach(a=>{
       const u=new URL(a.href,location.origin);
       const t=u.searchParams.get('topic');
+      /* 文章页（view=reader）也标当前主题：读者要知道这篇属于哪个主题。 */
       const on=d===state.domain&&state.topic!=='all'&&t===state.topic;
       if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');
     });
@@ -1494,8 +1548,13 @@ function renderDomains(){
      切域时行早已增强过、syncActive 不会再跑，漏刷会停留在上一次的标记。 */
   document.querySelectorAll('#domains .tk-domain').forEach(r=>{
     const on=(state.view==='panorama'||state.view==='directory')&&r.dataset.domain===state.domain;
-    if(on)r.setAttribute('aria-current',state.view==='panorama'?'true':'page');
-    else r.removeAttribute('aria-current');
+    if(on){
+      r.setAttribute('aria-current',state.view==='panorama'?'true':'page');
+      r.classList.add('active');
+    }else{
+      r.removeAttribute('aria-current');
+      r.classList.remove('active');
+    }
   });
   syncSubtopicCurrent();
   /* 域列表的骨架（竖线风格）由 shell 渲染（tk:domains-rendered 广播后到达）。
@@ -1529,7 +1588,11 @@ function enhanceDomains(){
     row.setAttribute('aria-expanded','false');
     /* 高亮当前域：全景视图下矩阵随 state.domain 重建，侧栏要让「矩阵现在
        统计的是哪个域」一眼可见。 */
-    const syncActive=()=>{if((state.view==='panorama'||state.view==='directory')&&state.domain===name)row.setAttribute('aria-current',state.view==='panorama'?'true':'page');else row.removeAttribute('aria-current')};
+    const syncActive=()=>{
+      const on=(state.view==='panorama'||state.view==='directory')&&state.domain===name;
+      if(on){row.setAttribute('aria-current',state.view==='panorama'?'true':'page');row.classList.add('active')}
+      else{row.removeAttribute('aria-current');row.classList.remove('active')}
+    };
     syncActive();
     document.addEventListener('tk:pano-domain',syncActive);
     row.onclick=(e)=>{
@@ -1613,7 +1676,10 @@ function renderDirectory(){
     ups.map(([u,c])=>'<a class="upstream-chip'+(state.upstream===u?' on':'')+'" data-up="'+esc(u)+'" title="'+esc(u)+' 的 '+c+' 篇">'+esc(u)+' '+c+'</a>').join('')+
     '</div>'):'';
   const filtered=(state.upstream&&state.upstream!=='all')?list.filter(n=>upstreamOf(n)===state.upstream):list;
-  for(const n of filtered){const k=state.domain==='all'?n.category:n.topic;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
+  /* 「即将到期」排序下不按主题分组：分组会把顺序切成一段一段，每段内部各自
+     从最急排到最不急，整页看不出「谁最该先复查」。这一种排序要的就是全局顺序，
+     所以全部条目合成一段。 */
+  for(const n of filtered){const k=state.sort==='due'?'即将到期':(state.domain==='all'?n.category:n.topic);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
   const groupRank=g=>state.domain==='all'?(order.indexOf(g)<0?999:order.indexOf(g)):(topicOrder[state.domain]||[]).indexOf(g)<0?999:(topicOrder[state.domain]||[]).indexOf(g);
   // 命中片段高亮：让"为什么这篇被搜出来"直接可见，而不是只列出标题。
   const q=state.query.trim();
@@ -1639,7 +1705,21 @@ function renderDirectory(){
    * （2026-09-24 用户反馈「重复的标题」）。主题页（含搜索结果）只留字数与时效；
    * 只有跨主题的「全部知识」页才需要主题名来区分条目归属。 */
   const showTopicInMeta=state.domain==='all'&&state.topic==='all'&&!state.query;
-  const metaLine=n=>[showTopicInMeta?n.topic:'',TKShell.fmtWords(n.words),n.change_rate?tr(CHANGE_RATE_TEXT[n.change_rate]||n.change_rate):''].filter(Boolean).map(v=>esc(v)).join(' · ');
+  /* 剩余天数只在「即将到期」排序下显示：它回答的是这一次排序的理由，
+     常驻会让每条目录都挂一个和阅读无关的日期数字。
+     「剩 N 天到期」「已过期 N 天」是拼接串，整串不命中词典（同 rt25），按语言分支拼。 */
+  const enLang=(window.TKI18N&&window.TKI18N.lang==='en');
+  const dueText=n=>{
+    if(state.sort!=='due'||!n.review_after)return '';
+    const target=Date.parse(n.review_after+'T00:00:00');
+    if(Number.isNaN(target))return '';
+    const base=Date.parse(new Date().toISOString().slice(0,10)+'T00:00:00');
+    const days=Math.round((target-base)/86400000);
+    if(days<0)return enLang?((-days)+' days overdue'):('已过期 '+(-days)+' 天');
+    if(days<=30)return enLang?(days+' days left'):('剩 '+days+' 天到期');
+    return '';
+  };
+  const metaLine=n=>[showTopicInMeta?n.topic:'',TKShell.fmtWords(n.words),n.change_rate?tr(CHANGE_RATE_TEXT[n.change_rate]||n.change_rate):'',dueText(n)].filter(Boolean).map(v=>esc(v)).join(' · ');
   const sections=[...groups].sort(([a],[b])=>groupRank(a)-groupRank(b)||a.localeCompare(b,'zh-CN')).map(([g,items])=>{
     const rows=items.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h3>${mark(n.title)}</h3><div class="path">${metaLine(n)}</div></div><p>${q?mark(n.excerpt||''):esc(n.excerpt||'')}</p></article>`).join('');
     return `<section class="topic-section"><h3 class="topic-title"><span>${esc(g==='总览'?'入口':g)}</span><small>${items.length}</small></h3>${rows}</section>`;
@@ -1647,7 +1727,7 @@ function renderDirectory(){
   // 空结果给可执行的下一步，而不是一句"没有匹配内容"就结束。
   const empty=groups.size?'':
     `<div class="empty">${state.query?`<p class="empty-title">没有找到“${esc(q)}”</p>`:`<p class="empty-title">「${esc(state.domain)}」还没有匹配的内容</p>`}<p class="empty-hint">${state.query?'试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识':'可能是筛选条件太窄，清掉筛选看看全部知识'}</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
-  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div><div class="sort"><button data-sort="title" aria-pressed="${state.sort==='title'}" class="${state.sort==='title'?'active':''}">按标题<span class="sr-only"> ${state.sort==='title'?'（当前排序）':''}</span></button><button data-sort="updated" aria-pressed="${state.sort==='updated'}" class="${state.sort==='updated'?'active':''}">按更新<span class="sr-only"> ${state.sort==='updated'?'（当前排序）':''}</span></button></div></div>${sections}${empty}`;
+  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div><div class="sort"><button data-sort="title" aria-pressed="${state.sort==='title'}" class="${state.sort==='title'?'active':''}">按标题<span class="sr-only"> ${state.sort==='title'?'（当前排序）':''}</span></button><button data-sort="updated" aria-pressed="${state.sort==='updated'}" class="${state.sort==='updated'?'active':''}">按更新<span class="sr-only"> ${state.sort==='updated'?'（当前排序）':''}</span></button><button data-sort="due" aria-pressed="${state.sort==='due'}" class="${state.sort==='due'?'active':''}">按即将到期<span class="sr-only"> ${state.sort==='due'?'（当前排序）':''}</span></button></div></div>${sections}${empty}`;
   if(upBar)$('#directory').insertAdjacentHTML('afterbegin',upBar);
   const clearDomain=$('#empty-clear-domain');
   if(clearDomain)clearDomain.onclick=()=>select('all','all');
@@ -2237,13 +2317,14 @@ function heroLede(zh){
     ?{text:'每条讲清一个机制怎么运作、代价在哪。',lead:'写给在真实系统里做决定的工程师'}
     :{text:'Each note spells out how a mechanism works and what it costs.',lead:'For engineers making decisions in real systems'};
 }
-/* 【反复迭代后结果·rt13】知识领域卡片区排除「知识库管理」。
- * 依据：lede 的 domainCount() 口径排除它（6 个领域），但卡片区此前只排了
- * 总览和 Clippings，同屏渲染 7 张卡——读者数卡片得 7，文案说 6，数字打架。
- * 排除后卡片 6 张、文案 6 个，口径一致。可达性保底：卡片区下方
- * 「辅助理解」区新增「知识库管理」卡（元文档入口从领域区迁到那里），
- * 侧栏搜索仍可命中全部 34 篇元文档。多个 AI 并行优化期间由本注释锁定此决策。 */
-function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'&&d!=='知识库管理');const zhHome=!(window.TKI18N&&window.TKI18N.lang==='en');const t_=(zhText,enText)=>(zhHome?zhText:enText);const lede=heroLede(zhHome);const descriptions={'AI 系统工程：从模型能力到生产能力':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测','后端系统：在并发、失败与变化中维持服务':'请求、并发、消息、复制、一致性、故障恢复和基础设施','缺陷分析：从个案到体系':'从真实上游缺陷学判断、复现、合入与回归，每条案例都有上游 commit 可查','数据系统：在并发与故障中保存事实':'建模、SQL、事务、索引、CDC、流处理、治理和恢复','性能工程：从用户等待到资源瓶颈':'进程、CPU、GPU、内存、I/O、网络、观测和容量','软件构建：让变化可以理解、验证与交付':'架构、语言运行时、依赖、测试、CI/CD、发布和调试','知识库管理':'怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新'};$('#home').innerHTML=`<section class="hero hero--display" data-crop><div><h1>把技术原理读到能上手用</h1><p class="hero-lede"><span>${esc(lede.text)}</span><span class="hero-lede-lead">${esc(lede.lead)}</span></p></div><div class="hero-meta"><span class="hero-meta-item"><b>${engineeringCount().toLocaleString()}</b><i>${esc(t_('篇工程知识','notes'))}</i></span><span class="hero-meta-item"><b>${domainCount().toLocaleString()}</b><i>${esc(t_('个领域','domains'))}</i></span><span class="hero-meta-item"><b>${sourceCount().toLocaleString()}</b><i>${esc(t_('条来源','sources'))}</i></span></div></section><section class="claim-row"><section class="claim"><p class="claim-eyebrow">${esc(t_('知识','Notes'))}</p><p class="claim-lead">${esc(t_('四个问题，读到能自己下判断','Four questions, until you can judge for yourself'))}</p><p class="claim-sub">${esc(t_('每篇都按这套结构写——读的时候知道自己在哪一步，读完知道证据够不够','Every note follows this structure — you always know which question you are on, and whether the evidence is enough'))}</p><ul class="claim-list"><li><b>${esc(t_('它为什么出现','Why it exists'))}</b><i>——</i><span>${esc(t_('之前卡在哪，没它的时候怎么办','What was stuck before'))}</span></li><li><b>${esc(t_('它怎么运作','How it works'))}</b><i>——</i><span>${esc(t_('机制是什么，关键那一步发生了什么','The mechanism, and its key step'))}</span></li><li><b>${esc(t_('思路怎么来的','Where the idea comes from'))}</b><i>——</i><span>${esc(t_('为什么这样设计，换了什么假设','Why this design, and which assumption it traded'))}</span></li><li><b>${esc(t_('什么时候不该用它','When not to use it'))}</b><i>——</i><span>${esc(t_('代价是什么，边界在哪','Cost and limits'))}</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><div id="radar-slot" style="margin-bottom:18px"></div><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间排。Agent 相关的内容归在 AI 系统工程下，和上下文、检索、质量放在一起</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="${esc(t_('打开 '+d,'Open '+d))}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${t_(state.notes.filter(n=>n.category===d&&n.topic!=='归档').length+' 篇',state.notes.filter(n=>n.category===d&&n.topic!=='归档').length)}</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>${t_('从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。','Pick a preset path in the <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">Learning centre</a>, or go straight to a classroom or a tutor. Topics arrive pre-filled; the model is called only after you confirm')}</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><!-- 【反复迭代后结果·rt13】Agent 评估卡产出行重写：原文案与处理行逐字重复「把(模型/Agent 的)判断绑定到命令、日志、产物和测试」，两行信息量等于一行。产出行改为说清产出物本身（评估结论+回归清单），并补 t_ 翻译包裹。 --><section class="section"><h2>评估与工程</h2><p>评估原型回答"到底有没有变好"，把 Agent 的判断绑定到证据；开源的工程流程提供能直接照做的做法</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>${t_('按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试','Choose evaluation dimensions per task, binding model judgement to commands, logs, artifacts and tests')}</span></div><div class="io-row"><b>产出</b><span>${t_('带证据链的评估结论与回归清单；当前是设计约定与静态原型','Evaluation conclusions with evidence chains and regression checklists; currently a design convention and a static prototype')}</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看评估原型</a><a href="/?path=${encodeURIComponent('工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/Agent评估系统的设计约定.md')}">设计约定</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>${t_('需求对齐、研究、规格、TDD、代码审查和架构改进','Requirement alignment, research, specs, TDD, code review and architecture improvements')}</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>架构图和源码用来查清一个东西和其它东西的关系：它依赖什么、被谁依赖。需要的时候打开，不需要就跳过</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图</p><div class="work-actions"><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></div></article><article class="aux-card"><h3>知识库管理</h3><p>维护本站的元文档：怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新</p><div class="work-actions"><a class="wa-open" href="/?domain=${encodeURIComponent('知识库管理')}">打开元文档</a></div></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法</p><div class="work-actions"><a class="wa-open" href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口</a></div></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识</p><div class="work-actions"><a class="wa-open" href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史</a><a class="wa-open" href="/learn/history">查看收录方式</a></div></article></div></section><div class="notice">先看懂一个领域，从知识领域卡片进入；想动手练，用学习工具；想知道系统到底有没有变好，看 Agent 评估</div>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});{const homeGraph=$('#home-graph');if(homeGraph)homeGraph.addEventListener('click',event=>{event.preventDefault();showGraph()});}renderAtlas();applyHomeStatus();retranslate();loadDigest()}
+/* 【反复迭代后结果·rt13→2026-09-24】知识领域卡片区只排除「总览」与「知识库管理」。
+ * rt13 时点 Clippings 一并排除（口径：剪藏是归档，与 domainCount() 的 6 领域
+ * 文案保持一致）。2026-09-24 用户反馈剪藏文章「搜得到但导航找不到、打开没有
+ * 所属」——侧栏树（/api/domains）与首页两处正规入口当时都排除了 Clippings，
+ * 唯一入口只剩搜索。恢复方式：侧栏树纳入 Clippings（服务端，垫底排序）；
+ * 首页不放领域卡（保持 6 卡 = 6 领域文案，数字不打架），在「辅助理解」区加
+ * 通栏 Clippings 卡（与知识库管理卡同为归档区先例）。domainCount() 口径不动。 */
+function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'&&d!=='知识库管理');const zhHome=!(window.TKI18N&&window.TKI18N.lang==='en');const t_=(zhText,enText)=>(zhHome?zhText:enText);const lede=heroLede(zhHome);const descriptions={'AI 系统工程：从模型能力到生产能力':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测','后端系统：在并发、失败与变化中维持服务':'请求、并发、消息、复制、一致性、故障恢复和基础设施','缺陷分析：从个案到体系':'从真实上游缺陷学判断、复现、合入与回归，每条案例都有上游 commit 可查','数据系统：在并发与故障中保存事实':'建模、SQL、事务、索引、CDC、流处理、治理和恢复','性能工程：从用户等待到资源瓶颈':'进程、CPU、GPU、内存、I/O、网络、观测和容量','软件构建：让变化可以理解、验证与交付':'架构、语言运行时、依赖、测试、CI/CD、发布和调试','知识库管理':'怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新'};$('#home').innerHTML=`<section class="hero hero--display" data-crop><div><h1>把技术原理读到能上手用</h1><p class="hero-lede"><span>${esc(lede.text)}</span><span class="hero-lede-lead">${esc(lede.lead)}</span></p></div><div class="hero-meta"><span class="hero-meta-item"><b>${engineeringCount().toLocaleString()}</b><i>${esc(t_('篇工程知识','notes'))}</i></span><span class="hero-meta-item"><b>${domainCount().toLocaleString()}</b><i>${esc(t_('个领域','domains'))}</i></span><span class="hero-meta-item"><b>${sourceCount().toLocaleString()}</b><i>${esc(t_('条来源','sources'))}</i></span></div></section><section class="claim-row"><section class="claim"><p class="claim-eyebrow">${esc(t_('知识','Notes'))}</p><p class="claim-lead">${esc(t_('四个问题，读到能自己下判断','Four questions, until you can judge for yourself'))}</p><p class="claim-sub">${esc(t_('每篇都按这套结构写——读的时候知道自己在哪一步，读完知道证据够不够','Every note follows this structure — you always know which question you are on, and whether the evidence is enough'))}</p><ul class="claim-list"><li><b>${esc(t_('它为什么出现','Why it exists'))}</b><i>——</i><span>${esc(t_('之前卡在哪，没它的时候怎么办','What was stuck before'))}</span></li><li><b>${esc(t_('它怎么运作','How it works'))}</b><i>——</i><span>${esc(t_('机制是什么，关键那一步发生了什么','The mechanism, and its key step'))}</span></li><li><b>${esc(t_('思路怎么来的','Where the idea comes from'))}</b><i>——</i><span>${esc(t_('为什么这样设计，换了什么假设','Why this design, and which assumption it traded'))}</span></li><li><b>${esc(t_('什么时候不该用它','When not to use it'))}</b><i>——</i><span>${esc(t_('代价是什么，边界在哪','Cost and limits'))}</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><div id="radar-slot" style="margin-bottom:18px"></div><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间排。Agent 相关的内容归在 AI 系统工程下，和上下文、检索、质量放在一起</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="${esc(t_('打开 '+d,'Open '+d))}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${t_(state.notes.filter(n=>n.category===d&&n.topic!=='归档').length+' 篇',state.notes.filter(n=>n.category===d&&n.topic!=='归档').length)}</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>${t_('从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。','Pick a preset path in the <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">Learning centre</a>, or go straight to a classroom or a tutor. Topics arrive pre-filled; the model is called only after you confirm')}</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><!-- 【反复迭代后结果·rt13】Agent 评估卡产出行重写：原文案与处理行逐字重复「把(模型/Agent 的)判断绑定到命令、日志、产物和测试」，两行信息量等于一行。产出行改为说清产出物本身（评估结论+回归清单），并补 t_ 翻译包裹。 --><section class="section"><h2>评估与工程</h2><p>评估原型回答"到底有没有变好"，把 Agent 的判断绑定到证据；开源的工程流程提供能直接照做的做法</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>${t_('按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试','Choose evaluation dimensions per task, binding model judgement to commands, logs, artifacts and tests')}</span></div><div class="io-row"><b>产出</b><span>${t_('带证据链的评估结论与回归清单；当前是设计约定与静态原型','Evaluation conclusions with evidence chains and regression checklists; currently a design convention and a static prototype')}</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看评估原型</a><a href="/?path=${encodeURIComponent('工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/Agent评估系统的设计约定.md')}">设计约定</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>${t_('需求对齐、研究、规格、TDD、代码审查和架构改进','Requirement alignment, research, specs, TDD, code review and architecture improvements')}</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>架构图和源码用来查清一个东西和其它东西的关系：它依赖什么、被谁依赖。需要的时候打开，不需要就跳过</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图</p><div class="work-actions"><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></div></article><article class="aux-card"><h3>知识库管理</h3><p>维护本站的元文档：怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新</p><div class="work-actions"><a class="wa-open" href="/?domain=${encodeURIComponent('知识库管理')}">打开元文档</a></div></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法</p><div class="work-actions"><a class="wa-open" href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口</a></div></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识</p><div class="work-actions"><a class="wa-open" href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史</a><a class="wa-open" href="/learn/history">查看收录方式</a></div></article><article class="aux-card" id="home-clippings"><h3>Clippings · 网页剪藏</h3><p>从网页剪藏收藏的外部好文章，原文完整保留</p><div class="work-actions"><a class="wa-open" href="/?domain=Clippings">打开剪藏区</a></div></article></div></section><div class="notice">先看懂一个领域，从知识领域卡片进入；想动手练，用学习工具；想知道系统到底有没有变好，看 Agent 评估</div>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});{const homeGraph=$('#home-graph');if(homeGraph)homeGraph.addEventListener('click',event=>{event.preventDefault();showGraph()});}renderAtlas();applyHomeStatus();retranslate();loadDigest()}
 function bindSourceToggle(){
   /* 两类折叠按钮共用一个绑定：来源串的 .source-toggle（.source-more）
      和论据卡的 .cite-toggle（.cite-list 与 .cite-more）。 */
@@ -2372,6 +2453,14 @@ function bindLearningEntries(){
         :'这个工具这会儿没启动，入口打不开');
     };
   });
+}
+/* 带词进站（/?q=）：把词写进搜索框并直接渲染结果态。
+   站外入口页（项目页、学习中心）的搜索框是把人送到这里，此前主站只认
+   path/domain/topic，词会在跳转中丢掉，所以跨页搜索一直做不成（2026-09-24）。 */
+function applySearchQuery(q){
+  state.query=q;state.domain='all';state.topic='all';
+  const box=$('#search');if(box)box.value=q;
+  show('directory');renderDomains();renderDirectory();
 }
 function clearSearch(){state.query='';$('#search').value=''}
 function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}clearSearch();state.domain=domain;state.topic=topic;state.selected=null;if(domain!=='all'&&domain!=='Clippings')state.expandedDomains.add(domain);show('directory');renderDomains();renderDirectory();expandActiveDomain();if(matchMedia('(max-width:760px)').matches)collapseMobileSidebar();if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}
@@ -2533,13 +2622,27 @@ function renderRelations(note){
     incomingNodes.forEach((item,index)=>{const y=inputY(index);lines.push(edge(16+nodeWidth,y+nodeH(item)/2,current.x,current.y+nodeH(note)/2,'incoming'));nodes.push(node(item,16,y))});/* 【rt30·收窄】16/504 跟随新列位。 */
     outgoingNodes.forEach((item,index)=>{const y=outputY(index);lines.push(edge(current.x+nodeWidth,current.y+nodeH(note)/2,504,y+nodeH(item)/2));nodes.push(node(item,504,y))});
   }
-  root.classList.add('collapsed');
+  const collapsed=root.dataset.notePath===note.path?root.classList.contains('collapsed'):matchMedia('(max-width:760px)').matches;
+  root.dataset.notePath=note.path;
+  root.classList.toggle('collapsed',collapsed);
   root.innerHTML=`<div class="article-relations-head"><div class="article-relations-heading"><h3>知识图谱</h3><span>${(window.TKI18N&&window.TKI18N.lang==='en')?(incoming.length+' incoming · '+outgoing.length+' outgoing'):(incoming.length+' 条入链 · '+outgoing.length+' 条延伸')}</span><!-- 【rt24】原模板直接拼中文整串，词典按整串匹配永不命中；改为按语言分支拼装。 --></div><button type="button" class="relation-collapse" title="折叠知识图谱" aria-label="折叠知识图谱" aria-expanded="true">▾</button></div><svg class="relation-graph" viewBox="0 0 ${width} ${height}" role="img" aria-label="${(window.TKI18N&&window.TKI18N.lang==='en')?(esc(window.TKI18N.t(note.title))+' — direct knowledge graph'):(esc(note.title)+' 的直接知识图谱')}"<!-- 【rt26】同修 4。 -->><defs><marker id="relation-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L8 4L0 8z" fill="#8faea4"></path></marker></defs><text class="relation-label" x="${mobile?35:16}" y="${mobile?15:13}"><!-- 【rt30·收窄】跟随新列位。 -->${(window.TKI18N&&window.TKI18N.lang==='en')?('Cites this note'+(incoming.length>incomingNodes.length?' · '+incoming.length:'')):('引用当前节点'+(incoming.length>incomingNodes.length?' · '+incoming.length:''))}</text><!-- 【rt24】同计数 span：模板拼数字导致整串永不命中，按语言分支拼装。 --><text class="relation-label" x="${mobile?35:504}" y="${mobile?177:13}"><!-- 【rt30·收窄】跟随新列位。 -->${(window.TKI18N&&window.TKI18N.lang==='en')?('Extends from this note'+(outgoing.length>outgoingNodes.length?' · '+outgoing.length:'')):('从当前节点延伸'+(outgoing.length>outgoingNodes.length?' · '+outgoing.length:''))}</text>${lines.join('')}${node(note,current.x,current.y,'current')}${nodes.join('')}</svg>`;
   root.querySelectorAll('[data-note]').forEach(nodeElement=>{nodeElement.onclick=()=>openNote(nodeElement.dataset.note);nodeElement.onkeydown=event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();openNote(nodeElement.dataset.note)}}});
-  /* 与同模块对称：知识图谱默认展开，显式清掉上一篇可能留下的 collapsed。 */
-  root.classList.remove('collapsed');
   const toggle=root.querySelector('.relation-collapse');
-  toggle.onclick=()=>{const collapsed=root.classList.toggle('collapsed');const en=window.TKI18N&&window.TKI18N.lang==='en';/* 【rt26】点击后重赋的 title/aria-label 原恒为中文，EN 态改分支。 */toggle.textContent=collapsed?'▸':'▾';toggle.title=collapsed?(en?'Expand graph':'展开知识图谱'):(en?'Collapse graph':'折叠知识图谱');toggle.setAttribute('aria-label',toggle.title);toggle.setAttribute('aria-expanded',String(!collapsed))};
+  const syncToggle=()=>{
+    const collapsed=root.classList.contains('collapsed');
+    toggle.textContent=collapsed?'▸':'▾';
+    toggle.title=collapsed?readerText('展开知识图谱','Expand graph'):readerText('折叠知识图谱','Collapse graph');
+    toggle.setAttribute('aria-label',toggle.title);
+    toggle.setAttribute('aria-expanded',String(!collapsed));
+  };
+  const flip=()=>{root.classList.toggle('collapsed');syncToggle()};
+  /* 按钮在标题行内部，不阻止冒泡会翻两次（折了又展，净效果为零）。 */
+  toggle.onclick=(e)=>{e.stopPropagation();flip()};
+  /* 标题行整行接管折叠：按钮热区太小，与右栏同模块/目录的整行
+     点击体验不一致（2026-09-24 图谱上移后一并补齐）。 */
+  const head=root.querySelector('.article-relations-head');
+  if(head){head.style.cursor='pointer';head.onclick=flip}
+  syncToggle();
 }
 /* 折叠钮的 aria-label 描述「点下去会发生什么」，必须随折叠态与语言同步：
    点击只改 aria-expanded 的话，收起后读屏仍听到「折叠」；语言切换后组合串
@@ -2556,7 +2659,9 @@ function syncRailToggleLabels(){
     btn.setAttribute('aria-label',en?`${collapsed?'Expand':'Collapse'} ${tr(label)}`:`${collapsed?'展开':'折叠'}${label}`);
   });
 }
+let readerHeadingObserver=null;
 function renderReaderRails(note){
+  if(readerHeadingObserver)readerHeadingObserver.disconnect();
   const siblings=$('#reader-siblings'),toc=$('#reader-toc');
   // Siblings: every note in the same domain/topic, so a reader can move
   // sideways through a module without going back to the directory.
@@ -2589,7 +2694,7 @@ function renderReaderRails(note){
   toc.hidden=heads.length===0;
   toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('')+'</ul>';
   /* 目录跳转后焦点随迁到目标标题（tabindex=-1 仅在缺省时补），键盘用户按 Tab 从正文继续，不再弹回目录区。 */
-  toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{e.preventDefault();const t=document.getElementById(a.getAttribute('href').slice(1));if(t){t.scrollIntoView({behavior:scrollBehavior(),block:'start'});if(!t.hasAttribute('tabindex'))t.setAttribute('tabindex','-1');t.focus({preventScroll:true})}});
+  toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateReaderHeading(a.getAttribute('href').slice(1),true)});
   /* 【ui4·TOC scrollspy】目录此前只有跳转没有位置反馈：滚到正文中部
      看不出"在读哪一节"。IntersectionObserver 监听各标题，视口上沿
      附近（rootMargin -96px 顶栏高度，-55% 收口带）最后进入的标题即
@@ -2604,16 +2709,30 @@ function renderReaderRails(note){
        首轮跳过滚动，用户真正滚动正文后的回调才滚目录。 */
     let spyPrimed=false;
     const spy=new IntersectionObserver(entries=>{
-      entries.forEach(en=>{
-        if(!en.isIntersecting)return;
-        tocLinks.forEach(a=>a&&a.removeAttribute('aria-current'));
-        const a=tocLinks.get(en.target.id);
+      /* 瞬滚（拖滚动条/End/回顶）时回调按批合并，被跳过的标题不产生
+         回调，只按「isIntersecting 的那个」标注定会把高亮滞留在最后
+         一个进过收口带的标题上（实测回顶后停在第二节）。改成每次回调
+         都按当前真实几何重算：清掉全部后取当前节。当前节=收口带
+         （60 到 45% 视口）内最上方的标题；带内没有时取带上方最近的
+         标题——scrollIntoView block:start 后标题常停在 top≈86（顶栏
+         之下），以及长段落滚到中段时上一节刚过线，这两种状态都该
+         跟随而非闪空。 */
+      const band={lo:60,hi:innerHeight*0.45};
+      const withTop=heads.map(h=>({h,t:h.getBoundingClientRect().top}));
+      const inBand=withTop.filter(x=>x.t>=band.lo&&x.t<band.hi);
+      const above=withTop.filter(x=>x.t<band.lo);
+      const target=inBand.length?inBand[0].h:(above.length?above[above.length-1].h:null);
+      tocLinks.forEach(a=>a&&a.removeAttribute('aria-current'));
+      const a=target&&tocLinks.get(target.id);
+      if(a){
         /* 滚动位置语义用 location（"当前位置在这"），不用 page（读屏把
            page 当页面切换的 landmark 快捷键目标，滚动驱动标注会误导航）。 */
-        if(a){a.setAttribute('aria-current','location');if(spyPrimed)a.scrollIntoView({block:'nearest'})}
-      });
+        a.setAttribute('aria-current','location');
+        if(spyPrimed)a.scrollIntoView({block:'nearest'})
+      }
       spyPrimed=true;
     },{rootMargin:'-96px 0px -55% 0px',threshold:0});
+    readerHeadingObserver=spy;
     heads.forEach(h=>spy.observe(h));
   }
 
@@ -2731,10 +2850,89 @@ function railHead(label,hasItems,openByDefault=true){
   const aria=en?`${openByDefault?'Collapse':'Expand'} ${tr(label)}`:`${openByDefault?'折叠':'展开'}${label}`;
   return `<p class="rail-head"><span>${label}</span>${hasItems?`<button type="button" class="rail-toggle" aria-expanded="${state_}" aria-label="${aria}">${chevron}</button>`:''}</p>`;
 }
+function readerText(zh,en){return window.TKI18N&&window.TKI18N.lang==='en'?en:zh}
+async function copyReaderText(button,status,source){
+  if(!navigator.clipboard||!navigator.clipboard.writeText){
+    status.textContent=readerText('当前页面无法访问剪贴板，请选择文本复制','Clipboard unavailable. Select the text to copy.');
+    return;
+  }
+  button.disabled=true;
+  status.textContent=readerText('正在复制…','Copying…');
+  let copied=false;
+  try{
+    await navigator.clipboard.writeText(source);
+    copied=true;
+    status.textContent=readerText('已复制','Copied');
+  }finally{
+    button.disabled=false;
+    if(!copied)status.textContent=readerText('复制失败，请检查浏览器剪贴板权限','Copy failed. Check clipboard permissions.');
+  }
+}
+let readerScrollObserver=null;
+function enhanceReaderContent(){
+  const body=$('#reader-body');
+  if(readerScrollObserver)readerScrollObserver.disconnect();
+  body.querySelectorAll('.code-block').forEach((pre,index)=>{
+    const code=pre.querySelector('code');
+    if(pre.parentElement.classList.contains('reader-code')){
+      const button=pre.parentElement.querySelector('.code-copy');
+      button.textContent=readerText('复制代码','Copy code');
+      button.setAttribute('aria-label',readerText(`复制第 ${index+1} 个代码块`,`Copy code block ${index+1}`));
+      pre.parentElement.querySelector('.code-copy-status').textContent='';
+      return;
+    }
+    const frame=document.createElement('div');frame.className='reader-code';
+    const tools=document.createElement('div');tools.className='code-tools';
+    const language=document.createElement('span');language.className='code-language';
+    const lang=[...code.classList].find(name=>name.startsWith('language-'));
+    language.textContent=lang?lang.slice(9):readerText('代码','Code');
+    const status=document.createElement('span');status.className='code-copy-status';status.setAttribute('role','status');
+    const button=document.createElement('button');button.type='button';button.className='code-copy';
+    button.textContent=readerText('复制代码','Copy code');
+    button.setAttribute('aria-label',readerText(`复制第 ${index+1} 个代码块`,`Copy code block ${index+1}`));
+    button.onclick=()=>copyReaderText(button,status,code.textContent);
+    tools.append(language,status,button);pre.before(frame);frame.append(tools,pre);
+  });
+  const scrollables=[...body.querySelectorAll('.table-wrap,.code-block')];
+  const update=()=>scrollables.forEach((el,index)=>{
+    const overflow=el.scrollWidth>el.clientWidth+1||el.scrollHeight>el.clientHeight+1;
+    if(overflow){
+      el.tabIndex=0;el.setAttribute('role','region');
+      const label=el.matches('.table-wrap')?readerText('可横向滚动的表格','Horizontally scrollable table'):readerText('可滚动的代码','Scrollable code');
+      el.setAttribute('aria-label',`${label} ${index+1}`);
+    }else{
+      el.removeAttribute('tabindex');el.removeAttribute('role');el.removeAttribute('aria-label');
+    }
+  });
+  readerScrollObserver=new ResizeObserver(update);
+  scrollables.forEach(el=>readerScrollObserver.observe(el));
+  update();
+}
+function navigateReaderHeading(id,push=false){
+  const target=document.getElementById(id);
+  if(!target||!target.matches('#reader-body h2,#reader-body h3,#reader-body h4'))return false;
+  if(push){const url=new URL(location.href);url.searchParams.set('path',state.selected);url.hash=id;history.pushState({},'',url)}
+  const bar=$('.topbar');
+  target.style.scrollMarginTop=`${bar.getBoundingClientRect().height+16}px`;
+  target.setAttribute('tabindex','-1');
+  target.scrollIntoView({behavior:push?scrollBehavior():'instant',block:'start'});
+  target.focus({preventScroll:true});
+  return true;
+}
+function restoreReaderPosition(){
+  const id=decodeURIComponent(location.hash.slice(1));
+  if(!id||!navigateReaderHeading(id))window.scrollTo({top:0,behavior:'instant'});
+}
+window.addEventListener('hashchange',()=>{if(state.view==='reader')restoreReaderPosition()});
+document.addEventListener('tk:lang',()=>{if(state.view==='reader')enhanceReaderContent()});
 function updateReaderStudy(){const study=$('#reader-study'),title=$('#reader-title').textContent.trim(),visible=state.view==='reader'&&Boolean(title);study.hidden=!visible;study.href=visible?'/learn?topic='+encodeURIComponent(title):'/learn'}
 function updateReaderLearned(){const btn=$('#reader-learned');if(!btn)return;const path=state.selected;const on=TKShell.progress.statusOf(path)==='learned';btn.classList.toggle('on',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'✓ 已读':'标记已读'}
 function bindReaderLearned(){const btn=$('#reader-learned');if(!btn)return;btn.onclick=()=>{if(!state.selected)return;TKShell.progress.toggle(state.selected,'learned');updateReaderLearned()}}
-async function openNote(path,push=true){if(path==='知识库首页.md'||path==='知识库首页'){loadHome(push);return}try{const n=await json('/api/note?path='+encodeURIComponent(path));state.selected=n.path;$('#reader-title').textContent=n.title;/* 字数/更新日期/阅读时长元信息行：与列表、矩阵同一 words 来源与格式化口径；时长按中文平均阅读速度 400 字每分钟估算，不足一分钟按一分钟。「约 X 分钟」是动态拼接串，词典整串不命中（rt24 同坑），EN 态残留中文实测 2026-09-23，改按语言分支拼装。 */const en=(window.TKI18N&&window.TKI18N.lang==='en');const today=new Date().toISOString().slice(0,10);const stale=n.review_after&&n.review_after<today;$('#reader-meta').innerHTML=TKShell.fmtWords(n.words)?[TKShell.fmtWords(n.words),n.updated,n.words?(en?('about '+Math.max(1,Math.round(n.words/400))+' min'):('约 '+Math.max(1,Math.round(n.words/400))+' 分钟')):''].filter(Boolean).join(' · ')+(stale?('<span class="stale-badge" title="'+(en?'Review date passed; verify currency of facts':'复查日期已过，数字与结论请自行核对时效')+'">'+(en?'Review due':'需复查')+'</span>'):''):'';$('#reader-sources').innerHTML=renderSources(n.sources,n.papers);const srcMobile=$('#reader-sources-mobile');if(srcMobile)srcMobile.innerHTML=$('#reader-sources').innerHTML;bindSourceToggle();show('reader');updateReaderLearned();renderRelations(n);$('#reader-body').innerHTML=n.html;document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});if(window.renderMermaid)window.renderMermaid().catch((error)=>console.error("mermaid:",error));/* 图渲染不出时不弹窗：源码本来就在 pre 里，读者看得到内容 */renderReaderRails(n);reportVisit();if(bindProgress.update)bindProgress.update();/* 【rt24】show('reader') 的 retranslate() 跑在渲染之前（空转），标题/图谱/同模块/正文都是渲染后才存在的节点。渲染收尾处补一次重译，文章页 EN 态整体生效。 */retranslate();if(push)history.pushState({},'', '/?path='+encodeURIComponent(n.path));window.scrollTo({top:0})}catch(e){console.error(e);/* r19：失败只弹右下角 toast 有两处坑——初始 deep-link 打不开时内容区还挂着骨架屏（showLoading 的「正在读取知识库…」），读者面对假加载等待；toast 在 z-fab 层被「?」帮助按钮压住，5 秒后自动消失，两条出路都断。改为内容区常驻错误态（替换骨架屏/旧文章），返回按钮走 loadHome。 */
+async function openNote(path,push=true){if(path==='知识库首页.md'||path==='知识库首页'){loadHome(push);return}try{const n=await json('/api/note?path='+encodeURIComponent(path));state.selected=n.path;$('#reader-title').textContent=n.title;/* 字数/更新日期/阅读时长元信息行：与列表、矩阵同一 words 来源与格式化口径；时长按中文平均阅读速度 400 字每分钟估算，不足一分钟按一分钟。「约 X 分钟」是动态拼接串，词典整串不命中（rt24 同坑），EN 态残留中文实测 2026-09-23，改按语言分支拼装。
+  「核验于 X · 下次复查 Y」是同一类拼接串，同样按语言分支拼，日期本身不翻译。
+  核验日期取 review_at（review_after.py squash 写回时留下），存量 452 篇一篇都还没有，
+  缺失时回退 updated——读者要知道的是「这篇上次被人动过是哪天」，空着等于没说。
+  元信息行不再以字数为前提：字数为 0 的文章照样要显示核验日期与下次复查日期。 */const en=(window.TKI18N&&window.TKI18N.lang==='en');const today=new Date().toISOString().slice(0,10);const stale=n.review_after&&n.review_after<today;const verifiedAt=n.review_at||n.updated||'';$('#reader-meta').innerHTML=[TKShell.fmtWords(n.words),n.words?(en?('about '+Math.max(1,Math.round(n.words/400))+' min'):('约 '+Math.max(1,Math.round(n.words/400))+' 分钟')):'',verifiedAt?((en?'verified ':'核验于 ')+verifiedAt):'',n.review_after?((en?'next review ':'下次复查 ')+n.review_after):''].filter(Boolean).join(' · ')+(stale?('<span class="stale-badge" title="'+(en?'Review date passed; verify currency of facts':'复查日期已过，数字与结论请自行核对时效')+'">'+(en?'Review due':'需复查')+'</span>'):'');$('#reader-sources').innerHTML=renderSources(n.sources,n.papers);const srcMobile=$('#reader-sources-mobile');if(srcMobile)srcMobile.innerHTML=$('#reader-sources').innerHTML;bindSourceToggle();show('reader');updateReaderLearned();renderRelations(n);$('#reader-body').innerHTML=n.html;enhanceReaderContent();syncNavToNote(n);document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});const renderedMermaid=window.renderMermaid?window.renderMermaid():Promise.resolve();renderReaderRails(n);reportVisit();if(bindProgress.update)bindProgress.update();/* 【rt24】show('reader') 的 retranslate() 跑在渲染之前（空转），标题/图谱/同模块/正文都是渲染后才存在的节点。渲染收尾处补一次重译，文章页 EN 态整体生效。 */retranslate();if(push){const url=new URL(location.href);url.search='';url.searchParams.set('path',n.path);url.hash='';history.pushState({},'',url)}if(!location.hash)window.scrollTo({top:0,behavior:'instant'});await renderedMermaid;if(state.selected===n.path&&location.hash){await document.fonts.ready;restoreReaderPosition()}}catch(e){console.error(e);/* r19：失败只弹右下角 toast 有两处坑——初始 deep-link 打不开时内容区还挂着骨架屏（showLoading 的「正在读取知识库…」），读者面对假加载等待；toast 在 z-fab 层被「?」帮助按钮压住，5 秒后自动消失，两条出路都断。改为内容区常驻错误态（替换骨架屏/旧文章），返回按钮走 loadHome。 */
 $('#reader-title').textContent=(window.TKI18N&&window.TKI18N.lang==='en')?'Note not found':'笔记不存在或无法打开';
 $('#reader-meta').textContent='';
 $('#reader-sources').innerHTML='';const srcMobile2=$('#reader-sources-mobile');if(srcMobile2)srcMobile2.innerHTML='';
@@ -3363,7 +3561,7 @@ function applyTransform(){
 }
 
 function loadHome(push=false){clearSearch();state.domain='all';state.topic='all';state.selected=null;renderDomains();renderHome();show('home');if(push)history.pushState({},'','/');window.scrollTo({top:0,behavior:scrollBehavior()})}
-function selectFromUrl(){const params=new URLSearchParams(location.search),path=params.get('path'),domain=params.get('domain'),topic=params.get('topic');if(path==='知识库首页.md'||path==='知识库首页'||domain==='总览'||topic==='首页'){history.replaceState({},'','/');loadHome(false)}else if(path)openNote(path,false);else if(params.get('view')==='panorama'){state.domain=domain||'all';state.topic=topic||'all';if(params.get('tab')==='stack')state.panoTab='stack';showPanorama(false)}else if(params.get('view')==='graph')showGraph(false);else if(params.get('view')==='progress'){window.location.href='/panorama/reading'}else if(domain)select(domain,topic||'all',false);else loadHome(false)}
+function selectFromUrl(){const params=new URLSearchParams(location.search),path=params.get('path'),domain=params.get('domain'),topic=params.get('topic');const q=params.get('q');if(q&&!path){applySearchQuery(q);return}if(path==='知识库首页.md'||path==='知识库首页'||domain==='总览'||topic==='首页'){history.replaceState({},'','/');loadHome(false)}else if(path){if(state.view==='reader'&&state.selected===path)restoreReaderPosition();else openNote(path,false)}else if(params.get('view')==='panorama'){state.domain=domain||'all';state.topic=topic||'all';if(params.get('tab')==='stack')state.panoTab='stack';showPanorama(false)}else if(params.get('view')==='graph')showGraph(false);else if(params.get('view')==='progress'){window.location.href='/panorama/reading'}else if(domain)select(domain,topic||'all',false);else loadHome(false)}
 function showGraph(push=true){clearSearch();state.selected=null;
   /* focus 值先按域匹配（category 精确命中），不命中再按「域/主题」拆开匹配
      主题，最后按笔记路径匹配——deep-link 的值不区分三种模式，靠数据说话，
@@ -3906,7 +4104,7 @@ function enhanceMermaid(){
   document.querySelectorAll('pre.mermaid').forEach((pre) => {
     if (pre.dataset.mmd) return;
     pre.dataset.mmd = '1';
-    const svg = pre.querySelector('svg');
+    let svg = pre.querySelector('svg');
     if (!svg) return;
     const wrap = document.createElement('figure');
     wrap.className = 'mmd-figure';
@@ -3918,7 +4116,8 @@ function enhanceMermaid(){
     bar.innerHTML =
       '<button type="button" class="mmd-btn" data-act="out" title="放大" aria-label="放大图表">＋</button>' +
       '<button type="button" class="mmd-btn" data-act="in" title="缩小" aria-label="缩小图表">－</button>' +
-      '<button type="button" class="mmd-btn" data-act="copy" title="复制图源码">复制</button>';
+      '<button type="button" class="mmd-btn" data-act="copy" title="复制图源码" aria-label="复制图源码">复制</button>' +
+      '<span class="mmd-copy-status" role="status"></span>';
     wrap.insertBefore(bar, pre);
 
     const grip = document.createElement('div');
@@ -3928,6 +4127,7 @@ function enhanceMermaid(){
 
     let h = 0;
     const apply = () => {
+      svg = pre.querySelector('svg');
       if (h <= 0) { svg.style.removeProperty('max-height'); }
       else { svg.style.setProperty('max-height', h + 'px'); }
     };
@@ -3938,12 +4138,10 @@ function enhanceMermaid(){
       if (!b) return;
       const act = b.dataset.act;
       if (act === 'copy') {
-        const src = pre.getAttribute('data-mermaidSource') || pre.textContent || '';
-        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(src);
-        b.textContent = '已复制';
-        setTimeout(() => { b.textContent = '复制'; }, 1200);
+        copyReaderText(b,bar.querySelector('.mmd-copy-status'),pre.dataset.mermaidSource);
         return;
       }
+      svg = pre.querySelector('svg');
       const base = h > 0 ? h : svg.getBoundingClientRect().height;
       if (act === 'in') h = Math.max(200, Math.round(base * 0.75));
       else h = Math.min(2400, Math.round((h > 0 ? h : base) * 1.3));
@@ -3952,6 +4150,7 @@ function enhanceMermaid(){
 
     let startY = 0, startH = 0;
     grip.addEventListener('pointerdown', (e) => {
+      svg = pre.querySelector('svg');
       startY = e.clientY;
       startH = h > 0 ? h : svg.getBoundingClientRect().height;
       grip.setPointerCapture(e.pointerId);
