@@ -1929,3 +1929,15 @@ pre.mermaid svg{
 }
 .mmd-figure:hover .mmd-grip,.mmd-figure:focus-within .mmd-grip{opacity:1}
 
+/* 目录页的第二个分类维度：上游项目（与「主题」分组并列的横向筛选）。
+ * 数据来自文章 frontmatter 的 sources，只有取得到上游项目的域才出现。 */
+.upstream-bar{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:12px 0 2px; }
+.upstream-label{ font-size:var(--text-micro); color:var(--color-muted); margin-right:2px; }
+.upstream-chip{
+  padding:3px 10px; border-radius:var(--radius-full);
+  border:1px solid var(--color-line); background:var(--color-panel);
+  font-size:var(--text-small); color:var(--color-ink-soft);
+  cursor:pointer; text-decoration:none; white-space:nowrap;
+}
+.upstream-chip:hover{ border-color:var(--color-accent-line); color:var(--color-accent); }
+.upstream-chip.on{ background:var(--color-accent); border-color:var(--color-accent); color:var(--color-on-accent); }

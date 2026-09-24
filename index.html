@@ -1406,7 +1406,31 @@ function enhanceDomains(){
 }
 function renderDirectory(){
   const list=noteList(),groups=new Map();
-  for(const n of list){const k=state.domain==='all'?n.category:n.topic;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
+  /* ── 第二个分类维度：上游项目 ──────────────────────────────────
+   * 缺陷分析的文章记的是「在哪个上游项目里踩到的坑」，frontmatter 的
+   * sources 里就是上游 commit 链接，项目名能直接解析（bookkeeper 68、
+   * pulsar 32、spark 17…）。此前只有「域 → 主题」一条分类轴，这条信息
+   * 一直躺在数据里没被用过（2026-09-24 反馈）。
+   * 现在是两条轴并存：主题纵向分组 + 上游横向筛选，各自可点。
+   * 取不到上游项目的文章（其它域）不受影响：upstream 条整行不出现。 */
+  if(state.upstream===undefined)state.upstream='all';
+  const upstreamOf=n=>{
+    const arr=n.sources||[];
+    for(let i=0;i<arr.length;i++){
+      const m=/github\.com\/([^\/]+\/[^\/]+)/.exec(String(arr[i]));
+      if(m)return m[1];
+    }
+    return '';
+  };
+  const upCount=new Map();
+  for(const n of list){const u=upstreamOf(n);if(u)upCount.set(u,(upCount.get(u)||0)+1)}
+  const ups=[...upCount].sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const upBar=ups.length?('<div class="upstream-bar"><span class="upstream-label">上游项目</span>'+
+    '<a class="upstream-chip'+(state.upstream==='all'?' on':'')+'" data-up="all">全部</a>'+
+    ups.map(([u,c])=>'<a class="upstream-chip'+(state.upstream===u?' on':'')+'" data-up="'+esc(u)+'" title="'+esc(u)+' 的 '+c+' 篇">'+esc(u)+' '+c+'</a>').join('')+
+    '</div>'):'';
+  const filtered=(state.upstream&&state.upstream!=='all')?list.filter(n=>upstreamOf(n)===state.upstream):list;
+  for(const n of filtered){const k=state.domain==='all'?n.category:n.topic;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
   const groupRank=g=>state.domain==='all'?(order.indexOf(g)<0?999:order.indexOf(g)):(topicOrder[state.domain]||[]).indexOf(g)<0?999:(topicOrder[state.domain]||[]).indexOf(g);
   // 命中片段高亮：让"为什么这篇被搜出来"直接可见，而不是只列出标题。
   const q=state.query.trim();
@@ -1435,10 +1459,18 @@ function renderDirectory(){
   const empty=groups.size?'':
     `<div class="empty">${state.query?`<p class="empty-title">没有找到“${esc(q)}”</p>`:`<p class="empty-title">「${esc(state.domain)}」还没有匹配的内容</p>`}<p class="empty-hint">${state.query?'试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识':'可能是筛选条件太窄，清掉筛选看看全部知识'}</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
   $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div><div class="sort"><button data-sort="title" class="${state.sort==='title'?'active':''}">按标题</button><button data-sort="updated" class="${state.sort==='updated'?'active':''}">按更新</button></div></div>${sections}${empty}`;
+  if(upBar)$('#directory').insertAdjacentHTML('afterbegin',upBar);
   const clearDomain=$('#empty-clear-domain');
   if(clearDomain)clearDomain.onclick=()=>select('all','all');
   document.querySelectorAll('.note-row').forEach(row=>{row.setAttribute('tabindex','0');row.setAttribute('role','button');const h3=row.querySelector('h3');row.setAttribute('aria-label',(h3&&h3.textContent)||'打开笔记');row.onclick=()=>openNote(row.dataset.path);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(row.dataset.path)}}});
   document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;renderDirectory()});
+  /* 上游条：点一个项目就按它过滤，再点「全部」还原。只改 state 后重画本页，
+   * 不动 URL —— 它是一条筛选，不是一个可分享的页面状态。 */
+  document.querySelectorAll('.upstream-chip').forEach(c=>{
+    c.setAttribute('role','button'); c.setAttribute('tabindex','0');
+    c.onclick=()=>{state.upstream=c.dataset.up;renderDirectory()};
+    c.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();state.upstream=c.dataset.up;renderDirectory()}};
+  });
   /* 【rt25】列表是 innerHTML 渲染（标题/主题/计数都走词条），
      渲染后无重译则 EN 态整页不翻（同 rt24 文章页病根）。 */
   retranslate();
