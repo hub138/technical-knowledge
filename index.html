@@ -794,7 +794,7 @@
  *   不补偿——放大本就是为了看更大的字。--graph-comp 由 JS 在缩放时写入。
  * domain-head 用 foreignObject 装 HTML，不在同一补偿链路，单独用 zoom。 */
 .topic-count{font-size:var(--text-xs);fill:var(--color-ink);font-weight:750;pointer-events:none;font-variant-numeric:tabular-nums}
-.node text,.topic-node text{font-size:calc(var(--text-2xs) * var(--graph-comp,1));fill:var(--color-ink-soft);paint-order:stroke;stroke:var(--color-panel);stroke-width:2.5px;stroke-linejoin:round;pointer-events:none}
+.node text,.topic-node text,.topic-labels .topic-name{font-size:calc(var(--text-2xs) * var(--graph-comp,1));fill:var(--color-ink-soft);paint-order:stroke;stroke:var(--color-panel);stroke-width:2.5px;stroke-linejoin:round;pointer-events:none}
 #graph-world .domain-head{zoom:var(--graph-comp,1)}
 .node circle{stroke:var(--color-panel);stroke-width:1.5;cursor:pointer}
 .topic-node circle{cursor:pointer;stroke-width:2}.graph-note{font-size:var(--text-sm);fill:var(--color-muted)}.axis-line{stroke:var(--color-line-strong);stroke-width:1.5}.axis-label{font-size:var(--text-base);fill:var(--color-muted)}.empty{background:var(--color-panel);border:1px dashed var(--color-line);padding:30px;text-align:center;color:var(--color-muted);border-radius:7px}
@@ -2395,7 +2395,11 @@ function graphCanvas(){
   // 首帧或隐藏时 getBoundingClientRect 可能是 0，退回一组保守的默认值。
   const W=Math.max(320, Math.round(box.width)||(mobile?720:1200));
   const H=Math.max(280, Math.round(box.height)||(mobile?920:690));
-  svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto'});marker.append(svgEl('path',{d:'M0 0L10 5L0 10z',fill:'currentColor'}));marker.setAttribute('class','graph-arrow');defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);return{svg,world,W,H,mobile}}function svgEl(n,a={},text=''){const e=document.createElementNS('http://www.w3.org/2000/svg',n);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));if(text)e.textContent=text;return e}/* 窄屏的「知识图谱」：按领域分组的清单。
+  svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  /* 记下这次用的宽度：切换聚焦时面板会加/去 is-with-side，svg 宽度随之变。
+     重画那一刻容器可能还没布局完（宽度读到 0 退回默认值），画出来的列宽就与
+     实际不符 —— 所以要把实际值记下来，下一帧对照。 */
+  svg.dataset.graphW=String(W);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto'});marker.append(svgEl('path',{d:'M0 0L10 5L0 10z',fill:'currentColor'}));marker.setAttribute('class','graph-arrow');defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);return{svg,world,W,H,mobile}}function svgEl(n,a={},text=''){const e=document.createElementNS('http://www.w3.org/2000/svg',n);Object.entries(a).forEach(([k,v])=>e.setAttribute(k,v));if(text)e.textContent=text;return e}/* 窄屏的「知识图谱」：按领域分组的清单。
  *
  * 和力图表达同一件事（哪个领域厚、哪个主题重），但不依赖横向空间。
  * 用 foreignObject 装 HTML，因为这是文字排版而不是图形，交给浏览器排更合适 ——
@@ -2707,6 +2711,18 @@ function renderNetwork(){
     g.append(svgEl('text',{x:-r-8,y:4,'text-anchor':'end',class:'topic-name'},tr(tp.t)));
     g.append(svgEl('text',{y:4,'text-anchor':'middle',class:'topic-count'},String(tp.n)));
     world.append(g);
+    /* 标签提到最上层：文字留在各自的节点组里时，后画的节点圆会盖住先画
+     * 节点的文字 —— 实测多处主题名被圆吃掉半个（"安全与治理"只剩"全与治理"）。
+     * 统一挪到 world 末尾的标签层，并每次把它重新挪到末尾，文字就永远在
+     * 所有圆之上。移出后不再继承节点组的 dimmed 透明度，所以手动同步。 */
+    let ll = world.querySelector('.topic-labels');
+    if(!ll) ll = svgEl('g',{class:'topic-labels'});
+    [...g.querySelectorAll('text')].forEach(t=>{
+      t.setAttribute('transform', `translate(${tp.x},${tp.y})`);
+      if(g.classList.contains('dimmed')) t.style.opacity='0.35';
+      ll.appendChild(t);
+    });
+    world.append(ll);
   });
 
   notes.forEach(n=>{
@@ -2741,6 +2757,11 @@ function renderNetwork(){
     world.append(g);
   });
 
+    /* 所有节点（含后画的笔记圆点）都画完后，把标签层统一挪到最末尾：
+     * 上面每追加一个主题标签都会重挪一次，但笔记节点在那之后画，会盖住
+     * 标签。这里收尾一次，文字永远在所有圆之上。 */
+    const llEnd=world.querySelector('.topic-labels');
+    if(llEnd)world.append(llEnd);
     const gv=$('#graph-view');
   if(gv)gv.classList.toggle('has-focus',!!state.graphFocus);
   const hint=$('#graph-hint');
@@ -2794,7 +2815,18 @@ function toggleGraphFocus(mode,value){
     +(listMode
       ? ` <span class="graph-focus-hint">${tr('点主题名查看该主题下的全部笔记')}</span>`
       : ` <span class="graph-focus-hint">${tr('点域名、主题圆或笔记圆点，')}<span class="hint-seg">${tr('只看与它相关的连线；再点一次或按 Esc 取消，双击笔记进原文')}</span></span>`)
-    +` <span class="graph-method-note">${tr('实现借鉴 d3 link 曲线、Obsidian 局部图谱与 Cosmograph 的聚焦方式：按领域分列，曲线表达跨域引用，聚焦时点亮相关路径')}</span>`;renderNetwork()}
+    +` <span class="graph-method-note">${tr('实现借鉴 d3 link 曲线、Obsidian 局部图谱与 Cosmograph 的聚焦方式：按领域分列，曲线表达跨域引用，聚焦时点亮相关路径')}</span>`;renderNetwork();
+  /* 尺寸校验：取消聚焦时面板去掉 is-with-side、svg 宽度从 684 回到 1004，
+   * 但 renderNetwork 若跑在布局完成之前，读到的是 0 → 用默认 1200 画，节点
+   * 整体右移（实测 122px）、右侧空一大块，和打开前的分布对不上。
+   * 下一帧宽度稳定后对照一次，不一致就重画。 */
+  requestAnimationFrame(function(){
+    const s=$('#graph'); if(!s)return;
+    const now=Math.round(s.getBoundingClientRect().width);
+    const used=Number(s.dataset.graphW||0);
+    if(now&&used&&Math.abs(now-used)>8)renderNetwork();
+  });
+}
 function bindGraph(){const svg=$('#graph');let drag=null;let pinch=null;const active=new Map();
   /* 2026-09-22 手感改造（用户问题「移动速度太快」）。旧实现三宗罪：
    * ① 滚轮每事件固定 ×1.1/.9 —— 触控板轻扫触发几十个连续 wheel 事件，
