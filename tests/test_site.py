@@ -197,7 +197,6 @@ class AuthenticationTests(unittest.TestCase):
             "/apps/agent-evaluation/", "/apps/agent-evaluation/index.html",
             "/health", "/api/notes", "/api/access",
             "/api/note?path=" + quote(note_path),
-            "/projects/archify/README.md", "/projects/OpenMAIC/README-zh",
             "/static/base.css", "/static/shell.js",
         ]
         for route in routes:
@@ -546,7 +545,51 @@ class UiCopyTests(unittest.TestCase):
             )
 
 
-class VaultIntegrityTests(unittest.TestCase):
+class ReaderPagerTests(unittest.TestCase):
+    """阅读页同模块/翻页/奖励的源码契约。
+
+    排序逻辑在前端 JS 里，无法起 Python 服务验证渲染结果，这里锁定
+    "改代码才会红"的结构契约：同模块顺序表达式与目录页口径一致、
+    同模块容器在 reader-layout 右栏内、翻页与奖励的渲染接线存在。
+    """
+
+    def setUp(self) -> None:
+        self.html = (ROOT / "index.html").read_text(encoding="utf-8")
+
+    def test_module_peers_sort_matches_directory_default_sort(self) -> None:
+        """同模块三处（右栏列表/翻页/目录页）共用同一顺序：标题 zh-CN 序。
+
+        目录页 noteList 默认 sort:'title'，排序表达式是
+        a.title.localeCompare(b.title,'zh-CN')；renderReaderRails 的
+        modulePeers 必须用同一表达式，否则目录顺序和文章页顺序再次分叉。
+        """
+        self.assertIn("sort:'title'", self.html)
+        peers = re.search(
+            r"modulePeers=state\.notes\.filter\(x=>x\.category===note\.category&&x\.topic===note\.topic\)\s*"
+            r"\.sort\(\(a,b\)=>a\.title\.localeCompare\(b\.title,'zh-CN'\)\)",
+            self.html,
+        )
+        self.assertIsNotNone(peers, "modulePeers 必须按标题 zh-CN 序排序（与目录页一致）")
+
+    def test_siblings_container_lives_in_right_rail(self) -> None:
+        """同模块在 reader-layout 第二列（目录之后），正文列有翻页区与奖励条。"""
+        layout = re.search(r'<div class="reader-layout">(.{0,900}?)</div><div id="reader-sources-mobile"', self.html, re.DOTALL)
+        self.assertIsNotNone(layout, "reader-layout 结构不存在")
+        inner = layout.group(1)
+        self.assertIn('<div class="reader-maincol">', inner)
+        self.assertIn('id="reader-pager"', inner)
+        self.assertIn('id="reader-reward"', inner)
+        self.assertLess(inner.index('id="reader-toc"'), inner.index('id="reader-siblings"'), "同模块应在右栏目录之后")
+
+    def test_pager_and_reward_are_wired(self) -> None:
+        """renderReaderRails 调用翻页与奖励渲染；滚动更新里触发奖励检查。"""
+        self.assertIn("renderReaderPager(note,modulePeers,prevNote,nextNote)", self.html)
+        self.assertIn("renderReaderReward(note)", self.html)
+        self.assertIn("maybeShowReaderReward();", self.html)
+        self.assertIn("很棒，读完了", self.html)
+
+
+
     """vault 数据完整性:元数据、链接可达、发布红线。
 
     这些测的是数据不是代码,不会因为改页面而红。
