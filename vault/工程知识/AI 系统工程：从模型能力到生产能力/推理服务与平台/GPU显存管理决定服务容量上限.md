@@ -7,7 +7,7 @@ review_after: 2028-03-21
 change_rate: medium
 confidence: high
 sources:
-  - "https://developer.nvidia.com/blog/gpu-performance-analysis-gpu/"
+  - "https://docs.nvidia.com/deeplearning/performance/dl-performance-gpu-background/index.html"
   - "https://huggingface.co/docs/transformers/main_classes/kv_cache"
   - "https://vllm.ai/"
 tags:
@@ -33,6 +33,20 @@ tags:
 ## PagedAttention 与碎片
 
 传统 KV 缓存按最大序列长度预留连续显存，内部碎片 + 外部碎片吃掉 60-80% 预算。PagedAttention（vLLM 系）把 KV 缓存分页化管理，如 OS 虚拟内存的分页：序列按逻辑页映射到物理页框，碎片压缩到页内。容量提升数倍的本质是把碎片预算还给了并发。分页机制的祖先正是 [[工程知识/性能工程：从用户等待到资源瓶颈/操作系统与运行时/虚拟内存与文件系统把地址和持久化分层]]。
+
+同一张 80GB 卡、同一个 7B 模型，两种显存分配策略各走一条链，容量上限的差距就出在碎片这一项。
+
+```mermaid
+graph TD
+    M[80GB 卡装 7B 模型<br/>权重 14GB 余量 63GB] --> R[按最大长度预留连续]
+    M --> P[分页按需分配]
+    R --> R1[碎片吃掉 10-20% 预算]
+    R1 --> R2[实际并发约 24 路]
+    P --> P1[碎片压到 4% 以内]
+    P1 --> P2[实际并发约 30 路]
+```
+
+碎片的去向决定并发的上限：两条链只差碎片一项，并发差出四分之一——权重是常数、KV 是预算，工程上能收回的只有碎片。分页机制的块表怎么映射，见 [[工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/批处理、KV缓存、量化与并行如何改变服务容量]]。
 
 ## 可运行示例：一份显存预算表现场算
 
