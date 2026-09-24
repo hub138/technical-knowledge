@@ -42,7 +42,7 @@ graph TD
     B -->|溢出| F[丢 ACK 或 RST]
 ```
 
-上图的归因指向：Cookies 计数上涨是第一道闸的账，listen queue overflow 计数上涨是第二道闸的账，两个计数器各管一段，缓解手段不通用。
+上图给出两道闸的先后与各自的溢出后果：SYN 队列装未完成握手的连接，accept 队列装已完成握手等应用取走的连接，打满时前者拒掉新连接、后者把失败推迟到首笔数据传输。
 
 ## 看完能判断：取证与缓解
 
@@ -53,10 +53,10 @@ graph TD
 ```mermaid
 graph TD
     A["netstat -s 计数器"] --> B["SYN cookies 上涨<br/>即 SYN 队列溢出"]
-    B -->|处置| C["调 syn_backlog<br/>Cookies 常开"]
-    B --> D["listen overflow 涨<br/>即 accept 队列满"]
-    D -->|处置| E["两参数取小调大<br/>accept 与业务分离"]
-    D --> F["都平稳<br/>查网络与应用层"]
+    B --> C["调 syn_backlog<br/>Cookies 常开"]
+    C --> D["再看 listen overflow<br/>涨即 accept 队列满"]
+    D --> E["两参数取小调大<br/>accept 与业务分离"]
+    E --> F["都平稳<br/>查网络与应用层"]
 ```
 
 **压测验证**：用连接型压测工具把并发建连速率拉过队列上限，预期 `netstat -s` 的溢出计数按注入速率增长、默认行为下首包超时、`tcp_abort_on_overflow=1` 下连接被 RST——**压测报告里标注队列参数**，参数不同的两次压测结果不可比。

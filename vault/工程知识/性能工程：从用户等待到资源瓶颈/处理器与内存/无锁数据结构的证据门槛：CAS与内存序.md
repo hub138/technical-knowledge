@@ -35,7 +35,7 @@ sequenceDiagram
     A->>B: 读到节点 A
     Note over A: 此线程被抢占
     B->>B: 改成 B 再改回 A
-    A->>B: CAS 判定成功
+    Note over A: CAS 比较仍是 A<br/>判定成功并写入
     Note over B: 中间态已被消费<br/>结构已被改形
 ```
 
@@ -47,13 +47,13 @@ sequenceDiagram
 
 ```mermaid
 graph TD
-    A["一次原子写选内存序"] --> B["relaxed 只保原子<br/>重排自由，最省"]
-    B --> C["acquire release 配对<br/>形成先后边"]
-    C --> D["seq_cst 全局总序<br/>最强也最贵"]
-    B -->|选 relaxed 的代价| E["标志先于数据可见<br/>ARM 上随机出错"]
+    A["一次原子写选内存序"] --> B["最常见档 relaxed<br/>只保原子重排自由"]
+    B --> C["可提升档 acquire release<br/>配对形成先后边"]
+    C --> D["最强档 seq_cst<br/>全局总序也最贵"]
+    B -->|relaxed 留下的代价| E["标志先于数据可见<br/>ARM 上随机出错"]
 ```
 
-上图说明：从 relaxed 往上每加一档，重排空间缩小一分、开销增加一分；acquire/release 配对是跨平台部署的默认选择。
+上图给出三档的强弱与代价：档位可以按需要的顺序强度选，relaxed 省下的那道边界要在 ARM 上以随机出错偿还，acquire/release 配对是跨平台部署的默认选择。
 
 **证据门槛：什么时候无锁真的快**。三个条件同时满足才值得：临界区极短（几条指令，锁的获取释放开销占比过高）；竞争低或竞争模式友好（CAS 失败率低，自旋不烧）；或需要免锁的实时性/免死锁性质（中断上下文不能睡眠拿锁）。竞争激烈时长 CAS 自旋比互斥锁更糟（自旋消耗整核还阻塞总线，futex 在无竞争时只是一条原子指令）。判定靠测量：`lock cmpxchg` 失败率、每操作纳秒数、与 std::mutex 对照，不靠"无锁更快"的直觉。
 
