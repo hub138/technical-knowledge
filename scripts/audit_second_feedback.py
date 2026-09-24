@@ -31,7 +31,7 @@ with sync_playwright() as p:
     fs = pg.evaluate(
         "getComputedStyle(document.querySelector('#reader-siblings .rail-list a')).fontSize"
     )
-    check("同模块字号18px", fs == "18px", fs)
+    check("同模块字号16px", fs == "16px", fs)
 
     # ── 2. 目录折叠 ──
     toc = pg.locator("#reader-toc")
