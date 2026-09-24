@@ -34,6 +34,12 @@ sources:
 
 online softmax 是使能技术：softmax 分母依赖全行 max 与和，分块计算时每块的局部分母无法直接拼接；online softmax 用缩放因子逐步归并各块结果，保证分块计算与整体计算数学等价。这是"分块后仍然精确"的关键，也是它与近似方法（稀疏 attention、线性 attention）的本质区别。
 
+上表是维度对照，tiling 的数据流长什么样、瓶颈为什么在读写，看结构更直接。
+
+![FlashAttention：存储层级、tiling 数据流与实测时间对比](https://arxiv.org/html/2205.14135v2/banner_pdf.svg)
+
+左面板是 IO 感知的依据：SRAM 带宽 19 TB/s、HBM 1.5 TB/s，差一个数量级，把中间矩阵搬进搬出 HBM 就是把时间花在低带宽层。中间面板是 tiling 数据流：Q/K/V 切块后 Copy to SRAM，在片上算完 attention，只有 Output 回写 HBM，N×N 矩阵从头到尾不物化。右面板是 GPT-2 上的实测：标准实现的时间拆成 Matmul、Softmax、Mask 各段，FlashAttention fused kernel 一段远小于前者。图取自 [FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness（arXiv:2205.14135）](https://arxiv.org/abs/2205.14135) 论文 Figure 1。
+
 ## 失效形态
 
 | 失效 | 机制 | 信号 |
