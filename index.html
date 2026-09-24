@@ -1083,7 +1083,9 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
  * 两个相近数字并列——那会让读者以为内容规模有两个答案。 */
 .hero-meta-item{display:flex;align-items:baseline;gap:7px}
 .hero-meta-item b{font-size:20px;font-weight:750;color:var(--color-ink);font-variant-numeric:tabular-nums;line-height:1}
-.hero-meta-item i{font-style:normal;font-size:var(--text-xs);color:var(--color-muted)}
+/* 单位与数字同排阅读：12px/400 时比数字弱两档，视觉上像被忽略。提到
+   small 字号 + semibold，和 20px 数字形成主次但同属一个整体（2026-09-24 反馈）。 */
+.hero-meta-item i{font-style:normal;font-size:var(--text-small);font-weight:var(--weight-semibold);color:var(--color-ink-soft)}
 /* hero 氛围光（Linear 风格）：低透明度径向渐变衬在标题后方，浅深主题
  * 共用 accent 派生色。光斑盒（::before）比 hero 大一圈（inset:-40% -20%），
  * 颜色延伸到标题区外的留白里。四条盒边都不可见面：两个渐变的透明终点
