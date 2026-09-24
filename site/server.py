@@ -362,14 +362,26 @@ OPENMAIC_JOBS_ROOT = Path(
     os.environ.get("OPENMAIC_HOME") or Path.home() / "Developer" / "knowledge-tools" / "OpenMAIC"
 ) / "data" / "classroom-jobs"
 OPENMAIC_CLASSROOMS_ROOT = OPENMAIC_JOBS_ROOT.parent / "classrooms"
+# 数据目录按环境自动探测：环境变量优先，其次按候选顺序取第一个真实存在 data/user
+# 的目录，全都不存在时保持原有默认值。dev 与 Mac 的目录布局不同，写死单一默认
+# 路径会把已配置的服务误判成未配置。
+DEEPTUTOR_HOME_CANDIDATES = (
+    Path.home() / "Developer" / "knowledge-tools" / "DeepTutor",
+    REPOSITORY_ROOT.parent.parent.parent / "knowledge-tools" / "DeepTutor",
+)
 DEEPTUTOR_HOME = Path(
-    os.environ.get("DEEPTUTOR_HOME") or Path.home() / "Developer" / "knowledge-tools" / "DeepTutor"
+    os.environ.get("DEEPTUTOR_HOME")
+    or next(
+        (entry for entry in DEEPTUTOR_HOME_CANDIDATES if (entry / "data" / "user").is_dir()),
+        DEEPTUTOR_HOME_CANDIDATES[-1],
+    )
 )
 
 # 学习中心的页面：多个 URL 指向同一份 HTML，方便旧链接和站内导航都能用。
 # 集中成一张表，避免再加页面时只改一处、漏掉另一处（/learn 曾经整组丢失）。
 LEARNING_PAGES: dict[str, Path] = {
     "/learn": REPOSITORY_ROOT / "apps" / "learning" / "index.html",
+    "/learn/path": REPOSITORY_ROOT / "apps" / "learning" / "path.html",
     "/learn/openmaic": REPOSITORY_ROOT / "apps" / "learning" / "openmaic.html",
     "/learn/intuition": REPOSITORY_ROOT / "apps" / "learning" / "intuition.html",
     "/learn/transfer": REPOSITORY_ROOT / "apps" / "learning" / "transfer.html",
@@ -2473,6 +2485,7 @@ class Handler(BaseHTTPRequestHandler):
             "/apps/learning/intuition.html",
             "/apps/learning/transfer.html",
             "/apps/learning/history.html",
+            "/apps/learning/path.html",
         }:
             page = LEARNING_PAGES.get(path.rstrip("/")) or (
                 REPOSITORY_ROOT / "apps" / "learning" / Path(path).name
