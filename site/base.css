@@ -1942,3 +1942,14 @@ pre.mermaid svg{
 }
 .upstream-chip:hover{ border-color:var(--color-accent-line); color:var(--color-accent); }
 .upstream-chip.on{ background:var(--color-accent); border-color:var(--color-accent); color:var(--color-on-accent); }
+
+/* 目录页右侧的「本页主题」目录：与文章页 rail 同一套观感。
+ * 宽屏时把内容区压出一列给它（sticky 跟随滚动），窄屏放不下就整条隐藏——
+ * 挤在正文旁边不如没有。 */
+@media (min-width:1200px){
+  #directory{ display:grid; grid-template-columns:minmax(0,1fr) 190px; gap:20px; align-items:start; }
+  #directory>.dir-rail{ grid-column:2; grid-row:1 / span 999; position:sticky; top:14px; }
+}
+@media (max-width:1199px){ .dir-rail{ display:none; } }
+.dir-rail-list li a{ display:flex; justify-content:space-between; gap:8px; align-items:baseline; }
+.dir-rail-list li a em{ font-style:normal; font-size:var(--text-micro); color:var(--color-muted); flex:none; }

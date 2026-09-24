@@ -1316,7 +1316,9 @@ function show(view){state.view=view;
      panorama 每次页面加载各记一次；reader 不在此记——文章阅读由
      openNote 的 reportVisit 记到具体篇目，粒度更细，避免一行文章两条
      记录。同 load 内反复切回同一视图去重。 */
-  if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
+  if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';/* 显示时不写死 display：宽屏下目录页是两列 grid（右侧留出「本页主题」
+   目录），写死 block 会用内联样式盖掉 CSS 的 grid。这里只负责隐藏。 */
+$('#directory').style.display=view==='directory'?'':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
 function renderDomains(){
   /* 域列表的骨架（竖线风格）由 shell 渲染（tk:domains-rendered 广播后到达）。
      这里做主站才有的增强：点域 = 展开该域的主题子列表（再点收起），
@@ -1462,6 +1464,41 @@ function renderDirectory(){
   if(upBar)$('#directory').insertAdjacentHTML('afterbegin',upBar);
   const clearDomain=$('#empty-clear-domain');
   if(clearDomain)clearDomain.onclick=()=>select('all','all');
+  /* ── 列表页右侧的「本页主题」目录 ──────────────────────────────
+   * 文章页右侧一直有章节目录（.rail-list），但主题列表页没有——98 篇往下
+   * 滚，读者不知道这一页还有哪些主题、每个主题多少篇。这里照文章页同一套
+   * rail 结构补一条：列出本页所有主题分组 + 篇数，点了滚过去。
+   * 少于 3 个分组时不出现（一列标题没必要做目录）。 */
+  (function(){
+    const secs=[...document.querySelectorAll('#directory .topic-section')];
+    if(secs.length<3)return;
+    let rail=document.querySelector('#directory .dir-rail');
+    if(!rail){
+      rail=document.createElement('aside');
+      rail.className='dir-rail';
+      const host=$('#directory');
+      if(!host)return;
+      host.insertAdjacentElement('afterbegin',rail);
+    }
+    rail.innerHTML='<p class="rail-head"><span>本页主题</span></p><ul class="rail-list dir-rail-list">'+
+      secs.map((sec,i)=>{
+        const t=sec.querySelector('.topic-title span');
+        const n=sec.querySelector('.topic-title small');
+        if(!sec.id)sec.id='dir-sec-'+i;
+        const name=t?t.textContent.trim():('分组'+(i+1));
+        const cnt=n?n.textContent.trim():'';
+        return '<li><a href="#'+sec.id+'" data-sec="'+sec.id+'"><span>'+esc(name)+'</span>'+
+               (cnt?'<em>'+esc(cnt)+'</em>':'')+'</a></li>';
+      }).join('')+'</ul>';
+    rail.querySelectorAll('a').forEach(a=>{
+      a.onclick=e=>{
+        e.preventDefault();
+        const el=document.getElementById(a.dataset.sec);
+        if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+        try{history.replaceState(null,'','#'+a.dataset.sec)}catch(err){}
+      };
+    });
+  })();
   document.querySelectorAll('.note-row').forEach(row=>{row.setAttribute('tabindex','0');row.setAttribute('role','button');const h3=row.querySelector('h3');row.setAttribute('aria-label',(h3&&h3.textContent)||'打开笔记');row.onclick=()=>openNote(row.dataset.path);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(row.dataset.path)}}});
   document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;renderDirectory()});
   /* 上游条：点一个项目就按它过滤，再点「全部」还原。只改 state 后重画本页，
