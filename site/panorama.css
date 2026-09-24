@@ -89,6 +89,8 @@
 }
 .pano-grp { transition: opacity .18s; }
 .pano-grp:hover circle { stroke-width: 2.6; }
+.pano-grp:focus { outline: none; }
+.pano-grp:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 3px; }
 
 /* ── 层筛选条 ──────────────────────────────────────────────────── */
 .pano-focusbar {
