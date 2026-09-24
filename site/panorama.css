@@ -10,12 +10,23 @@
  *   小节标题   --text-body + 加粗（16px，卡片标题档）
  *   图例/角标  --text-small（13px）/ --text-micro（11px，图形内标签档） */
 
-.pano-intro { margin: 0 0 16px; }
+/* 上边距 20px：导语紧跟在 tab 栏（.pano-tabs）下面，margin 为 0 时实测
+ * 只差 4px，视觉上「贴着标题」，与覆盖矩阵那边（内容块离 tab 栏 47px）
+ * 完全不是一个节奏（2026-09-24 用户反馈）。20px 取全站「头部结束到内容
+ * 开始」的规范值（base.css .view-head 同值）。 */
+.pano-intro { margin: 32px 0 18px; }
 /* 段间距 4px：导语是「一组说明」（规则/警示/操作），段间 4px 保持整体感，
  * 与 matrix.css .mx-intro p 的段距同一档。 */
+/* 字号 --text-note(17px) → --text-small(13px)：同页两个 tab 差两档字号，
+ * 覆盖矩阵那侧的辅助文字（类型筛选标签）是 13px，八层栈却用 17px 铺满
+ * 1032px，看起来像另一套页面（2026-09-24 用户反馈「字体差的字号有点多、
+ * 布局也不一样」）。辅助说明统一到 --text-small，宽度也对齐矩阵的 900px。 */
+/* 行高 1.85（不是 1.7）：13px 连读四行时行距紧会发闷（knot 看图两次指出
+ * 「读长句略吃力」）。放宽行距比加大字号更划算 —— 字号留在规范档，
+ * 与矩阵侧的辅助文字同档，块面轻而不挤。 */
 .pano-intro p {
-  margin: 0 0 4px; font-size: var(--text-note); line-height: 1.75; color: var(--color-ink-soft);
-  max-width: 70ch;
+  margin: 0 0 4px; font-size: var(--text-small); line-height: 1.85; color: var(--color-ink-soft);
+  max-width: 900px;
 }
 .pano-intro p:last-child { margin-bottom: 0; }
 .pano-intro b { color: var(--color-ink); font-weight: 700; }
