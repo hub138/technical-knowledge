@@ -33,6 +33,14 @@ sources:
 
 四代的本质转变：**从"事件驱动"（丢包了才反应）到"模型驱动"（持续测量网络模型,按模型发送）**。BBR 之前的算法都在回答"出现了拥塞信号怎么办"，BBR 回答"网络现在是什么样子,我该发多快"。
 
+这个转变最直观的呈现是吞吐与 RTT 各自随在途数据的变化曲线：吞吐在填满瓶颈带宽（BDP）后就不再增长，但丢包驱动的算法还在往缓冲区里塞数据；RTT 在 BDP 之前纹丝不动，之后随缓冲区堆积一路上翘。最优操作点在两条曲线的拐点上——吞吐已到顶、时延尚未起涨：
+
+![吞吐随在途数据的变化：BDP 处到顶，丢包驱动算法的工作点在缓冲区满处](https://blog.acolyer.org/wp-content/uploads/2017/03/bbr-delivery-rate.jpeg?w=640)
+
+![RTT 随在途数据的变化：BDP 前恒为 RTprop，之后随缓冲区堆积上翘](https://blog.acolyer.org/wp-content/uploads/2017/03/bbr-rtt.jpeg?w=640)
+
+*图源：The Morning Paper《BBR: Congestion-based congestion control》引 ACM Queue 论文（Cardwell 等 2016），[blog.acolyer.org/2017/03/31/bbr-congestion-based-congestion-control](https://blog.acolyer.org/2017/03/31/bbr-congestion-based-congestion-control/)*
+
 ## 背景与代价
 
 思想背景：1988 年 Van Jacobson 的论文是整个领域的开山之作，他证明了拥塞崩溃源于"发送方对网络状态的无知 + 全体同步反应"。AIMD 的乘性减设计精巧在：减半是全局可收敛的——所有流同步减半后公平分享带宽,加性增让它们各自慢慢扩张。这是没有中央协调的分布式收敛设计，思想源头是控制论里的稳定性分析。

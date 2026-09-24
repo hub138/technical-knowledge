@@ -29,6 +29,18 @@ sources:
 
 **overlay：跨主机的虚晃一层**。多主机时容器 IP 不能靠桥接直接通（宿主之间是三层路由），overlay 在底层网络之上再叠一个虚拟二层：VXLAN 把容器的二层帧封装进 UDP 报文，跨宿主传输后解封还原。每个宿主跑一个 vtep（隧道端点），宿主间组成 overlay 的交换平面。Kubernetes 的 CNI 插件（Calico、Flannel、Cilium）各有取舍：Flannel VXLAN 是朴素 overlay，Calico BGP 走三层路由不用封装，Cilium eBPF 在内核里改写转发路径。
 
+封装与解封的样子放到图里看，容器帧怎么被装进宿主间的隧道：
+
+![Wikimedia 图：VXLAN 隧道示意——左右两侧各有两台主机接到宿主上的 VTEP-1 与 VTEP-2，两个 VTEP 之间隔着 Red IP 三层网络，顶部的紫色双向箭头标注 Túnel VXLAN entre VTEPs，容器间通信被封装成宿主间 IP 报文传输](https://upload.wikimedia.org/wikipedia/commons/f/fb/VXLAN-Tunnel.png)
+
+来源：Wikimedia Commons「VXLAN」条目图。两台 VTEP 之间只看得到三层 IP 网络，隧道就架在它上面——「容器 IP 不能靠桥接直接通」的困境与解法都在这幅形态里：容器帧出宿主前被 VTEP 封进 UDP，到对端解封还原，宿主间抓包看到的是宿主 IP 的报文。
+
+放进 Kubernetes 集群里，同一套连通问题长这样：
+
+![Kubernetes 官方文档图：集群网络全景——三个 node 各含若干 pod，pod 之间的黑色连线是跨主机的扁平 pod 网络，svc（Service）虚线框在 pod 网络之上提供稳定访问入口，nodes 连线在最外层](https://kubernetes.io/docs/images/kubernetes-cluster-network.svg)
+
+来源：Kubernetes 官方文档「Cluster Networking」。pod 网络是画在最下层的一条横线：不管 pod 在哪个 node 上都彼此可达，这条扁平连通性就是 CNI 插件用 bridge 或 overlay 在背后搭出来的；svc 层是集群在连通之上封装的虚拟 IP 层，与文章的 veth/bridge/overlay 三级方案是同一件事在集群规模的形态。
+
 ## 背景与代价
 
 思想背景：netns 进入内核（2007 年 2.6.24）是" namespaces 家族"的一环（pid/net/mnt/ipc/uts），思想源头是 1998 年的 FreeBSD jail：把系统的全局视图切成进程组的局部视图。veth/bridge 复用既有虚拟设备框架（bridge 是 2000 年前后的内核功能，早于容器十年），容器网络不是发明新机制，是把三个旧零件拼成新形态。overlay 的思想来自数据中心的大二层愿景（VMware VXLAN 2011 年标准化），容器集群把它继承下来。

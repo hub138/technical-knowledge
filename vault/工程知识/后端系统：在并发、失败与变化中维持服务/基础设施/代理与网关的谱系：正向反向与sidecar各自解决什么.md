@@ -31,6 +31,12 @@ sources:
 
 三形态的统一本质：**都是"流量必经点"的实现，差别只在插的位置与治理半径**。正向代理治理出向流量（半径=客户端的对外行为），反向代理治理入向流量（半径=一个集群的入口），sidecar 治理服务间流量（半径=单个实例的所有进出）。
 
+反向代理的形态一看就懂——客户端只认识 example.com，不知道背后被代理挡下的服务器集群：
+
+![反向代理：客户端与 example.com 代理通信，代理把请求转给内部服务器](https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Reverse_proxy_h2g2bob.svg/1280px-Reverse_proxy_h2g2bob.svg.png)
+
+*图源：Wikimedia Commons「Reverse proxy h2g2bob」，作者 h2g2bob，许可 [CC0](https://commons.wikimedia.org/wiki/File:Reverse_proxy_h2g2bob.svg)*
+
 ## 背景与代价
 
 思想背景：代理概念的祖先是电话接线员——所有通话经过总机，总机可以监听、转接、优先级排序。HTTP 代理的标准化（1996 年代）最早解决的是企业出口管控。反向代理随 Web 规模化兴起（90 年代末的负载均衡需求）。sidecar 是微服务时代的发明（2016 年 Envoy + 2017 年 Istio 把"每实例一个代理"制度化），它把反向代理的能力下放到实例级。

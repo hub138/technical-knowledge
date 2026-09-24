@@ -27,10 +27,20 @@ DNS 要解决的问题，是把人类记得住的名字（example.com）翻译�
 
 1. **本地缓存层**。浏览器缓存 → 操作系统缓存（nsswitch 路径）→ hosts 文件。命中即返回，绝大多数查询在这里终止。
 2. **stub resolver → 递归解析器**。本机配置的 DNS（公网 8.8.8.8、内网 CoreDNS）是递归解析器，它替你跑完整个递归过程。
-3. **递归过程**。解析器问根服务器（.com 在哪）→ 根返回 .com 的 NS 记录 → 解析器问 .com 权威（example.com 在哪）→ TLD 返回 example.com 的 NS → 解析器问 example.com 的权威服务器 → 拿到 A 记录。逐级问、逐级缓存。
+3. **递归过程**。解析器问根服务器（.com 在哪）→ 根返回 .com 的 NS 记录 → 解析器问 .com 权威（example.com 在哪）→ TLD 返回 example.com 的 NS → 解析器问 example.com 的权威服务器 → 拿到 A 记录。逐级问、逐级缓存。把这条递归链跑成完整时序，Cloudflare 的编号图一图看全——8 步解析加 2 步建页，谁发起递归查询（蓝线）、解析器代谁发迭代查询（黑线）分色标注：
+
+![Cloudflare 官方图：完整 DNS 查询与网页请求时序——用户电脑到 DNS 解析器发递归查询（步骤 1），解析器依次向根服务器（2-3）、TLD 服务器（4-5）、example.com 权威服务器（6-7）发迭代查询，拿到地址回给用户（8），用户再向 web 服务器发请求（9）收响应（10）；蓝色箭头标 Recursive Query、黑色箭头标 Iterative Query](https://images.ctfassets.net/slt3lc6tev37/54fXQrFHYvhAM7jIIpKEX7/8fb09ba9998d14862e80f5c9cc6d2170/complete-dns-lookup-and-webpage-query.png)
+
+来源：Cloudflare Learning Center，[What is DNS?](https://www.cloudflare.com/learning/dns/what-is-dns/)。图里解析器是唯一跑完全程的角色：用户的递归查询只有一跳（步骤 1），剩下的 2-7 是解析器替用户跑的迭代查询——"递归"与"迭代"的分工在这张图上是两种箭头。步骤 8 之后的解析结果按 TTL 进解析器缓存，下一次查询从步骤 1 直接命中返回，2-7 全部省掉。
 4. **答案回填缓存**。每一级答案带 TTL，解析器按 TTL 缓存，后续查询直接命中。
 
 这条链的关键性质：**每一级都可以缓存，缓存让解析从秒级变成毫秒级，也让失效变成了一场赌博**。
+
+把这条链画开，能看到缓存分布在从浏览器到权威服务器的每一级：
+
+![DNS 解析链上的各级缓存：应用缓存、本机缓存、转发与递归解析器缓存，最后才到权威服务器](https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/DNS_Architecture.svg/1280px-DNS_Architecture.svg.png)
+
+*图源：Wikimedia Commons「DNS Architecture」，作者 Aaron Filbert，许可 [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:DNS_Architecture.svg)*
 
 ## TTL：一致性与新鲜度的谈判
 

@@ -27,6 +27,12 @@ TCP 连接的建立与断开要解决的问题，是在不可靠的 IP 网络上
 
 **背景本质**：三次是"双向都确认收发能力"的数学下限。零次双方什么都不知道，一次确认一个方向，两次只确认一个方向的双向能力，三次两个方向都确认。追问"为什么不是四次"——第四次可以捎带在第一个数据包里（ACK 与数据合发），省一次纯往返。
 
+序列号怎么推进、两端状态怎么随报文迁移，维基百科的脚本图一步一标：
+
+![Wikipedia 条目图：TCP 三次握手两端状态与序列号推进——客户端 CLOSED→SYN_SENT 发 SYN seq=x，服务端 CLOSED→LISTEN→SYN_RECEIVED 回 SYN+ACK seq=y ack=x+1，客户端进 ESTABLISHED 再发 ACK seq=x+1 ack=y+1，服务端随后进 ESTABLISHED](https://upload.wikimedia.org/wikipedia/commons/8/82/TCP_connection_establishment.svg)
+
+来源：Wikipedia「Transmission Control Protocol」条目（CC BY-SA）。第二个报文的 ack=x+1 就是"确认了你的 ISN"在协议里的写法——两个方向各报各的 ISN、各确认对方的，这就是"双向都确认"落在报文上的形态。
+
 ## 四次挥手与异常路径
 
 断开比建立多一次报文（FIN、ACK、FIN、ACK），因为 TCP 全双工：一端发完数据要关（FIN），另一端可能还有数据要发，所以另一端的 ACK 与 FIN 分开发送。这就出现了 CLOSE_WAIT（收到 FIN、自己还没发 FIN）状态——对端已关，本地应用还在持有连接。CLOSE_WAIT 堆积是应用层忘记 close 的信号，这是线上排查的常见场景。
@@ -36,6 +42,20 @@ TCP 连接的建立与断开要解决的问题，是在不可靠的 IP 网络上
 - **RST 的三个触发**：端口未监听（连接请求打到不存在的服务）、进程崩溃（内核替它发 RST）、队列溢出（backlog 打满时 SYN 被 RST 或丢弃）。RST 不经过协商直接毁连接，两端状态立即回到 CLOSED。
 - **半开连接**：一端重启后不知道连接存在（内存里的状态没了），另一端还认为连接活着。下一个包到达重启端会触发 RST，连接被强制收尾。keepalive 探测是主动发现半开连接的手段。
 - **同时打开与同时关闭**：两端同时发 SYN（或同时发 FIN）时状态机走对称路径（SYN_SENT → SYN_RCVD），这是教科书冷门但真实存在（两端互调时偶发）。
+
+十一个状态怎么连成一台机器、主动关与被动关在下半场怎么走岔，RFC 793 的经典状态图一张看全：
+
+![Wikipedia 条目图（源自 RFC 793）：TCP 连接状态机全图——上方 CLOSED/LISTEN/SYN_SENT/SYN_RECEIVED/ESTABLISHED 为建立段，下方虚线框内 Active CLOSE 路径（FIN_WAIT_1→FIN_WAIT_2/CLOSING→TIME_WAIT）与 Passive CLOSE 路径（CLOSE_WAIT→LAST_ACK）分列，TIME_WAIT 超时后回 CLOSED，虚线箭头标 unusual event，红蓝箭头区分客户端与服务器路径](https://upload.wikimedia.org/wikipedia/commons/f/f6/Tcp_state_diagram_fixed_new.svg)
+
+来源：Wikipedia「Transmission Control Protocol」条目，原出 RFC 793（CC BY-SA）。左下虚线框就是正文说的收尾不对称：主动关的一方要多走 FIN_WAIT 与 TIME_WAIT，被动关的一方 CLOSE_WAIT 之后 LAST_ACK 一路直回——CLOSE_WAIT 堆积之所以是应用忘记 close 的信号，看图即知：被动关路径卡在 CLOSE_WAIT 不动，说明应用一直没发自己的 FIN。
+
+## 状态机全貌
+
+把建立、数据传输、关闭、异常路径的 11 个状态放进一张图，是 RFC 793 以来的经典画法。下图蓝线是服务端路径，红线是客户端路径，虚线是不常见事件（同时打开、同时关闭、RST）：
+
+![TCP 连接状态机（客户端路径为红线，服务端路径为蓝线，虚线为不常见事件）](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Tcp_state_diagram_fixed_new.svg/1280px-Tcp_state_diagram_fixed_new.svg.png)
+
+*图源：Wikimedia Commons「Tcp state diagram fixed new」，作者 Sergiodc2、Marty Pauley、Scil100，许可 [CC BY-SA 3.0](https://commons.wikimedia.org/wiki/File:Tcp_state_diagram_fixed_new.svg)，转绘自 RFC 793/9293 状态机。*
 
 ## 背景与代价
 

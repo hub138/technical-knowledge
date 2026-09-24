@@ -23,6 +23,12 @@ CDN 要解决的问题，是把内容搬到离用户近的地方。源站在单�
 
 ## 命中、回源与新鲜度（机制）
 
+CDN 的拓扑一句话：一个源站，多个边缘节点，用户就近取：
+
+![CDN 拓扑：中央源站把内容分发到多个边缘节点，用户从最近的边缘节点取内容](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Content_Distribution_Network_diagram.svg/1280px-Content_Distribution_Network_diagram.svg.png)
+
+*图源：Wikimedia Commons「Content Distribution Network diagram」，作者 Avelludo，许可 [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Content_Distribution_Network_diagram.svg)*
+
 **请求路由：DNS 与调度系统**。用户查 cdn.example.com，CDN 的权威 DNS（GSLB）按用户 IP 地理位置、节点负载、节点健康返回最近的 POP 地址。这层调度就是 DNS 解析全链路（见 [[工程知识/后端系统：在并发、失败与变化中维持服务/基础设施/DNS解析的全链路：递归缓存与失效传播.md]]）的 TTL 机制在运营层的使用：调度决策的生效速度受 DNS TTL 拖累（改调度要等 TTL 过期），故障摘除节点也慢半拍。
 
 **命中路径：边缘就地返回**。POP 的缓存服务器收到请求，内容在缓存且新鲜，直接返回（不发 x-cache: MISS 的回源流量）。命中路径的延迟构成：用户到 POP 的 RTT（同城几毫秒）+ POP 处理时间，跨洋 RTT 从链路里消失。这是 CDN 加速的主体收益。
