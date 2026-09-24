@@ -2330,6 +2330,21 @@ function renderRelations(note){
   const toggle=root.querySelector('.relation-collapse');
   toggle.onclick=()=>{const collapsed=root.classList.toggle('collapsed');const en=window.TKI18N&&window.TKI18N.lang==='en';/* 【rt26】点击后重赋的 title/aria-label 原恒为中文，EN 态改分支。 */toggle.textContent=collapsed?'▸':'▾';toggle.title=collapsed?(en?'Expand graph':'展开知识图谱'):(en?'Collapse graph':'折叠知识图谱');toggle.setAttribute('aria-label',toggle.title);toggle.setAttribute('aria-expanded',String(!collapsed))};
 }
+/* 折叠钮的 aria-label 描述「点下去会发生什么」，必须随折叠态与语言同步：
+   点击只改 aria-expanded 的话，收起后读屏仍听到「折叠」；语言切换后组合串
+   不命中词典，EN 态读到中文。两个事件都汇到这里统一重算。 */
+function syncRailToggleLabels(){
+  const en=window.TKI18N&&window.TKI18N.lang==='en';
+  const tr=window.TKI18N?window.TKI18N.t:(s)=>s;
+  document.querySelectorAll('.reader-siblings,.reader-toc').forEach(rail=>{
+    const btn=rail.querySelector('.rail-toggle');
+    if(!btn)return;
+    const labelEl=rail.querySelector('.rail-head span');
+    const label=labelEl?labelEl.textContent.trim():'';
+    const collapsed=rail.classList.contains('collapsed');
+    btn.setAttribute('aria-label',en?`${collapsed?'Expand':'Collapse'} ${tr(label)}`:`${collapsed?'展开':'折叠'}${label}`);
+  });
+}
 function renderReaderRails(note){
   const siblings=$('#reader-siblings'),toc=$('#reader-toc');
   // Siblings: every note in the same domain/topic, so a reader can move
@@ -2370,7 +2385,7 @@ function renderReaderRails(note){
 
   [siblings,toc].forEach(rail=>{
     const btn=rail.querySelector('.rail-toggle');
-    if(btn)btn.onclick=()=>{const c=rail.classList.toggle('collapsed');btn.setAttribute('aria-expanded',String(!c));btn.textContent=c?'▸':'▾'};
+    if(btn)btn.onclick=()=>{const c=rail.classList.toggle('collapsed');btn.setAttribute('aria-expanded',String(!c));btn.textContent=c?'▸':'▾';syncRailToggleLabels()};
   });
 }
 function railHead(label,hasItems,openByDefault=true){
@@ -2380,8 +2395,13 @@ function railHead(label,hasItems,openByDefault=true){
    * （用户实测反馈：原来两个反了。） */
   const chevron=openByDefault?'▾':'▸';
   const state_=String(openByDefault);
-  const act=openByDefault?'折叠':'展开';
-  return `<p class="rail-head"><span>${label}</span>${hasItems?`<button type="button" class="rail-toggle" aria-expanded="${state_}" aria-label="${act}${label}">${chevron}</button>`:''}</p>`;
+  /* aria-label 必须整串按语言分支拼装：${act}${label} 这类组合串在词典里
+     永远整串不命中（词典只有"同模块""本文目录"独立词条），EN 态读屏会
+     听到中文标签（rt26 同坑）。label 部分走 t() 现译，两段各自命中。 */
+  const en=window.TKI18N&&window.TKI18N.lang==='en';
+  const tr=window.TKI18N?window.TKI18N.t:(s)=>s;
+  const aria=en?`${openByDefault?'Collapse':'Expand'} ${tr(label)}`:`${openByDefault?'折叠':'展开'}${label}`;
+  return `<p class="rail-head"><span>${label}</span>${hasItems?`<button type="button" class="rail-toggle" aria-expanded="${state_}" aria-label="${aria}">${chevron}</button>`:''}</p>`;
 }
 function updateReaderStudy(){const study=$('#reader-study'),title=$('#reader-title').textContent.trim(),visible=state.view==='reader'&&Boolean(title);study.hidden=!visible;study.href=visible?'/learn?topic='+encodeURIComponent(title):'/learn'}
 function updateReaderLearned(){const btn=$('#reader-learned');if(!btn)return;const path=state.selected;const on=TKShell.progress.statusOf(path)==='learned';btn.classList.toggle('on',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'✓ 已读':'标记已读'}
@@ -3317,7 +3337,7 @@ async function initialize(){
   // translateDOM 扫不到。切语言后必须整块重画，否则会留下上一种语言的残页。
   /* 全景页两个视图都由 JS 现算（矩阵文案/八层栈导语/图表标注），切语言必须重绘，
      否则留下半中半英残页。home/graph 原有逻辑保留。 */
-  document.addEventListener('tk:lang',()=>{if(state.view==='home')renderHome();else if(state.view==='graph')renderGraph();else if(state.view==='panorama')renderPanoView();/* 【rt24】reader 视图补重渲染：图谱/同模块的 SVG 是 innerHTML 模板，语言分支在渲染时决定；不重渲染的话中文态会残留英文计数（实测回归）。标题正文节点由 translateDOM 自身覆盖，但模板拼装串必须重跑。 */else if(state.view==='reader'&&state.selected){const n=state.notes.find(x=>x.path===state.selected);if(n)renderRelations(n)}});
+  document.addEventListener('tk:lang',()=>{syncRailToggleLabels();if(state.view==='home')renderHome();else if(state.view==='graph')renderGraph();else if(state.view==='panorama')renderPanoView();/* 【rt24】reader 视图补重渲染：图谱/同模块的 SVG 是 innerHTML 模板，语言分支在渲染时决定；不重渲染的话中文态会残留英文计数（实测回归）。标题正文节点由 translateDOM 自身覆盖，但模板拼装串必须重跑。 */else if(state.view==='reader'&&state.selected){const n=state.notes.find(x=>x.path===state.selected);if(n)renderRelations(n)}});
   // 先给出骨架，避免首屏是一片空白让人以为坏了。
   showLoading();
   const loadingWarning=setTimeout(()=>{if(!state.notes.length)alertUser('知识内容加载较慢，仍在重试…')},6000);
