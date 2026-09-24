@@ -21,6 +21,10 @@ sources:
 
 Change Data Capture 读取数据库日志或变更流，把 insert/update/delete 转成带位点的事件，供搜索、缓存、数仓和 RAG 索引消费。CDC 事件是数据库提交后的观察，不是跨系统事务自动完成。
 
+![CDC 的机制链路：源应用写库产生的变更先进事务日志（TX Log），CDC 组件读日志而非问业务系统，把变更传播到目标数据库与目标应用——这正是"从提交日志捕获、可重放"的结构化表达](https://upload.wikimedia.org/wikipedia/commons/c/c6/Shadowbase_Replication-_Change_Data_Capture_Log_Scanner.jpg)
+
+*图源：Wikimedia Commons「Shadowbase Replication - Change Data Capture Log Scanner」，作者 Prholenstein，许可 CC BY-SA 4.0。*
+
 ## 事件至少需要
 
 ```text
