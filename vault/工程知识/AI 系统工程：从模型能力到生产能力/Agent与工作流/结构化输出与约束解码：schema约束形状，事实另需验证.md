@@ -7,10 +7,10 @@ review_after: 2027-03-22
 change_rate: medium
 confidence: high
 tags:
-  - ai/inference
-  - agent-engineering/tools
-  - correctness
-  - reliability
+  - "ai/inference"
+  - "agent-engineering/tools"
+  - "correctness"
+  - "ai/reliability"
 sources:
   - "https://arxiv.org/abs/2307.09702"
   - "https://json-schema.org/"

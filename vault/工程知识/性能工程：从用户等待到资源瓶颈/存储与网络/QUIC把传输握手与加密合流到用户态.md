@@ -7,10 +7,10 @@ confidence: high
 change_rate: medium
 review_after: 2028-09-22
 tags:
-  - networking
-  - protocols
-  - performance/network
-  - network
+  - "networking"
+  - "web/http"
+  - "performance/network"
+  - "systems/network"
 sources:
   - "https://www.rfc-editor.org/rfc/rfc9000"
   - "https://www.rfc-editor.org/rfc/rfc9001"

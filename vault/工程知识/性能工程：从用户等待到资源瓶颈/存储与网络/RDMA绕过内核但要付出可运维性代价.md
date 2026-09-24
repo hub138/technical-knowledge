@@ -7,10 +7,10 @@ confidence: high
 change_rate: low
 review_after: 2029-09-22
 tags:
-  - hardware
-  - networking
-  - performance/network
-  - network
+  - "hardware"
+  - "networking"
+  - "performance/network"
+  - "systems/network"
 sources:
   - "https://www.rdmaconsortium.org/home/transport-layer-choice/2.0%20Transport%20Layer%20Choice.htm"
   - "https://www.usenix.org/system/files/conference/atc18/atc18-mundkur.pdf"

@@ -157,11 +157,9 @@ def resolve(tag: str, block: str, vocab):
     if target != "__BY_DOMAIN__":
         return target
     domain = article_domain(block)
-    if domain is None:
-        return None
-    # 宽泛词的就近收编：ai/* 文章 → ai/…正式词条；其余 → 词表内的领域层
+    # 宽泛词的就近收编：有语境词按语境，没有用语义归属的默认词条
     if tag == "performance":
-        return domain if domain in vocab else "performance/profiling"
+        return domain if (domain and domain in vocab) else "performance/profiling"
     if tag == "reliability":
         if domain and domain.startswith("ai/"):
             return "ai/reliability"

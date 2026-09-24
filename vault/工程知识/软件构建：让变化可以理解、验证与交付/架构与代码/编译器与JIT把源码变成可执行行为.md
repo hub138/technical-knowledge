@@ -7,9 +7,9 @@ review_after: 2027-03-03
 change_rate: medium
 confidence: high
 tags:
-  - software/compiler
-  - runtime
-  - performance
+  - "software/compiler"
+  - "runtime"
+  - "software/compiler"
 sources:
   - "https://llvm.org/docs/"
   - "https://openjdk.org/jeps/"

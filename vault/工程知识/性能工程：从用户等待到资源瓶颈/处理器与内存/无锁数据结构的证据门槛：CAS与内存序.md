@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - concurrency
-  - performance/cpu
-  - systems/programming
+  - "concurrency"
+  - "performance/cpu"
+  - "software/engineering"
 sources:
   - "https://en.cppreference.com/w/cpp/atomic/memory_order"
   - "https://lwn.net/Articles/543814/"

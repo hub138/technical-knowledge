@@ -7,10 +7,10 @@ confidence: high
 change_rate: low
 review_after: 2029-03-21
 tags:
-  - hardware
-  - performance/storage
-  - systems/memory
-  - storage
+  - "hardware"
+  - "performance/storage"
+  - "systems/memory"
+  - "data/storage"
 sources:
   - "https://flashdba.com/2014/04/16/understanding-selfish-page-modes/"
   - "https://www.usenix.org/legacy/event/fast08/tech/full_papers/lee/lee.pdf"

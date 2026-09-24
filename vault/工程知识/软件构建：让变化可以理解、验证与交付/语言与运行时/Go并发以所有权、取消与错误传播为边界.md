@@ -7,10 +7,10 @@ review_after: 2026-11-30
 change_rate: medium
 confidence: high
 tags:
-  - go
-  - backend
-  - concurrency
-  - reliability
+  - "go"
+  - "backend/architecture"
+  - "concurrency"
+  - "software/resilience"
 sources:
   - "https://go.dev/doc/devel/release"
   - "https://go.dev/doc/go1.27"

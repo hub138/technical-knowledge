@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: medium
 confidence: high
 tags:
-  - ai/moe
-  - inference
-  - performance
+  - "ai/moe"
+  - "ai/inference"
+  - "ai/moe"
 sources:
   - "https://arxiv.org/abs/2401.04088"
   - "https://arxiv.org/abs/2101.03961"

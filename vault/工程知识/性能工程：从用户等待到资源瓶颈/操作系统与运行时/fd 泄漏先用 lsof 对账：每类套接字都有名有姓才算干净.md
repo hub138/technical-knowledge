@@ -7,9 +7,9 @@ change_rate: low
 confidence: high
 review_after: 2029-09-23
 tags:
-  - os
-  - operating-systems/process
-  - defect-analysis
+  - "systems/os"
+  - "operating-systems/process"
+  - "defect-analysis"
 sources:
   - "https://man7.org/linux/man-pages/man8/lsof.8.html"
   - "https://man7.org/linux/man-pages/man2/fcntl.2.html"

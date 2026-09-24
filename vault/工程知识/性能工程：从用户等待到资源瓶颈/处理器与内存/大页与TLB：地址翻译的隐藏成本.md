@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - systems/memory
-  - performance/cpu
-  - linux/vm
+  - "systems/memory"
+  - "performance/cpu"
+  - "systems/os"
 sources:
   - "https://www.kernel.org/doc/html/latest/admin-guide/mm/hugetlbpage.html"
   - "https://lwn.net/Articles/376606/"

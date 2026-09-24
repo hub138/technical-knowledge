@@ -7,9 +7,9 @@ change_rate: medium
 confidence: high
 review_after: 2028-03-23
 tags:
-  - agent-engineering/operations
-  - agent/reliability
-  - systems/operations
+  - "agent-engineering/operations"
+  - "agent/reliability"
+  - "operations"
 sources:
   - "https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html"
   - "https://github.com/open-telemetry/semantic-conventions-genai"

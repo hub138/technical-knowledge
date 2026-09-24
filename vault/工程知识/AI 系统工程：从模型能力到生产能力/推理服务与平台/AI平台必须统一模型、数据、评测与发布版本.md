@@ -7,8 +7,8 @@ change_rate: medium
 confidence: high
 review_after: 2027-03-03
 tags:
-  - ai/platform
-  - mlops
+  - "ai/platform"
+  - "ai/mlops"
 sources:
   - "https://kubernetes.io/docs/tasks/manage-gpus/scheduling-gpus/"
   - "https://docs.ray.io/en/latest/serve/production-guide/index.html"

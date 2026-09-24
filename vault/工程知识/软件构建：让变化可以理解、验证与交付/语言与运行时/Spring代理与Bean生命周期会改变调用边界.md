@@ -11,9 +11,9 @@ sources:
   - "https://docs.spring.io/spring-framework/reference/data-access/transaction.html"
   - "https://docs.oracle.com/en/java/"
 tags:
-  - java
-  - spring
-  - backend
+  - "java"
+  - "spring"
+  - "backend/architecture"
 ---
 
 # Spring 代理与 Bean 生命周期会改变调用边界

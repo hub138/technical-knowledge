@@ -7,9 +7,9 @@ review_after: 2027-03-03
 change_rate: medium
 confidence: high
 tags:
-  - data/cdc
-  - streaming
-  - integration
+  - "data/cdc"
+  - "streaming"
+  - "backend/integration"
 sources:
   - "https://debezium.io/documentation/reference/stable/architecture.html"
   - "https://kafka.apache.org/documentation/#semantics"

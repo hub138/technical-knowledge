@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: medium
 confidence: high
 tags:
-  - backend/scalability
-  - capacity-planning
-  - estimation
+  - "backend/scalability"
+  - "resource-capacity"
+  - "resource-capacity"
 sources:
   - "https://sre.google/workbook/capacity-planning/"
   - "https://sre.google/sre-book/handling-overload/"

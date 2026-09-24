@@ -7,9 +7,9 @@ review_after: 2027-09-03
 change_rate: low
 confidence: high
 tags:
-  - systems/network
-  - tcp
-  - backend
+  - "systems/network"
+  - "tcp"
+  - "backend/architecture"
 sources:
   - "https://www.rfc-editor.org/rfc/rfc9293"
   - "https://man7.org/linux/man-pages/man7/socket.7.html"

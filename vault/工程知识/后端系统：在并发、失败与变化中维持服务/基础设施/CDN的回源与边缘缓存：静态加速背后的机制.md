@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - networking
-  - web/http
-  - infrastructure
+  - "networking"
+  - "web/http"
+  - "backend/infrastructure"
 sources:
   - "https://www.rfc-editor.org/rfc/rfc9111"
   - "https://www.rfc-editor.org/rfc/rfc9110"

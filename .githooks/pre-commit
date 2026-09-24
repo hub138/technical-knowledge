@@ -1,0 +1,49 @@
+#!/bin/bash
+# 提交前门禁：只跑改动面命中的检查，全绿才放行提交。
+#
+# 为什么在钩子里而不是只在文档里写「发布前跑 check_all」：门禁写在文档里
+# 靠自觉，钩子才挡得住半夜的提交。检查按 staged 改动面裁剪——改 vault 才
+# 跑 links，改 site/ 样式才跑 tokens，全量 tests 在 CI/发布前兜底，提交
+# 时只花几秒。skill-drift 永远跑（它管的是文档指针，任何提交都可能悬空）。
+#
+# 安装：git config core.hooksPath .githooks（仓库内已带本目录）
+# 跳过：git commit --no-verify（留逃生门，但 check_all 全量在发布流程兜底）
+
+set -e
+cd "$(git rev-parse --show-toplevel)"
+
+staged=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$staged" ] && exit 0
+
+echo "── preflight（按改动面裁剪）──"
+
+# 文档指针：任何提交都可能让 skill 文档悬空
+python3 scripts/check_skill_drift.py --no-articles >/dev/null
+echo "  ok  skill-drift"
+
+# 改了 vault 内容才跑链接（要全库扫描，几秒级）
+if echo "$staged" | grep -q "^vault/"; then
+  python3 scripts/link_audit.py >/dev/null
+  echo "  ok  links"
+fi
+
+# 改了 tokens/base.css 或页面才跑 token 对账（秒级）
+if echo "$staged" | grep -qE "^(site/(tokens|base)\.css|index\.html|site/insights\.html|apps/)"; then
+  python3 scripts/token_audit.py >/dev/null
+  echo "  ok  tokens"
+fi
+
+# 改了 i18n 词典或页面文案才跑 i18n（两个审计都快）
+if echo "$staged" | grep -qE "^(site/i18n\.js|index\.html|papers/|sources/|projects/|apps/|site/shell\.js)"; then
+  python3 scripts/i18n_dict_audit.py >/dev/null
+  python3 scripts/i18n_audit.py >/dev/null
+  echo "  ok  i18n"
+fi
+
+# 改了论文注册表或论文脚本才跑注册表对账
+if echo "$staged" | grep -qE "(arxiv-registry|fetch-papers|paper-titles|paper-fields)"; then
+  python3 scripts/fetch-papers.py --check >/dev/null
+  echo "  ok  papers"
+fi
+
+echo "── preflight 全绿 ──"

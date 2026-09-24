@@ -7,8 +7,8 @@ change_rate: medium
 confidence: high
 review_after: 2027-03-03
 tags:
-  - agent-engineering/correctness
-  - agent-engineering/reliability
+  - "agent-engineering/correctness"
+  - "agent/reliability"
 sources:
   - "实践证据档案（已脱敏）"
   - "https://www.anthropic.com/research/trustworthy-agents"

@@ -11,9 +11,9 @@ sources:
   - "https://www.rfc-editor.org/rfc/rfc1035"
   - "https://developers.cloudflare.com/dns/fundamentals/what-is-dns/"
 tags:
-  - networking
-  - performance/network
-  - reliability
+  - "networking"
+  - "performance/network"
+  - "software/resilience"
 ---
 
 # DNS解析是延迟与故障的隐形入口

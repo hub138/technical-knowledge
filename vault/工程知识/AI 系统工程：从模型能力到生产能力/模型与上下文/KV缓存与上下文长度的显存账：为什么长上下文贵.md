@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: medium
 confidence: high
 tags:
-  - ai/long-context
-  - performance
-  - gpu
+  - "ai/long-context"
+  - "ai/long-context"
+  - "gpu/performance"
 sources:
   - "https://docs.nvidia.com/cuda/pdf/CUDA_C_Programming_Guide.pdf"
   - "https://huggingface.co/docs/transformers/main/en/llm_tutorial"

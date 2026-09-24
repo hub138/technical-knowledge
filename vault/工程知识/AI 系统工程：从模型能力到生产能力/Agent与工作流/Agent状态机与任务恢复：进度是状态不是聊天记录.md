@@ -7,10 +7,10 @@ review_after: 2027-03-22
 change_rate: medium
 confidence: high
 tags:
-  - agent-engineering/state
-  - agent-engineering/runtime
-  - reliability
-  - resilience
+  - "agent-engineering/state"
+  - "agent-engineering/runtime"
+  - "agent/reliability"
+  - "resilience"
 sources:
   - "https://modelcontextprotocol.io/specification/2026-07-28"
   - "https://a2a-protocol.org/v1.0.0/specification/"

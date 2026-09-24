@@ -7,10 +7,10 @@ review_after: 2027-03-22
 change_rate: medium
 confidence: high
 tags:
-  - agent-engineering/state
-  - agent-engineering/architecture
-  - correctness
-  - reliability
+  - "agent-engineering/state"
+  - "agent-engineering/architecture"
+  - "correctness"
+  - "agent/reliability"
 sources:
   - "https://arxiv.org/abs/2210.03629"
 ---

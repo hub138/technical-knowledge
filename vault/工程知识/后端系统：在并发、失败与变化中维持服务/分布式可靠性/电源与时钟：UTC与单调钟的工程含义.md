@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - hardware
-  - distributed-systems/time
-  - fundamentals
+  - "hardware"
+  - "distributed-systems/time"
+  - "ai/fundamentals"
 sources:
   - "https://www.rfc-editor.org/rfc/rfc1305"
   - "https://www.kernel.org/doc/html/latest/core-api/timekeeping.html"
@@ -30,6 +30,18 @@ sources:
 **电源的痕迹：启动时间与电源事件**。机器重启后，墙上时钟靠 RTC 纽扣电池维持（不依赖系统电源），但单调钟归零。挂起恢复（suspend/resume）后，部分单调钟继续（含挂起时间）、部分暂停（CLOCK_MONOTONIC 不含挂起，CLOCK_BOOTTIME 含）——语义选择要按场景：超时预算要不要把挂起时间算进去。电源故障的不可预测性是存储一致性的源头之一（掉电瞬间的写入是否写入磁盘，见 [[工程知识/性能工程：从用户等待到资源瓶颈/操作系统与运行时/脏页回写在性能与崩溃丢失窗口间权衡.md]]），时钟只是它的一个投影。
 
 **混合时钟与逻辑时钟的分工**。分布式系统不信任单机时钟，把时间语义分层：物理时钟（UTC/单调钟）给人看与给日志排序（尽力而为）、逻辑时钟（Lamport 时钟、向量时钟）给事件定因果（严格保证）。混合时钟（HLC，hybrid logical clock）折中：物理时间打底 + 逻辑计数补分辨，CockroachDB 等用它在事务里近似物理时间又保因果。选型判据：要因果正确性用逻辑钟，要人可读用物理钟，两者都要用 HLC。
+
+按用途选钟，三条纪律各归各的钟：
+
+```mermaid
+graph TD
+    N["按用途选钟"] --> T1["测耗时"]
+    N --> T2["记事件"]
+    N --> T3["定因果"]
+    T1 --> M1["单调钟<br/>不怕回拨"]
+    T2 --> M2["墙上钟 UTC"]
+    T3 --> M3["逻辑钟或 HLC"]
+```
 
 ## 背景与代价
 

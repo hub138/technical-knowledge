@@ -7,10 +7,10 @@ change_rate: medium
 confidence: high
 review_after: 2027-03-21
 tags:
-  - frontend
-  - design
-  - ai-assisted
-  - quality
+  - "frontend"
+  - "design"
+  - "ai/coding-agents"
+  - "quality"
 sources:
   - "https://www.bilibili.com/video/BV1nbe16SESV/"
   - "https://refactoringui.com/"

@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - columnar
-  - olap
-  - performance
+  - "columnar"
+  - "olap"
+  - "performance/profiling"
 sources:
   - "https://clickhouse.com/docs"
   - "https://parquet.apache.org/docs/"

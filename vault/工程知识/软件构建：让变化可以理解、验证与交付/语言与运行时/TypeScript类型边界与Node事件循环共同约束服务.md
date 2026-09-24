@@ -7,10 +7,10 @@ review_after: 2026-11-30
 change_rate: medium
 confidence: high
 tags:
-  - typescript
-  - nodejs
-  - backend
-  - web
+  - "typescript"
+  - "nodejs"
+  - "backend/architecture"
+  - "web"
 sources:
   - "https://www.typescriptlang.org/docs/handbook/intro.html"
   - "https://www.typescriptlang.org/docs/handbook/release-notes/typescript-6-0.html"

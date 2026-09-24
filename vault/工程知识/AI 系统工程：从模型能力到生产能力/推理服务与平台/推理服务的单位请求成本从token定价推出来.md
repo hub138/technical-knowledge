@@ -7,9 +7,9 @@ review_after: 2027-03-21
 change_rate: medium
 confidence: high
 tags:
-  - ai/serving
-  - cost-model
-  - capacity
+  - "ai/serving"
+  - "ai/serving"
+  - "capacity"
 sources:
   - "https://openai.com/api/pricing/"
   - "https://arxiv.org/abs/2305.05176"

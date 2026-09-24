@@ -32,11 +32,23 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
-CHROME = (
+CHROME_CANDIDATES = [
+    # macOS：puppeteer 安装布局
     Path.home()
     / ".cache/puppeteer/chrome-headless-shell/mac_arm-142.0.7444.175"
-    / "chrome-headless-shell-mac-arm64/chrome-headless-shell"
-)
+    / "chrome-headless-shell-mac-arm64/chrome-headless-shell",
+    # linux：playwright 安装布局（本仓 audit_shots.py 同款）
+    Path.home() / ".cache/ms-playwright/chromium-1223/chrome-linux64/chrome",
+    *(
+        Path.home().glob(".cache/ms-playwright/chromium-*/chrome-linux64/chrome")
+        if Path.home().joinpath(".cache/ms-playwright").is_dir()
+        else []
+    ),
+    Path("/usr/bin/chromium"),
+    Path("/usr/bin/chromium-browser"),
+    Path("/usr/bin/google-chrome"),
+]
+CHROME = next((p for p in CHROME_CANDIDATES if p.exists()), None)
 
 # (name, route, the file that route serves). The file is needed so the probe can
 # be written into it before the request; see sample().
@@ -239,8 +251,13 @@ def sample(url: str, width: int, target: Path | None = None) -> dict | None:
     worse than no check. So the probe is written into the page the server
     serves, exactly as contrast_audit.py does it.
     """
-    if not CHROME.exists():
-        raise SystemExit(f"chrome-headless-shell not found at {CHROME}")
+    if CHROME is None or not CHROME.exists():
+        tried = "\n  ".join(str(p) for p in CHROME_CANDIDATES)
+        raise SystemExit(
+            "未找到可用的 chrome-headless-shell / chromium，已试：\n  "
+            + tried
+            + "\n装一个（npx playwright install chromium）或在本表补你的路径"
+        )
 
     restore: tuple[Path, str] | None = None
     if target is not None:

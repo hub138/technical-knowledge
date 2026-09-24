@@ -7,9 +7,9 @@ review_after: 2027-01-15
 change_rate: high
 confidence: high
 tags:
-  - agent/caching
-  - agent/cost
-  - skill/mastery
+  - "agent/caching"
+  - "agent-engineering/operations"
+  - "learning"
 sources:
   - "https://docs.anthropic.com/en/docs/build-with-claude/prompt-caching"
   - "https://arxiv.org/abs/2309.06180"

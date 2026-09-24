@@ -7,8 +7,8 @@ review_after: 2027-02-28
 change_rate: medium
 confidence: high
 tags:
-  - software/version-control
-  - tooling/git
+  - "software/version-control"
+  - "software/version-control"
 sources:
   - "https://git-scm.com/docs"
   - "https://git-scm.com/docs/git-reflog"

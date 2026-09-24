@@ -11,9 +11,9 @@ sources:
   - "https://raft.github.io/"
   - "https://github.com/etcd-io/raft"
 tags:
-  - distributed-systems/consensus
-  - consensus
-  - reliability
+  - "distributed-systems/consensus"
+  - "distributed-systems/consensus"
+  - "distributed-systems"
 ---
 
 # Raft选举与日志复制把共识变成工程实现

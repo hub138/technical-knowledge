@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - lsm
-  - database/storage
-  - performance
+  - "lsm"
+  - "data/storage"
+  - "performance/profiling"
 sources:
   - "https://www.semver.org/"
   - "https://rocksdb.org/docs/"

@@ -7,9 +7,9 @@ review_after: 2027-03-15
 change_rate: low
 confidence: high
 tags:
-  - backend/ddd
-  - backend/domain-modeling
-  - skill/mastery
+  - "backend/ddd"
+  - "backend/domain-modeling"
+  - "learning"
 sources:
   - "https://martinfowler.com/bliki/DDD_Aggregate.html"
   - "https://www.domainlanguage.com/ddd/"

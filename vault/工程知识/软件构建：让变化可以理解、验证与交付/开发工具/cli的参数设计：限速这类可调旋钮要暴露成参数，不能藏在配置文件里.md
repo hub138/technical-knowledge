@@ -7,9 +7,9 @@ change_rate: low
 confidence: high
 review_after: 2029-09-23
 tags:
-  - app
-  - workflow
-  - backend/api
+  - "web"
+  - "workflow"
+  - "backend/api"
 sources:
   - "https://clig.dev/"
   - "https://bookkeeper.apache.org/"

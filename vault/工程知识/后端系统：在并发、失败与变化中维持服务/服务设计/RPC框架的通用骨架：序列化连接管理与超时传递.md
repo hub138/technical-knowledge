@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - distributed/communication
-  - networking
-  - api-design
+  - "distributed/communication"
+  - "networking"
+  - "backend/api"
 sources:
   - "https://grpc.github.io/grpc/core/md_doc_core.html"
   - "https://developer.google.com/static/protocol-buffers/docs/overview"

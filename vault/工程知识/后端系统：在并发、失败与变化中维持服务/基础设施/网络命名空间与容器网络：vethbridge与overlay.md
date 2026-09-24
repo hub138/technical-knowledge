@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - networking
-  - infrastructure
-  - devops/container
+  - "networking"
+  - "backend/infrastructure"
+  - "infrastructure/containers"
 sources:
   - "https://man7.org/linux/man-pages/man7/netns.7.html"
   - "https://www.kernel.org/doc/html/latest/networking/bridge.html"

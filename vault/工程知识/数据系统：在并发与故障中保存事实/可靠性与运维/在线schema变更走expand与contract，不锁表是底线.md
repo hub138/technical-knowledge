@@ -7,8 +7,8 @@ review_after: 2027-03-21
 change_rate: medium
 confidence: high
 tags:
-  - database/migration
-  - database/operations
+  - "migrations"
+  - "database/operations"
 sources:
   - "https://www.percona.com/blog/online-schema-change-tools/"
   - "https://dev.mysql.com/doc/refman/8.0/en/innodb-online-ddl-operations.html"

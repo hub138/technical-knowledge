@@ -7,9 +7,9 @@ review_after: 2026-10-23
 change_rate: high
 confidence: high
 tags:
-  - ai/radar
-  - ai/serving
-  - ai/agents
+  - "research/freshness"
+  - "ai/serving"
+  - "ai/agents"
 sources:
   - "Agent应用工程技术核验（来源层档案，已脱敏）"
   - "https://developers.openai.com/api/docs/deprecations"

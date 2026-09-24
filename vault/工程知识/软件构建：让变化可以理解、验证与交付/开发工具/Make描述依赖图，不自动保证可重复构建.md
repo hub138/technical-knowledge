@@ -7,8 +7,8 @@ review_after: 2027-02-28
 change_rate: low
 confidence: high
 tags:
-  - build/make
-  - software/automation
+  - "software/dependencies"
+  - "software/automation"
 sources:
   - "https://www.gnu.org/software/make/manual/make.html"
   - "https://reproducible-builds.org/docs/"

@@ -7,10 +7,10 @@ confidence: high
 change_rate: low
 review_after: 2029-09-22
 tags:
-  - data/storage
-  - file-systems
-  - reliability
-  - storage
+  - "data/storage"
+  - "systems/filesystems"
+  - "data/reliability"
+  - "data/storage"
 sources:
   - "https://pdos.csail.mit.edu/6.824/papers/crash-consistency.pdf"
   - "https://www.usenix.org/legacy/event/fast05/tech/full_papers/vijayan/vijayan.pdf"

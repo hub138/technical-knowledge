@@ -7,9 +7,9 @@ change_rate: low
 confidence: high
 review_after: 2029-09-23
 tags:
-  - net
-  - networking
-  - concurrency
+  - "systems/network"
+  - "networking"
+  - "concurrency"
 sources:
   - "https://c-ares.org/"
   - "https://man7.org/linux/man-pages/man3/getaddrinfo.3.html"

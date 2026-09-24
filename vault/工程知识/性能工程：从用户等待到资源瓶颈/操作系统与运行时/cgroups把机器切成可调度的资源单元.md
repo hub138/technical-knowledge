@@ -7,10 +7,10 @@ confidence: high
 change_rate: low
 review_after: 2029-09-22
 tags:
-  - linux/operations
-  - operating-systems/process
-  - performance
-  - systems
+  - "linux/operations"
+  - "operating-systems/process"
+  - "linux/operations"
+  - "systems"
 sources:
   - "https://www.kernel.org/doc/html/latest/admin-guide/cgroup-v2.html"
   - "https://facebookmicrosites.io/cgroup2/docs/overview"

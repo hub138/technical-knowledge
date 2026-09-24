@@ -3,7 +3,10 @@
 ## 测试门禁
 
 - **必跑**：`pytest tests/test_site.py`，必须全绿才允许发布。
-- **统一巡检入口**：仓库 `scripts/check_all.py` 一条命令跑全部检查（tests、tokens、links、copy、readme、i18n、papers、contrast、layout、skill-drift），输出一张 verdict 表（2026-09-24 自 Harness 工程实践吸收）。发布前按改动面加跑对应子集：改样式/颜色 → contrast 与 tokens，改文案 → copy 与 i18n，改链接/删内容 → links；改了 nav/路由则全跑。skill-drift 管 skill 文档与代码的同步：改了路由、文件名、frontmatter 字段、词表锚点，或改了 skill 文档，跑它确认文档指针没有悬空（含内嵌 `.knowledge-skills/` 与聚合层主副本的同步）。
+5:- **统一巡检入口**：仓库 `scripts/check_all.py` 一条命令跑全部检查（tests、tokens、links、copy、readme、i18n、papers、contrast、layout、skill-drift），输出一张 verdict 表（2026-09-24 自 Harness 工程实践吸收）。发布前按改动面加跑对应子集：改样式/颜色 → contrast 与 tokens，改文案 → copy 与 i18n，改链接/删内容 → links；改了 nav/路由则全跑。skill-drift 管 skill 文档与代码的同步：改了路由、文件名、frontmatter 字段、词表锚点，或改了 skill 文档，跑它确认文档指针没有悬空（含内嵌 `.knowledge-skills/` 与聚合层主副本的同步）。
+6:- **提交钩子兜底**（2026-09-24）：`.githooks/pre-commit` 已随仓库配置（`core.hooksPath .githooks`），按 staged 改动面裁剪检查——skill-drift 永跑，改 vault 才跑 links、改样式才跑 tokens、改文案才跑 i18n、改论文注册表才跑 papers，全绿才放行提交。钩子挡日常，`check_all` 全量在发布流程兜底；`--no-verify` 是逃生门，用了就要在发布前补跑全量。
+7:- **skill 副本晋升**（2026-09-24）：`scripts/sync_skill_copies.py`（`diff | promote | pull | sync`）对账内嵌 `.knowledge-skills/` 与聚合层主副本——promote 把站点侧改动发布到平台侧，pull 反向，sync 按 mtime 双向收敛。改完 skill 文档后先 diff 看差异面，再选方向晋升；晋升后 skill-drift 的副本同步面自动归零。
+8:- **tag 词表收编**（2026-09-24）：`scripts/collect_orphan_tags.py` 把游离 tag（不在 matrix.js 词表里的写法）按显式映射表归并到正式词条，`--dry` 预览 `--write` 落笔，无映射的词保持原样不猜。写新文章时 tag 从 `site/matrix.js` 词表里选，收不进词表的先扩词表再使用，让 skill-drift 的落位检查保持干净。
 - **必须看清结果**：不要用 `tail -1` 等会吞掉失败信息的方式看输出；有一次只看最后一行把 1 个失败当成全过，差点带病上线。
 - **修源头不改断言**：断言失败 = 代码或内容有问题。禁止为了让测试通过而改断言。
 - 测试的正确用途示例：它拦住过 vault wikilink 前缀错误导致的断链——内容问题也是发布阻塞项。

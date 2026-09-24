@@ -7,10 +7,10 @@ confidence: high
 change_rate: low
 review_after: 2029-09-22
 tags:
-  - networking
-  - tcp
-  - performance/network
-  - network
+  - "networking"
+  - "tcp"
+  - "performance/network"
+  - "systems/network"
 sources:
   - "https://www.rfc-editor.org/rfc/rfc793"
   - "https://www.serverfault.com/questions/202860/what-is-the-cost-of-many-sockets-in-time-wait"

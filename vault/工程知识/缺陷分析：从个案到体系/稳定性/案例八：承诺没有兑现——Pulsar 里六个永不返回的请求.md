@@ -7,9 +7,9 @@ change_rate: low
 confidence: high
 review_after: 2027-03-20
 tags:
-  - defect-analysis
-  - stability
-  - pulsar
+  - "defect-analysis"
+  - "software/resilience"
+  - "pulsar"
 sources:
   - "https://github.com/apache/pulsar/commit/102fdb3a09d883b2d3b41a2e83ebabcb53d995f1"
   - "https://github.com/apache/pulsar/commit/c8872591e2e87cb7f537d9978905e1fc3ba1b618"

@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: medium
 confidence: high
 tags:
-  - ai/adaptation
-  - decision
-  - llm
+  - "ai/adaptation"
+  - "architecture"
+  - "ai/models"
 sources:
   - "https://docs.anthropic.com/en/docs/build-with-claude/prompt-engineering/overview"
   - "https://arxiv.org/abs/2005.11401"

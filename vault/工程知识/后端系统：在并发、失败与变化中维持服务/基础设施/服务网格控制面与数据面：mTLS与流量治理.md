@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - service-mesh
-  - security
-  - distributed/communication
+  - "backend/service-mesh"
+  - "security"
+  - "distributed/communication"
 sources:
   - "https://istio.io/latest/docs/ops/deployment/architecture/"
   - "https://www.envoyproxy.io/docs/envoy/latest/intro/arch_overview/arch_overview"

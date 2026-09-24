@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - linux/io
-  - performance/io
-  - operating-systems/process
+  - "linux/io"
+  - "linux/io"
+  - "operating-systems/process"
 sources:
   - "https://unixism.net/loti/what_is_io_uring.html"
   - "https://kernel.dk/io_uring.pdf"

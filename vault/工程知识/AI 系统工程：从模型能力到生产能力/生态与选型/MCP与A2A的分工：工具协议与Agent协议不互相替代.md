@@ -7,10 +7,10 @@ review_after: 2027-03-22
 change_rate: medium
 confidence: high
 tags:
-  - agent-engineering/architecture
-  - agent-engineering/tools
-  - ai/agents
-  - reliability
+  - "agent-engineering/architecture"
+  - "agent-engineering/tools"
+  - "ai/agents"
+  - "ai/reliability"
 sources:
   - "https://modelcontextprotocol.io/specification/2026-07-28"
   - "https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/"

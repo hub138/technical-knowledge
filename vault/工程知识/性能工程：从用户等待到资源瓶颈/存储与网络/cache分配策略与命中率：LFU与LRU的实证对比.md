@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - backend/cache
-  - performance/algorithm
-  - data-structures
+  - "backend/cache"
+  - "software/algorithms"
+  - "data-structures"
 sources:
   - "https://en.wikipedia.org/wiki/Cache_replacement_policies"
   - "https://dl.acm.org/doi/10.1145/3568991"

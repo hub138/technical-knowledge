@@ -7,9 +7,9 @@ change_rate: low
 confidence: high
 review_after: 2029-09-23
 tags:
-  - hw
-  - hardware
-  - defect-analysis
+  - "hardware"
+  - "hardware"
+  - "defect-analysis"
 sources:
   - "https://www.smartmontools.org/"
   - "https://en.wikipedia.org/wiki/S.M.A.R.T."

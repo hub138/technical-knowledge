@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - tcp
-  - networking
-  - performance
+  - "tcp"
+  - "networking"
+  - "networking"
 sources:
   - "http://man7.org/linux/man-pages/man8/tcp.8.html" 
   - "https://www.rfc-editor.org/rfc/rfc9293"

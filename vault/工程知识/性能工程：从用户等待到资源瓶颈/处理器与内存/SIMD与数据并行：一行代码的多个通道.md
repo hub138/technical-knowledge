@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - performance/cpu
-  - performance/vectorization
-  - systems/programming
+  - "performance/cpu"
+  - "performance/cpu"
+  - "software/engineering"
 sources:
   - "https://en.wikipedia.org/wiki/SIMD"
   - "https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html"

@@ -7,9 +7,9 @@ review_after: 2027-09-22
 change_rate: low
 confidence: high
 tags:
-  - backend/networking
-  - networking
-  - infrastructure
+  - "backend/networking"
+  - "networking"
+  - "backend/infrastructure"
 sources:
   - "https://docs.envoyproxy.io/envoy/latest/intro/what_is_envoy"
   - "https://www.envoyproxy.io/docs/envoy/latest/configuration/overview"

@@ -7,9 +7,9 @@ change_rate: medium
 confidence: high
 review_after: 2028-03-23
 tags:
-  - agent-engineering/operations
-  - agent/architecture
-  - systems/operations
+  - "agent-engineering/operations"
+  - "agent/architecture"
+  - "operations"
 sources:
   - "https://docs.anthropic.com/en/docs/claude-code/hooks"
   - "https://github.com/openai/codex"

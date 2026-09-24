@@ -7,9 +7,9 @@ review_after: 2027-01-15
 change_rate: high
 confidence: high
 tags:
-  - agent/planning
-  - agent/task-decomposition
-  - skill/mastery
+  - "agent/planning"
+  - "agent/task-decomposition"
+  - "learning"
 sources:
   - "https://arxiv.org/abs/2308.08155"
   - "https://www.anthropic.com/research/building-effective-agents"
