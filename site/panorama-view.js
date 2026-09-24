@@ -316,6 +316,35 @@
     });
   }
 
+  /* ── 放大某层时列出该层的文章 ──────────────────────────────────
+   * 大圆上写着「82」，此前点它只是把视图放大，读者拿不到那 82 篇。
+   * 与覆盖矩阵同一条规则：聚合数字必须能钻取到明细（2026-09-24 反馈）。
+   * 数据现成 —— g.leaves 里就是该层的条目，不需要新接口。 */
+  var listHost = null;
+  function renderLayerList(g) {
+    if (!listHost) return;
+    if (!g) { listHost.hidden = true; listHost.innerHTML = ""; return; }
+    var items = (g.leaves || []).map(function (l) { return l.item; });
+    items.sort(function (a, b) { return (b.l || 0) - (a.l || 0); });
+    listHost.innerHTML = "";
+    var head = el("div", "pano-list-head");
+    head.innerHTML = "<b>" + esc(Lname(g.layer)) + "</b> · " + items.length +
+      (EN() ? " notes · " : " 篇 · ") + esc(Ltech(g.layer) || "");
+    listHost.appendChild(head);
+    var rows = el("div", "pano-list-rows");
+    items.forEach(function (it) {
+      var row = el("div", "pano-list-row");
+      var a = el("a", "pano-list-link", it.t);
+      /* /?path= 是 SPA 唯一认的文章参数（矩阵清单同款，写别的会落回首页） */
+      a.href = "/?path=" + encodeURIComponent(it.p);
+      row.appendChild(a);
+      row.appendChild(el("span", "pano-list-words", (it.l || 0) + (EN() ? " words" : " 字")));
+      rows.appendChild(row);
+    });
+    listHost.appendChild(rows);
+    listHost.hidden = false;
+  }
+
   /* ── 绘制 ──────────────────────────────────────────────────────── */
   var root, vb = { x: 0, y: 0, w: W, h: H };
   function draw(host) {
@@ -429,6 +458,7 @@
       vb = target;
       root.setAttribute("viewBox", vb.x.toFixed(1) + " " + vb.y.toFixed(1) + " " + vb.w.toFixed(1) + " " + vb.h.toFixed(1));
     } else lerpVB(target);
+    renderLayerList(g);
     syncFocusBar();
     syncCursors();
   }
@@ -590,6 +620,10 @@
     var lg = el("p", "pano-legend");
     lg.innerHTML = legendHTML();
     host.appendChild(lg);
+
+    listHost = el("div", "pano-layerlist");
+    listHost.hidden = true;
+    host.appendChild(listHost);
 
     if (!full) {
       requestAnimationFrame(function () {

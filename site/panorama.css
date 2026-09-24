@@ -158,3 +158,25 @@
    * 同页两 tab 的说明句在桌面与移动端都必须同档（用户抓的「字体
    * 差异这么大」），降档规则制造了 15px vs 13px 的第二处不同档。 */
 }
+
+/* 放大某层时，图下方列出该层的文章：大圆上的「82」点开就该看到这 82 篇。
+ * 与覆盖矩阵的格子清单同款口径（标题 + 字数，按字数降序），不另造一套。 */
+.pano-layerlist{
+  margin:14px 9px 0; padding:12px 14px;
+  border:1px solid var(--color-line); border-radius:10px;
+  background:var(--color-panel);
+}
+.pano-list-head{ font-size:var(--text-small); color:var(--color-ink-soft); margin-bottom:8px; }
+.pano-list-head b{ color:var(--color-ink); }
+.pano-list-rows{ display:grid; gap:1px; max-height:300px; overflow:auto; }
+.pano-list-row{
+  display:flex; justify-content:space-between; align-items:baseline; gap:14px;
+  padding:4px 6px; border-radius:5px; line-height:1.5;
+}
+.pano-list-row:hover{ background:var(--color-raised); }
+.pano-list-link{
+  font-size:var(--text-small); color:var(--color-accent); text-decoration:none;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+.pano-list-link:hover{ text-decoration:underline; }
+.pano-list-words{ flex:none; font-size:var(--text-micro); color:var(--color-muted); font-variant-numeric:tabular-nums; }
