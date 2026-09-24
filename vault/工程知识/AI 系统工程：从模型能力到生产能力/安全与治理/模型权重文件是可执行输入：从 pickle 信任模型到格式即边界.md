@@ -52,9 +52,26 @@ with open("pytorch_model.bin", "wb") as f:
 
 这条路径不是漏洞：Python 官方文档明文写着 "The pickle module is not secure. Only unpickle data you trust."。PyTorch 的 `.pt/.pth/.bin/.ckpt` 底层就是 pickle，`torch.load()` 继承全部风险。JFrog 2024 年在 Hugging Face 扫出约 100 个含恶意代码执行模式的模型（goober2/baller13 嵌入反弹 shell 的 `__reduce__`，连回攻击者 C2）。
 
+同一个权重文件按两种格式加载，结局在加载那一刻就已分岔：
+
+```mermaid
+graph TD
+    W[下载权重文件] --> P{加载路径}
+    P -->|pickle 系格式| A[执行操作码]
+    A -->|GLOBAL 导入 REDUCE 调用| B[命令随加载执行]
+    P -->|safetensors| D[解析 JSON 头]
+    D -->|按区间映射字节| F[纯读张量数据]
+```
+
+pickle 链上每一步都是格式设计好的行为：反序列化即执行，`GLOBAL` 导入、`REDUCE` 调用，攻击载荷走的就是这条正常加载路径。safetensors 链从 JSON 头直接取张量字节，整条链没有一处可以执行代码——这就是"攻击面按设计消除"的含义。
+
 ## 格式即边界：safetensors 的信任模型差异
 
-safetensors 的安全主张不是"扫描掉恶意内容"，而是"让攻击无法表示"：
+safetensors 的安全主张不是"扫描掉恶意内容"，而是"让攻击无法表示"。文件里只有头部长度、JSON 头和张量字节，加载路径读的是什么，结构图一目了然：
+
+![safetensors 格式结构：8 字节头长度、JSON 头声明张量名与字节区间、其余为原始张量数据](https://cdn-gcs.ngxson.com/nuiblog2/2025/2/1740665538210_94e230e8.jpg)
+
+头与数据的布局如下：前 8 字节是 JSON 头的长度，JSON 头逐个声明张量的 dtype、shape 与字节区间，其余部分是原始张量数据。整份文件里没有操作码流，也没有可调用对象，`__reduce__` 无法藏进一个"没有代码概念"的格式。图取自 Hugging Face 博客 [Common AI Model Formats](https://huggingface.co/blog/ngxson/common-ai-model-formats)。
 
 - 文件 = 8 字节头长度 + JSON 头（tensor 名、dtype、shape、字节区间）+ raw bytes。
 - **格式里没有代码的概念**：没有操作码流、没有可调用对象、没有 import 路径。`__reduce__` 无法藏进一个"没有代码概念"的格式。
