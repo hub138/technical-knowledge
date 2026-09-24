@@ -50,6 +50,8 @@
 - [ ] 关键交互走一遍真实路径（点进去、返回、刷新、深链）
 - [ ] 换了数据/换了宽度再验一次，第一遍过了不算过
 - [ ] **测量工具先过对照实验再产出证据**：无头浏览器等工具可能在容器里整体失灵（实测：Chromium 148 与 Firefox 150 在容器内 Tab 顺序导航全部失效，连三链接静态页都走不动，键盘注入 keydown/insert_text 均无效），用键盘走查当证据前，先拿一个只有两三个链接的最小静态页验工具本身能否走通；工具坏了时改用环境无关的 DOM 序审计（可聚焦元素按 DOM 序 dump、可访问名称遍历），并作废此前同源证据，空追现象成本极高
+- [ ] **可聚焦元素 dump 必须过滤真实可见性**：`querySelectorAll('button,[tabindex]')` 会数进 `display:none` 容器里的元素（实测：清单态下隐藏的缩放工具栏 4 个按钮混进 Tab 序 dump），不过滤就高估序列、掩盖真空缺；先按 `offsetParent`/`getBoundingClientRect` 过滤，或直接真键盘 Tab 步进记录落点
+- [ ] **触摸手势验证用 CDP 真实触摸注入，合成 PointerEvent 会假阴性**：手势处理函数调 `setPointerCapture` 时，脚本合成的 PointerEvent 因假 pointerId 抛错被吞，表现为"手势无效"——那是测试手法坏了，站点没问题（实测：合成事件捏合无反应，CDP `Input.dispatchTouchEvent` 同一场景 1.00→2.00 生效）；断言看 state 数值变化，不看有没有报错
 
 ## 常见翻车（本项目都发生过）
 
