@@ -2710,9 +2710,14 @@ function renderNetwork(){
    *
    * 给右边多留一个 labelW：最后一列的可用宽度就和其它列一致了。 */
   const padX=mobile?26:40, top=mobile?96:104;
-  const gutter= mobile?78:118;   // 最后一列右侧的余量
+  /* gutter 本来写死 118。聚焦时右侧面板把画布挤到 684，118 就占了 17%
+   * —— 实测右空 159px、左空只有 75px，看着就是"右边一大块空白"。
+   * 改成按画布宽度取，窄画布自动收窄。 */
+  const gutter= mobile?78:Math.min(118,Math.round(W*0.12));
   const colW=(W-padX*2-gutter)/domains.length;
   const labelW=Math.min(colW*.42, mobile?72:104);
+  /* 整幅图右移半个差，让左右留白接近（内容居中，而不是贴着左边） */
+  const shift=Math.round((gutter-padX)/2);
 
   const noteDomain=(path)=>{
     const n=state.notes.find(x=>x.path===path);
@@ -2757,7 +2762,7 @@ function renderNetwork(){
   }
 
   domains.forEach((d,di)=>{
-    const cx=padX+colW*(di+.5)+labelW/2;
+    const cx=padX+shift+colW*(di+.5)+labelW/2;
     const group=notes.filter(n=>n.category===d);
     const ts=orderedTopics(d,new Set(group.map(n=>n.topic)))
       .map(t=>({t,n:group.filter(x=>x.topic===t).length}))
