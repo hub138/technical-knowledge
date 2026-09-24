@@ -543,7 +543,7 @@
   border:1px solid var(--color-line);border-left:3px solid var(--color-accent);
   border-radius:var(--radius-sm);background:var(--color-panel);
   color:var(--color-ink-soft);font-size:var(--text-body);line-height:1.7;
-}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--color-line);padding:26px 0 16px;margin-bottom:20px}.directory-head h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--color-ink-soft);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted);border-radius:5px;padding:5px 9px;font-size:var(--text-sm)}.sort button.active,.sort button:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:var(--text-lg);margin:0 0 8px;display:flex;gap:8px;align-items:center}.topic-title small{font-size:var(--text-xs);font-weight:400;color:var(--color-muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--color-panel);border:1px solid var(--color-line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--color-line);border-radius:0 0 7px 7px}.note-row{border-left:3px solid transparent;transition:background var(--duration-fast) var(--ease-out),border-left-color var(--duration-fast) var(--ease-out)}.note-row:hover{background:var(--color-surface);border-left-color:var(--color-accent)}.note-row h3{font-size:var(--text-md);margin:0 0 3px}.note-row .path{font-size:var(--text-xs);color:var(--color-accent)}.note-row p{margin:0;color:var(--color-ink-soft);font-size:var(--text-base);line-height:1.6}.reader{display:none}.reader.open{display:block}/* 文章页头部距顶 26px：与 base.css「页面头部规范」（view-head 顶 26）同值同源，此前标题顶格贴 sticky 顶栏 */.reader-head{border-bottom:1px solid var(--color-line);padding-top:26px;padding-bottom:17px;margin-bottom:19px}.reader h2{font-size:var(--text-3xl);line-height:1.3;margin:0}/* 标题下的元信息行（字数 · 更新日期）：弱化、小字，不与来源区抢视觉。 */.reader-meta{margin:0 0 10px;color:var(--color-muted);font-size:var(--text-xs)}.reader-sources{
+}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--color-line);padding:26px 0 16px;margin-bottom:20px}.directory-head h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--color-ink-soft);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted);border-radius:5px;padding:5px 9px;font-size:var(--text-sm)}.sort button.active,.sort button:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:var(--text-md);margin:0 0 8px;display:flex;gap:8px;align-items:center}/* 分组标题从 text-lg(18px) 降到 text-md(16px)：与条目标题保持一档层级差（2026-09-24 目录字号审计） */.topic-title small{font-size:var(--text-xs);font-weight:400;color:var(--color-muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--color-panel);border:1px solid var(--color-line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--color-line);border-radius:0 0 7px 7px}.note-row{border-left:3px solid transparent;transition:background var(--duration-fast) var(--ease-out),border-left-color var(--duration-fast) var(--ease-out)}.note-row:hover{background:var(--color-surface);border-left-color:var(--color-accent)}.note-row h3{font-size:var(--text-sm);margin:0 0 3px}/* 目录条目标题从 text-md(16px) 降到 text-sm(14px)：此前与摘要 16px 反向倒挂，视觉突兀（2026-09-24 用户反馈） */.note-row .path{font-size:var(--text-xs);color:var(--color-accent)}.note-row p{margin:0;color:var(--color-ink-soft);font-size:var(--text-base);line-height:1.6}.reader{display:none}.reader.open{display:block}/* 文章页头部距顶 26px：与 base.css「页面头部规范」（view-head 顶 26）同值同源，此前标题顶格贴 sticky 顶栏 */.reader-head{border-bottom:1px solid var(--color-line);padding-top:26px;padding-bottom:17px;margin-bottom:19px}.reader h2{font-size:var(--text-3xl);line-height:1.3;margin:0}/* 标题下的元信息行（字数 · 更新日期）：弱化、小字，不与来源区抢视觉。 */.reader-meta{margin:0 0 10px;color:var(--color-muted);font-size:var(--text-xs)}.reader-sources{
   margin:var(--space-3) 0 0;color:var(--color-muted);
   font-size:var(--text-body);line-height:1.9;
 }
@@ -721,7 +721,7 @@
  * （四页切词）只适用中文，详见 base.css 的 .view-head p 注释。 */
 :lang(en) .graph-focus-hint{text-wrap:balance}
 /* 方法说明独立成行：混排时「实现」两字会孤零零挂在主句行尾（实测）。 */
-.graph-method-note{display:block;margin-top:4px;color:var(--color-faint);font-size:var(--text-small)}.graph-panel{background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px;padding:10px}
+.graph-method-note{display:block;margin-top:4px;color:var(--color-faint);font-size:var(--text-small)}.graph-panel{background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px;padding:10px;position:relative;overflow:hidden}
 /* 点击聚焦：点域/主题后，无关的线和点淡出——和 hover 高亮同一套词汇，
  * 但有明确的选中态（aria-pressed），点空白或 Esc 取消。 */
 .graph .edge,.graph .node,.graph .topic-node,.graph .domain-head{transition:opacity var(--duration-fast) var(--ease-out)}
@@ -768,6 +768,62 @@
 .graph-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;box-shadow:0 0 0 3px color-mix(in srgb, currentColor 22%, transparent)}
 .graph-legend i{background:currentColor}
 .graph-legend .gl-sem{padding-left:16px;border-left:1px solid var(--color-line)}
+/* ── 图谱侧边栏（点域/主题/笔记后右侧的文章卡片栏）──────────────
+ * 用户诉求：点「基础设施 18」时不知道 18 是什么，右边要有一栏卡片
+ * 列出这些文章，好的点进去看。
+ * 布局：graph-panel 是 flex 行布局，svg 有 min-width:0 允许被压缩；
+ * 侧栏在图外右侧 300px 固定宽，聚焦出现时 svg 自动变窄（图谱缩放
+ * 状态独立保存，变窄不丢）。第一版浮在图上遮挡节点，改为并排后无
+ * 遮挡。窄屏（≤900px）落回图下方整宽。 */
+.graph-panel{display:flex;flex-direction:column}
+.graph-panel .graph-tools{flex:none}
+.graph-side{
+  position:absolute;top:46px;right:10px;bottom:54px;width:300px;
+  display:none;flex-direction:column;
+  background:var(--color-panel);
+  border:1px solid var(--color-line);border-radius:10px;
+  box-shadow:0 8px 28px rgba(20,42,35,.12);
+  padding:12px;gap:10px;
+  animation:gs-in var(--duration-base) var(--ease-out);
+  z-index:5;
+}
+.graph-panel.is-with-side{flex-direction:row;align-items:stretch;flex-wrap:wrap}
+.graph-panel.is-with-side .graph-tools{flex-basis:100%}
+.graph-panel.is-with-side #graph{flex:0 1 calc(100% - 320px);min-width:0;width:auto;height:auto;max-height:min(70vh,700px)}
+/* 图例在 DOM 里位于侧栏之前且占满整行，wrap 打包时会把侧栏挤到下一
+ * 行——聚焦态用 order 把侧栏排到图旁、图例垫底。 */
+.graph-panel.is-with-side .graph-side{order:2}
+.graph-panel.is-with-side .graph-legend{order:3}
+.graph-panel.is-with-side .graph-side{
+  display:flex;position:static;width:300px;flex:none;height:auto;
+  max-height:min(70vh,700px);margin-left:10px;
+}
+@keyframes gs-in{from{opacity:0;transform:translateX(12px)}to{opacity:1;transform:none}}
+.gs-head{display:flex;flex-direction:column;gap:3px;padding-bottom:9px;border-bottom:1px solid var(--color-line)}
+.gs-head b{font-size:var(--text-md);color:var(--color-ink);line-height:1.35}
+.gs-head span{font-size:var(--text-xs);color:var(--color-muted)}
+.gs-list{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:7px;padding-right:2px}
+.gs-card{
+  display:flex;align-items:center;gap:9px;text-align:left;width:100%;
+  padding:9px 11px;border:1px solid var(--color-line);border-radius:8px;
+  background:var(--color-surface);cursor:pointer;
+  transition:border-color var(--duration-fast) var(--ease-out),transform var(--duration-fast) var(--ease-out),box-shadow var(--duration-fast) var(--ease-out);
+}
+.gs-card:hover{border-color:var(--color-accent);transform:translateY(-1px);box-shadow:0 3px 10px rgba(20,42,35,.08)}
+.gs-card:focus-visible{outline:2px solid var(--color-accent);outline-offset:1px}
+.gs-dot{flex:none;width:8px;height:8px;border-radius:50%;background:var(--color-line);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-line) 25%,transparent)}
+.gs-card.is-learned .gs-dot{background:var(--color-ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--color-ok) 25%,transparent)}
+.gs-title{flex:1;font-size:var(--text-sm);color:var(--color-ink);line-height:1.4;overflow-wrap:anywhere}
+.gs-meta{flex:none;font-size:var(--text-xs);color:var(--color-faint);font-variant-numeric:tabular-nums}
+.gs-close{
+  flex:none;padding:7px 0;border:1px solid var(--color-line);border-radius:7px;
+  background:transparent;color:var(--color-muted);font-size:var(--text-xs);cursor:pointer;
+  transition:color var(--duration-fast) var(--ease-out),border-color var(--duration-fast) var(--ease-out);
+}
+.gs-close:hover{color:var(--color-ink);border-color:var(--color-ink)}
+@media (max-width:900px){
+  .graph-panel.is-with-side .graph-side{width:auto;flex-basis:100%;margin-left:0;max-height:320px;animation:none;order:3}
+}
 .graph-legend .edge,.edge{stroke-linecap:round}
 /* 线的可见度调了三次，两头都试过才找准。
  *
@@ -830,7 +886,7 @@
  *   不补偿——放大本就是为了看更大的字。--graph-comp 由 JS 在缩放时写入。
  * domain-head 用 foreignObject 装 HTML，不在同一补偿链路，单独用 zoom。 */
 .topic-count{font-size:var(--text-xs);fill:var(--color-ink);font-weight:750;pointer-events:none;font-variant-numeric:tabular-nums}
-.node text,.topic-node text{font-size:calc(var(--text-2xs) * var(--graph-comp,1));fill:var(--color-ink-soft);paint-order:stroke;stroke:var(--color-panel);stroke-width:2.5px;stroke-linejoin:round;pointer-events:none}
+.node text,.topic-node text,.topic-labels .topic-name{font-size:calc(var(--text-2xs) * var(--graph-comp,1));fill:var(--color-ink-soft);paint-order:stroke;stroke:var(--color-panel);stroke-width:2.5px;stroke-linejoin:round;pointer-events:none}
 #graph-world .domain-head{zoom:var(--graph-comp,1)}
 .node circle{stroke:var(--color-panel);stroke-width:1.5;cursor:pointer}
 .topic-node circle{cursor:pointer;stroke-width:2}.graph-note{font-size:var(--text-sm);fill:var(--color-muted)}.axis-line{stroke:var(--color-line-strong);stroke-width:1.5}.axis-label{font-size:var(--text-base);fill:var(--color-muted)}.empty{background:var(--color-panel);border:1px dashed var(--color-line);padding:30px;text-align:center;color:var(--color-muted);border-radius:7px}
@@ -931,7 +987,7 @@ body .kbd-hint{display:none}}
   .tk-fav-btn::before { top: -9px; left: -9px; right: -9px; bottom: -9px; } /* 命中区 26→44，视觉圆钮不变 */
 }
 
-@media print{.tk-sidebar,.topbar,.kbd-hint,.tk-fab,.tk-fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar{display:none!important}body{background:var(--color-panel)}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}/* 侧边栏本身在 base.css 里变成顶部横条。域树在主站是第二层导航，手机上收进「目录」后面，免得把首屏挤满。 */.tk-mobile-menu{display:block;border:1px solid var(--color-line);background:var(--color-panel);border-radius:6px;padding:6px 9px;color:var(--color-accent);min-height:44px;box-sizing:border-box}#tk-sidebar.collapsed #domains{display:none}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.hero{display:block}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:11px}.domain-grid{grid-template-columns:1fr}.directory-head,.view-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2{font-size:var(--text-2xl)}}
+@media print{.tk-sidebar,.topbar,.kbd-hint,.tk-fab,.tk-fb-overlay,.app-alert,.reader-toc,.reader-siblings,.article-relations,.reader-tools,.progress-bar,.tk-controls,.tk-controls *,.radar-badge{display:none!important}:root[data-theme="dark"]{--color-bg:#fff;--color-surface:#fff;--color-panel:#fff;--color-raised:#fff;--color-ink:#000;--color-ink-soft:#1a1a1a;--color-muted:#444;--color-line:#ddd}body{background:#fff;color:#000}.content{padding:0;max-width:none}.reader-body{max-width:none;font-size:11pt;line-height:1.6;background:#fff;color:#000}.reader-head{border:0;margin:0 0 12pt}.reader-body a{color:#000;text-decoration:none}.reader-body a[href^="http"]::after{content:" (" attr(href) ")";font-size:9pt;color:#555}.reader-body pre,.reader-body blockquote,.reader-body .quote{background:#f6f6f4!important;color:#000!important;border-color:#ddd!important}}@media(max-width:760px){/* 顶栏：搜索占满一行，主题按钮靠右，不要互相挤压。 */.topbar{grid-template-columns:1fr auto;row-gap:10px}.topbar .search{grid-column:1/-1}.app{display:block}/* 侧边栏本身在 base.css 里变成顶部横条。域树在主站是第二层导航，手机上收进「目录」后面，免得把首屏挤满。 */.tk-mobile-menu{display:block;border:1px solid var(--color-line);background:var(--color-panel);border-radius:6px;padding:6px 9px;color:var(--color-accent);min-height:44px;box-sizing:border-box}#tk-sidebar.collapsed #domains{display:none}.main{padding-top:62px}.topbar{padding:13px 15px}.topbar h1{display:none}.hero{display:block}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:11px}.domain-grid{grid-template-columns:1fr}.directory-head,.view-head{display:block}.sort,.visual-tabs{margin-top:13px}.note-row{display:block}.note-row p{margin-top:6px}.reader h2{font-size:var(--text-2xl)}}
 
 body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leading-normal)}
 
@@ -1113,7 +1169,7 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .topic-section{display:grid;gap:8px;margin-bottom:31px}.topic-title{font-size:var(--text-lg);margin:0 0 3px;padding:0 2px}.topic-title small{padding:1px 6px;background:var(--color-surface);border-radius:4px}
 .note-row{border:1px solid var(--color-line);border-radius:6px!important;padding:14px 16px;background:var(--color-panel);box-shadow:0 1px 2px rgba(20,42,35,.02)}
 .note-row:hover{background:var(--color-panel);border-color:var(--color-accent-line);transform:translateX(2px)}
-.note-row h3{font-size:var(--text-md)}.note-row .path{color:var(--color-muted)}.note-row p{font-size:var(--text-base)}
+.note-row h3{font-size:var(--text-sm)}.note-row .path{color:var(--color-muted)}.note-row p{font-size:var(--text-base)}
 .reader{max-width:1240px;margin:0 auto}.reader-head{padding-bottom:22px;margin-bottom:25px}.reader h2{font-size:var(--text-4xl)}.reader-body{max-width:740px;font-size:var(--text-lg);line-height:1.75;color:var(--color-ink-soft)}.reader-body h2{font-size:var(--text-2xl);margin-top:38px}.reader-body h3{font-size:var(--text-xl)}.reader-body blockquote{background:var(--color-surface);border-left-color:var(--color-accent)}.reader-body .code-block,.reader-body pre.mermaid{background:var(--color-surface);border:1px solid var(--color-line)}.reader-body th{background:var(--color-surface)}
 .graph-panel{padding:13px;border-radius:7px;box-shadow:0 1px 3px rgba(20,42,35,.03)}
 
@@ -1381,7 +1437,9 @@ function show(view){state.view=view;
      panorama 每次页面加载各记一次；reader 不在此记——文章阅读由
      openNote 的 reportVisit 记到具体篇目，粒度更细，避免一行文章两条
      记录。同 load 内反复切回同一视图去重。 */
-  if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
+  if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';/* 显示时不写死 display：宽屏下目录页是两列 grid（右侧留出「本页主题」
+   目录），写死 block 会用内联样式盖掉 CSS 的 grid。这里只负责隐藏。 */
+$('#directory').style.display=view==='directory'?'':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
 function syncSubtopicCurrent(){
   document.querySelectorAll('.tk-subtopics').forEach(sub=>{
     const row=sub.previousElementSibling;
@@ -1497,7 +1555,31 @@ function enhanceDomains(){
 }
 function renderDirectory(){
   const list=noteList(),groups=new Map();
-  for(const n of list){const k=state.domain==='all'?n.category:n.topic;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
+  /* ── 第二个分类维度：上游项目 ──────────────────────────────────
+   * 缺陷分析的文章记的是「在哪个上游项目里踩到的坑」，frontmatter 的
+   * sources 里就是上游 commit 链接，项目名能直接解析（bookkeeper 68、
+   * pulsar 32、spark 17…）。此前只有「域 → 主题」一条分类轴，这条信息
+   * 一直躺在数据里没被用过（2026-09-24 反馈）。
+   * 现在是两条轴并存：主题纵向分组 + 上游横向筛选，各自可点。
+   * 取不到上游项目的文章（其它域）不受影响：upstream 条整行不出现。 */
+  if(state.upstream===undefined)state.upstream='all';
+  const upstreamOf=n=>{
+    const arr=n.sources||[];
+    for(let i=0;i<arr.length;i++){
+      const m=/github\.com\/([^\/]+\/[^\/]+)/.exec(String(arr[i]));
+      if(m)return m[1];
+    }
+    return '';
+  };
+  const upCount=new Map();
+  for(const n of list){const u=upstreamOf(n);if(u)upCount.set(u,(upCount.get(u)||0)+1)}
+  const ups=[...upCount].sort((a,b)=>b[1]-a[1]).slice(0,10);
+  const upBar=ups.length?('<div class="upstream-bar"><span class="upstream-label">按上游项目筛选</span>'+
+    '<a class="upstream-chip'+(state.upstream==='all'?' on':'')+'" data-up="all">全部</a>'+
+    ups.map(([u,c])=>'<a class="upstream-chip'+(state.upstream===u?' on':'')+'" data-up="'+esc(u)+'" title="'+esc(u)+' 的 '+c+' 篇">'+esc(u)+' '+c+'</a>').join('')+
+    '</div>'):'';
+  const filtered=(state.upstream&&state.upstream!=='all')?list.filter(n=>upstreamOf(n)===state.upstream):list;
+  for(const n of filtered){const k=state.domain==='all'?n.category:n.topic;if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
   const groupRank=g=>state.domain==='all'?(order.indexOf(g)<0?999:order.indexOf(g)):(topicOrder[state.domain]||[]).indexOf(g)<0?999:(topicOrder[state.domain]||[]).indexOf(g);
   // 命中片段高亮：让"为什么这篇被搜出来"直接可见，而不是只列出标题。
   const q=state.query.trim();
@@ -1522,10 +1604,64 @@ function renderDirectory(){
   const empty=groups.size?'':
     `<div class="empty">${state.query?`<p class="empty-title">没有找到“${esc(q)}”</p>`:`<p class="empty-title">「${esc(state.domain)}」还没有匹配的内容</p>`}<p class="empty-hint">${state.query?'试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识':'可能是筛选条件太窄，清掉筛选看看全部知识'}</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
   $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div><div class="sort"><button data-sort="title" aria-pressed="${state.sort==='title'}" class="${state.sort==='title'?'active':''}">按标题<span class="sr-only"> ${state.sort==='title'?'（当前排序）':''}</span></button><button data-sort="updated" aria-pressed="${state.sort==='updated'}" class="${state.sort==='updated'?'active':''}">按更新<span class="sr-only"> ${state.sort==='updated'?'（当前排序）':''}</span></button></div></div>${sections}${empty}`;
+  if(upBar)$('#directory').insertAdjacentHTML('afterbegin',upBar);
   const clearDomain=$('#empty-clear-domain');
   if(clearDomain)clearDomain.onclick=()=>select('all','all');
+  /* ── 列表页右侧的目录栏 ────────────────────────────────────────
+   * 文章页右侧一直有章节目录（.rail-list），主题列表页照同一套 rail
+   * 结构补一条。宽屏右栏两条内容路：分组≥3 时列本页主题（点击滚过去）；
+   * 落在单个主题/小域/搜索结果上分组不足时，改列本页文章（点击打开），
+   * 右栏不再留空白列。没有内容时不渲染，上一帧的空壳也移除。 */
+  (function(){
+    const secs=[...document.querySelectorAll('#directory .topic-section')];
+    let head,items;
+    if(secs.length>=3){
+      head='本页主题';
+      items=secs.map((sec,i)=>{
+        const t=sec.querySelector('.topic-title span');
+        const n=sec.querySelector('.topic-title small');
+        if(!sec.id)sec.id='dir-sec-'+i;
+        const name=t?t.textContent.trim():('分组'+(i+1));
+        const cnt=n?n.textContent.trim():'';
+        return '<li><a href="#'+sec.id+'" data-sec="'+sec.id+'"><span>'+esc(name)+'</span>'+
+               (cnt?'<em>'+esc(cnt)+'</em>':'')+'</a></li>';
+      }).join('');
+    }else if(filtered.length){
+      head='本页文章';
+      items=filtered.map(n=>'<li><a href="#" data-note="'+esc(n.path)+'"><span>'+esc(n.title)+'</span></a></li>').join('');
+    }else{
+      const stale=document.querySelector('#directory .dir-rail');
+      if(stale)stale.remove();
+      return;
+    }
+    let rail=document.querySelector('#directory .dir-rail');
+    if(!rail){
+      rail=document.createElement('aside');
+      rail.className='dir-rail';
+      const host=$('#directory');
+      if(!host)return;
+      host.insertAdjacentElement('afterbegin',rail);
+    }
+    rail.innerHTML='<p class="rail-head"><span>'+head+'</span></p><ul class="rail-list dir-rail-list">'+items+'</ul>';
+    rail.querySelectorAll('a').forEach(a=>{
+      a.onclick=e=>{
+        e.preventDefault();
+        if(a.dataset.note){openNote(a.dataset.note);return}
+        const el=document.getElementById(a.dataset.sec);
+        if(el)el.scrollIntoView({behavior:'smooth',block:'start'});
+        try{history.replaceState(null,'','#'+a.dataset.sec)}catch(err){}
+      };
+    });
+  })();
   document.querySelectorAll('.note-row').forEach(row=>{row.setAttribute('tabindex','0');row.setAttribute('role','button');const h3=row.querySelector('h3');row.setAttribute('aria-label',(h3&&h3.textContent)||'打开笔记');row.onclick=()=>openNote(row.dataset.path);row.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(row.dataset.path)}}});
   document.querySelectorAll('[data-sort]').forEach(b=>b.onclick=()=>{state.sort=b.dataset.sort;renderDirectory()});
+  /* 上游条：点一个项目就按它过滤，再点「全部」还原。只改 state 后重画本页，
+   * 不动 URL —— 它是一条筛选，不是一个可分享的页面状态。 */
+  document.querySelectorAll('.upstream-chip').forEach(c=>{
+    c.setAttribute('role','button'); c.setAttribute('tabindex','0');
+    c.onclick=()=>{state.upstream=c.dataset.up;renderDirectory()};
+    c.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();state.upstream=c.dataset.up;renderDirectory()}};
+  });
   /* 【rt25】列表是 innerHTML 渲染（标题/主题/计数都走词条），
      渲染后无重译则 EN 态整页不翻（同 rt24 文章页病根）。 */
   retranslate();
@@ -1719,7 +1855,7 @@ function renderDigest(items, status) {
         ${heroItem.source ? `<span class="digest-source">${esc(heroItem.source)}</span>` : ''}
         ${heroFacts.length ? `<span class="digest-facts">${esc(heroFacts.join(' · '))}</span>` : ''}
         <button type="button" class="tk-fav-btn${heroItem.__fav ? ' is-fav' : ''}" data-fav-id="${esc(heroItem.__fid)}" aria-label="${heroItem.__fav ? '取消收藏' : '收藏'}" title="${heroItem.__fav ? '取消收藏' : '收藏'}">${heroItem.__fav ? TKICON.starOn : TKICON.star}</button>
-        ${operator ? `<button type="button" class="digest-feature-btn" data-feature="${manualHero ? '' : esc(heroItem.url || '')}" title="${manualHero ? '恢复评分自动' : '钉选为头条'}">${manualHero ? TKICON.close+'自动' : TKICON.pin+'头条'}</button>` : ''}
+        ${operator ? `<button type="button" class="digest-feature-btn" data-feature="${manualHero ? '' : esc(heroItem.url || '')}" title="${manualHero ? tr('恢复评分自动') : tr('钉选为头条')}">${manualHero ? TKICON.close+tr('自动') : TKICON.pin+tr('头条')}</button>` : ''}
       </span>
     </a>`;
   const listRows = restItems.map((item) => {
@@ -1737,7 +1873,7 @@ function renderDigest(items, status) {
           ${item.score ? `<i class="digest-score-inline">${esc(item.score)}</i>` : ''}
           ${item.source ? `<span class="digest-source">${esc(item.source)}</span>` : ''}
           <button type="button" class="tk-fav-btn${item.__fav ? ' is-fav' : ''}" data-fav-id="${esc(item.__fid)}" aria-label="${item.__fav ? '取消收藏' : '收藏'}" title="${item.__fav ? '取消收藏' : '收藏'}">${item.__fav ? TKICON.starOn : TKICON.star}</button>
-          ${operator && item.url !== featuredId ? `<button type="button" class="digest-feature-btn" data-feature="${esc(item.url || '')}" title="设为头条">${TKICON.pin}</button>` : ''}
+          ${operator && item.url !== featuredId ? `<button type="button" class="digest-feature-btn" data-feature="${esc(item.url || '')}" title="${tr('设为头条')}">${TKICON.pin}</button>` : ''}
         </span>
       </span>
     </a>`;
@@ -2383,6 +2519,12 @@ function renderReaderRails(note){
      阈值 0 靠进/出沿触发即可，节标题不像图片需要比例可见。 */
   const tocLinks=new Map(heads.map(h=>[h.id, toc.querySelector(`a[href="#${h.id}"]`)]));
   if('IntersectionObserver' in window && heads.length){
+    /* 首轮回调是初始渲染（observe 注册后必然全量回调一次），此时必须
+       只标注不滚动：scrollIntoView 会把顺序焦点导航的起点吸进目录栏，
+       之后用户按 Tab 第一步直接落进目录链接，skip link 被整个跳过
+       （2026-09-24 r15 实测：1.0s 前首步落 skip-link，目录渲染完落目录）。
+       首轮跳过滚动，用户真正滚动正文后的回调才滚目录。 */
+    let spyPrimed=false;
     const spy=new IntersectionObserver(entries=>{
       entries.forEach(en=>{
         if(!en.isIntersecting)return;
@@ -2390,8 +2532,9 @@ function renderReaderRails(note){
         const a=tocLinks.get(en.target.id);
         /* 滚动位置语义用 location（"当前位置在这"），不用 page（读屏把
            page 当页面切换的 landmark 快捷键目标，滚动驱动标注会误导航）。 */
-        if(a){a.setAttribute('aria-current','location');a.scrollIntoView({block:'nearest'})}
+        if(a){a.setAttribute('aria-current','location');if(spyPrimed)a.scrollIntoView({block:'nearest'})}
       });
+      spyPrimed=true;
     },{rootMargin:'-96px 0px -55% 0px',threshold:0});
     heads.forEach(h=>spy.observe(h));
   }
@@ -2436,7 +2579,11 @@ function graphCanvas(){
   // 首帧或隐藏时 getBoundingClientRect 可能是 0，退回一组保守的默认值。
   const W=Math.max(320, Math.round(box.width)||(mobile?720:1200));
   const H=Math.max(280, Math.round(box.height)||(mobile?920:690));
-  svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto'});marker.append(svgEl('path',{d:'M0 0L10 5L0 10z',fill:'currentColor'}));marker.setAttribute('class','graph-arrow');defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);
+  svg.innerHTML='';svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  /* 记下这次用的宽度：切换聚焦时面板会加/去 is-with-side，svg 宽度随之变。
+     重画那一刻容器可能还没布局完（宽度读到 0 退回默认值），画出来的列宽就与
+     实际不符 —— 所以要把实际值记下来，下一帧对照。 */
+  svg.dataset.graphW=String(W);const defs=svgEl('defs');const marker=svgEl('marker',{id:'graph-arrow',viewBox:'0 0 10 10',refX:'8',refY:'5',markerWidth:'6',markerHeight:'6',orient:'auto'});marker.append(svgEl('path',{d:'M0 0L10 5L0 10z',fill:'currentColor'}));marker.setAttribute('class','graph-arrow');defs.append(marker);const world=svgEl('g',{id:'graph-world'});svg.append(defs,world);
   /* 缩放/平移是探索进度的记忆：rebuild 后按 state 回放，数值显示与图形
    * 同步；zoom=1 且无平移时跳过。往返视图、语言切换后的重建都受益。 */
   if(state.zoom!==1||state.pan.x||state.pan.y)applyTransform();
@@ -2474,7 +2621,7 @@ function renderNetworkList(svg, domains, notes, tr, filter=null){
     b.onclick=()=>select(b.dataset.domain, b.dataset.topic);
   });
   const clear=box.querySelector('.graph-list-clear');
-  if(clear)clear.onclick=()=>toggleGraphFocus(state.graphFocus.mode, state.graphFocus.value);
+  if(clear)clear.onclick=()=>{toggleGraphFocus(state.graphFocus.mode, state.graphFocus.value);renderGraphSide()};
 }
 
 function renderNetwork(){
@@ -2752,6 +2899,18 @@ function renderNetwork(){
     g.append(svgEl('text',{x:-r-8,y:4,'text-anchor':'end',class:'topic-name'},tr(tp.t)));
     g.append(svgEl('text',{y:4,'text-anchor':'middle',class:'topic-count'},String(tp.n)));
     world.append(g);
+    /* 标签提到最上层：文字留在各自的节点组里时，后画的节点圆会盖住先画
+     * 节点的文字 —— 实测多处主题名被圆吃掉半个（"安全与治理"只剩"全与治理"）。
+     * 统一挪到 world 末尾的标签层，并每次把它重新挪到末尾，文字就永远在
+     * 所有圆之上。移出后不再继承节点组的 dimmed 透明度，所以手动同步。 */
+    let ll = world.querySelector('.topic-labels');
+    if(!ll) ll = svgEl('g',{class:'topic-labels'});
+    [...g.querySelectorAll('text')].forEach(t=>{
+      t.setAttribute('transform', `translate(${tp.x},${tp.y})`);
+      if(g.classList.contains('dimmed')) t.style.opacity='0.35';
+      ll.appendChild(t);
+    });
+    world.append(ll);
   });
 
   notes.forEach(n=>{
@@ -2793,6 +2952,8 @@ function renderNetwork(){
   });
 
     const gv=$('#graph-view');
+    /* 收尾：把主题标签层挪到最上层 —— 笔记圆点是在标签之后画的，会盖住文字 */
+    { const llEnd=world.querySelector('.topic-labels'); if(llEnd)world.append(llEnd); }
   if(gv)gv.classList.toggle('has-focus',!!state.graphFocus);
   const hint=$('#graph-hint');
   if(hint)hint.textContent=state.graphFocus
@@ -2802,7 +2963,8 @@ function renderNetwork(){
           ? ((state.notes.find(n=>n.path===state.graphFocus.value)||{}).title||state.graphFocus.value)
           : state.graphFocus.value.split('/').pop())
       +' · 点空白或 Esc 取消 · 双击笔记圆点进原文'
-    : tr('滚轮或捏合缩放 · 拖拽平移 · 点域、主题或笔记聚焦');
+  : tr('滚轮或捏合缩放 · 拖拽平移 · 点域、主题或笔记聚焦');
+  renderGraphSide();
   /* 【ui3·图例升级】i 改用 color 载色：background:currentColor 继承,
      box-shadow halo 用 color-mix 淡化同色。style 只写 color 一个属性。
      三个语义项（大小/已读/已读环）加 .gl-sem 类：CSS 里给首项前加
@@ -2828,8 +2990,84 @@ function toggleGraphFocus(mode,value){
   state.graphFocus = (state.graphFocus && state.graphFocus.mode===mode && state.graphFocus.value===value)
     ? null : {mode,value};
   renderGraph();
+  renderGraphSide();
   history.replaceState({},'', state.graphFocus
     ? '/?view=graph&focus='+encodeURIComponent(value) : '/?view=graph');
+}
+/* ── 图谱侧边栏：聚焦节点的文章卡片栏 ─────────────────────────────
+ * 用户诉求：图谱上点「基础设施 18」，不知道 18 是什么意思，右边要
+ * 有一栏卡片列出这 18 篇是什么，好看的文章点进去看。侧栏跟随聚焦
+ * 出现（域/主题/笔记三种粒度），聚焦取消时一起收起。
+ * 挂在 .graph-panel 里、动态创建：模板行超长，无法直接在 HTML 里编辑。 */
+function renderGraphSide(){
+  const panel=document.querySelector('#graph-view .graph-panel');
+  if(!panel)return;
+  let side=document.getElementById('graph-side');
+  if(!side){side=document.createElement('aside');side.id='graph-side';side.className='graph-side';side.setAttribute('aria-label','聚焦节点下的文章');panel.appendChild(side)}
+  const f=state.graphFocus;
+  panel.classList.toggle('is-with-side',!!f);
+  if(!f){side.hidden=true;side.innerHTML='';return}
+  const tr=TKShell.tr;
+  const zh=!(window.TKI18N&&window.TKI18N.lang==='en');
+  const t=(a,b)=>zh?a:b;
+  /* 三种粒度各自的文章集合与标题：
+   * 域=该域全部笔记；主题=该主题的笔记；笔记=这篇+它在图谱里连到的
+   * 邻居（linkedNotes 在 renderNetwork 里按边算好，这里复用同一口径
+   * ——聚焦一篇时侧栏回答「它连着谁」，与图上点亮的线一致）。 */
+  let list=[],heading='',sub='';
+  if(f.mode==='domain'){
+    list=state.notes.filter(n=>n.category===f.value&&!n.exclude_from_graph);
+    heading=f.value;
+    sub=t(list.length+' 篇 · 点卡片阅读',list.length+' notes · click to read');
+  }else if(f.mode==='topic'){
+    const parts=f.value.split('/');
+    list=state.notes.filter(n=>n.category===parts[0]&&n.topic===parts[1]&&!n.exclude_from_graph);
+    heading=parts[1];
+    sub=esc(parts[0])+' · '+t(list.length+' 篇 · 点卡片阅读',list.length+' notes · click to read');
+  }else{
+    const self=state.notes.find(n=>n.path===f.value);
+    list=self?[self]:[];
+    /* 邻居从 state.edges 自算：renderNetwork 里的 linkedNotes 是它的
+     * 局部变量，这里取不到（实测取引用直接 ReferenceError，侧栏停在
+     * 空壳）。同一条边集合，口径与图上点亮的连线一致。 */
+    const linked=new Set();
+    for(const e of state.edges){
+      if(e.source===f.value)linked.add(e.target);
+      else if(e.target===f.value)linked.add(e.source);
+    }
+    if(linked.size){
+      const others=state.notes.filter(n=>linked.has(n.path)&&!n.exclude_from_graph);
+      list=list.concat(others);
+    }
+    heading=self?self.title:f.value.split('/').pop();
+    sub=t('这篇笔记'+(list.length-1)+' 篇关联 · 点卡片阅读',(list.length-1)+' linked notes · click to read');
+  }
+  /* 空侧栏不出现：列表为空说明这个节点下没有文章，直接收起聚焦，
+   * 不渲染空壳卡片栏（用户实测指出的第二个问题）。 */
+  if(!list.length){
+    state.graphFocus=null;
+    panel.classList.remove('is-with-side');
+    side.hidden=true;side.innerHTML='';
+    renderGraph();
+    return;
+  }
+  /* 已读状态：与图谱圆点同一来源（TKShell.progress），已学的标绿点。 */
+  const card=(n)=>{
+    const learned=TKShell.progress.statusOf(n.path)==='learned';
+    return `<button type="button" class="gs-card${learned?' is-learned':''}" data-path="${esc(n.path)}">
+      <span class="gs-dot"></span>
+      <span class="gs-title">${esc(n.title)}</span>
+      <span class="gs-meta">${TKShell.fmtWords(n.words)}</span>
+    </button>`;
+  };
+  side.innerHTML=`<div class="gs-head"><b>${esc(heading)}</b><span>${sub}</span></div>
+    <div class="gs-list">${list.map((n)=>card(n)).join('')}</div>
+    <button type="button" class="gs-close">${t('收起侧栏','Close panel')}</button>`;
+  side.hidden=false;
+  side.querySelectorAll('.gs-card').forEach(c=>{
+    c.onclick=()=>openNote(c.dataset.path);
+  });
+  side.querySelector('.gs-close').onclick=()=>toggleGraphFocus(f.mode,f.value);
 }function renderGraph(){const tr=TKShell.tr;$('#graph-title').textContent=tr('知识图谱');
   /* 副标题按渲染形态分支：窄屏画的是领域分组清单（renderNetworkList），
    * 清单里没有主题圆、笔记圆点、Esc、双击这些力图交互——照搬桌面文案
@@ -2849,7 +3087,18 @@ function toggleGraphFocus(mode,value){
     +(listMode
       ? ` <span class="graph-focus-hint">${tr('点主题名查看该主题下的全部笔记')}</span>`
       : ` <span class="graph-focus-hint">${tr('点域名、主题圆或笔记圆点，')}<span class="hint-seg">${tr('只看与它相关的连线；再点一次或按 Esc 取消，双击笔记进原文')}</span></span>`)
-    +` <span class="graph-method-note">${tr('实现借鉴 d3 link 曲线、Obsidian 局部图谱与 Cosmograph 的聚焦方式：按领域分列，曲线表达跨域引用，聚焦时点亮相关路径')}</span>`;renderNetwork()}
+    +` <span class="graph-method-note">${tr('实现借鉴 d3 link 曲线、Obsidian 局部图谱与 Cosmograph 的聚焦方式：按领域分列，曲线表达跨域引用，聚焦时点亮相关路径')}</span>`;renderNetwork();
+  /* 尺寸校验：取消聚焦时面板去掉 is-with-side、svg 宽度从 684 回到 1004，
+   * 但 renderNetwork 若跑在布局完成之前，读到的是 0 → 用默认 1200 画，节点
+   * 整体右移（实测 122px）、右侧空一大块，和打开前的分布对不上。
+   * 下一帧宽度稳定后对照一次，不一致就重画。 */
+  requestAnimationFrame(function(){
+    const s=$('#graph'); if(!s)return;
+    const now=Math.round(s.getBoundingClientRect().width);
+    const used=Number(s.dataset.graphW||0);
+    if(now&&used&&Math.abs(now-used)>8)renderNetwork();
+  });
+}
 function bindGraph(){const svg=$('#graph');let drag=null;let pinch=null;const active=new Map();
   /* 2026-09-22 手感改造（用户问题「移动速度太快」）。旧实现三宗罪：
    * ① 滚轮每事件固定 ×1.1/.9 —— 触控板轻扫触发几十个连续 wheel 事件，
@@ -2876,7 +3125,7 @@ function bindGraph(){const svg=$('#graph');let drag=null;let pinch=null;const ac
     const qx=(vx-state.pan.x)/state.zoom, qy=(vy-state.pan.y)/state.zoom;
     state.pan={x:vx-t*qx, y:vy-t*qy};
     state.zoom=t;applyTransform()};
-  svg.onpointerdown=e=>{if(e.target.closest('.node,.topic-node,.domain-head'))return;if(state.graphFocus){state.graphFocus=null;renderGraph();history.replaceState({},'','/?view=graph');return}drag={x:e.clientX,y:e.clientY,px:state.pan.x,py:state.pan.y};svg.setPointerCapture(e.pointerId);active.set(e.pointerId,{x:e.clientX,y:e.clientY});if(active.size===2){const[p1,p2]=[...active.values()];pinch={d:Math.hypot(p1.x-p2.x,p1.y-p2.y),zoom:state.zoom,mid:{x:(p1.x+p2.x)/2,y:(p1.y+p2.y)/2},pan:{x:state.pan.x,y:state.pan.y}};drag=null}};
+svg.onpointerdown=e=>{if(e.target.closest('.node,.topic-node,.domain-head,.graph-side'))return;if(state.graphFocus){state.graphFocus=null;renderGraph();renderGraphSide();history.replaceState({},'','/?view=graph');return}drag={x:e.clientX,y:e.clientY,px:state.pan.x,py:state.pan.y};svg.setPointerCapture(e.pointerId);active.set(e.pointerId,{x:e.clientX,y:e.clientY});if(active.size===2){const[p1,p2]=[...active.values()];pinch={d:Math.hypot(p1.x-p2.x,p1.y-p2.y),zoom:state.zoom,mid:{x:(p1.x+p2.x)/2,y:(p1.y+p2.y)/2},pan:{x:state.pan.x,y:state.pan.y}};drag=null}};
   svg.onpointermove=e=>{if(!active.has(e.pointerId))return;active.set(e.pointerId,{x:e.clientX,y:e.clientY});
     if(pinch&&active.size===2){const[p1,p2]=[...active.values()];const d=Math.hypot(p1.x-p2.x,p1.y-p2.y);const t=clampZoom(pinch.zoom*d/pinch.d);
       /* 与滚轮同一套锚定换算：指心中点缩放前后指下的内容不动。 */
@@ -3138,7 +3387,10 @@ function collapseMobileSidebar(){setMobileSidebar(true)}
 function bindNavigation(){setMobileSidebar(matchMedia('(max-width:760px)').matches);const menuButton=$('#mobile-menu');if(menuButton)menuButton.onclick=()=>setMobileSidebar(!$('#tk-sidebar').classList.contains('collapsed'));$('#reader-back').onclick=()=>{if(state.domain!=='all'){select(state.domain,state.topic);const back=[...document.querySelectorAll('#domains .tk-domain')].find(r=>r.dataset.domain===state.domain);if(back)back.focus()}else if(state.query.trim()){show('directory');renderDirectory();$('#search').focus()}else{loadHome(true);const brand=$('#tk-sidebar .tk-brand');if(brand)brand.focus()}};$('#search').oninput=event=>{state.query=event.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};
 /* 回车：输入即筛选已在实时工作，回车负责「明确跳到结果并聚焦第一条」——
    放大镜图标的默认预期就是回车可搜，不能让回车毫无反应。 */
-$('#search').onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();if(!state.query.trim())return;show('directory');renderDomains();renderDirectory()}};window.onpopstate=selectFromUrl}
+$('#search').onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();if(!state.query.trim())return;show('directory');renderDomains();renderDirectory();/* 回车聚焦第一条：注释承诺的「明确跳到结果并聚焦第一条」。没有这步，
+   焦点留在搜索框，j/k 与 Enter 的全键盘阅读流在这里断链（r16 实测）。
+   note-row 已有 tabindex=0 + role=button + :focus-visible 样式，聚焦即亮。 */
+const firstRow=document.querySelector('#directory .note-row');if(firstRow)firstRow.focus()}};window.onpopstate=selectFromUrl}
 /* ── 键盘操作 ──────────────────────────────────────────────────────────
    阅读时手不离键盘：/ 搜索、j/k 移动、Enter 打开、Esc 返回、
    g+字母跳转、t 切主题、? 看帮助。
@@ -3168,6 +3420,15 @@ function bindKeyboard(){
   let gPending=0;
   document.addEventListener('keydown',event=>{
     const tag=(event.target.tagName||'').toLowerCase();
+    /* skip link 回车：浏览器默认锚点导航只滚动不落焦（焦点会丢给
+     * 文章里第一个 id 命中的标题，r15 实测落 H2），Tab 会从标题续走。
+     * 这里拦下 Enter，把焦点还给 #reader-body，Tab 从正文续走。 */
+    if(event.key==='Enter'&&event.target.classList&&event.target.classList.contains('skip-link')){
+      event.preventDefault();
+      const body=$('#reader-body');
+      if(body){body.focus();body.scrollIntoView({block:'start'})}
+      return;
+    }
     const typing=tag==='input'||tag==='textarea'||event.target.isContentEditable;
     /* Cmd/Ctrl+K 聚焦搜索 —— BestBlogs 右上角的同款键位；macOS 浏览器
      * 里 Cmd+K 原生无占用（地址栏搜索是 Cmd+L / Cmd+F 是页内查找），
@@ -3178,7 +3439,7 @@ function bindKeyboard(){
     if(event.key==='Escape'){
       {const kbdOv=$('#kbd-overlay');if(kbdOv&&kbdOv.classList.contains('open')){kbdOverlay(false);event.preventDefault();return}}
       if(typing&&event.target.id==='search'){event.target.value='';state.query='';loadHome(false);event.preventDefault();return}
-      if(state.view==='graph'&&state.graphFocus){state.graphFocus=null;renderGraph();history.replaceState({},'','/?view=graph');event.preventDefault();return}
+      if(state.view==='graph'&&state.graphFocus){state.graphFocus=null;renderGraph();renderGraphSide();history.replaceState({},'','/?view=graph');event.preventDefault();return}
       /* 全景页 Esc 与图谱页对称：先退格子详情，再退八层栈放大态。
          图谱能 Esc 退 focus 而全景不能，是交互不对称。 */
       if(state.view==='panorama'){

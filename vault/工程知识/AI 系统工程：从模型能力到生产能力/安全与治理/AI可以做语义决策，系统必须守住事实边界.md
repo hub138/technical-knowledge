@@ -12,7 +12,6 @@ tags:
 sources:
   - "实践证据档案（已脱敏）"
   - "https://www.anthropic.com/research/trustworthy-agents"
-  - "https://arxiv.org/abs/2311.14610"
 ---
 
 # AI 可以做语义决策，系统必须守住事实边界

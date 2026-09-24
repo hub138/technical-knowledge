@@ -571,14 +571,18 @@ LOGIN_HTML = r'''<!doctype html>
 :root{color-scheme:light;--bg:#f3f5f2;--panel:#fff;--ink:#202826;--muted:#68736f;--line:#d9dfdb;--accent:#137766}
 *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:15px/1.6 -apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}
 main{width:min(420px,calc(100% - 32px));background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:30px;box-shadow:0 16px 40px #23302b14}h1{font-size:21px;margin:0 0 7px}p{color:var(--muted);margin:0 0 21px}label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:7px;font:inherit;outline:0}input:focus{border-color:var(--accent);box-shadow:0 0 0 3px #13776620}button{width:100%;margin-top:16px;padding:11px 13px;border:0;border-radius:7px;background:var(--accent);color:white;font:600 14px inherit;cursor:pointer}button:disabled{opacity:.6;cursor:wait}.error{min-height:24px;color:#ad3e4f;margin:13px 0 0;font-size:13px}
-</style></head><body><main><h1>工程知识库</h1><p>此地址来自其他设备，请输入访问密码。</p><form id="form"><label for="password">访问密码</label><input id="password" type="password" autocomplete="current-password" autofocus required><button id="submit" type="submit">进入知识库</button><div class="error" id="error" role="alert"></div></form></main><script>
+</style></head><body><main><h1>工程知识库</h1><p id="hint">此地址来自其他设备，请输入访问密码。</p><form id="form"><label for="password">访问密码</label><input id="password" type="password" autocomplete="current-password" autofocus required><button id="submit" type="submit">进入知识库</button><div class="error" id="error" role="alert"></div></form></main><script>
 const next=new URLSearchParams(location.search).get('next')||'/';
+/* 中台（/insights）只认运营者密码：站点密码在这里永远输不对，
+   提前点名，避免用站点密码反复试。 */
+const forInsights=next.startsWith('/insights');
+if(forInsights){const hint=document.querySelector('#hint');if(hint)hint.textContent='中台页面：请输入运营者密码。';}
 /* `//evil.com` 以 '/' 开头，但它跳到别的站点。startsWith 挡不住，
    必须比 origin 与 pathname。 */
 const safeNext=(()=>{try{const target=new URL(next,location.origin);
 return target.origin===location.origin&&target.pathname.startsWith('/')
 ?target.pathname+target.search+target.hash:'/'}catch{return '/'}})();const form=document.querySelector('#form');const input=document.querySelector('#password');const button=document.querySelector('#submit');const error=document.querySelector('#error');
-form.addEventListener('submit',async event=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:input.value})});if(!response.ok)throw new Error('invalid');location.replace(safeNext)}catch{error.textContent='密码不正确';input.value='';input.focus()}finally{button.disabled=false}});
+form.addEventListener('submit',async event=>{event.preventDefault();button.disabled=true;error.textContent='';try{const response=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:input.value})});if(!response.ok)throw new Error('invalid');location.replace(safeNext)}catch{error.textContent=forInsights?'密码不正确（中台要的是运营者密码）':'密码不正确';input.value='';input.focus()}finally{button.disabled=false}});
 </script></body></html>'''
 
 
@@ -2223,14 +2227,21 @@ class Handler(BaseHTTPRequestHandler):
         # 就被放行。这里按来源地址直接拒绝，密码不再能解锁。
         if path == "/insights" or path.startswith("/api/insights/"):
             if not self.client_is_operator():
-                # 中台页面：完全未登录的访客引导去登录页（输入运营者密码
-                # 的地方）；已持站点密码的同事给 403 说明（重定向会死循环：
-                # 站点密码永远换不来运营者 cookie）。API 路径保持 JSON。
+                # 中台门禁：完全未登录的访客去登录页；已持站点密码的也
+                # 要给出路。站点密码与运营者密码是两把钥匙，只持站点
+                # 登录态的人看到的是「已登录」的页面，403 在页面上只是
+                # 一句读不到数据，没有去重输密码的出口。登录页就是运营者
+                # 密码的输入处，输对即得运营者 cookie，不存在重定向循环。
+                # API 路径保持 JSON，附 needs_operator_login 让页面识别。
                 if path == "/insights" and not self.is_authenticated():
                     self.redirect("/auth/login?next=%2Finsights")
                     return
                 self.send_json(
-                    {"error": "insights is only available from this machine"}, 403
+                    {
+                        "error": "insights needs the operator password",
+                        "needs_operator_login": True,
+                    },
+                    403,
                 )
                 return
 
@@ -2383,6 +2394,7 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path == "/api/insights/visitors":
             self.send_json({"visitors": insights_visitors()})
+            return
         if path == "/api/insights/visitor-detail":
             self.send_json({"detail": insights_visitor_detail()})
             return

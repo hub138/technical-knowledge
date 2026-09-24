@@ -461,8 +461,7 @@ a.has-children {
 
 /* 全景视图下矩阵随域切换（tk:pano-domain 广播同步），当前域用实色左边线
    + 主题色文字标出，与 hover 态区分开。 */
-.tk-domain.active,
-.tk-domain[aria-current] {
+.tk-domain.active {
   border-left-color: var(--color-accent);
   border-left-width: 2px;
   color: var(--color-accent);
@@ -1697,23 +1696,6 @@ body.tk-host button {
      链接命中区收回到内容端（自适应宽度），底部分隔线不收（视觉不变）。 */
   .tk-sidebar .tk-brand { align-self: flex-start; }
 
-  /* 【2026-09-23 折叠规则全站化】目录按钮的展示与折叠态隐藏域树，原来
-     只写在首页内联样式里，companion 页（papers/sources/evaluation/
-     learning）挂同一 shell 却没有这些规则，移动端域树 451px 把正文顶到
-     499px（首页 239px）。收进 base.css 让所有页面同规则；首页内联那份
-     与此处等价，保留不动。 */
-  .tk-mobile-menu {
-    display: block;
-    border: 1px solid var(--color-line);
-    background: var(--color-panel);
-    border-radius: 6px;
-    padding: 6px 9px;
-    color: var(--color-accent);
-    min-height: 44px;
-    box-sizing: border-box;
-  }
-  .tk-sidebar.collapsed .tk-domains { display: none; }
-
   .tk-shell,
   .content {
     /* 通道与按钮几何配套，两套几何两套值：
@@ -1983,3 +1965,37 @@ pre.mermaid svg{
   pointer-events:auto;
 }
 
+/* 目录页的第二个分类维度：上游项目（与「主题」分组并列的横向筛选）。
+ * 数据来自文章 frontmatter 的 sources，只有取得到上游项目的域才出现。 */
+.upstream-bar{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:12px 0 2px; }
+.upstream-label{ font-size:var(--text-micro); color:var(--color-muted); margin-right:2px; }
+.upstream-chip{
+  padding:3px 10px; border-radius:var(--radius-full);
+  border:1px solid var(--color-line); background:var(--color-panel);
+  font-size:var(--text-small); color:var(--color-ink-soft);
+  cursor:pointer; text-decoration:none; white-space:nowrap;
+  max-width:220px; overflow:hidden; text-overflow:ellipsis;
+}
+.upstream-chip:hover{ border-color:var(--color-accent-line); color:var(--color-accent); }
+.upstream-chip.on{ background:var(--color-accent); border-color:var(--color-accent); color:var(--color-on-accent); }
+
+/* 目录页右侧的「本页主题」目录：与文章页 rail 同一套观感。
+ * 宽屏时把内容区压出一列给它（sticky 跟随滚动），窄屏放不下就整条隐藏——
+ * 挤在正文旁边不如没有。 */
+@media (min-width:1200px){
+  #directory{ display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:20px; align-items:start; }
+  /* 主内容各块显式钉在第 1 列：目录栏不存在或内容不足时，自动放置会把
+     头部块挤进右侧窄列（实测：排序按钮竖排 + 大片空白列）。 */
+  #directory>.upstream-bar,
+  #directory>.directory-head,
+  #directory>.topic-section,
+  #directory>.empty{ grid-column:1; }
+  #directory>.dir-rail{ grid-column:2; grid-row:1 / span 999; position:sticky; top:14px; max-height:calc(100vh - 130px); overflow:auto; }
+  /* 列表页目录栏与文章页 reader-toc 同规范：13px 小字。窄栏里 16px 继承
+     字号会让长标题折成三四行，视觉突兀（2026-09-24 用户反馈「字太大、栏窄」）。 */
+  #directory>.dir-rail{ font-size:var(--text-small); }
+  #directory>.dir-rail .rail-head{ font-size:var(--text-small); }
+}
+@media (max-width:1199px){ .dir-rail{ display:none; } }
+.dir-rail-list li a{ display:flex; justify-content:space-between; gap:8px; align-items:baseline; }
+.dir-rail-list li a em{ font-style:normal; font-size:var(--text-micro); color:var(--color-muted); flex:none; }

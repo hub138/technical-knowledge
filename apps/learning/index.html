@@ -333,6 +333,10 @@
       .step .tool {
         display: inline-block;
         margin-top: 5px;
+        /* 触摸目标 24px 底线：21px 高差 3px，上下 padding 扩盒、
+           负 margin 抵消，视觉不变。 */
+        padding: 2px 0;
+        margin-top: 3px;
       }
       .step a.tool { margin-right: 10px; }
       .guide {

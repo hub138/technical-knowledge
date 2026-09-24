@@ -167,6 +167,7 @@
     /* 【rt20】history 页正文句：EN 态 DOM 实测残留 30 条，其中静态
        正文句（hero 副题、panel 副题、purpose 长句、四阶段句、rules
        三条、callout 句）此前全部缺词条。逐条补齐。 */
+    "打开生成过的课堂": { en: "Open your classrooms" },
     "继续打开本机生成过的互动课堂，查看生成状态，并把稳定结论复核后收录进知识库。": {
       en: "Reopen interactive classrooms generated on this machine, check how generation went, and file the settled conclusions into the knowledge base after review.",
     },
@@ -1101,6 +1102,7 @@
     },
 
     // ── Insights ──
+    "访问都发生在哪里": { en: "Where visits happen" },
     "访问与反馈": { en: "Visits and feedback" },
     "仅本机可见": { en: "This machine only" },
     "总访问次数": { en: "Total visits" },
@@ -1168,6 +1170,10 @@
     "个来源": { en: "sources" },
     "还没有访问记录。": { en: "No visits recorded yet." },
     "读不到中台数据：": { en: "Cannot read the insights data: " },
+    "这页要运营者身份，当前登录不适用。": {
+      en: "This page needs the operator identity; the current login does not apply.",
+    },
+    "前往登录": { en: "Go to login" },
     "确认站点服务在运行，然后刷新": {
       en: "Make sure the site service is running, then refresh",
     },
@@ -2294,6 +2300,46 @@
     "兼容与升级": { en: "Compat & upgrades" },
     "硬件故障": { en: "Hardware failures" },
     "剪藏": { en: "Clippings" },
+
+    /* 【2026-09-24 圈十三】英文模式残留清扫：skip link、导航导语、
+       学习子页按钮、头条钮、insights caveat、sources 导语、论文分类。
+       残留清单来自 EN 态全路由 DOM 走查实测。 */
+    "跳到正文": { en: "Skip to content" },
+    "头条": { en: "Featured" },
+    "钉选为头条": { en: "Pin as featured" },
+    "设为头条": { en: "Set as featured" },
+    "恢复评分自动": { en: "Restore auto ranking" },
+    "自动": { en: "Auto" },
+    "用课堂、追问、练习和迁移检验是否真的会用。": {
+      en: "Classrooms, questioning, practice and transfer, to check you can actually use it.",
+    },
+    "回到生成过的课堂": {
+      en: "Back to the classrooms you generated",
+    },
+    "列出本机生成过的互动课堂，点开即学": {
+      en: "Interactive classrooms generated on this machine, open one to continue",
+    },
+    "打开生成过的课堂": { en: "Open your generated classrooms" },
+    "继续打开本机生成过的互动课堂，查看生成状态，并把稳定结论复核后收录进知识库。": {
+      en: "Reopen interactive classrooms generated on this machine, check their status, and fold verified conclusions back into the knowledge base.",
+    },
+    "打开真实课堂": { en: "Open a real classroom" },
+    "阅读本地中文项目说明": { en: "Read the local Chinese project notes" },
+    "打开导师": { en: "Open the tutor" },
+    "新建课堂": { en: "New classroom" },
+    "开始课堂": { en: "Start a classroom" },
+    "总访问次数按进入页面的打点逐条累计，同一天反复刷新会累加；「按天去重访问」把同一天同一访客算作一次。停留时长来自页面隐藏或关闭时的一次补报，切后台、断网或直接杀进程时会缺报，所以停留只反映有人守着页面的时间，是信号，不是精确计时。访问量按 IP 去重：同一台设备换网络会被算成两个人，局域网 NAT 后的多台设备可能共用一个 IP。它是用来发现「哪些内容有人在看、哪些反馈还没处理」的信号，不是精确的用户统计。": {
+      en: "Total visits count every page-load ping; repeated refreshes on the same day all add up. \"Daily unique visits\" counts one visit per visitor per day. Dwell time is reported once when the page is hidden or closed, so switching tabs, going offline, or killing the process loses the report — dwell reflects time someone kept the page open, a signal rather than an exact timer. Visits dedupe by IP: one device switching networks counts as two people, and devices behind one NAT may share an IP. Use it to spot which content gets read and which feedback is still unhandled, not as precise user statistics.",
+    },
+    "这些站点每天产出值得花时间的技术内容。这里按月聚合它们的最新文章，标题、摘要、来源一目了然 —— 不用逐个站点翻。": {
+      en: "These sites publish technical content worth your time every day. Their latest articles are aggregated here by month — titles, summaries and sources at a glance, no need to visit each one.",
+    },
+    "LLM 应用": { en: "LLM applications" },
+    "生成与多模态": { en: "Generation and multimodal" },
+    "视觉感知": { en: "Visual perception" },
+    "决策与具身": { en: "Decision and embodied" },
+    "基础与理论": { en: "Foundations and theory" },
+    "科学与跨学科": { en: "Science and cross-disciplinary" },
   };
 
   /* ── Current language ─────────────────────────────────────────────────── */

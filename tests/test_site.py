@@ -340,8 +340,14 @@ class AuthenticationTests(unittest.TestCase):
             )
             site_cookie = login[1]["Set-Cookie"].split(";", 1)[0]
             # 站点密码只解锁工具启动，不解锁中台——两把钥匙不同权。
-            # 已登录但非运营者给 403 而非再跳登录（否则死循环）。
+            # 页面给 403 而非再跳登录（否则死循环），错误体附
+            # needs_operator_login，页面据此给出登录出口而非裸报错。
             self.assertEqual(self.request("GET", "/insights", headers={"Cookie": site_cookie})[0], 403)
+            status, _headers, body = self.request(
+                "GET", "/api/insights/summary", headers={"Cookie": site_cookie}
+            )
+            self.assertEqual(status, 403)
+            self.assertTrue(json.loads(body)["needs_operator_login"])
         finally:
             SERVER_MODULE.OPERATOR_PASSWORD = original
 

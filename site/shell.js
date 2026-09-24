@@ -587,8 +587,32 @@
           slot.innerHTML = rows.map((row) => `
             <a class="tk-domain" href="/?domain=${encodeURIComponent(row.name)}" data-domain="${esc(row.name)}">
               <span>${esc(row.name)}</span>
-              <span class="count">${row.count}</span>
+              <span class="count tk-domain-count" title="看全部 ${row.count} 篇" role="link" tabindex="0"
+                    aria-label="看全部 ${row.count} 篇">${row.count}</span>
             </a>`).join("");
+          /* 数字即清单入口：点域的篇数 → 去该域全部文章的清单（/?domain= 本
+           * 来就能列出全部，实测 98 篇）。此前点整个域只能展开主题，读者看到
+           * 「98」却拿不到那 98 篇（2026-09-24 反馈「数字不知道啥意思、点不
+           * 进去」）。点域名仍走原来的展开，两者互不干扰。 */
+          slot.addEventListener("click", (ev) => {
+            const c = ev.target.closest(".tk-domain-count");
+            if (!c) return;
+            const row = c.closest(".tk-domain");
+            const name = row && row.dataset.domain;
+            if (!name) return;
+            ev.preventDefault(); ev.stopPropagation();
+            location.href = "/?domain=" + encodeURIComponent(name);
+          });
+          slot.addEventListener("keydown", (ev) => {
+            if (ev.key !== "Enter" && ev.key !== " ") return;
+            const c = ev.target.closest(".tk-domain-count");
+            if (!c) return;
+            const row = c.closest(".tk-domain");
+            const name = row && row.dataset.domain;
+            if (!name) return;
+            ev.preventDefault(); ev.stopPropagation();
+            location.href = "/?domain=" + encodeURIComponent(name);
+          });
           /* 广播给主站：有笔记数据的页面在此之上加「点域展开主题」能力。 */
           document.dispatchEvent(new CustomEvent("tk:domains-rendered"));
           /* 【rt24】域列表是 fetch 回调里 innerHTML 的，晚于页面加载时的
@@ -939,11 +963,35 @@
         </div>`;
       favModal.hidden = false;
       favModal.classList.add("open");
+      const opener = document.activeElement;
       const done = (answer) => {
         favModal.hidden = true;
         favModal.classList.remove("open");
         favModal.onclick = null;
+        favModal.onkeydown = null;
+        if (opener && document.contains(opener)) opener.focus();
         resolve(answer);
+      };
+      /* aria-modal 只是读屏边界，浏览器不代管焦点：打开时焦点进入
+         第一个控件，Tab 在弹窗内循环，Escape 与点遮罩共用 done 出口，
+         关闭归还触发钮。对照基准是反馈弹窗（全套合规）。 */
+      const buttons = Array.from(favModal.querySelectorAll("button"));
+      if (buttons.length) buttons[0].focus();
+      favModal.onkeydown = (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          done(false);
+        } else if (event.key === "Tab" && buttons.length) {
+          const first = buttons[0];
+          const last = buttons[buttons.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
       };
       favModal.onclick = (event) => {
         const act = event.target.closest("[data-act]");
@@ -976,12 +1024,36 @@
         </div>`;
       favModal.hidden = false;
       favModal.classList.add("open");
+      const opener = document.activeElement;
+      const buttons = Array.from(favModal.querySelectorAll("button"));
+      if (buttons.length) buttons[0].focus();
+      const done = () => {
+        favModal.hidden = true;
+        favModal.classList.remove("open");
+        favModal.onclick = null;
+        favModal.onkeydown = null;
+        if (opener && document.contains(opener)) opener.focus();
+        resolve();
+      };
+      favModal.onkeydown = (event) => {
+        if (event.key === "Escape") {
+          event.preventDefault();
+          done();
+        } else if (event.key === "Tab" && buttons.length) {
+          const first = buttons[0];
+          const last = buttons[buttons.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+      };
       favModal.onclick = (event) => {
         if (event.target.closest("[data-act]") || event.target === favModal) {
-          favModal.hidden = true;
-          favModal.classList.remove("open");
-          favModal.onclick = null;
-          resolve();
+          done();
         }
       };
     });

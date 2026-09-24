@@ -34,7 +34,9 @@
         color: var(--color-ink);
         font: 15px/1.75 -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", sans-serif;
       }
-      a { color: var(--color-ok); text-decoration: none; }
+      /* 文字一律走 ink 档：--color-ok 只给填充（圆点、进度条、按钮底）用，
+         在白底上 3.7:1 不过 AA（tokens.css 注释即此约定）。 */
+      a { color: var(--color-ok-ink); text-decoration: none; }
       a:hover { text-decoration: none; }
       button, input, textarea { font: inherit; }
       .topbar {
@@ -101,8 +103,9 @@
         text-decoration: none;
         cursor: pointer;
       }
-      .button:hover { border-color: var(--color-ok); color: var(--color-ok); text-decoration: none; }
-      .button.primary { border-color: var(--color-ok); background: var(--color-ok); color: var(--color-panel); }
+      .button:hover { border-color: var(--color-ok-ink); color: var(--color-ok-ink); text-decoration: none; }
+      /* 主按钮白字对绿底需 ≥4.5，底色走 ink 档；边框随底色同档。 */
+      .button.primary { border-color: var(--color-ok-ink); background: var(--color-ok-ink); color: #fff; }
       .button.primary:hover { background: var(--color-accent-hover); color: var(--color-panel); }
       .button.blue { border-color: var(--color-info-soft); background: var(--color-info-soft); color: var(--color-info-ink); }
       .hero-action small { display: block; margin-top: 8px; color: var(--color-muted); font-size: var(--text-micro); line-height: 1.55; }
@@ -144,7 +147,7 @@
       }
       .panel h3 { margin: 0 0 6px; font-size: 16px; line-height: 1.4; }
       .panel p { margin: 0; color: var(--color-muted); font-size: 13px; line-height: 1.7; }
-      .step-no { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-bottom: 12px; border-radius: 50%; background: var(--color-ok-soft); color: var(--color-ok); font-size: 12px; font-weight: 800; }
+      .step-no { display: inline-grid; place-items: center; width: 24px; height: 24px; margin-bottom: 12px; border-radius: 50%; background: var(--color-ok-soft); color: var(--color-ok-ink); font-size: 12px; font-weight: 800; }
       .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
       .callout { padding: 15px 17px; border: 1px solid var(--color-accent-line); border-left: 3px solid var(--color-ok); border-radius: 6px; background: var(--color-ok-soft); }
       .callout.warm { border-color: var(--color-warm-line); border-left-color: var(--color-warm); background: var(--color-warm-soft); }

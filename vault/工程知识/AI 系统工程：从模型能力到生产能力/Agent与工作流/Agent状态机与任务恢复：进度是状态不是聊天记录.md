@@ -14,7 +14,7 @@ tags:
 sources:
   - "https://modelcontextprotocol.io/specification/2026-07-28"
   - "https://a2a-protocol.org/v1.0.0/specification/"
-  - "https://en.wikipedia.org/wiki/Extended_Finite_State_Machine"
+  - "https://en.wikipedia.org/wiki/Extended_finite-state_machine"
 ---
 
 # Agent状态机与任务恢复：进度是状态不是聊天记录

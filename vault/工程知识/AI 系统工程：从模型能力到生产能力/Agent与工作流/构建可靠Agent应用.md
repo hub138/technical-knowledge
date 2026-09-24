@@ -11,7 +11,7 @@ tags:
   - agent-engineering/architecture
 sources:
   - "https://www.anthropic.com/engineering/building-effective-agents"
-- "https://openai.github.io/openai-agents-python/agents/"
+  - "https://openai.github.io/openai-agents-python/agents/"
   - "实践证据档案（已脱敏）"
 ---
 

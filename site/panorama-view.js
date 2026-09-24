@@ -57,11 +57,15 @@
    *    当成「这层不足 10 篇」，而它们根本不是缺口层。红色现在只留给
    *    缺口标记，身份色一律避开。
    * ② 8 层只有 6 个色（1/3 同色、2/8 同色），身份色失去区分作用。
+   * 换的第二版又被评审挑出两处：三蓝太近难分、粉红与橙都带红橙倾向仍像
+   * 警示红。第三版又被挑出：品红紧邻红色仍像警示、深青/青蓝/蓝三个蓝青
+   * 系难分。最终版的做法是——跳过红—橙—粉整段色相；蓝青系只留天蓝一个，
+   * 靛蓝往紫偏，深青往绿偏；再补两级中性灰（石板 / 深板岩）拉开明度差。
    * 与 matrix-view.js 的 LAYER_COLOR 是一对一映射（hw/os/net/data/dist/
    * app ↔ 1~6），改这里必须同步改那边。 */
   var LAYER = {
-    "1": "#a16207", "2": "#b45309", "3": "#0e7490", "4": "#0284c7",
-    "5": "#059669", "6": "#7c3aed", "7": "#1a365d", "8": "#be185d"
+    "1": "#0f766e", "2": "#65a30d", "3": "#0284c7", "4": "#6366f1",
+    "5": "#7c3aed", "6": "#475569", "7": "#1e293b", "8": "#ca8a04"
   };
   var EN = function () { return window.TKI18N && window.TKI18N.lang === "en"; };
   var Lname = function (L) { return EN() && L.name_en ? L.name_en : L.name; };
@@ -312,6 +316,36 @@
     });
   }
 
+  /* ── 放大某层时列出该层的文章 ──────────────────────────────────
+   * 大圆上写着「82」，此前点它只是把视图放大，读者拿不到那 82 篇。
+   * 与覆盖矩阵同一条规则：聚合数字必须能钻取到明细（2026-09-24 反馈）。
+   * 数据现成 —— g.leaves 里就是该层的条目，不需要新接口。 */
+  var listHost = null;
+  function renderLayerList(g) {
+    if (!listHost) return;
+    if (!g) { listHost.hidden = true; listHost.innerHTML = ""; return; }
+    var items = (g.leaves || []).map(function (l) { return l.item; });
+    items.sort(function (a, b) { return (b.l || 0) - (a.l || 0); });
+    listHost.innerHTML = "";
+    var head = el("div", "pano-list-head");
+    head.innerHTML = "<b>" + esc(Lname(g.layer)) + "</b> · " + items.length +
+      (EN() ? " notes · " : " 篇 · ") + esc(Ltech(g.layer) || "");
+    listHost.appendChild(head);
+    var rows = el("div", "pano-list-rows");
+    items.forEach(function (it) {
+      var row = el("div", "pano-list-row");
+      var a = el("a", "pano-list-link", it.t);
+      a.title = it.t;
+      /* /?path= 是 SPA 唯一认的文章参数（矩阵清单同款，写别的会落回首页） */
+      a.href = "/?path=" + encodeURIComponent(it.p);
+      row.appendChild(a);
+      row.appendChild(el("span", "pano-list-words", (it.l || 0) + (EN() ? " words" : " 字")));
+      rows.appendChild(row);
+    });
+    listHost.appendChild(rows);
+    listHost.hidden = false;
+  }
+
   /* ── 绘制 ──────────────────────────────────────────────────────── */
   var root, vb = { x: 0, y: 0, w: W, h: H };
   function draw(host) {
@@ -425,6 +459,7 @@
       vb = target;
       root.setAttribute("viewBox", vb.x.toFixed(1) + " " + vb.y.toFixed(1) + " " + vb.w.toFixed(1) + " " + vb.h.toFixed(1));
     } else lerpVB(target);
+    renderLayerList(g);
     syncFocusBar();
     syncCursors();
   }
@@ -586,6 +621,10 @@
     var lg = el("p", "pano-legend");
     lg.innerHTML = legendHTML();
     host.appendChild(lg);
+
+    listHost = el("div", "pano-layerlist");
+    listHost.hidden = true;
+    host.appendChild(listHost);
 
     if (!full) {
       requestAnimationFrame(function () {

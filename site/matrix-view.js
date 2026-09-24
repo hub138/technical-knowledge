@@ -36,8 +36,8 @@
    * #dc2626（--color-danger），与八层栈「缺口层」的红色标记撞语义，
    * 且 hw/net 同色。新的 1~6 号色见 panorama-view.js 的 LAYER。 */
   var LAYER_COLOR = {
-    hw: "#a16207", os: "#b45309", net: "#0e7490", data: "#0284c7",
-    dist: "#059669", app: "#7c3aed"
+    hw: "#0f766e", os: "#65a30d", net: "#0284c7", data: "#6366f1",
+    dist: "#7c3aed", app: "#475569"
   };
 
   /* 格子深浅：按篇数分档。

@@ -1163,7 +1163,7 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
         // PAPERNOTES_CATEGORY_ORDER），所以这里不需要再特判兜底桶。
         const catRow = categories.map((c) => `
           <button type="button" class="pn-cat" data-cat="${esc(c.name)}"
-            aria-pressed="${pn.cat === c.name ? "true" : "false"}">${esc(c.name)}
+            aria-pressed="${pn.cat === c.name ? "true" : "false"}">${esc(tr(c.name))}
             <b>${c.count.toLocaleString()}</b></button>`).join("");
         // 选中大类后展开它的子领域；没选就只显示大类。
         const active = categories.find((c) => c.name === pn.cat);
