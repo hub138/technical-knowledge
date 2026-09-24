@@ -42,7 +42,7 @@
 vault/                         可直接用 Obsidian 打开
   工程知识/                     六大技术领域，一个工程问题一页
   知识库管理/                   来源、更新、质量和维护规则
-  Clippings/                   原始剪藏，按要求完整保留
+Clippings/                   网页剪藏，Mac 端持续写入，站点自动归类
 site/                          HTTP 服务与 Markdown 渲染
 apps/agent-evaluation/         Agent 评估：把判断绑定到证据的设计约定与原型
 packages/agent-foundation/     会话、上下文、记忆、恢复与证据基础包

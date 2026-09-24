@@ -691,7 +691,7 @@ def display_label(value: str) -> str:
     return value.split("{{", 1)[0].strip()
 
 
-def excerpt(body: str, title: str) -> str:
+def excerpt(body: str, title: str, fallback: str = "") -> str:
     in_fence = False
     for raw in body.splitlines():
         line = raw.strip()
@@ -700,6 +700,9 @@ def excerpt(body: str, title: str) -> str:
             continue
         if in_fence or not line or line.startswith(("#", "|", "![", "> [!")):
             continue
+        if line.startswith("<iframe") or line.startswith("&lt;iframe"):
+            # 剪藏正文只有一段嵌入播放器时，摘要不能抓 iframe 属性当文案。
+            continue
         line = re.sub(r"^[-*+]\s+", "", line)
         line = re.sub(r"^\d+[.)]\s+", "", line)
         line = WIKILINK_RE.sub(lambda m: m.group(2) or Path(m.group(1)).stem, line)
@@ -707,7 +710,9 @@ def excerpt(body: str, title: str) -> str:
         line = re.sub(r"[*_`>]", "", line).strip()
         if line and line != title:
             return line[:190]
-    return ""
+    # 纯视频剪藏正文只有 iframe，没有可读文字；退回 frontmatter 的
+    # description（Obsidian 剪藏器抓的原文简介）。
+    return fallback[:190]
 
 
 def openmaic_auth_cookie(access_code: str, issued_at_ms: int | None = None) -> str:
@@ -1288,6 +1293,10 @@ class Vault:
                 continue
             front, body = parse_frontmatter(text)
             parts = rel.split("/")
+            title = scalar(front.get("title"), path.stem)
+            tags = front.get("tags", [])
+            if not isinstance(tags, list):
+                tags = [str(tags)] if tags else []
             if parts[0] == "工程知识" and len(parts) > 2:
                 category = parts[1]
                 topic = parts[2] if len(parts) > 3 else "概览"
@@ -1296,19 +1305,21 @@ class Vault:
                 topic = parts[1] if len(parts) > 2 else "概览"
             elif parts[0] == "Clippings":
                 category = "Clippings"
-                topic = "剪藏"
+                # Mac 端 Obsidian Web Clipper 持续往这里写新文章（自动同步），
+                # topic 不能写死「剪藏」：取 tags 里除通用标签 clippings 之外的
+                # 第一个，Mac 端按主题打标即可归位；没打标就归「剪藏」。
+                clip_tags = [str(t) for t in tags if str(t) != "clippings"]
+                topic = clip_tags[0] if clip_tags else "剪藏"
             else:
                 category = "总览"
                 topic = "首页"
-            title = scalar(front.get("title"), path.stem)
-            tags = front.get("tags", [])
-            if not isinstance(tags, list):
-                tags = [str(tags)] if tags else []
             # 知识库管理记录的是维护方法、工具和变更日志，不是技术知识本身。
             # 它的文章照常可读，但不进图谱：图谱表达"工程知识之间怎么连"，
             # 混入维护资料会把领域间的真实关系淹掉。
+            # Clippings 同理：外部剪藏文章是别人的内容归档，不是本库产出的
+            # 工程知识，混进图谱会把领域间真实关系淹掉，也不参与关系推断。
             # 按 category 判定而不是只认 frontmatter，新增文章无需作者记得加字段。
-            exclude_from_graph = truthy(front.get("exclude_from_graph")) or category == "知识库管理"
+            exclude_from_graph = truthy(front.get("exclude_from_graph")) or category in {"知识库管理", "Clippings"}
             notes[rel] = {
                 "path": rel,
                 "title": title,
@@ -1327,6 +1338,12 @@ class Vault:
                 "review_at": scalar(front.get("review_at"), ""),
                 "change_rate": scalar(front.get("change_rate"), ""),
                 "confidence": scalar(front.get("confidence"), ""),
+                # 剪藏元数据：仅 Clippings 文章有值，/api/notes 按分类挑着输出。
+                # wiki 链接语法剥掉展示层（[[oil欧呦]] → oil欧呦）。
+                "clip_author": scalar(front.get("author")).replace("[[", "").replace("]]", ""),
+                "clip_published": scalar(front.get("published")),
+                "clip_source": scalar(front.get("source")),
+                "clip_description": scalar(front.get("description")),
                 "tags": tags,
                 "sources": front.get("sources", []) if isinstance(front.get("sources", []), list) else [],
                 "body": body,
@@ -1795,8 +1812,10 @@ def render_markdown(body: str, vault: Vault, current: str) -> str:
                 kind = marker.group(1).lower()
                 block.tag = "aside"
                 block.attrSet("class", f"callout {kind}")
-                first.content = first.content[marker.end():]
-                first.meta["callout_title"] = kind.title()
+                heading, separator, content = first.content[marker.end():].partition("\n")
+                titles = {"note": "说明", "tip": "提示", "info": "信息", "warning": "注意", "danger": "风险", "important": "重要", "example": "示例", "quote": "引用"}
+                first.meta["callout_title"] = heading.strip() or titles.get(kind, kind.title())
+                first.content = content if separator else ""
             quotes.append(block.tag)
         elif block.type == "blockquote_close":
             block.tag = quotes.pop()
@@ -1806,7 +1825,7 @@ def render_markdown(body: str, vault: Vault, current: str) -> str:
     def inline_rule(tokens, index, options, env):
         block = tokens[index]
         title = block.meta.get("callout_title")
-        prefix = f"<strong>{html.escape(title)}</strong> " if title else ""
+        prefix = f'<span class="callout-title">{render_inline(title, vault, current)}</span>' if title else ""
         return prefix + render_inline(block.content, vault, current)
 
     def code_rule(tokens, index, options, env):
@@ -2585,7 +2604,18 @@ class Handler(BaseHTTPRequestHandler):
                     continue
                 public = {k: v for k, v in n.items() if k not in {"body", "mtime", "listed"}}
                 body = str(n["body"])
-                public["excerpt"] = excerpt(body, str(n["title"]))
+                public["excerpt"] = excerpt(body, str(n["title"]), str(n["clip_description"]))
+                # 剪藏文章的元数据：原文作者、发布日期、原文链接。iframe 白名单
+                # 已保证 B 站正文可播放，这里把「文章从哪来」也交代清楚。
+                if n["category"] == "Clippings":
+                    clip_src = n["clip_source"]
+                    public["clip"] = {
+                        "author": n["clip_author"],
+                        "published": n["clip_published"],
+                        "source": clip_src,
+                        "description": n["clip_description"],
+                        "kind": ("video" if clip_src and ("bilibili.com/video" in clip_src or "player.bilibili.com" in clip_src) else "page"),
+                    }
                 # The frontend searches over search_text and hashes it to detect
                 # changes, so it stays in the payload until search moves server-side.
                 # 截到 600 字符：全量 body 让 /api/notes 膨胀到 2.3MB，经
@@ -2593,7 +2623,7 @@ class Handler(BaseHTTPRequestHandler):
                 # 页面拿到残缺 JSON 就变成"暂时读不到"。本地浅搜索 600
                 # 字符足够；深度检索走 /api/search。
                 # 截断长度可由环境变量调：默认 600（本地直连无传输限制，
-                # 浅搜索够用）；公网受限链路上（如办公网对非标端口的字节
+                # 公网经 ~700KB 掐断）。受限链路上（如办公网对非标端口的字节
                 # 上限）调小让 /api/notes 整体过线，深度检索走 /api/search。
                 cap = int(os.environ.get("KNOWLEDGE_SEARCH_TEXT_CAP") or 600)
                 public["search_text"] = body[:cap]
@@ -2862,6 +2892,21 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json({"error": "note not found"}, 404)
                 return
             public = {k: v for k, v in note.items() if k not in {"body", "mtime", "listed"}}
+            # 剪藏元数据收拢成 clip 对象（与 /api/notes 同构），
+            # clip_* 内部字段名不进前端。
+            if note["category"] == "Clippings":
+                clip_src = note["clip_source"]
+                public["clip"] = {
+                    "author": note["clip_author"],
+                    "published": note["clip_published"],
+                    "source": clip_src,
+                    "description": note["clip_description"],
+                    "kind": ("video" if clip_src and ("bilibili.com/video" in clip_src or "player.bilibili.com" in clip_src) else "page"),
+                }
+            public.pop("clip_author", None)
+            public.pop("clip_published", None)
+            public.pop("clip_source", None)
+            public.pop("clip_description", None)
             rendered = render_markdown(str(note["body"]), self.vault, rel)
             public["html"] = re.sub(r"^<h1\b[^>]*>.*?</h1>\s*", "", rendered, count=1, flags=re.DOTALL)
             public["raw"] = str(note["body"])

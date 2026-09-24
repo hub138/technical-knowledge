@@ -8,6 +8,7 @@ created: 2026-08-28
 description: 如何用Obsidian管理好自己的AI知识库？, 视频播放量 104、弹幕量 0、点赞数 10、投硬币枚数 2、收藏人数 5、转发人数 1, 视频作者 March-春节不贾, 作者简介 AI智能体，微信：March00912，相关视频：Codex联动Obsidian，搭建卡帕西同款知识库，手把手教程，深入理解AI Agent设计原理与工程实践！如果不想看书，可以看我的视频！这是一本书，大家可以去github上找！，Obsidian邪修用法，免费云同步，AI，手机端，进阶技巧，ClaudeFable5对产品经理的影响？，手把手教你用Claude Code和Obsidian搭建本地AI知识库！，个人知识库怎么搭？最简单Obsidian入门教程【保姆级教学】，AI一键搭建Obsidian知识库架构和学习路径，从0开始学习并精通任何一个知识领域。，Hermes+Obsidian+LLM wkii，构建AI知识库，我是如何用obsidian+AI做知识管理&内容创作的？🤔，我的微信和Obsidian终于打通了！
 tags:
   - clippings
+  - "知识管理"
 ---
 <iframe width="560" height="315" src="https://player.bilibili.com/player.html?bvid=BV1Ghjz6VEe2&amp;page=1&amp;high_quality=1&amp;danmaku=0" title="Bilibili video player" frameborder="0" allowfullscreen=""></iframe>
 

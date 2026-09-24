@@ -639,7 +639,31 @@
 .reader-body blockquote>p:last-child{margin-bottom:var(--space-2)}
 .reader-body blockquote{margin:var(--space-5) 0;border-left:3px solid var(--color-accent);padding:var(--space-1) var(--space-4);color:inherit;background:var(--color-surface)}
 .reader-body a{color:var(--color-accent)}
-.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--color-line);border-radius:var(--radius-sm)}
+.reader-body img{max-width:100%;max-height:600px;object-fit:contain;border:1px solid var(--color-line);border-radius:var(--radius-sm)}
+.reader-image{display:block;margin:var(--space-5) 0}
+.reader-image img{display:block;margin:0 auto}
+.reader-image-tools{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-2);font-size:var(--text-body);line-height:var(--leading-normal)}
+.reader-image-status{margin-right:auto;color:var(--color-muted)}
+.reader-image-open,.reader-image-retry{min-height:44px;padding:var(--space-2) var(--space-3);border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-panel);color:var(--color-accent);font:inherit;cursor:pointer}
+.reader-image-open:hover,.reader-image-retry:hover{border-color:var(--color-accent);background:var(--color-accent-soft)}
+.reader-image-retry[hidden]{display:none}
+.reader-image[data-state="error"]{padding:var(--space-4);border:1px solid var(--color-warm-line);border-radius:var(--radius-sm);background:var(--color-warn-soft)}
+.reader-image[data-state="error"] img{display:none}
+.reader-body .callout-title{display:block;margin-bottom:var(--space-2);font-weight:var(--weight-bold)}
+.reader-outline{width:min(560px,calc(100vw - 32px));max-height:80vh;padding:0;border:1px solid var(--color-line);border-radius:var(--radius-lg);background:var(--color-panel);color:var(--color-ink);box-shadow:var(--shadow-lg);overscroll-behavior:contain}
+.reader-outline::backdrop{background:var(--color-overlay)}
+.reader-outline-head{display:flex;align-items:center;justify-content:space-between;gap:var(--space-4);padding:var(--space-4);position:sticky;top:0;background:var(--color-panel);border-bottom:1px solid var(--color-line);z-index:1}
+.reader-outline-head h2{margin:0;font-size:var(--text-h3)}
+.reader-outline-head button{min-height:44px;padding:var(--space-2) var(--space-3);border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-panel);color:var(--color-ink);font:inherit;cursor:pointer}
+.reader-outline-head button:hover{background:var(--color-accent-soft);border-color:var(--color-accent)}
+.reader-outline ul{list-style:none;margin:0;padding:var(--space-2)}
+.reader-outline a{display:block;padding:var(--space-3);min-height:44px;line-height:var(--leading-normal);font-size:var(--text-body);color:var(--color-ink-soft);overflow-wrap:anywhere}
+.reader-outline a[data-level="3"]{padding-left:var(--space-6)}
+.reader-outline a[data-level="4"]{padding-left:var(--space-8)}
+.reader-outline a:hover,.reader-outline a:focus-visible{background:var(--color-accent-soft);color:var(--color-accent);border-radius:var(--radius-sm)}
+#reader-outline-trigger[hidden]{display:none}
+@media(min-width:1200px){#reader-outline-trigger{display:none}}
+@media print{.reader-image-tools,.reader-outline{display:none}.reader-image[data-state="error"]{display:none}}
 .reader-body code{background:var(--color-surface);color:var(--color-accent-ink);border:1px solid var(--color-accent-line);border-radius:var(--radius-xs);padding:1px var(--space-1);font-family:var(--font-mono);font-size:1em}
 .reader-body .code-block,.reader-body pre.mermaid{background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-ink);border-radius:var(--radius-sm);padding:var(--space-4);overflow:auto;font-size:var(--text-body);line-height:1.65;overflow-wrap:normal}
 .reader-body .code-block code,.reader-body pre.mermaid code{background:none;border:0;padding:0;color:inherit;font-size:inherit}
@@ -1382,11 +1406,11 @@ body.tk-host .reader-sources a:hover,body.tk-host .reader-sources a:focus-visibl
 /* 文章页"知识图谱"区在正文之后：标题 16px（--text-body）、计数 13px（--text-small，micro 档只用于图形角标不做文字）；上边框与正文分隔，宽度收口到正文列（max-width 740px）与 .reader-body 一致。备份 .design/backup-index-rt22b.html */.search{max-width:480px;flex:0 1 480px;margin-left:auto;margin-right:118px}.topbar .reader-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none;margin:0 118px 0 12px}@media(max-width:760px){.topbar .reader-tools{margin:0}}/* 手机端无固定钮占位，118px 让位边距会把按钮行顶出容器 */.topbar .reader-back,.topbar .reader-study{white-space:nowrap}.article-relations{border-bottom:1px solid var(--color-line);padding:0 0 16px;margin:0 0 24px;max-width:740px}.article-relations-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.article-relations-heading{display:flex;align-items:baseline;gap:9px;min-width:0}.article-relations-head h3{margin:0;font-size:var(--text-body)}.article-relations-head span{color:var(--color-muted);font-size:var(--text-small)}.relation-collapse{width:28px;height:28px;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-muted);cursor:pointer;font-size:var(--text-md);line-height:1}.relation-collapse:hover{border-color:var(--color-accent);background:var(--color-accent-soft);color:var(--color-accent)}.relation-graph{display:block;width:100%;height:245px;overflow:visible}/* rt16 高度 205→245：配合两行卡（66px 卡高 + 78 间距）的 viewBox 250，原 205 裁掉三卡纵排底部。 *//* 连线语义就是"分隔线"，用边框 token：暗色下自动换成 #475569，
    不再像硬编码浅灰绿那样在深底上消失。 */
 .relation-edge{stroke:var(--color-line-strong);stroke-width:1.5;fill:none}/* 入链比延伸淡一档，保持两类边的区分。 */
-.relation-edge.incoming{stroke:var(--color-faint)}.relation-node{cursor:pointer}.relation-node rect{fill:var(--color-panel);stroke:var(--color-line);stroke-width:1.2}.relation-node.current rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.5}.relation-node:hover rect,.relation-node:focus rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.8}.relation-node .relation-node-title{fill:var(--color-ink);font-size:var(--text-sm);font-weight:700}.relation-node .relation-node-meta{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:600}.relation-node.current .relation-node-meta{fill:var(--color-accent)}.relation-label{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.04em}.article-relations.collapsed .relation-graph{display:none}.article-relations.collapsed{padding-bottom:10px}/* 窄桌面（≤1240px）文章视图：顶栏一行装不下「搜索框+四枚操作按钮+语言+主题」，搜索框 flex-shrink 无下限被压到 36px 只剩 ⌘K 片悬着（1024 实测 input 52px）。改为整行换行：搜索独占第一行，按钮与语言、主题落第二行；换行态搜索行右侧预留 118px 给固定定位的中文/主题控件（882-1002px 实测压在通栏搜索条上）。:has 限定文章视图（操作按钮可见），首页不受影响。 */@media(max-width:1240px){.topbar:has(#reader-actions:not([hidden])){flex-wrap:wrap;row-gap:8px}.topbar:has(#reader-actions:not([hidden])) .search{flex:1 1 100%;max-width:none;margin:0 118px 0 0}.topbar:has(#reader-actions:not([hidden])) .reader-tools{margin:0}}/* 文章页移动端首屏收口（2026-09-23 排版审计）：工具按钮从两列 grid
+.relation-edge.incoming{stroke:var(--color-faint)}.relation-node{cursor:pointer}.relation-node rect{fill:var(--color-panel);stroke:var(--color-line);stroke-width:1.2}.relation-node.current rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.5}.relation-node:hover rect,.relation-node:focus rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.8}.relation-node .relation-node-title{fill:var(--color-ink);font-size:var(--text-sm);font-weight:700}.relation-node .relation-node-meta{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:600}.relation-node.current .relation-node-meta{fill:var(--color-accent)}.relation-label{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.04em}.article-relations.collapsed .relation-graph{display:none}.article-relations.collapsed{padding-bottom:10px}/* 窄桌面（≤1240px）文章视图：顶栏一行装不下「搜索框+四枚操作按钮+语言+主题」，搜索框 flex-shrink 无下限被压到 36px 只剩 ⌘K 片悬着（1024 实测 input 52px）。改为整行换行：搜索独占第一行，按钮与语言、主题落第二行；换行态搜索行右侧预留 118px 给固定定位的中文/主题控件（882-1002px 实测压在通栏搜索条上）。:has 限定文章视图（操作按钮可见），首页不受影响。 */@media(max-width:1240px){.topbar:has(#reader-actions:not([hidden])){flex-wrap:wrap;row-gap:8px}.topbar:has(#reader-actions:not([hidden])) .search{flex:1 1 100%;max-width:none;margin:0 118px 0 0}.topbar:has(#reader-actions:not([hidden])) .reader-tools{margin:0;max-width:100%;overflow-x:auto;justify-content:flex-start}}/* 文章页移动端首屏收口（2026-09-23 排版审计）：工具按钮从两列 grid
    改为单行横滑——原 183px 的 topbar 里按钮独占 69px 第二行。
    阅读工具（返回/下载/已读/学习）是低频操作，一行滑过即可，
    不值得在每一屏的顶部占一整行。 */
-@media(max-width:760px){.topbar{flex-wrap:wrap}.topbar .search{order:1;max-width:none;flex:1 0 100%}.topbar .reader-tools{order:2;width:100%;display:flex;flex-wrap:nowrap;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.topbar .reader-tools::-webkit-scrollbar{display:none}.topbar .reader-back,.topbar .reader-study,.topbar .reader-tool{flex:none;text-align:center;white-space:nowrap}.relation-graph{height:390px}.article-relations-heading{align-items:flex-start;flex-direction:column;gap:1px}}
+@media(max-width:760px){.topbar{flex-wrap:wrap}.topbar .search{order:1;max-width:none;flex:1 0 100%}.topbar .reader-tools{order:2;width:100%;display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}.topbar .reader-tools::-webkit-scrollbar{height:var(--space-1)}.topbar .reader-back,.topbar .reader-study,.topbar .reader-tool{flex:none;text-align:center;white-space:nowrap}.relation-graph{height:390px}.article-relations-heading{align-items:flex-start;flex-direction:column;gap:1px}}
 .topbar .theme-toggle{width:auto;min-width:36px;height:36px;margin:0;padding:0 12px;border:1px solid var(--color-line);border-radius:6px;background:var(--color-panel);color:var(--color-muted);font-size:var(--text-lg);cursor:pointer;flex-shrink:0}.topbar .theme-toggle:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}
 .radar-badge{position:relative;border:2px solid var(--color-warm);background:linear-gradient(135deg,var(--color-warm-soft) 0%,rgba(250,243,232,.3) 100%);border-radius:7px;padding:9px 11px;margin:8px 8px 4px;cursor:pointer;transition:all var(--duration-fast) var(--ease-out);box-shadow:0 2px 8px rgba(168,95,45,.15)}
 .radar-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(168,95,45,.25);border-color:var(--color-warm)}
@@ -1407,7 +1431,8 @@ body.tk-host .reader-sources a:hover,body.tk-host .reader-sources a:focus-visibl
 <a class="skip-link" href="#reader-body">跳到正文</a>
 <div class="app">
 <aside class="tk-sidebar" id="tk-sidebar"></aside>
-<main class="main"><header class="topbar"><!-- 搜索框：结构=base.css .tk-search 规范（皮肤唯一真源）+ 本地放置类 .search（flex-basis 480→620 伸长）。皮肤规则零本地。input 必须带 type="search"：皮肤选择器是 .tk-search input[type="search"]，缺了它整套皮肤失效（rt12 修复：曾因漏写导致 input 以浏览器默认样式裸奔 183px、图标与 ⌘K 悬空）。 --><label class="tk-search search"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span><input type="search" id="search" placeholder="输入即筛选 · 回车搜索" autocomplete="off"><kbd class="tk-search-kbd" id="search-kbd">⌘K</kbd></label><div class="reader-tools" id="reader-actions" hidden><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><button id="reader-download" class="reader-tool" type="button" title="下载这篇的 Markdown 原文">下载 .md</button><button id="reader-learned" class="reader-tool reader-learned" type="button" aria-pressed="false" title="标记这篇为已读（只保存在本浏览器）">✓ 标记已学</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div>
+<main class="main"><header class="topbar"><!-- 搜索框：结构=base.css .tk-search 规范（皮肤唯一真源）+ 本地放置类 .search（flex-basis 480→620 伸长）。皮肤规则零本地。input 必须带 type="search"：皮肤选择器是 .tk-search input[type="search"]，缺了它整套皮肤失效（rt12 修复：曾因漏写导致 input 以浏览器默认样式裸奔 183px、图标与 ⌘K 悬空）。 --><label class="tk-search search"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span><input type="search" id="search" placeholder="输入即筛选 · 回车搜索" autocomplete="off"><kbd class="tk-search-kbd" id="search-kbd">⌘K</kbd></label><div class="reader-tools" id="reader-actions" hidden><button id="reader-outline-trigger" class="reader-tool" type="button" aria-haspopup="dialog" aria-controls="reader-outline" aria-expanded="false" hidden>本文目录</button><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><button id="reader-download" class="reader-tool" type="button" title="下载这篇的 Markdown 原文">下载 .md</button><button id="reader-learned" class="reader-tool reader-learned" type="button" aria-pressed="false" title="标记这篇为已读（只保存在本浏览器）">✓ 标记已学</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div>
+<dialog id="reader-outline" class="reader-outline" aria-labelledby="reader-outline-title"><header class="reader-outline-head"><h2 id="reader-outline-title">本文目录</h2><button type="button" id="reader-outline-close" autofocus>关闭</button></header><nav aria-label="本文章节"><ul id="reader-outline-list"></ul></nav></dialog>
 <div class="progress-bar" id="progress-bar" aria-hidden="true"></div>
 <button type="button" class="kbd-hint" id="kbd-hint" title="键盘快捷键（Shift+/）" aria-label="查看键盘快捷键"><kbd aria-hidden="true">?</kbd></button>
 <div class="kbd-overlay" id="kbd-overlay" role="dialog" aria-modal="true" aria-labelledby="kbd-title" hidden>
@@ -1723,7 +1748,7 @@ function renderDirectory(){
     if(days<=30)return enLang?(days+' days left'):('剩 '+days+' 天到期');
     return '';
   };
-  const metaLine=n=>[showTopicInMeta?n.topic:'',TKShell.fmtWords(n.words),n.change_rate?tr(CHANGE_RATE_TEXT[n.change_rate]||n.change_rate):'',dueText(n)].filter(Boolean).map(v=>esc(v)).join(' · ');
+  const metaLine=n=>[(n.clip&&n.clip.author)?n.clip.author:'',showTopicInMeta?n.topic:'',TKShell.fmtWords(n.words),n.change_rate?tr(CHANGE_RATE_TEXT[n.change_rate]||n.change_rate):'',dueText(n)].filter(Boolean).map(v=>esc(v)).join(' · ');
   const sections=[...groups].sort(([a],[b])=>groupRank(a)-groupRank(b)||a.localeCompare(b,'zh-CN')).map(([g,items])=>{
     const rows=items.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h3>${mark(n.title)}</h3><div class="path">${metaLine(n)}</div></div><p>${q?mark(n.excerpt||''):esc(n.excerpt||'')}</p></article>`).join('');
     return `<section class="topic-section"><h3 class="topic-title"><span>${esc(g==='总览'?'入口':g)}</span><small>${items.length}</small></h3>${rows}</section>`;
@@ -2432,6 +2457,22 @@ function renderSources(sources,papers){
   const more=rest.length?('<span class="source-more" hidden>'+sep+rest.map(link).join(sep)+'</span><button type="button" class="source-toggle" aria-expanded="false">还有 '+rest.length+' 个</button>'):'';
   return block+'<span class="source-line"><b>'+esc(tr('来源'))+'</b> <span class="source-list">'+shown.map(link).join(sep)+'</span>'+more+'</span>';
 }
+/* 剪藏文章的来源行：原文链接 + 作者 + 发布日期，与 renderSources 同一层渲染。
+ * renderSources 只吃 sources（工程笔记的引用列表），剪藏文章没有这个字段，
+ * 需要独立的渲染路径，否则「这篇文章从哪来」在页面上无处交代。 */
+function renderClipSource(clip){
+  if(!clip)return '';
+  const tr=TKShell.tr;
+  const parts=[];
+  if(clip.source&&/^https?:\/\//.test(clip.source)){
+    parts.push('<a href="'+esc(clip.source)+'" title="'+esc(clip.source)+'" target="_blank" rel="noreferrer">'+esc(sourceLabel(clip.source))+'</a>');
+  }
+  if(clip.author)parts.push(esc(clip.author));
+  if(clip.published)parts.push(esc(clip.published));
+  if(!parts.length)return '';
+  const en=(window.TKI18N&&window.TKI18N.lang==='en');
+  return '<span class="source-line"><b>'+esc(tr('原文'))+'</b> <span class="source-list">'+parts.join('<span class="source-sep">·</span>')+'</span></span>';
+}
 function applyHomeStatus(){const titleOf=card=>{const h=card&&card.querySelector('h3');return h?h.textContent:null};const cards=[...document.querySelectorAll('#home .work-card')],classroom=cards.find(card=>titleOf(card)==='OpenMAIC'),tutor=cards.find(card=>titleOf(card)==='DeepTutor'),status=state.learningStatus;/* The chip carries the state, so its colour has to as well. A service that is
    down used to render in the same green as one that is up — the text said
    ｜未启动｜ and the styling said ｜正常｜. `tone` is one of ok / warn / unknown
@@ -2467,7 +2508,7 @@ function applySearchQuery(q){
   show('directory');renderDomains();renderDirectory();
 }
 function clearSearch(){state.query='';$('#search').value=''}
-function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}clearSearch();state.domain=domain;state.topic=topic;state.selected=null;if(domain!=='all'&&domain!=='Clippings')state.expandedDomains.add(domain);show('directory');renderDomains();renderDirectory();expandActiveDomain();if(matchMedia('(max-width:760px)').matches)collapseMobileSidebar();if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}
+function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}clearSearch();state.domain=domain;state.topic=topic;state.selected=null;if(domain!=='all')state.expandedDomains.add(domain);show('directory');renderDomains();renderDirectory();expandActiveDomain();if(matchMedia('(max-width:760px)').matches)collapseMobileSidebar();if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}
 function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch(err){return s}}
 /* 侧边栏、主题、反馈三件事都由 site/shell.js 提供，工作台页面调的是同一份。
    这里只负责主站特有的两件事：域树挂在侧边栏里，以及图谱是页内视图要拦下点击。 */
@@ -2696,6 +2737,7 @@ function renderReaderRails(note){
   /* 没有可列标题就撤掉整个目录栏：一个只有"本文目录"四个字的空框
      既占位又没有动作，比没有更糟（待核验内容这类短文实测）。 */
   toc.hidden=heads.length===0;
+  renderReaderOutline(heads);
   toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('')+'</ul>';
   /* 目录跳转后焦点随迁到目标标题（tabindex=-1 仅在缺省时补），键盘用户按 Tab 从正文继续，不再弹回目录区。 */
   toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateReaderHeading(a.getAttribute('href').slice(1),true)});
@@ -2746,8 +2788,8 @@ function renderReaderRails(note){
     const head=rail.querySelector('.rail-head');
     const btn=rail.querySelector('.rail-toggle');
     const flip=()=>{const c=rail.classList.toggle('collapsed');if(btn){btn.setAttribute('aria-expanded',String(!c));btn.textContent=c?'▸':'▾'}syncRailToggleLabels()};
-    if(btn)btn.onclick=flip;
-    if(head)head.onclick=e=>{if(e.target.closest('a'))return;flip()};
+    if(btn)btn.onclick=e=>{e.stopPropagation();flip()};
+    if(head)head.onclick=e=>{if(e.target.closest('a,button'))return;flip()};
   });
 }
 /* ── 上一篇 / 下一篇（2026-09-24 反馈）──────────────────────────────
@@ -2872,9 +2914,82 @@ async function copyReaderText(button,status,source){
     if(!copied)status.textContent=readerText('复制失败，请检查浏览器剪贴板权限','Copy failed. Check clipboard permissions.');
   }
 }
+const readerOutlineWide=matchMedia('(min-width:1200px)');
+function renderReaderOutline(heads){
+  const dialog=$('#reader-outline'),trigger=$('#reader-outline-trigger'),list=$('#reader-outline-list');
+  if(dialog.open)dialog.close();
+  trigger.hidden=heads.length===0;
+  trigger.textContent=readerText('本文目录','On this page');
+  $('#reader-outline-title').textContent=trigger.textContent;
+  $('#reader-outline-close').textContent=readerText('关闭','Close');
+  list.innerHTML=heads.map(h=>`<li><a href="#${esc(h.id)}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('');
+  trigger.onclick=()=>{dialog.showModal();trigger.setAttribute('aria-expanded','true')};
+  $('#reader-outline-close').onclick=()=>dialog.close();
+  dialog.onclose=()=>trigger.setAttribute('aria-expanded','false');
+  dialog.onkeydown=event=>{
+    if(event.key!=='Tab')return;
+    const items=[...dialog.querySelectorAll('button,a[href]')].filter(el=>el.getClientRects().length);
+    const first=items[0],last=items[items.length-1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+  };
+  dialog.onclick=event=>{
+    const link=event.target.closest('a[href^="#"]');
+    if(link){
+      if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+      event.preventDefault();dialog.close();navigateReaderHeading(link.getAttribute('href').slice(1),true);
+    }else if(event.target===dialog){
+      const rect=dialog.getBoundingClientRect();
+      if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)dialog.close();
+    }
+  };
+}
+readerOutlineWide.addEventListener('change',event=>{
+  const dialog=$('#reader-outline');
+  if(event.matches&&dialog.open){dialog.close();$('#reader-toc .rail-toggle')?.focus()}
+});
+function enhanceReaderImages(body){
+  body.querySelectorAll('img').forEach((image,index)=>{
+    if(image.closest('.reader-image')){image.dispatchEvent(new Event('reader-language'));return}
+    const source=image.getAttribute('src');
+    const url=new URL(source,location.href);
+    if(!['http:','https:'].includes(url.protocol))return;
+    const frame=document.createElement('span');frame.className='reader-image';frame.dataset.state='loading';
+    const tools=document.createElement('span');tools.className='reader-image-tools';
+    const status=document.createElement('span');status.className='reader-image-status';status.setAttribute('role','status');
+    const original=document.createElement('a');original.className='reader-image-open';original.href=source;original.target='_blank';original.rel='noopener noreferrer';
+    const retry=document.createElement('button');retry.type='button';retry.className='reader-image-retry';retry.hidden=true;
+    const update=()=>{
+      const failed=frame.dataset.state==='error';
+      original.textContent=readerText('查看原图','View original');
+      original.setAttribute('aria-label',readerText(`查看第 ${index+1} 张原图`,`View original image ${index+1}`));
+      retry.textContent=readerText('重新加载图片','Reload image');
+      retry.hidden=!failed;
+      status.textContent=failed?readerText('图片加载失败，请重新加载或查看原图','Image failed to load. Retry or view the original.'):
+        frame.dataset.retrying==='true'?readerText('正在加载图片…','Loading image…'):'';
+      if(failed)status.textContent+=' '+image.alt;
+    };
+    image.before(frame);frame.append(image,tools);tools.append(status,original,retry);
+    image.addEventListener('reader-language',update);
+    image.addEventListener('load',()=>{
+      const restore=document.activeElement===retry;
+      frame.dataset.state='ready';delete frame.dataset.retrying;update();
+      if(restore)original.focus({preventScroll:true});
+    });
+    image.addEventListener('error',()=>{frame.dataset.state='error';delete frame.dataset.retrying;update()});
+    retry.onclick=()=>{
+      frame.dataset.state='loading';frame.dataset.retrying='true';update();
+      image.src=source;
+      original.focus({preventScroll:true});
+    };
+    if(image.complete)frame.dataset.state=image.naturalWidth>0?'ready':'error';
+    update();
+  });
+}
 let readerScrollObserver=null;
 function enhanceReaderContent(){
   const body=$('#reader-body');
+  enhanceReaderImages(body);
   if(readerScrollObserver)readerScrollObserver.disconnect();
   body.querySelectorAll('.code-block').forEach((pre,index)=>{
     const code=pre.querySelector('code');
@@ -2928,7 +3043,7 @@ function restoreReaderPosition(){
   if(!id||!navigateReaderHeading(id))window.scrollTo({top:0,behavior:'instant'});
 }
 window.addEventListener('hashchange',()=>{if(state.view==='reader')restoreReaderPosition()});
-document.addEventListener('tk:lang',()=>{if(state.view==='reader')enhanceReaderContent()});
+document.addEventListener('tk:lang',()=>{if(state.view==='reader'){enhanceReaderContent();renderReaderOutline([...$('#reader-body').querySelectorAll('h2,h3,h4')])}});
 function updateReaderStudy(){const study=$('#reader-study'),title=$('#reader-title').textContent.trim(),visible=state.view==='reader'&&Boolean(title);study.hidden=!visible;study.href=visible?'/learn?topic='+encodeURIComponent(title):'/learn'}
 function updateReaderLearned(){const btn=$('#reader-learned');if(!btn)return;const path=state.selected;const on=TKShell.progress.statusOf(path)==='learned';btn.classList.toggle('on',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'✓ 已读':'标记已读'}
 function bindReaderLearned(){const btn=$('#reader-learned');if(!btn)return;btn.onclick=()=>{if(!state.selected)return;TKShell.progress.toggle(state.selected,'learned');updateReaderLearned()}}
@@ -2936,10 +3051,11 @@ async function openNote(path,push=true){if(path==='知识库首页.md'||path==='
   「核验于 X · 下次复查 Y」是同一类拼接串，同样按语言分支拼，日期本身不翻译。
   核验日期取 review_at（review_after.py squash 写回时留下），存量 452 篇一篇都还没有，
   缺失时回退 updated——读者要知道的是「这篇上次被人动过是哪天」，空着等于没说。
-  元信息行不再以字数为前提：字数为 0 的文章照样要显示核验日期与下次复查日期。 */const en=(window.TKI18N&&window.TKI18N.lang==='en');const today=new Date().toISOString().slice(0,10);const stale=n.review_after&&n.review_after<today;const verifiedAt=n.review_at||n.updated||'';$('#reader-meta').innerHTML=[TKShell.fmtWords(n.words),n.words?(en?('about '+Math.max(1,Math.round(n.words/400))+' min'):('约 '+Math.max(1,Math.round(n.words/400))+' 分钟')):'',verifiedAt?((en?'verified ':'核验于 ')+verifiedAt):'',n.review_after?((en?'next review ':'下次复查 ')+n.review_after):''].filter(Boolean).join(' · ')+(stale?('<span class="stale-badge" title="'+(en?'Review date passed; verify currency of facts':'复查日期已过，数字与结论请自行核对时效')+'">'+(en?'Review due':'需复查')+'</span>'):'');$('#reader-sources').innerHTML=renderSources(n.sources,n.papers);const srcMobile=$('#reader-sources-mobile');if(srcMobile)srcMobile.innerHTML=$('#reader-sources').innerHTML;bindSourceToggle();show('reader');updateReaderLearned();renderRelations(n);$('#reader-body').innerHTML=n.html;enhanceReaderContent();syncNavToNote(n);document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});const renderedMermaid=window.renderMermaid?window.renderMermaid():Promise.resolve();renderReaderRails(n);reportVisit();if(bindProgress.update)bindProgress.update();/* 【rt24】show('reader') 的 retranslate() 跑在渲染之前（空转），标题/图谱/同模块/正文都是渲染后才存在的节点。渲染收尾处补一次重译，文章页 EN 态整体生效。 */retranslate();if(push){const url=new URL(location.href);url.search='';url.searchParams.set('path',n.path);url.hash='';history.pushState({},'',url)}if(!location.hash)window.scrollTo({top:0,behavior:'instant'});await renderedMermaid;if(state.selected===n.path&&location.hash){await document.fonts.ready;restoreReaderPosition()}}catch(e){console.error(e);/* r19：失败只弹右下角 toast 有两处坑——初始 deep-link 打不开时内容区还挂着骨架屏（showLoading 的「正在读取知识库…」），读者面对假加载等待；toast 在 z-fab 层被「?」帮助按钮压住，5 秒后自动消失，两条出路都断。改为内容区常驻错误态（替换骨架屏/旧文章），返回按钮走 loadHome。 */
+  元信息行不再以字数为前提：字数为 0 的文章照样要显示核验日期与下次复查日期。 */const en=(window.TKI18N&&window.TKI18N.lang==='en');const today=new Date().toISOString().slice(0,10);const stale=n.review_after&&n.review_after<today;const verifiedAt=n.review_at||n.updated||'';/* 剪藏文章：元信息行最前补作者与发布日期（或「视频」标记），第一眼交代这是外部收藏与出处时间。 */const clipBits=n.clip?[n.clip.author||'',n.clip.published||'',(n.clip.kind==='video'?(en?'video':'视频'):'')].filter(Boolean).map(v=>esc(v)):[];$('#reader-meta').innerHTML=[...clipBits,TKShell.fmtWords(n.words),n.words?(en?('about '+Math.max(1,Math.round(n.words/400))+' min'):('约 '+Math.max(1,Math.round(n.words/400))+' 分钟')):'',verifiedAt?((en?'verified ':'核验于 ')+verifiedAt):'',n.review_after?((en?'next review ':'下次复查 ')+n.review_after):''].filter(Boolean).join(' · ')+(stale?('<span class="stale-badge" title="'+(en?'Review date passed; verify currency of facts':'复查日期已过，数字与结论请自行核对时效')+'">'+(en?'Review due':'需复查')+'</span>'):'');$('#reader-sources').innerHTML=renderSources(n.sources,n.papers)+(n.clip?renderClipSource(n.clip):'');const srcMobile=$('#reader-sources-mobile');if(srcMobile)srcMobile.innerHTML=$('#reader-sources').innerHTML;bindSourceToggle();show('reader');updateReaderLearned();renderRelations(n);$('#reader-body').innerHTML=n.html;enhanceReaderContent();syncNavToNote(n);document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});const renderedMermaid=window.renderMermaid?window.renderMermaid():Promise.resolve();renderReaderRails(n);reportVisit();if(bindProgress.update)bindProgress.update();/* 【rt24】show('reader') 的 retranslate() 跑在渲染之前（空转），标题/图谱/同模块/正文都是渲染后才存在的节点。渲染收尾处补一次重译，文章页 EN 态整体生效。 */retranslate();if(push){const url=new URL(location.href);url.search='';url.searchParams.set('path',n.path);url.hash='';history.pushState({},'',url)}if(!location.hash)window.scrollTo({top:0,behavior:'instant'});await renderedMermaid;if(state.selected===n.path&&location.hash){await document.fonts.ready;restoreReaderPosition()}}catch(e){console.error(e);/* r19：失败只弹右下角 toast 有两处坑——初始 deep-link 打不开时内容区还挂着骨架屏（showLoading 的「正在读取知识库…」），读者面对假加载等待；toast 在 z-fab 层被「?」帮助按钮压住，5 秒后自动消失，两条出路都断。改为内容区常驻错误态（替换骨架屏/旧文章），返回按钮走 loadHome。 */
 $('#reader-title').textContent=(window.TKI18N&&window.TKI18N.lang==='en')?'Note not found':'笔记不存在或无法打开';
 $('#reader-meta').textContent='';
 $('#reader-sources').innerHTML='';const srcMobile2=$('#reader-sources-mobile');if(srcMobile2)srcMobile2.innerHTML='';
+renderReaderOutline([]);
 const nfRail=$('#reader-siblings'),nfToc=$('#reader-toc');if(nfRail)nfRail.innerHTML='';if(nfToc)nfToc.innerHTML='';const nfPager=$('#reader-pager');if(nfPager){nfPager.innerHTML='';nfPager.hidden=true}const nfReward=$('#reader-reward');if(nfReward){nfReward.hidden=true;nfReward.classList.remove('on')}
 $('#reader-body').innerHTML=`<div class="empty" style="padding:42px 0"><p class="empty-title">${(window.TKI18N&&window.TKI18N.lang==='en')?'This note does not exist':'这篇文章不存在，可能已被移动或删除'}</p><p class="empty-hint">链接可能来自旧分享或输入有误。可以回到知识库首页，或用顶部搜索找相近内容</p><button type="button" class="empty-action" id="nf-home">${(window.TKI18N&&window.TKI18N.lang==='en')?'Back to home':'返回知识库首页'}</button></div>`;
 const nfHome=$('#nf-home');if(nfHome)nfHome.onclick=()=>loadHome(true);
@@ -3806,6 +3922,7 @@ function toggleThemeFromKeyboard(){
 function bindKeyboard(){
   let gPending=0;
   document.addEventListener('keydown',event=>{
+    if(event.defaultPrevented||event.target.closest('dialog[open]'))return;
     const tag=(event.target.tagName||'').toLowerCase();
     /* skip link 回车：浏览器默认锚点导航只滚动不落焦（焦点会丢给
      * 文章里第一个 id 命中的标题，r15 实测落 H2），Tab 会从标题续走。
@@ -3843,8 +3960,8 @@ function bindKeyboard(){
     if(key==='?'||(key==='/'&&event.shiftKey)){const kbdOv2=$('#kbd-overlay');kbdOverlay(!!(kbdOv2&&kbdOv2.classList.contains('open')));event.preventDefault();return}
     if(key==='/'){const searchBox2=$('#search');if(searchBox2)searchBox2.focus();event.preventDefault();return}
     if(key==='t'){toggleThemeFromKeyboard();event.preventDefault();return}
-    if(key==='j'||key==='ArrowDown'){moveSelection(1);event.preventDefault();return}
-    if(key==='k'||key==='ArrowUp'){moveSelection(-1);event.preventDefault();return}
+    if(state.view==='directory'&&(key==='j'||key==='ArrowDown')){moveSelection(1);event.preventDefault();return}
+    if(state.view==='directory'&&(key==='k'||key==='ArrowUp')){moveSelection(-1);event.preventDefault();return}
     // "g <letter>" 跳转。链式状态：第一次 g 只记时间并等待，
     // 第二次按键才查表 —— 但第二次也可能是 g（g g = 图谱），
     // 所以必须先查表再决定是否继续等待。

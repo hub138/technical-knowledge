@@ -8,6 +8,7 @@ created: 2026-09-20
 description: "我的 github：https://github.com/oil-oil"
 tags:
   - "clippings"
+  - "AI 编程工具"
 ---
 <iframe width="560" height="315" src="https://player.bilibili.com/player.html?bvid=BV11Sge6AEnM&amp;page=1&amp;high_quality=1&amp;danmaku=0" title="Bilibili video player" frameborder="0" allowfullscreen=""></iframe>
 

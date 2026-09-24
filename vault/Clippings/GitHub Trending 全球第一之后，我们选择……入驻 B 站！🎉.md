@@ -8,6 +8,7 @@ created: 2026-09-04
 description: "大家好，这里是 OpenMAIC，我们正式入驻 B 站啦！👋第一次见面，分享两个重磅消息：🏆 登顶 GitHub Trending 全球 TOP 1，收获 25K+ Stars🇺🇳 9 月 6 日，我们将带着 OpenMAIC 走进联合国！从一个关于“多智能体互动课堂”的开源构想，到收获 25K+ Stars、获得全球开发者的关注，再到即将登上更大的国际舞台——这一路，离不开每一位"
 tags:
   - "clippings"
+  - "AI 学习与成长"
 ---
 <iframe width="560" height="315" src="https://player.bilibili.com/player.html?bvid=BV1LFth6QE38&amp;page=1&amp;high_quality=1&amp;danmaku=0" title="Bilibili video player" frameborder="0" allowfullscreen=""></iframe>
 

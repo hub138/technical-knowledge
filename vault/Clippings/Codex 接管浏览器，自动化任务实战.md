@@ -8,6 +8,7 @@ created: 2026-09-20
 description: "Codex 接管浏览器，自动化任务实战, 视频播放量 50928、弹幕量 1、点赞数 565、投硬币枚数 105、收藏人数 1387、转发人数 208, 视频作者 oil欧呦, 作者简介 00年 AI  产品经理/前端工程师，infj 分享日常生活，产品设计心得，AI 实践技巧。交流答疑+ oil-oil6，相关视频：一个Skill 让 Agent 自动操作浏览器，告别重复枯燥任务，Codex接管浏览器、但不抢我的鼠标、你说神奇不神奇！！！，新手第一次用Codex，必装的7个超实用Skill，跨境Al运营神器，让Codex全全接管你的平台，官方教程！Codex 控制电脑帮你干活的三种方式，6分钟：普通人也能用上Codex（安装教程），这才是我想要的浏览器！纯干货，建议收藏！！！，我用 Codex 实测5个月：AI电商自动化到底卡在哪？，【2026最新codex使用教程】Codex+deepseek完成自动化办公+剪辑+PPT+作图+接入飞书，小白不会代码也能用Codex，附：文档，同济博一｜我的Codex论文辅助全流程"
 tags:
   - "clippings"
+  - "AI 编程工具"
 ---
 <iframe width="560" height="315" src="https://player.bilibili.com/player.html?bvid=BV1GH7z6VEj9&amp;page=1&amp;high_quality=1&amp;danmaku=0" title="Bilibili video player" frameborder="0" allowfullscreen=""></iframe>
 

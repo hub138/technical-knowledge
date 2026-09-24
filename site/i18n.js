@@ -74,7 +74,8 @@
     },
 
     // ── Article rail ──
-    "本文目录": { en: "On this page" },
+"本文目录": { en: "On this page" },
+    "本文章节": { en: "Sections of this note" },
     "同模块文章": { en: "More in this module" },
     "同模块上一篇下一篇": { en: "Previous and next in this module" },
     "我的阅读 ↗": { en: "My reading ↗" },
@@ -740,7 +741,15 @@
     // 标题/正文/链接三段按知识库管理卡同款补词条，EN 态不裸奔中文。
     "Clippings · 网页剪藏": { en: "Clippings · web clippings" },
     "从网页剪藏收藏的外部好文章，原文完整保留": { en: "External articles clipped from the web, kept in full" },
-    "打开剪藏区": { en: "Open the clippings" },
+"打开剪藏区": { en: "Open the clippings" },
+// 【2026-09-24】剪藏文章在阅读页/目录页展示作者与出处，这些标记要能翻译。
+    "原文": { en: "Original" },
+    "视频": { en: "video" },
+    "网页剪藏": { en: "Web clipping" },
+    "AI 编程工具": { en: "AI coding tools" },
+    "AI 设计": { en: "AI design" },
+    "AI 学习与成长": { en: "Learning AI" },
+    "知识管理": { en: "Knowledge management" },
     /* 总览=panorama 视图的维度标签（panorama-view.js），知识全景=导航项名。
        两者在 EN 态都用 Panorama 会撞车（审计报碰撞）；总览回退 Overview，
        概览已另译 Section overview，无冲突。 */

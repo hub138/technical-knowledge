@@ -221,7 +221,14 @@ class AuthenticationTests(unittest.TestCase):
         health = self.request("GET", "/health", headers={"Cookie": cookie})
         self.assertGreater(json.loads(health[2])["notes"], 100)
         note = self.request("GET", "/api/note?path=" + quote(note_path), headers={"Cookie": cookie})
-        self.assertIn("RAG", json.loads(note[2])["title"])
+        payload = json.loads(note[2])
+        self.assertIn("RAG", payload["title"])
+        # 文章页的元信息行要显示「核验于 · 下次复查」：review_at 由 review_after.py
+        # squash 写回，现存文章全都还没有，所以字段必须在（空串），页面据此回退 updated。
+        # 缺字段会让前端读到 undefined，整行静默消失
+        self.assertIn("review_at", payload)
+        self.assertIn("review_after", payload)
+        self.assertTrue(payload["updated"])
 
     def test_tool_redirects_do_not_trust_request_host(self) -> None:
         """重定向目标必须用服务端自己的 public_host(),不能信请求 Host 头
@@ -363,6 +370,59 @@ class AuthenticationTests(unittest.TestCase):
         finally:
             SERVER_MODULE.OPERATOR_PASSWORD = original
 
+    def test_freshness_panel_is_behind_the_same_operator_gate(self) -> None:
+        """知识保鲜板块的数据接口与中台其余接口同一把钥匙。
+
+        它读的是复查台账（谁认领了什么、哪几篇欠着复查），属于运营信息。
+        新增板块时最容易漏的就是这道门：接口挂在 /api/insights/ 下面才会被
+        那一段来源判定覆盖，另起一个前缀就等于开了后门。
+        """
+        original = SERVER_MODULE.OPERATOR_PASSWORD
+        SERVER_MODULE.OPERATOR_PASSWORD = "op-secret"
+        try:
+            status, _headers, body = self.request("GET", "/api/insights/freshness")
+            self.assertEqual(status, 403)
+            self.assertTrue(json.loads(body)["needs_operator_login"])
+
+            login = self.request(
+                "POST", "/auth/login",
+                json.dumps({"password": "test-password-only"}),
+                {"Content-Type": "application/json"},
+            )
+            site_cookie = login[1]["Set-Cookie"].split(";", 1)[0]
+            self.assertEqual(
+                self.request("GET", "/api/insights/freshness",
+                             headers={"Cookie": site_cookie})[0],
+                403,
+            )
+
+            connection = http.client.HTTPConnection("127.0.0.1", self.port, timeout=10)
+            connection.request(
+                "POST", "/auth/login",
+                json.dumps({"password": "op-secret"}),
+                {"Content-Type": "application/json"},
+            )
+            response = connection.getresponse()
+            set_cookies = response.msg.get_all("Set-Cookie") or []
+            response.read()
+            connection.close()
+            operator = next(
+                c.split(";")[0] for c in set_cookies if c.startswith("knowledge_site_operator=")
+            )
+            status, _headers, body = self.request(
+                "GET", "/api/insights/freshness", headers={"Cookie": operator}
+            )
+            self.assertEqual(status, 200)
+            payload = json.loads(body)
+            for key in ("due", "soon", "claimed", "week", "last_patrol", "tracked"):
+                self.assertIn(key, payload)
+            self.assertEqual(
+                set(payload["week"]), {"ok", "changed", "skip", "failed"}
+            )
+            self.assertGreater(payload["tracked"], 100)
+        finally:
+            SERVER_MODULE.OPERATOR_PASSWORD = original
+
     def test_digest_feature_site_cookie_forbidden(self) -> None:
         """站点密码持有者可以启动工具，但钉选头条是运营者专属（403）。"""
         original = SERVER_MODULE.OPERATOR_PASSWORD
@@ -439,6 +499,53 @@ class AuthenticationTests(unittest.TestCase):
                 response = self.request("GET", path)
                 self.assertEqual(response[0], 308)
                 self.assertEqual(response[1]["Location"], "/")
+
+
+class ClippingsTests(unittest.TestCase):
+    """剪藏文章的入库与输出。
+
+    剪藏由 Mac 端 Obsidian Web Clipper 持续写入（自动同步），
+    站点必须自动归类：主题取自 frontmatter 的 tags（除通用标签 clippings
+    之外的第一个），元数据（作者/发布日期/原文链接）进 /api/notes 与
+    /api/note，正文只有嵌入播放器时摘要退回 description。
+    这些断言盯的是数据契约，不是页面文案。
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.vault = SERVER_MODULE.Vault(ROOT / "vault")
+
+    def clips(self) -> list[dict]:
+        self.vault.refresh()
+        return [n for n in self.vault.notes.values() if n["category"] == "Clippings"]
+
+    def test_clips_are_listed_and_categorized(self) -> None:
+        """每篇剪藏都归在 Clippings 分类下，且都被列入笔记列表。"""
+        clips = self.clips()
+        self.assertTrue(clips, "vault 里应有剪藏文章")
+        for n in clips:
+            self.assertTrue(n["listed"], f"{n['path']} 未列入列表")
+
+    def test_topic_comes_from_tags(self) -> None:
+        """主题取 tags 里除 clippings 外的第一个；没打标退回「剪藏」。"""
+        clips = self.clips()
+        for n in clips:
+            extra = [str(t) for t in n["tags"] if str(t) != "clippings"]
+            expected = extra[0] if extra else "剪藏"
+            self.assertEqual(n["topic"], expected, f"{n['path']} 主题归类不符")
+
+    def test_clip_metadata_is_present(self) -> None:
+        """剪藏文章的原文链接必须解析出来（作者/日期允许为空）。"""
+        for n in self.clips():
+            self.assertTrue(
+                str(n["clip_source"]).startswith("http"),
+                f"{n['path']} 缺少原文链接",
+            )
+
+    def test_excluded_from_graph(self) -> None:
+        """剪藏是外部内容归档，不参与工程知识图谱与关系推断。"""
+        for n in self.clips():
+            self.assertTrue(n["exclude_from_graph"], f"{n['path']} 未排除出图谱")
 
 
 class VisitStatsTests(unittest.TestCase):

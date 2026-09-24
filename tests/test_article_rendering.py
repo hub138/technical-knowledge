@@ -71,6 +71,16 @@ class ArticleRenderingTests(unittest.TestCase):
                 checked += 1
         self.assertGreater(checked, 400)
 
+    def test_callout_keeps_custom_title_and_body(self):
+        document = self.render('知识库管理/归档/来源/实践证据/AI研发迭代框架案例.md')
+        callout = document.select_one('aside.callout.warning')
+        self.assertIsNotNone(callout)
+        title = callout.select_one('.callout-title')
+        self.assertEqual(title.get_text(), '证据边界')
+        self.assertEqual(len(callout.select('.callout-title')), 1)
+        self.assertIn('这是项目时期的证据快照', callout.get_text())
+        self.assertIn('已复现', [node.get_text() for node in callout.select('code')])
+
     def test_real_article_tables_and_code_remain_structured(self):
         document = self.render(LIST_NOTE)
         self.assertGreater(len(document.select('.code-block > code')), 0)

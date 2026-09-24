@@ -2,7 +2,7 @@
 title: 租约必须配合 Fencing Token 阻止过期持有者
 type: concept
 status: active
-updated: 2026-09-16
+updated: 2026-09-25
 review_after: 2027-02-28
 change_rate: low
 confidence: high
@@ -15,6 +15,10 @@ sources:
   - "https://man7.org/linux/man-pages/man2/fcntl.2.html"
   - "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html"
   - "[[工程知识/后端系统：在并发、失败与变化中维持服务/分布式可靠性/部分失败决定分布式系统的设计]]"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "清理条件句堆叠1处改独立陈述句，命中1到0，密度0.37达标维持1图"
 ---
 
 # 租约必须配合 Fencing Token 阻止过期持有者
@@ -35,7 +39,7 @@ sources:
 
 ## 正确的锁使用
 
-先判断是否真的需要分布式锁。创建唯一业务对象优先用数据库唯一约束，状态更新优先用版本号/CAS，任务分片优先用稳定 owner；这些机制直接保护业务不变量，通常比“先拿锁再写”更容易验证。只有多个进程必须独占一个无法原子更新的外部资源时，才进入租约设计。
+先判断业务是否真的需要分布式锁。创建唯一业务对象优先用数据库唯一约束，状态更新优先用版本号/CAS，任务分片优先用稳定 owner；这些机制直接保护业务不变量，通常比“先拿锁再写”更容易验证。多个进程必须独占一个无法原子更新的外部资源时，才进入租约设计。
 
 最常见的错误是把“锁还在”当作“旧持有者已经停止”。实例 A 暂停超过 TTL 后，实例 B 会取得新租约；A 恢复时仍可能继续写。因此续租只能降低过期概率，不能阻止旧 owner，最终必须由资源侧检查单调递增的 fencing token。
 
@@ -53,6 +57,18 @@ with open(lock_path, "a+") as handle:
 ## 为什么任务系统需要 fencing token
 
 仅有 TTL 的租约可能在网络暂停后出现旧持有者“复活”：新任务已经取得租约，旧任务仍向下游写入。每次成功取得租约生成单调递增的 fencing token，下游拒绝小于当前 token 的写入，才能阻止陈旧执行者。
+
+```mermaid
+graph TD
+    A["A 取得租约<br/>token = 41"] -->|"GC 暂停超 TTL"| P["租约过期"]
+    P --> B["B 取得新租约<br/>token = 42"]
+    B -->|"写 token 42"| S["存储记录最大 token = 42"]
+    A -.->|"恢复后写 token 41"| S
+    S -->|"41 < 42 拒绝"| R["旧持有者写不进去"]
+    S -->|"42 ≥ 42 接受"| OK["新持有者的写入有效"]
+```
+
+图的关键在存储那一格：它记下见过的最大 token，之后每次写入都拿 token 跟它比——41 小于 42，A 恢复后的写入被拒之门外。租约本身只能让「B 大概率拿到新租约」，拦不住「A 复活后接着写」；把「谁新谁旧」变成下游可验证的事实，靠的是单调 token 在每个写入点的检查。这也是为什么所有写入点都必须传递并检查 token：漏掉一个点，陈旧执行就从那里钻进去。
 
 ```text
 lease owner=A token=41  --暂停/过期-->

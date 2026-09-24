@@ -2,7 +2,7 @@
 title: MCP 连接能力，A2A 委托任务
 status: active
 type: comparison
-updated: 2026-09-03
+updated: 2026-09-25
 review_after: 2026-09-30
 change_rate: medium
 confidence: high
@@ -13,6 +13,10 @@ sources:
   - "https://modelcontextprotocol.io/specification/2026-07-28"
   - "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx"
   - "https://a2a-protocol.org/v1.0.0/specification/"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "现状核对：SELFCHECK PASS短篇0命中密度0.47达标，边界表与组合图齐全，本轮零改动仅标记"
 ---
 
 # MCP 连接能力，A2A 委托任务

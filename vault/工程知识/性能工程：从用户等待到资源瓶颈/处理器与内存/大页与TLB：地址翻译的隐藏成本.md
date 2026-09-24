@@ -2,7 +2,7 @@
 title: 大页与TLB：地址翻译的隐藏成本
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 review_after: 2027-09-22
 change_rate: low
 confidence: high
@@ -14,6 +14,10 @@ sources:
   - "https://www.kernel.org/doc/html/latest/admin-guide/mm/hugetlbpage.html"
   - "https://lwn.net/Articles/376606/"
   - "https://en.wikipedia.org/wiki/Page_table"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味2处：512倍改覆盖半径对照（4KB到2MB、16MB到8GB量级）"
 ---
 
 ## 要解决的问题
@@ -35,9 +39,9 @@ graph TD
 
 x86 用 MMU 缓存（PDE cache 等）缓解中间级，ARM 把中间级缓存在 walk cache。**数据访问的延迟里含着翻译延迟**，报表里看不到"TLB miss"单独一行，它藏在 cache miss 的阴影里（一次访存 miss 可能同时是 dTLB miss）。
 
-**大页的两种形态：Hugetlbfs 与 THP**。显式大页（Hugetlbfs / mmap MAP_HUGETLB）：启动时预留 2MB/1GB 物理大页池，应用显式 mmap，翻译项从"每 4KB 一项"降到"每 2MB 一项"，覆盖半径扩大 512 倍。透明大页（THP，Transparent Huge Pages）：内核在缺页时自动尝试用 2MB 页补齐（madvise(MADV_HUGEPAGE) 引导或 always 全局），无需应用改造。两种形态的取舍：显式大页可靠无碎片风险但要预留管理（数据库场景的标准配置，Oracle/PostgreSQL 文档都写明步骤）；THP 零改造但有碎片与延迟代价（分配时 compaction 抓狂、运行中 split/merge 抖动）。
+**大页的两种形态：Hugetlbfs 与 THP**。显式大页（Hugetlbfs / mmap MAP_HUGETLB）：启动时预留 2MB/1GB 物理大页池，应用显式 mmap，翻译项从"每 4KB 一项"降到"每 2MB 一项"，同样一项的覆盖半径从 4KB 扩到 2MB。透明大页（THP，Transparent Huge Pages）：内核在缺页时自动尝试用 2MB 页补齐（madvise(MADV_HUGEPAGE) 引导或 always 全局），无需应用改造。两种形态的取舍：显式大页可靠无碎片风险但要预留管理（数据库场景的标准配置，Oracle/PostgreSQL 文档都写明步骤）；THP 零改造但有碎片与延迟代价（分配时 compaction 抓狂、运行中 split/merge 抖动）。
 
-**TLB 分层与页大小收益的边界**。L1 dTLB 几十项、L2 STLB 几千项，2MB 页把两者覆盖半径放大 512 倍（L2 从 ~16MB 到 ~8GB 量级）。但收益只兑现在**访问的地址空间跨度大且局部性差**的工作负载：数据库随机扫描大堆、JVM 大堆 GC 扫描、HPC 大数组遍历。顺序小堆的工作负载（多数 Web 服务）TLB 本来就够用，开 THP 只有管理开销。判定靠 `perf stat -e dTLB-load-misses`（或 dtlb_load_misses.stlb_hit 比例）：miss 率高且工作集大才值得上大页。
+**TLB 分层与页大小收益的边界**。L1 dTLB 几十项、L2 STLB 几千项，2MB 页把每项的覆盖半径从 4KB 扩到 2MB，几千项 STLB 合计覆盖从 ~16MB 量级升到 ~8GB 量级。但收益只兑现在**访问的地址空间跨度大且局部性差**的工作负载：数据库随机扫描大堆、JVM 大堆 GC 扫描、HPC 大数组遍历。顺序小堆的工作负载（多数 Web 服务）TLB 本来就够用，开 THP 只有管理开销。判定靠 `perf stat -e dTLB-load-misses`（或 dtlb_load_misses.stlb_hit 比例）：miss 率高且工作集大才值得上大页。
 
 **碎片：大页的现实约束**。2MB 物理连续页在长期运行的系统上稀缺（内存碎片化），分配失败触发 compaction（迁移内存腾连续块，代价是暂停与 IO）。`/proc/buddyinfo` 看连续块分布，`/sys/kernel/mm/transparent_hugepage/` 看分配成功/失败统计。THP defrag 策略（always/defer/madvise）就是在这个代价与收益间的旋钮。
 

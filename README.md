@@ -56,7 +56,7 @@ after checking the official documentation, a paper, or a local run.
 vault/                         open directly in Obsidian
   工程知识/                     six domains, one note per engineering question
   知识库管理/                   sourcing, updating, quality and maintenance rules
-  Clippings/                   raw clippings, kept verbatim
+Clippings/                   web clippings, written from the Mac and auto-classified
 site/                          HTTP server and Markdown rendering
 apps/agent-evaluation/         Agent evaluation: bind judgments to evidence
 packages/agent-foundation/     sessions, context, memory, recovery, evidence

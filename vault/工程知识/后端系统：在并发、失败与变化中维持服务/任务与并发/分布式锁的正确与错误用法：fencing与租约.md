@@ -2,7 +2,7 @@
 title: 分布式锁的正确与错误用法：fencing与租约
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 review_after: 2027-09-22
 change_rate: medium
 confidence: high
@@ -14,6 +14,10 @@ sources:
   - "https://martin.kleppmann.com/2016/02/08/how-to-do-distributed-locking.html"
   - "https://redis.io/docs/latest/develop/use/patterns/distributed-locks/"
   - "https://www.usenix.org/legacy/publications/library/proceedings/osdi04/tech\_docs/full\_papers/mccord\_pal/mccord\_pal\_html/"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "清理极值判断1处改普通陈述，命中1到0，密度0.32达标维持1图"
 ---
 
 # 分布式锁的正确与错误用法：fencing与租约
@@ -56,7 +60,7 @@ graph TD
 
 - **先问“锁失效会怎样”再选实现**。答案“浪费但不坏” → 效率锁，Redis SETNX TTL 即可。答案“数据腐败” → 正确性锁，fencing 或共识系统 + fencing，或干脆改设计（把互斥需求消掉：单队列消费、数据库唯一约束、幂等设计）。
 - **“用 ZK 就安全”是错觉，会话复活问题依旧**。ZK 解决脑裂（锁不会被两人同时持有），不解决持有者暂停后过期写（那是 fencing 的活）。正确性锁的完整形态：共识锁服务 + fencing token + 存储验证。
-- **第三方 API 场景的正确性靠幂等不靠锁**。外部支付、发短信等不可 fencing 的资源，分布式锁只是“减少并发”的软手段，真正保证唯一的是幂等键（业务侧唯一 ID，下游去重）。锁 + 幂等双保险，不要单押锁。
+- **第三方 API 场景的正确性靠幂等不靠锁**。外部支付、发短信等不可 fencing 的资源，分布式锁只是“减少并发”的软手段，唯一性由幂等键保证（业务侧唯一 ID，下游去重）。锁 + 幂等双保险，不要单押锁。
 - **看门狗续租不是安全机制**。Redisson 的看门狗（自动续租）让锁“看起来一直有效”，但它延长的是失效概率不是消除（暂停复活时看门狗同样暂停）。看门狗优化效率锁的可用性，对正确性锁无补。
 
 ## 验证

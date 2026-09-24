@@ -15,6 +15,10 @@ sources:
   - "https://www.rfc-editor.org/rfc/rfc793"
   - "https://www.serverfault.com/questions/202860/what-is-the-cost-of-many-sockets-in-time-wait"
   - "https://vincent.bernat.ch/en/2011-tcp-time-wait-state"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "基线三项全绿（PASS/短篇0.49达标/0命中）现状良好仅标记"
 ---
 
 # TIME_WAIT是连接收尾的代价与设计

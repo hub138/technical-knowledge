@@ -2,7 +2,7 @@
 title: Raft选举与日志复制把共识变成工程实现
 type: concept
 status: active
-updated: 2026-09-21
+updated: 2026-09-25
 review_after: 2027-09-21
 change_rate: low
 confidence: high
@@ -14,6 +14,10 @@ tags:
   - "distributed-systems/consensus"
   - "distributed-systems/consensus"
   - "distributed-systems"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "现状核对：SELFCHECK PASS密度0.88达标0命中，两幅etcd官方与论文Figure2外链图带来源齐全，六维信号词与就地上链完整，本轮零改动仅标记"
 ---
 
 # Raft选举与日志复制把共识变成工程实现

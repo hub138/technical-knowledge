@@ -2,7 +2,7 @@
 title: NUMA让跨槽访问付出带宽与延迟代价
 type: concept
 status: active
-updated: 2026-09-21
+updated: 2026-09-25
 confidence: high
 change_rate: low
 review_after: 2029-03-21
@@ -15,11 +15,15 @@ sources:
   - "https://www.hpl.hp.com/techreports/2012/HPL-2012-61.pdf"
   - "https://akkadia.org/drepper/cpumemory.pdf"
   - "https://www.kernel.org/doc/html/latest/admin-guide/mm/numapolicy.html"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味1处首段二分对照改直陈；密度0.46达标图不动"
 ---
 
 # NUMA让跨槽访问付出带宽与延迟代价
 
-多路服务器不是一块统一的内存挂在所有 CPU 上，而是每个 CPU 槽位独占本地内存、通过互联总线访问别人的内存。要解决的问题：线程跑在 A 槽、数据分配在 B 槽，每次访存都要穿过互联总线，带宽减半、延迟翻倍，而这类损失在常规指标里不可见——top 看不出内存是远程的，必须用 NUMA 视角的工具才能看到。
+多路服务器里每个 CPU 槽位独占本地内存，访问别的槽位要过互联总线。要解决的问题：线程跑在 A 槽、数据分配在 B 槽，每次访存都要穿过互联总线，带宽减半、延迟翻倍，而这类损失在常规指标里不可见——top 看不出内存是远程的，必须用 NUMA 视角的工具才能看到。
 
 ## 机制：本地内存与远程内存的代价表
 

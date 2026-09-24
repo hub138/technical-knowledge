@@ -2,7 +2,7 @@
 title: conntrack 表满不丢连接的判定：计数、桶与协议差异
 status: active
 type: mechanism
-updated: 2026-09-23
+updated: 2026-09-25
 change_rate: low
 confidence: high
 review_after: 2029-09-23
@@ -12,11 +12,15 @@ tags:
 sources:
   - "https://wiki.nftables.org/wiki-nftables/index.php/Conntrack"
   - "https://www.kernel.org/doc/Documentation/networking/nf_conntrack-sysctl.txt"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味2处三件套概念包装；补水位分级处置图1张（无图长文类）"
 ---
 
 # conntrack 表满不丢连接的判定：计数、桶与协议差异
 
-> **要点**：连接跟踪表的容量判据是 `nf_conntrack_count` 逼近 `nf_conntrack_max`（水位 70% 预警、90% 行动），溢出的直接症状是"新连接被静默丢弃、老连接正常"——读 count 与 max 的水位、按协议分别统计条目构成（TIME_WAIT 类短连接是膨胀主因），调参的三件套是上限、超时与桶数一起动。
+> **要点**：连接跟踪表的容量判据是 `nf_conntrack_count` 逼近 `nf_conntrack_max`（水位 70% 预警、90% 行动），溢出的直接症状是"新连接被静默丢弃、老连接正常"——读 count 与 max 的水位、按协议分别统计条目构成（TIME_WAIT 类短连接是膨胀主因），调参动上限、桶数、超时三处一起动。
 
 ## 要解决的问题：连接跟踪为什么存在，又为什么丢包
 
@@ -26,9 +30,23 @@ Netfilter 的连接跟踪（conntrack）为每条经过的连接在内核里建�
 
 **计数与水位**：`nf_conntrack_count` 是当前条目数，`nf_conntrack_max` 是上限——**水位判定线**：持续 70% 以上预警（扩容窗口开启）、90% 以上行动（调参或限流）、100% 即丢包。`/proc/sys/net/netfilter/nf_conntrack_count` 与 `cat /proc/sys/net/netfilter/nf_conntrack_max` 两个文件是第一现场，`conntrack -S` 看 per-CPU 统计（insert_failed 计数非零即在丢）。
 
+count 对 max 的水位决定处置动作的档位，丢包只在最后一级：
+
+```mermaid
+flowchart TB
+    a["count 对 max<br/>的水位"] --> b1["低于 70%<br/>正常观察"]
+    a --> b2["70% 以上<br/>预警 扩容窗口开启"]
+    a --> b3["90% 以上<br/>行动 调参或限流"]
+    a --> b4["100%<br/>新连接建包被丢"]
+    b2 --> c["降超时 先于 升上限<br/>短连接条目是膨胀主因"]
+    b3 --> c
+```
+
+图回答的是水位分级的处置次序：70% 与 90% 两级预警给的是提前量，动作先降超时再动上限，insert_failed 计数是丢包的实证信号。
+
 **条目的构成统计**：`conntrack -L | awk '{print $4}' | sort | uniq -c` 按协议状态统计——**膨胀的主因通常是 TIME_WAIT/短连接类条目**：每个 HTTP 短请求建一条 conntrack，条目存活到超时（默认 tcp timeout_time_wait 120 秒），QPS 万级的短连接服务几分钟就能灌满默认 65536 的表。**分别统计的意义**：确认膨胀来源（短连接 vs UDP 洪水 vs 扫描流量），不同来源的处理动作不同。
 
-**超时参数是第二调节阀**：条目的生存期按状态分档（`nf_conntrack_tcp_timeout_time_wait`、`_established`、`_close_wait` 等）——**降超时是比升上限更优先的动作**：TIME_WAIT 120 秒降到 30 秒，同样流量下条目数降为四分之一；established 超时（默认 432000 秒 = 5 天）对大量半开失效连接的表尤其值得压。**上限、桶数、超时三件套**：`nf_conntrack_max` 升高的同时要核 `nf_conntrack_buckets`（哈希桶数，建议与 max 同量级或 max/4 起，桶太少查表 CPU 飙升）、按业务超时节奏调状态超时——**单动 max 是最常见的半截调参**。
+**超时参数是第二调节阀**：条目的生存期按状态分档（`nf_conntrack_tcp_timeout_time_wait`、`_established`、`_close_wait` 等）——**降超时是比升上限更优先的动作**：TIME_WAIT 120 秒降到 30 秒，同样流量下条目数降为四分之一；established 超时（默认 432000 秒 = 5 天）对大量半开失效连接的表尤其值得压。**上限、桶数、超时三处一起动**：`nf_conntrack_max` 升高的同时要核 `nf_conntrack_buckets`（哈希桶数，建议与 max 同量级或 max/4 起，桶太少查表 CPU 飙升）、按业务超时节奏调状态超时——**单动 max 是最常见的半截调参**。
 
 **不走 conntrack 的旁路**：纯内部可信流量（监控拨测、健康检查、本机回环）可用 raw 表 NOTRACK 豁免——**豁免是精简不是优化**：每条豁免的连接不占表容量，但也不受状态防火墙保护，豁免范围要白名单化并留文档。
 

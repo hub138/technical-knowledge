@@ -13,6 +13,10 @@ sources:
 tags:
   - performance/gpu
   - systems
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "基线三项全绿（PASS/达标0.34/0命中）现状良好仅标记"
 ---
 
 # GPU 性能取决于计算、访存、并行与通信

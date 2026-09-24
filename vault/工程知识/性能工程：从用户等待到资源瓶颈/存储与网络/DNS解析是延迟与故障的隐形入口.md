@@ -2,7 +2,7 @@
 title: DNS解析是延迟与故障的隐形入口
 type: concept
 status: active
-updated: 2026-09-21
+updated: 2026-09-25
 review_after: 2027-09-21
 change_rate: low
 confidence: high
@@ -14,6 +14,10 @@ tags:
   - "networking"
   - "performance/network"
   - "software/resilience"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "补量级与TTL两本账应用段；补冷热解析路径分流图1张"
 ---
 
 # DNS解析是延迟与故障的隐形入口
@@ -33,7 +37,23 @@ tags:
 
 每一层都能贡献延迟或错误：本地缓存 TTL 过期触发完整递归；递归解析器过载或丢包导致 SERVFAIL；权威侧按地理位置返回不同 IP（GeoDNS），跨地域容灾切换靠改这里。缓存是双刃剑：TTL 长则故障切换慢，TTL 短则解析负载与延迟上升。
 
+看完能判断的量级：递归解析未命中时的耗时按链路跳数累加——根、TLD、权威各一跳，每跳一个 RTT，公网链路单跳常见几十毫秒，冷解析几百毫秒是常态量级（实测命令见验证节 dig +trace）；命中本地缓存后是微秒到毫秒级，两者差两到三个数量级，这就是「高频域名务必吃缓存」的账。TTL 取值的两本账：TTL 从 3600 改到 60，解析流量涨约一个数量级（权威侧 QPS 按缓存命中率反推），换来故障切换从小时级缩到分钟级；Cloudflare 与 Google 公共递归的工程实践中，生产域名 TTL 常见 60-300 秒档，切换要求快的（蓝绿发布）取下限、稳定域名取上限。
+
 ## 三类故障模式
+
+解析请求的两条路径在跳数与耗时上的分岔：
+
+```mermaid
+flowchart TB
+    a["getaddrinfo"] --> b{"本地缓存"}
+    b -->|"命中 TTL 内"| c["微秒到毫秒级<br/>不产生网络流量"]
+    b -->|"未命中"| d["根一跳"]
+    d --> e["TLD 一跳"]
+    e --> f["权威一跳"]
+    f --> g["合计三个 RTT<br/>几十到几百毫秒"]
+```
+
+图回答的是冷热两条解析路径的耗时差从哪来：命中缓存的请求不出主机，未命中的请求逐级委托三跳、每跳付一个 RTT，量级差两到三个数量级。
 
 | 模式 | 表象 | 根因层 |
 | --- | --- | --- |

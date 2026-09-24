@@ -2,7 +2,7 @@
 title: 任务分解的质量决定 Agent 的上限
 type: principle
 status: active
-updated: 2026-09-24
+updated: 2026-09-25
 review_after: 2027-01-15
 change_rate: high
 confidence: high
@@ -13,10 +13,10 @@ tags:
 sources:
   - "https://arxiv.org/abs/2308.08155"
   - "https://www.anthropic.com/research/building-effective-agents"
-editorial_pass: 1
-editorial_at: 2026-09-24
+editorial_pass: 2
+editorial_at: 2026-09-25
 editorial_by: agent-A
-editorial_note: "清二分对照、条件句与路标比较句共四处，图与内容不动"
+editorial_note: "补大任务双路径图1张密度0.56达标"
 ---
 
 # 任务分解的质量决定 Agent 的上限
@@ -35,6 +35,16 @@ editorial_note: "清二分对照、条件句与路标比较句共四处，图与
 - 测试没跑通就报告完成
 
 **失败原因在任务太大。** 一个需要 20 步、每步都有分支的任务，让模型"一次想清楚"，等于让它同时持有 20 个未决决策——它只能草率地全部猜掉。
+
+```mermaid
+flowchart TB
+    a["同一个任务<br/>拆出用户模块"] --> b1["不分解直做<br/>12 个文件一次改"]
+    a --> b2["按产出分解<br/>7 步各带验收"]
+    b1 --> c1["改 12 文件<br/>测试未跑通即报完成"]
+    b2 --> c2["每步有完成标志<br/>错误在早期暴露"]
+```
+
+图回答的是任务大小怎么决定结果：一次性持有的未决决策数量决定草率程度，分解把 20 个未决决策拆成 7 个带验收的小步。
 
 ## 方案：先分解，再逐步执行
 

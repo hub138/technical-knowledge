@@ -8,6 +8,7 @@ created: 2026-09-20
 description: "学了几个月Agent，有感而发"
 tags:
   - "clippings"
+  - "AI 学习与成长"
 ---
 <iframe width="560" height="315" src="https://player.bilibili.com/player.html?bvid=BV1WpbW62Eg3&amp;page=1&amp;high_quality=1&amp;danmaku=0" title="Bilibili video player" frameborder="0" allowfullscreen=""></iframe>
 

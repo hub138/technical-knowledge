@@ -8,6 +8,7 @@ created: 2026-09-20
 description: "如何使用 AI 做出顶级的 UI 设计, 视频播放量 7189、弹幕量 8、点赞数 391、投硬币枚数 248、收藏人数 1012、转发人数 112, 视频作者 oil欧呦, 作者简介 00年 AI  产品经理/前端工程师，infj 分享日常生活，产品设计心得，AI 实践技巧。交流答疑+ oil-oil6，相关视频：2026最新Figma零基础完全入门教程 | 零基础学会Figma | Ul设计入门教程，我如何从 0 到 1 成为 AI 产品经理？，这个skill，让AI做出顶级审美的图表，选哪个？iPhone 18 Pro&Duo深度上手，怎么才能vibe code出来漂亮的UI？（二），如何 Vibe Coding 有设计感的个人网站？，如何快速让 AI 复刻任何网页设计？，液态玻璃前端 ui，如何还原 GPT Image 2 做的的 UI 设计稿?，怎么用 GPT Image 2 做稳定的 UI 设计？"
 tags:
   - "clippings"
+  - "AI 设计"
 ---
 <iframe width="560" height="315" src="https://player.bilibili.com/player.html?bvid=BV1nbe16SESV&amp;page=1&amp;high_quality=1&amp;danmaku=0" title="Bilibili video player" frameborder="0" allowfullscreen=""></iframe>
 

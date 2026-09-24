@@ -12,6 +12,10 @@ tags:
 sources:
   - "https://man7.org/linux/man-pages/man1/df.1.html"
   - "https://man7.org/linux/man-pages/man1/lsof.8.html"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "基线三项全绿（PASS/达标0.31/0命中）现状良好仅标记"
 ---
 
 # df 与 du 的差值就是被占住的已删文件：磁盘占用异常的三个来源

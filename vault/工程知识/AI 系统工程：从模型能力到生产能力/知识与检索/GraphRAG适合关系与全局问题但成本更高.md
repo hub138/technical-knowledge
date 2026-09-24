@@ -2,7 +2,7 @@
 title: GraphRAG 适合关系与全局问题但成本更高
 type: concept
 status: active
-updated: 2026-09-03
+updated: 2026-09-25
 review_after: 2026-12-03
 change_rate: medium
 confidence: medium
@@ -14,11 +14,15 @@ sources:
   - "https://arxiv.org/abs/2404.16130"
   - "https://github.com/microsoft/graphrag"
   - "https://arxiv.org/abs/2401.18059"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "清理条件句与套话触发词各1处（改直接陈述与逐条核对表述），命中2到0，密度0.82维持2图现状不动图"
 ---
 
 # GraphRAG 适合关系与全局问题但成本更高
 
-它的边界是：只有当问题需要跨文档关系、社区或全局聚合时，图结构才值得承担构建和更新成本；局部事实、精确查值和高频实时状态不应强行图化。验证时要把关系边、摘要和原文逐条对齐，并与 hybrid RAG 比较质量、延迟、更新滞后和运维成本。
+它的边界是：问题需要跨文档关系、社区或全局聚合时，图结构值得承担构建和更新成本；局部事实、精确查值和高频实时状态不应强行图化。验证时要把关系边、摘要和原文逐条核对，并与 hybrid RAG 比较质量、延迟、更新滞后和运维成本。
 
 GraphRAG 在文档实体和关系上构图，并通过社区发现、层次摘要或图遍历回答“全局主题、关系链和跨文档聚合”问题。它不是把所有 RAG 都换成图：精确查值、简单语义问答和实时状态通常仍应优先 SQL、倒排、向量或 API。
 

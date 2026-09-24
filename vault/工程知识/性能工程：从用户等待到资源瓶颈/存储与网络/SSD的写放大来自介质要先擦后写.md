@@ -2,7 +2,7 @@
 title: SSD的写放大来自介质要先擦后写
 type: concept
 status: active
-updated: 2026-09-21
+updated: 2026-09-25
 confidence: high
 change_rate: low
 review_after: 2029-03-21
@@ -15,6 +15,10 @@ sources:
   - "https://flashdba.com/2014/04/16/understanding-selfish-page-modes/"
   - "https://www.usenix.org/legacy/event/fast08/tech/full_papers/lee/lee.pdf"
   - "https://en.wikipedia.org/wiki/Write_amplification"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "1处命中为擦除块对齐硬件术语误报保留；图0.80达标不动"
 ---
 
 # SSD的写放大来自介质要先擦后写

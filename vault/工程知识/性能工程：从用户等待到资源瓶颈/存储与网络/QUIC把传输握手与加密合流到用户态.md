@@ -2,7 +2,7 @@
 title: QUIC把传输握手与加密合流到用户态
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 confidence: high
 change_rate: medium
 review_after: 2028-09-22
@@ -15,11 +15,15 @@ sources:
   - "https://www.rfc-editor.org/rfc/rfc9000"
   - "https://www.rfc-editor.org/rfc/rfc9001"
   - "https://blog.cloudflare.com/http3-the-past-present-and-future/"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味1处抽象名词做主语；2图0.64已达标不动"
 ---
 
 # QUIC把传输握手与加密合流到用户态
 
-传输协议在内核里走了四十年，QUIC（RFC 9000，2021 年标准化）把它搬到用户态 UDP 之上重做了一遍。要解决的问题：TCP 的握手与 TLS 的握手是两条链，连接建立时间是两者相加；TCP 层一个丢包会卡住这条连接上所有 HTTP 流（队头阻塞跨层泄漏）；协议行为改一次要等内核发版，演进周期以年计。QUIC 的本质是把传输层从内核抽到用户态库，一次重构同时处理这三件事。
+传输协议在内核里走了四十年，QUIC（RFC 9000，2021 年标准化）把它搬到用户态 UDP 之上重做了一遍。要解决的问题：TCP 的握手与 TLS 的握手是两条链，连接建立时间是两者相加；TCP 层一个丢包会卡住这条连接上所有 HTTP 流（队头阻塞跨层泄漏）；协议行为改一次要等内核发版，演进周期以年计。QUIC 把传输层从内核抽到用户态库，一次重构同时处理这三件事。
 
 ## 机制：三条改造与各自的代价
 
@@ -30,6 +34,16 @@ sources:
 | 握手合流 | TCP 1-RTT 与 TLS 1-RTT 串行 | 传输与加密一次握完，1-RTT 建连 | 传输头自带加密，中间盒无法审计，调试要专用工具 |
 | 队头阻塞 | TCP 丢一个段，连接上所有流卡住 | 流间独立，丢包只阻塞所在流 | 每流独立丢包检测状态，实现复杂度上升 |
 | 演进速度 | 改内核，周期以年计 | 用户态库随应用发布 | 失去内核 TCP fast path 与硬件卸载优化 |
+
+![TCP+TLS 时代的连接建立：TCP 三次握手与 TLS 握手串行进行，请求要等两条链走完（取自 Cloudflare《HTTP/3: the past, the present, and the future》，https://blog.cloudflare.com/http3-the-past-present-and-future/）](https://blog.cloudflare.com/_image?href=https%3A%2F%2Fblog.cloudflare.com%2F_emdash%2Fapi%2Fmedia%2Ffile%2F01KW44C99K9HK86VRFN0ZFYM3G.png&w=715&h=734&f=webp&fit=cover&position=center)
+
+这张图数出来是八步：TCP 三次握手三步，TLS 握手三到四步，最后才是 HTTP 请求与响应——前六步都在为「能开始传业务数据」做准备。串行是延迟的主因，每一步都要一个完整的往返。
+
+## 验证
+
+![QUIC 把传输与加密握手套进同一次往返，四个包之后就能发 HTTP 请求（取自 Cloudflare《HTTP/3: the past, the present, and the future》，https://blog.cloudflare.com/http3-the-past-present-and-future/）](https://blog.cloudflare.com/_image?href=https%3A%2F%2Fblog.cloudflare.com%2F_emdash%2Fapi%2Fmedia%2Ffile%2F01KW44QBZX9KAGJ4SDGG0DMYWX.png&w=715&h=512&f=webp&fit=cover&position=center)
+
+对照上一张图：握手从八步压到四步，QUIC 包里每个包都自带加密帧，传输参数直接搭 TLS ClientHello 的车——「合流」在图上的形态就是两种握手共用同一串往返。往返次数减半之外，每个包都加密也让中间设备无法按明文头做审计，这是表里「调试要专用工具」的来源。
 
 收益与代价的权衡里最容易被忽略的一条：UDP 路径在企业网络与部分运营商处被限速或封禁，QUIC 部署必须保留 TCP 回退，服务端要同时维护两套协议实现，运维成本翻倍。Cloudflare 的部署报告给出了大规模实测的建连收益与回退比例，验证本文断言时值得对照。
 

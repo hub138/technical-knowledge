@@ -2,7 +2,7 @@
 title: 向量数据库不是 RAG 本身
 type: concept
 status: active
-updated: 2026-09-03
+updated: 2026-09-25
 review_after: 2026-12-03
 change_rate: medium
 confidence: high
@@ -14,6 +14,10 @@ sources:
   - "https://arxiv.org/abs/2401.08281"
   - "https://github.com/facebookresearch/faiss/wiki/Getting-started"
   - "https://github.com/nmslib/hnswlib"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "现状核对：SELFCHECK PASS密度0.62达标0命中，HNSW分层图与全链路边界图齐全，三层定位python示例与调优顺序账齐全，本轮零改动仅标记"
 ---
 
 # 向量数据库不是 RAG 本身

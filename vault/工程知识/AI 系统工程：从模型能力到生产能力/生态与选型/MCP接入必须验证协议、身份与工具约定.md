@@ -2,7 +2,7 @@
 title: MCP 接入必须验证协议、身份与工具约定
 type: reference
 status: active
-updated: 2026-09-03
+updated: 2026-09-25
 review_after: 2026-09-30
 change_rate: high
 confidence: high
@@ -15,11 +15,15 @@ sources:
   - "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx"
   - "https://blog.modelcontextprotocol.io/posts/mcp-roadmap/"
   - "[[工程知识/AI 系统工程：从模型能力到生产能力/生态与选型/AI技术动态]]"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "清两处只有才能条件句，MRTR段补往返时序图（input_required挂起+幂等键比对防重复写入），密度0.24偏薄修正为0.45达标，命中2到0"
 ---
 
 # MCP 接入必须验证协议、身份与工具约定
 
-可以把 MCP 作为大 Agent 的一个子模块：业务代码仍由普通函数、HTTP 或数据库接口组成，只有需要跨应用发现、共享或隔离部署的能力才通过 MCP 暴露。只知道 JSON 配置并不等于可以安全上线；你还必须验证服务身份、能力协商、输入输出 schema、权限、副作用、超时和版本兼容。
+可以把 MCP 作为大 Agent 的一个子模块：业务代码仍由普通函数、HTTP 或数据库接口组成，需要跨应用发现、共享或隔离部署的能力通过 MCP 暴露，其余留在进程内。只知道 JSON 配置并不等于可以安全上线；你还必须验证服务身份、能力协商、输入输出 schema、权限、副作用、超时和版本兼容。
 
 ## 从基础到演进
 
@@ -50,6 +54,17 @@ sources:
 ### 原理：MRTR 如何替代服务器主动请求
 
 当工具在执行中需要用户确认或补充参数，2026-07-28 服务器返回 `resultType: "input_required"`，客户端带 `inputResponses` 重试原始调用。重试必须具备幂等键和原请求摘要校验，防止用户确认后重复写入；对于长任务，按 SEP-2663 的 Tasks extension（需协商/显式启用）使用 `tasks/get`、`tasks/update`、`tasks/cancel`，不要把任务状态藏在传输 session 中。
+
+```mermaid
+flowchart TD
+    C["客户端发起工具调用<br/>携带幂等键"] --> S["server 执行中<br/>需要用户确认"]
+    S --> R["返回 input_required<br/>调用挂起不写入"]
+    R --> U["用户补充确认<br/>客户端组装 inputResponses"]
+    U --> S2["重试原始调用<br/>同一幂等键+原请求摘要"]
+    S2 --> K{"幂等键比对<br/>已写入过？"}
+    K -->|"未写入"| W["执行并写入<br/>返回结果"]
+    K -->|"已写入"| N["直接返回上次结果<br/>不重复执行"]
+```
 
 验证的锚点：接入结论要与能力协商对账——预写客户端不会调用服务端未声明的能力、违反输入约束的参数被拒绝，任一项与预期对不上就是工具约定没有被核验。
 
@@ -145,7 +160,7 @@ graph TD
 
 ## 机制与本质
 
-MCP 接入的机制层：协议只标准化能力描述与调用传输，服务身份、授权范围、输入输出结构与副作用语义都由应用侧承担。配置文件描述的是某一次发现的结果，工具当前是否可用、参数是否合法、调用是否越权，只有在执行器里逐次核对才能成立，热更新之后立即交给模型使用会让这层核对失效。
+MCP 接入的机制层：协议只标准化能力描述与调用传输，服务身份、授权范围、输入输出结构与副作用语义都由应用侧承担。配置文件描述的是某一次发现的结果，工具当前是否可用、参数是否合法、调用是否越权，都要在执行器里逐次核对，热更新之后立即交给模型使用会让这层核对失效。
 
 ## 要解决的问题
 

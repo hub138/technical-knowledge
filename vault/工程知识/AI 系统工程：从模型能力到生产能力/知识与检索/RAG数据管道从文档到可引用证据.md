@@ -2,7 +2,7 @@
 title: RAG 数据管道从文档到可引用证据
 type: playbook
 status: active
-updated: 2026-09-03
+updated: 2026-09-25
 review_after: 2026-12-03
 change_rate: medium
 confidence: high
@@ -18,6 +18,10 @@ sources:
   - "https://iceberg.apache.org/"
   - "https://delta.io/"
   - "https://hudi.apache.org/"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "现状核对：SELFCHECK PASS密度0.45达标0命中，管道链路与官方图对照及七字段chunk元数据齐全，本轮零改动仅标记"
 ---
 
 # RAG 数据管道从文档到可引用证据

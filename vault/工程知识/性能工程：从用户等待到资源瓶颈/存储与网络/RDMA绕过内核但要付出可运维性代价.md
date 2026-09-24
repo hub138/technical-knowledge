@@ -15,6 +15,10 @@ sources:
   - "https://www.rdmaconsortium.org/home/transport-layer-choice/2.0%20Transport%20Layer%20Choice.htm"
   - "https://www.usenix.org/system/files/conference/atc18/atc18-mundkur.pdf"
   - "https://www.kernel.org/doc/html/latest/infiniband/verbs.html"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "基线三项全绿（PASS/短篇0.50达标/0命中）现状良好仅标记"
 ---
 
 # RDMA绕过内核但要付出可运维性代价

@@ -2,7 +2,7 @@
 title: TLS握手与证书链决定连接建立成本
 type: concept
 status: active
-updated: 2026-09-21
+updated: 2026-09-25
 review_after: 2027-09-21
 change_rate: low
 confidence: high
@@ -14,17 +14,36 @@ tags:
   - networking
   - security
   - performance/network
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味1处二分对照；2图0.80已达标不动"
 ---
 
 # TLS握手与证书链决定连接建立成本
 
-HTTPS 连接头几十毫秒去哪了？抓包看到的不是"网络慢"，是 TLS 握手：1-RTT（TLS 1.3）或 2-RTT（TLS 1.2）往返，加上证书链验证的非对称运算。要解决的问题：连接建立成本是尾延迟与弱网体验的隐藏贡献者，而握手参数（版本、套件、证书链长度、会话复用）决定了它是一次性还是每连接反复支付。
+HTTPS 连接头几十毫秒去哪了？抓包看到的那几十毫秒主要是 TLS 握手：1-RTT（TLS 1.3）或 2-RTT（TLS 1.2）往返，加上证书链验证的非对称运算。要解决的问题：连接建立成本是尾延迟与弱网体验的隐藏贡献者，而握手参数（版本、套件、证书链长度、会话复用）决定了它是一次性还是每连接反复支付。
 
 ## 机制：握手在算什么
 
 TLS 1.2 握手两轮往返：ClientHello → ServerHello+Certificate → 客户端验证证书链 → Finished。TLS 1.3 压到一轮：密钥交换与证书同飞，且砍掉了 RSA 密钥传输（只留椭圆曲线/临时 DH），前向安全性成为默认。
 
+```mermaid
+graph TD
+    A["TLS 1.2 · 2-RTT"] -->|"① ClientHello"| B["② ServerHello + Certificate"]
+    B -->|"③ ClientKeyExchange + Finished"| C["④ Server Finished"]
+    C -->|"两个完整往返后数据才开始"| D["应用数据"]
+    E["TLS 1.3 · 1-RTT"] -->|"① ClientHello 自带 KeyShare"| F["② ServerHello + Certificate + Finished"]
+    F -->|"③ Client Finished"| G["应用数据"]
+```
+
+两张时序对照着读：1.2 里客户端先空手探路，拿到服务端选择后第二趟才交密钥材料，两个完整往返；1.3 把密钥份额直接塞进第一个包（赌服务端会选 x25519，几乎总对），证书与 Finished 搭第二趟的车，一个往返完成。RTT 减半之外，RSA 密钥传输被砍掉意味着前向安全从可选项变成默认项——这是「砍掉一个往返」与「砍掉一类攻击」同时发生的改造。
+
 证书链验证是 CPU 大头：叶子证书 → 中间 CA → 根（内置于客户端信任库）。链越长验证越贵；服务器没发全中间证书，客户端要自己 AIA fetching 补链，弱网下多一个完整往返。
+
+![叶子证书到根证书的签发与验证链（Wikimedia Commons《Chain of trust》，作者 Yanpas，CC BY-SA 4.0，https://commons.wikimedia.org/wiki/File:Chain_of_trust.svg）](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Chain_of_trust.svg/1280px-Chain_of_trust.svg.png)
+
+图里每张证书有同样的四格结构，验证就是逐级用上一级的公钥验下一级的签名（sign 边），直到根证书——根用自己的钥匙签自己（self-sign），信任的起点是它预装在客户端信任库里。链上少发一张中间证书，客户端就要走 AIA fetching 现场补链，这正是弱网下握手变慢的常见原因。
 
 ## 会话复用把一次性成本摊薄
 

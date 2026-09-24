@@ -133,6 +133,12 @@ def main() -> None:
         ])
         note = next((line for line in out.splitlines() if "interaction cases" in line), out)
         results.append(("article-interactions", ok, note))
+        ok, out = run("article-navigation", [
+            PYTHON, str(ROOT / "scripts/article_navigation_media_audit.py"),
+            "--base", args.base, "--navigation-only",
+        ])
+        note = next((line for line in out.splitlines() if "navigation/media cases" in line), out)
+        results.append(("article-navigation", ok, note))
 
         # 3. Layout at three widths.
         ok, out = run("layout", [PYTHON, str(ROOT / "scripts/layout_audit.py"),

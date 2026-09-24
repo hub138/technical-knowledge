@@ -8,6 +8,7 @@ created: 2026-09-20
 description: "如何用 Codex 管理一个长期项目, 视频播放量 147968、弹幕量 17、点赞数 3298、投硬币枚数 1072、收藏人数 10850、转发人数 550, 视频作者 oil欧呦, 作者简介 00年 AI  产品经理/前端工程师，infj 分享日常生活，产品设计心得，AI 实践技巧。交流答疑+ oil-oil6，相关视频：Agent、Skill、Harness啥意思？一次性讲明白AI技术名词！，不要再用对话管理Codex了，从零开始，用 Codex 搭一个科研工作区，用codex之前一定要接入Github！，新手第一次用Codex，必装的7个超实用Skill，我把所有工作都搬进 Codex 了！它真不只是写代码，6分钟：普通人也能用上Codex（安装教程），从 LLM 到 Agent Skill，一期视频带你打通底层逻辑！，40分钟成为codex高级玩家 完整教程，Codex联动Obsidian，搭建卡帕西同款知识库，手把手教程"
 tags:
   - "clippings"
+  - "AI 编程工具"
 ---
 <iframe width="560" height="315" src="https://player.bilibili.com/player.html?bvid=BV1dY7S6yEQu&amp;page=1&amp;high_quality=1&amp;danmaku=0" title="Bilibili video player" frameborder="0" allowfullscreen=""></iframe>
 

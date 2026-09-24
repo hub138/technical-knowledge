@@ -2,7 +2,7 @@
 title: ECC内存把单比特错误挡在报告之前
 type: concept
 status: active
-updated: 2026-09-22
+updated: 2026-09-25
 confidence: high
 change_rate: low
 review_after: 2029-09-22
@@ -15,6 +15,10 @@ sources:
   - "https://web.archive.org/web/20210125084934/http://www.cs.toronto.edu/~bianca/papers/sigmetrics09.pdf"
   - "https://users.ece.utexas.edu/~adnan/pubs/bhattacharya-asplos24.pdf"
   - "https://en.wikipedia.org/wiki/ECC_memory"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "补SECDED原理与Hamming背景两段；修正开销2%为12.5%；补三级响应分流图1张"
 ---
 
 # ECC内存把单比特错误挡在报告之前
@@ -23,6 +27,8 @@ sources:
 
 ## 机制：检测-纠正-报告的三级响应表
 
+这套设计的来历：1950 年 Richard Hamming 在贝尔实验室被打孔机的偶发读错逼出来的（Hamming code，一手来源是其 1950 年 Bell System Technical Journal 论文 Error Detecting and Error Correcting Codes），是第一个能自动纠错而非只报错的编码。它替代的对象是"两份副本投票"式的冗余：同样扛单比特错，副本翻倍买两倍内存，SECDED 只加 12.5% 位宽——存储越贵，编码的账越划算。
+
 | 错误形态 | ECC 行为 | 系统层后果 |
 | --- | --- | --- |
 | 单比特错误（SBE） | 硬件当场纠正 | 无感知，仅计数器 +1 |
@@ -30,7 +36,24 @@ sources:
 | 芯片整条失效（chipkill） | 需 chipkill 级 ECC 纠正 | 服务器级方案可纠正，普通 ECC 宕机 |
 | 校验位自身出错 | 硬件判为可纠正 | 无感知 |
 
-权衡：ECC 带来约 2% 的带宽与容量开销（72 位宽的 64 位数据 + 8 校验位）、访存延迟小幅上升、内存条价格高一档。收益是静默损坏概率数量级下降。这个取舍在消费级（无 ECC，便宜快）与服务器级（必配 ECC，稳）之间由市场代做了选择，但工作站与自建机器的用户要自己面对。Google 的 SIGMETRICS'09 研究（DRAM Errors in the Wild）用大规模集群数据证明了真实错误率远高于厂商标称的软错误模型，且错误与温度、拓扑位置相关——这是"要不要 ECC"讨论里最常被引用的一手证据。
+错误进入 ECC 校验后按形态走不同归宿，各自的系统层后果：
+
+```mermaid
+flowchart TB
+    a["读回 72 位<br/>校验方程报警"] --> b{"指纹指向"}
+    b -->|"唯一数据位"| c1["单比特 当场翻转"]
+    b -->|"无效位置"| c2["双比特 报错宕机"]
+    b -->|"校验位自身"| c3["判可纠正 无感知"]
+    c1 --> d1["计数器 +1"]
+    c2 --> d2["NMI/MCE"]
+    c3 --> d3["计数器 +1"]
+```
+
+图回答的是三级响应怎么分岔：同一套校验指纹把四种形态归到三条归宿，只有「指纹指向无效位置」一条通向宕机，其余都静默消化。
+
+权衡：ECC 带来约 12.5% 的位宽与容量开销（72 位宽的 64 位数据 + 8 校验位，每 8 个数据位养 1 个校验位）、访存延迟小幅上升、内存条价格高一档。收益是静默损坏概率数量级下降。这个取舍在消费级（无 ECC，便宜快）与服务器级（必配 ECC，稳）之间由市场代做了选择，但工作站与自建机器的用户要自己面对。Google 的 SIGMETRICS'09 研究（DRAM Errors in the Wild）用大规模集群数据证明了真实错误率远高于厂商标称的软错误模型，且错误与温度、拓扑位置相关——这是"要不要 ECC"讨论里最常被引用的一手证据。
+
+ECC 用的是 SECDED 编码（Single Error Correction, Double Error Detection）：每 72 位里用 8 个校验位给每个数据位编一个唯一的奇偶指纹，出错时哪个校验方程报警的组合唯一指向出错位，单比特当场翻转回来；双比特时指纹指向无效位置，硬件知道错在哪但回不去，只能报错。校验位本身就是那 12.5% 开销的全部。chipkill 在同一思路上加一条约束：把校验位打散到不同内存芯片上，让任何一颗芯片整条失效（整字节同灭）时指纹仍能定位——代价是地址布线更复杂，收益从"扛单比特"扩到"扛整片"。
 
 ## 验证
 

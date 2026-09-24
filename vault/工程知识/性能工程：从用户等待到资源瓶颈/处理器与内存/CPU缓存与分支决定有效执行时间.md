@@ -2,7 +2,7 @@
 title: CPU 缓存与分支决定有效执行时间
 type: concept
 status: active
-updated: 2026-09-03
+updated: 2026-09-25
 review_after: 2027-09-03
 change_rate: low
 confidence: high
@@ -14,6 +14,10 @@ sources:
   - "https://perf.wiki.kernel.org/index.php/Main_Page"
   - "https://www.intel.com/content/www/us/en/developer/articles/technical/intel-sdm.html"
   - "https://developer.arm.com/documentation"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "去味2处（条件句拆解、倍数补测量方式）；图已达标不动"
 ---
 
 # CPU 缓存与分支决定有效执行时间
@@ -24,7 +28,7 @@ CPU 性能取决于指令是否能持续供给和数据是否及时到达。寄�
 
 ## 最小局部性实验
 
-用同一批数据对照顺序数组遍历、随机指针访问和可预测/不可预测分支，固定编译器、频率和线程数；记录 cycles、instructions、cache/branch miss、内存带宽和 p99。只有计数器变化与业务耗时同向，才能把优化归因于局部性或预测，而不是缓存预热或调度噪声。
+用同一批数据对照顺序数组遍历、随机指针访问和可预测/不可预测分支，固定编译器、频率和线程数；记录 cycles、instructions、cache/branch miss、内存带宽和 p99。归因要求计数器变化与业务耗时同向；缓存预热或调度噪声造成的波动会在同向性检查里现形。
 
 ## 看懂瓶颈
 
@@ -56,7 +60,7 @@ for (j = 0; j < N; j++)
 // perf stat -e cache-misses 可见：列序的 cache-misses 高一个量级
 ```
 
-分支预测的同场实验：排序后数组上的分支化条件求和（`if (a[i] >= 128)`）比未排序快 2-4 倍——分支预测器对有序模式命中 99%，对随机模式命中 50%，每次预测失败 15-20 个周期的流水线冲刷。
+分支预测的同场实验：排序后数组上的分支化条件求和比未排序数组明显更快（同一段代码两个数据集，perf 的 branch-misses 计数相差一个数量级）——分支预测器对有序模式接近全中、对随机模式约一半失败，每次预测失败付出 15-20 个周期的流水线冲刷。
 
 同一段分支代码，只因为数据有序程度不同，跑出两种差距数倍的结局：
 

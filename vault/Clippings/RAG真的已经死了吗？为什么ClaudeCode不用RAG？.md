@@ -8,6 +8,7 @@ created: 2026-09-11
 description: "现在行业有一种说法，说RAG已经死了。包括现在主流的Coding Agent清一色也没所有使用RAG了？面试官也常问：你的项目要不要选择RAG？为什么ClaudeCode不选择RAG呢？咱们先不聊答案，从4个维度：1. RAG已死这件事是怎么传出的？谁先说的？2. 从结构化/非结构化数据 角度3. 从上下文大小角度。4. 从速度和成本的角度。想清楚这4个问题，我相信答案也昭然若揭"
 tags:
   - "clippings"
+  - "AI 编程工具"
 ---
 <iframe width="560" height="315" src="https://player.bilibili.com/player.html?bvid=BV1YdMp6kEEf&amp;page=1&amp;high_quality=1&amp;danmaku=0" title="Bilibili video player" frameborder="0" allowfullscreen=""></iframe>
 

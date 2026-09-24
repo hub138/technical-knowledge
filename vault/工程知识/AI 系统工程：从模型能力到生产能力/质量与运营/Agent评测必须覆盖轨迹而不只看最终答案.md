@@ -2,7 +2,7 @@
 title: Agent 评测必须覆盖轨迹，而不只看最终答案
 status: active
 type: concept
-updated: 2026-09-03
+updated: 2026-09-25
 change_rate: medium
 confidence: high
 review_after: 2027-03-03
@@ -13,6 +13,10 @@ sources:
   - "https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents"
   - "https://openai.github.io/openai-agents-python/testing/"
   - "https://pages.nist.gov/trec-browser/trec34/rag/proceedings/"
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-A
+editorial_note: "现状核对：SELFCHECK PASS密度0.40达标0命中，三轨迹现形图与五层评价表齐全，本轮零改动仅标记"
 ---
 
 # Agent 评测必须覆盖轨迹，而不只看最终答案

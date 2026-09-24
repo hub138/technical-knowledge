@@ -6,6 +6,8 @@ published:
 created: 2026-08-28
 description:
 tags:
+  - "clippings"
+  - "知识管理"
 ---
 深圳市有意思文化传媒有限公司
 
