@@ -1938,6 +1938,7 @@ pre.mermaid svg{
   border:1px solid var(--color-line); background:var(--color-panel);
   font-size:var(--text-small); color:var(--color-ink-soft);
   cursor:pointer; text-decoration:none; white-space:nowrap;
+  max-width:220px; overflow:hidden; text-overflow:ellipsis;
 }
 .upstream-chip:hover{ border-color:var(--color-accent-line); color:var(--color-accent); }
 .upstream-chip.on{ background:var(--color-accent); border-color:var(--color-accent); color:var(--color-on-accent); }

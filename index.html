@@ -1425,7 +1425,7 @@ function renderDirectory(){
   const upCount=new Map();
   for(const n of list){const u=upstreamOf(n);if(u)upCount.set(u,(upCount.get(u)||0)+1)}
   const ups=[...upCount].sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const upBar=ups.length?('<div class="upstream-bar"><span class="upstream-label">上游项目</span>'+
+  const upBar=ups.length?('<div class="upstream-bar"><span class="upstream-label">按上游项目筛选</span>'+
     '<a class="upstream-chip'+(state.upstream==='all'?' on':'')+'" data-up="all">全部</a>'+
     ups.map(([u,c])=>'<a class="upstream-chip'+(state.upstream===u?' on':'')+'" data-up="'+esc(u)+'" title="'+esc(u)+' 的 '+c+' 篇">'+esc(u)+' '+c+'</a>').join('')+
     '</div>'):'';
