@@ -1196,7 +1196,12 @@ kbd{display:inline-block;min-width:20px;padding:2px 6px;border:1px solid var(--c
  * 紧挨着邻列主题），描一圈底色描边把标题变成「标签片」，压住的文字
  * 被干净切断而不是两行字混叠在一起。paint-order 让描边垫在字形下面。 */
 .node text{paint-order:stroke;stroke:var(--color-panel);stroke-width:3px;stroke-linejoin:round}
-.node:focus{outline:none}
+/* 键盘聚焦的可见性不靠 outline（圆点套方框视觉噪），改由 JS 在 focusin
+   时把悬停态的邻线点亮——键盘拿到与鼠标 onmouseenter 同一套探索反馈。
+   .node:focus{outline:none} 保留吞 outline 的原设计，但必须是"换到等价
+   替代"，不能是净失去。 */
+.node:focus text{display:block}
+.graph .node:focus ~ .edge.focused{stroke:var(--color-warm)}
 .home:empty::before{content:'正在加载知识库...';display:block;padding:48px 0;color:var(--color-muted);font-size:var(--text-md)}
 html[data-lang="en"] .home:empty::before{content:'Loading the library...'}
 .domain-card:focus-visible,.note-row:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
@@ -2377,7 +2382,9 @@ function renderReaderRails(note){
         if(!en.isIntersecting)return;
         tocLinks.forEach(a=>a&&a.removeAttribute('aria-current'));
         const a=tocLinks.get(en.target.id);
-        if(a){a.setAttribute('aria-current','page');a.scrollIntoView({block:'nearest'})}
+        /* 滚动位置语义用 location（"当前位置在这"），不用 page（读屏把
+           page 当页面切换的 landmark 快捷键目标，滚动驱动标注会误导航）。 */
+        if(a){a.setAttribute('aria-current','location');a.scrollIntoView({block:'nearest'})}
       });
     },{rootMargin:'-96px 0px -55% 0px',threshold:0});
     heads.forEach(h=>spy.observe(h));
@@ -2748,8 +2755,14 @@ function renderNetwork(){
     g.onclick=(e)=>{e.stopPropagation();toggleGraphFocus('note',n.path)};
     g.ondblclick=()=>openNote(n.path);
     g.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();openNote(n.path)}};
-    g.onmouseenter=()=>{if(state.graphFocus)return;document.querySelectorAll('.edge').forEach(e=>{if(e.dataset.source===n.path||e.dataset.target===n.path)e.classList.add('focused')})};
-    g.onmouseleave=()=>{if(state.graphFocus)return;document.querySelectorAll('.edge.focused').forEach(e=>e.classList.remove('focused'))};
+    /* 悬停与键盘聚焦走同一个邻线点亮函数：focusin/focusout 是悬停的
+       键盘等价物，各挂各的回调迟早漂移成两套反馈。 */
+    const lightEdges=()=>{if(state.graphFocus)return;document.querySelectorAll('.edge').forEach(e=>{if(e.dataset.source===n.path||e.dataset.target===n.path)e.classList.add('focused')})};
+    const dimEdges=()=>{if(state.graphFocus)return;document.querySelectorAll('.edge.focused').forEach(e=>e.classList.remove('focused'))};
+    g.onmouseenter=lightEdges;
+    g.onmouseleave=dimEdges;
+    g.addEventListener('focusin',lightEdges);
+    g.addEventListener('focusout',dimEdges);
     if(state.graphFocus){
       /* 笔记点没有名字，域聚焦时 45 个点挤成一团纯属橙色噪点——淡出；
        * 连线另一端「是谁」由有名字的主题圆和域标题承载。
