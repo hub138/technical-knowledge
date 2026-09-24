@@ -1598,9 +1598,11 @@ function renderDirectory(){
      EN 态分段翻译：主题/难度走词条（rt24 已备 48 主题），字数保留数字。 */
   const tr=w=>(window.TKI18N&&window.TKI18N.lang==='en')?window.TKI18N.t(w):w;
   /* change_rate 直接印 low/medium/high 是维护口径的裸英文，读者读不出含义
-   * （2026-09-23 反馈）。它是「这个主题的知识变化快慢」，落到读者能懂的话：
-   * 变化慢 / 变化中等 / 变化快——顺便解释了为什么复查周期有长有短。 */
-  const CHANGE_RATE_TEXT={low:'变化慢',medium:'变化中等',high:'变化快'};
+   * （2026-09-23 反馈：裸印 low/medium/high 读不出含义。2026-09-24 再改：
+   * 最初翻成「变化慢 / 变化中等 / 变化快」仍是维护口径——读者不关心知识
+   * 变化多快，只关心「这内容还能不能用」。所以直接说会不会过时：
+   * 不易过时 / 可能过时 / 容易过时。 */
+  const CHANGE_RATE_TEXT={low:'不易过时',medium:'可能过时',high:'容易过时'};
   const metaLine=n=>[n.topic,TKShell.fmtWords(n.words),n.change_rate?tr(CHANGE_RATE_TEXT[n.change_rate]||n.change_rate):''].filter(Boolean).map(v=>esc(v)).join(' · ');
   const sections=[...groups].sort(([a],[b])=>groupRank(a)-groupRank(b)||a.localeCompare(b,'zh-CN')).map(([g,items])=>{
     const rows=items.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h3>${mark(n.title)}</h3><div class="path">${metaLine(n)}</div></div><p>${q?mark(n.excerpt||''):esc(n.excerpt||'')}</p></article>`).join('');

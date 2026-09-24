@@ -38,9 +38,9 @@
   const DICT = {
     // ── Navigation ──
     "知识库": { en: "Knowledge" },
-    "变化快": { en: "changes fast" },
-    "变化中等": { en: "changes moderately" },
-    "变化慢": { en: "changes slowly" },
+    "容易过时": { en: "outdates quickly" },
+    "可能过时": { en: "may go outdated" },
+    "不易过时": { en: "rarely outdated" },
 
     // ── Graph controls ──
     "关系网络": { en: "Relations" },
