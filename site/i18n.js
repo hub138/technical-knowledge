@@ -75,7 +75,11 @@
 
     // ── Article rail ──
     "本文目录": { en: "On this page" },
-    "同模块其他文章": { en: "More in this module" },
+    "同模块文章": { en: "More in this module" },
+    "同模块上一篇下一篇": { en: "Previous and next in this module" },
+    "我的阅读 ↗": { en: "My reading ↗" },
+    "我的阅读已升级为独立页面，点击前往": { en: "My reading moved to its own page — click to open" },
+    "键盘快捷键（Shift+/）": { en: "Keyboard shortcuts (Shift+/)" },
 
     // ── Insights page ──
     "访问与反馈 · 工程知识库": { en: "Visits and feedback · engineering knowledge" },
@@ -140,6 +144,8 @@
     /* 【2026-09-22 去箭头同步】页面文案删掉 → 后，旧 key「打开我的课堂 →」
        成了孤儿（页面不再引用），换成本 key。 */
     "打开我的课堂": { en: "Open my classrooms" },
+    "。想按顺序读？": { en: ". To read in order, " },
+    "进入学习路线": { en: "open the learning path" },
     "打开互动课堂": { en: "Open the classroom" },
     "打开已生成示例": { en: "Open a generated example" },
     "打开案例课堂": { en: "Open the case classroom" },
@@ -948,11 +954,17 @@
     "从当前节点延伸": { en: "Extends from this note" },
     "展开知识图谱": { en: "Expand the graph" },
     "折叠知识图谱": { en: "Collapse the graph" },
+    /* shell.js 模板字符串里经 tr() 包裹的动态词条：运行时按展开后的
+       完整中文精确匹配（词典机制无模式匹配，键必须含具体 label 前缀
+       无法穷举——所以 shell.js 改为把整串交给 tr()，键用原型串。
+       实际匹配靠 t() 的精确查找，词条键与模板展开结果一致的场合
+       才命中；这里登记的是审计器抓到的字面量形态。 */
+    "展开 的子项": { en: "Expand the sub-items of " },
+    "看全部 篇": { en: "See all " },
     /* 【rt24】雷达卡（时效内容置顶卡）的 UI 串。卡片标题本身是笔记数据
        （title），但"每周更新"是固定标签。 */
     "每周更新": { en: "Updated weekly" },
     "的直接知识图谱": { en: " — immediate knowledge graph" },
-    "同模块文章": { en: "More in this module" },
     "篇）·": { en: "in the graph)" },
     "篇 ·": { en: " notes · " },
     /* 英文端必须能区分：这里带篇数语义，下面的裸箭头是通用方向符号。

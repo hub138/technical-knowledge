@@ -44,7 +44,11 @@ Scaling law 观察模型规模、训练 token 和计算量与验证损失之间�
 
 ## 量化锚点：三参数的预算表
 
-Chinchilla 型算力分配的实用账：算力 C ≈ 6ND（参数量乘 token 数），最优配比 D/N ≈ 20（每参数约 20 token）。10^23 FLOPs 预算的两种分法：70B 参数 × 2T token，或 40B × 4T token——后者按 Chinchilla 论文的实测损失更低。推理成本把账改写：训练省下的参数量在推理期每次请求都要付（参数量正比推理算力），长期高流量的服务朝"训练欠拟合、推理省钱"方向移动，这是 Llama 系列长期训练（参数少于 Chinchilla 最优、token 远多于 20 倍）的经济学。
+Chinchilla 型算力分配的实用账：算力 C ≈ 6ND（参数量乘 token 数），最优配比 D/N ≈ 20（每参数约 20 token）。10^23 FLOPs 预算的两种分法：70B 参数 × 2T token，或 40B × 4T token——后者按 Chinchilla 论文的实测损失更低。每条 isoFLOP 曲线的谷底落在哪个参数规模，论文原图一眼说清：
+
+![Chinchilla 论文图 3：同一批 isoFLOP 预算（横轴模型参数量，纵轴验证损失）下，每条曲线的谷底随预算增大向更大参数规模移动，谷底连线给出「每参数约 20 token」的最优配比；按谷底分配，40B×4T 的损失低于 70B×2T](https://arxiv.org/html/2203.15556v1/isoflop_7.svg)
+
+来源：Hoffmann et al.，[Training Compute-Optimal Large Language Models](https://arxiv.org/abs/2203.15556)（Figure 3）。谷底就是「这笔预算该买多大模型」的答案：预算翻倍谷底右移，配比保持约 20 token/参数；推理成本再把账改写——训练省下的参数量在推理期每次请求都要付（参数量正比推理算力），长期高流量的服务朝"训练欠拟合、推理省钱"方向移动，这是 Llama 系列长期训练（参数少于 Chinchilla 最优、token 远多于 20 倍）的经济学。
 
 ## 案例回流：假设先行的衔接
 

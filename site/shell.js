@@ -448,7 +448,7 @@
                    （实测截图）；包一层 relative 行，箭头贴回本行行尾。 */
                 `<span class="tk-nav-row">`
                 + link(item, page, " has-children")
-                + `<button type="button" class="tk-subnav-toggle" data-subgroup="${item.key}" aria-expanded="false" aria-label="展开 ${item.label} 的子项"></button>`
+                + `<button type="button" class="tk-subnav-toggle" data-subgroup="${item.key}" aria-expanded="false" aria-label="${(window.TKI18N && window.TKI18N.lang === 'en') ? ('Expand sub-items of ' + item.label) : ('展开 ' + item.label + ' 的子项')}"></button>`
                 + `</span>`
                 + `<span class="tk-subnav-group" id="subgroup-${item.key}" data-subgroup="${item.key}" hidden>${overviewLink(item)}${kids
                     .map(
@@ -476,7 +476,7 @@
               return (
                 `<span class="tk-nav-row">`
                 + link(item, page, " has-children")
-                + `<button type="button" class="tk-subnav-toggle" data-subgroup="${item.key}" aria-expanded="false" aria-label="展开 ${item.label} 的子项"></button>`
+                + `<button type="button" class="tk-subnav-toggle" data-subgroup="${item.key}" aria-expanded="false" aria-label="${(window.TKI18N && window.TKI18N.lang === 'en') ? ('Expand sub-items of ' + item.label) : ('展开 ' + item.label + ' 的子项')}"></button>`
                 + `</span>`
                 + `<span class="tk-subnav-group" id="subgroup-${item.key}" data-subgroup="${item.key}" hidden>${overviewLink(item)}${kids
                     .map(
@@ -627,8 +627,8 @@
           slot.innerHTML = rows.map((row) => `
             <a class="tk-domain" href="/?domain=${encodeURIComponent(row.name)}" data-domain="${esc(row.name)}">
               <span>${esc(row.name)}</span>
-              <span class="count tk-domain-count" title="看全部 ${row.count} 篇" role="link" tabindex="0"
-                    aria-label="看全部 ${row.count} 篇">${row.count}</span>
+              <span class="count tk-domain-count" title="${(window.TKI18N && window.TKI18N.lang === 'en') ? ('See all ' + row.count + ' notes') : ('看全部 ' + row.count + ' 篇')}" role="link" tabindex="0"
+                    aria-label="${(window.TKI18N && window.TKI18N.lang === 'en') ? ('See all ' + row.count + ' notes') : ('看全部 ' + row.count + ' 篇')}">${row.count}</span>
             </a>`).join("");
           /* 数字即清单入口：点域的篇数 → 去该域全部文章的清单（/?domain= 本
            * 来就能列出全部，实测 98 篇）。此前点整个域只能展开主题，读者看到
