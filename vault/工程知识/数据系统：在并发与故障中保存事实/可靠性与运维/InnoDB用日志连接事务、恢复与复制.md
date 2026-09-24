@@ -2,7 +2,7 @@
 title: InnoDB 用日志连接事务、恢复与复制
 type: playbook
 status: active
-updated: 2026-08-31
+updated: 2026-09-25
 review_after: 2027-02-28
 change_rate: medium
 confidence: high
@@ -14,6 +14,10 @@ tags:
   - database/mysql
   - database/reliability
   - database/ha
+editorial_pass: 1
+editorial_at: 2026-09-25
+editorial_by: agent-C
+editorial_note: "短篇补复制链路五段对账与半同步退化账段；补链路分段图1张"
 ---
 
 # InnoDB 用日志连接事务、恢复与复制
@@ -26,7 +30,27 @@ tags:
 | `undo log` | 回滚、MVCC 旧版本和一致性读 | 崩溃后的完整备份 |
 | `binlog` | Server 层逻辑变更记录；复制、PITR、审计 | 代替 redo 的页级恢复 |
 
+三份日志在提交时刻由两阶段提交协调，衔接的形状：
+
+```mermaid
+flowchart TB
+    t["事务更新<br/>改 Buffer Pool 写 redo"] --> p1["redo prepare"]
+    p1 --> b["写 binlog"]
+    b --> p2["redo commit"]
+    p1 -.->|"崩溃在 prepare 前<br/>undo 回滚"| u["事务不存在"]
+    b -.->|"写 binlog 后崩溃<br/>重启核对补提交"| r["binlog 有则提交<br/>无则回滚"]
+    p2 --> ok["复制与 PITR<br/>从 binlog 取事实"]
+```
+
+图回答的是三份日志为什么在提交时刻必须有协调者：redo 与 binlog 分属引擎层与 Server 层，各写各的，崩溃恢复要判定“这个事务到底算不算提交”，唯一依据是两阶段提交留下的衔接状态——prepare 后崩、写完 binlog 后崩、commit 后崩，三种时刻的结局各不相同（回滚、核对后补提交、已提交），恢复从检查点重放时靠这套状态接续。复制与 PITR 不读 redo，事实来源统一在 binlog，这是“逻辑复制不绑引擎页格式”的代价与自由。
+
 更新通常先改 Buffer Pool、写 redo；提交时通过两阶段提交协调 redo 和 binlog，避免“binlog 有记录但 InnoDB 未提交”或反过来的不一致。`binlog_format=ROW` 通常比 statement 更适合可靠复制和按行恢复，但要结合版本、工具和合规要求验证。
+
+两个日志文件在同一时刻必须给出同一个结论，靠的是提交前先问一圈、全部答应了才落最终决定：
+
+![两阶段提交时序图：Coordinator 先向 Participant 0 与 Participant 1 各发 Prepare()，两个参与者分别回 prepared；全部应答后才进入提交阶段，Coordinator 逐个发出 Commit()，参与者各自完成提交并回执](https://upload.wikimedia.org/wikipedia/commons/8/86/Two_phase_commit_seq_diagram_success_01.png)
+
+*图源：Wikimedia Commons「Two phase commit seq diagram success 01」，作者 Jayaprabhakar，许可 [CC0](https://commons.wikimedia.org/wiki/File:Two_phase_commit_seq_diagram_success_01.png)。图里两个阶段的分界就是正文说的那个协调点：Prepare 阶段任何一方回绝，Commit 阶段就不会开始，redo 与 binlog 因此不会各自走到不同的终点。*
 
 ## 持久性和抖动
 
@@ -37,6 +61,22 @@ tags:
 ## 复制、高可用和读写分离
 
 复制链路至少要监控：主库写入、日志生成、网络传输、从库 relay 应用和 SQL 应用。延迟可能来自大事务、单线程应用、热点锁、磁盘或网络；只看一个 `Seconds_Behind_Master` 不足以定位原因。
+
+延迟定位按链路五段对账，每一段有自己的观察点与判据：
+
+```mermaid
+flowchart TB
+    m["主库写入<br/>binlog 生成速率"] --> n["网络传输<br/>带宽与中断计数"]
+    n --> r["relay log 落稳<br/>IO 线程位点"]
+    r --> s["SQL 线程应用<br/>大事务与锁等待"]
+    s --> d["数据可见<br/>延迟汇总数"]
+    n -.->|"传输段堆积"| lag2["带宽或跨机房"]
+    s -.->|"应用段堆积"| lag["单线程或大事务"]
+```
+
+图回答的是"只看一个延迟数定位不了原因"的结构性依据：五段串联，延迟累积在哪一段决定了对策完全不同——传输段是带宽与机房问题、应用段是单线程与大事务问题、主库段是写入洪峰问题，`Seconds_Behind_Master` 只反映末端汇总，三个不同病因共用一个表象。定位顺序：先看 relay log 位点与 binlog 位点的差（传输段），再看 relay 与已应用位点的差（应用段），差值在哪一段停住，病因就在哪一段。
+
+半同步的账要把丢失窗口摆进数字：`rpl_semi_sync_master_wait_point=AFTER_SYNC`（增强半同步，5.7+ 默认形态）在从库收到 binlog 后即应答，主库崩溃切换时刚应答的事务在从库有 relay 但可能未应用——窗口是"应答到应用"的距离；退化判定看 `Rpl_semi_sync_master_status` 是否退化为 OFF（`rpl_semi_sync_master_timeout` 超时后自动降级为异步，这是半同步最常见的失效形态：平时是半同步，主从断连超时后变成异步，丢失窗口静默扩大）。核对命令：`SHOW GLOBAL STATUS LIKE 'Rpl_semi_sync%'` 与故障注入切换演练配合，参数表上的半同步不等于故障时刻的半同步。
 
 高可用切换必须回答：
 

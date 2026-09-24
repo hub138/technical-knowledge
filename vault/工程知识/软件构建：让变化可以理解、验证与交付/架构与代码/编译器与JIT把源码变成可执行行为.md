@@ -22,6 +22,12 @@ sources:
 
 源码经过词法/语法分析、类型与语义检查、中间表示、优化、代码生成、链接和加载，才成为 CPU 执行的指令。解释器、AOT、JIT 和混合运行时在启动、峰值性能、可观测性和环境依赖之间取舍。
 
+词法/语法分析的产物是一棵抽象语法树——源码的结构形态在优化开始前就已经定型。欧几里得算法的 AST 长这样：
+
+![抽象语法树示例：statement sequence 顶节点挂 while 循环与 return，循环条件是 compare(b, 0)，循环体是 branch 分支挂两个 assign（a = a - b 与 b = b - a）——源码的嵌套结构变成了可被优化器遍历与改写的树形数据](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Abstract_syntax_tree_for_Euclidean_algorithm.svg/1280px-Abstract_syntax_tree_for_Euclidean_algorithm.svg.png)
+
+*图源：Wikimedia Commons「Abstract syntax tree for Euclidean algorithm」，作者 npmushun，许可 [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Abstract_syntax_tree_for_Euclidean_algorithm.svg)。*
+
 同一段代码在冷启动、预热中和稳态可能走过不同执行路径；把一次短 benchmark 的结果当作生产性能，会把编译时间、JIT 采样和缓存状态误算成业务能力。
 
 ## 最小编译实验
@@ -52,6 +58,18 @@ java HotLoop                # 默认分层编译（C1+C2）
 ## 量化锚点：预热与稳定
 
 JIT 的代价是预热：服务重启后前几分钟 C2 还没就位，延迟分布的长尾全在预热期。预热预算按 tier 触发次数对账（默认 C2 需要约 1 万次调用），冷路径（每分钟一次的定时任务）永远停在解释执行——它不需要优化，优化收益覆盖不了编译成本。静态编译（GraalVM native-image）取消预热，代价是放弃运行时画像，峰值性能通常低于充分预热的 C2。
+
+三种执行形态在同一段热循环上的读数与代价对照：
+
+```mermaid
+flowchart TB
+    a["解释执行<br/>约 1 秒"] -->|"调用约 2000 次<br/>触发 C1"| b["C1 快速编译<br/>约 0.15 秒"]
+    b -->|"再调用约万次<br/>触发 C2"| c["C2 完全优化<br/>约 0.02 秒"]
+    a -.->|"冷路径每分钟一次<br/>收益覆盖不了编译成本"| a2["永远停在解释执行"]
+    c -.->|"静态编译取消预热<br/>放弃运行时画像"| d["native-image<br/>峰值通常低于 C2"]
+```
+
+图回答的是预热的账：同一段代码的三种执行形态是阶梯关系，越靠右越快，但每一级的触发条件都是调用次数累计——服务刚重启时全在左端，长尾延迟的来源就是这段爬梯时间；两条虚线是阶梯之外的两种形态：冷路径永远停在第一级（优化收益覆盖不了编译成本），静态编译直接砍掉爬梯但峰值通常到不了 C2 的水平。
 
 ## 验证
 
