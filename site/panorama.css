@@ -10,11 +10,15 @@
  *   小节标题   --text-body + 加粗（16px，卡片标题档）
  *   图例/角标  --text-small（13px）/ --text-micro（11px，图形内标签档） */
 
-/* 上边距 20px：导语紧跟在 tab 栏（.pano-tabs）下面，margin 为 0 时实测
- * 只差 4px，视觉上「贴着标题」，与覆盖矩阵那边（内容块离 tab 栏 47px）
- * 完全不是一个节奏（2026-09-24 用户反馈）。20px 取全站「头部结束到内容
- * 开始」的规范值（base.css .view-head 同值）。 */
-.pano-intro { margin: 32px 0 18px; }
+/* 上边距 32px：导语紧跟在 tab 栏（.pano-tabs）下面，margin 为 0 时实测
+ * 只差 4px，视觉上「贴着标题」，与覆盖矩阵那边（内容块离 tab 栏 24~47px）
+ * 不是一个节奏（2026-09-24 用户反馈）。20px 是全站规范值（.view-head），
+ * 这里再放宽到 32px —— 图是居中的，导语上方留白多一点才压得住。 */
+/* 左右 9px = 图的 8px 内距 + 1px 边框（.pano-stage）：说明文字块与下方
+ * 气泡图共用同一条左右边线。此前文字块占满容器（1032）而图的内容区只
+ * 有 1014，且图是居中的、文字左对齐 —— 文字落在图中轴的左侧，右侧空出
+ * 一大片（2026-09-24 用户反馈「右边超级空」）。 */
+.pano-intro { margin: 32px 9px 18px; }
 /* 段间距 6px：导语是「一组说明」（规则/警示/操作），段距小于行距，读起来
  * 是一块而不是四句。原本 4px 是跟 matrix.css .mx-intro p 对齐的档位，
  * 降到 13px 后四行几乎黏在一起（knot 看图反馈），放到 6px 更透气。 */
@@ -27,7 +31,7 @@
  * 与矩阵侧的辅助文字同档，块面轻而不挤。 */
 .pano-intro p {
   margin: 0 0 6px; font-size: var(--text-small); line-height: 1.85; color: var(--color-ink-soft);
-  max-width: 900px;
+  max-width: 900px;    /* 只让左边缘与图对齐，不拉满到图的右边界 */
 }
 .pano-intro p:last-child { margin-bottom: 0; }
 .pano-intro b { color: var(--color-ink); font-weight: 700; }
@@ -55,7 +59,7 @@
   margin: 30px 0 12px; letter-spacing: .2px;
 }
 .pano-legend {
-  margin: 10px 0 0; font-size: var(--text-small); color: var(--color-muted); line-height: 1.7;
+  margin: 10px 9px 0; font-size: var(--text-small); color: var(--color-muted); line-height: 1.7;
 }
 
 /* ── 图谱舞台 ──────────────────────────────────────────────────── */

@@ -32,9 +32,12 @@
    * 复制一份而不是 import，因为 panorama-view 是懒加载视图脚本，
    * matrix-view 先执行时它可能还没就位。（两处色表改动要同步，这是
    * 已知的一对一映射，panorama-view.js 头部有反向注释。） */
+  /* 与 panorama-view.js 的 LAYER 同步改（2026-09-24）：hw/net 原用
+   * #dc2626（--color-danger），与八层栈「缺口层」的红色标记撞语义，
+   * 且 hw/net 同色。新的 1~6 号色见 panorama-view.js 的 LAYER。 */
   var LAYER_COLOR = {
-    hw: "#dc2626", os: "#b45309", net: "#dc2626", data: "#0284c7",
-    dist: "#059669", app: "#7c3aed"
+    hw: "#0f766e", os: "#65a30d", net: "#0284c7", data: "#6366f1",
+    dist: "#7c3aed", app: "#475569"
   };
 
   /* 格子深浅：按篇数分档。
