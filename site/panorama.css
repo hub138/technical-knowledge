@@ -176,7 +176,8 @@
 .pano-list-row:hover{ background:var(--color-raised); }
 .pano-list-link{
   font-size:var(--text-small); color:var(--color-accent); text-decoration:none;
-  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  /* 不截断：标题是挑文章读的唯一依据，省略号会把最关键的尾部切掉。
+     与覆盖矩阵 .mx-detail-link 同一做法 —— 长标题换行显示完整。 */
 }
 .pano-list-link:hover{ text-decoration:underline; }
 .pano-list-words{ flex:none; font-size:var(--text-micro); color:var(--color-muted); font-variant-numeric:tabular-nums; }

@@ -335,6 +335,7 @@
     items.forEach(function (it) {
       var row = el("div", "pano-list-row");
       var a = el("a", "pano-list-link", it.t);
+      a.title = it.t;
       /* /?path= 是 SPA 唯一认的文章参数（矩阵清单同款，写别的会落回首页） */
       a.href = "/?path=" + encodeURIComponent(it.p);
       row.appendChild(a);
