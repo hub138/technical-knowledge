@@ -25,6 +25,10 @@ sources:
 
 NAND 闪存单元的物理限制：写操作只能把位从 1 改成 0（充电），要改回 1 必须对整个擦除块（erase block，通常数 MB）执行高电压擦除。擦除有次数限制（SLC 约 10 万次、QLC 约 1000 次），且擦除块必须整体操作。FTL（Flash Translation Layer，闪存转换层）因此不能原地更新：一次 4KB 逻辑写要读出所在擦除块的其它页、写进新的擦除块位置、更新映射表。写路径变成"读-改-写"，放大从这里开始。
 
+![写入以 4KiB 页为单位、擦除以 256KiB 块为单位的不对称（Wikimedia Commons《NAND Flash Pages and Blocks》，作者 Dmitry Nosachev，CC BY-SA 4.0，https://commons.wikimedia.org/wiki/File:NAND_Flash_Pages_and_Blocks.svg）](https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/NAND_Flash_Pages_and_Blocks.svg/1280px-NAND_Flash_Pages_and_Blocks.svg.png)
+
+图里两种粒度相差两个数量级：改一页的数据必须牵扯整块。上面那张图是「一次写入被摊成多次物理写」，这张图说清了它为什么必然发生——粒度不对称是擦除块的物理属性，FTL 只能在这个约束里调度。
+
 | 来源 | 机制 | 典型量级 |
 | --- | --- | --- |
 | 擦除块对齐 | 页比擦除块小三个数量级，改一页牵动整块 | 随碎片化上升 |
@@ -35,6 +39,10 @@ NAND 闪存单元的物理限制：写操作只能把位从 1 改成 0（充电�
 | SMR 叠瓦 | 磁记录的类似约束：磁道叠写必须整带重写 | 量级更大 |
 
 表里的放大来源可以叠乘。收益是闪存的顺序写吞吐与随机读延迟；代价是物理写入量成倍、寿命消耗成倍、性能抖动（GC 停顿）。
+
+![一次 4KiB 主机写入在盘上被摊成多次物理写（Wikimedia Commons《Write Amplification on SSD》，作者 Music Sorter，CC BY-SA 3.0，https://commons.wikimedia.org/wiki/File:Write_Amplification_on_SSD.svg）](https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/Write_Amplification_on_SSD.svg/1280px-Write_Amplification_on_SSD.svg.png)
+
+图上左边蓝色是主机发出的一次逻辑写，右边红色的每一块都是它在介质上真实消耗的物理写——倍数就是写放大。容量规划按左栏算、寿命估算按右栏算，两侧对不上账是 SSD 场景最常见的估算失准来源。
 
 ## 验证
 
