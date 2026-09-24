@@ -461,7 +461,8 @@ a.has-children {
 
 /* 全景视图下矩阵随域切换（tk:pano-domain 广播同步），当前域用实色左边线
    + 主题色文字标出，与 hover 态区分开。 */
-.tk-domain.active {
+.tk-domain.active,
+.tk-domain[aria-current] {
   border-left-color: var(--color-accent);
   border-left-width: 2px;
   color: var(--color-accent);

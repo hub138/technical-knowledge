@@ -687,7 +687,7 @@
 .tk-subtopic{display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:5px 8px 5px 26px;margin-left:14px;border-left:1px solid var(--color-line);color:var(--color-ink-soft);font-size:var(--text-small);text-decoration:none}
 .tk-subtopic:first-child{border-top:0}
 .tk-subtopic:hover{color:var(--color-accent);border-left-color:var(--color-accent);background:var(--color-accent-soft)}
-.tk-subtopic--all{color:var(--color-accent);font-weight:var(--weight-semibold)}
+.tk-subtopic--all{color:var(--color-accent);font-weight:var(--weight-semibold)}.tk-subtopic[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:var(--weight-semibold)}
 .tk-radar-pin{display:contents}
 .tk-subtopic .count{font-size:var(--text-2xs);color:var(--color-muted);font-variant-numeric:tabular-nums}
 .pg-domain-block{margin-bottom:24px}
@@ -943,7 +943,6 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
    accent 语言。时效入口的功能保留，视觉音量归位。 */
 .radar-card,.nav-section .radar-card{display:flex;align-items:center;gap:6px;box-sizing:border-box;margin:0;padding:5px 8px 5px 26px;border:0;border-left:1px solid var(--color-line);border-radius:0;background:transparent;box-shadow:none;cursor:pointer;text-align:left;color:var(--color-ink-soft);font-size:var(--text-small);line-height:1.4;transition:color var(--duration-fast) var(--ease-out),border-color var(--duration-fast) var(--ease-out),background var(--duration-fast) var(--ease-out)}
 .tk-subtopics .radar-card:hover,.nav-section .radar-card:hover{color:var(--color-accent);border-left-color:var(--color-accent);background:var(--color-accent-soft);box-shadow:none}
-.radar-card[aria-current="page"]{color:var(--color-accent);background:var(--color-accent-soft);border-left-color:var(--color-accent)}
 .radar-card .radar-icon{flex:none;font-size:var(--text-2xs);line-height:1;opacity:.75}
 .radar-card .radar-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex:1 1 auto}
 .radar-card .radar-text strong{font-size:var(--text-small);font-weight:var(--weight-medium);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0;color:inherit}
@@ -1374,7 +1373,30 @@ function show(view){state.view=view;
      openNote 的 reportVisit 记到具体篇目，粒度更细，避免一行文章两条
      记录。同 load 内反复切回同一视图去重。 */
   if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';$('#directory').style.display=view==='directory'?'block':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>state.sort==='updated'?(b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN'):a.title.localeCompare(b.title,'zh-CN'))}
+function syncSubtopicCurrent(){
+  document.querySelectorAll('.tk-subtopics').forEach(sub=>{
+    const row=sub.previousElementSibling;
+    const d=row&&row.dataset?row.dataset.domain:null;
+    if(!d)return;
+    sub.querySelectorAll('.tk-subtopic').forEach(a=>{
+      const u=new URL(a.href,location.origin);
+      const t=u.searchParams.get('topic');
+      const on=d===state.domain&&state.topic!=='all'&&t===state.topic;
+      if(on)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');
+    });
+    const allLink=sub.querySelector('.tk-subtopic--all');
+    if(allLink){const on=d===state.domain&&state.topic==='all';if(on)allLink.setAttribute('aria-current','page');else allLink.removeAttribute('aria-current')}
+  });
+}
 function renderDomains(){
+  /* 域行当前态在这里统一刷，不依赖 enhanceDomains 的闭包：select()
+     切域时行早已增强过、syncActive 不会再跑，漏刷会停留在上一次的标记。 */
+  document.querySelectorAll('#domains .tk-domain').forEach(r=>{
+    const on=(state.view==='panorama'||state.view==='directory')&&r.dataset.domain===state.domain;
+    if(on)r.setAttribute('aria-current',state.view==='panorama'?'true':'page');
+    else r.removeAttribute('aria-current');
+  });
+  syncSubtopicCurrent();
   /* 域列表的骨架（竖线风格）由 shell 渲染（tk:domains-rendered 广播后到达）。
      这里做主站才有的增强：点域 = 展开该域的主题子列表（再点收起），
      主题行点进去是 ?domain=X&topic=Y 的筛选结果。
@@ -1390,6 +1412,7 @@ function expandActiveDomain(){
   const row=[...document.querySelectorAll('#domains .tk-domain')].find(r=>r.dataset.domain===state.domain);
   if(!row||row.getAttribute('aria-expanded')==='true')return;
   row.click();
+  syncSubtopicCurrent();
 }
 function enhanceDomains(){
   if(!state.notes.length)return;
@@ -1405,7 +1428,7 @@ function enhanceDomains(){
     row.setAttribute('aria-expanded','false');
     /* 高亮当前域：全景视图下矩阵随 state.domain 重建，侧栏要让「矩阵现在
        统计的是哪个域」一眼可见。 */
-    const syncActive=()=>{row.classList.toggle('active',state.view==='panorama'&&state.domain===name)};
+    const syncActive=()=>{if((state.view==='panorama'||state.view==='directory')&&state.domain===name)row.setAttribute('aria-current',state.view==='panorama'?'true':'page');else row.removeAttribute('aria-current')};
     syncActive();
     document.addEventListener('tk:pano-domain',syncActive);
     row.onclick=(e)=>{
@@ -1444,6 +1467,8 @@ function enhanceDomains(){
          走词典（词条已备，见 i18n.js rt24 块）。 */
       if(window.TKI18N)window.TKI18N.translateDOM(subEl);
       row.after(subEl);
+      /* 手动展开也会重建 subEl，当前态必须同步，不能只靠 select 路径。 */
+      syncSubtopicCurrent();
       /* 雷达卡点击 = 打开文章（SPA），不走目录筛选。 */
       subEl.querySelectorAll('.radar-card').forEach(b=>{b.onclick=()=>openNote(b.dataset.path)});
       /* 子项点击走 SPA 内筛选（select），不整页跳转——整页刷新会把
@@ -3037,7 +3062,7 @@ function renderMatrixView(){const host=$('#panorama-body');if(!host||!window.TKM
  if(window.TKI18N)window.TKI18N.translateDOM(host)}
 function setMobileSidebar(collapsed){const sidebar=$('#tk-sidebar'),button=$('#mobile-menu');if(!sidebar||!button)return;sidebar.classList.toggle('collapsed',collapsed);button.setAttribute('aria-expanded',String(!collapsed));button.setAttribute('aria-label',collapsed?'打开目录':'收起目录')}
 function collapseMobileSidebar(){setMobileSidebar(true)}
-function bindNavigation(){setMobileSidebar(matchMedia('(max-width:760px)').matches);const menuButton=$('#mobile-menu');if(menuButton)menuButton.onclick=()=>setMobileSidebar(!$('#tk-sidebar').classList.contains('collapsed'));$('#reader-back').onclick=()=>{if(state.domain!=='all')select(state.domain,state.topic);else if(state.query.trim()){show('directory');renderDirectory();$('#search').focus()}else loadHome(true)};$('#search').oninput=event=>{state.query=event.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};
+function bindNavigation(){setMobileSidebar(matchMedia('(max-width:760px)').matches);const menuButton=$('#mobile-menu');if(menuButton)menuButton.onclick=()=>setMobileSidebar(!$('#tk-sidebar').classList.contains('collapsed'));$('#reader-back').onclick=()=>{if(state.domain!=='all'){select(state.domain,state.topic);const back=[...document.querySelectorAll('#domains .tk-domain')].find(r=>r.dataset.domain===state.domain);if(back)back.focus()}else if(state.query.trim()){show('directory');renderDirectory();$('#search').focus()}else{loadHome(true);const brand=$('#tk-sidebar .tk-brand');if(brand)brand.focus()}};$('#search').oninput=event=>{state.query=event.target.value;if(!state.query.trim()){loadHome(false);return}state.domain='all';state.topic='all';show('directory');renderDomains();renderDirectory()};
 /* 回车：输入即筛选已在实时工作，回车负责「明确跳到结果并聚焦第一条」——
    放大镜图标的默认预期就是回车可搜，不能让回车毫无反应。 */
 $('#search').onkeydown=event=>{if(event.key==='Enter'){event.preventDefault();if(!state.query.trim())return;show('directory');renderDomains();renderDirectory()}};window.onpopstate=selectFromUrl}
