@@ -1597,7 +1597,11 @@ function renderDirectory(){
   /* 【rt25】meta 行是「主题 · 字数 · 难度」三段拼接，整串永不命中词典。
      EN 态分段翻译：主题/难度走词条（rt24 已备 48 主题），字数保留数字。 */
   const tr=w=>(window.TKI18N&&window.TKI18N.lang==='en')?window.TKI18N.t(w):w;
-  const metaLine=n=>[n.topic,TKShell.fmtWords(n.words),n.change_rate].filter(Boolean).map(v=>esc(tr(v))).join(' · ');
+  /* change_rate 直接印 low/medium/high 是维护口径的裸英文，读者读不出含义
+   * （2026-09-23 反馈）。它是「这个主题的知识变化快慢」，落到读者能懂的话：
+   * 变化慢 / 变化中等 / 变化快——顺便解释了为什么复查周期有长有短。 */
+  const CHANGE_RATE_TEXT={low:'变化慢',medium:'变化中等',high:'变化快'};
+  const metaLine=n=>[n.topic,TKShell.fmtWords(n.words),n.change_rate?tr(CHANGE_RATE_TEXT[n.change_rate]||n.change_rate):''].filter(Boolean).map(v=>esc(v)).join(' · ');
   const sections=[...groups].sort(([a],[b])=>groupRank(a)-groupRank(b)||a.localeCompare(b,'zh-CN')).map(([g,items])=>{
     const rows=items.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h3>${mark(n.title)}</h3><div class="path">${metaLine(n)}</div></div><p>${q?mark(n.excerpt||''):esc(n.excerpt||'')}</p></article>`).join('');
     return `<section class="topic-section"><h3 class="topic-title"><span>${esc(g==='总览'?'入口':g)}</span><small>${items.length}</small></h3>${rows}</section>`;
@@ -2310,7 +2314,26 @@ function applyHomeStatus(){const titleOf=card=>{const h=card&&card.querySelector
    and each maps to a chip class that exists in the stylesheet. */
 const setStatus=(card,text,tone)=>{const chip=card&&card.querySelector('.status');if(!chip)return;chip.textContent=window.TKI18N?window.TKI18N.t(text):text;chip.classList.remove('ok','warn','unknown');chip.classList.add(tone)};
 if(classroom){const c=(status&&status.openmaic)||null;setStatus(classroom,c?(c.online&&c.llm?'互动课堂可用':c.online?'服务运行中':'未启动'):'状态未知',c?(c.online&&c.llm?'ok':c.online?'warn':'warn'):'unknown')}
-if(tutor){const t=(status&&status.deeptutor)||null;setStatus(tutor,t?(t.online&&t.llm?'导师可用':'配置不完整'):'状态未知',t?(t.online&&t.llm?'ok':'warn'):'unknown')}}
+if(tutor){const t=(status&&status.deeptutor)||null;setStatus(tutor,t?(t.online&&t.llm?'导师可用':'配置不完整'):'状态未知',t?(t.online&&t.llm?'ok':'warn'):'unknown')}
+bindLearningEntries()}
+/* 学习工具入口：点下去才判断能不能开。
+ * 在线就照常跳（launch 路由/工具地址）；不在线才拦下并说一句人话——
+ * 状态说明归卡片上的 chip，浮层只在真正点不动的那一刻出现。 */
+function bindLearningEntries(){
+  document.querySelectorAll('#home .work-card a[href]').forEach((a)=>{
+    const href=a.getAttribute('href')||'';
+    const key=href.includes('openmaic')?'openmaic':href.includes('deeptutor')?'deeptutor':null;
+    if(!key)return;
+    a.onclick=(event)=>{
+      const s=(state.learningStatus&&state.learningStatus[key])||null;
+      if(s&&s.online)return;
+      event.preventDefault();
+      alertUser(window.TKI18N&&window.TKI18N.lang==='en'
+        ?'This tool is not running right now, so the entry will not open'
+        :'这个工具这会儿没启动，入口打不开');
+    };
+  });
+}
 function clearSearch(){state.query='';$('#search').value=''}
 function select(domain='all',topic='all',push=true){if(domain==='总览'||topic==='首页'){loadHome(push);return}clearSearch();state.domain=domain;state.topic=topic;state.selected=null;if(domain!=='all'&&domain!=='Clippings')state.expandedDomains.add(domain);show('directory');renderDomains();renderDirectory();expandActiveDomain();if(matchMedia('(max-width:760px)').matches)collapseMobileSidebar();if(push)history.pushState({},'',`/?domain=${encodeURIComponent(domain)}${topic==='all'?'':'&topic='+encodeURIComponent(topic)}`);window.scrollTo({top:0})}
 function sourceLabel(s){try{return new URL(s).hostname.replace(/^www\./,'')}catch(err){return s}}
@@ -2953,6 +2976,11 @@ function renderNetwork(){
     world.append(g);
   });
 
+    /* 所有节点（含后画的笔记圆点）都画完后，把标签层统一挪到最末尾：
+     * 上面每追加一个主题标签都会重挪一次，但笔记节点在那之后画，会盖住
+     * 标签。这里收尾一次，文字永远在所有圆之上。 */
+    const llEnd=world.querySelector('.topic-labels');
+    if(llEnd)world.append(llEnd);
     const gv=$('#graph-view');
     /* 收尾：把主题标签层挪到最上层 —— 笔记圆点是在标签之后画的，会盖住文字 */
     { const llEnd=world.querySelector('.topic-labels'); if(llEnd)world.append(llEnd); }
@@ -3588,7 +3616,11 @@ async function refreshNotes(initial=false){
    * 循环体只跑一圈，无额外开销。 */
   /* 首页 100 条（带 edges），剩余页**并行**拉（每页 150 条纯 notes）——
      串行 4 页 × 0.35s 的等待在并行下缩成一轮。 */
-  const part0=await json('/api/notes?offset=0&limit=100');
+  /* 首屏 60 条（带 edges）：压缩后约 65KB——受限链路在 77KB 处掐断响应
+     （实测，且 nginx 未开 gzip_proxied 时压缩根本不生效），首屏必须留出
+     余量。edges 只随第一页带，剩余页并行拉纯 notes（每页 150 条 ≈ 72KB，
+     也在余量内）。本机直连一页拉完，循环体只跑一圈。 */
+  const part0=await json('/api/notes?offset=0&limit=60');
   const first=part0;
   let total=typeof part0.total==='number'?part0.total:(part0.notes||[]).length;
   let allNotes=(part0.notes||[]).slice();
@@ -3664,7 +3696,7 @@ async function initialize(){
   catch(error){console.error(error);showLoadError()}
   enhanceDomains();
   await refreshPapers();
-  await refreshLearningStatus(true);
+  await refreshLearningStatus();
 }
 function showLoading(){
   const box=$('#directory');
@@ -3782,14 +3814,28 @@ window.renderMermaid=async function(){
       s.onerror=()=>reject(new Error('mermaid 加载失败'));
       document.head.appendChild(s);
     });
-    window.mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'base',themeVariables:{
-      /* 图要退到内容的层级上：字号不跟正文抢（正文 15px，图内 14px），
-         节点用白底 + 站点同源的淡蓝边框（--color-accent-line #c3d0e4），
-         不引入站点没有的亮蓝。圆角 8、内边距 16 让节点不挤。 */
-      fontSize:'14px',
-      fontFamily:'inherit',
-      nodePadding:20,
-      borderRadius:8,
+  }
+  /* 图跟主题走（r18 修复：此前初始化一次后写死亮色变量，暗色下整图
+     白底刺眼，切主题也不重画）。两套变量组同结构，暗色取暗色档变量；
+     重渲染前必须重新 initialize——mermaid 只在 initialize 时读主题。 */
+  const dark=document.documentElement.dataset.theme==='dark';
+  window.mermaid.initialize({startOnLoad:false,securityLevel:'strict',theme:'base',themeVariables:{
+    fontSize:'14px',
+    fontFamily:'inherit',
+    nodePadding:20,
+    borderRadius:8,
+    ...(dark?{
+      /* 暗色：节点用面板底色，文字/边框/连线跟暗色档，避免亮底刺眼 */
+      mainBkg:'#1a2030',
+      nodeBorder:'#3b4a66',
+      primaryBorderColor:'#3b4a66',
+      primaryTextColor:'#e8ecf5',
+      lineColor:'#5a688a',
+      secondaryColor:'#202737',
+      tertiaryColor:'#171c29',
+      edgeLabelBackground:'#1a2030'
+    }:{
+      /* 亮色：图退到内容层级，节点白底 + 站点同源淡蓝边框（--color-accent-line） */
       mainBkg:'#ffffff',
       nodeBorder:'#7d93af',
       primaryBorderColor:'#7d93af',
@@ -3798,9 +3844,14 @@ window.renderMermaid=async function(){
       secondaryColor:'#f4f7f5',
       tertiaryColor:'#f8faf9',
       edgeLabelBackground:'#ffffff'
-    },flowchart:{htmlLabels:true,nodeSpacing:50,rankSpacing:60}});
-  }
-  nodes.forEach((node,index)=>{node.dataset.mermaidSource=node.textContent||'';node.id=node.id||`mermaid-${index}-${Date.now()}`});
+    })
+  },flowchart:{htmlLabels:true,nodeSpacing:50,rankSpacing:60}});
+  nodes.forEach((node,index)=>{
+    if(!node.dataset.mermaidSource){
+      node.dataset.mermaidSource=node.textContent||'';
+      node.id=node.id||`mermaid-${index}-${Date.now()}`;
+    }
+  });
   await window.mermaid.run({nodes});
   if(window.enhanceMermaid)window.enhanceMermaid();
 };

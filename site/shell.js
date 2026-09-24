@@ -524,18 +524,19 @@
       const setOpen = (open) => {
         group.hidden = !open;
         toggle.setAttribute("aria-expanded", String(open));
-        try { localStorage.setItem(`tk-subnav-open:${parentKey}`, open ? "1" : "0"); } catch (_) {}
       };
 
-      /* 初始态：当前页是本组子项 → 强制展开；否则读上次记住的状态（默认收起）。 */
+      /* 初始态：只在当前页正是本组子项时展开，其余一律收起。
+       *
+       * 之前把展开状态记进 localStorage，结果点开过一次就永久展开——
+       * 每次进站「项目与教学」都是张开的，侧边栏越来越长（2026-09-23 反馈）。
+       * 折叠子项的价值就是默认不占地方，要展开就这一次点一下。 */
       const childKeys = (window.TK_NAV.subitems || []);
       const onChildPage = childKeys.some((key) => {
         const child = items().find((i) => i.key === key);
         return child && child.parent === parentKey && child.key === page;
       });
-      let initial = false;
-      try { initial = localStorage.getItem(`tk-subnav-open:${parentKey}`) === "1"; } catch (_) {}
-      setOpen(onChildPage || initial);
+      setOpen(onChildPage);
 
       toggle.addEventListener("click", () => setOpen(group.hidden));
       /* 父项链接也负责展开（不拦跳转）：点「项目与教学」过去时顺手展开，
