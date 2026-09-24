@@ -116,3 +116,4 @@ vault.bak-*/
 # 完成状态写在文章 frontmatter 的 editorial_pass / editorial_at / editorial_by 里，
 # 那三个字段跟着文章走，是唯一的事实源。
 /.editorial/
+.agent/tmp/
