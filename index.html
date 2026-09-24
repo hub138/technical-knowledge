@@ -3375,11 +3375,14 @@ async function initialize(){
      刷新/分享不再落错 tab。replaceState 不新增历史记录，回退仍是上一个视图。 */
   if(bt)bt.onclick=()=>{
     state.panoTab='stack';renderPanoView();
-    history.replaceState({},'','/?view=panorama'+(state.domain!=='all'?'&domain='+encodeURIComponent(state.domain):'')+'&tab=stack')
+    /* replaceState 必须带上现有 hash：先 render（zoomFromHash 读 hash 恢复
+       放大态）再 replaceState，不带 hash 会把 #zoom= 抹掉，紧随其后的
+       委托监听器再 render 一次时 hash 已空，放大态被冲掉（2026-09-24 实测）。 */
+    history.replaceState({},'','/?view=panorama'+(state.domain!=='all'?'&domain='+encodeURIComponent(state.domain):'')+'&tab=stack'+(location.hash||''))
   };
   if(bm)bm.onclick=()=>{
     state.panoTab='matrix';renderPanoView();
-    history.replaceState({},'','/?view=panorama'+(state.domain!=='all'?'&domain='+encodeURIComponent(state.domain):''))
+    history.replaceState({},'','/?view=panorama'+(state.domain!=='all'?'&domain='+encodeURIComponent(state.domain):'')+(location.hash||''))
   };
   /* 八层栈的小圆点击：SPA 打开文章（tk:pano-open 由 panorama-view 派发）。 */
   document.addEventListener('tk:pano-open',e=>openNote(e.detail.path));
