@@ -101,6 +101,12 @@ PagedAttention 把 KV cache 切成**小块**（类似操作系统的分页），
 | 请求 A | 块 1、块 2、块 7（非连续） |
 | 请求 B | 块 3 |
 
+"块之间不必连续"靠一张块表实现：请求看到自己的逻辑块永远连续，块表把每个逻辑块翻译到 GPU 显存里任意位置的物理块，新块用满才分配下一个。
+
+![vLLM 的 block table：逻辑块到物理块的翻译](https://arxiv.org/html/2309.06180v1/logical-and-physical-block-table.svg)
+
+左列是请求 A 的逻辑 KV 块（token 顺序连续），中间 Block Table 记录每个逻辑块映射的物理块号与已填槽数，右列是 GPU 显存里的物理块池——逻辑块 0/1/2 分别散落在物理块 7/1/3，生成新 token 时先填未满块的空槽，填满才从池里领新块。逻辑连续、物理分散，预留浪费从此不存在。图取自 [Efficient Memory Management for Large Language Model Serving with PagedAttention（arXiv:2309.06180）](https://arxiv.org/abs/2309.06180) 论文 Figure 6。
+
 **收益**：
 
 - 显存浪费从 60-80% 降到 **不到 4%**
