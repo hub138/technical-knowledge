@@ -3359,8 +3359,8 @@ function enhanceMermaid(){
     const bar = document.createElement('div');
     bar.className = 'mmd-bar';
     bar.innerHTML =
-      '<button type="button" class="mmd-btn" data-act="out" title="放大">＋</button>' +
-      '<button type="button" class="mmd-btn" data-act="in" title="缩小">－</button>' +
+      '<button type="button" class="mmd-btn" data-act="out" title="放大" aria-label="放大图表">＋</button>' +
+      '<button type="button" class="mmd-btn" data-act="in" title="缩小" aria-label="缩小图表">－</button>' +
       '<button type="button" class="mmd-btn" data-act="copy" title="复制图源码">复制</button>';
     wrap.insertBefore(bar, pre);
 
