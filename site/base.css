@@ -203,9 +203,9 @@ body.tk-host::before {
 /* Quieter than its parent so the nested entry reads as a child rather than
    competing with the destination above it. */
 .tk-nav-icon--sub {
-  width: 14px;
-  height: 18px;
-  font-size: 10px;
+  width: 16px;
+  height: 20px;
+  font-size: 12px;
   opacity: 0.65;
 }
 
@@ -235,28 +235,30 @@ a.has-children {
   padding-right: 30px;
 }
 
-/* 箭头按钮：盖在父项行右缘。透明背景无边框，整行看着仍是一个导航项。
+/* 箭头按钮：铺满整个父项行，点这一行的任何位置都在切换折叠
+ * （用户 2026-09-24 反馈：折叠不该只局限在小箭头上，点「知识全景」
+ *   整行就该展开或收起）。按钮在链接之上，本身只管折叠；
+ *   跳转仍由下面的 a.has-children 承担——两者分工见 shell.js。
  * top 必须显式给：absolute 无 top 时取静态位置（父项链接块之后），
- * 箭头会掉到行下方悬空（用户截图里的游离 ▼）。 */
+ * 箭头会掉到行下方悬空。 */
 .tk-subnav-toggle {
   position: absolute;
-  top: 50%;
-  right: 6px;
-  transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  padding: 0;
+  justify-content: flex-end;
+  padding: 0 12px 0 0;
   border: none;
   background: none;
   color: var(--color-muted);
   font-size: var(--arrow-size);
   line-height: 1;
   cursor: pointer;
-  /* ▸ 收起态；aria-expanded=true 时旋成 ▾（▸/▾ 语义分工见 tokens.css）。
-   * 旋转在 ::before 上，这里的 transform 专管垂直居中，互不打架。 */
   transition: transform var(--duration-fast) var(--ease-out);
 }
 
@@ -295,8 +297,8 @@ a.has-children {
   display: flex;
   align-items: center;
   gap: 7px;
-  /* 二级条目就该比父项矮：28px 行高对父项 40px，一眼分得出层级。 */
-  min-height: 28px;
+  /* 二级条目就该比父项矮：32px 行高对父项 40px，一眼分得出层级。 */
+  min-height: 32px;
   /* 左缩进由 .tk-subnav-group 统一给（margin+padding+左线）；
    * 这里不再自带 margin-left —— 旧版常展开布局的残留，嵌进 group 后
    * 变成双重缩进，子项标签比主项深 41px，行左半截全是空白（用户截图
@@ -306,10 +308,10 @@ a.has-children {
   border: 1px solid transparent;
   border-radius: 6px;
   color: var(--color-muted);
-  /* 子项是条目不是入口：13px + regular，明显轻于父项（15px/medium）。
-   * 之前 14px/semibold 比父项还重，看着就是缩水的一级导航（用户反馈
-   * 「格式文字都不一样」）。active 态升回 medium 补偿对比度。 */
-  font-size: 13px;
+  /* 二级条目：14px —— 13px 在侧栏里读着吃力（2026-09-24 反馈：我的阅读、
+   * 学习路线、学习中心、我的课堂四个都太小）。行高同步放到 32px，
+   * 仍矮于父项 40px，层级一眼分得出来。 */
+  font-size: 14px;
   font-weight: var(--weight-normal);
   text-decoration: none;
   transition:

@@ -22,15 +22,9 @@ python3 scripts/search.py "dashboard" --domain product
 python3 scripts/search.py "elegant" --domain typography
 ```
 
-## 视觉参考站（站长钦定，取长补短不照抄）
+## 视觉参考站（取长补短不照抄）
 
-| 站 | 学什么 |
-|---|---|
-| bestblogs.dev/reading/follow | 总标杆：橙色调、导航、右上角、正文排版、夜间模式按钮、侧边栏、字数与阅读时长提示 |
-| papernotes.org | 紫 + 深蓝配色、按会议分类、一句话摘要 |
-| arxivdaily.com | 深红 logo、黑粗字体、清晰摘要 |
-| ruanyifeng.com | 老牌口碑、内容组织 |
-| readhub.cn / zeli.app | 资讯类设计思路（放最后，标资讯） |
+参考站与具体项目绑定，不写在本技能里。接到美化任务时问用户有没有钦定的参考站，有就把「站名 + 学什么」填在这里，例如「某站 | 导航与正文排版、夜间模式按钮」；每站一条学习点，取长补短不照抄。
 
 ## 待补（这次没拿到一手证据，别当依据引用）
 

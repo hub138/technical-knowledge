@@ -14,7 +14,9 @@
   "use strict";
 
   var M = window.TKMatrix;
-  var KINDS = M.KINDS, LAYERS = M.LAYERS;
+  /* 列的显示顺序用 kindsInDisplayOrder()（学习路径：原理 → 实践 → 故障）。
+   * KINDS 数组顺序只服务分类匹配，不服务展示。 */
+  var KINDS = M.kindsInDisplayOrder(), LAYERS = M.LAYERS;
   var EN = function () { return window.TKI18N && window.TKI18N.lang === "en"; };
   var kName = function (k) { return EN() && k.name_en ? k.name_en : k.name; };
   var kHint = function (k) { return EN() && k.hint_en ? k.hint_en : k.hint; };
@@ -438,22 +440,24 @@
       body.appendChild(el("div", "mx-gaps-none", EN() ? "No empty cells" : "没有空格子"));
     }
 
-    /* 空格按类型归组：一个类型一条，层次收成标签。 */
+    /* 空格按类型归组：一个类型一条，层次收成标签。
+     * 遍历走显示顺序（本地 KINDS 已是学习路径序），分组行的先后
+     * 与矩阵列顺序一致。 */
     if (empties.length) {
       var byKind = {};
       empties.forEach(function (c) { (byKind[c.kind] = byKind[c.kind] || []).push(c); });
-      Object.keys(byKind).forEach(function (kid) {
-        var k = KINDS.filter(function (x) { return x.id === kid; })[0];
+      KINDS.forEach(function (k) {
+        if (!byKind[k.id]) return;
         var group = el("div", "mx-gaps-group");
         var gh = el("div", "mx-gaps-group-head");
         gh.appendChild(el("span", "mx-gaps-mark mx-mark-empty", "✗"));
         gh.appendChild(el("span", "mx-gaps-group-name", kName(k)));
         gh.appendChild(el("span", "mx-gaps-group-note", EN()
-          ? byKind[kid].length + (byKind[kid].length === 1 ? " layer empty" : " layers empty")
-          : byKind[kid].length + " 层全空"));
+          ? byKind[k.id].length + (byKind[k.id].length === 1 ? " layer empty" : " layers empty")
+          : byKind[k.id].length + " 层全空"));
         group.appendChild(gh);
         var chips = el("div", "mx-gaps-chips");
-        byKind[kid].forEach(function (c) {
+        byKind[k.id].forEach(function (c) {
           var L = LAYERS.filter(function (x) { return x.id === c.layer; })[0];
           var chip = el("button", "mx-gap-chip mx-gap-chip--empty", lName(L));
           chip.type = "button";

@@ -13,10 +13,10 @@ Mac vault 编辑 ──→ git push ──→ GitHub main ──→ dev 每 5 �
 ```
 
 - **dev 是唯一线上服务**。Mac 的 knowledge-site 已停用（plist .retired）；Mac 的 18787 是转发隧道不是站点。
-- 回环别名 `127.10.0.1` 是安全约定：经代理/隧道进来的流量目的地址落在别名上 → 判非本机。Mac 本机测试绑 `0.0.0.0` 时不触发此判定（回环直连仍算本机）。
+- 回环别名 `127.10.0.1` 是安全契约：经代理/隧道进来的流量目的地址落在别名上 → 判非本机。Mac 本机测试绑 `0.0.0.0` 时不触发此判定（回环直连仍算本机）。
 - dev 克隆路径随机器而定（用 `KNOWLEDGE_REPO` 或技能目录同级的 `technical-knowledge` 定位），本地分支 main。改 systemd/nginx 后要 `daemon-reload` / `nginx -s reload`（nginx 是 daemon off 裸跑，systemd 里 disabled）。
 
-## 端口约定（五位数是后来的约定，别混）
+## 端口契约（五位数是后来的约定，别混）
 
 | 端口 | 是什么 |
 |---|---|

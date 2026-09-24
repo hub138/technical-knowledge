@@ -1,0 +1,1128 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>我的阅读 · technical-knowledge</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/static/tokens.css" />
+    <link rel="stylesheet" href="/static/base.css" />
+    <script src="/static/nav.js"></script>
+    <script src="/static/i18n.js"></script>
+    <script src="/static/legacy-polyfills.js"></script>
+    <script src="/static/shell.js"></script>
+    <script src="/static/matrix.js"></script>
+    <script>
+      /* 侧边栏与反馈组件和主站是同一份（shell.js 渲染），等 DOM 就绪后挂载。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({
+        page: "reading",
+        context: true,
+        subnav: window.TK_NAV.subitems,
+        auth: true,
+      }));
+      document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
+        where: () => '当前页面：<b>' + (((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title) + '</b>',
+        title: () => ((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title,
+      }));
+    </script>
+    <style>
+      /* 本页结构：上面「我的阅读」（全库标注视图，数据是 localStorage 的
+         tk-progress-v1），下面「学习路线」（按主题排好的阅读队列）。
+         两个分区共用同一份进度数据，勾选后互相刷新（tk:progress-changed）。
+         字号/字重/圆角/间距全部走 tokens.css 标尺，全局规则由 base.css 提供。 */
+
+      .rd-head h1 {
+        margin: 0 0 4px;
+      }
+      .rd-head-desc {
+        color: var(--color-muted);
+        margin: 0;
+        max-width: 72ch;
+      }
+      /* 分区跳转：本页装了两个导航项，锚点决定当前是哪个。放在页头，
+         读者一眼知道这页有两块，也知道自己在哪一块。 */
+      .rd-jump {
+        display: flex;
+        gap: 8px;
+        margin-top: 14px;
+        flex-wrap: wrap;
+      }
+      .rd-jump a {
+        padding: 5px 12px;
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        color: var(--color-muted);
+        font-size: 13px;
+        text-decoration: none;
+        transition:
+          background var(--duration-fast) var(--ease-out),
+          color var(--duration-fast) var(--ease-out),
+          border-color var(--duration-fast) var(--ease-out);
+      }
+      .rd-jump a:hover {
+        border-color: var(--color-accent-line);
+        color: var(--color-accent);
+      }
+      .rd-jump a[aria-current="page"] {
+        background: var(--color-accent-soft);
+        border-color: var(--color-accent-line);
+        color: var(--color-accent);
+        font-weight: var(--weight-medium);
+      }
+      .rd-sec {
+        margin-top: 38px;
+      }
+      .rd-sec h2 {
+        font-size: var(--text-h3);
+        margin: 0 0 4px;
+      }
+      .rd-sec-intro {
+        color: var(--color-muted);
+        font-size: var(--text-small);
+        margin: 0 0 14px;
+        max-width: 72ch;
+      }
+
+      /* ── 我的阅读：动作行 ─────────────────────────────────── */
+      .progress-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:0 0 16px}
+      .pg-filter{display:inline-flex;align-items:center;gap:4px;font-size:var(--text-sm);color:var(--color-muted);cursor:pointer}
+      .pg-filter input{accent-color:var(--color-accent)}
+      .pg-clear{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted);border-radius:5px;padding:5px 9px;font-size:var(--text-sm);cursor:pointer}
+      .pg-io{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-ink-soft);border-radius:5px;padding:5px 9px;font-size:var(--text-sm);cursor:pointer}
+      .pg-io:hover{border-color:var(--color-accent);color:var(--color-accent)}
+      .pg-clear:hover{border-color:var(--color-danger);color:var(--color-danger)}
+
+      /* ── 我的阅读：总进度 + 域进度条 ──────────────────────── */
+      .pg-overall{margin-bottom:24px}
+      .pg-overall-num{font-size:var(--text-lg);margin-bottom:8px}
+      .pg-overall-num b{font-size:var(--text-2xl);font-variant-numeric:tabular-nums}
+      .pg-overall-num span{color:var(--color-muted)}
+      .pg-planned-num{margin-left:10px;color:var(--color-accent)}
+      .pg-track{height:10px;background:var(--color-surface);border:1px solid var(--color-line);border-radius:999px;overflow:hidden}
+      .pg-track--big{height:14px}
+      .pg-track--big i{display:block;height:100%;background:var(--color-ok);border-radius:999px;transition:width var(--duration-slow) var(--ease-out)}
+      .pg-domain-bars{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:8px;margin-top:16px}
+      .pg-domain{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 8px;align-items:baseline;padding:8px 12px;background:var(--color-panel);border:1px solid var(--color-line);border-radius:6px;color:var(--color-ink-soft);font-size:var(--text-xs)}
+      .pg-domain:hover{border-color:var(--color-accent);color:var(--color-accent)}
+      .pg-domain-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:var(--weight-semibold)}
+      .pg-domain-name+.pg-domain-track{grid-column:1/-1}
+      .pg-domain-track{height:6px;background:var(--color-surface);border:1px solid var(--color-line);border-radius:999px;overflow:hidden}
+      .pg-domain-track i{display:block;height:100%;background:var(--color-ok)}
+      .pg-domain-count{font-variant-numeric:tabular-nums;color:var(--color-muted)}
+
+      /* ── 最近读完 / 下一步 ────────────────────────────────── */
+      .pg-next{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 12px;padding:8px 12px;background:var(--color-accent-soft);border:1px solid var(--color-accent-line);border-radius:8px}
+      .pg-next-label{font-size:var(--text-xs);color:var(--color-accent);font-weight:var(--weight-semibold)}
+      .pg-next-item{display:inline-flex;gap:6px;align-items:center;font-size:var(--text-xs);background:var(--color-panel);border:1px solid var(--color-line);border-radius:999px;padding:3px 5px 3px 10px}
+      .pg-next-item a{color:var(--color-ink-soft)}
+      .pg-next-item a:hover{color:var(--color-accent)}
+      .pg-next-done{width:20px;height:20px;border:0;border-radius:50%;background:var(--color-ok);color:#fff;cursor:pointer;font-size:var(--text-2xs);line-height:1}
+      .pg-next-done:hover{filter:brightness(1.1)}
+      .pg-recent{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:0 0 16px;padding:8px 12px;background:var(--color-ok-soft);border-radius:8px}
+      .pg-recent-label{font-size:var(--text-xs);color:var(--color-ok-ink);font-weight:var(--weight-semibold)}
+      .pg-recent-item{font-size:var(--text-xs);color:var(--color-ink-soft);background:var(--color-panel);border:1px solid var(--color-line);border-radius:999px;padding:3px 10px;cursor:pointer}
+      .pg-recent-item:hover{color:var(--color-accent);border-color:var(--color-accent)}
+
+      /* ── 我的阅读：域块 + 主题组 + 行 ─────────────────────── */
+      .pg-domain-block{margin-bottom:24px}
+      .pg-domain-block h3{font-size:var(--text-lg);margin:0 0 10px;display:flex;align-items:baseline;gap:10px}
+      .pg-domain-block h3 .pg-domain-count{font-size:var(--text-xs);font-weight:var(--weight-semibold);color:var(--color-muted)}
+      .pg-domain-graph{font-size:var(--text-xs);color:var(--color-accent);font-weight:var(--weight-semibold);margin-left:auto}
+      .pg-topic-group{margin-bottom:16px}
+      .pg-topic-group h4{font-size:var(--text-sm);color:var(--color-muted);margin:0 0 6px;font-weight:var(--weight-semibold)}
+      .pg-row{display:flex;gap:8px;align-items:center;padding:8px 10px;background:var(--color-panel);border:1px solid var(--color-line);border-bottom:0}
+      .pg-row:first-of-type{border-radius:8px 8px 0 0}
+      .pg-row:last-of-type{border-bottom:1px solid var(--color-line);border-radius:0 0 8px 8px}
+      .pg-check,.pg-star{flex:none;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--color-line);border-radius:6px;background:var(--color-panel);cursor:pointer;font-size:var(--text-sm);line-height:1;color:var(--color-muted)}
+      .pg-check:hover,.pg-star:hover{border-color:var(--color-accent);color:var(--color-accent)}
+      .pg-check.on{background:var(--color-ok);border-color:var(--color-ok);color:#fff}
+      .pg-star.on{color:var(--color-star);border-color:var(--color-star-line);background:var(--color-star-soft)}
+      .pg-title{color:var(--color-ink);font-size:var(--text-sm);font-weight:var(--weight-semibold);cursor:pointer;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+      .pg-title:hover{color:var(--color-accent);text-decoration:underline;text-underline-offset:3px}
+      .pg-topic{flex:none;font-size:var(--text-xs);color:var(--color-faint)}
+      .pg-row.is-learned .pg-title{color:var(--color-faint);text-decoration:line-through;text-decoration-color:var(--color-line-strong)}
+      .pg-row.is-planned .pg-title{color:var(--color-ink)}
+
+      /* ── 学习路线（从 path.html 迁移，语义布局不变） ──────── */
+      .lp-hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+        gap: 36px;
+        align-items: end;
+      }
+      .lp-hero p {
+        max-width: 62ch;
+      }
+      .lp-picker {
+        align-self: end;
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
+        padding: var(--space-4);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-md);
+        display: grid;
+        gap: var(--space-3);
+      }
+      .lp-picker fieldset {
+        border: 0;
+        padding: 0;
+        margin: 0;
+      }
+      .lp-picker legend,
+      .lp-picker label {
+        display: block;
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        margin-bottom: var(--space-2);
+      }
+      .lp-select-row select {
+        width: 100%;
+        /* 16px 是 iOS Safari 的分界：小于它聚焦时整页自动放大。 */
+        font-size: 16px;
+        min-height: 44px;
+        border: 1px solid var(--color-line);
+        border-radius: 5px;
+        padding: 8px 10px;
+        outline: 0;
+        background: var(--color-panel);
+        color: var(--color-ink);
+      }
+      .lp-select-row select:focus {
+        border-color: var(--color-ok);
+        box-shadow: 0 0 0 3px #08766316;
+      }
+      .lp-kinds {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px 14px;
+      }
+      .lp-kinds label {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: var(--text-small);
+        font-weight: var(--weight-normal);
+        margin: 0;
+        cursor: pointer;
+        padding: 4px 0;
+      }
+      .lp-kinds input {
+        margin: 0;
+        accent-color: var(--color-accent);
+        width: 15px;
+        height: 15px;
+        flex: none;
+      }
+      .lp-continue {
+        margin-top: 34px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 13px 24px;
+        align-items: center;
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-md);
+        padding: 14px var(--space-4);
+      }
+      .lp-continue .lp-next {
+        flex: 1 1 340px;
+        min-width: 0;
+      }
+      .lp-continue .lp-next small {
+        display: block;
+        font-size: var(--text-micro);
+        color: var(--color-muted);
+        margin-bottom: 4px;
+        font-weight: var(--weight-semibold);
+      }
+      .lp-continue .lp-next a {
+        color: var(--color-accent);
+        font-size: var(--text-body);
+        font-weight: var(--weight-semibold);
+        display: inline-block;
+        max-width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+      }
+      .lp-continue .lp-next a:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .lp-continue .lp-next span.lp-done {
+        font-size: var(--text-body);
+        color: var(--color-ink-soft);
+      }
+      .lp-progress {
+        flex: 1 1 220px;
+        min-width: 180px;
+      }
+      .lp-progress small {
+        display: block;
+        font-size: var(--text-micro);
+        color: var(--color-muted);
+        margin-bottom: 5px;
+      }
+      .lp-progress-bar {
+        height: 7px;
+        background: var(--color-line);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .lp-progress-fill {
+        height: 100%;
+        background: var(--color-accent);
+        border-radius: 4px;
+        width: 0;
+        transition: width var(--duration-fast) var(--ease-out);
+      }
+      .lp-hide-learned {
+        flex: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        font-size: var(--text-small);
+        cursor: pointer;
+        padding: 4px 0;
+      }
+      .lp-hide-learned input {
+        margin: 0;
+        accent-color: var(--color-accent);
+        width: 15px;
+        height: 15px;
+        flex: none;
+      }
+      .lp-start-btn {
+        flex: none;
+        display: inline-block;
+        background: var(--color-accent);
+        color: var(--color-on-accent);
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        padding: 8px 18px;
+        border-radius: var(--radius-full);
+        text-decoration: none;
+        transition: background var(--duration-fast) var(--ease-out);
+      }
+      .lp-start-btn:hover {
+        background: var(--color-accent-hover);
+        text-decoration: none;
+      }
+      .lp-sections {
+        margin-top: 26px;
+        display: grid;
+        gap: 13px;
+      }
+      .lp-stage {
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-md);
+        overflow: hidden;
+      }
+      .lp-stage.is-done {
+        border-color: var(--color-ok);
+      }
+      .lp-stage-head {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px 14px;
+        align-items: baseline;
+        padding: 14px var(--space-4) 12px;
+        border-bottom: 1px solid var(--color-line);
+      }
+      .lp-stage-head .lp-stage-no {
+        font-size: 21px;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        color: var(--color-accent);
+        opacity: 0.32;
+        line-height: 1;
+      }
+      .lp-stage-head h3 {
+        font-size: var(--text-h3);
+        margin: 0;
+      }
+      .lp-stage-head .lp-stage-hint {
+        font-size: var(--text-small);
+        color: var(--color-muted);
+      }
+      .lp-stage-head .lp-stage-count {
+        margin-left: auto;
+        font-size: var(--text-small);
+        color: var(--color-ink-soft);
+        font-variant-numeric: tabular-nums;
+      }
+      .lp-stage-done {
+        margin-left: auto;
+        font-size: var(--text-micro);
+        font-weight: var(--weight-semibold);
+        color: var(--color-ok-ink);
+        background: var(--color-ok-soft);
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+        flex: none;
+      }
+      .lp-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-height: 44px;
+        padding: 8px var(--space-4);
+        border-bottom: 1px solid var(--color-line);
+        transition: background var(--duration-fast) var(--ease-out);
+      }
+      .lp-item:hover {
+        background: var(--color-accent-soft);
+      }
+      .lp-items .lp-item:last-of-type {
+        border-bottom: 0;
+      }
+      .lp-check {
+        flex: none;
+        width: 15px;
+        height: 15px;
+        margin: 0;
+        accent-color: var(--color-accent);
+        cursor: pointer;
+      }
+      .lp-title {
+        min-width: 0;
+        flex: 1;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--color-ink);
+        font-size: var(--text-body);
+      }
+      .lp-title:hover {
+        color: var(--color-accent);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .lp-learned-mark {
+        flex: none;
+        font-size: var(--text-micro);
+        color: var(--color-ok-ink);
+        background: var(--color-ok-soft);
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-weight: var(--weight-semibold);
+      }
+      .lp-words {
+        flex: none;
+        font-size: var(--text-small);
+        color: var(--color-muted);
+        font-variant-numeric: tabular-nums;
+        padding-left: var(--space-3);
+        border-left: 1px solid var(--color-line);
+      }
+      .lp-item.is-learned .lp-title {
+        color: var(--color-muted);
+      }
+      .lp-more-row {
+        padding: 8px var(--space-4);
+      }
+      .lp-all-read {
+        padding: 12px var(--space-4);
+        font-size: var(--text-small);
+        color: var(--color-muted);
+      }
+      .lp-more-btn {
+        background: none;
+        border: 0;
+        color: var(--color-accent);
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        cursor: pointer;
+        padding: 4px 0;
+      }
+      .lp-more-btn:hover {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .lp-empty,
+      .lp-error {
+        margin-top: 26px;
+        background: var(--color-panel);
+        border: 1px solid var(--color-line);
+        border-radius: var(--radius-md);
+        padding: 26px var(--space-4);
+        color: var(--color-muted);
+        font-size: var(--text-body);
+      }
+      .lp-error {
+        color: var(--color-danger);
+      }
+      .lp-loading {
+        margin-top: 26px;
+        color: var(--color-muted);
+        font-size: var(--text-body);
+      }
+      @media (max-width: 900px) {
+        .lp-hero {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 620px) {
+        .lp-continue {
+          display: grid;
+          gap: 11px;
+        }
+        .lp-hide-learned {
+          align-self: start;
+        }
+      }
+      /* 暗色模式：面板类与主站同款兜底，避免暗色下面板发白。 */
+      :root[data-theme="dark"] .lp-picker,
+      :root[data-theme="dark"] .lp-continue,
+      :root[data-theme="dark"] .lp-stage,
+      :root[data-theme="dark"] .lp-empty,
+      :root[data-theme="dark"] .lp-error,
+      :root[data-theme="dark"] .pg-row,
+      :root[data-theme="dark"] .pg-domain,
+      :root[data-theme="dark"] .pg-next-item,
+      :root[data-theme="dark"] .pg-recent-item,
+      :root[data-theme="dark"] .pg-check,
+      :root[data-theme="dark"] .pg-star {
+        background: var(--color-panel) !important;
+      }
+    </style>
+  </head>
+  <body class="tk-host">
+    <aside class="tk-sidebar" id="tk-sidebar"></aside>
+    <div class="tk-shell">
+      <article class="rd-page">
+        <div class="rd-head">
+          <h1 id="rd-title">我的阅读</h1>
+          <p class="rd-head-desc" id="rd-desc">标记已读、排稍后读——只保存在这台浏览器上，不会上传</p>
+          <nav class="rd-jump" aria-label="本页分区">
+            <a href="/panorama/reading" data-jump="reading">我的阅读</a>
+            <a href="/panorama/reading#rd-path" data-jump="path">学习路线</a>
+          </nav>
+        </div>
+
+        <section id="rd-reading" class="rd-sec">
+          <h2>已读与稍后读</h2>
+          <p class="rd-sec-intro">全库的已读与稍后读都在这里。与阅读页、学习路线共享同一份进度，任一处勾选、全站同步。</p>
+          <div class="progress-actions">
+            <label class="pg-filter"><input type="radio" name="pg-filter" value="all" checked>全部</label>
+            <label class="pg-filter"><input type="radio" name="pg-filter" value="todo">未读</label>
+            <label class="pg-filter"><input type="radio" name="pg-filter" value="learned">已读</label>
+            <label class="pg-filter"><input type="radio" name="pg-filter" value="planned">稍后读</label>
+            <button type="button" class="pg-io" id="pg-export" title="把标注下载成 JSON 文件">导出</button>
+            <button type="button" class="pg-io" id="pg-import" title="从 JSON 文件导入标注">导入</button>
+            <input type="file" id="pg-import-file" accept=".json,application/json" hidden>
+            <button type="button" class="pg-clear" id="pg-clear">清除全部标注</button>
+          </div>
+          <div id="progress-body"></div>
+        </section>
+
+        <section id="rd-path" class="rd-sec">
+          <h2>学习路线</h2>
+          <p class="rd-sec-intro">选一个领域和主题，把这一主题的文章排出一条路线：先懂机制，再看怎么观测，认得出故障，学得会修复，最后沉淀成实践。顺序已排好，不用自己挑。换主题即换路线，进度按主题分别显示。</p>
+          <div class="lp-loading" id="lp-loading">正在加载学习路线数据…</div>
+          <form class="lp-picker" id="lp-picker">
+            <div class="lp-select-row">
+              <label for="lp-domain">领域</label>
+              <select id="lp-domain"></select>
+            </div>
+            <div class="lp-select-row">
+              <label for="lp-topic">主题</label>
+              <select id="lp-topic"></select>
+            </div>
+            <fieldset>
+              <legend>要学哪几段</legend>
+              <div class="lp-kinds" id="lp-kinds"></div>
+            </fieldset>
+          </form>
+          <div class="lp-continue" id="lp-continue" hidden>
+            <div class="lp-next">
+              <small id="lp-progress-label">进度</small>
+              <a href="#" id="lp-next-link" hidden></a>
+              <span class="lp-done" id="lp-next-done" hidden>这一主题的勾选段全部读完，可以换下一个主题了</span>
+            </div>
+            <div class="lp-progress">
+              <small>整体进度</small>
+              <div class="lp-progress-bar">
+                <div class="lp-progress-fill" id="lp-progress-fill"></div>
+              </div>
+            </div>
+            <a class="lp-start-btn" id="lp-start" href="#" hidden>开始读</a>
+            <label class="lp-hide-learned"><input type="checkbox" id="lp-hide-learned">隐藏已读</label>
+          </div>
+          <div class="lp-sections" id="lp-sections"></div>
+          <div class="lp-empty" id="lp-empty" hidden></div>
+          <div class="lp-error" id="lp-error" hidden></div>
+        </section>
+      </article>
+
+      <script>
+        (function () {
+          "use strict";
+          var esc = window.TKShell.esc;
+
+          /* ═══ 第一分区：我的阅读（从 index.html renderProgress 迁移） ═══ */
+          var state = { notes: [], pgFilter: "all" };
+          var STAR_SVG = '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.2l2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8z"/></svg>';
+
+          function tr(text) {
+            return window.TKI18N ? window.TKI18N.t(text) : text;
+          }
+
+          function ordered(list) {
+            var PINNED_FIRST = ["总览", "缺陷分析：从个案到体系"];
+            var PINNED_LAST = ["Clippings", "知识库管理"];
+            return Array.from(list).sort(function (a, b) {
+              var fa = PINNED_FIRST.indexOf(a), fb = PINNED_FIRST.indexOf(b);
+              if (fa >= 0 || fb >= 0) return (fa < 0 ? 99 : fa) - (fb < 0 ? 99 : fb) || a.localeCompare(b, "zh-CN");
+              var la = PINNED_LAST.indexOf(a), lb = PINNED_LAST.indexOf(b);
+              if (la >= 0 || lb >= 0) return (la < 0 ? 99 : la) - (lb < 0 ? 99 : lb) || a.localeCompare(b, "zh-CN");
+              return a.localeCompare(b, "zh-CN");
+            });
+          }
+
+          function renderProgress() {
+            window.TKShell.progress.load();
+            var notes = state.notes.filter(function (n) {
+              return n.category !== "总览" && n.category !== "Clippings" && n.topic !== "概览" && !n.exclude_from_graph;
+            });
+            var domains = ordered(new Set(notes.map(function (n) { return n.category; })));
+            var f = state.pgFilter;
+            var stOf = function (n) { return window.TKShell.progress.statusOf(n.path); };
+            var passed = function (n) { return f === "all" || f === stOf(n) || (f === "todo" && !stOf(n)); };
+            var total = notes.length;
+            var learned = notes.filter(function (n) { return stOf(n) === "learned"; }).length;
+            var planned = notes.filter(function (n) { return stOf(n) === "planned"; }).length;
+            var pct = total ? Math.round(learned / total * 100) : 0;
+
+            var domainBars = domains.map(function (d) {
+              var list = notes.filter(function (n) { return n.category === d; });
+              var dn = list.filter(function (n) { return stOf(n) === "learned"; }).length;
+              var p = list.length ? Math.round(dn / list.length * 100) : 0;
+              return '<a class="pg-domain" href="/?view=graph&focus=' + encodeURIComponent(d) + '" title="在知识图谱中聚焦 ' + esc(d) + '">'
+                + '<span class="pg-domain-name">' + esc(tr(d)) + '</span>'
+                + '<span class="pg-domain-count">' + dn + "/" + list.length + '</span>'
+                + '<span class="pg-domain-track"><i style="width:' + p + '%"></i></span></a>';
+            }).join("");
+
+            var groups = domains.map(function (d) {
+              var list = notes.filter(function (n) { return n.category === d && passed(n); });
+              if (!list.length) return "";
+              var dn = notes.filter(function (n) { return n.category === d && stOf(n) === "learned"; }).length;
+              var totalD = notes.filter(function (n) { return n.category === d; }).length;
+              var topicSet = new Set(list.map(function (n) { return n.topic; }));
+              var topics = Array.from(topicSet).sort(function (a, b) { return a.localeCompare(b, "zh-CN"); });
+              var sections = topics.map(function (t) {
+                var rows = list.filter(function (n) { return n.topic === t; }).map(function (n) {
+                  var st = stOf(n);
+                  return '<div class="pg-row' + (st === "learned" ? " is-learned" : st === "planned" ? " is-planned" : "") + '" data-path="' + esc(n.path) + '">'
+                    + '<button type="button" class="pg-check' + (st === "learned" ? " on" : "") + '" data-path="' + esc(n.path) + '" aria-pressed="' + (st === "learned") + '" title="' + (st === "learned" ? "已读，点击取消" : "标记为已读") + '">✓</button>'
+                    + '<button type="button" class="pg-star' + (st === "planned" ? " on" : "") + '" data-path="' + esc(n.path) + '" aria-pressed="' + (st === "planned") + '" title="' + (st === "planned" ? "稍后读，点击取消" : "加入稍后读") + '">' + STAR_SVG + '</button>'
+                    + '<a class="pg-title" data-path="' + esc(n.path) + '" role="link" tabindex="0" title="' + esc(n.title) + '">' + esc(n.title) + '</a>'
+                    + '<span class="pg-topic">' + esc(tr(t)) + '</span>'
+                    + '</div>';
+                }).join("");
+                return '<div class="pg-topic-group"><h4>' + esc(tr(t)) + '</h4>' + rows + '</div>';
+              }).join("");
+              return '<section class="pg-domain-block"><h3>' + esc(tr(d))
+                + '<span class="pg-domain-count">' + dn + "/" + totalD + ' 已读</span>'
+                + '<a class="pg-domain-graph" href="/?view=graph&focus=' + encodeURIComponent(d) + '">图谱聚焦 →</a></h3>'
+                + sections + '</section>';
+            }).join("");
+
+            var recent = Object.entries(window.TKShell.progress.ensure().learned)
+              .sort(function (x, y) { return y[1] - x[1]; }).slice(0, 3)
+              .map(function (pair) {
+                var path = pair[0];
+                return state.notes.find(function (n) { return n.path === path; });
+              }).filter(Boolean);
+            var recentBlock = recent.length
+              ? '<div class="pg-recent"><span class="pg-recent-label">最近读完</span>' + recent.map(function (n) {
+                  return '<a class="pg-recent-item" href="/?path=' + encodeURIComponent(n.path) + '">' + esc(n.title.length > 26 ? n.title.slice(0, 25) + "…" : n.title) + '</a>';
+                }).join("") + '</div>'
+              : "";
+
+            var nextUp = (f === "all" || f === "planned")
+              ? Object.entries(window.TKShell.progress.ensure().planned).sort(function (x, y) { return x[1] - y[1]; }).slice(0, 3)
+                  .map(function (pair) {
+                    var path = pair[0];
+                    return state.notes.find(function (n) { return n.path === path; });
+                  }).filter(Boolean)
+              : [];
+            var nextBlock = nextUp.length
+              ? '<div class="pg-next"><span class="pg-next-label">下一步</span>' + nextUp.map(function (n) {
+                  return '<span class="pg-next-item"><a href="/?path=' + encodeURIComponent(n.path) + '">' + esc(n.title.length > 30 ? n.title.slice(0, 29) + "…" : n.title) + '</a><button type="button" class="pg-next-done" data-path="' + esc(n.path) + '" title="标记为已读">✓</button></span>';
+                }).join("") + '</div>'
+              : "";
+
+            var body = document.getElementById("progress-body");
+            body.innerHTML = ""
+              + '<div class="pg-overall">'
+              + '<div class="pg-overall-num"><b>' + learned + '</b> / ' + total + ' <span>已读 · ' + pct + '%</span>' + (planned ? '<span class="pg-planned-num">稍后读 ' + planned + '</span>' : "") + '</div>'
+              + '<div class="pg-track pg-track--big"><i style="width:' + pct + '%"></i></div>'
+              + '<div class="pg-domain-bars">' + domainBars + '</div>'
+              + '</div>'
+              + nextBlock
+              + recentBlock
+              + (groups || '<div class="pg-empty-hint">这个过滤条件下没有文章。</div>');
+
+            body.querySelectorAll(".pg-check").forEach(function (b) {
+              b.onclick = function (e) { e.stopPropagation(); window.TKShell.progress.toggle(b.dataset.path, "learned"); };
+            });
+            body.querySelectorAll(".pg-star").forEach(function (b) {
+              b.onclick = function (e) { e.stopPropagation(); window.TKShell.progress.toggle(b.dataset.path, "planned"); };
+            });
+            body.querySelectorAll(".pg-next-done").forEach(function (b) {
+              b.onclick = function (e) { e.stopPropagation(); window.TKShell.progress.set(b.dataset.path, "learned"); };
+            });
+          }
+
+          /* 导出/导入/清除：与主站同一套行为。 */
+          document.getElementById("pg-export").onclick = function () {
+            var blob = new Blob([JSON.stringify(window.TKShell.progress.ensure(), null, 2)], { type: "application/json" });
+            var a = document.createElement("a");
+            a.href = URL.createObjectURL(blob);
+            a.download = "knowledge-progress-" + new Date().toISOString().slice(0, 10) + ".json";
+            a.click();
+            URL.revokeObjectURL(a.href);
+          };
+          var impFile = document.getElementById("pg-import-file");
+          document.getElementById("pg-import").onclick = function () { impFile.click(); };
+          impFile.onchange = function () {
+            var file = impFile.files && impFile.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function () {
+              try {
+                var incoming = JSON.parse(reader.result);
+                if (!incoming || typeof incoming !== "object") throw new Error("shape");
+                var cur = window.TKShell.progress.ensure();
+                ["learned", "planned"].forEach(function (bucket) {
+                  var inc = incoming[bucket] || {};
+                  Object.keys(inc).forEach(function (path) {
+                    var at = inc[path];
+                    if (typeof at !== "number") return;
+                    if (!cur[bucket][path] || cur[bucket][path] < at) cur[bucket][path] = at;
+                  });
+                });
+                window.TKShell.progress.save();
+                renderProgress();
+              } catch (err) {
+                alert("导入失败：文件不是有效的进度 JSON");
+              }
+            };
+            reader.readAsText(file);
+            impFile.value = "";
+          };
+          document.getElementById("pg-clear").onclick = function () {
+            if (!confirm("清除全部阅读标注？这会重置这台浏览器上的所有进度。")) return;
+            window.TKShell.progress.data = { learned: {}, planned: {} };
+            window.TKShell.progress.save();
+            renderProgress();
+          };
+
+          var radios = document.querySelectorAll('input[name="pg-filter"]');
+          radios.forEach(function (r) {
+            r.onchange = function () { state.pgFilter = r.value; renderProgress(); };
+          });
+
+          /* ═══ 第二分区：学习路线（从 path.html 迁移，逻辑不变） ═══ */
+          var LP = { notes: [], domain: "", topic: "", kinds: {}, expanded: {}, hideLearned: false };
+          var LEARN_ORDER = ["mech", "obs", "fail", "fix", "prac", "vocab"];
+          var DEFAULT_ON = { mech: true, obs: true, fail: true, fix: true, prac: true, vocab: false };
+          var EXPAND = 5;
+          var WORDS_PER_MIN = 300;
+          var KINDS = window.TKMatrix.KINDS;
+          var KIND_META = {};
+          if (KINDS) {
+            KINDS.forEach(function (k) { KIND_META[k.id] = { name: k.name, hint: k.hint || "" }; });
+          }
+          var KIND_ORDER = {};
+          LEARN_ORDER.forEach(function (id, i) { KIND_ORDER[id] = i; });
+
+          var LAST_KEY = "tk.learn-path.last";
+
+          for (var k2 in DEFAULT_ON) LP.kinds[k2] = DEFAULT_ON[k2];
+
+          function isLearned(note) {
+            return window.TKShell.progress.statusOf(note.path) === "learned";
+          }
+          function readMinutes(words) {
+            if (!words) return 0;
+            return Math.max(1, Math.round(words / 300));
+          }
+          function visibleNotes() {
+            return LP.notes.filter(function (n) {
+              return n.category !== "总览" && n.category !== "Clippings" && n.topic !== "概览" && !n.exclude_from_graph;
+            });
+          }
+          function domainList(items) {
+            var seen = new Set();
+            var out = [];
+            items.forEach(function (n) {
+              if (!seen.has(n.category)) { seen.add(n.category); out.push(n.category); }
+            });
+            return out.sort(function (a, b) { return a.localeCompare(b, "zh-CN"); });
+          }
+          function topicList(items, domain) {
+            var seen = new Set();
+            var out = [];
+            items.forEach(function (n) {
+              if (n.category !== domain) return;
+              if (!seen.has(n.topic)) { seen.add(n.topic); out.push({ name: n.topic, count: 1 }); }
+              else {
+                for (var i = 0; i < out.length; i++) if (out[i].name === n.topic) out[i].count++;
+              }
+            });
+            return out.sort(function (a, b) { return a.name.localeCompare(b.name, "zh-CN"); });
+          }
+          function kindOf(n) {
+            return window.TKMatrix.classify(n).kind;
+          }
+          function stages() {
+            var items = visibleNotes().filter(function (n) { return n.category === LP.domain && n.topic === LP.topic; });
+            var out = [];
+            LEARN_ORDER.forEach(function (id) {
+              if (!LP.kinds[id]) return;
+              var notes = items.filter(function (n) { return kindOf(n) === id; }).map(function (n) {
+                return { note: n, path: n.path, title: n.title, words: n.words || 0 };
+              }).sort(function (a, b) { return (a.words || 0) - (b.words || 0); });
+              if (!notes.length) return;
+              out.push({ id: id, notes: notes });
+            });
+            return out;
+          }
+          function nextNote(sts) {
+            for (var i = 0; i < sts.length; i++) {
+              var notes = sts[i].notes;
+              for (var j = 0; j < notes.length; j++) {
+                if (!isLearned(notes[j].note)) return notes[j];
+              }
+            }
+            return null;
+          }
+          function renderContinue(sts) {
+            var box = document.getElementById("lp-continue");
+            var link = document.getElementById("lp-next-link");
+            var done = document.getElementById("lp-next-done");
+            var label = document.getElementById("lp-progress-label");
+            var fill = document.getElementById("lp-progress-fill");
+            box.hidden = !sts.length;
+            if (!sts.length) return;
+            var total = 0, read = 0;
+            sts.forEach(function (st) {
+              total += st.notes.length;
+              st.notes.forEach(function (c) { if (isLearned(c.note)) read++; });
+            });
+            var pct = total ? Math.round(read / total * 100) : 0;
+            label.textContent = "进度：" + total + " 篇中已读 " + read + " · " + pct + "%";
+            fill.style.width = pct + "%";
+            var next = nextNote(sts);
+            var start = document.getElementById("lp-start");
+            if (next) {
+              link.hidden = false;
+              done.hidden = true;
+              link.textContent = next.title;
+              link.href = "/?path=" + encodeURIComponent(next.path);
+              start.hidden = false;
+              start.href = link.href;
+            } else {
+              link.hidden = true;
+              done.hidden = false;
+              start.hidden = true;
+            }
+          }
+          function itemRow(c) {
+            var learned = isLearned(c.note);
+            var li = document.createElement("div");
+            li.className = "lp-item" + (learned ? " is-learned" : "");
+            var cb = document.createElement("input");
+            cb.type = "checkbox";
+            cb.className = "lp-check";
+            cb.checked = learned;
+            cb.setAttribute("aria-label", (learned ? "取消已读：" : "标记已读：") + c.title);
+            cb.dataset.path = c.path;
+            li.appendChild(cb);
+            var a = document.createElement("a");
+            a.className = "lp-title";
+            a.href = "/?path=" + encodeURIComponent(c.path);
+            a.textContent = c.title;
+            li.appendChild(a);
+            if (learned) {
+              var mark = document.createElement("span");
+              mark.className = "lp-learned-mark";
+              mark.textContent = "✓ 已读";
+              li.appendChild(mark);
+            }
+            var w = document.createElement("span");
+            w.className = "lp-words";
+            w.textContent = window.TKShell.fmtWords(c.words || 0) + " · 约 " + readMinutes(c.words) + " 分钟";
+            li.appendChild(w);
+            return li;
+          }
+          function renderSections(sts) {
+            var host = document.getElementById("lp-sections");
+            var empty = document.getElementById("lp-empty");
+            host.innerHTML = "";
+            var hasAny = false;
+            sts.forEach(function (st, i) {
+              var meta = KIND_META[st.id];
+              var notes = st.notes;
+              if (LP.hideLearned) {
+                notes = notes.filter(function (c) { return !isLearned(c.note); });
+              }
+              var readCount = 0;
+              st.notes.forEach(function (c) { if (isLearned(c.note)) readCount++; });
+              var allDone = st.notes.length > 0 && readCount === st.notes.length;
+              var card = document.createElement("section");
+              card.className = "lp-stage" + (allDone ? " is-done" : "");
+              var head = document.createElement("div");
+              head.className = "lp-stage-head";
+              var no = document.createElement("span");
+              no.className = "lp-stage-no";
+              no.textContent = String(i + 1).padStart(2, "0");
+              head.appendChild(no);
+              var h3 = document.createElement("h3");
+              h3.textContent = meta ? meta.name : st.id;
+              head.appendChild(h3);
+              var hint = document.createElement("span");
+              hint.className = "lp-stage-hint";
+              hint.textContent = meta ? meta.hint : "";
+              head.appendChild(hint);
+              if (allDone) {
+                var doneBadge = document.createElement("span");
+                doneBadge.className = "lp-stage-done";
+                doneBadge.textContent = "✓ 已读完 " + st.notes.length + " 篇";
+                head.appendChild(doneBadge);
+              } else {
+                var count = document.createElement("span");
+                count.className = "lp-stage-count";
+                count.textContent = readCount + "/" + st.notes.length;
+                head.appendChild(count);
+              }
+              card.appendChild(head);
+              var items = document.createElement("div");
+              items.className = "lp-items";
+              var open = !!LP.expanded[st.id];
+              var shown = open ? notes : notes.slice(0, EXPAND);
+              shown.forEach(function (c) { items.appendChild(itemRow(c)); });
+              if (!shown.length && st.notes.length && LP.hideLearned) {
+                var allread = document.createElement("div");
+                allread.className = "lp-all-read";
+                allread.textContent = "这一段的 " + st.notes.length + " 篇都已读完。";
+                items.appendChild(allread);
+              }
+              if (!open && notes.length > EXPAND) {
+                var more = document.createElement("div");
+                more.className = "lp-more-row";
+                var btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "lp-more-btn";
+                btn.dataset.stage = st.id;
+                btn.textContent = "展开剩余 " + (notes.length - EXPAND) + " 篇";
+                more.appendChild(btn);
+                items.appendChild(more);
+              }
+              card.appendChild(items);
+              host.appendChild(card);
+              hasAny = true;
+            });
+            empty.hidden = hasAny;
+            if (!hasAny) {
+              empty.textContent = "这个主题里，勾选的段都还没有文章。可以换个主题，或把段勾选补全。";
+            }
+          }
+          function render() {
+            var sts = stages();
+            renderContinue(sts);
+            renderSections(sts);
+          }
+          function renderKinds() {
+            var host = document.getElementById("lp-kinds");
+            host.innerHTML = "";
+            LEARN_ORDER.forEach(function (id) {
+              var meta = KIND_META[id];
+              var label = document.createElement("label");
+              var cb = document.createElement("input");
+              cb.type = "checkbox";
+              cb.checked = LP.kinds[id];
+              cb.dataset.kind = id;
+              label.appendChild(cb);
+              var span = document.createElement("span");
+              span.textContent = meta ? meta.name : id;
+              label.appendChild(span);
+              host.appendChild(label);
+            });
+          }
+          function renderDomains(items) {
+            var sel = document.getElementById("lp-domain");
+            var domains = domainList(items);
+            sel.innerHTML = "";
+            domains.forEach(function (d) {
+              var opt = document.createElement("option");
+              opt.value = d;
+              opt.textContent = d;
+              if (d === LP.domain) opt.selected = true;
+              sel.appendChild(opt);
+            });
+            LP.domain = sel.value;
+          }
+          function renderTopics(items) {
+            var sel = document.getElementById("lp-topic");
+            var topics = topicList(items, LP.domain);
+            sel.innerHTML = "";
+            topics.forEach(function (t) {
+              var opt = document.createElement("option");
+              opt.value = t.name;
+              opt.textContent = t.name + "（" + t.count + " 篇）";
+              if (t.name === LP.topic) opt.selected = true;
+              sel.appendChild(opt);
+            });
+            LP.topic = sel.value;
+          }
+          function syncUrl() {
+            var q = new URLSearchParams();
+            if (LP.domain) q.set("domain", LP.domain);
+            if (LP.topic) q.set("topic", LP.topic);
+            /* 锚点必须留着：#rd-path 是侧栏区分「学习路线 / 我的阅读」的
+               依据，replaceState 把它抹掉会让高亮跳回「我的阅读」。 */
+            history.replaceState({}, "", "/panorama/reading" + (q.toString() ? "?" + q.toString() : "") + location.hash);
+          }
+          function saveLast() {
+            try {
+              localStorage.setItem(LAST_KEY, JSON.stringify({
+                domain: LP.domain,
+                topic: LP.topic,
+                kinds: LP.kinds,
+              }));
+            } catch (e) { /* 存储被禁时静默跳过，不影响页面功能。 */ }
+          }
+
+          document.getElementById("lp-domain").addEventListener("change", function (event) {
+            LP.domain = event.target.value;
+            LP.topic = "";
+            LP.expanded = {};
+            renderTopics(visibleNotes());
+            syncUrl();
+            saveLast();
+            render();
+          });
+          document.getElementById("lp-topic").addEventListener("change", function (event) {
+            LP.topic = event.target.value;
+            LP.expanded = {};
+            syncUrl();
+            saveLast();
+            render();
+          });
+          document.getElementById("lp-kinds").addEventListener("change", function (event) {
+            var id = event.target.dataset.kind;
+            if (!id) return;
+            LP.kinds[id] = event.target.checked;
+            LP.expanded = {};
+            saveLast();
+            render();
+          });
+          document.getElementById("lp-hide-learned").addEventListener("change", function (event) {
+            LP.hideLearned = event.target.checked;
+            render();
+          });
+          document.getElementById("lp-sections").addEventListener("change", function (event) {
+            var path = event.target.dataset && event.target.dataset.path;
+            if (!path) return;
+            window.TKShell.progress.toggle(path, "learned");
+            render();
+          });
+          document.getElementById("lp-sections").addEventListener("click", function (event) {
+            var id = event.target.dataset && event.target.dataset.stage;
+            if (!id) return;
+            LP.expanded[id] = !LP.expanded[id];
+            render();
+          });
+
+          /* URL 预选：?domain=&topic= 进来直接定位；无参数时读上次选择。 */
+          var params = new URLSearchParams(location.search);
+          var last = null;
+          try { last = JSON.parse(localStorage.getItem(LAST_KEY) || "null"); } catch (e) { last = null; }
+          if (params.get("domain")) {
+            LP.domain = params.get("domain");
+            LP.topic = params.get("topic") || "";
+          } else if (last && last.domain) {
+            LP.domain = last.domain;
+            LP.topic = last.topic || "";
+            if (last.kinds) {
+              Object.keys(LP.kinds).forEach(function (kk) {
+                if (typeof last.kinds[kk] === "boolean") LP.kinds[kk] = last.kinds[kk];
+              });
+            }
+          }
+
+          /* 进度变化：两个分区一起刷新。 */
+          document.addEventListener("tk:progress-changed", function () {
+            renderProgress();
+            render();
+          });
+
+          /* 数据加载：一份 notes 两个分区共用。 */
+          function loadNotes(cb) {
+            fetch("/api/notes").then(function (r) { return r.json(); }).then(function (data) {
+              cb(Array.isArray(data) ? data : (data.notes || []));
+            }).catch(function () {
+              var err = document.getElementById("lp-error");
+              err.hidden = false;
+              err.textContent = "学习路线数据加载失败，请刷新重试。";
+            });
+          }
+
+          renderKinds();
+          loadNotes(function (notes) {
+            state.notes = notes;
+            LP.notes = notes;
+            document.getElementById("lp-loading").hidden = true;
+            var items = visibleNotes();
+            renderDomains(items);
+            renderTopics(items);
+            syncUrl();
+            saveLast();
+            renderProgress();
+            render();
+            syncNavHighlight();
+          });
+
+          /* 侧栏高亮：同一个页面承载两个导航项（我的阅读 / 学习路线），
+             区分依据是锚点 #rd-path。侧栏在 DOMContentLoaded 时就渲染完
+             了，锚点变化不会自动回灌，这里手动改 aria-current。 */
+          function syncNavHighlight() {
+            var isPath = location.hash === "#rd-path";
+            var want = isPath ? "/panorama/reading#rd-path" : "/panorama/reading";
+            document.querySelectorAll(".tk-subnav-inline").forEach(function (a) {
+              var href = a.getAttribute("href");
+              if (href !== "/panorama/reading" && href !== "/panorama/reading#rd-path") return;
+              if (href === want) a.setAttribute("aria-current", "page");
+              else a.removeAttribute("aria-current");
+            });
+            document.querySelectorAll(".rd-jump a").forEach(function (a) {
+              var key = a.dataset.jump;
+              if (key === (isPath ? "path" : "reading")) a.setAttribute("aria-current", "page");
+              else a.removeAttribute("aria-current");
+            });
+            var titleEl = document.getElementById("rd-title");
+            var descEl = document.getElementById("rd-desc");
+            if (titleEl) titleEl.textContent = isPath ? "学习路线" : "我的阅读";
+            if (descEl) {
+              descEl.textContent = isPath
+                ? "选一个主题，按机制、观测、故障、修复、实践的顺序读完——只保存在这台浏览器上"
+                : "标记已读、排稍后读——只保存在这台浏览器上，不会上传";
+            }
+            document.title = (isPath ? "学习路线" : "我的阅读") + " · technical-knowledge";
+            if (isPath) {
+              var target = document.getElementById("rd-path");
+              if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }
+          }
+          window.addEventListener("hashchange", syncNavHighlight);
+        })();
+      </script>
+    </div>
+  </body>
+</html>

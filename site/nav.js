@@ -102,6 +102,24 @@ description: "用于评估 Agent 的原型：定义任务约定与证据边界�
       parent: "projects",
     },
     {
+      key: "path",
+      label: "学习路线",
+      href: "/panorama/reading#rd-path",
+      icon: "◔",
+      title: "按顺序读完一个主题",
+      description: "机制 → 观测 → 故障 → 修复 → 实践，顺序已排好",
+      parent: "panorama",
+    },
+    {
+      key: "reading",
+      label: "我的阅读",
+      href: "/panorama/reading",
+      icon: "◑",
+      title: "已读与稍后读的清单",
+      description: "全库阅读标注、学习路线与进度，只保存在这台浏览器",
+      parent: "panorama",
+    },
+    {
       key: "classrooms",
       label: "我的课堂",
       href: "/learn/history",
@@ -111,6 +129,8 @@ description: "用于评估 Agent 的原型：定义任务约定与证据边界�
       parent: "projects",
     },
   ],
-  /* 由工作台页面渲染成二级导航，挂在"项目与教学"下。 */
-  subitems: ["learning", "classrooms"],
+  /* 二级导航：学习工具挂"项目与教学"下；学习路线与我的阅读
+     挂"知识全景"下（用户 2026-09-24 指定：路线属于全景视角的一部分，
+     我的阅读放路线上面，同在 /panorama/reading 一个页面里）。 */
+  subitems: ["learning", "reading", "path", "classrooms"],
 };

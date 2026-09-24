@@ -61,6 +61,8 @@
     insights: { title: "访问与反馈", description: NAV_DESC.insights },
     learning: { title: "学习中心", description: NAV_DESC.learning },
     classrooms: { title: "我的课堂", description: NAV_DESC.classrooms },
+    path: { title: "学习路线", description: NAV_DESC.path },
+    reading: { title: "我的阅读", description: NAV_DESC.reading },
   };
 
   /* Which nav entry the current URL belongs to.
@@ -79,6 +81,10 @@
     {
       key: "classrooms",
       match: (p) => p.startsWith("/learn/history") || p.startsWith("/apps/learning/history"),
+    },
+    {
+      key: "reading",
+      match: (p) => p.startsWith("/panorama/reading"),
     },
     {
       key: "learning",
@@ -153,6 +159,14 @@
     document.querySelectorAll("[data-tk-theme-toggle]").forEach((node) => {
       node.setAttribute("aria-pressed", String(dark));
     });
+    /* 图表跟随主题重渲染（r18：mermaid 只在 initialize 时读主题，
+     * 切换后必须重初始化再重画，否则图表停留在切换前的配色）。 */
+    if (typeof window.renderMermaid === "function" &&
+        document.querySelector("pre.mermaid")) {
+      window.renderMermaid().catch((err) => {
+        console.error("mermaid 重渲染失败", err);
+      });
+    }
   };
 
   applyTheme(urlTheme || storedTheme() || (media.matches ? "dark" : "light"));
@@ -302,6 +316,11 @@
         const view = q.get("view");
         if (view === "graph" || view === "panorama" || view === "progress") return view;
       }
+      /* 学习路线与我的阅读同在 /panorama/reading 一个页面里，靠锚点区分：
+         带 #rd-path 的链接高亮「学习路线」，否则高亮「我的阅读」。 */
+      if (location.pathname.startsWith("/panorama/reading")) {
+        return location.hash === "#rd-path" ? "path" : "reading";
+      }
       return keyForPath(location.pathname);
     })();
     const meta = metaFor(page);
@@ -403,6 +422,13 @@
         .map((key) => items().find((i) => i.key === key))
         .filter((child) => child && child.parent === parentKey);
 
+    /* 折叠控件铺满整行后，父项链接被盖在下面点不到，跳转入口改由组内
+     * 第一项承接：展开后最上面就是父项页面本身（「知识全景」→ 全景总览）。 */
+    const overviewLink = (item) =>
+      `<a class="tk-subnav-inline tk-subnav-overview" href="${item.href}"${
+        item.key === page ? ' aria-current="page"' : ""
+      } title="${item.title || item.label}"><span class="tk-nav-icon tk-nav-icon--sub" aria-hidden="true">${item.icon}</span><span>总览</span></a>`;
+
     const navHtml = grouped
       .map((entry) => {
         if (!entry.group) {
@@ -424,7 +450,7 @@
                 + link(item, page, " has-children")
                 + `<button type="button" class="tk-subnav-toggle" data-subgroup="${item.key}" aria-expanded="false" aria-label="展开 ${item.label} 的子项"></button>`
                 + `</span>`
-                + `<span class="tk-subnav-group" id="subgroup-${item.key}" data-subgroup="${item.key}" hidden>${kids
+                + `<span class="tk-subnav-group" id="subgroup-${item.key}" data-subgroup="${item.key}" hidden>${overviewLink(item)}${kids
                     .map(
                       (child) =>
                         `<a class="tk-subnav-inline" href="${child.href}"${
@@ -439,7 +465,30 @@
         const label = GROUP_LABEL[entry.group] || entry.group;
         return (
           `<p class="tk-nav-group-label" aria-hidden="true">${label}</p>` +
-          entry.items.map((item) => link(item, page)).join("")
+          entry.items
+            .map((item) => {
+              /* 分组项同样支持二级：childrenOf 按 parent 字段挂载。
+               * 「知识全景」带子项（我的阅读/学习路线，用户 2026-09-24
+               * 指定：路线是全景视角的一部分）。渲染语言与无分组项
+               * 完全一致：父项链接 + toggle 箭头 + 折叠组。 */
+              const kids = childrenOf(item.key);
+              if (!kids.length) return link(item, page);
+              return (
+                `<span class="tk-nav-row">`
+                + link(item, page, " has-children")
+                + `<button type="button" class="tk-subnav-toggle" data-subgroup="${item.key}" aria-expanded="false" aria-label="展开 ${item.label} 的子项"></button>`
+                + `</span>`
+                + `<span class="tk-subnav-group" id="subgroup-${item.key}" data-subgroup="${item.key}" hidden>${overviewLink(item)}${kids
+                    .map(
+                      (child) =>
+                        `<a class="tk-subnav-inline" href="${child.href}"${
+                          child.key === page ? ' aria-current="page"' : ""
+                        } title="${child.title || child.label}"><span class="tk-nav-icon tk-nav-icon--sub" aria-hidden="true">${child.icon}</span><span>${child.label}</span></a>`,
+                    )
+                    .join("")}</span>`
+              );
+            })
+            .join("")
         );
       })
       .join("");
@@ -542,22 +591,12 @@
       /* 父项链接也负责展开（不拦跳转）：点「项目与教学」过去时顺手展开，
          符合"这个分类下面有什么"的预期。 */
       const parentLink = mount.querySelector(`.tk-nav a[href="${(items().find((i) => i.key === parentKey) || {}).href}"]`);
-      if (parentLink) parentLink.addEventListener("click", (event) => {
-        /* 父项行点击 = 双向 toggle：组已展开且当前就在本组 → 折叠并拦下
-           跳转（不然用户点「项目与教学」永远只能展开、找不到关闭方式——
-           实测反馈）；组收起 → 展开并正常跳转过去。行尾的小箭头按钮保留，
-           作为纯折叠控件。 */
-        const onGroupPage = page === parentKey || childKeys.some((key) => {
-          const child = items().find((i) => i.key === key);
-          return child && child.parent === parentKey && child.key === page;
-        });
-        if (!group.hidden) {
-          event.preventDefault();
-          setOpen(false);
-        } else {
-          setOpen(true);
-          if (onGroupPage) event.preventDefault();
-        }
+      if (parentLink) parentLink.addEventListener("click", () => {
+        /* 父项链接只负责跳转，顺手把本组展开（符合「这个分类下面有什么」
+           的预期）。折叠一律交给行尾的箭头按钮 —— 此前父项链接在组已展开
+           时会 preventDefault 只折叠不跳转，用户在子项页点「知识全景」看
+           不到任何跳转，反馈「点了会刷一下、页面不动」（2026-09-24）。 */
+        setOpen(true);
       });
     });
 

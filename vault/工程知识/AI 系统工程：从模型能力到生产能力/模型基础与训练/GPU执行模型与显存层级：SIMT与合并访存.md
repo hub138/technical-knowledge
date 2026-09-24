@@ -12,7 +12,7 @@ tags:
   - performance/gpu
 sources:
   - "https://docs.nvidia.com/cuda/"
-  - "https://developer.nvidia.com/blog/understanding-the-gpu-memory-hierarchy/"
+  - "https://docs.nvidia.com/cuda/cuda-c-programming-guide/index.html#device-memory-accesses"
 ---
 
 # GPU执行模型与显存层级：SIMT与合并访存
@@ -25,7 +25,15 @@ GPU 执行模型要解决的问题，是**用一条指令驱动成千上万的�
 
 **warp 与分支发散**。调度单位是 warp（32 线程锁步）。warp 内所有线程执行同一条指令；if-else 分支让 warp 分裂：先执行 then 分支的线程（其余空闲），再执行 else 分支（先前那批空闲）。两个分支都执行完才汇合，warp 的有效吞吐减半。发散是 SIMT 的税：控制流越复杂（每线程走不同路径），浪费越多。GPU 友好的代码要"全体一致"（warp 内线程尽量走同一路径），排序、分桶、直方图类算法的 GPU 版本都要围绕"消除发散"重构。
 
-**显存层级与合并访存**。GPU 的存储是金字塔：寄存器（每线程私有，最快）→ 共享内存/L1（每 SM 共享，快）→ L2（全芯片）→ 显存 HBM（慢一个数量级以上，但带宽极高）。合并访存（coalesced access）：warp 的 32 个线程访问连续地址（如 32 个 float 正好 128B 一段），硬件合成一次显存事务；地址散乱则每个线程一次事务，访存吞吐塌方。**访存模式是 GPU 编程的第一定律**：矩阵乘的分块（tiling）、共享内存的显式搬运，全是把"散乱访存"重写成"连续访存 + 局部复用"。
+**显存层级与合并访存**。GPU 的存储是金字塔：寄存器（每线程私有，最快）→ 共享内存/L1（每 SM 共享，快）→ L2（全芯片）→ 显存 HBM（慢一个数量级以上，但带宽极高）。合并访存（coalesced access）：warp 的 32 个线程访问连续地址（如 32 个 float 正好 128B 一段），硬件合成一次显存事务；地址散乱则每个线程一次事务，访存吞吐塌方。**访存模式是 GPU 编程的第一定律**：矩阵乘的分块（tiling）、共享内存的显式搬运，全是把"散乱访存"重写成"连续访存 + 局部复用"。同一个 warp 的两种访问写法在硬件里走到哪里，一张图看完：
+
+```mermaid
+graph TD
+    A["warp 内 32 个线程<br/>访问 32 个 float"] -->|"连续地址 data[i]"| B["落进同一段 128B<br/>硬件合成 1 次事务"]
+    A -->|"跨步地址 data[i*32]"| C["散在 32 个段<br/>拆成 32 次事务"]
+    B --> D["访存吞吐吃满<br/>带宽红利到手"]
+    C --> E["通道大量闲置<br/>吞吐塌方一个量级"]
+```
 
 **kernel 与主机-设备分工**。GPU 代码（kernel）从 CPU 启动，数据经 PCIe/NVLink 在主机内存与显存间搬运。kernel 内部：grid（全部线程）→ block（每 SM 一个或多个）→ warp（调度单位）→ thread。内存拷贝与 kernel 启动是异步的（流 stream），CPU 发起后可继续干活——但拷贝与计算的流水线重叠要显式设计，否则 GPU 在等数据、CPU 在等 GPU，两边空转。prefill/decode 的性能差异（LLM 场景）根源在这：prefill 是大 batch 矩阵计算（并行宽度大、计算密度高），decode 是逐步小计算反复读权重与 KV cache（访存密集、并行宽度小），两者对 GPU 的压榨方式完全不同。
 

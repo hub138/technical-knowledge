@@ -13,6 +13,7 @@ contrast pass, a test suite and a careful read of the diff.
     copy         is the visitor-facing writing any good
     readme       do the two READMEs still say the same things
     i18n-dict    is every dictionary key unique and unambiguous
+    skill-drift  do skill docs still point at real files, anchors and routes
 
 Usage:
     python3 scripts/check_all.py                # everything
@@ -85,6 +86,9 @@ def main() -> None:
         ("papernotes", "scripts/fetch-papernotes.py", ["--check"]),
         ("paper-titles", "scripts/paper-titles.py", []),
         ("paper-fields", "scripts/paper-fields-zh.py", []),
+        # skill 文档与代码的漂移检测：路径引用、代码锚点、API 路由、
+        # 契约字段消费、内嵌副本同步，五类失效面全部断言化
+        ("skill-drift", "scripts/check_skill_drift.py", []),
     ):
         script_arg = script
         ok, out = run(label, [PYTHON, str(ROOT / script_arg), *argv])

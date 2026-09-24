@@ -105,3 +105,51 @@
 | JS heap OOM（4GB/8GB） | 超长会话内存累积 | 压缩上下文/重启会话/重活拆会话 |
 | 长英文标题在窄容器换行 | 容器宽度未利用/未截断 | 利用右侧空间或 ellipsis |
 | 小字看不清（标签/按钮/徽标） | 字号字重过小 | 加粗加大，截图核对可发现性 |
+
+## 2026-09-24 新增（二级页 / 导航 / 验证）
+
+### 改完代码没重启，一切验证都在证伪旧行为
+- **症状**：curl 返 200、playwright 却是旧页面；同一份代码三个实例表现不一致。
+- **根因**：28787（systemd）、18788、8787 是三个独立进程，改文件不触发重载。
+- **正解**：改完立刻重启 28787（`systemctl restart knowledge-site.service`）与
+  18788/8787（`bash /data/code/AIagent/scripts/restart_knowledge_sites.sh`），再验证。
+
+### 迁移页面后旧路由先被通配分支截获，返 503
+- **症状**：`/learn/path` 迁到 `/panorama/reading` 后，旧地址返 503
+  `{"error":"learning page unavailable"}` 而不是 308。
+- **根因**：`/learn/path` 仍留在 `LEARNING_PAGES` 里，前面的精确匹配分支先命中，
+  去读已删除的 `apps/learning/path.html`，OSError → 503。
+- **正解**：迁移页面时**从旧路由表里删掉条目**，只留重定向表；路由表与重定向表
+  必须分开维护，别指望「加了重定向就自动不走旧表」。
+
+### `n.tags` 是数组，不是对象
+- **症状**：迁移后的页面列表全空，段勾选正常、无报错。
+- **根因**：`kindOf` 写成 `n.tags && n.tags.kind`，而 `/api/notes` 的 tags 是
+  字符串数组，取对象属性永远 undefined。
+- **正解**：段归属一律走 `TKMatrix.classify(note).kind`，不要自己解析 tags。
+
+### 两个导航项指向同一 URL，高亮只会落在一个上
+- **症状**：点「学习路线」子项，侧栏高亮却是「我的阅读」。
+- **根因**：`aria-current` 按 page key 判定，两个子项 href 相同时无法区分。
+- **正解**：给其中一个加锚点（`#rd-path`），page key 由 `location.hash` 判定；
+  页面内 `history.replaceState` 必须把 `location.hash` 拼回去，否则锚点被抹掉；
+  侧栏在 DOMContentLoaded 已渲染完，锚点变化要自己回灌 `aria-current`。
+
+### playwright 在本站的两个固定写法
+- `wait_until="networkidle"` 在本站必超时（有轮询请求），一律用 `domcontentloaded` + 显式 sleep。
+- 18788 实例无需登录；`/insights` 那条登录流程只对带密码的实例用。
+
+### 折叠控件只认小箭头
+- **症状**：用户点父项行文字区没反应，以为「点了会刷一下、页面不动」。
+- **根因**：toggle 按钮宽高 22px 绝对定位在行尾，其余区域是链接；链接又带
+  `preventDefault` 只折叠不跳转。
+- **正解**：toggle 铺满整行（`top/right/bottom/left: 0`）负责折叠，跳转改由折叠组
+  内的「总览」项承担，两个动作不再抢同一个点击区。
+
+## 配图验收的站点服务坑
+
+- **服务启动即报 KeyError**：Linux 下启动站点服务必须设 `KNOWLEDGE_SITE_PASSWORD` 环境变量（任意非空值），缺变量直接崩溃。服务命令 `python3 site/server.py --root <仓库>/vault --host 0.0.0.0 --port 28787`，监听 `127.10.0.1:28787`。服务已在运行时重复启动报地址占用，先 `curl -s -o /dev/null -w "%{http_code}" http://127.10.0.1:28787/` 确认 200 再直接用。
+- **探测用根路径**：文章路径里有空格与中文，拼进 URL 探测会失败，造成服务在跑的假象。
+- **页面参数要带 `工程知识/` 前缀**：页面参数是 vault 相对路径，漏前缀接口返回 not found、页面停在骨架屏。
+- **SPA 未加载完数图必得 0**：正文显示「正在读取知识库…」时数图块必得 0，先确认骨架屏消失再截图。
+- **竖排链超 6 节点留意容器限高**：截图发现裁切先分归属——图确实过长的压缩图，渲染端限高过紧的调站点样式，改完重截。

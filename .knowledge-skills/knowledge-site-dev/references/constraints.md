@@ -3,6 +3,7 @@
 ## 测试门禁
 
 - **必跑**：`pytest tests/test_site.py`，必须全绿才允许发布。
+- **统一巡检入口**：仓库 `scripts/check_all.py` 一条命令跑全部检查（tests、tokens、links、copy、readme、i18n、papers、contrast、layout、skill-drift），输出一张 verdict 表（2026-09-24 自 Harness 工程实践吸收）。发布前按改动面加跑对应子集：改样式/颜色 → contrast 与 tokens，改文案 → copy 与 i18n，改链接/删内容 → links；改了 nav/路由则全跑。skill-drift 管 skill 文档与代码的同步：改了路由、文件名、frontmatter 字段、词表锚点，或改了 skill 文档，跑它确认文档指针没有悬空（含内嵌 `.knowledge-skills/` 与聚合层主副本的同步）。
 - **必须看清结果**：不要用 `tail -1` 等会吞掉失败信息的方式看输出；有一次只看最后一行把 1 个失败当成全过，差点带病上线。
 - **修源头不改断言**：断言失败 = 代码或内容有问题。禁止为了让测试通过而改断言。
 - 测试的正确用途示例：它拦住过 vault wikilink 前缀错误导致的断链——内容问题也是发布阻塞项。

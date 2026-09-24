@@ -139,7 +139,11 @@
    * 先懂机制 → 才能观测 → 才能认出故障模式 → 才知道怎么修 → 最后沉淀成规矩。
    *
    * 按 list 顺序匹配，命中即停：一篇同时带 defect-analysis 和 concept 时，
-   * 它是故障案例不是原理，所以 fail 排在 mech 前面。 */
+   * 它是故障案例不是原理，所以 fail 排在 mech 前面。
+   * 这个顺序只服务分类匹配，不服务展示 —— 2026-09-24 反馈：矩阵列的
+   * 默认顺序跟着数组走，读者一进来先看到「故障模式」，学习路径却是
+   * 先懂原理再谈故障。两件事解耦：匹配用上面的顺序，展示用
+   * KINDS_DISPLAY_ORDER（先原理 → 再实践 → 后故障 → 辅助收尾）。 */
   var KINDS = [
     {
       id: "fail", name: "故障模式", name_en: "Failure modes", hint: "它会怎么坏", hint_en: "how it breaks",
@@ -172,7 +176,7 @@
              "software/testing", "backend/testing", "testing", "quality",
              "operations", "operations/process", "reproducibility", "ai/reproducibility",
              "research/gaps", "research/freshness", "source/case-study", "source/index"],
-      types: ["playbook", "guide", "note", "worklog", "project", "index"]
+      types: ["playbook", "guide", "note", "worklog", "project", "index", "practice"]
     },
     {
       id: "mech", name: "机制原理", name_en: "Mechanisms", hint: "它到底是怎么工作的", hint_en: "how it actually works",
@@ -189,6 +193,18 @@
       types: ["reference", "overview", "map"]
     }
   ];
+
+  /* 展示顺序：矩阵列、类型胶囊、缺口分组都按它走。
+   * 学习路径 = 先懂原理（mech）→ 再看怎么实践（prac、obs）→
+   * 才谈故障（fix、fail）→ 辅助收尾（vocab）。
+   * 与 KINDS 的匹配顺序无关：fail 仍先于 mech 参与分类，别改回去。 */
+  var KINDS_DISPLAY_ORDER = ["mech", "prac", "obs", "fix", "fail", "vocab"];
+
+  function kindsInDisplayOrder() {
+    return KINDS_DISPLAY_ORDER.map(function (id) {
+      return KINDS.filter(function (k) { return k.id === id; })[0];
+    });
+  }
 
   /* 不进技术矩阵：元知识（讲知识库本身）与外部剪藏。
    * 混进来会让"数据与存储"这类格子凭空多出十几篇，缺口被填平。 */
@@ -303,8 +319,9 @@
   }
 
   global.TKMatrix = {
-    LAYERS: LAYERS, KINDS: KINDS,
+    LAYERS: LAYERS, KINDS: KINDS, KINDS_DISPLAY_ORDER: KINDS_DISPLAY_ORDER,
     isExcluded: isExcluded,
-    classify: classify, classifyAll: classifyAll, matrix: matrix
+    classify: classify, classifyAll: classifyAll, matrix: matrix,
+    kindsInDisplayOrder: kindsInDisplayOrder
   };
 })(typeof window !== "undefined" ? window : (typeof global !== "undefined" ? global : this));

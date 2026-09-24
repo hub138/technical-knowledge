@@ -381,11 +381,20 @@ DEEPTUTOR_HOME = Path(
 # 集中成一张表，避免再加页面时只改一处、漏掉另一处（/learn 曾经整组丢失）。
 LEARNING_PAGES: dict[str, Path] = {
     "/learn": REPOSITORY_ROOT / "apps" / "learning" / "index.html",
-    "/learn/path": REPOSITORY_ROOT / "apps" / "learning" / "path.html",
     "/learn/openmaic": REPOSITORY_ROOT / "apps" / "learning" / "openmaic.html",
     "/learn/intuition": REPOSITORY_ROOT / "apps" / "learning" / "intuition.html",
     "/learn/transfer": REPOSITORY_ROOT / "apps" / "learning" / "transfer.html",
     "/learn/history": REPOSITORY_ROOT / "apps" / "learning" / "history.html",
+}
+
+# 我的阅读 + 学习路线：挂在知识全景下的二级页面（用户 2026-09-24 指定）。
+# 旧 /learn/path 链接 308 到新地址，书签与历史记录不失效。
+PANORAMA_PAGES: dict[str, Path] = {
+    "/panorama/reading": REPOSITORY_ROOT / "apps" / "panorama" / "reading.html",
+}
+
+PANORAMA_REDIRECTS: dict[str, str] = {
+    "/learn/path": "/panorama/reading",
 }
 
 
@@ -2485,7 +2494,6 @@ class Handler(BaseHTTPRequestHandler):
             "/apps/learning/intuition.html",
             "/apps/learning/transfer.html",
             "/apps/learning/history.html",
-            "/apps/learning/path.html",
         }:
             page = LEARNING_PAGES.get(path.rstrip("/")) or (
                 REPOSITORY_ROOT / "apps" / "learning" / Path(path).name
@@ -2499,6 +2507,20 @@ class Handler(BaseHTTPRequestHandler):
             return
         if path in {"/learn/openmic", "/learn/openmic/"}:
             self.redirect("/learn/openmaic", 308)
+            return
+        # 知识全景的二级页面（我的阅读 + 学习路线）。
+        if path.rstrip("/") in PANORAMA_PAGES:
+            page = PANORAMA_PAGES[path.rstrip("/")]
+            try:
+                payload = page.read_bytes()
+            except OSError:
+                self.send_json({"error": "panorama page unavailable"}, 503)
+                return
+            self.send_bytes(payload, "text/html; charset=utf-8")
+            return
+        # 旧学习路线地址：学习路线已并入全景二级页，308 保住旧书签。
+        if path.rstrip("/") in PANORAMA_REDIRECTS:
+            self.redirect(PANORAMA_REDIRECTS[path.rstrip("/")], 308)
             return
         if path.startswith("/learn/"):
             # 其余 /learn/* 跳转到对应的知识笔记。

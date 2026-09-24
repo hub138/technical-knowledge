@@ -513,10 +513,15 @@ base.css 的 .page-toolbar 规范，但 [hidden] 兜底属于本页卡片
       .src-toc-name {
         flex: 1; min-width: 0;
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        /* 2026-09-24 反馈「字有点小、没加粗」：站名是速览的主角色，
+           13px semibold 与下方 feed 名同档，数字保持小一档作次级。 */
+        font-size: var(--text-small); font-weight: var(--weight-semibold);
+        color: var(--color-ink);
       }
       .src-toc-num {
-        flex: none; color: var(--color-faint);
-        font-size: var(--text-2xs); font-variant-numeric: tabular-nums;
+        flex: none; color: var(--color-ink-soft);
+        font-size: var(--text-small); font-weight: var(--weight-medium);
+        font-variant-numeric: tabular-nums;
       }
       /* 目录组内按来源分层：站名 + 条数一行，条目挂在下面。
        * 曾经用折叠开关包一层 —— 一个组里 73 条平铺，扫不出结构（读者反馈"丑"）；

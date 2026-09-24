@@ -46,7 +46,11 @@ description: 开发 technical-knowledge 知识站（工程知识库网站）。�
 
 ## 工作方式
 
+- **脚本化巡检**（2026-09-24 自 Harness 工程实践吸收）：同一验证动作写第二次时就沉淀成 `scripts/` 下的确定性脚本（现成参考：check_all.py 统一门禁、audit_shots.py 全站截图、audit_regression.py 回归三件套），重复操作交给脚本，判断与决策留给 AI；新脚本入口支持 `--base` 参数复用端口约定。
 - **自主巡检**：每个改动后自己全站截图找问题，不等用户报；发现一个同类问题 → 全站扫一遍。
+- **现成验证脚本**（改完重启后直接跑，别每次重写）：
+  - `scripts/verify_reading_page.py` —— `/panorama/reading` 两分区功能回归（勾选同步、隐藏已读、换域、响应式、暗色、控制台报错）。
+  - `scripts/verify_subnav.py` —— 侧栏折叠与高亮（整行折叠、总览入口、锚点归属、页头跳转）。
 - **持续模式**：长任务一口气做完，不暂停不问「要不要继续」；用户离开也持续工作。
 - **长会话管理**：JS heap OOM（4GB/8GB）在超长会话反复出现——压缩上下文或重启会话，重活拆会话。
 - **性能预算**：外部 API 有配额（BestBlogs 每日 500 次）；抓取固定化 + 定时更新，去掉无意义刷新按钮。
@@ -67,7 +71,27 @@ description: 开发 technical-knowledge 知识站（工程知识库网站）。�
 | 本地测试 | `KNOWLEDGE_DATA_HOME=/tmp/knowledge-test-data server.py --host 0.0.0.0 --port 18788` |
 | **静态资源 URL** | **`/static/`（不是 `/site/`）**——仓库目录是 `site/`，URL 是 `/static/` |
 | 密码 | dev `/etc/knowledge-site.env`（600）；运营者会话豁免监控 |
-| 测试 | `pytest tests/test_site.py`（47 例）；改 nav/路由前后必跑 |
+| 测试 | `pytest tests/test_site.py`（54 例）；改 nav/路由前后必跑 |
+
+## 改完代码必须重启（看不到变化的头号原因）
+
+三个实例跑的是**同一份代码**，但互不共享内存。改完不重启 = 浏览器看旧行为，
+截图、curl、playwright 全都证伪不了问题。
+
+| 实例 | 怎么起 | 重启命令 |
+|---|---|---|
+| 28787（systemd，nginx 28788 的后端） | `python3 site/server.py --root vault --host 127.10.0.1 --port 28787` | `systemctl restart knowledge-site.service` |
+| 18788（手动，本地验证用） | 同上，`--host 0.0.0.0 --port 18788` | `bash /data/code/AIagent/scripts/restart_knowledge_sites.sh` |
+| 8787（手动，本机接口） | 同上，`--host 127.0.0.1 --port 8787` | 同上脚本一并重启 |
+
+- 脚本自己 `source /etc/knowledge-site.env`，**不用手动带密码**。手动起必须带
+  `KNOWLEDGE_SITE_PASSWORD`，否则 `RuntimeError: KNOWLEDGE_SITE_PASSWORD is not set`
+  （macOS Keychain 分支只在 Darwin 生效，Linux 上必然报这个）。
+- **禁止 `ps aux | grep server.py | xargs kill`**：会误杀同机的其他项目服务
+  （`mr_six/.../agent-architecture-review/server.py` 就被这么杀过一次）。
+- 公网入口 `http://<host>:28788` 是 nginx，`proxy_pass → 127.10.0.1:28787`，
+  28788 返 502 就是 28787 没起来。
+- 路径别写错：静态资源 URL 是 `/static/shell.js`，`/site/shell.js` 会返回 404 HTML。
 
 ## 红线
 
@@ -82,6 +106,6 @@ description: 开发 technical-knowledge 知识站（工程知识库网站）。�
 - 看不到变化 / 排查决策树 → [workflow.md](references/workflow.md)
 - 拓扑 / 端口 / 数据流 / 监控豁免 → [architecture.md](references/architecture.md)
 - 高亮 / 排序 / 策展 / 文案 / 布局 / 站长视觉偏好 → [design-language.md](references/design-language.md)
-- **发布红线（测试门禁 / 内容红线 / 降级 / i18n / 回滚）→ [constraints.md](references/constraints.md)**
+- **发布红线（测试门禁 / check_all 统一巡检 / 内容红线 / 降级 / i18n / 回滚）→ [constraints.md](references/constraints.md)**
 - **多写者协作（Mac↔dev / dev 直改 / 变基 / 发布核对）→ [collaboration.md](references/collaboration.md)**
 - 症状排查 → [pitfalls.md](references/pitfalls.md)
