@@ -452,14 +452,21 @@
             tone: "",
             note: tr("读者在页面上的累计停留"),
           },
-          {
-            n: summary.feedback_open,
-            k: "feedback_open",
-            l: tr("待处理反馈"),
-            tone: summary.feedback_open ? "warn" : "",
-          },
-          { n: summary.feedback_total, k: "feedback_total", l: tr("反馈总数"), tone: "" },
         ];
+        /* 一条反馈都没有时，「待处理 0」「总数 0」就是两张空卡片，摆着很突兀
+         * —— 整组不显示，有反馈了再出现（2026-09-24 反馈）。 */
+        const feedbackGroup = Number(summary.feedback_total || 0)
+          ? [
+              {
+                n: summary.feedback_open,
+                k: "feedback_open",
+                l: tr("待处理反馈"),
+                tone: summary.feedback_open ? "warn" : "",
+              },
+              { n: summary.feedback_total, k: "feedback_total", l: tr("反馈总数"), tone: "" },
+            ]
+          : [];
+        items.push(...feedbackGroup);
         $("#tiles").innerHTML = items
           .map(
             (i) =>
