@@ -543,7 +543,7 @@
   border:1px solid var(--color-line);border-left:3px solid var(--color-accent);
   border-radius:var(--radius-sm);background:var(--color-panel);
   color:var(--color-ink-soft);font-size:var(--text-body);line-height:1.7;
-}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--color-line);padding:26px 0 16px;margin-bottom:20px}.directory-head h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--color-ink-soft);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted);border-radius:5px;padding:5px 9px;font-size:var(--text-sm)}.sort button.active,.sort button:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:var(--text-md);margin:0 0 8px;display:flex;gap:8px;align-items:center}/* 分组标题从 text-lg(18px) 降到 text-md(16px)：与条目标题保持一档层级差（2026-09-24 目录字号审计） */.topic-title small{font-size:var(--text-xs);font-weight:400;color:var(--color-muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--color-panel);border:1px solid var(--color-line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--color-line);border-radius:0 0 7px 7px}.note-row{border-left:3px solid transparent;transition:background var(--duration-fast) var(--ease-out),border-left-color var(--duration-fast) var(--ease-out)}.note-row:hover{background:var(--color-surface);border-left-color:var(--color-accent)}.note-row h3{font-size:var(--text-sm);margin:0 0 3px}/* 目录条目标题从 text-md(16px) 降到 text-sm(14px)：此前与摘要 16px 反向倒挂，视觉突兀（2026-09-24 用户反馈） */.note-row .path{font-size:var(--text-xs);color:var(--color-accent)}.note-row p{margin:0;color:var(--color-ink-soft);font-size:var(--text-base);line-height:1.6}.reader{display:none}.reader.open{display:block}/* 文章页头部距顶 26px：与 base.css「页面头部规范」（view-head 顶 26）同值同源，此前标题顶格贴 sticky 顶栏 */.reader-head{border-bottom:1px solid var(--color-line);padding-top:26px;padding-bottom:17px;margin-bottom:19px}.reader h2{font-size:var(--text-3xl);line-height:1.3;margin:0}/* 标题下的元信息行（字数 · 更新日期）：弱化、小字，不与来源区抢视觉。 */.reader-meta{margin:0 0 10px;color:var(--color-muted);font-size:var(--text-xs)}/* 到期复查徽标：frontmatter 的 review_after 已过当天时显示，提醒读者注意时效。复用站点暖色警示语义。 */.reader-meta .stale-badge{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:4px;background:var(--color-warn-soft);color:var(--color-warn);font-size:var(--text-2xs);font-weight:700;vertical-align:1px}.reader-sources{
+}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--color-line);padding:26px 0 16px;margin-bottom:20px}.directory-head h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--color-ink-soft);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted);border-radius:5px;padding:5px 9px;font-size:var(--text-sm)}.sort button.active,.sort button:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:var(--text-md);margin:0 0 8px;display:flex;gap:8px;align-items:center}/* 分组标题从 text-lg(18px) 降到 text-md(16px)：与条目标题保持一档层级差（2026-09-24 目录字号审计） */.topic-title small{font-size:var(--text-xs);font-weight:400;color:var(--color-muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--color-panel);border:1px solid var(--color-line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--color-line);border-radius:0 0 7px 7px}.note-row{border-left:3px solid transparent;transition:background var(--duration-fast) var(--ease-out),border-left-color var(--duration-fast) var(--ease-out)}.note-row:hover{background:var(--color-surface);border-left-color:var(--color-accent)}.note-row h3{font-size:var(--text-sm);margin:0 0 3px}/* 目录条目标题从 text-md(16px) 降到 text-sm(14px)：此前与摘要 16px 反向倒挂，视觉突兀（2026-09-24 用户反馈） */.note-row .path{font-size:var(--text-xs);color:var(--color-accent)}.note-row p{margin:0;color:var(--color-ink-soft);font-size:var(--text-base);line-height:1.6}/* 剪藏目录的介绍卡：交代这个栏目是什么、内容怎么来的、插件从哪装。视觉层级低于 note-row（浅底、细边、小字），说明文字不与文章条目抢视觉。 */.clip-intro{background:var(--color-accent-soft);border:1px solid var(--color-line);border-radius:7px;padding:12px 15px;margin-bottom:18px}.clip-intro-text{font-size:var(--text-sm);line-height:1.7;color:var(--color-ink-soft)}.clip-intro-text b{display:block;font-size:var(--text-xs);color:var(--color-muted);margin-bottom:4px;font-weight:700}.clip-intro-text a{color:var(--color-accent)}.reader{display:none}.reader.open{display:block}/* 文章页头部距顶 26px：与 base.css「页面头部规范」（view-head 顶 26）同值同源，此前标题顶格贴 sticky 顶栏 */.reader-head{border-bottom:1px solid var(--color-line);padding-top:26px;padding-bottom:17px;margin-bottom:19px}.reader h2{font-size:var(--text-3xl);line-height:1.3;margin:0}/* 标题下的元信息行（字数 · 更新日期）：弱化、小字，不与来源区抢视觉。 */.reader-meta{margin:0 0 10px;color:var(--color-muted);font-size:var(--text-xs)}/* 到期复查徽标：frontmatter 的 review_after 已过当天时显示，提醒读者注意时效。复用站点暖色警示语义。 */.reader-meta .stale-badge{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:4px;background:var(--color-warn-soft);color:var(--color-warn);font-size:var(--text-2xs);font-weight:700;vertical-align:1px}.reader-sources{
   margin:var(--space-3) 0 0;color:var(--color-muted);
   font-size:var(--text-body);line-height:1.9;
 }
@@ -661,6 +661,7 @@
 .reader-outline a[data-level="3"]{padding-left:var(--space-6)}
 .reader-outline a[data-level="4"]{padding-left:var(--space-8)}
 .reader-outline a:hover,.reader-outline a:focus-visible{background:var(--color-accent-soft);color:var(--color-accent);border-radius:var(--radius-sm)}
+#reader-toc .toc-list a[aria-current="location"],#reader-outline-list a[aria-current="location"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:var(--weight-semibold);box-shadow:inset 3px 0 var(--color-accent);border-radius:var(--radius-xs)}
 #reader-outline-trigger[hidden]{display:none}
 @media(min-width:1200px){#reader-outline-trigger{display:none}}
 @media print{.reader-image-tools,.reader-outline{display:none}.reader-image[data-state="error"]{display:none}}
@@ -1223,7 +1224,7 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .note-row{border:1px solid var(--color-line);border-radius:6px!important;padding:14px 16px;background:var(--color-panel);box-shadow:0 1px 2px rgba(20,42,35,.02)}
 .note-row:hover{background:var(--color-panel);border-color:var(--color-accent-line);transform:translateX(2px)}
 .note-row h3{font-size:var(--text-sm)}.note-row .path{color:var(--color-muted)}.note-row p{font-size:var(--text-base)}
-.reader{max-width:1018px;margin:0 auto}/* 容器上限=列宽之和 740+30+248：固定 1240 时多出 222px 全堆在正文与目录之间成空带（2026-09-24 用户截图红框，宽窗口实测 bandW 222+）。 */.reader-head{padding-bottom:22px;margin-bottom:25px}.reader-head h2{font-size:var(--text-4xl)}
+.reader{max-width:1018px;margin:0 auto}/* 容器上限=列宽之和 740+30+248：固定 1240 时多出 222px 全堆在正文与目录之间成空带（2026-09-24 用户截图红框，宽窗口实测 bandW 222+）。 */.reader-head{padding-bottom:22px;margin-bottom:25px}.reader-head h1{font-size:var(--text-4xl);line-height:1.3;margin:0}
 .graph-panel{padding:13px;border-radius:7px;box-shadow:0 1px 3px rgba(20,42,35,.03)}
 
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
@@ -1233,7 +1234,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 @media(max-width:760px){.app{display:block}.sidebar{position:relative;width:100%;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--color-line)}.sidebar.collapsed .sidebar-support{display:none}.main{padding-top:0}.topbar{top:0;padding:12px 14px;background:var(--color-bg-veil)}/* 移动端头部规范镜像：hero 折算值 顶 32/底距 28（桌面 40/32 的收窄），
    真源在 base.css 移动端块 .tk-shell .hero:first-child —— 首页根容器
    是 .app，那条拿不到，这里镜像。曾写死 26px content 内距与旧 26 顶距
-时代对不上规范，一并对齐。 */.content{padding:16px 15px calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding:32px 0 16px;margin-bottom:28px}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:13px}.domain-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.view-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader-head h2{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-body)}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
+时代对不上规范，一并对齐。 */.content{padding:16px 15px calc(var(--float-lane) + 26px) 15px}.hero{display:block;padding:32px 0 16px;margin-bottom:28px}.hero-meta{flex-wrap:wrap;gap:12px 22px;margin-top:13px}.domain-grid,.work-grid,.secondary-grid,.aux-grid{grid-template-columns:1fr}.work-card,.secondary-card{min-height:0}.work-head{display:block}.work-head .status{display:inline-block;margin-top:8px}.directory-head,.view-head{display:block}.note-row{display:block;padding:13px}.note-row p{margin-top:7px}.reader{margin:0}.reader-head h1{font-size:var(--text-3xl)}.reader-body{font-size:var(--text-body)}.graph-panel{padding:6px}.graph-panel svg{height:min(78vh,720px)}}
 /* Final interaction pass: keep dense knowledge views quiet until the reader asks for detail. */
 /* 提示框的三个颜色曾是硬编码浅色值（#e8c6a8 / #fff9f2 / #704823），
  * 暗色模式没有对应覆盖 —— 深底上会浮出一块浅橙底配深棕字。
@@ -1452,7 +1453,7 @@ body.tk-host .reader-sources a:hover,body.tk-host .reader-sources a:focus-visibl
     </div>
     <button type="button" class="kbd-close" id="kbd-close">关闭</button>
   </div>
-</div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><h2 id="reader-title"></h2><p id="reader-meta" class="reader-meta"></p><div id="reader-sources" class="reader-sources"></div></div><div class="reader-layout"><div class="reader-maincol"><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section><article id="reader-body" class="reader-body" tabindex="-1"></article><section id="reader-pager" class="reader-pager" aria-label="同模块上一篇下一篇"></section><aside id="reader-reward" class="reader-reward" role="status" hidden></aside></div><div class="reader-railcol"><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside><aside class="reader-siblings" id="reader-siblings" aria-label="同模块文章"></aside></div></div><div id="reader-sources-mobile" class="reader-sources"></div></section><section id="graph-view" class="graph"><div class="view-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value" role="status">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大图谱" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮或捏合缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱" tabindex="0"></svg>
+</div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><h1 id="reader-title"></h1><p id="reader-meta" class="reader-meta"></p><div id="reader-sources" class="reader-sources"></div></div><div class="reader-layout"><div class="reader-maincol"><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section><article id="reader-body" class="reader-body" tabindex="-1"></article><section id="reader-pager" class="reader-pager" aria-label="同模块上一篇下一篇"></section><aside id="reader-reward" class="reader-reward" role="status" hidden></aside></div><div class="reader-railcol"><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside><aside class="reader-siblings" id="reader-siblings" aria-label="同模块文章"></aside></div></div><div id="reader-sources-mobile" class="reader-sources"></div></section><section id="graph-view" class="graph"><div class="view-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value" role="status">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大图谱" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮或捏合缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱" tabindex="0"></svg>
 <div id="legend" class="graph-legend"></div></div></section><section id="panorama-view" class="pano-view"><div class="view-head"><div><h2 id="pano-title">知识全景</h2><p id="pano-subtitle" hidden></p></div></div><div class="pano-tabs" role="tablist"><button type="button" class="pano-tab on" id="pano-tab-matrix" role="tab" aria-selected="true">覆盖矩阵</button><button type="button" class="pano-tab" id="pano-tab-stack" role="tab" aria-selected="false">八层技术栈</button><button type="button" class="pano-tab" id="pano-tab-mine" role="tab" aria-selected="false" title="我的阅读已升级为独立页面，点击前往">我的阅读 ↗</button></div><div id="pano-stack-host" hidden></div><div id="panorama-body" class="pano-body"></div><div id="pano-progress" hidden><div class="view-head"><div><h2>我的阅读</h2><p>标记已读、排稍后读——只保存在这台浏览器上，不会上传</p></div><div class="progress-actions"><label class="pg-filter"><input type="radio" name="pg-filter" value="all" checked>全部</label><label class="pg-filter"><input type="radio" name="pg-filter" value="todo">未读</label><label class="pg-filter"><input type="radio" name="pg-filter" value="learned">已读</label><label class="pg-filter"><input type="radio" name="pg-filter" value="planned">稍后读</label><button type="button" class="pg-io" id="pg-export" title="把标注下载成 JSON 文件">导出</button><button type="button" class="pg-io" id="pg-import" title="从 JSON 文件导入标注">导入</button><input type="file" id="pg-import-file" accept=".json,application/json" hidden><button type="button" class="pg-clear" id="pg-clear">清除全部标注</button></div></div><div id="progress-body"></div></div></section></div></main>
 </div>
 <script>
@@ -1519,11 +1520,18 @@ function show(view){state.view=view;
      记录。同 load 内反复切回同一视图去重。 */
   if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';/* 显示时不写死 display：宽屏下目录页是两列 grid（右侧留出「本页主题」
    目录），写死 block 会用内联样式盖掉 CSS 的 grid。这里只负责隐藏。 */
-$('#directory').style.display=view==='directory'?'':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>{
+$('#directory').style.display=view==='directory'?'':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}
+/* 复查到期日的排序键：只认 YYYY-MM-DD，其它取值（模板占位串、写错的日期、空值）
+   统一按「没有日期」处理，排在有日期的后面。目录排序与剩余天数两处共用同一判据。 */
+const ISO_DAY=/^\d{4}-\d{2}-\d{2}$/;
+const dueKey=n=>ISO_DAY.test(n.review_after||'')?n.review_after:'9999-12-31';
+function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>{
   if(state.sort==='updated')return (b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN');
   /* 「即将到期」按 review_after 升序：已过复查日的排最前，30 天内到期的紧跟其后，
-     没有 review_after 的沉底（用 9999 占位，不参与日期比较也不插到中间）。 */
-  if(state.sort==='due')return (a.review_after||'9999-12-31').localeCompare(b.review_after||'9999-12-31')||a.title.localeCompare(b.title,'zh-CN');
+     没有日期的沉底。只认 YYYY-MM-DD：模板文件里写的是 {{date:YYYY-MM-DD}} 这类占位串，
+     而 localeCompare 把花括号排在数字之前，直接比会把三个模板顶到整页最前面（实测）。
+     日期串按字典序比就是按时间比，这里不用 localeCompare。 */
+  if(state.sort==='due'){const ka=dueKey(a),kb=dueKey(b);return ka<kb?-1:ka>kb?1:a.title.localeCompare(b.title,'zh-CN')}
   return a.title.localeCompare(b.title,'zh-CN');
 })}
 /* 打开文章时把侧栏导航摆到这篇文章的位置（2026-09-24）：
@@ -1680,6 +1688,7 @@ function enhanceDomains(){
   });
 }
 function renderDirectory(){
+  const en=(window.TKI18N&&window.TKI18N.lang==='en');
   const list=noteList(),groups=new Map();
   /* ── 第二个分类维度：上游项目 ──────────────────────────────────
    * 缺陷分析的文章记的是「在哪个上游项目里踩到的坑」，frontmatter 的
@@ -1739,7 +1748,7 @@ function renderDirectory(){
      「剩 N 天到期」「已过期 N 天」是拼接串，整串不命中词典（同 rt25），按语言分支拼。 */
   const enLang=(window.TKI18N&&window.TKI18N.lang==='en');
   const dueText=n=>{
-    if(state.sort!=='due'||!n.review_after)return '';
+    if(state.sort!=='due'||!ISO_DAY.test(n.review_after||''))return '';
     const target=Date.parse(n.review_after+'T00:00:00');
     if(Number.isNaN(target))return '';
     const base=Date.parse(new Date().toISOString().slice(0,10)+'T00:00:00');
@@ -1756,7 +1765,7 @@ function renderDirectory(){
   // 空结果给可执行的下一步，而不是一句"没有匹配内容"就结束。
   const empty=groups.size?'':
     `<div class="empty">${state.query?`<p class="empty-title">没有找到“${esc(q)}”</p>`:`<p class="empty-title">「${esc(state.domain)}」还没有匹配的内容</p>`}<p class="empty-hint">${state.query?'试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识':'可能是筛选条件太窄，清掉筛选看看全部知识'}</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
-  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div><div class="sort"><button data-sort="title" aria-pressed="${state.sort==='title'}" class="${state.sort==='title'?'active':''}">按标题<span class="sr-only"> ${state.sort==='title'?'（当前排序）':''}</span></button><button data-sort="updated" aria-pressed="${state.sort==='updated'}" class="${state.sort==='updated'?'active':''}">按更新<span class="sr-only"> ${state.sort==='updated'?'（当前排序）':''}</span></button><button data-sort="due" aria-pressed="${state.sort==='due'}" class="${state.sort==='due'?'active':''}">按即将到期<span class="sr-only"> ${state.sort==='due'?'（当前排序）':''}</span></button></div></div>${sections}${empty}`;
+  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div>${(state.domain==='Clippings'&&state.topic==='all')?`<div class="clip-intro"><div class="clip-intro-text"><b>${en?'What this section is':'这个栏目是什么'}</b>${en?'External articles clipped from the web (mostly Bilibili videos), captured with <a href="https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf?hl=zh-CN" target="_blank" rel="noreferrer">Obsidian Web Clipper</a>. New clippings from the Mac sync here automatically; each one keeps its original author, publish date and source link.':'外部文章的剪藏归档，多数来自 B 站视频，用 <a href="https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf?hl=zh-CN" target="_blank" rel="noreferrer">Obsidian Web Clipper</a> 浏览器插件保存。Mac 端新剪的内容会自动同步到这里，每篇保留原文作者、发布日期与原文链接。'}</div></div>`:''}<div class="sort"><button data-sort="title" aria-pressed="${state.sort==='title'}" class="${state.sort==='title'?'active':''}">按标题<span class="sr-only"> ${state.sort==='title'?'（当前排序）':''}</span></button><button data-sort="updated" aria-pressed="${state.sort==='updated'}" class="${state.sort==='updated'?'active':''}">按更新<span class="sr-only"> ${state.sort==='updated'?'（当前排序）':''}</span></button><button data-sort="due" aria-pressed="${state.sort==='due'}" class="${state.sort==='due'?'active':''}">按即将到期<span class="sr-only"> ${state.sort==='due'?'（当前排序）':''}</span></button></div></div>${sections}${empty}`;
   if(upBar)$('#directory').insertAdjacentHTML('afterbegin',upBar);
   const clearDomain=$('#empty-clear-domain');
   if(clearDomain)clearDomain.onclick=()=>select('all','all');
@@ -2704,9 +2713,19 @@ function syncRailToggleLabels(){
     btn.setAttribute('aria-label',en?`${collapsed?'Expand':'Collapse'} ${tr(label)}`:`${collapsed?'展开':'折叠'}${label}`);
   });
 }
-let readerHeadingObserver=null;
+let readerHeadingCleanup=null;
+let readerCurrentHeading='';
+function setReaderCurrentHeading(id){
+  readerCurrentHeading=id;
+  document.querySelectorAll('#reader-toc .toc-list a,#reader-outline-list a').forEach(link=>{
+    if(id&&link.getAttribute('href').slice(1)===id){
+      if(link.getAttribute('aria-current')!=='location')link.setAttribute('aria-current','location');
+    }else if(link.hasAttribute('aria-current'))link.removeAttribute('aria-current');
+  });
+}
 function renderReaderRails(note){
-  if(readerHeadingObserver)readerHeadingObserver.disconnect();
+  if(readerHeadingCleanup)readerHeadingCleanup();
+  setReaderCurrentHeading('');
   const siblings=$('#reader-siblings'),toc=$('#reader-toc');
   // Siblings: every note in the same domain/topic, so a reader can move
   // sideways through a module without going back to the directory.
@@ -2741,46 +2760,44 @@ function renderReaderRails(note){
   toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('')+'</ul>';
   /* 目录跳转后焦点随迁到目标标题（tabindex=-1 仅在缺省时补），键盘用户按 Tab 从正文继续，不再弹回目录区。 */
   toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateReaderHeading(a.getAttribute('href').slice(1),true)});
-  /* 【ui4·TOC scrollspy】目录此前只有跳转没有位置反馈：滚到正文中部
-     看不出"在读哪一节"。IntersectionObserver 监听各标题，视口上沿
-     附近（rootMargin -96px 顶栏高度，-55% 收口带）最后进入的标题即
-当前节，a[aria-current=page] 样式 CSS 规范里已有（accent-soft 底）。
-     阈值 0 靠进/出沿触发即可，节标题不像图片需要比例可见。 */
-  const tocLinks=new Map(heads.map(h=>[h.id, toc.querySelector(`a[href="#${h.id}"]`)]));
-  if('IntersectionObserver' in window && heads.length){
-    /* 首轮回调是初始渲染（observe 注册后必然全量回调一次），此时必须
-       只标注不滚动：scrollIntoView 会把顺序焦点导航的起点吸进目录栏，
-       之后用户按 Tab 第一步直接落进目录链接，skip link 被整个跳过
-       （2026-09-24 r15 实测：1.0s 前首步落 skip-link，目录渲染完落目录）。
-       首轮跳过滚动，用户真正滚动正文后的回调才滚目录。 */
-    let spyPrimed=false;
-    const spy=new IntersectionObserver(entries=>{
-      /* 瞬滚（拖滚动条/End/回顶）时回调按批合并，被跳过的标题不产生
-         回调，只按「isIntersecting 的那个」标注定会把高亮滞留在最后
-         一个进过收口带的标题上（实测回顶后停在第二节）。改成每次回调
-         都按当前真实几何重算：清掉全部后取当前节。当前节=收口带
-         （60 到 45% 视口）内最上方的标题；带内没有时取带上方最近的
-         标题——scrollIntoView block:start 后标题常停在 top≈86（顶栏
-         之下），以及长段落滚到中段时上一节刚过线，这两种状态都该
-         跟随而非闪空。 */
-      const band={lo:60,hi:innerHeight*0.45};
-      const withTop=heads.map(h=>({h,t:h.getBoundingClientRect().top}));
-      const inBand=withTop.filter(x=>x.t>=band.lo&&x.t<band.hi);
-      const above=withTop.filter(x=>x.t<band.lo);
-      const target=inBand.length?inBand[0].h:(above.length?above[above.length-1].h:null);
-      tocLinks.forEach(a=>a&&a.removeAttribute('aria-current'));
-      const a=target&&tocLinks.get(target.id);
-      if(a){
-        /* 滚动位置语义用 location（"当前位置在这"），不用 page（读屏把
-           page 当页面切换的 landmark 快捷键目标，滚动驱动标注会误导航）。 */
-        a.setAttribute('aria-current','location');
-        if(spyPrimed)a.scrollIntoView({block:'nearest'})
-      }
-      spyPrimed=true;
-    },{rootMargin:'-96px 0px -55% 0px',threshold:0});
-    readerHeadingObserver=spy;
-    heads.forEach(h=>spy.observe(h));
-  }
+  let frame=0,stopped=false,endScroll=-1;
+  const updateCurrent=()=>{
+    frame=0;
+    if(stopped||state.view!=='reader'||$('#reader-outline').open)return;
+    const inset=$('.topbar').getBoundingClientRect().height+16;
+    let id='';
+    for(const heading of heads){
+      if(heading.getBoundingClientRect().top<=inset+1)id=heading.id;
+      else break;
+    }
+    if(endScroll>=0&&scrollY>=endScroll-1&&$('#reader-body').getBoundingClientRect().bottom<=innerHeight&&heads.length)id=heads[heads.length-1].id;
+    const changed=id!==readerCurrentHeading;
+    setReaderCurrentHeading(id);
+    const active=toc.querySelector('a[aria-current="location"]');
+    const rail=toc.closest('.reader-railcol');
+    if(changed&&active&&active.getClientRects().length&&!rail.contains(document.activeElement)){
+      const item=active.getBoundingClientRect(),bounds=rail.getBoundingClientRect();
+      if(item.top<bounds.top)rail.scrollTop+=item.top-bounds.top;
+      else if(item.bottom>bounds.bottom)rail.scrollTop+=item.bottom-bounds.bottom;
+    }
+  };
+  const schedule=()=>{
+    if(stopped)return;
+    if(scrollY>0&&scrollY+innerHeight>=document.documentElement.scrollHeight-1)endScroll=scrollY;
+    else if(endScroll>=0&&scrollY<endScroll-1)endScroll=-1;
+    if(!frame)frame=requestAnimationFrame(updateCurrent);
+  };
+  window.addEventListener('scroll',schedule,{passive:true});
+  window.addEventListener('resize',schedule);
+  const observer=new ResizeObserver(schedule);
+  observer.observe($('#reader-body'));
+  observer.observe($('.reader-maincol'));
+  document.fonts.ready.then(schedule);
+  readerHeadingCleanup=()=>{
+    stopped=true;cancelAnimationFrame(frame);observer.disconnect();
+    window.removeEventListener('scroll',schedule);window.removeEventListener('resize',schedule);
+  };
+  schedule();
 
   [siblings,toc].forEach(rail=>{
     /* 点击区=标题整行（用户 2026-09-24 反馈：只认 36px 小箭头太小）。箭头钮
@@ -2923,7 +2940,15 @@ function renderReaderOutline(heads){
   $('#reader-outline-title').textContent=trigger.textContent;
   $('#reader-outline-close').textContent=readerText('关闭','Close');
   list.innerHTML=heads.map(h=>`<li><a href="#${esc(h.id)}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('');
-  trigger.onclick=()=>{dialog.showModal();trigger.setAttribute('aria-expanded','true')};
+  setReaderCurrentHeading(heads.some(h=>h.id===readerCurrentHeading)?readerCurrentHeading:'');
+  trigger.onclick=()=>{
+    dialog.showModal();trigger.setAttribute('aria-expanded','true');
+    const active=list.querySelector('a[aria-current="location"]');
+    if(active){
+      const top=active.getBoundingClientRect().top-dialog.getBoundingClientRect().top;
+      dialog.scrollTop+=top-dialog.querySelector('header').getBoundingClientRect().height-8;
+    }
+  };
   $('#reader-outline-close').onclick=()=>dialog.close();
   dialog.onclose=()=>trigger.setAttribute('aria-expanded','false');
   dialog.onkeydown=event=>{
@@ -3030,7 +3055,12 @@ function enhanceReaderContent(){
 function navigateReaderHeading(id,push=false){
   const target=document.getElementById(id);
   if(!target||!target.matches('#reader-body h2,#reader-body h3,#reader-body h4'))return false;
-  if(push){const url=new URL(location.href);url.searchParams.set('path',state.selected);url.hash=id;history.pushState({},'',url)}
+  if(push){
+    const url=new URL(location.href);
+    url.searchParams.set('path',state.selected);url.hash=id;
+    if(url.href!==location.href)history.pushState({},'',url);
+  }
+  setReaderCurrentHeading(id);
   const bar=$('.topbar');
   target.style.scrollMarginTop=`${bar.getBoundingClientRect().height+16}px`;
   target.setAttribute('tabindex','-1');
