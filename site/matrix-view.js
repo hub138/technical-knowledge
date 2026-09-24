@@ -120,7 +120,13 @@
           /* 空格子也给回应：页面承诺「点格子看文章」，点空的没反应等于
              承诺落空。说清这个方向是真空，比沉默好。 */
           cell.classList.add("mx-clickable");
-          cell.addEventListener("click", function () { showEmptyCell(host, L, k); });
+          cell.setAttribute("tabindex", "0");
+          cell.setAttribute("role", "button");
+          var openEmpty = function () { showEmptyCell(host, L, k); };
+          cell.addEventListener("click", openEmpty);
+          cell.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openEmpty(); }
+          });
           cell.addEventListener("mouseenter", function (ev) { showTip(ev, L, k, c); });
           cell.addEventListener("mouseleave", hideTip);
         } else {
@@ -135,7 +141,13 @@
         }
         if (c.n > 0) {
           cell.classList.add("mx-clickable");
-          cell.addEventListener("click", function () { showCell(host, L, k, c); });
+          cell.setAttribute("tabindex", "0");
+          cell.setAttribute("role", "button");
+          var openCell = function () { showCell(host, L, k, c); };
+          cell.addEventListener("click", openCell);
+          cell.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openCell(); }
+          });
         }
         grid.appendChild(cell);
       });
