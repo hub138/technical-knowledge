@@ -612,8 +612,14 @@
 .reader-sources a:hover{text-decoration:underline}
 .source-sep{margin:0 5px;color:var(--color-line-strong)}
 .source-toggle{margin-left:8px;padding:1px 8px;border:1px solid var(--color-line);border-radius:var(--radius-full);background:transparent;color:var(--color-muted);font:inherit;font-size:var(--text-xs);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
-.source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--color-accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{font-size:var(--text-small);display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 204px;column-gap:26px;align-items:start}#reader-siblings{grid-column:2}.reader-layout:has(#reader-toc[hidden]):has(#reader-siblings[hidden]){grid-template-columns:minmax(0,1fr) 0;column-gap:0}}/* 同模块 2026-09-24 从正文后移入右栏（目录下方）：右栏原本只有目录、下方留白；模块文章少时竖排列表不占正文宽度。窄屏（≤1199px）右栏隐藏，回退为正文后的横排胶囊。字号从 13px 提到 var(--text-body)（16px）：用户反馈胶囊字太小。 */
-.reader-siblings{margin:18px 0 0;padding-top:12px;border-top:1px solid var(--color-line)}.reader-siblings .rail-head{margin:0 0 6px;padding:0;border:0;justify-content:flex-start}.reader-siblings .rail-head span{font-size:var(--text-small);color:var(--color-muted)}.reader-siblings .rail-list{display:grid;gap:2px}.reader-siblings .rail-list a{padding:6px 8px;border:0;border-radius:5px;background:none;white-space:normal;line-height:1.5;font-size:var(--text-body)}@media(max-width:1199px){.reader-siblings .rail-list{display:flex;flex-wrap:wrap;gap:7px}.reader-siblings .rail-list a{padding:5px 11px;border:1px solid var(--color-line);border-radius:15px;background:var(--color-panel);white-space:nowrap;font-size:var(--text-small)}}.reader-toc{position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto;font-size:var(--text-sm)}.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--color-line);color:var(--color-ink);font-size:var(--text-body);font-weight:var(--weight-bold)}.rail-toggle{border:0;background:none;color:var(--color-muted);cursor:pointer;padding:0 2px;font-size:var(--text-base);line-height:1}.rail-toggle:hover{color:var(--color-accent)}.rail-list{margin:0;padding:0;list-style:none;display:grid;gap:2px}/* 目录链接的颜色从 --color-muted 提到 --color-ink-soft。
+.source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--color-accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{font-size:var(--text-small);display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 204px;column-gap:26px;align-items:start}.reader-railcol{grid-column:2;position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto}.reader-railcol .reader-toc{position:static;max-height:none;overflow:visible}.reader-layout:has(#reader-toc[hidden]):has(#reader-siblings[hidden]){grid-template-columns:minmax(0,1fr) 0;column-gap:0}}/* 同模块文章 2026-09-24 从正文后移入右栏（目录下方）；同日晚改：目录与同模块包进 .reader-railcol 一列整体 sticky——原先只有目录 sticky，同模块折叠行是静态块，被网格自动放置到正文列末行，目录底与折叠行之间空出一整条空白（用户截图反馈「每个页面都这么空」的病根之一）。窄屏（≤1199px）右栏隐藏，回退为正文后的横排胶囊。字号 13px → var(--text-body) 16px（一次反馈）→ var(--text-h3) 18px、窄屏胶囊 15px（二次反馈「字再大一点」）。 */
+/* 收尾卡与图谱区宽度（2026-09-24 晚）：reader-pager/reader-reward 原先铺满
+   maincol（正文 740px 时卡片 813px），article-relations 限宽 960px——同屏
+   三套宽度（740/813/960），底部区左右缘互不对齐，视觉散架。统一锚定正文
+   列宽：收尾卡 740px，图谱区跟 maincol 走（网格收窄时同步收窄）。 */
+#reader-pager,#reader-reward{max-width:740px}
+#reader-relations.article-relations{max-width:none}
+.reader-siblings{margin:18px 0 0;padding-top:12px;border-top:1px solid var(--color-line)}.reader-siblings .rail-head{margin:0 0 6px;padding:0;border:0;justify-content:flex-start}.reader-siblings .rail-head span{font-size:var(--text-small);color:var(--color-muted)}.reader-siblings .rail-list{display:grid;gap:2px}.reader-siblings .rail-list a{padding:6px 8px;border:0;border-radius:5px;background:none;white-space:normal;line-height:1.5;font-size:var(--text-h3)}@media(max-width:1199px){.reader-siblings .rail-list{display:flex;flex-wrap:wrap;gap:7px}.reader-siblings .rail-list a{padding:5px 11px;border:1px solid var(--color-line);border-radius:15px;background:var(--color-panel);white-space:nowrap;font-size:15px}}.reader-toc{position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto;font-size:var(--text-sm)}.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--color-line);color:var(--color-ink);font-size:var(--text-body);font-weight:var(--weight-bold)}.rail-toggle{border:0;background:none;color:var(--color-muted);cursor:pointer;padding:0 2px;font-size:var(--text-base);line-height:1}.rail-toggle:hover{color:var(--color-accent)}.rail-list{margin:0;padding:0;list-style:none;display:grid;gap:2px}/* 目录链接的颜色从 --color-muted 提到 --color-ink-soft。
    * 它是一条可点的导航，不是脚注 —— 灰到读不出"这里能点"就等于没有。
    * 悬停时才变主色，用它来表示"当前指向哪一条"。 */
   .rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--color-ink-soft);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--color-accent-soft);color:var(--color-accent)}.rail-list a[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:var(--text-sm);color:var(--color-muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:var(--text-sm);color:var(--color-muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}.reader-body{max-width:960px;font-size:var(--text-lg);line-height:1.85}.reader-body h1{font-size:var(--text-3xl)}.reader-body h2{font-size:var(--text-2xl);border-bottom:1px solid var(--color-line);padding-bottom:5px;margin-top:31px}.reader-body h3{font-size:var(--text-xl);margin-top:25px}.reader-body p{margin:14px 0}.reader-body ul,.reader-body ol{padding-left:25px}.reader-body li{margin:5px 0}.reader-body blockquote{border-left:3px solid var(--color-accent);padding:4px 15px;color:var(--color-muted);background:var(--color-surface)}.reader-body a{color:var(--color-accent)}.reader-body img{max-width:100%;max-height:600px;border:1px solid var(--color-line);border-radius:6px}.reader-body code{background:var(--color-surface);color:var(--color-accent-ink);border:1px solid var(--color-accent-line);border-radius:4px;padding:1px 4px;font-family:var(--font-mono);font-size:.88em}.reader-body .code-block,.reader-body pre.mermaid{background:var(--color-surface);border:1px solid var(--color-line);color:var(--color-ink);border-radius:7px;padding:14px 16px;overflow:auto;font-size:var(--text-base);line-height:1.65}.reader-body .code-block code,.reader-body pre.mermaid code{background:none;border:0;padding:0;color:inherit;font-size:inherit}.reader-body table{border-collapse:collapse;width:100%;margin:var(--space-5) 0;font-size:var(--text-sm)}
@@ -1292,8 +1298,12 @@ html[data-lang="en"] .home:empty::before{content:'Loading the library...'}
 
 .topbar .theme-toggle{position:absolute;right:30px;top:20px;z-index:var(--z-sidebar)}
 @media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}/* 上一篇/下一篇翻页条：正文收尾处，左右两格，顺序与右栏同模块列表、目录页一致。 */
-.reader-pager{margin:30px 0 0;padding-top:16px;border-top:1px solid var(--color-line)}.pager-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pager-cell{display:flex;flex-direction:column;gap:3px;padding:11px 14px;border:1px solid var(--color-line);border-radius:8px;background:var(--color-panel);text-decoration:none;min-height:52px}.pager-cell:not(.pager-none):hover{border-color:var(--color-accent);background:var(--color-accent-soft)}.pager-next{text-align:right;align-items:flex-end}.pager-label{font-size:var(--text-small);color:var(--color-muted);font-weight:700}.pager-cell:not(.pager-none):hover .pager-label{color:var(--color-accent)}.pager-title{font-size:var(--text-body);font-weight:700;color:var(--color-ink-soft);line-height:1.4}.pager-cell:not(.pager-none):hover .pager-title{color:var(--color-accent)}.pager-none{opacity:.45;justify-content:center}@media(max-width:760px){.pager-grid{grid-template-columns:1fr}.pager-next{align-items:flex-start;text-align:left}}/* 读毕奖励条：滚到文末淡入一次，肯定句加累计已读数。 */
-.reader-reward{margin:16px 0 0;padding:12px 16px;border:1px solid var(--color-accent-line);border-radius:8px;background:var(--color-accent-soft);display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}.reader-reward.on{opacity:1;transform:none}.reward-star{color:var(--color-accent);font-size:20px}.reward-text{display:flex;flex-direction:column;gap:1px;font-size:var(--text-body);color:var(--color-ink)}.reward-text b{font-size:var(--text-md);font-weight:800;color:var(--color-accent-ink)}
+.reader-pager{margin:30px 0 0;padding-top:16px;border-top:1px solid var(--color-line)}.pager-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pager-cell{display:flex;flex-direction:column;gap:3px;padding:11px 14px;border:1px solid var(--color-line);border-radius:8px;background:var(--color-panel);text-decoration:none;min-height:52px}.pager-cell:not(.pager-none):hover{border-color:var(--color-accent);background:var(--color-accent-soft)}.pager-next{text-align:right;align-items:flex-end}.pager-label{font-size:var(--text-small);color:var(--color-muted);font-weight:700}.pager-cell:not(.pager-none):hover .pager-label{color:var(--color-accent)}.pager-title{font-size:var(--text-body);font-weight:700;color:var(--color-ink-soft);line-height:1.4}.pager-cell:not(.pager-none):hover .pager-title{color:var(--color-accent)}.pager-none{opacity:.45;justify-content:center}@media(max-width:760px){.pager-grid{grid-template-columns:1fr}.pager-next{align-items:flex-start;text-align:left}}/* 读毕奖励条：滚到文末淡入一次，肯定句加累计已读数与阅读用时。 */
+.reader-reward{margin:16px 0 0;padding:12px 16px;border:1px solid var(--color-accent-line);border-radius:8px;background:var(--color-accent-soft);display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}.reader-reward.on{opacity:1;transform:none}.reward-star{color:var(--color-accent);font-size:20px}.reward-text{display:flex;flex-direction:column;gap:1px;font-size:var(--text-body);color:var(--color-ink)}.reward-text b{font-size:var(--text-md);font-weight:800;color:var(--color-accent-ink)}/* 2026-09-24 二次反馈修复：.reader-toc 之前整栏 position:sticky，正文一滚
+   目录整个浮起来压在下方「同模块文章」上（用户截图圈出重叠）。改为只有
+   标题行悬浮：滚过目录列表后，悬浮的只有「本文目录 ▾」一行，点它仍能
+   折叠/展开，列表本体随页面正常滚走，与同模块不再挤在一起。 */
+.reader-toc{max-height:none;overflow:visible;font-size:var(--text-sm)}.reader-toc .rail-head{position:sticky;top:96px;z-index:5;background:var(--color-bg);margin:0 0 10px;padding:9px 0 8px;border-bottom:1px solid var(--color-line)}
 </style>
 <style id="link-polish">
 /* App navigation and action links stay quiet; article links retain a clear
@@ -1315,9 +1325,7 @@ a:hover { text-decoration: none; }
 :root[data-theme="dark"] .radar-badge-desc{color:var(--color-warm-line)}
 
 .topbar .theme-toggle{position:absolute;right:30px;top:20px;z-index:var(--z-sidebar)}
-@media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}/* 上一篇/下一篇翻页条：正文收尾处，左右两格，顺序与右栏同模块列表、目录页一致。 */
-.reader-pager{margin:30px 0 0;padding-top:16px;border-top:1px solid var(--color-line)}.pager-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pager-cell{display:flex;flex-direction:column;gap:3px;padding:11px 14px;border:1px solid var(--color-line);border-radius:8px;background:var(--color-panel);text-decoration:none;min-height:52px}.pager-cell:not(.pager-none):hover{border-color:var(--color-accent);background:var(--color-accent-soft)}.pager-next{text-align:right;align-items:flex-end}.pager-label{font-size:var(--text-small);color:var(--color-muted);font-weight:700}.pager-cell:not(.pager-none):hover .pager-label{color:var(--color-accent)}.pager-title{font-size:var(--text-body);font-weight:700;color:var(--color-ink-soft);line-height:1.4}.pager-cell:not(.pager-none):hover .pager-title{color:var(--color-accent)}.pager-none{opacity:.45;justify-content:center}@media(max-width:760px){.pager-grid{grid-template-columns:1fr}.pager-next{align-items:flex-start;text-align:left}}/* 读毕奖励条：滚到文末淡入一次，肯定句加累计已读数。 */
-.reader-reward{margin:16px 0 0;padding:12px 16px;border:1px solid var(--color-accent-line);border-radius:8px;background:var(--color-accent-soft);display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}.reader-reward.on{opacity:1;transform:none}.reward-star{color:var(--color-accent);font-size:20px}.reward-text{display:flex;flex-direction:column;gap:1px;font-size:var(--text-body);color:var(--color-ink)}.reward-text b{font-size:var(--text-md);font-weight:800;color:var(--color-accent-ink)}
+@media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}
 </style>
 <style id="reader-mobile-compact">
 /* 文章页移动端首屏收口（2026-09-23 文章页排版审计）：
@@ -1356,10 +1364,7 @@ a:hover { text-decoration: none; }
 :root[data-theme="dark"] .radar-badge-desc{color:var(--color-warm-line)}
 
 .topbar .theme-toggle{position:absolute;right:30px;top:20px;z-index:var(--z-sidebar)}
-@media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}/* 上一篇/下一篇翻页条：正文收尾处，左右两格，顺序与右栏同模块列表、目录页一致。 */
-.reader-pager{margin:30px 0 0;padding-top:16px;border-top:1px solid var(--color-line)}.pager-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pager-cell{display:flex;flex-direction:column;gap:3px;padding:11px 14px;border:1px solid var(--color-line);border-radius:8px;background:var(--color-panel);text-decoration:none;min-height:52px}.pager-cell:not(.pager-none):hover{border-color:var(--color-accent);background:var(--color-accent-soft)}.pager-next{text-align:right;align-items:flex-end}.pager-label{font-size:var(--text-small);color:var(--color-muted);font-weight:700}.pager-cell:not(.pager-none):hover .pager-label{color:var(--color-accent)}.pager-title{font-size:var(--text-body);font-weight:700;color:var(--color-ink-soft);line-height:1.4}.pager-cell:not(.pager-none):hover .pager-title{color:var(--color-accent)}.pager-none{opacity:.45;justify-content:center}@media(max-width:760px){.pager-grid{grid-template-columns:1fr}.pager-next{align-items:flex-start;text-align:left}}/* 读毕奖励条：滚到文末淡入一次，肯定句加累计已读数。 */
-.reader-reward{margin:16px 0 0;padding:12px 16px;border:1px solid var(--color-accent-line);border-radius:8px;background:var(--color-accent-soft);display:flex;align-items:center;gap:10px;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}.reader-reward.on{opacity:1;transform:none}.reward-star{color:var(--color-accent);font-size:20px}.reward-text{display:flex;flex-direction:column;gap:1px;font-size:var(--text-body);color:var(--color-ink)}.reward-text b{font-size:var(--text-md);font-weight:800;color:var(--color-accent-ink)}
-
+@media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}
 </style>
 </head>
 <body class="tk-host">
@@ -1386,7 +1391,7 @@ a:hover { text-decoration: none; }
     </div>
     <button type="button" class="kbd-close" id="kbd-close">关闭</button>
   </div>
-</div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><h2 id="reader-title"></h2><p id="reader-meta" class="reader-meta"></p><div id="reader-sources" class="reader-sources"></div></div><div class="reader-layout"><div class="reader-maincol"><article id="reader-body" class="reader-body" tabindex="-1"></article><section id="reader-pager" class="reader-pager" aria-label="同模块上一篇下一篇"></section><aside id="reader-reward" class="reader-reward" role="status" hidden></aside></div><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside><aside class="reader-siblings" id="reader-siblings" aria-label="同模块其他文章"></aside></div><div id="reader-sources-mobile" class="reader-sources"></div><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section></section><section id="graph-view" class="graph"><div class="view-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value" role="status">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大图谱" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮或捏合缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱" tabindex="0"></svg>
+</div><div class="content"><section id="home" class="home"></section><section id="directory" class="directory"></section><section id="reader" class="reader"><div class="reader-head"><h2 id="reader-title"></h2><p id="reader-meta" class="reader-meta"></p><div id="reader-sources" class="reader-sources"></div></div><div class="reader-layout"><div class="reader-maincol"><article id="reader-body" class="reader-body" tabindex="-1"></article><section id="reader-pager" class="reader-pager" aria-label="同模块上一篇下一篇"></section><aside id="reader-reward" class="reader-reward" role="status" hidden></aside></div><div class="reader-railcol"><aside id="reader-toc" class="reader-toc" aria-label="本文目录"></aside><aside class="reader-siblings" id="reader-siblings" aria-label="同模块其他文章"></aside></div></div><div id="reader-sources-mobile" class="reader-sources"></div><section id="reader-relations" class="article-relations" aria-label="文章知识图谱"></section></section><section id="graph-view" class="graph"><div class="view-head"><div><h2 id="graph-title"></h2><p id="graph-subtitle"></p></div></div><div class="graph-panel"><div class="graph-tools"><button type="button" class="graph-tool" id="graph-zoom-out" title="缩小" aria-label="缩小图谱">−</button><span class="graph-zoom-value" id="graph-zoom-value" role="status">100%</span><button type="button" class="graph-tool" id="graph-zoom-in" title="放大图谱" aria-label="放大图谱">+</button><button type="button" class="graph-tool graph-tool--wide" id="graph-reset" title="重置缩放与平移" aria-label="重置视图">重置</button><span class="graph-hint" id="graph-hint">滚轮或捏合缩放 · 拖拽平移 · 点节点打开</span></div><svg id="graph" aria-label="知识图谱" tabindex="0"></svg>
 <div id="legend" class="graph-legend"></div></div></section><section id="panorama-view" class="pano-view"><div class="view-head"><div><h2 id="pano-title">知识全景</h2><p id="pano-subtitle" hidden></p></div></div><div class="pano-tabs" role="tablist"><button type="button" class="pano-tab on" id="pano-tab-matrix" role="tab" aria-selected="true">覆盖矩阵</button><button type="button" class="pano-tab" id="pano-tab-stack" role="tab" aria-selected="false">八层技术栈</button><button type="button" class="pano-tab" id="pano-tab-mine" role="tab" aria-selected="false">我的阅读</button></div><div id="pano-stack-host" hidden></div><div id="panorama-body" class="pano-body"></div><div id="pano-progress" hidden><div class="view-head"><div><h2>我的阅读</h2><p>标记已读、排稍后读——只保存在这台浏览器上，不会上传</p></div><div class="progress-actions"><label class="pg-filter"><input type="radio" name="pg-filter" value="all" checked>全部</label><label class="pg-filter"><input type="radio" name="pg-filter" value="todo">未读</label><label class="pg-filter"><input type="radio" name="pg-filter" value="learned">已读</label><label class="pg-filter"><input type="radio" name="pg-filter" value="planned">稍后读</label><button type="button" class="pg-io" id="pg-export" title="把标注下载成 JSON 文件">导出</button><button type="button" class="pg-io" id="pg-import" title="从 JSON 文件导入标注">导入</button><input type="file" id="pg-import-file" accept=".json,application/json" hidden><button type="button" class="pg-clear" id="pg-clear">清除全部标注</button></div></div><div id="progress-body"></div></div></section></div></main>
 </div>
 <script>
@@ -1444,6 +1449,9 @@ function retranslate(){if(window.TKI18N)window.TKI18N.translateDOM()}
 let viewVisitKey='';/* 视图进入打点去重：同一次页面加载里反复切视图只记一次。 */
 const VIEW_TITLES={home:'首页',directory:'目录视图',graph:'知识图谱（视图）',panorama:'知识全景（视图）'};
 function show(view){state.view=view;
+  /* 离开阅读视图即结算当前文章的累计时长（visibilitychange 只管切后台，
+     站内切到目录/图谱等视图也要停表，防止计时虚增）。 */
+  if(view!=='reader')readingTime.flush();
   /* 视图进入监控（用户要求：访问任何页面都打点）。home/directory/graph/
      panorama 每次页面加载各记一次；reader 不在此记——文章阅读由
      openNote 的 reportVisit 记到具体篇目，粒度更细，避免一行文章两条
@@ -2533,9 +2541,10 @@ function renderReaderRails(note){
   const siblings=$('#reader-siblings'),toc=$('#reader-toc');
   // Siblings: every note in the same domain/topic, so a reader can move
   // sideways through a module without going back to the directory.
-  /* 顺序与目录页一致（2026-09-24 反馈）：目录页 noteList 默认 sort:'title'
-     按标题 localeCompare zh-CN 排，此前同模块胶囊取的是 state.notes 原始
-     （API 返回）顺序，两处对不上，读者在目录里建立的顺序感进了文章页就乱。
+  /* 「同模块文章」（2026-09-24 二次反馈改名，更直白）；顺序与目录页
+     一致：目录页 noteList 默认 sort:'title' 按标题 localeCompare zh-CN
+     排，此前同模块胶囊取的是 state.notes 原始（API 返回）顺序，两处
+     对不上，读者在目录里建立的顺序感进了文章页就乱。
      现在 pills 列表、右栏、翻页三处共用同一份 modulePeers。 */
   const modulePeers=state.notes.filter(x=>x.category===note.category&&x.topic===note.topic)
     .sort((a,b)=>a.title.localeCompare(b.title,'zh-CN'));
@@ -2548,7 +2557,7 @@ function renderReaderRails(note){
   /* 同模块从正文后移到右栏（目录下方）：右栏本来只有目录，下方留白；
      模块文章少时胶囊一排平铺不占正文宽度。窄屏（≤1199px）右栏整体
      隐藏，此时回退为正文后的横向胶囊（CSS media query 控制显示）。 */
-  siblings.innerHTML=railHead('同模块',modulePeers.length>1,false)+'<ul class="rail-list">'+modulePeers.map(x=>`<li><a href="/?path=${encodeURIComponent(x.path)}" data-note="${esc(x.path)}"${x.path===note.path?' aria-current="page"':''}>${esc(x.title)}</a></li>`).join('')+'</ul>';
+  siblings.innerHTML=railHead('同模块文章',modulePeers.length>1,false)+'<ul class="rail-list">'+modulePeers.map(x=>`<li><a href="/?path=${encodeURIComponent(x.path)}" data-note="${esc(x.path)}"${x.path===note.path?' aria-current="page"':''}>${esc(x.title)}</a></li>`).join('')+'</ul>';
   siblings.querySelectorAll('a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});
   renderReaderPager(note,modulePeers,prevNote,nextNote);
   renderReaderReward(note);
@@ -2606,15 +2615,45 @@ function renderReaderPager(note,modulePeers,prevNote,nextNote){
   pager.innerHTML=`<div class="pager-grid">${cell(prevNote,en?'Previous':'上一篇','prev')}${cell(nextNote,en?'Next':'下一篇','next')}</div>`;
   pager.querySelectorAll('a[data-note]').forEach(a=>a.onclick=e=>{e.preventDefault();openNote(a.dataset.note)});
 }
-/* ── 读毕奖励（2026-09-24 反馈）────────────────────────────────────
-   滚动接近文末时出现一次（同一次会话同一篇不重复），文案正向肯定并
-   汇报累计已读数（来自本地阅读进度 learned 计数），引导继续读下一篇。
-   触发走已有 bindProgress 的滚动更新，不新增 scroll 监听。 */
-const rewardState={shownFor:null,armed:false};
+/* ── 累计阅读时长（2026-09-24 用户要求）──────────────────────────
+   已读判定从「滚到文末即算」改为「单篇累计阅读 ≥ 60 秒」：同一篇文章
+   多次访问的时长按路径累加（localStorage tk-reading-v1），页面切到后台
+   （visibilitychange hidden）或离开阅读视图即结算暂停，回来继续累加。
+   滚到文末但时长不够时，奖励条显示剩余秒数提示，攒够才弹出祝贺。 */
+const readingTime={
+  KEY:'tk-reading-v1',THRESHOLD:60,path:null,last:0,
+  load(){try{return JSON.parse(localStorage.getItem(this.KEY)||'{}')}catch(e){return{}}},
+  save(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
+  total(path){const d=this.load();let t=d[path]||0;
+    /* 实时含当前段：判定时本次会话往往还没 stop 入账，只看已存值会
+       系统性偏小，60 秒门槛永远差一截。last 属于当前 path 才计入。 */
+    if(this.path===path&&this.last)t+=(Date.now()-this.last)/1000;return t},
+  fmt(sec){const en=window.TKI18N&&window.TKI18N.lang==='en';const m=Math.floor(sec/60),s=Math.round(sec%60);
+    if(m<=0)return en?`${s}s`:`${s} 秒`;return en?`${m}m ${s}s`:`${m} 分 ${s} 秒`},
+  start(path){this.stop();this.path=path;this.last=Date.now()},
+  stop(){if(!this.path)return;const now=Date.now();const d=this.load();
+    d[this.path]=(d[this.path]||0)+(now-this.last)/1000;this.save(d);this.last=now},
+  /* 无条件结算当前时段并停表：切篇、离开阅读视图都走这里。
+     不能按路径判断要不要结算——切篇时传入的是新路径，与在计的旧路径
+     必不相等，条件结算会把旧篇最后一段丢掉。 */
+  flush(){this.stop();this.path=null},
+};
+document.addEventListener('visibilitychange',()=>{
+  if(document.hidden)readingTime.stop();else if(readingTime.path&&state.view==='reader')readingTime.last=Date.now();
+});
+/* 关闭/刷新页面：visibilitychange 在部分浏览器不触发，补 pagehide 兜底结算。 */
+window.addEventListener('pagehide',()=>readingTime.stop());
+const rewardState={shownFor:null,armed:false,hinted:false,done:false};
 function renderReaderReward(note){
   const box=$('#reader-reward');
   box.hidden=true;box.classList.remove('on');
   rewardState.shownFor=note.path;
+  rewardState.hinted=false;
+  rewardState.done=false;
+  /* 累计时长：切篇时把上一篇的时长结算入账，新篇从头开始计时。
+     flush 先停掉当前计时并清空 path，start 再绑定新篇。 */
+  readingTime.flush();
+  readingTime.start(note.path);
   /* 文章切换后先不接奖励判定：openNote 里 bindProgress.update() 跑在
      scrollTo(0) 之前，此刻滚动位置还停在上一篇文章底部，会把新文章
      误判成"已读毕"。等本轮打开流程结束（rAF 时滚动已回顶）再启用。 */
@@ -2623,23 +2662,35 @@ function renderReaderReward(note){
 }
 function maybeShowReaderReward(){
   const box=$('#reader-reward');
-  if(state.view!=='reader'||!box||box.hidden===false||box.classList.contains('on'))return;
+  if(state.view!=='reader'||!box||rewardState.done)return;
   if(!rewardState.armed||rewardState.shownFor!==state.selected)return;
   const article=$('#reader-body');
   if(!article||!article.offsetHeight)return;
   const end=article.getBoundingClientRect().bottom;
-  /* 文末进入视口下沿 220px 内（约为 3~4 行正文高度）即算读毕。 */
+  /* 文末进入视口下沿 220px 内（约为 3~4 行正文高度）即到达读毕位置。 */
   if(end>innerHeight+220)return;
+  const path=state.selected;
+  const total=readingTime.total(path);
+  const en=window.TKI18N&&window.TKI18N.lang==='en';
+  /* 满 60 秒才弹祝贺并记已读；不够时提示还差多少（同一篇只提示一次，
+     读者继续停留攒时长，跨过 60 秒的下次滚动即转正。 */
+  if(total<readingTime.THRESHOLD){
+    if(!rewardState.hinted){rewardState.hinted=true;
+      const need=Math.ceil(readingTime.THRESHOLD-total);
+      box.innerHTML=`<span class="reward-star">✦</span><span class="reward-text"><b>${en?'Keep reading…':'再读一会儿'}</b>${en?`Read for ${readingTime.fmt(Math.floor(total))} · ${need}s more to count as done`:`已读 ${readingTime.fmt(Math.floor(total))} · 累计满 1 分钟记为已读（还差 ${need} 秒）`}</span>`;
+      box.hidden=false;requestAnimationFrame(()=>box.classList.add('on'))}
+    return}
   const counts=TKShell.progress.counts();
   const learned=counts.learned||0;
-  const en=window.TKI18N&&window.TKI18N.lang==='en';
   const praise=en?'Well read':'很棒，读完了';
-  const stat=learned>1?(en?`${learned} notes read in total`:`累计已读 ${learned} 篇`):(en?'First note done':'第一篇完成');
+  const spent=readingTime.fmt(Math.floor(total));
+  const stat=learned>1?(en?`${learned} notes read in total · this one ${spent}`:`累计已读 ${learned} 篇 · 这篇累计 ${spent}`):(en?`First note done · ${spent} on this one`:`第一篇完成 · 这篇累计 ${spent}`);
   box.innerHTML=`<span class="reward-star">✦</span><span class="reward-text"><b>${praise}</b>${stat}</span>`;
   box.hidden=false;
+  rewardState.done=true;
   requestAnimationFrame(()=>box.classList.add('on'));
   /* 读了这篇就顺手记为已读：奖励与进度数据一致，进度页不缺这一篇。 */
-  if(TKShell.progress.statusOf(state.selected)!=='learned'){TKShell.progress.set(state.selected,'learned');updateReaderLearned()}
+  if(TKShell.progress.statusOf(path)!=='learned'){TKShell.progress.set(path,'learned');updateReaderLearned()}
 }
 function railHead(label,hasItems,openByDefault=true){
   /* 阅读页顶部两个信息块默认态不同，各有理由：

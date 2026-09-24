@@ -952,7 +952,7 @@
        （title），但"每周更新"是固定标签。 */
     "每周更新": { en: "Updated weekly" },
     "的直接知识图谱": { en: " — immediate knowledge graph" },
-    "同模块": { en: "Same module" },
+    "同模块文章": { en: "More in this module" },
     "篇）·": { en: "in the graph)" },
     "篇 ·": { en: " notes · " },
     /* 英文端必须能区分：这里带篇数语义，下面的裸箭头是通用方向符号。
