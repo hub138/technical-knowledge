@@ -26,6 +26,8 @@ OUT = pathlib.Path(__file__).resolve().parent / "paper-titles.json"
 # arxiv id -> Chinese title
 TITLES = {
     # ── 2024 ──
+    "2402.01030": "CodeAct：用可执行代码统一智能体的动作空间",
+    "2506.08837": "面向 LLM 智能体防提示注入的设计模式",
     "2410.20878": "AutoRAG：自动优化 RAG 管道",
     "2404.16130": "从局部到全局：面向查询聚焦摘要的 Graph RAG 方法",
     "2403.14403": "Adaptive-RAG：按问题复杂度自适应选择检索策略",

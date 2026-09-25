@@ -2226,42 +2226,48 @@ body.tk-reading .reader-reward{max-width:none}
    与主卡之间靠 30px 列沟呼吸。 */
 body.tk-reading .reader-railcol{top:84px}
 /* 卡内代码块升级为掘金深色（浅色主题下；深色主题 token 已是深底）。 */
-body.tk-reading:not([data-theme=dark]) .reader-body .code-block{
+:root:not([data-theme=dark]) .reader-body .code-block{
   background:#282c34;
   border-color:#1e222a;
   color:#dcdfe4;
 }
-body.tk-reading:not([data-theme=dark]) .reader-body .code-block code{
+:root:not([data-theme=dark]) .reader-body .code-block code{
   color:#dcdfe4;
 }
-body.tk-reading:not([data-theme=dark]) .reader-code .code-tools{
+:root:not([data-theme=dark]) .reader-code .code-tools{
   background:#21252b;
   border-color:#1e222a;
   color:#9da5b4;
   border-radius:var(--radius-sm) var(--radius-sm) 0 0;
 }
-body.tk-reading:not([data-theme=dark]) .reader-code .code-block{
+:root:not([data-theme=dark]) .reader-code .code-block{
   border-top-left-radius:0;border-top-right-radius:0;
 }
-body.tk-reading:not([data-theme=dark]) .code-language{
+:root:not([data-theme=dark]) .code-language{
   color:#61afef;
   font-weight:var(--weight-semibold);
 }
-body.tk-reading:not([data-theme=dark]) .code-copy{
+:root:not([data-theme=dark]) .code-copy{
   background:#2f333d;border-color:#3a3f4b;color:#c8ccd4;
 }
-body.tk-reading:not([data-theme=dark]) .code-copy:hover,
-body.tk-reading:not([data-theme=dark]) .code-copy:focus-visible{
+:root:not([data-theme=dark]) .code-copy:hover,
+:root:not([data-theme=dark]) .code-copy:focus-visible{
   background:#3a3f4b;border-color:#4a505c;color:#fff;
 }
 /* 掘金正文关键词蓝色在深底代码里走不了——保持本站海军蓝，只把行内代码
    从「描边胶囊」改成掘金的「浅灰底」弱化处理，长代码不再打断阅读。 */
-body.tk-reading:not([data-theme=dark]) .reader-body code{
-  background:rgba(135,131,120,.15);
+:root:not([data-theme=dark]) .reader-body :not(pre)>code{
+  background:var(--color-warm-soft);
   border:0;
-  color:#c7254e;
-  padding:2px 6px;
-  border-radius:4px;
+  color:var(--color-warm-ink);
+  padding:1px 6px;
+  border-radius:2px;
+}
+/* 深色主题不跟随浅色的粉红：粉红压深底实测 2.42（审计报），
+   深色档改用 token 亮蓝，对深色面板 8.9:1。 */
+:root[data-theme=dark] .reader-body :not(pre)>code{
+  background:var(--color-warm-soft);
+  color:var(--color-warm-ink);
 }
 /* 阅读浮动按钮组（点赞/反馈）：掘金左下圆形浮层，本站复用 FAB 通道。
    结构由 index.html 注入 #reader-fabs，只在文章视图出现。 */

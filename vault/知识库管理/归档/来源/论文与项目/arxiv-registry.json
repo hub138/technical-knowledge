@@ -2284,6 +2284,38 @@
     }
    ]
   },
+  "2402.01030": {
+   "id": "2402.01030",
+   "title": "Executable Code Actions Elicit Better LLM Agents",
+   "authors": [
+    "Xingyao Wang",
+    "Yangyi Chen",
+    "Lifan Yuan",
+    "Yizhe Zhang",
+    "Yunzhu Li",
+    "Hao Peng",
+    "Heng Ji"
+   ],
+   "published": "2024-02-01",
+   "updated": "2024-06-07",
+   "summary": "Large Language Model (LLM) agents, capable of performing a broad range of actions, such as invoking tools and controlling robots, show great potential in tackling real-world challenges. LLM agents are typically prompted to produce actions by generating JSON or text in a pre-defined format, which is usually limited by constrained action space (e.g., the scope of pre-defined tools) and restricted flexibility (e.g., inability to compose multiple tools). This work proposes to use executable Python code to consolidate LLM agents' actions into a unified action space (CodeAct). Integrated with a Python interpreter, CodeAct can execute code actions and dynamically revise prior actions or emit new actions upon new observations through multi-turn interactions. Our extensive analysis of 17 LLMs on API-Bank and a newly curated benchmark shows that CodeAct outperforms widely used alternatives (up to 20% higher success rate). The encouraging performance of CodeAct motivates us to build an open-source LLM agent that interacts with environments by executing interpretable code and collaborates with users using natural language. To this end, we collect an instruction-tuning dataset CodeActInstruct that consists of 7k multi-turn interactions using CodeAct. We show that it can be used with existing data to improve models in agent-oriented tasks without compromising their general capability. CodeActAgent, finetuned from Llama2 and Mistral, is integrated with Python interpreter and uniquely tailored to perform sophisticated tasks (e.g., model training) using existing libraries and autonomously self-debug.",
+   "categories": [
+    "cs.CL",
+    "cs.AI"
+   ],
+   "primary": "cs.CL",
+   "comment": "Accepted by ICML 2024; Code, data, model, and demo are available at https://github.com/xingyaoww/code-act",
+   "url": "https://arxiv.org/abs/2402.01030",
+   "cited_by": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/代码智能体需要结构索引、任务探索与运行证据.md",
+     "title": "代码智能体需要结构索引、任务探索与运行证据",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    }
+   ]
+  },
   "2403.02310": {
    "id": "2403.02310",
    "title": "Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve",
@@ -2551,6 +2583,45 @@
      "title": "检索从一次查询演进为有状态的证据获取",
      "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ]
+  },
+  "2506.08837": {
+   "id": "2506.08837",
+   "title": "Design Patterns for Securing LLM Agents against Prompt Injections",
+   "authors": [
+    "Luca Beurer-Kellner",
+    "Beat Buesser",
+    "Ana-Maria Creţu",
+    "Edoardo Debenedetti",
+    "Daniel Dobos",
+    "Daniel Fabian",
+    "Marc Fischer",
+    "David Froelicher",
+    "Kathrin Grosse",
+    "Daniel Naeff",
+    "Ezinwanne Ozoani",
+    "Andrew Paverd",
+    "Florian Tramèr",
+    "Václav Volhejn"
+   ],
+   "published": "2025-06-10",
+   "updated": "2025-06-27",
+   "summary": "As AI agents powered by Large Language Models (LLMs) become increasingly versatile and capable of addressing a broad spectrum of tasks, ensuring their security has become a critical challenge. Among the most pressing threats are prompt injection attacks, which exploit the agent's resilience on natural language inputs -- an especially dangerous threat when agents are granted tool access or handle sensitive information. In this work, we propose a set of principled design patterns for building AI agents with provable resistance to prompt injection. We systematically analyze these patterns, discuss their trade-offs in terms of utility and security, and illustrate their real-world applicability through a series of case studies.",
+   "categories": [
+    "cs.LG",
+    "cs.CR"
+   ],
+   "primary": "cs.LG",
+   "comment": "",
+   "url": "https://arxiv.org/abs/2506.08837",
+   "cited_by": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/工具是受约束的能力，不是提示词里的函数名.md",
+     "title": "工具是受约束的能力，不是提示词里的函数名",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "Agent与工作流",
      "kind": "evidence"
     }
    ]
