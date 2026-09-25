@@ -700,6 +700,8 @@
     "← 返回目录": { en: "← Back to index" },
     "返回目录": { en: "Back to index" },
     "返回当前领域或搜索结果": { en: "Return to the current domain or search results" },
+    "回到顶部": { en: "Back to top" },
+    "取消加载": { en: "Cancel loading" },
     "下载 .md": { en: "Download .md" },
     "下载这篇的 Markdown 原文": { en: "Download this note as Markdown" },
     "复制链接": { en: "Copy link" },
