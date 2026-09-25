@@ -674,8 +674,9 @@ base.css 的 .page-toolbar 规范，但 [hidden] 兜底属于本页卡片
     </style>
   </head>
   <body class="tk-host">
+    <a class="skip-link" href="#sources-main">跳到正文</a>
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
-    <div class="tk-shell">
+    <div class="tk-shell" id="sources-main" tabindex="-1">
       <!-- 头部形态=hero（身份头，宽松几何）：真源在 base.css「页面头部
 规范」。内容页点进来先回答「这是什么页」，搜索是头部的
            interaction area（Atlassian/GCS page header 同款解剖），

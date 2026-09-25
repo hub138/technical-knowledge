@@ -4149,8 +4149,12 @@ function bindKeyboard(){
      * 这里拦下 Enter，把焦点还给 #reader-body，Tab 从正文续走。 */
     if(event.key==='Enter'&&event.target.classList&&event.target.classList.contains('skip-link')){
       event.preventDefault();
-      const body=$('#reader-body');
-      if(body){body.focus();body.scrollIntoView({block:'start'})}
+      /* 焦点目标随视图切换：阅读视图下进正文（r15 行为不变）；首页与全景下
+       * #reader 整节 display:none，0x0 元素 focus 无效、焦点会滞留在链接上，
+       * Tab 从头再来等于白跳——这时送搜索框，它是这两个视图的主交互起点。 */
+      const readerVisible=$('#reader-body')&&$('#reader-body').offsetParent!==null;
+      const target=readerVisible?$('#reader-body'):$('#search');
+      if(target){target.focus();target.scrollIntoView({block:'start'})}
       return;
     }
     const typing=tag==='input'||tag==='textarea'||event.target.isContentEditable;
