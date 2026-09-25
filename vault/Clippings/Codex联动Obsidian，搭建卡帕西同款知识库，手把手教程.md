@@ -17,7 +17,7 @@ tags:
 
 最新修改时间为06月25日
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -63,7 +63,7 @@ HoverNotes
 
 33%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -109,7 +109,7 @@ Codex Cli Path
 
 33%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -155,7 +155,7 @@ Codex直接联通
 
 34%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -201,7 +201,7 @@ HoverNotes
 
 46%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -247,7 +247,7 @@ HoverNotes
 
 54%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -293,7 +293,7 @@ HoverNotes
 
 50%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -339,7 +339,7 @@ HoverNotes
 
 50%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -385,7 +385,7 @@ HoverNotes
 
 26%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -431,7 +431,7 @@ Importer插件-安装
 
 44%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -477,7 +477,7 @@ Notion-导入Obsidian
 
 33%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -521,7 +521,7 @@ HoverNotes
 
 00:09
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -561,7 +561,7 @@ HoverNotes
 
 219-迭代系统搭建录屏
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -605,7 +605,7 @@ HoverNotes
 
 00:30
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -653,7 +653,7 @@ Xuan酱Skill包.zip
 
 82.03KB
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -699,7 +699,7 @@ HoverNotes
 
 50%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -745,7 +745,7 @@ HoverNotes
 
 50%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -795,7 +795,7 @@ Plain Text
 
 请你调用文风Skill，结合已经搜集到的相关资料，把这篇“用AI+Obsidian搭建知识库”的初稿写出来。
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -851,7 +851,7 @@ Plain Text
 
 用配图Skill，给这篇公众号生成相符合的配图，用image2模型。
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -899,7 +899,7 @@ HoverNotes
 
 39%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -947,7 +947,7 @@ HoverNotes
 
 61%
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -991,7 +991,7 @@ HoverNotes
 
 00:26
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
@@ -1035,7 +1035,7 @@ HoverNotes
 
 00:21
 
-![HoverNotes Icon](chrome-extension://fhdmbhgpabjkadpaafomaabbdckofphm/assets/icons/hover-notes-icon-white.svg)
+> [图片缺失：HoverNotes Icon（剪藏时未保存原图）]
 
 HoverNotes
 
