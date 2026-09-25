@@ -58,7 +58,7 @@ SSR 在服务端生成初始 HTML，CSR 由浏览器 JavaScript 获取数据并�
 
 一次跨源写请求实际发了两趟，时序图上的字段逐条对得上：
 
-![MDN 官方文档图：CORS 预检请求时序——Client(https://foo.example) 先发 OPTIONS /doc 带 Access-Control-Request-Method: POST 与 Request-Headers，Server(https://bar.other) 回 204 带 Allow-Origin、Allow-Methods、Max-Age: 86400；预检通过后 Client 才发真正的 POST /doc 并收到 200](https://mdn.github.io/shared-assets/images/diagrams/http/cors/preflight-correct.svg)
+![MDN 官方文档图：CORS 预检请求时序——Client(https://foo.example) 先发 OPTIONS /doc 带 Access-Control-Request-Method: POST 与 Request-Headers，Server(https://bar.other) 回 204 带 Allow-Origin、Allow-Methods、Max-Age: 86400；预检通过后 Client 才发真正的 POST /doc 并收到 200](/static/figures/preflight-correct.svg)
 
 来源：MDN 官方文档「Cross-Origin Resource Sharing (CORS)」。图上的两趟报文就是 preflight 的开销来源：第一趟 OPTIONS 只问权限不传数据，`Access-Control-Max-Age: 86400` 决定了这趟多久可以省一次——「预检缓存用 Max-Age，但同时考虑策略变更」的取舍点就在这里；图里 POST 的响应仍带 `Access-Control-Allow-Origin`，说明授权判定在每一趟都要成立，preflight 通过不等于业务请求被授权。
 

@@ -26,13 +26,13 @@ sources:
 
 **B 树：原地更新的有序树**。多叉平衡树，页为节点（16KB 上下），根到叶 3-4 层即覆盖亿级行。写路径：找到叶子页 → 原地改 → 若页满则分裂，向上传播。读路径：树高对数，点查 3-4 次 IO 定位。写代价藏在原地更新：随机写（页分散在盘上）+ 页分裂的连锁（写放大 WAF：一次逻辑写可能触发页分裂传播、供未来读的预读失效）。B+树索引为访问路径服务（见 [[工程知识/数据系统：在并发与故障中保存事实/查询与索引/B+Tree索引为访问路径服务.md]]）写的是索引结构，本文写它作为存储路线的代价结构。
 
-![Wikipedia 条目图：B+树结构——根节点存导航键 3、5，内部节点逐层引导，叶层三个节点存键 1-2、3-4、5-7 与数据指针 d1-d7，叶节点间从左到右相连成顺序链表](https://upload.wikimedia.org/wikipedia/commons/3/37/Bplustree.png)
+![Wikipedia 条目图：B+树结构——根节点存导航键 3、5，内部节点逐层引导，叶层三个节点存键 1-2、3-4、5-7 与数据指针 d1-d7，叶节点间从左到右相连成顺序链表](/static/figures/bplustree.png)
 
 来源：Wikipedia「B+ tree」条目（CC BY-SA）。这棵树的关键在页的位置固定：键 4 插进来只会改动叶层的一个页与沿途导航键，页在盘上的位置原地不变——「写随机」的代价来源就是任意页都可能被触碰。
 
 **LSM：追加+分层合并**。写路径：写 memtable（内存跳表）→ 满了刷成 SSTable（不可变、有序文件）→ 后台 compaction 把多层 SSTable 合并去重。读路径：memtable → L0（可能多个重叠文件）→ 逐层向下找，每层多个文件都可能命中同一键的旧版本——读放大（RAF）是 LSM 的命门：最坏情况查遍全部层。存储引擎的两大路线之外，LSM树用写放大换取顺序写和可扩展性（见 [[工程知识/数据系统：在并发与故障中保存事实/事务与存储/LSM树用写放大换取顺序写和可扩展性.md]]）已把 LSM 的写放大机制写透，本文补两条路线的对照谱系与选型。
 
-![Wikipedia 条目图：LSM 树的分层 compaction——Level 0 多个小文件向下合并成 Level 1 更大的 sorted 文件，再合并进 Level 2 单个更大的有序文件](https://upload.wikimedia.org/wikipedia/commons/f/f2/LSM_Tree.png)
+![Wikipedia 条目图：LSM 树的分层 compaction——Level 0 多个小文件向下合并成 Level 1 更大的 sorted 文件，再合并进 Level 2 单个更大的有序文件](/static/figures/lsm-tree.png)
 
 来源：Wikipedia「Log-structured merge-tree」条目。与 B+树图对照看：同一个 key 的更新在 B+树里落到固定的那个页，在 LSM 里写成新文件等 compaction 去重——「B 树用读性能换写吞吐、LSM 用写吞吐换读性能」在两幅图的形态差异里可以直接指认。
 

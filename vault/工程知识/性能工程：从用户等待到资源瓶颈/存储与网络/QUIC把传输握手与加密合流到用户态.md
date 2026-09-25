@@ -35,13 +35,13 @@ editorial_note: "去味1处抽象名词做主语；2图0.64已达标不动"
 | 队头阻塞 | TCP 丢一个段，连接上所有流卡住 | 流间独立，丢包只阻塞所在流 | 每流独立丢包检测状态，实现复杂度上升 |
 | 演进速度 | 改内核，周期以年计 | 用户态库随应用发布 | 失去内核 TCP fast path 与硬件卸载优化 |
 
-![TCP+TLS 时代的连接建立：TCP 三次握手与 TLS 握手串行进行，请求要等两条链走完（取自 Cloudflare《HTTP/3: the past, the present, and the future》，https://blog.cloudflare.com/http3-the-past-present-and-future/）](https://blog.cloudflare.com/_image?href=https%3A%2F%2Fblog.cloudflare.com%2F_emdash%2Fapi%2Fmedia%2Ffile%2F01KW44C99K9HK86VRFN0ZFYM3G.png&w=715&h=734&f=webp&fit=cover&position=center)
+![TCP+TLS 时代的连接建立：TCP 三次握手与 TLS 握手串行进行，请求要等两条链走完（取自 Cloudflare《HTTP/3: the past, the present, and the future》，https://blog.cloudflare.com/http3-the-past-present-and-future/）](/static/figures/01kw44c99k9hk86vrfn0zfym3g.png)
 
 这张图数出来是八步：TCP 三次握手三步，TLS 握手三到四步，最后才是 HTTP 请求与响应——前六步都在为「能开始传业务数据」做准备。串行是延迟的主因，每一步都要一个完整的往返。
 
 ## 验证
 
-![QUIC 把传输与加密握手套进同一次往返，四个包之后就能发 HTTP 请求（取自 Cloudflare《HTTP/3: the past, the present, and the future》，https://blog.cloudflare.com/http3-the-past-present-and-future/）](https://blog.cloudflare.com/_image?href=https%3A%2F%2Fblog.cloudflare.com%2F_emdash%2Fapi%2Fmedia%2Ffile%2F01KW44QBZX9KAGJ4SDGG0DMYWX.png&w=715&h=512&f=webp&fit=cover&position=center)
+![QUIC 把传输与加密握手套进同一次往返，四个包之后就能发 HTTP 请求（取自 Cloudflare《HTTP/3: the past, the present, and the future》，https://blog.cloudflare.com/http3-the-past-present-and-future/）](/static/figures/01kw44qbzx9kagj4sdgg0dmywx.png)
 
 对照上一张图：握手从八步压到四步，QUIC 包里每个包都自带加密帧，传输参数直接搭 TLS ClientHello 的车——「合流」在图上的形态就是两种握手共用同一串往返。往返次数减半之外，每个包都加密也让中间设备无法按明文头做审计，这是表里「调试要专用工具」的来源。
 

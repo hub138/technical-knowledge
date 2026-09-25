@@ -33,7 +33,7 @@ Bloom filter、索引块和缓存减少无效读取；分层/大小分级 compac
 
 分层的样子放到一张图里看，L0 的小文件怎么一层层合并成更大的文件：
 
-![Wikipedia 条目图：LSM 树的分层 compaction——Level 0 的多个小文件向下合并，Level 1 的文件标注 sorted 且更大，Level 2 是单个更大的有序文件，箭头表示每层的合并方向](https://upload.wikimedia.org/wikipedia/commons/f/f2/LSM_Tree.png)
+![Wikipedia 条目图：LSM 树的分层 compaction——Level 0 的多个小文件向下合并，Level 1 的文件标注 sorted 且更大，Level 2 是单个更大的有序文件，箭头表示每层的合并方向](/static/figures/lsm-tree.png)
 
 来源：Wikipedia「Log-structured merge-tree」条目。层越深文件越少越大、层内有序——这幅形态就是「同 key 多版本散布各层」的来源：读要逐层找，compaction 把上层小文件重写进下层大文件，写放大发生在每一次向下的箭头处；布隆过滤器挡掉的是「这一层根本不含此 key」的探测。
 

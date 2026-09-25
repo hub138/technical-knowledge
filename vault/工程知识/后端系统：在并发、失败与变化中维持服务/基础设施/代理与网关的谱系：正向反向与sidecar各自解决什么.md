@@ -33,7 +33,7 @@ sources:
 
 反向代理的形态一看就懂——客户端只认识 example.com，不知道背后被代理挡下的服务器集群：
 
-![反向代理：客户端与 example.com 代理通信，代理把请求转给内部服务器](https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Reverse_proxy_h2g2bob.svg/1280px-Reverse_proxy_h2g2bob.svg.png)
+![反向代理：客户端与 example.com 代理通信，代理把请求转给内部服务器](/static/figures/1280px-reverse-proxy-h2g2bob-svg.png)
 
 *图源：Wikimedia Commons「Reverse proxy h2g2bob」，作者 h2g2bob，许可 [CC0](https://commons.wikimedia.org/wiki/File:Reverse_proxy_h2g2bob.svg)*
 

@@ -51,7 +51,7 @@ graph TD
 
 论文 Figure 1 把这条判据的前半段画成了对照实验：同一个问题，只回答的 Standard 和只行动的 Act-Only 都失败，思考-行动-观察交错的 ReAct 成功：
 
-![ReAct 论文 Figure 1：四种提示法在同一任务上的对照](https://arxiv.org/html/2210.03629v3/teaser-new.svg)
+![ReAct 论文 Figure 1：四种提示法在同一任务上的对照](/static/figures/teaser-new.svg)
 
 上图取自 [ReAct 论文的 HTML 版](https://arxiv.org/abs/2210.03629)（ICLR 2023, Yao et al.）：左上 Standard 只给答案、左下 CoT 只推理不给行动，幻觉链条一路错下去；Act-Only 有搜索动作却没有观察整理，搜到 Front Row 也停不下来；ReAct 每步 Thought 定位差距、Act 补信息、Obs 修正方向，第四步收束到正确答案。环境反馈快、单步代价低时这种交错的成本才划算，与上表 ReAct 行的适用条件对应。
 

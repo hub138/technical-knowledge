@@ -29,7 +29,7 @@ editorial_note: "现状核对：SELFCHECK PASS密度0.88达标0命中，两幅et
 
 leader 被隔离之后会发生什么，etcd 官方文档画成了前后两个时刻：
 
-![etcd 官方文档 Figure 3：leader 被隔离后新 leader 当选](https://etcd.io/docs/v3.5/learning/img/server-learner-figure-03.png)
+![etcd 官方文档 Figure 3：leader 被隔离后新 leader 当选](/static/figures/server-learner-figure-03.png)
 
 时刻 1，三节点集群里 leader 与两个 follower 之间被网络分区隔开，它的分区里凑不出 2 个节点的多数派（quorum），停止推进；时刻 2，另一侧的两个 follower 选出新 leader，旧 leader 一旦收到更高 term 的消息就自动降级为 follower。图取自 [etcd 官方文档的 learner 设计页](https://etcd.io/docs/v3.5/learning/design-learner/)，Apache 2.0。
 
@@ -51,7 +51,7 @@ leader -> followers: AppendEntries(term=3, prevLogIndex=6)
 
 Raft 论文 Figure 2 把状态字段、两个 RPC 与服务器规则浓缩成一张规范卡，实现时逐条核对用：
 
-![Raft 论文 Figure 2：状态字段、RequestVote 与 AppendEntries 规则浓缩卡](https://cdn.jsdelivr.net/gh/maemual/raft-zh_cn@master/images/raft-%E5%9B%BE2.png)
+![Raft 论文 Figure 2：状态字段、RequestVote 与 AppendEntries 规则浓缩卡](/static/figures/raft-2.png)
 
 上面伪代码里的每一步都能在卡上找到出处：`prevLogIndex` 校验在 AppendEntries 的接收方规则第 2 条；日志不一致时 leader 把该 follower 的 `nextIndex` 减一重发，在右下 Leaders 规则里；commit 点的推进条件（多数派 `matchIndex ≥ N` 且该条日志属于当前 term）是 Leaders 规则最后一条。图为 Ongaro 与 Ousterhout 论文《In Search of an Understandable Consensus Algorithm》的 Figure 2，经 [Raft 论文中文翻译仓库](https://github.com/maemual/raft-zh_cn) 转载。
 

@@ -31,13 +31,13 @@ sources:
 
 封装与解封的样子放到图里看，容器帧怎么被装进宿主间的隧道：
 
-![Wikimedia 图：VXLAN 隧道示意——左右两侧各有两台主机接到宿主上的 VTEP-1 与 VTEP-2，两个 VTEP 之间隔着 Red IP 三层网络，顶部的紫色双向箭头标注 Túnel VXLAN entre VTEPs，容器间通信被封装成宿主间 IP 报文传输](https://upload.wikimedia.org/wikipedia/commons/f/fb/VXLAN-Tunnel.png)
+![Wikimedia 图：VXLAN 隧道示意——左右两侧各有两台主机接到宿主上的 VTEP-1 与 VTEP-2，两个 VTEP 之间隔着 Red IP 三层网络，顶部的紫色双向箭头标注 Túnel VXLAN entre VTEPs，容器间通信被封装成宿主间 IP 报文传输](/static/figures/vxlan-tunnel.png)
 
 来源：Wikimedia Commons「VXLAN」条目图。两台 VTEP 之间只看得到三层 IP 网络，隧道就架在它上面——「容器 IP 不能靠桥接直接通」的困境与解法都在这幅形态里：容器帧出宿主前被 VTEP 封进 UDP，到对端解封还原，宿主间抓包看到的是宿主 IP 的报文。
 
 放进 Kubernetes 集群里，同一套连通问题长这样：
 
-![Kubernetes 官方文档图：集群网络全景——三个 node 各含若干 pod，pod 之间的黑色连线是跨主机的扁平 pod 网络，svc（Service）虚线框在 pod 网络之上提供稳定访问入口，nodes 连线在最外层](https://kubernetes.io/docs/images/kubernetes-cluster-network.svg)
+![Kubernetes 官方文档图：集群网络全景——三个 node 各含若干 pod，pod 之间的黑色连线是跨主机的扁平 pod 网络，svc（Service）虚线框在 pod 网络之上提供稳定访问入口，nodes 连线在最外层](/static/figures/kubernetes-cluster-network.svg)
 
 来源：Kubernetes 官方文档「Cluster Networking」。pod 网络是画在最下层的一条横线：不管 pod 在哪个 node 上都彼此可达，这条扁平连通性就是 CNI 插件用 bridge 或 overlay 在背后搭出来的；svc 层是集群在连通之上封装的虚拟 IP 层，与文章的 veth/bridge/overlay 三级方案是同一件事在集群规模的形态。
 

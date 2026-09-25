@@ -29,15 +29,15 @@ QUIC 要解决的问题，是把 TCP+TLS 这对组合积攒四十年的结构性
 
 握手成本的差距长什么样，三条时间线并排一比就清楚——TCP 一轮、TCP+TLS 三轮、QUIC 一轮带数据：
 
-![对比图：三条握手时间线——左为纯 TCP（握手 1 轮后 Ack+Data），中为 TCP+TLS（TCP 握手 1 轮 + TLS 握手 2 轮之后才 Data，共 3 轮），右为 QUIC（等价于 TCP+TLS 的功能，QUIC handshake+Data 合在 1 轮内完成），电脑与服务器图标之间的箭头按往返着色](https://images.ctfassets.net/ee3ypdtck0rk/1jJIIq4Vlqyg0PqOQFh0E4/d9e23de6a0780ffc977fe109f226767e/3.2.gif)
+![对比图：三条握手时间线——左为纯 TCP（握手 1 轮后 Ack+Data），中为 TCP+TLS（TCP 握手 1 轮 + TLS 握手 2 轮之后才 Data，共 3 轮），右为 QUIC（等价于 TCP+TLS 的功能，QUIC handshake+Data 合在 1 轮内完成），电脑与服务器图标之间的箭头按往返着色](/static/figures/3-2.gif)
 
 来源：Robin Marx，[HTTP/3 深入系列](https://blog.p2hp.com/archives/7885)（CC 授权转载）。中间那列就是正文说的"TCP 三次握手完了才能跑 TLS 握手，两个 RTT 起步"：加密被当成独立一层叠在传输层之上，每层各握各的手；QUIC 把两轮合成一轮，省下的正是每次新连接都要付的那一程。
 
 丢一个包在两代协议里的差别，Robin Marx 的两张动画图一目了然——TCP 下丢一个包，已到达的数据卡在内核进不了应用，后面全部跟着等；QUIC 下三个 stream 各走各的，丢包只影响自己：
 
-![TCP 的队头阻塞：3 号包丢失，已到达的 4、5、6 号包卡在内核交付不了，应用在 t4-t6 全程等待](https://images.ctfassets.net/ee3ypdtck0rk/1KuiWdS8lshyThKf7Na1Ga/2270693afa2c00227f2cbb07e7333baf/6.gif)
+![TCP 的队头阻塞：3 号包丢失，已到达的 4、5、6 号包卡在内核交付不了，应用在 t4-t6 全程等待](/static/figures/6.gif)
 
-![QUIC 无传输层队头阻塞：三个 stream 在同一条 UDP 管道里独立交付，丢失的包只影响自己](https://images.ctfassets.net/ee3ypdtck0rk/1JTpryCUILC2rPvdHN4n2m/4de5fbedac511ff91ecb658477c1b17d/8.1.gif)
+![QUIC 无传输层队头阻塞：三个 stream 在同一条 UDP 管道里独立交付，丢失的包只影响自己](/static/figures/8-1.gif)
 
 *图源：Robin Marx《HTTP/3 深入系列》，[HTTP/3 原理与实践](https://blog.p2hp.com/archives/7885)（CC 授权转载）*
 
@@ -45,7 +45,7 @@ QUIC 要解决的问题，是把 TCP+TLS 这对组合积攒四十年的结构性
 
 三个红利的共同来源，把 HTTP/2 与 HTTP/3 的协议栈并排画出来就一目了然：QUIC 一个方块同时占住了安全层与大半传输层，而且整个方块悬在用户态：
 
-![层级对照图：左为 HTTP/2 栈（HTTPS 应用层、TLS 安全层、TCP 传输层），右为 HTTP/3 栈（HTTPS 应用层、QUIC 一个方块兼任安全层+传输层的流复用与可靠性、UDP 薄层），QUIC 方块标为 user space，UDP 以下标为 hardware-determined（kernel & network）space，底部共用 IP 层](https://images.ctfassets.net/ee3ypdtck0rk/bZkd0DAnMuwfBZBctyCg2/79f67c56786ee7a38998c15ba3ddadd4/Screen_Shot_2020-08-26_at_19.06.39.png)
+![层级对照图：左为 HTTP/2 栈（HTTPS 应用层、TLS 安全层、TCP 传输层），右为 HTTP/3 栈（HTTPS 应用层、QUIC 一个方块兼任安全层+传输层的流复用与可靠性、UDP 薄层），QUIC 方块标为 user space，UDP 以下标为 hardware-determined（kernel & network）space，底部共用 IP 层](/static/figures/screen-shot-2020-08-26-at-19-06-39.png)
 
 来源：Robin Marx，[HTTP/3 深入系列](https://blog.p2hp.com/archives/7885)。绿色大括号标出的 user space 分界就是"用户态传输"的字面含义：握手合流、流独立、连接迁移三件事全部长在这个用户态方块里，改它只需要发应用更新，内核与网络设备那一侧一行不动。
 

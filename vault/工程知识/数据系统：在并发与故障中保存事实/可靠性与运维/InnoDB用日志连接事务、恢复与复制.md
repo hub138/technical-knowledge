@@ -48,7 +48,7 @@ flowchart TB
 
 两个日志文件在同一时刻必须给出同一个结论，靠的是提交前先问一圈、全部答应了才落最终决定：
 
-![两阶段提交时序图：Coordinator 先向 Participant 0 与 Participant 1 各发 Prepare()，两个参与者分别回 prepared；全部应答后才进入提交阶段，Coordinator 逐个发出 Commit()，参与者各自完成提交并回执](https://upload.wikimedia.org/wikipedia/commons/8/86/Two_phase_commit_seq_diagram_success_01.png)
+![两阶段提交时序图：Coordinator 先向 Participant 0 与 Participant 1 各发 Prepare()，两个参与者分别回 prepared；全部应答后才进入提交阶段，Coordinator 逐个发出 Commit()，参与者各自完成提交并回执](/static/figures/two-phase-commit.png)
 
 *图源：Wikimedia Commons「Two phase commit seq diagram success 01」，作者 Jayaprabhakar，许可 [CC0](https://commons.wikimedia.org/wiki/File:Two_phase_commit_seq_diagram_success_01.png)。图里两个阶段的分界就是正文说的那个协调点：Prepare 阶段任何一方回绝，Commit 阶段就不会开始，redo 与 binlog 因此不会各自走到不同的终点。*
 

@@ -38,13 +38,13 @@ GraphRAG 在文档实体和关系上构图，并通过社区发现、层次摘�
 
 构图的产物长什么样，两张图各看一层。先看实体与关系构成的图谱整体：
 
-![Wikimedia Commons 图：GraphRAG 抽取出的知识图谱形态——数千个实体节点按关系聚成多个颜色簇，节点大小表示连接程度，簇内密集、簇间有稀疏连线，整体呈社区结构](https://upload.wikimedia.org/wikipedia/commons/f/f5/GraphRAG.svg)
+![Wikimedia Commons 图：GraphRAG 抽取出的知识图谱形态——数千个实体节点按关系聚成多个颜色簇，节点大小表示连接程度，簇内密集、簇间有稀疏连线，整体呈社区结构](/static/figures/graphrag.svg)
 
 来源：Wikimedia Commons「GraphRAG」条目图。这幅图里成团的颜色块就是「社区」：向量检索只能捞到团内的几个点，而「跨文档关系」与「全局主题」要的正是跨这些簇的连线与整簇的摘要——「向量检索按相似度取回片段，散落在多份文档中的关系无法在一次召回里汇集」在图上就是簇与簇之间的那些稀疏连线，它们永远不会同时出现在一个 top-k 里。
 
 再看官方参考实现把这条链路的步骤摆成的完整流程：
 
-![微软 GraphRAG 官方图：GraphRAG 管道流程——文档输入后经实体与关系抽取、社区发现与多层级社区摘要，最终形成可供查询使用的索引结构](https://microsoft.github.io/graphrag/img/GraphRag-Figure1.jpg)
+![微软 GraphRAG 官方图：GraphRAG 管道流程——文档输入后经实体与关系抽取、社区发现与多层级社区摘要，最终形成可供查询使用的索引结构](/static/figures/graphrag-figure1.jpg)
 
 来源：微软 GraphRAG 官方文档（microsoft.github.io/graphrag）。图上从文本到社区摘要的每一段都是一次 LLM 调用：左侧抽取段对应「语料每千字 3-10 次调用」，右侧摘要段对应「查询期逐层遍历每跳一次汇总」——两代管道的价格差就落在这幅图的这两段上，而向量 RAG 的成本只在最右侧查询一步。
 

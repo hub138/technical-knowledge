@@ -29,7 +29,7 @@ TCP 连接的建立与断开要解决的问题，是在不可靠的 IP 网络上
 
 序列号怎么推进、两端状态怎么随报文迁移，维基百科的脚本图一步一标：
 
-![Wikipedia 条目图：TCP 三次握手两端状态与序列号推进——客户端 CLOSED→SYN_SENT 发 SYN seq=x，服务端 CLOSED→LISTEN→SYN_RECEIVED 回 SYN+ACK seq=y ack=x+1，客户端进 ESTABLISHED 再发 ACK seq=x+1 ack=y+1，服务端随后进 ESTABLISHED](https://upload.wikimedia.org/wikipedia/commons/8/82/TCP_connection_establishment.svg)
+![Wikipedia 条目图：TCP 三次握手两端状态与序列号推进——客户端 CLOSED→SYN_SENT 发 SYN seq=x，服务端 CLOSED→LISTEN→SYN_RECEIVED 回 SYN+ACK seq=y ack=x+1，客户端进 ESTABLISHED 再发 ACK seq=x+1 ack=y+1，服务端随后进 ESTABLISHED](/static/figures/tcp-connection-establishment.svg)
 
 来源：Wikipedia「Transmission Control Protocol」条目（CC BY-SA）。第二个报文的 ack=x+1 就是"确认了你的 ISN"在协议里的写法——两个方向各报各的 ISN、各确认对方的，这就是"双向都确认"落在报文上的形态。
 
@@ -45,7 +45,7 @@ TCP 连接的建立与断开要解决的问题，是在不可靠的 IP 网络上
 
 十一个状态怎么连成一台机器、主动关与被动关在下半场怎么走岔，RFC 793 的经典状态图一张看全：
 
-![Wikipedia 条目图（源自 RFC 793）：TCP 连接状态机全图——上方 CLOSED/LISTEN/SYN_SENT/SYN_RECEIVED/ESTABLISHED 为建立段，下方虚线框内 Active CLOSE 路径（FIN_WAIT_1→FIN_WAIT_2/CLOSING→TIME_WAIT）与 Passive CLOSE 路径（CLOSE_WAIT→LAST_ACK）分列，TIME_WAIT 超时后回 CLOSED，虚线箭头标 unusual event，红蓝箭头区分客户端与服务器路径](https://upload.wikimedia.org/wikipedia/commons/f/f6/Tcp_state_diagram_fixed_new.svg)
+![Wikipedia 条目图（源自 RFC 793）：TCP 连接状态机全图——上方 CLOSED/LISTEN/SYN_SENT/SYN_RECEIVED/ESTABLISHED 为建立段，下方虚线框内 Active CLOSE 路径（FIN_WAIT_1→FIN_WAIT_2/CLOSING→TIME_WAIT）与 Passive CLOSE 路径（CLOSE_WAIT→LAST_ACK）分列，TIME_WAIT 超时后回 CLOSED，虚线箭头标 unusual event，红蓝箭头区分客户端与服务器路径](/static/figures/tcp-state-diagram-fixed-new.svg)
 
 来源：Wikipedia「Transmission Control Protocol」条目，原出 RFC 793（CC BY-SA）。左下虚线框就是正文说的收尾不对称：主动关的一方要多走 FIN_WAIT 与 TIME_WAIT，被动关的一方 CLOSE_WAIT 之后 LAST_ACK 一路直回——CLOSE_WAIT 堆积之所以是应用忘记 close 的信号，看图即知：被动关路径卡在 CLOSE_WAIT 不动，说明应用一直没发自己的 FIN。
 

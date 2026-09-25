@@ -30,7 +30,7 @@ editorial_note: "现状核对：SELFCHECK PASS密度0.62达标0命中，HNSW分�
 
 HNSW 的图结构在图上分三层看，查询路径逐层下降：
 
-![Wikimedia Commons 图：HNSW 分层图结构——Layer 2 最稀疏只有少量点与入口点 entry point，Layer 1 中等密度，Layer 0 包含全部点；红色 query vector 从顶层沿最近邻逐层 descend 到下层，最终在 Layer 0 落到最近邻附近](https://upload.wikimedia.org/wikipedia/commons/2/28/Hierarchical_Navigable_Small_World_%28HNSW%29.png)
+![Wikimedia Commons 图：HNSW 分层图结构——Layer 2 最稀疏只有少量点与入口点 entry point，Layer 1 中等密度，Layer 0 包含全部点；红色 query vector 从顶层沿最近邻逐层 descend 到下层，最终在 Layer 0 落到最近邻附近](/static/figures/hierarchical-navigable-small-world-hnsw.png)
 
 来源：Wikimedia Commons「Hierarchical Navigable Small World (HNSW)」条目图。三层从上到下点密度递增，红色查询箭头逐层 descend——这就是「用图结构减少搜索范围」的具体形态：顶层图长、跳得远，用来快速接近目标区域，下层图密、跳得近，用来精确定位；「提高探测范围能提升召回」对应的是放大每层的候选队列，代价就是图上箭头要走更多分叉。
 
@@ -61,7 +61,7 @@ HNSW 的图结构在图上分三层看，查询路径逐层下降：
 
 全链路的环节与谁负责哪一段，一张图看清边界：
 
-![Wikimedia Commons 图：GraphRAG 抽取融合管道示意图——Question 进入 Encoder 后由 Tool Selector 选择检索工具，下方连接多个检索来源，展示查询经编码、工具选择到多源取证的链路分工](https://upload.wikimedia.org/wikipedia/commons/f/f5/GraphRAG.svg)
+![Wikimedia Commons 图：GraphRAG 抽取融合管道示意图——Question 进入 Encoder 后由 Tool Selector 选择检索工具，下方连接多个检索来源，展示查询经编码、工具选择到多源取证的链路分工](/static/figures/graphrag.svg)
 
 来源：Wikimedia Commons「GraphRAG」条目图。图中 Encoder 与 Tool Selector 是链路里可替换的两段，与向量库所在的那一段并不重合——换图里任何一个方块都不改变另一个方块的产出质量，这正是「换库（Milvus 换 Qdrant 再换 pgvector）指标纹丝不动」的形态来源：选型只动其中一段，而分块与嵌入的效果落在它之前。
 

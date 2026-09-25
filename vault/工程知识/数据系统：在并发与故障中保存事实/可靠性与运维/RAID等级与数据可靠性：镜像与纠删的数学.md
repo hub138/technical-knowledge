@@ -25,7 +25,7 @@ RAID 要解决的问题，是**单块盘失效不能带走数据**。盘的年�
 
 **镜像：简单直接的 n 份**。数据同时写两块盘（RAID1），读可以负载均衡，坏一块另一块还在。容量利用率 50%。可靠性数学：两块盘同时坏才丢数据，概率是单盘故障率的平方（1%² = 0.01%/年）。恢复也简单：复制即可，重建时间短。
 
-![Wikipedia 条目图：RAID1 两块盘的镜像分布——Disk 0 与 Disk 1 存完全相同的 A1-A4，两盘内容逐块一致](https://upload.wikimedia.org/wikipedia/commons/b/b7/RAID_1.svg)
+![Wikipedia 条目图：RAID1 两块盘的镜像分布——Disk 0 与 Disk 1 存完全相同的 A1-A4，两盘内容逐块一致](/static/figures/raid-1.svg)
 
 来源：Wikipedia「Standard RAID levels」条目（CC BY-SA）。两块盘的每一块都成对出现，这就是「概率是故障率的平方」的物理形态：丢数据需要同一数据块的两份副本同时消失。
 
@@ -39,7 +39,7 @@ RAID 要解决的问题，是**单块盘失效不能带走数据**。盘的年�
 
 RAID6 在同一条带里放两个校验，同一幅分布图长这样：
 
-![Wikipedia 条目图：RAID6 五块盘的条带分布——每行同时有数据块与两个校验块 Ap、Aq，校验对逐行轮转位置，任意一条带坏两块盘仍可重建](https://upload.wikimedia.org/wikipedia/commons/7/70/RAID_6.svg)
+![Wikipedia 条目图：RAID6 五块盘的条带分布——每行同时有数据块与两个校验块 Ap、Aq，校验对逐行轮转位置，任意一条带坏两块盘仍可重建](/static/figures/raid-6.svg)
 
 来源：同上。与 RAID5 图对照看：每行多出的 Aq/Bp+Cq/Dq+E1 这类第二个校验位，把「再坏一块就全损」的重建窗口风险压掉一档——这正是大盘时代 RAID6 成为底线的数学来源。
 

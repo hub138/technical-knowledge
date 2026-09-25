@@ -31,15 +31,15 @@ TLS 要解决的问题，是在不安全的网络上安全地交换密钥：双�
 
 密钥交换的 1.2 与 1.3 差别，Cloudflare 用两张图画得很清楚——1.2 要两个来回才拿到共享密钥，1.3 客户端直接把密钥材料放进第一个 Hello：
 
-![TLS 1.2 的 DH 握手：Hello 与公钥分两次往返](https://blog.cloudflare.com/_image?href=https%3A%2F%2Fblog.cloudflare.com%2F_emdash%2Fapi%2Fmedia%2Ffile%2F01KW45W6NY4TFFT479X01PT9MC.png&w=715&h=659&f=webp&fit=cover&position=center)
+![TLS 1.2 的 DH 握手：Hello 与公钥分两次往返](/static/figures/01kw45w6ny4tfft479x01pt9mc.png)
 
-![TLS 1.3 的 DH 握手：客户端把密钥材料并入第一个 Hello，一个往返完成](https://blog.cloudflare.com/_image?href=https%3A%2F%2Fblog.cloudflare.com%2F_emdash%2Fapi%2Fmedia%2Ffile%2F01KW47T9FM1Y3DHMHJPHDAW8KS.png&w=715&h=659&f=webp&fit=cover&position=center)
+![TLS 1.3 的 DH 握手：客户端把密钥材料并入第一个 Hello，一个往返完成](/static/figures/01kw47t9fm1y3dhmhjphdaw8ks.png)
 
 *图源：Cloudflare 博客《A Detailed Look at RFC 8446 (a.k.a. TLS 1.3)》，[blog.cloudflare.com/rfc-8446-aka-tls-1-3](https://blog.cloudflare.com/rfc-8446-aka-tls-1-3/)*
 
 两个报文飞行图把"两段"放进真实时序里：TCP 三次握手占 50ms，之后 ClientHello 出发、服务器一次带回证书、密钥交换再走一个往返，TLS 110ms——证书在哪一步送达、往返花在哪，一眼可见：
 
-![Cloudflare 官方图：客户端与服务器的 TLS 握手报文时序——TCP 段 SYN/SYN-ACK/ACK 共 50ms，TLS 段 ClientHello 上行，ServerHello+Certificate+ServerHelloDone 一次带回证书，ClientKeyExchange+ChangeCipherSpec+Finished 上行完成密钥交换，服务器 ChangeCipherSpec+Finished 回行，TLS 段共 110ms（TLS 1.2 RSA 形态，预主密钥用证书公钥加密上传）](https://images.ctfassets.net/slt3lc6tev37/5aYOr5erfyNBq20X5djTco/3c859532c91f25d961b2884bf521c1eb/tls-ssl-handshake.png)
+![Cloudflare 官方图：客户端与服务器的 TLS 握手报文时序——TCP 段 SYN/SYN-ACK/ACK 共 50ms，TLS 段 ClientHello 上行，ServerHello+Certificate+ServerHelloDone 一次带回证书，ClientKeyExchange+ChangeCipherSpec+Finished 上行完成密钥交换，服务器 ChangeCipherSpec+Finished 回行，TLS 段共 110ms（TLS 1.2 RSA 形态，预主密钥用证书公钥加密上传）](/static/figures/tls-ssl-handshake.png)
 
 来源：Cloudflare Learning Center，[What happens in a TLS handshake?](https://www.cloudflare.com/learning/ssl/what-happens-in-a-tls-handshake/)。图里是 TLS 1.2 的 RSA 形态（四次报文两轮往返）；1.3 把密钥交换并进第一轮往返压成 1-RTT，证书链每多一级就多一份随 ServerHello 下发的传输量——这就是"证书链多一级多一次传输"在报文层面的样子。
 

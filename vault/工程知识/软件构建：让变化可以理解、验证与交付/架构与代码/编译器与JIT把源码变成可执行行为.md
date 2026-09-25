@@ -24,7 +24,7 @@ sources:
 
 词法/语法分析的产物是一棵抽象语法树——源码的结构形态在优化开始前就已经定型。欧几里得算法的 AST 长这样：
 
-![抽象语法树示例：statement sequence 顶节点挂 while 循环与 return，循环条件是 compare(b, 0)，循环体是 branch 分支挂两个 assign（a = a - b 与 b = b - a）——源码的嵌套结构变成了可被优化器遍历与改写的树形数据](https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Abstract_syntax_tree_for_Euclidean_algorithm.svg/1280px-Abstract_syntax_tree_for_Euclidean_algorithm.svg.png)
+![抽象语法树示例：statement sequence 顶节点挂 while 循环与 return，循环条件是 compare(b, 0)，循环体是 branch 分支挂两个 assign（a = a - b 与 b = b - a）——源码的嵌套结构变成了可被优化器遍历与改写的树形数据](/static/figures/1280px-abstract-syntax-tree-for-euclidean-algorithm-svg.png)
 
 *图源：Wikimedia Commons「Abstract syntax tree for Euclidean algorithm」，作者 npmushun，许可 [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Abstract_syntax_tree_for_Euclidean_algorithm.svg)。*
 

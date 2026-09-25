@@ -73,7 +73,7 @@ pickle 链上每一步都是格式设计好的行为：反序列化即执行，`
 
 safetensors 的安全主张是"让攻击无法表示"。文件里只有头部长度、JSON 头和张量字节，加载路径读的是什么，结构图一目了然：
 
-![safetensors 格式结构：8 字节头长度、JSON 头声明张量名与字节区间、其余为原始张量数据](https://cdn-gcs.ngxson.com/nuiblog2/2025/2/1740665538210_94e230e8.jpg)
+![safetensors 格式结构：8 字节头长度、JSON 头声明张量名与字节区间、其余为原始张量数据](/static/figures/1740665538210-94e230e8.jpg)
 
 头与数据的布局如下：前 8 字节是 JSON 头的长度，JSON 头逐个声明张量的 dtype、shape 与字节区间，其余部分是原始张量数据。整份文件里没有操作码流，也没有可调用对象，`__reduce__` 无法藏进一个"没有代码概念"的格式。图取自 Hugging Face 博客 [Common AI Model Formats](https://huggingface.co/blog/ngxson/common-ai-model-formats)。
 

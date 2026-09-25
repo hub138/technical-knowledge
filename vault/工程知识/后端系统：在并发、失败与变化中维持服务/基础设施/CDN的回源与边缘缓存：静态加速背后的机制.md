@@ -25,7 +25,7 @@ CDN 要解决的问题，是把内容搬到离用户近的地方。源站在单�
 
 CDN 的拓扑一句话：一个源站，多个边缘节点，用户就近取：
 
-![CDN 拓扑：中央源站把内容分发到多个边缘节点，用户从最近的边缘节点取内容](https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Content_Distribution_Network_diagram.svg/1280px-Content_Distribution_Network_diagram.svg.png)
+![CDN 拓扑：中央源站把内容分发到多个边缘节点，用户从最近的边缘节点取内容](/static/figures/1280px-content-distribution-network-diagram-svg.png)
 
 *图源：Wikimedia Commons「Content Distribution Network diagram」，作者 Avelludo，许可 [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Content_Distribution_Network_diagram.svg)*
 

@@ -2744,7 +2744,9 @@ class Handler(BaseHTTPRequestHandler):
             self.redirect("/?path=" + quote(resolved, safe=""))
             return
         if path.startswith("/static/"):
-            name = path[8:]
+            # 图片镜像用了语义命名（含中文），浏览器请求时会按 URL 规则编码，
+            # 这里不 unquote 就拿编码串去拼磁盘路径，中文文件全部 404。
+            name = unquote(path[8:])
             if name.startswith("."):
                 self.send_json({"error": "asset not found"}, 404)
                 return

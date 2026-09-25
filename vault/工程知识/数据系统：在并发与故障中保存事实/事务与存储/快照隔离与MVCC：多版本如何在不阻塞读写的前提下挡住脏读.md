@@ -34,13 +34,13 @@ sources:
 
 InnoDB 的版本链长这样——最新版本住在聚簇索引里，历史版本挂在 undo 空间，ROLL_PTR 从新指向旧：
 
-![MySQL InnoDB 版本链结构：左侧 B-Tree 索引页指向聚簇索引记录（PK Fields + TRX_ID + ROLL_PTR + 三列的最新值 v1/v3/v2），ROLL_PTR 存 undo 页号与页内偏移，右侧 Undo page 1/2 各存一条 undo record（PK Fields + TRX_ID + ROLL_PTR + 被改列的旧值），底部 Version chain 链条按 New version → Old version 方向串起 Field 1(v1)→Field 3(v2)→Field 3(v1)→Field 2(v2)→Field 2(v1)](https://kernelmaker.github.io/public/images/2026-03-10/5.png)
+![MySQL InnoDB 版本链结构：左侧 B-Tree 索引页指向聚簇索引记录（PK Fields + TRX_ID + ROLL_PTR + 三列的最新值 v1/v3/v2），ROLL_PTR 存 undo 页号与页内偏移，右侧 Undo page 1/2 各存一条 undo record（PK Fields + TRX_ID + ROLL_PTR + 被改列的旧值），底部 Version chain 链条按 New version → Old version 方向串起 Field 1(v1)→Field 3(v2)→Field 3(v1)→Field 2(v2)→Field 2(v1)](/static/figures/5.png)
 
 来源：Zhao Song，[MySQL vs PostgreSQL Internals (Part 2) — MVCC](https://kernelmaker.github.io/mysql-vs-pg-mvcc)。undo record 只存被改列的旧值、不存整行副本，这就是版本存储的"差量"形态；可见性判定不可见时沿 ROLL_PTR 往旧走，方向与新→旧箭头一致。
 
 PostgreSQL 把新旧版本全放在表内（heap），用 HOT 链与快照配合找可见版本：
 
-![PostgreSQL 可见版本查找路径：B-Tree 索引页的两个 index tuple 各带 Heap TID 分别指向 Heap Page 1 与 Heap Page 2 的 HOT 链 V1 到 V3 与 V4 到 V6，编号 1-3 标出 MVCC 搜索顺序：从第一个 index tuple 的 HOT 链开始，链断则跳到同 PK 的下一个 index tuple 继续，底部 Logical Version Chain V1 到 V6 与 Snapshot xmin xids xmax 对照，说明按快照在链上找可见版本](https://kernelmaker.github.io/public/images/2026-03-10/10.png)
+![PostgreSQL 可见版本查找路径：B-Tree 索引页的两个 index tuple 各带 Heap TID 分别指向 Heap Page 1 与 Heap Page 2 的 HOT 链 V1 到 V3 与 V4 到 V6，编号 1-3 标出 MVCC 搜索顺序：从第一个 index tuple 的 HOT 链开始，链断则跳到同 PK 的下一个 index tuple 继续，底部 Logical Version Chain V1 到 V6 与 Snapshot xmin xids xmax 对照，说明按快照在链上找可见版本](/static/figures/10.png)
 
 来源：同上。与 InnoDB 相反，PG 的版本链从旧指向新（ctid 方向）、历史版本与最新版本混在同一个 heap 里靠 VACUUM 回收——同一篇正文说的"同一隔离级别名字下，可见性的精确起点与旧版本的存放位置是两种工程形态"，这两张图就是那两种形态的并排对照。
 

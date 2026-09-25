@@ -28,7 +28,7 @@ Prefill 处理输入上下文，计算密集且可以批量；Decode 逐 token �
 
 一个长输入的 prefill 混进正在输出的批次时，GPU 时间被它整块占住，所有在途会话的下一次 decode 只能等它算完，用户看到的现象就是 token 流突然停住再恢复。
 
-![不同调度器面对同一批请求的迭代时间线：vLLM 与 Orca 让在途 decode 停摆，FasterTransformer 让新 prefill 饿死，Sarathi-Serve 把 prefill 切块与 decode 交错后两头不停](https://arxiv.org/html/2403.02310v1/sarathi_server_timeline.svg)
+![不同调度器面对同一批请求的迭代时间线：vLLM 与 Orca 让在途 decode 停摆，FasterTransformer 让新 prefill 饿死，Sarathi-Serve 把 prefill 切块与 decode 交错后两头不停](/static/figures/sarathi-server-timeline.svg)
 
 上图是同一批请求（A、B 在途 decode，C、D 新进入）在四种调度器下的迭代时间线，取自 [Sarathi-Serve 论文（OSDI 2024）](https://arxiv.org/abs/2403.02310)：vLLM 与 Orca 把整段 prefill 排在 decode 前面，在途用户的 token 间隔被拉长数秒；FasterTransformer 反过来先 decode，新请求的 prefill 一直排不上。两种优先级各牺牲一边，这就是混部队列的两难；Sarathi-Serve 的分块 prefill（图中 Cp1、Cp2）把一次长 prefill 拆进多个迭代与 decode 交错，两头都不停。反过来，如果调度器永远优先 decode，新的长输入可能长期拿不到 prefill 机会，TTFT 恶化。调度目标因此是在首 token 和连续输出之间分配有限时间、显存与批次位置，填满 GPU 只是副产物。
 

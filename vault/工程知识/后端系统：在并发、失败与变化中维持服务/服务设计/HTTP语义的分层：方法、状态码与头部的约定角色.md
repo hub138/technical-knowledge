@@ -64,9 +64,9 @@ POST 两者都不保证。它不是"创建"的同义词，而是"语义未定、
 
 真实报文里头部层长什么样，Cloudflare 学习站贴了两屏 DevTools 截图——请求头一屏、响应头一屏，正文讲的字段都在里面：
 
-![Cloudflare Learning Center 截图：一次对 www.google.com 的 GET 请求的 Request Headers 面板——伪头部 :authority、:method、:path、:scheme（HTTP/2 形态）之后是 accept: text/html、accept-encoding: gzip, deflate, br、accept-language、upgrade-insecure-requests、user-agent 等端到端头部逐行列出](https://www.cloudflare.com/img/learning/ddos/glossary/hypertext-transfer-protocol-http/http-request-headers.png)
+![Cloudflare Learning Center 截图：一次对 www.google.com 的 GET 请求的 Request Headers 面板——伪头部 :authority、:method、:path、:scheme（HTTP/2 形态）之后是 accept: text/html、accept-encoding: gzip, deflate, br、accept-language、upgrade-insecure-requests、user-agent 等端到端头部逐行列出](/static/figures/http-request-headers.png)
 
-![Cloudflare Learning Center 截图：对应的 Response Headers 面板——cache-control: private, max-age=0、content-encoding: br、content-type: text/html; charset=UTF-8、date、status: 200、strict-transport-security: max-age=86400、x-frame-options: SAMEORIGIN 逐行列出，缓存语义与安全策略都通过头部声明](https://www.cloudflare.com/img/learning/ddos/glossary/hypertext-transfer-protocol-http/http-response-headers.png)
+![Cloudflare Learning Center 截图：对应的 Response Headers 面板——cache-control: private, max-age=0、content-encoding: br、content-type: text/html; charset=UTF-8、date、status: 200、strict-transport-security: max-age=86400、x-frame-options: SAMEORIGIN 逐行列出，缓存语义与安全策略都通过头部声明](/static/figures/http-response-headers.png)
 
 来源：Cloudflare Learning Center，[What is HTTP?](https://www.cloudflare.com/learning/ddos/glossary/hypertext-transfer-protocol-http/)。两屏合起来正是"头部是元数据通道"的实物：请求屏的 `accept-encoding` 与响应屏的 `content-encoding: br` 是一次内容协商的两端，响应屏的 `cache-control` 决定中间每一层代理能缓存多久——头部层配错了，图里这两屏的任何一个字段都是故障现场。
 

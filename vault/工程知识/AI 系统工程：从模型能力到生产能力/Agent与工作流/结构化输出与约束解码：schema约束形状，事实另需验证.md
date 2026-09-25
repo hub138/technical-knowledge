@@ -29,7 +29,7 @@ editorial_note: "基线零命中、密度达标、六维与案例回流齐全，
 
 状态机屏蔽在每一步长什么样，引导生成论文的机制图最直观：
 
-![约束解码的逐 token 屏蔽机制](https://arxiv.org/html/2307.09702v4/fsm-logits-mask.svg)
+![约束解码的逐 token 屏蔽机制](/static/figures/fsm-logits-mask.svg)
 
 正则 `([0-9]*)?\.?[0-9]*` 编译成四状态自动机；当前状态允许的 token 在 logits 里保留，其余涂黑屏蔽。采样 `.2` 与采样 `1` 各自推进到不同状态，下一步的合法集合随之变化。图取自 [Efficient Guided Generation for Large Language Models（arXiv:2307.09702）](https://arxiv.org/abs/2307.09702) 论文 Figure 1。
 

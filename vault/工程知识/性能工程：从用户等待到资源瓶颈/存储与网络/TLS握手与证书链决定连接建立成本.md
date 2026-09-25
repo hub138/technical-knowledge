@@ -41,7 +41,7 @@ graph TD
 
 证书链验证是 CPU 大头：叶子证书 → 中间 CA → 根（内置于客户端信任库）。链越长验证越贵；服务器没发全中间证书，客户端要自己 AIA fetching 补链，弱网下多一个完整往返。
 
-![叶子证书到根证书的签发与验证链（Wikimedia Commons《Chain of trust》，作者 Yanpas，CC BY-SA 4.0，https://commons.wikimedia.org/wiki/File:Chain_of_trust.svg）](https://upload.wikimedia.org/wikipedia/commons/thumb/d/d1/Chain_of_trust.svg/1280px-Chain_of_trust.svg.png)
+![叶子证书到根证书的签发与验证链（Wikimedia Commons《Chain of trust》，作者 Yanpas，CC BY-SA 4.0，https://commons.wikimedia.org/wiki/File:Chain_of_trust.svg）](/static/figures/1280px-chain-of-trust-svg.png)
 
 图里每张证书有同样的四格结构，验证就是逐级用上一级的公钥验下一级的签名（sign 边），直到根证书——根用自己的钥匙签自己（self-sign），信任的起点是它预装在客户端信任库里。链上少发一张中间证书，客户端就要走 AIA fetching 现场补链，这正是弱网下握手变慢的常见原因。
 
