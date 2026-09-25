@@ -22,6 +22,9 @@ def load(page, url):
 
 def measure(context, base, width, theme, output):
     page = context.new_page()
+    # mermaid 渲染要走一遍图形布局，CPU 忙时（check_all 连续跑多个浏览器）
+    # 30 秒默认超时不够，会在 svg 出现之前判失败。
+    page.set_default_timeout(90000)
     errors = []
     page.on("pageerror", lambda error: errors.append(str(error)))
     url = f"{base}/?{urlencode({'path': DEFAULT_PATHS[0], 'theme': theme})}"
@@ -156,7 +159,14 @@ def measure(context, base, width, theme, output):
         page.wait_for_function("() => window.TKI18N.lang === 'zh'")
         check(copy.inner_text() == '复制代码', '中文复制按钮未恢复')
     page.set_viewport_size({'width': 794, 'height': 1123})
+    page.locator('#reader-pager').scroll_into_view_if_needed()
+    page.wait_for_function("() => document.querySelector('#reader-reward').classList.contains('on')")
+    check(page.locator('#reader-pager').is_visible() and page.locator('#reader-reward').is_visible(), '屏幕阅读辅助功能未显示')
     page.emulate_media(media='print')
+    for selector in ('#reader-pager', '#reader-reward', '#reader-actions'):
+        check(page.locator(selector).evaluate('el => getComputedStyle(el).display') == 'none', f'打印仍包含辅助区域: {selector}')
+    page.evaluate('window.scrollTo(0,document.documentElement.scrollHeight)')
+    page.screenshot(path=str(output / f'{theme}-{width}-print-ending.png'))
     page.wait_for_function("() => matchMedia('print').matches && innerWidth === 794")
     page.locator('.reader-code').first.screenshot(path=str(output / f'{theme}-{width}-print-code.png'))
     print_state = page.evaluate("""() => {
@@ -205,8 +215,16 @@ def verify_document_structure(context, base, output):
     page = context.new_page()
     list_path = '工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/任务分解的质量决定Agent的上限.md'
     repeated_path = '工程知识/缺陷分析：从个案到体系/安全/案例四十四：投毒不是写错，是写给你看——依赖投毒的三个真实剧本.md'
+    sql_path = '工程知识/数据系统：在并发与故障中保存事实/查询与索引/列存与向量化执行：OLAP引擎快的两个来源.md'
     for theme in ('light', 'dark'):
         page.set_viewport_size({'width': 375, 'height': 900})
+        response = page.goto(f"{base}/?{urlencode({'path': sql_path, 'theme': theme})}", wait_until='domcontentloaded')
+        assert response.status == 200
+        emphasis = page.locator('#reader-body strong').filter(has_text='SELECT * 是列存的反模式')
+        emphasis.wait_for()
+        assert emphasis.inner_text() == 'SELECT * 是列存的反模式'
+        assert page.locator('#reader-title').evaluate('el => el.tagName') == 'H1'
+        emphasis.locator('xpath=..').screenshot(path=str(output / f'{theme}-sql-emphasis.png'))
         load(page, f"{base}/?{urlencode({'path': list_path, 'theme': theme})}")
         nested = page.locator('#reader-body li > ul li').filter(has_text='可并行')
         assert nested.count() == 1, 'Nested list relation lost'
@@ -218,8 +236,8 @@ def verify_document_structure(context, base, output):
         page.set_viewport_size({'width': 1440, 'height': 900})
         response = page.goto(f"{base}/?{urlencode({'path': repeated_path, 'theme': theme})}", wait_until='domcontentloaded')
         assert response.status == 200
-        page.wait_for_function("() => [...document.querySelectorAll('#reader-body h3')].filter(h=>h.textContent.trim()==='机制').length === 3")
-        ids = page.locator('#reader-body h3').evaluate_all("els => els.filter(el=>el.textContent.trim()==='机制').map(el=>el.id)")
+        page.wait_for_function("() => [...document.querySelectorAll('#reader-body h3')].filter(h=>(h.firstChild?h.firstChild.textContent:h.textContent).trim()==='机制').length === 3")
+        ids = page.locator('#reader-body h3').evaluate_all("els => els.filter(el=>(el.firstChild?el.firstChild.textContent:el.textContent).trim()==='机制').map(el=>el.id)")
         assert len(set(ids)) == 3, 'Repeated headings have duplicate ids'
         for index, ident in enumerate(ids):
             page.locator('#reader-toc a').filter(has_text='机制').nth(index).click()

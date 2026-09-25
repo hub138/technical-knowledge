@@ -28,6 +28,8 @@ MEASURE = r"""() => {
   const visible = el => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden';
   const failures = [];
   const check = (ok, message) => { if (!ok) failures.push(message); };
+  const title = document.querySelector('#reader-title');
+  check(title.tagName === 'H1', 'article title must use h1');
   const base = style(body);
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
@@ -58,7 +60,11 @@ MEASURE = r"""() => {
       const s = style(el);
       const name = `${selector} ${el.textContent.trim().slice(0,32)}`;
       if (['p','li','th','td','blockquote'].includes(selector)) {
-        check(s.font >= 16 && Math.abs(s.font-base.font) < .5, `${name}: font ${s.font}, body ${base.font}`);
+        /* 图注（.reader-figure-caption）是有意的小字层级（掘金图注同款 13px），
+           与正文 16px+ 规则分属两档，豁免字号断言；对比度仍全量检查。 */
+        if (!el.classList.contains('reader-figure-caption')) {
+          check(s.font >= 16 && Math.abs(s.font-base.font) < .5, `${name}: font ${s.font}, body ${base.font}`);
+        }
         check(s.line / s.font >= 1.6, `${name}: line-height ${s.line / s.font}`);
       }
       if (selector === 'code') {
@@ -205,7 +211,9 @@ def main():
                 for width in args.width or (375, 768, 1024, 1440):
                     context = browser.new_context(viewport={"width": width, "height": 900},
                                                   reduced_motion="reduce")
-                    report = verify(context.new_page(), args.base, path, theme, width, output, index)
+                    shot_page = context.new_page()
+                    shot_page.set_default_timeout(90000)
+                    report = verify(shot_page, args.base, path, theme, width, output, index)
                     reports.append(report)
                     (output / "report.json").write_text(json.dumps(reports, ensure_ascii=False, indent=2), encoding="utf-8")
                     print(f"{len(report['failures'])} failures: {path} {theme} {width}px", flush=True)

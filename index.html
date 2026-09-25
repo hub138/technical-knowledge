@@ -671,9 +671,20 @@
 /* H3 此前与正文同为 18px（--text-h3 与 .reader-body 的 --text-lg 同值），
    字号维度没有拉开，只剩字重与颜色在区分层级。这里从 --text-body 派生 20px：
    卡在正文 18px 与 H2 22px 之间，主题与字号基准变化时跟着走。H4 保持 1em 与正文同档。 */
-.reader-body h3{font-size:calc(var(--text-body) * 1.25);margin:var(--space-6) 0 var(--space-3)}
+.reader-body h3{font-size:var(--text-h3);margin:var(--space-6) 0 var(--space-3)}
 .reader-body h4{font-size:1em;margin:var(--space-6) 0 var(--space-3)}
 .reader-body h1,.reader-body h2,.reader-body h3,.reader-body h4{color:var(--color-ink);font-weight:var(--weight-bold);line-height:var(--leading-tight)}
+/* 标题 hover 锚点（2026-09-26 二批，掘金学习）：h2/h3/h4 悬停时左侧浮现
+   链接符，点击把带 hash 的地址写进地址栏并复制链接（掘金行为是跳转
+   锚点；本站目录已承担跳转，这里补的是「复制带锚点链接」分享路径）。
+   纯 CSS 显隐 + JS 事件委托，键盘聚焦标题同样可用（focus-within）。 */
+.reader-body h2,.reader-body h3,.reader-body h4{position:relative}
+.reader-anchor{position:absolute;left:-1.35em;top:50%;transform:translateY(-50%);display:inline-flex;align-items:center;justify-content:center;width:1.1em;height:1.1em;border:0;background:none;color:var(--color-muted);font:inherit;font-size:.8em;line-height:1;text-decoration:none;opacity:0;cursor:pointer;transition:opacity var(--duration-fast) var(--ease-out)}
+.reader-anchor:hover,.reader-anchor:focus-visible{color:var(--color-accent);text-decoration:none}
+.reader-body h2:hover>.reader-anchor,.reader-body h3:hover>.reader-anchor,.reader-body h4:hover>.reader-anchor,.reader-anchor:focus-visible{opacity:1}
+.reader-anchor:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px;opacity:1}
+@media(max-width:900px){.reader-anchor{left:auto;right:0}}
+@media print{.reader-anchor{display:none}}
 
 /* meta 标签胶囊（2026-09-25 掘金学习）：文章页 meta 行下方单独成行的可点胶囊，
    对应掘金 meta 下面的标签区。数据与交互：域胶囊跳目录域筛选，主题胶囊跳
@@ -708,10 +719,11 @@
    文字与线条仍清晰可读；亮度变化加过渡，主题切换时不闪。浅色模式不受影响。 */
 :root[data-theme="dark"] .reader-body img{filter:brightness(.88) contrast(.94);transition:filter .25s ease}
 :root:not([data-theme="dark"]) .reader-body img{transition:filter .25s ease}
-/* 图注：紧跟图片、以「图源」开头的那一段。居中、小字、弱化，与图片同属一个视觉单元，
-   不与正文抢层级；颜色不靠色相单独承载信息，仍保留文字本身。类名由 enhanceReaderImages
-   在渲染时打上，规则改在这里，不散在 JS 里。 */
-.reader-body p.reader-figure-caption{margin:-10px auto var(--space-5);text-align:center;color:var(--color-muted);font-size:var(--text-small);line-height:1.6;max-width:620px;font-style:normal}
+/* 图注：紧跟图片、以「图源」开头的那一段。掘金式图注条（2026-09-26 二批）：
+   浅灰底通栏 + 左 4px 竖线（掘金实测 #f8f8f8 / #cbcbcb），文字居中一行，
+   与图片同属一个视觉单元，不与正文抢层级；颜色不靠色相单独承载信息，
+   仍保留文字本身。类名由 enhanceReaderImages 在渲染时打上，规则改在这里。 */
+.reader-body p.reader-figure-caption{margin:-10px auto var(--space-5);max-width:620px;padding:6px 16px;border-left:4px solid var(--color-line-strong);background:color-mix(in srgb, var(--color-muted) 7%, var(--color-panel));color:var(--color-muted);font-size:var(--text-small);line-height:1.6;font-style:normal;text-align:center;border-radius:0 var(--radius-xs) var(--radius-xs) 0}
 .reader-body p.reader-figure-caption em{font-style:normal}
 .reader-figure-caption a{color:var(--color-muted);text-decoration:underline;text-underline-offset:2px}
 .reader-image{display:block;margin:var(--space-5) 0}
@@ -795,6 +807,11 @@
 .reader-body td a,.reader-body td code{overflow-wrap:anywhere}
 .reader-body th{background:var(--color-surface);color:var(--color-ink);font-weight:var(--weight-semibold)}
 .reader-body tbody tr:hover{background:var(--color-surface)}.reader-body .callout{padding:11px 14px;border-left:3px solid var(--color-warm);background:var(--color-warm-soft);color:var(--color-warm-ink)}.graph{display:none}.graph.open{display:block}
+/* 掘金式分割线与斑马纹（2026-09-26 二批）：hr 上下 32px（掘金实测），
+   线色走 token；表格偶数行极浅灰底（掘金 #fbfbfb 档），行_hover 已有
+   surface 底不变。 */
+.reader-body hr{margin:var(--space-8) 0;border:0;border-top:1px solid var(--color-line)}
+.reader-body tbody tr:nth-child(even){background:color-mix(in srgb, var(--color-muted) 4%, transparent)}
 /* ── 学习进度（?view=progress） ────────────────────────────────────────
  * 全部状态来自 localStorage，页面只是这份数据的视图。 */
 .progress-view{display:none}.progress-view.open{display:block}
@@ -2920,12 +2937,26 @@ function renderReaderRails(note){
 
   // Table of contents from the rendered headings, indented by level.
   const heads=[...$('#reader-body').querySelectorAll('h2,h3,h4')];
-  heads.forEach((h,i)=>{h.id=h.id||`h-${i}-${(h.textContent||'').trim().slice(0,20).replace(/\W+/g,'-')}`});
+  /* id 基准取首文本节点：语言切换重渲染时首轮注入的锚点还在 DOM 里，
+     h.textContent 会带上「#」，id 与 hash 都会漂移。 */
+  heads.forEach((h,i)=>{h.id=h.id||`h-${i}-${(h.firstChild?h.firstChild.textContent:h.textContent||'').trim().slice(0,20).replace(/\W+/g,'-')}`});
+  /* 标题 hover 锚点（掘金学习二批）：每个标题注入一个「#」按钮，hover 显现，
+     点击复制带 hash 的分享链接并写入地址栏。事件委托挂 #reader-body 上，
+     动态注入的锚点无需逐个绑事件（见 bindReaderAnchors）。 */
+  heads.forEach(h=>{
+    if(h.querySelector('.reader-anchor'))return;
+    const a=document.createElement('a');
+    a.className='reader-anchor';a.href='#'+h.id;
+    a.textContent='#';
+    a.setAttribute('aria-label',readerText(`复制「${(h.firstChild?h.firstChild.textContent:h.textContent).trim().slice(0,30)}」小节链接`,`Copy link to section "${(h.firstChild?h.firstChild.textContent:h.textContent).trim().slice(0,30)}"`));
+    a.title=readerText('复制小节链接','Copy section link');
+    h.append(a);
+  });
   /* 没有可列标题就撤掉整个目录栏：一个只有"本文目录"四个字的空框
      既占位又没有动作，比没有更糟（待核验内容这类短文实测）。 */
   toc.hidden=heads.length===0;
   renderReaderOutline(heads);
-  toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}" title="${esc(h.textContent)}">${esc(h.textContent)}</a></li>`).join('')+'</ul>';
+  toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}" title="${esc(h.firstChild?h.firstChild.textContent:h.textContent)}">${esc(h.firstChild?h.firstChild.textContent:h.textContent)}</a></li>`).join('')+'</ul>';
   /* 目录跳转后焦点随迁到目标标题（tabindex=-1 仅在缺省时补），键盘用户按 Tab 从正文继续，不再弹回目录区。 */
   toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateReaderHeading(a.getAttribute('href').slice(1),true)});
   let frame=0,stopped=false,endScroll=-1;
@@ -3110,7 +3141,7 @@ function renderReaderOutline(heads){
   trigger.textContent=readerText('本文目录','On this page');
   $('#reader-outline-title').textContent=trigger.textContent;
   $('#reader-outline-close').textContent=readerText('关闭','Close');
-  list.innerHTML=heads.map(h=>`<li><a href="#${esc(h.id)}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('');
+  list.innerHTML=heads.map(h=>`<li><a href="#${esc(h.id)}" data-level="${h.tagName[1]}">${esc(h.firstChild?h.firstChild.textContent:h.textContent)}</a></li>`).join('');
   setReaderCurrentHeading(heads.some(h=>h.id===readerCurrentHeading)?readerCurrentHeading:'');
   trigger.onclick=()=>{
     dialog.showModal();trigger.setAttribute('aria-expanded','true');
@@ -3260,11 +3291,11 @@ function enhanceReaderImages(body){
       if(failed)status.textContent+=' '+image.alt;
     };
     image.before(frame);frame.append(image,tools);tools.append(status,original,retry);
-    /* 图源说明段（正文中以「图源」开头的那一段）与图片同属一个视觉单元，
-       在这里打上类名，样式交给 CSS，不在 JS 里写死视觉。 */
+    /* 图源说明段（正文中以「图源」或「图：」开头的那一段）与图片同属一个
+       视觉单元，在这里打上类名，样式交给 CSS，不在 JS 里写死视觉。 */
     const holder=frame.parentElement;
     const caption=holder&&holder.nextElementSibling;
-    if(caption&&caption.tagName==='P'&&/^\s*图源/.test(caption.textContent))caption.classList.add('reader-figure-caption');
+    if(caption&&caption.tagName==='P'&&/^\s*(图源|图：)/.test(caption.textContent))caption.classList.add('reader-figure-caption');
     image.addEventListener('reader-language',update);
     /* 点图放大：见 openImageLightbox。工具条上的「查看原图」保留（新标签打开原始文件，
        便于另存），这里多给一条不离开页面的路径。 */
@@ -3444,6 +3475,21 @@ function openReaderLink(event){
   if(event.defaultPrevented||event.button!==0||event.ctrlKey||event.metaKey||event.shiftKey||event.altKey||link.hasAttribute('download')||(link.target&&link.target!=='_self'))return;
   event.preventDefault();openNote(link.dataset.note);
 }
+/* 标题锚点点击（掘金学习二批）：默认 hash 跳转会被 openReaderLink 之外
+ * 的全局逻辑接走，这里统一行为——写入带 hash 的地址（可复制分享），
+ * 平滑滚到该小节，并把链接复制进剪贴板（失败时降级为只跳转）。 */
+document.addEventListener('click',event=>{
+  const anchor=event.target.closest('.reader-anchor');
+  if(!anchor)return;
+  event.preventDefault();
+  const id=decodeURIComponent(anchor.getAttribute('href').slice(1));
+  if(navigateReaderHeading(id,true)){
+    const url=new URL(location.href);
+    if(navigator.clipboard&&window.isSecureContext!==false){
+      navigator.clipboard.writeText(url.href).catch(()=>{});
+    }
+  }
+});
 async function openNote(path,push=true){
   if(path==='知识库首页.md'||path==='知识库首页'){loadHome(push);return}
   const requestId=++readerRequestId;
@@ -3511,7 +3557,17 @@ async function openNote(path,push=true){
   }finally{
     if(requestId===readerRequestId){
       setReaderLoading(null);
-      if(!location.hash||!state.selected)$('#reader-title').focus({preventScroll:true});
+      /* 焦点礼让：读者在加载完成前已把焦点放进正文（键盘用户 Tab 进表格、
+        代码块）时，不再把焦点拽回标题——实测 ArrowRight 后焦点被此处收回
+        H1，滚动容器的焦点环消失（交互审计 flaky 的根因）。只有焦点仍留在
+        加载前状态（body 或加载浮层）时才落到标题，作为键盘入口。 */
+      const active=document.activeElement;
+      const occupied=active&&active!==document.body&&active!==$('#reader-title')
+        &&$('#reader-body').contains(active)
+        /* 错误占位里的焦点（重试钮）不算读者的阅读焦点：正文重载后占位被
+           覆盖，焦点礼让会失效，此处必须落回标题（错误恢复断言依赖）。 */
+        &&!$('#reader-body .reader-load-error');
+      if(!occupied&&(!location.hash||!state.selected))$('#reader-title').focus({preventScroll:true});
     }
   }
 }
@@ -4944,6 +5000,13 @@ window.renderMermaid=async function(){
   });
   await window.mermaid.run({nodes});
   if(window.enhanceMermaid)window.enhanceMermaid();
+  /* 图注条补扫（掘金学习二批）：mermaid 图在 enhanceReaderImages 时还是
+     源码文本，图片容器未生成，那一轮的图注识别扫不到；这里渲染完成后
+     对每个 mmd-figure 的后继段补一次「图：/图源」识别。 */
+  nodes.forEach(node=>{
+    const caption=node.closest('figure.mmd-figure')?.nextElementSibling;
+    if(caption&&caption.tagName==='P'&&/^\s*(图源|图：)/.test(caption.textContent))caption.classList.add('reader-figure-caption');
+  });
 };
 </script>
 
