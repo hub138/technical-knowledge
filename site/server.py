@@ -14,6 +14,39 @@ _GZIP_MIN = 1024  # 太小的压了没意义
 def _is_compressible(content_type: str) -> bool:
     return any(content_type.startswith(p) for p in _COMPRESSIBLE)
 
+
+def static_etag(file: Path) -> str:
+    """静态文件的协商校验值：size+mtime 组成的弱 ETag。
+
+    只 stat 不读内容——i18n.js 200KB 的文件算一次 md5 要读整个文件，
+    size+mtime 纳秒级就能判断「变没变」，这正是协商缓存要回答的唯一问题。
+    mtime 用 stat 的原始浮点值，文件被覆盖写入时它必然变化。
+    """
+    info = file.stat()
+    return f'W/"{info.st_size:x}-{int(info.st_mtime * 1e9):x}"'
+
+
+# 位图固有尺寸的磁盘缓存：PIL 解码一次几十毫秒，文章每次刷新都重渲染，
+# 尺寸却只随文件变化。键是 (路径, size, mtime_ns)，文件变了自动失效。
+_DIMENSION_CACHE: dict[tuple[str, int, int], tuple[int, int] | None] = {}
+
+
+def image_dimensions(file: Path) -> tuple[int, int] | None:
+    """位图的 (宽, 高)，读不出或不是位图返回 None（SVG 走 viewBox 自适应）。"""
+    try:
+        info = file.stat()
+    except OSError:
+        return None
+    key = (str(file), info.st_size, info.st_mtime_ns)
+    if key not in _DIMENSION_CACHE:
+        try:
+            from PIL import Image
+            with Image.open(file) as picture:
+                _DIMENSION_CACHE[key] = picture.size
+        except Exception:
+            _DIMENSION_CACHE[key] = None
+    return _DIMENSION_CACHE[key]
+
 import argparse
 import hashlib
 import hmac
@@ -1821,6 +1854,13 @@ def render_inline(source: str, vault: Vault, current: str, references: dict | No
         # 走下面那段会被当成 vault 内路径解析并拒绝，图就只剩一行转义文本。
         if not url.scheme and not url.netloc and url.path.startswith("/static/"):
             token.attrSet("loading", "lazy")
+            local = Path(__file__).resolve().parent / url.path[len("/static/"):]
+            dimensions = image_dimensions(local)
+            if dimensions:
+                # 固有尺寸进 DOM 后，浏览器在图片下载完成前就知道占多高，
+                # 懒加载不再把后面的文字往下顶（长文里每张图加载都是一次跳动）。
+                token.attrSet("width", str(dimensions[0]))
+                token.attrSet("height", str(dimensions[1]))
             return parser.renderer.image(tokens, index, options, env)
         if not url.scheme and not url.netloc:
             project = vault.root == PUBLIC_PROJECTS_ROOT.resolve()
@@ -1828,9 +1868,14 @@ def render_inline(source: str, vault: Vault, current: str, references: dict | No
                 candidate = unquote(url.path[len('/projects/'):])
             else:
                 candidate = posixpath.normpath(posixpath.join(posixpath.dirname(current), unquote(url.path)))
-            if vault.safe_file(candidate) is None:
+            file = vault.safe_file(candidate)
+            if file is None:
                 return html.escape(f"![{token.content}]({src})")
             token.attrSet("src", ('/projects/' + quote(candidate)) if project else ('/asset?path=' + quote(candidate)))
+            dimensions = image_dimensions(file)
+            if dimensions:
+                token.attrSet("width", str(dimensions[0]))
+                token.attrSet("height", str(dimensions[1]))
         token.attrSet("loading", "lazy")
         return parser.renderer.image(tokens, index, options, env)
 
@@ -2125,9 +2170,46 @@ class Handler(BaseHTTPRequestHandler):
         """客户端是否接受 gzip。"""
         return "gzip" in (self.headers.get("Accept-Encoding", "")).lower()
 
+    def _if_none_match_hits(self, etag: str) -> bool:
+        """If-None-Match 是否命中当前 ETag。
+
+        RFC 7232 弱比较：W/ 前缀两侧剥掉再比，多值逗号分隔，`*` 匹配
+        任何已存在资源。浏览器回发的是它存的那一个值，这里只做字符串
+        级判断，不做缓存语义。
+        """
+        header = self.headers.get("If-None-Match", "")
+        if not header:
+            return False
+        def weak(value: str) -> str:
+            value = value.strip()
+            if value.startswith("W/"):
+                value = value[2:]
+            return value
+        current = weak(etag)
+        return any(
+            part.strip() == "*" or weak(part) == current
+            for part in header.split(",")
+        )
+
     def send_bytes(
-        self, payload: bytes, content_type: str, status: int = 200, download: str = ""
+        self, payload: bytes, content_type: str, status: int = 200, download: str = "",
+        etag: str = "",
     ) -> None:
+        # 协商缓存：If-None-Match 与当前 ETag 一致就不回 body。检查放在
+        # stamp 与 gzip 之前 —— 304 没有内容可压，也没有 HTML 可注入。
+        # 命中的收益是实打实的传输量：no-cache 的 i18n.js 有 200KB，过去
+        # 每次页面浏览都全量重传，协商命中后只剩几百字节的头。
+        if etag and status == 200 and self._if_none_match_hits(etag):
+            self.send_response(304)
+            self.send_header("ETag", etag)
+            self.send_header("Vary", "Accept-Encoding")
+            # 与 200 一致的缓存策略：浏览器缓存住这个「没变」的结论。
+            if self.path.split("?", 1)[0].endswith((".js", ".css")):
+                self.send_header("Cache-Control", "no-cache")
+            else:
+                self.send_header("Cache-Control", "public, max-age=3600")
+            self.end_headers()
+            return
         payload = self.stamp_client_scope(payload, content_type)
         # gzip。/api/notes 是 1.7MB 的 JSON —— 未压缩时它就是首页最大的一笔下载。实测压缩后约 300KB。压缩放在 send_bytes，因为每个响应都经过这里，一处生效全站生效。
         # 只压文本类：图片/字体已经是压缩格式，压了没收益还费 CPU。
@@ -2149,6 +2231,8 @@ class Handler(BaseHTTPRequestHandler):
         if content_type in ("text/css", "text/javascript") and "charset" not in content_type:
             content_type += "; charset=utf-8"
         self.send_header("Content-Type", content_type)
+        if etag:
+            self.send_header("ETag", etag)
         if getattr(self, "_gzipped", False):
             self.send_header("Content-Encoding", "gzip")
             self.send_header("Vary", "Accept-Encoding")
@@ -2688,11 +2772,15 @@ class Handler(BaseHTTPRequestHandler):
             # figures/ 是站内配图目录：文章引用的图镜像到这里，避免依赖外链
             # （外链会被图源站限流，读者看到的是空图框）。只放行图片后缀。
             if file.parent == root / "figures":
-                allowed = {".png", ".jpg", ".jpeg", ".webp", ".svg"}
+                allowed = {".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif"}
             if file.suffix.lower() not in allowed:
                 self.send_json({"error": "asset not found"}, 404)
                 return
-            self.send_bytes(file.read_bytes(), mimetypes.guess_type(file.name)[0] or "application/octet-stream")
+            self.send_bytes(
+                file.read_bytes(),
+                mimetypes.guess_type(file.name)[0] or "application/octet-stream",
+                etag=static_etag(file),
+            )
             return
         if path == "/favicon.svg":
             # 浏览器会自动请求 /favicon.ico，但我们用 <link rel="icon"> 显式
@@ -2700,7 +2788,7 @@ class Handler(BaseHTTPRequestHandler):
             # 老路径继续 404 —— 站内从没放过 ico，改它没有收益。
             fav = Path(__file__).resolve().parent / "favicon.svg"
             if fav.is_file():
-                self.send_bytes(fav.read_bytes(), "image/svg+xml")
+                self.send_bytes(fav.read_bytes(), "image/svg+xml", etag=static_etag(fav))
                 return
         if path == "/robots.txt":
             # 公网实例可以被搜索引擎收录；中台与工具启动路径明确排除。
@@ -3076,7 +3164,11 @@ class Handler(BaseHTTPRequestHandler):
             if len(payload) > 20 * 1024 * 1024:
                 self.send_json({"error": "asset too large"}, 413)
                 return
-            self.send_bytes(payload, mimetypes.guess_type(file.name)[0] or "application/octet-stream")
+            self.send_bytes(
+                payload,
+                mimetypes.guess_type(file.name)[0] or "application/octet-stream",
+                etag=static_etag(file),
+            )
             return
         # 未知页面路径：以前返回裸 JSON {"error":"not found"}，浏览器里就是一行
         # 没有样式的错误文本。用户敲错 URL 或点失效链接时应得到与全站一致的

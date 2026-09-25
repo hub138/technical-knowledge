@@ -671,7 +671,13 @@
 .reader-body blockquote>p:last-child{margin-bottom:var(--space-2)}
 .reader-body blockquote{margin:var(--space-5) 0;border-left:3px solid var(--color-accent);padding:var(--space-1) var(--space-4);color:inherit;background:var(--color-surface)}
 .reader-body a{color:var(--color-accent)}
-.reader-body img{display:block;margin:0 auto;max-width:100%;max-height:600px;object-fit:contain;border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-surface)}
+/* 限高原为 600px：宽高比小的图（如 1280x1700 的时序图）被压成 451x600，
+   在 740px 宽的正文栏里左右各空 140px，看着像缩略图。放宽到 760px 后
+   这类图能长到约 570x760，正文栏利用率接近满；超高图仍由 max-width 兜住。
+   height:auto 是给服务端注入的 width/height 属性配套的：属性在图片下载前
+   就把纵横比告诉浏览器（懒加载不再顶跳布局），max-width 生效时高度必须
+   等比跟随，否则窄屏下图片会被压扁。 */
+.reader-body img{display:block;margin:0 auto;max-width:100%;height:auto;max-height:760px;object-fit:contain;border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-surface)}
 /* 暗色模式下白底配图（Wikimedia 导出的位图/矢量图占全站配图六成）是一整块
    亮区，直接从暗页面切到 #fff 图面对暗适应的眼睛非常刺眼。降亮度降对比做柔光，
    文字与线条仍清晰可读；亮度变化加过渡，主题切换时不闪。浅色模式不受影响。 */
