@@ -75,6 +75,14 @@ LOCAL = {
     # 由 JS world.style.setProperty 写在 #graph-world 元素上，
     # CSS 端 .node text/.topic-node text/.domain-head 消费
     "--graph-comp",
+    # index.html 图谱图例：legend 每一项的颜色由 JS 内联 style 写在 <span> 上，
+    # CSS 端 .graph-legend i 消费（--dcolor: <该域的颜色>）
+    "--dcolor",
+    # 顶栏收缩态（.topbar.is-condensed）：shell.js/index.html 用 setProperty
+    # 写在顶栏元素上的两个几何量——搜索框让位后的宽、标题的右界。只在该
+    # 元素上有意义，不能进 tokens.css。
+    "--tk-search-w",
+    "--tk-title-right",
 }
 
 

@@ -628,12 +628,21 @@
        * 之前把展开状态记进 localStorage，结果点开过一次就永久展开——
        * 每次进站「项目与教学」都是张开的，侧边栏越来越长（2026-09-23 反馈）。
        * 折叠子项的价值就是默认不占地方，要展开就这一次点一下。 */
+      /* 子项页要展开，父项自己的页也要展开。
+       *
+       * 折叠组的第一项是「总览」（overviewLink），href 指向父项本身。
+       * 只按子项 key 判定的话，从子项页点「总览」跳到 ?view=panorama，
+       * page 变成父项 key，不等于任何子项 key，组当场收回 —— 刚点的
+       * 入口和两个子项一起消失（2026-09-25 反馈「点总览子目录会消失」）。
+       * 总览属于这一组，父项页就等于"正在看这一组"。 */
       const childKeys = (window.TK_NAV.subitems || []);
-      const onChildPage = childKeys.some((key) => {
-        const child = items().find((i) => i.key === key);
-        return child && child.parent === parentKey && child.key === page;
-      });
-      setOpen(onChildPage);
+      const onGroupPage =
+        parentKey === page ||
+        childKeys.some((key) => {
+          const child = items().find((i) => i.key === key);
+          return child && child.parent === parentKey && child.key === page;
+        });
+      setOpen(onGroupPage);
 
       toggle.addEventListener("click", () => setOpen(group.hidden));
       /* 父项链接也负责展开（不拦跳转）：点「项目与教学」过去时顺手展开，
@@ -1339,9 +1348,146 @@
       : w + (en ? " words" : " 字");
   };
 
+  /* ── 全站顶栏（含搜索框）────────────────────────────────────────────
+   * 为什么收进 shell：顶栏最早只存在于主站 index.html 的内联样式里，
+   * papers / sources 这些独立页面拿不到，只能在 hero 里自己挂搜索框，
+   * 于是「同一个搜索框在主站右上角、在别的页面掉进正文」。组件跟着页面
+   * 各写一份，跨页不一致就是必然结果——这次把生成与行为都收到这里。
+   *
+   * 结构：<header class="topbar"><div class="topbar-slot">
+   *         <label class="tk-search search">…</label>
+   *         <span class="topbar-title"></span></div></header>
+   * 皮肤走 base.css 的 .tk-search 与 .topbar（那两处是真源），本函数只管
+   * 生成结构与行为，不写任何样式。
+   *
+   * 行为：
+   *  - 下滑过阈值：顶栏常驻不隐藏，内容从搜索框翻成当前页面标题（知乎式）。
+   *    此前做成「整条顶栏收起」，读者下滑后既没有搜索入口也没有位置感。
+   *  - onInput 给本页本地筛选（papers / sources 用），不传就只在回车时
+   *    带着词跳主站全站搜索。 */
+  const mountTopbar = (opts = {}) => {
+    /* 锚点决定顶栏有多宽：插进 .tl-main（页面内容容器）里，顶栏就只有内容
+     * 那么宽、右边还带着容器留白，看着像"没贴到右上角"。顶栏是全站导航，
+     * 必须挂在 body 顶层与侧栏并列，所以 .tk-shell 优先于 section.hero。 */
+    const anchor =
+      opts.anchor ||
+      document.querySelector(".tk-shell") ||
+      document.querySelector("section.hero") ||
+      document.body.firstElementChild;
+    if (!anchor || !anchor.parentNode) return null;
+
+    const lang = window.TKI18N && window.TKI18N.lang === "en";
+    const placeholder =
+      opts.placeholder || (lang ? "Search all articles" : "输入即筛选 · 回车搜索");
+    const id = opts.id || "tk-topbar-search";
+
+    const bar = document.createElement("header");
+    bar.className = "topbar";
+    bar.innerHTML =
+      `<div class="topbar-slot">` +
+        `<label class="tk-search search">` +
+          `<span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>` +
+          `<input type="search" id="${id}" placeholder="${placeholder}" autocomplete="off" aria-label="${placeholder}">` +
+          `<kbd class="tk-search-kbd">⌘K</kbd>` +
+        `</label>` +
+        `<span class="topbar-title" id="${id}-title" hidden></span>` +
+      `</div>`;
+    const container = anchor.closest('.tk-shell') || anchor;
+    container.before(bar);
+
+    /* opts.reuse：页面里已经有一个搜索框（papers / sources 原先挂在 hero 里），
+     * 直接把它搬进顶栏，id 与已绑定的事件原样保留——搬位置不改行为，
+     * 免得为了统一位置把筛选逻辑重绑一遍。 */
+    if (opts.reuse) {
+      const slot = bar.querySelector(".topbar-slot");
+      slot.replaceChild(opts.reuse, slot.querySelector(".search"));
+      opts.reuse.hidden = false;
+      opts.reuse.classList.add("search");
+    }
+
+    const input = bar.querySelector("input");
+    const titleEl = bar.querySelector(".topbar-title");
+    const pageTitle =
+      opts.title ||
+      (document.querySelector("section.hero h1")?.textContent || "").trim() ||
+      document.title;
+
+    if (typeof opts.onInput === "function") {
+      input.addEventListener("input", () => opts.onInput(input.value));
+    }
+    input.addEventListener("keydown", (e) => {
+      if (e.key !== "Enter") return;
+      e.preventDefault();
+      if (typeof opts.onSearch === "function") return opts.onSearch(input.value.trim());
+      const q = input.value.trim();
+      if (q) window.location.href = "/?q=" + encodeURIComponent(q);
+    });
+    document.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        input.focus();
+        input.select();
+      }
+    });
+
+    /* 翻页：判据是滚动方向 + 死区，不是距离（按距离会小幅抖动来回开合）。 */
+    let last = window.scrollY;
+    let condensed = false;
+    const update = () => {
+      const y = Math.max(0, window.scrollY);
+      const next = y > 120 && y > last + 4 ? true : y < last - 4 ? false : condensed;
+      if (next !== condensed) {
+        condensed = next;
+        bar.classList.toggle("is-condensed", condensed);
+        titleEl.hidden = false;
+        titleEl.textContent = pageTitle;
+        if (condensed) fitTopbar();
+      }
+      last = y;
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", () => { if (condensed) fitTopbar(); }, { passive: true });
+    /* 文字优先的动态折叠（slot 版，papers/sources 等页）：
+       标题与搜索框都叠在 slot 里。先量标题自然宽，搜索框 420 → 170 → 96
+       四级让位到 0；标题右界 = 让位后搜索框宽 + 24px 间距（均相对 slot）。
+       都放不下才由 CSS right 约束截断成省略号。变量命名与主站版一致，
+       base.css 同名 var 取值。
+       同步一次成型（2026-09-25）：slot 版搜索框 right:0 定位，宽度变化
+       只动左缘，slot 宽度与搜索框右缘都是布局常数，一次算完同步写入；
+       同一帧生效，滚动事件密集时不再出现先 420 后定型的中间帧截断。 */
+    function fitTopbar() {
+      const slot = bar.querySelector(".topbar-slot");
+      const search = bar.querySelector(".search");
+      const label = titleEl.textContent || "";
+      if (!slot || !search || !label) return;
+      const slotW = slot.getBoundingClientRect().width;
+      const fitKey = label + "|" + Math.round(slotW);
+      if (bar._tkFitKey === fitKey) return;
+      const cs = getComputedStyle(titleEl);
+      const probe = document.createElement("span");
+      probe.style.cssText = "position:absolute;visibility:hidden;white-space:nowrap;left:-9999px;top:0;"
+        + "font:" + cs.fontWeight + " " + cs.fontSize + " " + cs.fontFamily + ";letter-spacing:" + cs.letterSpacing;
+      probe.textContent = label;
+      document.body.appendChild(probe);
+      const natural = probe.getBoundingClientRect().width;
+      probe.remove();
+      const gap = 24;
+      let w = 0;
+      for (const lv of [420, 170, 96, 0]) {
+        if (natural <= slotW - lv - gap) { w = lv; break; }
+      }
+      bar._tkFitKey = fitKey;
+      bar.style.setProperty("--tk-search-w", w ? w + "px" : "0px");
+      bar.style.setProperty("--tk-title-right", w + gap + "px");
+    }
+    update();
+    return { bar, input, titleEl, setTitle: (t) => { titleEl.textContent = t; } };
+  };
+
   window.TKShell = {
     sidebar,
     mountSearch,
+    mountTopbar,
     feedback,
     migratePath,
     progress,

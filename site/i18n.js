@@ -799,6 +799,10 @@
     "✓ 标记已学": { en: "✓ Mark learned" },
     "✓ 已读": { en: "✓ Learned" },
     "标记已读": { en: "Mark mastered" },
+    // ── Reader floating actions (added 2026-09-25: i18n_audit reported them missing) ──
+    "这篇有用": { en: "This helped" },
+    "这篇有用，记一笔（只保存在本浏览器）": { en: "This helped — take a note (this browser only)" },
+    "对这篇提意见": { en: "Give feedback on this note" },
     "输入即筛选 · 回车搜索": { en: "Type to filter · Enter to search" },
     "标记这篇为已读（只保存在本浏览器）": { en: "Mark this note as learned (this browser only)" },
     "未读": { en: "Not yet" },

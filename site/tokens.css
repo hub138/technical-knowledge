@@ -29,6 +29,17 @@
   --color-overlay: rgba(15, 23, 42, 0.42);
   --color-bg-veil: rgba(254, 253, 251, 0.92);
 
+  /* ── 文章卡（2026-09-25 掘金学习）────────────────────────────────
+   * 掘金文章页的结构：灰底衬托 + 白卡承载正文。本站此前文章区与背景
+   * 同色铺开，正文区没有「一张纸」的层次。灰底取本站色相的中性档
+   * （不取掘金的冷灰 #f2f3f5，那与本站暖白底温度打架）；
+   * 标签胶囊用 line 系底 + ink-soft 字，不引入新色相。 */
+  --color-page-muted: #f6f4f0;   /* 文章卡外的衬底：比 bg 深两档、仍属暖白族 */
+  --color-chip-bg: #f1f5f9;      /* 标签胶囊底：slate-100，与 line 同族 */
+  --color-chip-ink: #475569;     /* 标签胶囊字：与 --color-muted 同值（挂靠语义） */
+  --color-chip-line: #e2e8f0;    /* 标签胶囊边：与 --color-line 同值 */
+  --reader-card-radius: 12px;    /* 文章卡圆角：比 --radius-lg 大一档，大面板专用 */
+
   /* ── Text ───────────────────────────────────────────────────────────── */
   /* 石板灰蓝（slate-800 / slate-700）。
    *
@@ -286,6 +297,12 @@
   --color-overlay: rgba(2, 6, 16, 0.66);
   --color-bg-veil: rgba(15, 23, 42, 0.92);
 
+  /* 文章卡（与浅色段同语义）：暗色衬底比 bg 更深一档，卡片仍用 panel 色。 */
+  --color-page-muted: #0b1220;
+  --color-chip-bg: #26334a;
+  --color-chip-ink: #cbd5e1;
+  --color-chip-line: #334155;
+
   --color-ink: #f1f5f9;
   --color-ink-soft: #cbd5e1;
   --color-muted: #94a3b8;
@@ -507,6 +524,12 @@
   --color-raised: #202737;
   --color-overlay: rgba(8, 11, 18, 0.62);
   --color-bg-veil: rgba(19, 23, 34, 0.92);
+
+  /* 文章卡（与浅色段同语义）。 */
+  --color-page-muted: #0e131d;
+  --color-chip-bg: #202737;
+  --color-chip-ink: #d3dae8;
+  --color-chip-line: #2a3245;
 
   --color-ink: #e8ecf5;
   --color-ink-soft: #d3dae8;

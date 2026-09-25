@@ -46,7 +46,7 @@
 .to-top{position:fixed;right:22px;bottom:150px;z-index:var(--z-sticky);min-width:44px;min-height:44px;border-radius:50%;border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-ink);font-size:var(--text-md);cursor:pointer;opacity:0;visibility:hidden;transform:translateY(8px);box-shadow:0 2px 10px rgba(0,0,0,.12)}.to-top.is-on{opacity:1;visibility:visible;transform:none}@media (prefers-reduced-motion: no-preference){.to-top{transition:opacity .2s ease,transform .2s ease}}@media (prefers-reduced-motion: reduce){.to-top{transition:none}}.to-top:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}@media(max-width:760px){.to-top{right:14px;bottom:120px}}/* 顶栏标题的字号与截断统一由 base.css 的 .topbar .topbar-title 提供（--text-h2）。这里原先写了一份 font-size:var(--text-sm)，内联在 base.css 之后加载，把主站标题压到 14px、与其他页面的 22px 不一致 —— 2026-09-25 删除，字号回到真源。 *//* 顶栏搜索（.tk-search）：皮肤（图标/几何/焦点环）真源在 site/base.css
 的「搜索框皮肤（.tk-search）」规范 —— 2026-09-22 收编，本地只留放置：
    在顶栏 flex 行里占满中段。不要在这里写任何 input 皮肤。 */
-.search{flex:1}
+.search{flex:1 1 320px;max-width:460px;/* 2026-09-25：此前 flex:1 无限伸长，≤1200px 时搜索框撑到 762px 把工具条挤下第二行（顶栏 71→114px），视觉上像重叠。限宽 460（对齐掘金顶栏窄搜索），工具条回到同一行 */}
 /* .hero 的标题几何统一由 .view-head 提供（site/base.css），这里不再重复定义字号与间距。 */
 /* 标题下面那句：说明这个库收的是什么、每条笔记讲什么、读完能拿到什么判断。
  * 数字由脚本按当前内容算出（不再写死"186 篇"），见 renderHome 里的
@@ -465,7 +465,9 @@
  * 现在 key 收成纯文案「打开完整图谱」，箭头由 ::after 统一生成，
  * 和领域卡片用同一套尺寸/间距/hover。改 key 必须同时改 HTML 与词典，
  * 三者不同步英文界面就会漏翻 —— 已一并改。 */
-.atlas-open{flex:none;color:var(--color-accent);font-size:var(--text-small);font-weight:var(--weight-semibold);white-space:nowrap}
+/* 原高 21px：作为独立控件（不在段落文字流里）低于 WCAG 2.5.8 的 24px 底线，
+   触摸设备上尤其难点。补上下内边距把可点高度抬到 28px，视觉上仍是紧凑文字链。 */
+.atlas-open{flex:none;display:inline-flex;align-items:center;min-height:28px;color:var(--color-accent);font-size:var(--text-small);font-weight:var(--weight-semibold);white-space:nowrap}
 .atlas-open::after{
   content:'\2192';margin-left:var(--space-2);font-size:var(--text-xs);
   opacity:.8;display:inline-block;transition:transform var(--duration-fast) var(--ease-out);
@@ -565,7 +567,7 @@
   border:1px solid var(--color-line);border-left:3px solid var(--color-accent);
   border-radius:var(--radius-sm);background:var(--color-panel);
   color:var(--color-ink-soft);font-size:var(--text-body);line-height:1.7;
-}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--color-line);padding:26px 0 16px;margin-bottom:20px}.directory-head h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--color-ink-soft);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted);border-radius:5px;padding:5px 9px;font-size:var(--text-sm)}.sort button.active,.sort button:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:var(--text-md);margin:0 0 8px;display:flex;gap:8px;align-items:center}/* 分组标题从 text-lg(18px) 降到 text-md(16px)：与条目标题保持一档层级差（2026-09-24 目录字号审计） */.topic-title small{font-size:var(--text-xs);font-weight:400;color:var(--color-muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--color-panel);border:1px solid var(--color-line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--color-line);border-radius:0 0 7px 7px}.note-row{border-left:3px solid transparent;transition:background var(--duration-fast) var(--ease-out),border-left-color var(--duration-fast) var(--ease-out)}.note-row:hover{background:var(--color-surface);border-left-color:var(--color-accent)}.note-row h3{font-size:var(--text-sm);margin:0 0 3px}/* 目录条目标题从 text-md(16px) 降到 text-sm(14px)：此前与摘要 16px 反向倒挂，视觉突兀（2026-09-24 用户反馈） */.note-row .path{font-size:var(--text-xs);color:var(--color-accent)}.note-row p{margin:0;color:var(--color-ink-soft);font-size:var(--text-base);line-height:1.6}/* 剪藏目录的介绍卡：交代这个栏目是什么、内容怎么来的、插件从哪装。视觉层级低于 note-row（浅底、细边、小字），说明文字不与文章条目抢视觉。 */.clip-intro{background:var(--color-accent-soft);border:1px solid var(--color-line);border-radius:7px;padding:12px 15px;margin-bottom:18px}.clip-intro-text{font-size:var(--text-sm);line-height:1.7;color:var(--color-ink-soft)}.clip-intro-text b{display:block;font-size:var(--text-xs);color:var(--color-muted);margin-bottom:4px;font-weight:700}.clip-intro-text a{color:var(--color-accent)}.reader{display:none}.reader.open{display:block}/* 文章页头部距顶 26px：与 base.css「页面头部规范」（view-head 顶 26）同值同源，此前标题顶格贴 sticky 顶栏 */.reader-head{border-bottom:1px solid var(--color-line);padding-top:26px;padding-bottom:17px;margin-bottom:19px}.reader h2{font-size:var(--text-3xl);line-height:1.3;margin:0}/* 标题下的元信息行（字数 · 更新日期）：弱化、小字，不与来源区抢视觉。 */.reader-meta{margin:0 0 10px;color:var(--color-muted);font-size:var(--text-xs)}/* 到期复查徽标：frontmatter 的 review_after 已过当天时显示，提醒读者注意时效。复用站点暖色警示语义。 */.reader-meta .stale-badge{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:4px;background:var(--color-warn-soft);color:var(--color-warn);font-size:var(--text-2xs);font-weight:700;vertical-align:1px}.reader-sources{
+}.directory-head{display:flex;justify-content:space-between;gap:16px;align-items:end;border-bottom:1px solid var(--color-line);padding:26px 0 16px;margin-bottom:20px}.directory-head h2{font-size:var(--text-2xl);line-height:1.3;margin:0 0 5px}.directory-head p{color:var(--color-ink-soft);margin:0}.sort{display:flex;gap:5px}.sort button{border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted);border-radius:5px;padding:5px 9px;font-size:var(--text-sm)}.sort button.active,.sort button:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}.topic-section{margin-bottom:24px}.topic-title{font-size:var(--text-md);margin:0 0 8px;display:flex;gap:8px;align-items:center}/* 分组标题从 text-lg(18px) 降到 text-md(16px)：与条目标题保持一档层级差（2026-09-24 目录字号审计） */.topic-title small{font-size:var(--text-xs);font-weight:400;color:var(--color-muted)}.note-row{display:grid;grid-template-columns:minmax(280px,1.3fr) minmax(0,2fr);gap:18px;background:var(--color-panel);border:1px solid var(--color-line);border-bottom:0;padding:13px 15px;cursor:pointer}.note-row:first-of-type{border-radius:7px 7px 0 0}.note-row:last-of-type{border-bottom:1px solid var(--color-line);border-radius:0 0 7px 7px}.note-row{border-left:3px solid transparent;transition:background var(--duration-fast) var(--ease-out),border-left-color var(--duration-fast) var(--ease-out)}.note-row:hover{background:var(--color-surface);border-left-color:var(--color-accent)}.note-row h3{font-size:var(--text-sm);margin:0 0 3px}/* 目录条目标题从 text-md(16px) 降到 text-sm(14px)：此前与摘要 16px 反向倒挂，视觉突兀（2026-09-24 用户反馈） */.note-row .path{font-size:var(--text-xs);color:var(--color-accent)}.note-row p{margin:0;color:var(--color-ink-soft);font-size:var(--text-base);line-height:1.6}/* 剪藏目录的介绍卡：交代这个栏目是什么、内容怎么来的、插件从哪装。视觉层级低于 note-row（浅底、细边、小字），说明文字不与文章条目抢视觉。 */.clip-intro{background:var(--color-accent-soft);border:1px solid var(--color-line);border-radius:7px;padding:12px 15px;margin-bottom:18px}.clip-intro-text{font-size:var(--text-sm);line-height:1.7;color:var(--color-ink-soft)}.clip-intro-text b{display:block;font-size:var(--text-xs);color:var(--color-muted);margin-bottom:4px;font-weight:700}.clip-intro-text a{color:var(--color-accent)}.reader{display:none}.reader.open{display:block}/* 文章页头部距顶 26px：与 base.css「页面头部规范」（view-head 顶 26）同值同源，此前标题顶格贴 sticky 顶栏 */.reader-head{border-bottom:1px solid var(--color-line);padding-top:26px;padding-bottom:17px;margin-bottom:19px}.reader h2{font-size:var(--text-3xl);line-height:1.3;margin:0}/* 标题下的元信息行（字数 · 更新日期）：弱化、小字，不与来源区抢视觉。 */.reader-meta{margin:0 0 10px;color:var(--color-muted);font-size:var(--text-small)}/* 2026-09-25 掘金学习：meta 从 12px 提到 13px（--text-small），掘金实测 14px，12px 在大标题下过弱 *//* 到期复查徽标：frontmatter 的 review_after 已过当天时显示，提醒读者注意时效。复用站点暖色警示语义。 */.reader-meta .stale-badge{display:inline-block;margin-left:8px;padding:1px 7px;border-radius:4px;background:var(--color-warn-soft);color:var(--color-warn);font-size:var(--text-2xs);font-weight:700;vertical-align:1px}.reader-sources{
   margin:var(--space-3) 0 0;color:var(--color-muted);
   font-size:var(--text-body);line-height:1.9;
 }
@@ -644,7 +646,7 @@
 :root[data-theme="dark"] .domain-topics i + i::before,
 :root[data-theme="dark"] .tool-facts span + span::before{color:var(--color-faint)}
 .source-toggle{margin-left:8px;padding:1px 8px;border:1px solid var(--color-line);border-radius:var(--radius-full);background:transparent;color:var(--color-muted);font:inherit;font-size:var(--text-xs);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
-.source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--color-accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{font-size:var(--text-small);display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 248px;column-gap:30px;align-items:start}.reader-railcol{grid-column:2;position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto}.reader-railcol .reader-toc{position:static;max-height:none;overflow:visible}.reader-railcol .reader-toc .rail-head{position:static}.reader-layout:has(#reader-toc[hidden]):has(#reader-siblings[hidden]){grid-template-columns:minmax(0,1fr) 0;column-gap:0}}/* 同模块文章 2026-09-24 从正文后移入右栏（目录下方）；同日晚改：目录与同模块包进 .reader-railcol 一列整体 sticky——原先只有目录 sticky，同模块折叠行是静态块，被网格自动放置到正文列末行，目录底与折叠行之间空出一整条空白（用户截图反馈「每个页面都这么空」的病根之一）。窄屏（≤1199px）右栏隐藏，回退为正文后的横排胶囊。字号 13px → 16px（一次反馈「字再大一点」）→ 18px（二次反馈）→ 16px（三次反馈嫌太大）；右栏 204px→248px 加宽（三次反馈「有点窄」）。 */
+.source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--color-accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{font-size:var(--text-small);display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 216px;column-gap:26px;align-items:start;padding-left:16px;padding-right:16px;/* 2026-09-25：右栏 248→216、左右内距 46→24，把宽度让给正文——此前 1440 视口下正文只有 646px，两侧空、正文挤 */}.reader-railcol{grid-column:2;position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto}.reader-railcol .reader-toc{position:static;max-height:none;overflow:visible}.reader-railcol .reader-toc .rail-head{position:static}.reader-layout:has(#reader-toc[hidden]):has(#reader-siblings[hidden]){grid-template-columns:minmax(0,1fr) 0;column-gap:0}}/* 同模块文章 2026-09-24 从正文后移入右栏（目录下方）；同日晚改：目录与同模块包进 .reader-railcol 一列整体 sticky——原先只有目录 sticky，同模块折叠行是静态块，被网格自动放置到正文列末行，目录底与折叠行之间空出一整条空白（用户截图反馈「每个页面都这么空」的病根之一）。窄屏（≤1199px）右栏隐藏，回退为正文后的横排胶囊。字号 13px → 16px（一次反馈「字再大一点」）→ 18px（二次反馈）→ 16px（三次反馈嫌太大）；右栏 204px→248px 加宽（三次反馈「有点窄」）。 */
 /* 文章页收尾区宽度（2026-09-24 晚）：pager/reward/图谱区全在 maincol 里，
    统一锚定正文列宽——图谱区宽度真源是 .article-relations 的
    max-width:740px；pager/reward 自身无宽度约束，靠下面这行收口。
@@ -653,15 +655,36 @@
    改为 display:none 起步、.on 时恢复 flex，淡入动画语义不变。 */
 #reader-pager,#reader-reward{max-width:740px}
 .reader-siblings{margin:18px 0 0;padding-top:12px;border-top:1px solid var(--color-line)}.reader-siblings .rail-head{margin:0 0 6px;padding:0;border:0;justify-content:flex-start}.reader-siblings .rail-head span{color:var(--color-ink)}.reader-siblings .rail-list{display:grid;gap:2px}.reader-siblings .rail-list a{padding:6px 8px;border:0;border-radius:5px;background:none;white-space:normal;line-height:1.5;font-size:var(--text-sm)}@media(max-width:1199px){.reader-siblings .rail-list{display:flex;flex-wrap:wrap;gap:7px}.reader-siblings .rail-list a{padding:5px 11px;border:1px solid var(--color-line);border-radius:15px;background:var(--color-panel);white-space:nowrap;font-size:15px}}.reader-toc{position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto;font-size:var(--text-sm)}.rail-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 10px;padding-bottom:8px;border-bottom:1px solid var(--color-line);color:var(--color-ink);font-size:var(--text-body);font-weight:var(--weight-bold)}.rail-toggle{border:0;background:none;color:var(--color-muted);cursor:pointer;padding:0 2px;font-size:var(--text-base);line-height:1}.rail-toggle:hover{color:var(--color-accent)}/* 折叠点击区（2026-09-24 反馈）：箭头钮裸热区 36px 挡不住整行点击，标题行整行接管折叠交互，箭头钮退化为纯指示器（pointer-events:none），标题行 cursor:pointer + 便捷 aria。 */.rail-head:has(.rail-toggle){cursor:pointer}.rail-head .rail-toggle{pointer-events:none}/* 折叠行（同模块/图谱）在悬浮标题行正下方折叠时，标题行底边框与折叠内容之间会出现 1px 透缝，给折叠后的列表容器加白底补缝。 */.rail-list{margin:0;padding:0;list-style:none;display:grid;gap:2px}/* 目录链接的颜色从 --color-muted 提到 --color-ink-soft。
+/* 同模块文章双行结构（2026-09-25 掘金学习）：标题主信息单行省略，字数次信息
+   小字弱化，悬停时整条一起点亮。窄屏（≤1199px）回退成横排胶囊，计数行没有
+   横排空间，直接隐藏保持单行标题。 */
+.reader-siblings .sib-title{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.reader-siblings .sib-meta{display:block;margin-top:1px;color:var(--color-muted);font-size:var(--text-2xs);line-height:1.4}
+.reader-siblings .rail-list a:hover .sib-meta{color:var(--color-accent)}
+@media(max-width:1199px){.reader-siblings .sib-meta{display:none}}
    * 它是一条可点的导航，不是脚注 —— 灰到读不出"这里能点"就等于没有。
    * 悬停时才变主色，用它来表示"当前指向哪一条"。 */
-  .rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--color-ink-soft);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--color-accent-soft);color:var(--color-accent)}.rail-list a[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:var(--text-sm);color:var(--color-muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:var(--text-sm);color:var(--color-muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}/* 悬浮标题行下方透缝补底：折叠行标题与内容衔接处给标题行下沿加投影级背景，滚动中列表项从标题下滑过时不再露出字头。 */.rail-head::after{content:"";position:absolute;left:0;right:0;top:100%;height:6px;background:linear-gradient(var(--color-bg),rgba(254,253,251,0));pointer-events:none}
-.reader-body{max-width:740px;min-width:0;font-size:var(--text-lg);line-height:1.75;color:var(--color-ink-soft);overflow-wrap:anywhere}
+  .rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--color-ink-soft);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--color-accent-soft);color:var(--color-accent)}.rail-list a[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:var(--text-sm);color:var(--color-muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:var(--text-sm);color:var(--color-muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}/* 悬浮标题行下方透缝补底：折叠行标题与内容衔接处给标题行下沿加投影级背景，滚动中列表项从标题下滑过时不再露出字头。 */.rail-head::after{content:"";position:absolute;left:0;right:0;top:100%;height:6px;background:linear-gradient(var(--color-bg),rgba(254,253,251,0));pointer-events:none}/* ── 右栏两块卡片化 + 目录条目单行省略（2026-09-25）── 起因：小节标题被写成整段正文时（实测最长 351 字），目录条目连带右栏一起被撑变形。 修数据之外这里加视觉兜底：条目一律单行省略，再长的标题也只占一行，不破版。 「本文目录」与「同模块文章」是两块各自独立的折叠卡片，默认都展开。 */.reader-toc,.reader-siblings{background:var(--color-panel);border:1px solid var(--color-line);border-radius:9px;padding:10px 9px 12px;margin-bottom:14px}.reader-siblings{margin-bottom:0}.rail-list a{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rail-list a[aria-current="location"]{box-shadow:inset 3px 0 0 var(--color-accent);background:var(--color-accent-soft);color:var(--color-accent);font-weight:700}.toc-list a[data-level="2"]{font-weight:600;color:var(--color-ink)}
+.reader-body{max-width:756px;/* 2026-09-25：740→756，对齐掘金正文列宽；库内正文实测 646px 远窄于掘金，长行代码与表格挤在中间，两侧空得慌 */min-width:0;font-size:var(--text-lg);line-height:1.75;color:var(--color-ink-soft);overflow-wrap:anywhere}
 .reader-body h1{font-size:var(--text-h1)}
-.reader-body h2{font-size:var(--text-h2);border-bottom:1px solid var(--color-line);padding-bottom:var(--space-2);margin:var(--space-8) 0 var(--space-4)}
-.reader-body h3{font-size:var(--text-h3);margin:var(--space-6) 0 var(--space-3)}
+.reader-body h2{font-size:var(--text-h2);border-bottom:1px solid color-mix(in srgb, var(--color-line) 55%, transparent);padding-bottom:var(--space-2);margin:var(--space-8) 0 var(--space-4)}
+/* H3 此前与正文同为 18px（--text-h3 与 .reader-body 的 --text-lg 同值），
+   字号维度没有拉开，只剩字重与颜色在区分层级。这里从 --text-body 派生 20px：
+   卡在正文 18px 与 H2 22px 之间，主题与字号基准变化时跟着走。H4 保持 1em 与正文同档。 */
+.reader-body h3{font-size:calc(var(--text-body) * 1.25);margin:var(--space-6) 0 var(--space-3)}
 .reader-body h4{font-size:1em;margin:var(--space-6) 0 var(--space-3)}
 .reader-body h1,.reader-body h2,.reader-body h3,.reader-body h4{color:var(--color-ink);font-weight:var(--weight-bold);line-height:var(--leading-tight)}
+
+/* meta 标签胶囊（2026-09-25 掘金学习）：文章页 meta 行下方单独成行的可点胶囊，
+   对应掘金 meta 下面的标签区。数据与交互：域胶囊跳目录域筛选，主题胶囊跳
+   目录主题筛选，均走既有 select()。配色走 tokens.css 新增的 --color-chip-*
+   体系，浅色 slate-100 族、两套暗色主题各有对应值，主题切换不用额外分支。 */
+.reader-chips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 0}
+/* 圆角选择器带 .reader-chips 前缀：base.css 的 body.tk-host button（0-1-1）
+   权重高于裸 .meta-chip（0-1-0），会把药丸压成 5px（实测）。0-2-0 反超。 */
+.reader-chips .meta-chip{display:inline-flex;align-items:center;padding:2px 10px;border:1px solid var(--color-chip-line);border-radius:var(--radius-full);background:var(--color-chip-bg);color:var(--color-chip-ink);font:inherit;font-size:var(--text-xs);font-weight:var(--weight-medium);line-height:1.6;cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out),background var(--duration-fast) var(--ease-out)}
+.meta-chip:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}
+.meta-chip:focus-visible{outline:2px solid var(--color-accent);outline-offset:1px}
 .reader-body p{margin:var(--space-4) 0}
 .reader-body ul,.reader-body ol{padding-left:var(--space-6)}
 .reader-body li{margin:var(--space-2) 0}
@@ -669,7 +692,9 @@
 .reader-body li>p{margin:var(--space-2) 0}
 .reader-body blockquote>p:first-child{margin-top:var(--space-2)}
 .reader-body blockquote>p:last-child{margin-bottom:var(--space-2)}
-.reader-body blockquote{margin:var(--space-5) 0;border-left:3px solid var(--color-accent);padding:var(--space-1) var(--space-4);color:inherit;background:var(--color-surface)}
+.reader-body blockquote{margin:var(--space-5) 0;border-left:3px solid var(--color-accent);padding:var(--space-2) var(--space-4) var(--space-2) var(--space-5);color:var(--color-muted);background:var(--color-surface)}
+/* 2026-09-25 掘金学习：引用块正文与引文层级分开——掘金引文实测 #666 弱化；
+   本站用 muted(8:1) 保住对比度底线，同时与正文 ink-soft 拉开一档。 */
 .reader-body a{color:var(--color-accent)}
 /* 限高原为 600px：宽高比小的图（如 1280x1700 的时序图）被压成 451x600，
    在 740px 宽的正文栏里左右各空 140px，看着像缩略图。放宽到 760px 后
@@ -686,11 +711,32 @@
 /* 图注：紧跟图片、以「图源」开头的那一段。居中、小字、弱化，与图片同属一个视觉单元，
    不与正文抢层级；颜色不靠色相单独承载信息，仍保留文字本身。类名由 enhanceReaderImages
    在渲染时打上，规则改在这里，不散在 JS 里。 */
-.reader-body p.reader-figure-caption{margin:-12px 0 var(--space-5);text-align:center;color:var(--color-muted);font-size:inherit;line-height:inherit}
+.reader-body p.reader-figure-caption{margin:-10px auto var(--space-5);text-align:center;color:var(--color-muted);font-size:var(--text-small);line-height:1.6;max-width:620px;font-style:normal}
+.reader-body p.reader-figure-caption em{font-style:normal}
 .reader-figure-caption a{color:var(--color-muted);text-decoration:underline;text-underline-offset:2px}
 .reader-image{display:block;margin:var(--space-5) 0}
 .reader-image img{display:block;margin:0 auto}
-.reader-image-tools{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-2);font-size:var(--text-body);line-height:var(--leading-normal)}
+/* 正文图片原地放大（2026-09-25）——
+ * 正文图片最宽只有正文列那么宽（实测 570–740px），架构图上 8–10px 的标注文字压到
+ * 这个宽度就糊成一团；「查看原图」能看清，但要跳出站点开新标签、离开当前阅读位置。
+ * 所以点图即铺满视口：不打断阅读，Esc 或点背景就回到原位。
+ * z-index 80：站内现有最高是 60（顶栏/浮层），这里必须在它们之上。 */
+.reader-image img{cursor:zoom-in}
+.img-lightbox{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;padding:32px;background:rgba(0,0,0,.84);cursor:zoom-out;animation:img-lightbox-in .16s ease}
+.img-lightbox img{max-width:96vw;max-height:92vh;object-fit:contain;background:var(--color-surface);border-radius:var(--radius-sm);box-shadow:0 18px 48px rgba(0,0,0,.5);cursor:default;filter:none}
+.img-lightbox-close{position:absolute;top:18px;right:22px;min-height:36px;padding:0 14px;border:1px solid rgba(255,255,255,.34);border-radius:var(--radius-sm);background:rgba(0,0,0,.42);color:#fff;font:inherit;font-size:var(--text-sm);cursor:pointer}
+.img-lightbox-close:hover,.img-lightbox-close:focus-visible{background:rgba(0,0,0,.62);border-color:rgba(255,255,255,.6)}
+/* Mermaid 图放大：与位图共用同一个遮罩。SVG 没有固有像素尺寸，直接塞进 flex
+   容器会被拉成怪比例，所以按 viewBox 的自然尺寸设 width/height，再用 max-*
+   收进视口（preserveAspectRatio 默认 meet，比例不会变形）。 */
+.img-lightbox-svg{max-width:96vw;max-height:92vh;overflow:auto;background:var(--color-surface);border-radius:var(--radius-sm);box-shadow:0 18px 48px rgba(0,0,0,.5)}
+.img-lightbox-svg svg{display:block;max-width:100%;height:auto;filter:none}
+@keyframes img-lightbox-in{from{opacity:0}to{opacity:1}}
+@media (prefers-reduced-motion:reduce){.img-lightbox{animation:none}}
+/* 窄屏把内边距压到 8px：竖屏下每一像素都影响放大层能多大（正文里的图可以横滚
+   到比视口更宽，放大层只能吃视口减去 padding 的空间）。 */
+@media (max-width:640px){.img-lightbox{padding:8px}.img-lightbox-close{top:8px;right:10px}}
+.reader-image-tools{display:flex;align-items:center;flex-wrap:wrap;justify-content:flex-end;gap:var(--space-2);margin-top:var(--space-3);font-size:var(--text-body);line-height:var(--leading-normal)}
 .reader-image-status{margin-right:auto;color:var(--color-muted)}
 .reader-image-open,.reader-image-retry{min-height:44px;padding:var(--space-2) var(--space-3);border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-panel);color:var(--color-accent);font:inherit;cursor:pointer}
 .reader-image-open:hover,.reader-image-retry:hover{border-color:var(--color-accent);background:var(--color-accent-soft)}
@@ -721,7 +767,9 @@
 .reader-code{margin:var(--space-5) 0;min-width:0}
 .reader-code .code-block{margin:0;border-top-left-radius:0;border-top-right-radius:0}
 .code-tools{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-2);padding:var(--space-2) var(--space-3);border:1px solid var(--color-line);border-bottom:0;border-radius:var(--radius-sm) var(--radius-sm) 0 0;background:var(--color-surface);color:var(--color-muted);font-size:var(--text-small);line-height:var(--leading-normal)}
-.code-language{margin-right:auto;font-family:var(--font-mono)}
+/* 2026-09-25 掘金学习：代码头语言名用 eyebrow 语义（加字距 + 小字号），
+   让「bash / python」一眼读出是元信息而非正文；字距走 --tracking-caps。 */
+.code-language{margin-right:auto;font-family:var(--font-mono);font-size:var(--text-micro);font-weight:var(--weight-semibold);letter-spacing:var(--tracking-caps);text-transform:uppercase}
 .code-copy{min-height:36px;padding:var(--space-1) var(--space-3);border:1px solid var(--color-line);border-radius:var(--radius-xs);background:var(--color-panel);color:var(--color-ink);font:inherit;cursor:pointer;transition:background var(--duration-fast) var(--ease-out),border-color var(--duration-fast) var(--ease-out)}
 .code-copy:hover,.code-copy:focus-visible{background:var(--color-accent-soft);border-color:var(--color-accent)}
 .code-copy:disabled{cursor:not-allowed;opacity:.7}
@@ -807,7 +855,7 @@
 .tk-subtopic{display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:5px 8px 5px 26px;margin-left:14px;border-left:1px solid var(--color-line);color:var(--color-ink-soft);font-size:var(--text-small);text-decoration:none}
 .tk-subtopic:first-child{border-top:0}
 .tk-subtopic:hover{color:var(--color-accent);border-left-color:var(--color-accent);background:var(--color-accent-soft)}
-.tk-subtopic--all{color:var(--color-accent);font-weight:var(--weight-semibold)}.tk-subtopic[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:var(--weight-semibold);border-left-color:var(--color-accent);border-radius:0 6px 6px 0;margin-right:10px;box-shadow:var(--shadow-sm),inset 0 1px 2px rgba(20, 42, 35, 0.06)}
+.tk-subtopic--all{color:var(--color-accent)}.tk-subtopic[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);border-left-color:var(--color-accent);border-radius:0 6px 6px 0;box-shadow:var(--shadow-sm),inset 0 1px 2px rgba(20, 42, 35, 0.06)}
 .tk-radar-pin{display:contents}
 .tk-subtopic .count{font-size:var(--text-2xs);color:var(--color-muted);font-variant-numeric:tabular-nums}
 .pg-domain-block{margin-bottom:24px}
@@ -1046,11 +1094,12 @@
    relation-collapse 用两级选择器：单类版本定义在本块之后，同特异性会输。 */
 .rail-toggle{width:36px;height:36px;padding:0;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel)}
 .article-relations-head .relation-collapse{width:32px;height:32px}
-/* 触屏上折叠钮热区提到 40px（graph-tool 手机档同标准）：宽高直接提到
-   40，视觉仍是同款描边小方钮，不引入透明命中区避免压到下方卡片。 */
+/* 触屏上折叠钮热区提到 44px（触控目标下限，与 .mmd-btn 同标准）：宽高直接提到
+   44，视觉仍是同款描边小方钮，不引入透明命中区避免压到下方卡片。
+   原为 40px——44 是 WCAG 2.5.5 与 iOS/Android 通用的下限，40 差一点。 */
 @media (pointer: coarse) {
-  .rail-toggle{width:40px;height:40px}
-  .article-relations-head .relation-collapse{width:40px;height:40px}
+  .rail-toggle{width:44px;height:44px}
+  .article-relations-head .relation-collapse{width:44px;height:44px}
 }
 /* 首页「学习与实践」段落里的内联链接（学习中心）：19px 高的裸文本在
    手机上点不中，补边框与内边距成按钮。桌面不受影响。 */
@@ -1115,7 +1164,7 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .tk-subtopics .radar-card:hover,.nav-section .radar-card:hover{color:var(--color-accent);border-left-color:var(--color-accent);background:var(--color-accent-soft);box-shadow:none}
 .radar-card .radar-icon{flex:none;font-size:var(--text-2xs);line-height:1;opacity:.75}
 .radar-card .radar-text{display:flex;align-items:baseline;gap:6px;min-width:0;flex:1 1 auto}
-.radar-card .radar-text strong{font-size:var(--text-small);font-weight:var(--weight-medium);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0;color:inherit}
+.radar-card .radar-text strong{font-size:var(--text-small);font-weight:var(--weight-normal);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:0 1 auto;min-width:0;color:inherit}
 .radar-card .radar-text small{font-size:var(--text-2xs);font-weight:var(--weight-normal);color:var(--color-muted);white-space:nowrap;flex:0 1 auto;overflow:hidden;min-width:0}
 :root[data-theme="dark"] .radar-card{box-shadow:0 3px 10px rgba(0,0,0,.4)}
 :root[data-theme="dark"] .radar-card:hover{box-shadow:0 5px 14px rgba(0,0,0,.5)}
@@ -1281,7 +1330,19 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .note-row{border:1px solid var(--color-line);border-radius:6px!important;padding:14px 16px;background:var(--color-panel);box-shadow:0 1px 2px rgba(20,42,35,.02)}
 .note-row:hover{background:var(--color-panel);border-color:var(--color-accent-line);transform:translateX(2px)}
 .note-row h3{font-size:var(--text-sm)}.note-row .path{color:var(--color-muted)}.note-row p{font-size:var(--text-base)}
-.reader{max-width:1018px;margin:0 auto}/* 容器上限=列宽之和 740+30+248：固定 1240 时多出 222px 全堆在正文与目录之间成空带（2026-09-24 用户截图红框，宽窗口实测 bandW 222+）。 */.reader-head{padding-bottom:22px;margin-bottom:25px}.reader-head h1{font-size:var(--text-4xl);line-height:1.3;margin:0}
+.reader{max-width:1126px;margin:0 auto}
+/* ── 掘金式文章卡（2026-09-25）──────────────────────────────
+ * 掘金文章页的结构是「灰底 + 白卡 + 投影」：页面衬底深一档，正文放在一张
+ * 白色卡片里，读者的阅读区域与页面背景立刻分层。本站此前文章区与背景
+ * 同色铺开，正文没有「一张纸」的边界。
+ * 落法：show() 已给 body 挂 .tk-reading（文章视图专属），衬底色挂在这上面，
+ * 零 JS 改动。卡片本体是 .reader 容器：白底、圆角、轻投影、内边距 32px
+ * （掘金实测同值）。窄屏卡片内边距收到 16px，避免挤占正文。 */
+body.tk-reading{background:var(--color-page-muted)}
+#reader.open{background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--reader-card-radius);box-shadow:var(--shadow-sm);padding:26px 32px 40px;margin-bottom:48px}
+/* 窄屏：卡片内边距收紧、贴边（灰底不再露出窄条），圆角降一档。 */
+@media(max-width:760px){#reader.open{padding:18px 16px 28px;border-radius:var(--radius-lg);margin-bottom:24px}}
+.reader-head{padding-bottom:22px;margin-bottom:25px}.reader-head h1{font-size:var(--text-4xl);line-height:1.3;margin:0}
 .graph-panel{padding:13px;border-radius:7px;box-shadow:0 1px 3px rgba(20,42,35,.03)}
 
 button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
@@ -1333,12 +1394,16 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 .kbd-close:hover{border-color:var(--color-accent);color:var(--color-accent)}
 kbd{display:inline-block;min-width:20px;padding:2px 6px;border:1px solid var(--color-line);border-bottom-width:2px;border-radius:4px;background:var(--color-surface);color:var(--color-ink);font:600 var(--text-micro)/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;text-align:center}
 .reader-tools{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-bottom:10px}
-.reader-tool{border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-muted);padding:6px 10px;font:650 12px inherit;cursor:pointer}
+/* 工具栏按钮字号统一（2026-09-25 用户反馈）：同一行按钮此前三种字号
+   （.reader-tool 650 12px、.reader-back/--study 13px、下载/标记又被
+   1035 行 min-height 提到 16px 视觉），统一为 var(--text-sm) 13px/400，
+   主次靠颜色与背景承担，学习入口的强调由 accent 底色保留。 */
+.reader-tool{border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-muted);padding:6px 10px;font-size:var(--text-sm);font-weight:400;cursor:pointer}
 .reader-tool:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}
 .reader-tool:focus-visible{outline:2px solid var(--color-accent);outline-offset:2px}
 .reader-back{border:1px solid var(--color-line);background:var(--color-panel);border-radius:5px;color:var(--color-muted);padding:6px 10px;font-size:var(--text-sm)}
 .reader-back:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}
-.topbar{overflow:visible}.topbar .reader-tools[hidden]{display:none!important}.reader-study{position:relative;isolation:isolate;border:1px solid var(--color-accent-line);background:var(--color-accent-soft);border-radius:5px;color:var(--color-accent);padding:6px 10px;font-size:var(--text-sm);font-weight:700;text-decoration:none!important}
+.topbar{overflow:visible}.topbar .reader-tools[hidden]{display:none!important}.reader-study{position:relative;isolation:isolate;border:1px solid var(--color-accent-line);background:var(--color-accent-soft);border-radius:5px;color:var(--color-accent);padding:6px 10px;font-size:var(--text-sm);font-weight:400;text-decoration:none!important}
 .reader-study:hover,.reader-study:focus-visible{border-color:var(--color-accent);background:var(--color-accent-soft);text-decoration:none!important}
 .reader-study::after{content:attr(data-tooltip);position:absolute;z-index:var(--z-overlay);right:0;top:calc(100% + 8px);display:block;box-sizing:border-box;width:min(300px,calc(100vw - 42px));padding:9px 11px;border:1px solid var(--color-line-strong);border-radius:6px;background-color:var(--color-ink)!important;color:var(--color-panel)!important;box-shadow:0 10px 24px rgba(10,27,20,.25);font-size:var(--text-xs);font-weight:500;line-height:1.6;white-space:normal;overflow-wrap:anywhere;opacity:0;visibility:hidden;pointer-events:none;transform:translateY(-3px);transition:opacity var(--duration-fast) var(--ease-out),transform var(--duration-fast) var(--ease-out),visibility var(--duration-fast) var(--ease-out)}
 .reader-study:hover::after,.reader-study:focus-visible::after{opacity:1;visibility:visible;transform:translateY(0)}
@@ -1474,11 +1539,11 @@ body.tk-host .reader-sources a:hover,body.tk-host .reader-sources a:focus-visibl
 /* 文章页"知识图谱"区在正文之后：标题 16px（--text-body）、计数 13px（--text-small，micro 档只用于图形角标不做文字）；上边框与正文分隔，宽度收口到正文列（max-width 740px）与 .reader-body 一致。备份 .design/backup-index-rt22b.html */.search{max-width:480px;flex:0 1 480px;margin-left:auto;margin-right:118px}.topbar .reader-tools{display:flex;align-items:center;justify-content:flex-end;gap:8px;flex:none;margin:0 118px 0 12px}@media(max-width:760px){.topbar .reader-tools{margin:0}}/* 手机端无固定钮占位，118px 让位边距会把按钮行顶出容器 */.topbar .reader-back,.topbar .reader-study{white-space:nowrap}.article-relations{border-bottom:1px solid var(--color-line);padding:0 0 16px;margin:0 0 24px;max-width:740px}.article-relations-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:7px}.article-relations-heading{display:flex;align-items:baseline;gap:9px;min-width:0}.article-relations-head h3{margin:0;font-size:var(--text-body)}.article-relations-head span{color:var(--color-muted);font-size:var(--text-small)}.relation-collapse{width:28px;height:28px;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-muted);cursor:pointer;font-size:var(--text-md);line-height:1}.relation-collapse:hover{border-color:var(--color-accent);background:var(--color-accent-soft);color:var(--color-accent)}.relation-graph{display:block;width:100%;height:245px;overflow:visible}/* rt16 高度 205→245：配合两行卡（66px 卡高 + 78 间距）的 viewBox 250，原 205 裁掉三卡纵排底部。 *//* 连线语义就是"分隔线"，用边框 token：暗色下自动换成 #475569，
    不再像硬编码浅灰绿那样在深底上消失。 */
 .relation-edge{stroke:var(--color-line-strong);stroke-width:1.5;fill:none}/* 入链比延伸淡一档，保持两类边的区分。 */
-.relation-edge.incoming{stroke:var(--color-faint)}.relation-node{cursor:pointer}.relation-node rect{fill:var(--color-panel);stroke:var(--color-line);stroke-width:1.2}.relation-node.current rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.5}.relation-node:hover rect,.relation-node:focus rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.8}.relation-node .relation-node-title{fill:var(--color-ink);font-size:var(--text-sm);font-weight:700}.relation-node .relation-node-meta{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:600}.relation-node.current .relation-node-meta{fill:var(--color-accent)}.relation-label{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.04em}.article-relations.collapsed .relation-graph{display:none}.article-relations.collapsed{padding-bottom:10px}/* 窄桌面（≤1240px）文章视图：顶栏一行装不下「搜索框+四枚操作按钮+语言+主题」，搜索框 flex-shrink 无下限被压到 36px 只剩 ⌘K 片悬着（1024 实测 input 52px）。改为整行换行：搜索独占第一行，按钮与语言、主题落第二行；换行态搜索行右侧预留 118px 给固定定位的中文/主题控件（882-1002px 实测压在通栏搜索条上）。:has 限定文章视图（操作按钮可见），首页不受影响。 */@media(max-width:1240px){.topbar:has(#reader-actions:not([hidden])){flex-wrap:wrap;row-gap:8px}.topbar:has(#reader-actions:not([hidden])) .search{flex:1 1 100%;max-width:none;margin:0 118px 0 0}.topbar:has(#reader-actions:not([hidden])) .reader-tools{margin:0;max-width:100%;overflow-x:auto;justify-content:flex-start}}/* 文章页移动端首屏收口（2026-09-23 排版审计）：工具按钮从两列 grid
+.relation-edge.incoming{stroke:var(--color-faint)}.relation-node{cursor:pointer}.relation-node rect{fill:var(--color-panel);stroke:var(--color-line);stroke-width:1.2}.relation-node.current rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.5}.relation-node:hover rect,.relation-node:focus rect{fill:var(--color-accent-soft);stroke:var(--color-accent);stroke-width:1.8}.relation-node .relation-node-title{fill:var(--color-ink);font-size:var(--text-sm);font-weight:700}.relation-node .relation-node-meta{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:600}.relation-node.current .relation-node-meta{fill:var(--color-accent)}.relation-label{fill:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.04em}.article-relations.collapsed .relation-graph{display:none}.article-relations.collapsed{padding-bottom:10px}/* 窄桌面（≤1240px）文章视图：顶栏一行装不下「搜索框+四枚操作按钮+语言+主题」，搜索框 flex-shrink 无下限被压到 36px 只剩 ⌘K 片悬着（1024 实测 input 52px）。改为整行换行：搜索独占第一行，按钮与语言、主题落第二行；换行态搜索行右侧预留 118px 给固定定位的中文/主题控件（882-1002px 实测压在通栏搜索条上）。:has 限定文章视图（操作按钮可见），首页不受影响。 */@media(max-width:1240px){.topbar:has(#reader-actions:not([hidden])){flex-wrap:wrap;row-gap:8px}.topbar:has(#reader-actions:not([hidden])) .search{flex:1 1 320px;max-width:460px;margin:0 118px 0 0}.topbar:has(#reader-actions:not([hidden])) .reader-tools{margin:0;max-width:100%;overflow-x:auto;justify-content:flex-start}/* 2026-09-25 修压盖：换行态搜索框 flex:1 1 100% 独占整行，翻页标题 absolute 叠在通栏搜索条上（900-1100 实测标题右缘压进搜索框 144-344px）。换行态顶栏第一行是搜索的专用行，正文 H1 常驻可读，顶栏标题在此断点不显示。 */.topbar:has(#reader-actions:not([hidden])) .topbar-title{display:none!important}}/* 文章页移动端首屏收口（2026-09-23 排版审计）：工具按钮从两列 grid
    改为单行横滑——原 183px 的 topbar 里按钮独占 69px 第二行。
    阅读工具（返回/下载/已读/学习）是低频操作，一行滑过即可，
    不值得在每一屏的顶部占一整行。 */
-@media(max-width:760px){.topbar{flex-wrap:wrap}.topbar .search{order:1;max-width:none;flex:1 0 100%}.topbar .reader-tools{order:2;width:100%;display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}.topbar .reader-tools::-webkit-scrollbar{height:var(--space-1)}.topbar .reader-back,.topbar .reader-study,.topbar .reader-tool{flex:none;text-align:center;white-space:nowrap}.relation-graph{height:390px}.article-relations-heading{align-items:flex-start;flex-direction:column;gap:1px}}
+@media(max-width:760px){.topbar{flex-wrap:wrap}.topbar .search{order:1;max-width:460px;flex:1 1 320px}.topbar .reader-tools{order:2;width:100%;display:flex;flex-wrap:nowrap;justify-content:flex-start;gap:8px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:thin}.topbar .reader-tools::-webkit-scrollbar{height:var(--space-1)}.topbar .reader-back,.topbar .reader-study,.topbar .reader-tool{flex:none;text-align:center;white-space:nowrap}.relation-graph{height:390px}.article-relations-heading{align-items:flex-start;flex-direction:column;gap:1px}}
 .topbar .theme-toggle{width:auto;min-width:36px;height:36px;margin:0;padding:0 12px;border:1px solid var(--color-line);border-radius:6px;background:var(--color-panel);color:var(--color-muted);font-size:var(--text-lg);cursor:pointer;flex-shrink:0}.topbar .theme-toggle:hover{border-color:var(--color-accent);color:var(--color-accent);background:var(--color-accent-soft)}
 .radar-badge{position:relative;border:2px solid var(--color-warm);background:linear-gradient(135deg,var(--color-warm-soft) 0%,rgba(250,243,232,.3) 100%);border-radius:7px;padding:9px 11px;margin:8px 8px 4px;cursor:pointer;transition:all var(--duration-fast) var(--ease-out);box-shadow:0 2px 8px rgba(168,95,45,.15)}
 .radar-badge:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(168,95,45,.25);border-color:var(--color-warm)}
@@ -1499,7 +1564,7 @@ body.tk-host .reader-sources a:hover,body.tk-host .reader-sources a:focus-visibl
 <a class="skip-link" href="#reader-body">跳到正文</a>
 <div class="app">
 <aside class="tk-sidebar" id="tk-sidebar"></aside>
-<main class="main"><header class="topbar"><!-- 搜索框：结构=base.css .tk-search 规范（皮肤唯一真源）+ 本地放置类 .search（flex-basis 480→620 伸长）。皮肤规则零本地。input 必须带 type="search"：皮肤选择器是 .tk-search input[type="search"]，缺了它整套皮肤失效（rt12 修复：曾因漏写导致 input 以浏览器默认样式裸奔 183px、图标与 ⌘K 悬空）。 --><label class="tk-search search"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span><input type="search" id="search" placeholder="输入即筛选 · 回车搜索" autocomplete="off"><kbd class="tk-search-kbd" id="search-kbd">⌘K</kbd></label><span id="topbar-title" class="topbar-title" hidden></span><div class="reader-tools" id="reader-actions" hidden><button id="reader-outline-trigger" class="reader-tool" type="button" aria-haspopup="dialog" aria-controls="reader-outline" aria-expanded="false" hidden>本文目录</button><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><button id="reader-download" class="reader-tool" type="button" title="下载这篇的 Markdown 原文">下载 .md</button><button id="reader-learned" class="reader-tool reader-learned" type="button" aria-pressed="false" title="标记这篇为已读（只保存在本浏览器）">✓ 标记已学</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div><button id="to-top" class="to-top" type="button" aria-label="回到顶部" title="回到顶部">↑</button>
+<main class="main"><header class="topbar"><!-- 搜索框：结构=base.css .tk-search 规范（皮肤唯一真源）+ 本地放置类 .search（flex-basis 480→620 伸长）。皮肤规则零本地。input 必须带 type="search"：皮肤选择器是 .tk-search input[type="search"]，缺了它整套皮肤失效（rt12 修复：曾因漏写导致 input 以浏览器默认样式裸奔 183px、图标与 ⌘K 悬空）。 --><label class="tk-search search"><span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span><input type="search" id="search" placeholder="输入即筛选 · 回车搜索" autocomplete="off"><kbd class="tk-search-kbd" id="search-kbd">⌘K</kbd></label><span id="topbar-title" class="topbar-title" hidden></span><div class="reader-tools" id="reader-actions" hidden><button id="reader-outline-trigger" class="reader-tool" type="button" aria-haspopup="dialog" aria-controls="reader-outline" aria-expanded="false" hidden>本文目录</button><button id="reader-back" class="reader-back" type="button" title="返回当前领域或搜索结果">← 返回目录</button><button id="reader-download" class="reader-tool" type="button" title="下载这篇的 Markdown 原文">下载 .md</button><button id="reader-learned" class="reader-tool reader-learned" type="button" aria-pressed="false" title="标记这篇为已读（只保存在本浏览器）">✓ 标记已学</button><a id="reader-study" class="reader-study" href="/learn" target="_blank" rel="noopener noreferrer" data-tooltip="进入学习中心：课堂用于建立直觉，导师用于追问与迁移；只会预填主题，不会自动调用模型" hidden>用这个主题学习</a></div></header><div id="app-alert" class="app-alert" role="status" aria-live="polite"></div><div id="reader-fabs" class="reader-fabs" hidden><button id="reader-fab-like" class="reader-fab" type="button" aria-pressed="false" title="这篇有用，记一笔（只保存在本浏览器）" aria-label="这篇有用">👍</button><button id="reader-fab-feedback" class="reader-fab" type="button" title="对这篇提意见" aria-label="对这篇提意见">💬</button></div><button id="to-top" class="to-top" type="button" aria-label="回到顶部" title="回到顶部">↑</button>
 <dialog id="reader-outline" class="reader-outline" aria-labelledby="reader-outline-title"><header class="reader-outline-head"><h2 id="reader-outline-title">本文目录</h2><button type="button" id="reader-outline-close" autofocus>关闭</button></header><nav aria-label="本文章节"><ul id="reader-outline-list"></ul></nav></dialog>
 <div id="reader-loading" class="reader-loading" hidden><span id="reader-loading-message" role="status"></span><button type="button" id="reader-load-cancel">取消加载</button></div>
 <div class="progress-bar" id="progress-bar" aria-hidden="true"></div>
@@ -1592,7 +1657,7 @@ function show(view,requestId=null){
      记录。同 load 内反复切回同一视图去重。 */
   if(view!=='reader'&&viewVisitKey!=='view:'+view){viewVisitKey='view:'+view;TKShell.visit({path:'view:'+view,title:VIEW_TITLES[view]||view,name:(feedbackUi&&feedbackUi.name())||'',screen:`${screen.width}x${screen.height}`})}$('#home').style.display=view==='home'?'block':'none';/* 显示时不写死 display：宽屏下目录页是两列 grid（右侧留出「本页主题」
    目录），写死 block 会用内联样式盖掉 CSS 的 grid。这里只负责隐藏。 */
-$('#directory').style.display=view==='directory'?'':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';updateReaderStudy();updateSharedNav(view);retranslate()}
+$('#directory').style.display=view==='directory'?'':'none';$('#reader').classList.toggle('open',view==='reader');$('#graph-view').classList.toggle('open',view==='graph');const panv=$('#panorama-view');if(panv)panv.classList.toggle('open',view==='panorama');$('#reader-actions').hidden=view!=='reader';document.body.classList.toggle('tk-reading',view==='reader');if(typeof updateReaderFabs==='function')updateReaderFabs();updateReaderStudy();updateSharedNav(view);retranslate()}
 /* 复查到期日的排序键：只认 YYYY-MM-DD，其它取值（模板占位串、写错的日期、空值）
    统一按「没有日期」处理，排在有日期的后面。目录排序与剩余天数两处共用同一判据。 */
 const ISO_DAY=/^\d{4}-\d{2}-\d{2}$/;
@@ -1731,7 +1796,7 @@ function enhanceDomains(){
       const radarBlock=radars.length?`<div class="tk-radar-pin">${radars.map(n=>`<button type="button" class="radar-card" data-path="${esc(n.path)}" title="${esc(n.title)}（每周更新的时效内容）"><span class="radar-icon" aria-hidden="true">⚡</span><span class="radar-text"><strong>${esc(n.title)}</strong><small>每周更新</small></span></button>`).join('')}</div>`:'';
       const subEl=document.createElement('div');
       subEl.className='tk-subtopics';
-      subEl.innerHTML=`<a class="tk-subtopic tk-subtopic--all" href="/?domain=${encodeURIComponent(name)}">${(window.TKI18N&&window.TKI18N.lang==='en')?('All ('+inDomain.length+')'):('全部 '+inDomain.length+' 篇')}</a>`
+      subEl.innerHTML=`<a class="tk-subtopic tk-subtopic--all" href="/?domain=${encodeURIComponent(name)}"><span>${(window.TKI18N&&window.TKI18N.lang==='en')?'All':'全部'}</span><span class="count">${inDomain.length}</span></a>`
         +radarBlock
         +topics.map(t=>`<a class="tk-subtopic" href="/?domain=${encodeURIComponent(name)}&topic=${encodeURIComponent(t)}"><span>${esc(t)}</span><span class="count">${inDomain.filter(n=>n.topic===t).length}</span></a>`).join('')
         +(archived?`<a class="tk-subtopic" href="/?domain=${encodeURIComponent(name)}&topic=${encodeURIComponent('归档')}"><span>归档</span><span class="count">${archived}</span></a>`:'');
@@ -2836,12 +2901,19 @@ function renderReaderRails(note){
   const prevNote=idx>0?modulePeers[idx-1]:null;
   const nextNote=idx>=0&&idx<modulePeers.length-1?modulePeers[idx+1]:null;
   /* 每次渲染重置折叠态：容器 class 不随 innerHTML 重建，不重置的话
-     上一篇手动展开过、下一篇就带着展开态进来（状态跨文章泄漏）。 */
-  siblings.classList.add('collapsed');
+     上一篇手动折叠过、下一篇就带着折叠态进来（状态跨文章泄漏）。
+     默认展开（2026-09-25）：「同模块文章」与「本文目录」是右栏两块各自独立的
+     折叠区，读者进来先看得到能横移到哪一篇，需要清静时再各自收起——此前默认
+     折叠，等于把一篇里最有用的横向入口藏了起来。 */
+  siblings.classList.remove('collapsed');
   /* 同模块从正文后移到右栏（目录下方）：右栏本来只有目录，下方留白；
      模块文章少时胶囊一排平铺不占正文宽度。窄屏（≤1199px）右栏整体
      隐藏，此时回退为正文后的横向胶囊（CSS media query 控制显示）。 */
-  siblings.innerHTML=railHead('同模块文章',modulePeers.length>1,false)+'<ul class="rail-list">'+modulePeers.map(x=>`<li><a href="/?path=${encodeURIComponent(x.path)}" data-note="${esc(x.path)}"${x.path===note.path?' aria-current="page"':''}>${esc(x.title)}</a></li>`).join('')+'</ul>';
+  /* 掘金相关推荐（2026-09-25 学习）：每条是「标题+阅读·点赞」双行结构，主信息
+     标题、次信息数字，读者扫一眼就知道每篇多大体量。本站对应物是同模块文章
+     列表，次信息用字数（数据源 modulePeers[i].words，与 meta 行同一 fmtWords
+     全站口径），宽度窄不换行省略，不与标题抢视觉。 */
+  siblings.innerHTML=railHead('同模块文章',modulePeers.length>1,true) /* 默认展开，与下方 remove('collapsed') 一致 */+'<ul class="rail-list">'+modulePeers.map(x=>`<li><a href="/?path=${encodeURIComponent(x.path)}" data-note="${esc(x.path)}" title="${esc(x.title)}"${x.path===note.path?' aria-current="page"':''}><span class="sib-title">${esc(x.title)}</span><span class="sib-meta">${TKShell.fmtWords(x.words)}</span></a></li>`).join('')+'</ul>';
   siblings.querySelectorAll('a[data-note]').forEach(a=>a.onclick=openReaderLink);
   renderReaderPager(note,modulePeers,prevNote,nextNote);
   renderReaderReward(note);
@@ -2853,7 +2925,7 @@ function renderReaderRails(note){
      既占位又没有动作，比没有更糟（待核验内容这类短文实测）。 */
   toc.hidden=heads.length===0;
   renderReaderOutline(heads);
-  toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}">${esc(h.textContent)}</a></li>`).join('')+'</ul>';
+  toc.innerHTML=railHead('本文目录',heads.length>0)+'<ul class="rail-list toc-list">'+heads.map(h=>`<li><a href="#${h.id}" data-level="${h.tagName[1]}" title="${esc(h.textContent)}">${esc(h.textContent)}</a></li>`).join('')+'</ul>';
   /* 目录跳转后焦点随迁到目标标题（tabindex=-1 仅在缺省时补），键盘用户按 Tab 从正文继续，不再弹回目录区。 */
   toc.querySelectorAll('a[href^="#"]').forEach(a=>a.onclick=e=>{if(e.ctrlKey||e.metaKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateReaderHeading(a.getAttribute('href').slice(1),true)});
   let frame=0,stopped=false,endScroll=-1;
@@ -2900,7 +2972,7 @@ function renderReaderRails(note){
        pointer-events:none 退化为纯指示器，行点击统一走 head；键盘仍走钮（可聚焦）。 */
     const head=rail.querySelector('.rail-head');
     const btn=rail.querySelector('.rail-toggle');
-    const flip=()=>{const c=rail.classList.toggle('collapsed');if(btn){btn.setAttribute('aria-expanded',String(!c));btn.textContent=c?'▸':'▾'}syncRailToggleLabels()};
+    const flip=()=>{const c=rail.classList.toggle('collapsed');if(btn){btn.setAttribute('aria-expanded',String(!c));const _en=window.TKI18N&&window.TKI18N.lang==='en';btn.textContent=_en?(c?'Show \u25b8':'Hide \u25be'):(c?'\u5c55\u5f00 \u25b8':'\u6536\u8d77 \u25be')}syncRailToggleLabels()};
     if(btn)btn.onclick=e=>{e.stopPropagation();flip()};
     if(head)head.onclick=e=>{if(e.target.closest('a,button'))return;flip()};
   });
@@ -2997,9 +3069,9 @@ function maybeShowReaderReward(){
 function railHead(label,hasItems,openByDefault=true){
   /* 阅读页顶部两个信息块默认态不同，各有理由：
    *   知识图谱——默认**展开**：它是读者第一想看的"这篇和谁有关"，有入链/延伸
-   *   同模块  ——默认**折叠**：只是同主题兄弟篇，占版面但信息量低，想看再点开
-   * （用户实测反馈：原来两个反了。） */
-  const chevron=openByDefault?'▾':'▸';
+   *   同模块  ——2026-09-25 改为默认**展开**：它是读者横移到下一篇的入口，藏起来
+   *   等于把最有用的东西收进抽屉；两块各自独立折叠，需要清静时再各自收起。 */
+  const chevron=null; /* 真实文字在下方按语言分支拼，见 chevronLabel */
   const state_=String(openByDefault);
   /* aria-label 必须整串按语言分支拼装：${act}${label} 这类组合串在词典里
      永远整串不命中（词典只有"同模块""本文目录"独立词条），EN 态读屏会
@@ -3007,7 +3079,10 @@ function railHead(label,hasItems,openByDefault=true){
   const en=window.TKI18N&&window.TKI18N.lang==='en';
   const tr=window.TKI18N?window.TKI18N.t:(s)=>s;
   const aria=en?`${openByDefault?'Collapse':'Expand'} ${tr(label)}`:`${openByDefault?'折叠':'展开'}${label}`;
-  return `<p class="rail-head"><span>${label}</span>${hasItems?`<button type="button" class="rail-toggle" aria-expanded="${state_}" aria-label="${aria}">${chevron}</button>`:''}</p>`;
+  /* 掘金式：标题右侧写「收起/展开」文字而不是只放一个箭头——实测只放箭头时
+     读者看不出这两块各自可下滑，会以为是合并的一整块。 */
+  const chevronLabel=en?(openByDefault?'Hide ▾':'Show ▸'):(openByDefault?'收起 ▾':'展开 ▸');
+  return `<p class="rail-head"><span>${label}</span>${hasItems?`<button type="button" class="rail-toggle" aria-expanded="${state_}" aria-label="${aria}">${chevronLabel}</button>`:''}</p>`;
 }
 function readerText(zh,en){return window.TKI18N&&window.TKI18N.lang==='en'?en:zh}
 async function copyReaderText(button,status,source){
@@ -3069,12 +3144,106 @@ readerOutlineWide.addEventListener('change',event=>{
   const dialog=$('#reader-outline');
   if(event.matches&&dialog.open){dialog.close();$('#reader-toc .rail-toggle')?.focus()}
 });
+/* 点正文图片就地放大：铺满视口显示原图，Esc / 点背景 / 关闭按钮都能退出。
+   打开期间锁住页面滚动，关闭后把焦点还给那张图——键盘用户不会丢位置。 */
+function openImageLightbox(image){
+  if(document.getElementById('img-lightbox'))return;
+  const box=document.createElement('div');
+  box.id='img-lightbox';box.className='img-lightbox';box.setAttribute('role','dialog');
+  box.setAttribute('aria-modal','true');
+  const label=image.alt||'图片';
+  box.setAttribute('aria-label',label);
+  const big=document.createElement('img');
+  big.src=image.currentSrc||image.src;big.alt=image.alt||'';
+  const close=document.createElement('button');
+  close.type='button';close.className='img-lightbox-close';close.textContent='关闭';
+  const scrollY=window.scrollY;
+  const previous=document.activeElement;
+  const dismiss=()=>{
+    document.removeEventListener('keydown',onKey);
+    box.remove();
+    document.body.style.overflow='';
+    window.scrollTo(0,scrollY);
+    if(previous&&previous.isConnected)previous.focus({preventScroll:true});
+  };
+  const onKey=event=>{
+    if(event.key==='Escape'){event.preventDefault();dismiss()}
+    /* 放大层里只有关闭按钮一个可聚焦元素，Tab 不该跑到背后的页面上 */
+    else if(event.key==='Tab'){event.preventDefault();close.focus()}
+  };
+  close.addEventListener('click',dismiss);
+  box.addEventListener('click',event=>{if(event.target===box)dismiss()});
+  box.append(close,big);
+  document.body.append(box);
+  document.body.style.overflow='hidden';
+  document.addEventListener('keydown',onKey);
+  close.focus({preventScroll:true});
+}
+/* Mermaid 图点开就地放大。位图已经有这个能力，图没有——244 篇文章的机制图都是
+   Mermaid，尤其窄屏上宽图被压到 0.7 缩放后仍要横滑看全，这里给一条不离开页面
+   的放大路径。关闭行为与位图一致（Esc / 点背景 / 关闭按钮），焦点归还到原图。 */
+function openSvgLightbox(svg){
+  if(document.getElementById('img-lightbox'))return;
+  const vb=(svg.getAttribute('viewBox')||'').trim().split(/[\s,]+/).map(Number);
+  const clone=svg.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.removeAttribute('style');
+  /* 按自然尺寸渲染会闹笑话：正文里 svg 是按容器宽度铺满的（实测 706x787），
+     放大层若用自然尺寸（553 宽）反而更小。矢量图放大不失真，所以这里直接
+     按视口可用区域等比放大到最大——窄屏宽图的收益最明显。 */
+  if(vb.length>=4&&vb[2]>0&&vb[3]>0){
+    const availW=Math.round(window.innerWidth*0.96), availH=Math.round(window.innerHeight*0.92);
+    /* 底线：不得小于正文里的显示尺寸。竖屏看纵向图时宽度已被正文占满，
+       fit 会算出比正文更小的尺寸，点开反而变小——这种负向体验要挡掉。 */
+    const shown=svg.getBoundingClientRect().width;
+    const floor=shown>0?shown/vb[2]:0;
+    const scale=Math.max(Math.min(availW/vb[2],availH/vb[3]),floor);
+    clone.setAttribute('width',Math.round(vb[2]*scale));
+    clone.setAttribute('height',Math.round(vb[3]*scale));
+  }
+  const holder=document.createElement('div');
+  holder.className='img-lightbox-svg';
+  holder.append(clone);
+  const box=document.createElement('div');
+  box.id='img-lightbox';box.className='img-lightbox';box.setAttribute('role','dialog');
+  box.setAttribute('aria-modal','true');
+  box.setAttribute('aria-label',svg.getAttribute('aria-label')||'图表');
+  const close=document.createElement('button');
+  close.type='button';close.className='img-lightbox-close';close.textContent='关闭';
+  const scrollY=window.scrollY;
+  const previous=document.activeElement;
+  const dismiss=()=>{
+    document.removeEventListener('keydown',onKey);
+    box.remove();
+    document.body.style.overflow='';
+    window.scrollTo(0,scrollY);
+    if(previous&&previous.isConnected)previous.focus({preventScroll:true});
+  };
+  const onKey=event=>{
+    if(event.key==='Escape'){event.preventDefault();dismiss()}
+    else if(event.key==='Tab'){event.preventDefault();close.focus()}
+  };
+  close.addEventListener('click',dismiss);
+  box.addEventListener('click',event=>{if(event.target===box)dismiss()});
+  box.append(close,holder);
+  document.body.append(box);
+  document.body.style.overflow='hidden';
+  document.addEventListener('keydown',onKey);
+  close.focus({preventScroll:true});
+}
 function enhanceReaderImages(body){
   body.querySelectorAll('img').forEach((image,index)=>{
     if(image.closest('.reader-image')){image.dispatchEvent(new Event('reader-language'));return}
     const source=image.getAttribute('src');
     const url=new URL(source,location.href);
     if(!['http:','https:'].includes(url.protocol))return;
+    /* 首屏之外的图等滚动到再取：长文可能十几张图，列表页（优质好文）一次
+       上百张，全部即时加载会把首屏带宽吃光。首图仍即时加载——它是读者
+       进来的第一印象，不能等。decoding=async 让解码不挡住主线程。 */
+    if(index>0){image.setAttribute('loading','lazy');image.setAttribute('decoding','async');}
+    /* 渲染器给所有图都打了 lazy，这里把首图改回 eager——它是首屏内容，
+       等滚动触发加载反而会看到空白框。 */
+    else{image.setAttribute('loading','eager');}
     const frame=document.createElement('span');frame.className='reader-image';frame.dataset.state='loading';
     const tools=document.createElement('span');tools.className='reader-image-tools';
     const status=document.createElement('span');status.className='reader-image-status';status.setAttribute('role','status');
@@ -3097,6 +3266,9 @@ function enhanceReaderImages(body){
     const caption=holder&&holder.nextElementSibling;
     if(caption&&caption.tagName==='P'&&/^\s*图源/.test(caption.textContent))caption.classList.add('reader-figure-caption');
     image.addEventListener('reader-language',update);
+    /* 点图放大：见 openImageLightbox。工具条上的「查看原图」保留（新标签打开原始文件，
+       便于另存），这里多给一条不离开页面的路径。 */
+    image.addEventListener('click',()=>openImageLightbox(image));
     image.addEventListener('load',()=>{
       const restore=document.activeElement===retry;
       frame.dataset.state='ready';delete frame.dataset.retrying;update();
@@ -3109,6 +3281,22 @@ function enhanceReaderImages(body){
       original.focus({preventScroll:true});
     };
     if(image.complete)frame.dataset.state=image.naturalWidth>0?'ready':'error';
+    /* 位图放大只会变模糊：图源本身小于容器时按原始宽度显示，不再拉满。
+       SVG 是矢量，放大不损失清晰度，仍然拉满容器。 */
+    const capUpscale=()=>{
+      if(!image.naturalWidth)return;
+      const isVector=/\.svg(\?|#|$)/i.test(source);
+      if(isVector)return;
+      /* 只写「不放大小图」这一条约束，不能把 max-width 定成原图宽度：
+         内联样式盖过 CSS 的 max-width:100%，宽图（如 1280x956）就按 1280
+         铺开，冲出 740px 的正文栏（2026-09-25 实测 1017x760 溢出）。
+         所以取「原图宽」与「所在栏宽」中更小的那个。 */
+      const holder=image.parentElement;
+      const avail=holder?holder.clientWidth:0;
+      image.style.maxWidth=(avail>0?Math.min(image.naturalWidth,avail):image.naturalWidth)+'px';
+    };
+    image.addEventListener('load',capUpscale);
+    if(image.complete)capUpscale();
     update();
   });
 }
@@ -3197,6 +3385,38 @@ function updateReaderLearned(){
   btn.textContent=on?readerText('已读','Read'):readerText('标记已读','Mark as read');
 }
 function bindReaderLearned(){const btn=$('#reader-learned');if(!btn)return;btn.onclick=()=>{if(!state.selected)return;TKShell.progress.toggle(state.selected,'learned');updateReaderLearned()}}
+/* 阅读浮层按钮组（掘金左下角互动浮层的本站版）：点赞=「这篇有用」按篇
+   记在本浏览器（localStorage key 带路径），反馈=打开站内反馈面板。
+   只在文章视图出现；文章切换时状态随之刷新。 */
+function readerFabLikes(){
+  try{return JSON.parse(localStorage.getItem('tk-reader-likes')||'{}')}catch(e){return{}}
+}
+function updateReaderFabs(){
+  const wrap=$('#reader-fabs');if(!wrap)return;
+  wrap.hidden=state.view!=='reader';
+  if(state.view!=='reader')return;
+  const like=$('#reader-fab-like');
+  const on=Boolean(state.selected)&&Boolean(readerFabLikes()[state.selected]);
+  like.classList.toggle('on',on);
+  like.setAttribute('aria-pressed',String(on));
+}
+function bindReaderFabs(){
+  const like=$('#reader-fab-like'),fb=$('#reader-fab-feedback');
+  if(!like||!fb)return;
+  like.onclick=()=>{
+    if(!state.selected)return;
+    const all=readerFabLikes();
+    if(all[state.selected])delete all[state.selected];else all[state.selected]=Date.now();
+    localStorage.setItem('tk-reader-likes',JSON.stringify(all));
+    updateReaderFabs();
+  };
+  fb.onclick=()=>{
+    const shellFab=document.querySelector('.tk-fab');
+    if(shellFab)shellFab.click();
+    else location.href='/insights#feedback';
+  };
+}
+window.addEventListener('tk:view',updateReaderFabs);
 let readerRequestId=0;
 let readerPendingPath=null;
 function setReaderLoading(path){
@@ -3238,6 +3458,13 @@ async function openNote(path,push=true){
     const stale=n.review_after&&n.review_after<today;
     const verifiedAt=n.review_at||n.updated||'';
     const clipBits=n.clip?[n.clip.author||'',n.clip.published||'',(n.clip.kind==='video'?(en?'video':'视频'):'')].filter(Boolean).map(v=>esc(v)):[];
+    /* 掘金文章页 meta 行（2026-09-25 学习）：信息行下方是可点的标签胶囊。
+       本站 meta 由「作者 · 日期 · 字数 · 阅读时长 · 核验」构成，胶囊行单独
+       成行挂在 meta 后：域胶囊走 select(domain)（目录页域筛选），主题胶囊
+       走 select(domain,topic)。锚元素而非按钮：它表达的是跳转。 */
+    const chipHtml=[n.category&&n.category!=='总览'?`<button type="button" class="meta-chip" data-jump="domain" data-domain="${esc(n.category)}">${esc(n.category)}</button>`:'',n.topic&&n.topic!=='首页'?`<button type="button" class="meta-chip" data-jump="topic" data-domain="${esc(n.category)}" data-topic="${esc(n.topic)}">${esc(n.topic)}</button>`:''].filter(Boolean).join('');
+    if(chipHtml)$('#reader-meta').insertAdjacentHTML('afterend','<p class="reader-chips" id="reader-chips">'+chipHtml+'</p>');
+    else{const old=$('#reader-chips');if(old)old.remove()}
     $('#reader-meta').innerHTML=[...clipBits,TKShell.fmtWords(n.words),n.words?(en?('about '+Math.max(1,Math.round(n.words/400))+' min'):('约 '+Math.max(1,Math.round(n.words/400))+' 分钟')):'',verifiedAt?((en?'verified ':'核验于 ')+verifiedAt):'',n.review_after?((en?'next review ':'下次复查 ')+n.review_after):''].filter(Boolean).join(' · ')+(stale?('<span class="stale-badge" title="'+(en?'Review date passed; verify currency of facts':'复查日期已过，数字与结论请自行核对时效')+'">'+(en?'Review due':'需复查')+'</span>'):'');
     $('#reader-sources').innerHTML=renderSources(n.sources,n.papers)+(n.clip?renderClipSource(n.clip):'');
     const srcMobile=$('#reader-sources-mobile');
@@ -3246,6 +3473,7 @@ async function openNote(path,push=true){
     $('#reader-body').innerHTML=n.html;
     enhanceReaderContent();syncNavToNote(n);
     document.querySelectorAll('#reader-body a[data-note]').forEach(a=>a.onclick=openReaderLink);
+    document.querySelectorAll('#reader-chips .meta-chip').forEach(c=>c.onclick=()=>{clearSearch();select(c.dataset.domain,c.dataset.jump==='topic'?c.dataset.topic:'all')});
     const renderedMermaid=window.renderMermaid?window.renderMermaid():Promise.resolve();
     renderReaderRails(n);reportVisit();
     if(bindProgress.update)bindProgress.update();
@@ -4269,8 +4497,11 @@ function bindTopbarAutoHide(){
   const update=()=>{
     const y=Math.max(0,window.scrollY);
     // 4px 死区：触屏惯性滚动会持续产生微小位移，没有死区会疯狂开合
-    if(y>last+4&&y>120&&!condensed){condensed=true;bar.classList.add('is-condensed')}
-    else if(y<last-4&&condensed){condensed=false;bar.classList.remove('is-condensed')}
+    if(y>last+4&&y>120&&!condensed){condensed=true;bar.classList.add('is-condensed');fitTopbar()}
+    /* 回到顶部才解除翻页态（2026-09-25 用户预期：往上滚时搜索框不该中途
+       跳出来，应拉到最上面才出现）。中途上滑仍保持精简顶栏——标题与
+       翻页信息常驻，回顶后完整顶栏（大标题、搜索框）一次性回归。 */
+    else if(y<=2&&condensed){condensed=false;bar.classList.remove('is-condensed')}
     last=y;
     // 回到顶部：只在滚过一屏后出现，点击走平滑滚动但尊重 reduce 设置
     if(toTop){
@@ -4283,10 +4514,81 @@ function bindTopbarAutoHide(){
       const label=(a&&a.title)||viewLabel(state.view)||'';
       // 可见性交给 .is-condensed 的 CSS（opacity/transform），用 hidden 会跳过过渡
       titleEl.hidden=false;
-      if(condensed&&titleEl.textContent!==label)titleEl.textContent=label;
+      if(condensed&&titleEl.textContent!==label){titleEl.textContent=label;bar._tkFitKey=null}
+      if(condensed)fitTopbar(label);
     }
   };
   window.addEventListener('scroll',update,{passive:true});
+  window.addEventListener('resize',()=>{if(condensed)fitTopbar()},{passive:true});
+  /* 文字优先的动态折叠：先量标题自然宽度，再决定搜索框让多少。
+     主站结构：搜索框在顶栏 flex 行内（无 slot），标题 absolute 左侧。
+     四级让位：420 → 170 → 96（只剩图标+⌘K）→ 0（整框收起），
+     全都放不下才靠 right 约束截断成省略号。变量挂在 bar 上，
+     base.css 用同名 var 取值。
+     同步一次成型（2026-09-25 二改）：搜索框靠 margin-left:auto 顶在
+     reader-tools 左侧，宽度变化只移动左缘、右缘位置不变，任意时刻实测
+     的右缘都是同一布局常数，无需先回到 420 基准再等两帧过渡。旧版两阶段
+     测量在滚动事件密集时反复整段重跑：每个事件先把搜索框闪回 420、标题
+     右界停留在上一轮旧值，静止前最后一个事件又从 420 起步——实测表现为
+     搜索框来回变宽变窄（闪烁）、标题在旧右界下截出省略号。现在一次算出
+     让位级与标题右界并同步写入，同一帧生效；标签、顶栏宽、搜索框右缘
+     都没变时直接跳过，滚动事件里不再重复量宽写样式。 */
+  function fitTopbar(label){
+    const search=bar.querySelector('.search');
+    label=label||(titleEl?titleEl.textContent||'':'');
+    if(!search||!label)return;
+    const br=bar.getBoundingClientRect();
+    /* 搜索框右缘的实测常数：主站搜索框 flex 行内靠 margin-left:auto 顶到
+       中段右端，右端顶到 reader-tools 的左缘（文章视图）或顶栏右缘
+       （无工具视图）。宽度变化只动左缘，右缘任意时刻实测值相同，
+       无需基准测量。文章视图让位预算被工具按钮行占掉一块
+       （1440 实测 495px），放不下长标题时搜索框收 0 也正常——
+       按钮行才是右端的实际约束。 */
+    const searchRight=search.getBoundingClientRect().right-br.left;
+    const fitKey=label+'|'+Math.round(br.width)+'|'+Math.round(searchRight);
+    if(bar._tkFitKey===fitKey)return;
+    const cs=getComputedStyle(titleEl||document.body);
+    const probe=document.createElement('span');
+    probe.style.cssText='position:absolute;visibility:hidden;white-space:nowrap;left:-9999px;top:0;'
+      +'font:'+cs.fontWeight+' '+cs.fontSize+' '+cs.fontFamily+';letter-spacing:'+cs.letterSpacing;
+    probe.textContent=label;
+    document.body.appendChild(probe);
+    const natural=probe.getBoundingClientRect().width;
+    probe.remove();
+    const gap=24,leftPad=30;
+    const levels=[420,170,96,0];
+    let w=levels[levels.length-1];
+    for(const lv of levels){
+      if(natural<=searchRight-lv-leftPad-gap){w=lv;break}
+    }
+    /* 文章视图的搜索框右缘顶在 reader-tools 按钮行左侧（按钮 flex:none
+       占约 500px），四级让位只把搜索框收到 0，标题在按钮行左侧仍可能
+       放不下。此时标题右界越过搜索框左缘——搜索框已是 0 宽不占位，
+       这段宽度本来就是标题可用的。右界取「按钮左缘-gap」与
+       「左界+自然宽」中较小者：优先把标题完整放下，真放不下时
+       顶到按钮区边界为止，绝不盖住按钮。无工具视图 searchRight
+       即顶栏右缘，四级判定的第一个出口就会命中，这个分支不进。 */
+    if(natural>searchRight-leftPad-gap){
+      const toolsEl=document.getElementById('reader-actions');
+      const hardMax=toolsEl&&!toolsEl.hidden
+        ?br.width-(toolsEl.getBoundingClientRect().left-br.left)+gap
+        :br.width-(searchRight-gap);
+      const wantRight=leftPad+natural;
+      /* 标题右界越过搜索框左缘：搜索框让到底仍不够，收成 0 宽不再占位，
+         整段中段宽度都归标题，右界直接按按钮区边界与自然宽取小。 */
+      bar.style.setProperty('--tk-search-w','0px');
+      bar.style.setProperty('--tk-title-right',Math.max(leftPad,Math.min(hardMax,wantRight))+'px');
+      bar._tkFitKey=fitKey;
+      return;
+    }
+    bar.style.setProperty('--tk-search-w',w?w+'px':'0px');
+    /* 标题右界（顶栏坐标系）= 顶栏宽 - 搜索框右缘 + 让位级 + gap。
+       标题与搜索框之间隔着 reader-tools 按钮行（工具按钮 flex:none
+       夹在中段），标题右界不能顶进按钮区，让位算到哪一级、
+       右界就停在哪一级。 */
+    bar.style.setProperty('--tk-title-right',Math.max(leftPad,br.width-searchRight+w+gap)+'px');
+  }
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(bar.classList.contains('is-condensed'))fitTopbar()});
   if(toTop)toTop.addEventListener('click',()=>{
     const ok=!matchMedia('(prefers-reduced-motion: reduce)').matches;
     window.scrollTo({top:0,behavior:ok?'smooth':'auto'});
@@ -4399,7 +4701,7 @@ async function initialize(){
      所以「手机上先收起」必须在它之后设置，否则收起状态会被这次重建抹掉 ——
      现象就是手机首屏被 390px 高的域树占满，而折叠按钮看起来没反应。 */
   bindGraph();bindKeyboard();bindFeedback();bindProgress();bindTopbarAutoHide();bindReaderTools();renderSharedNav();bindNavigation();
-  bindReaderLearned();document.addEventListener('tk:progress-changed',()=>{if(state.view==='progress')renderProgress();updateReaderStudy();updateReaderLearned();});
+  bindReaderLearned();bindReaderFabs();updateReaderFabs();document.addEventListener('tk:progress-changed',()=>{if(state.view==='progress')renderProgress();updateReaderStudy();updateReaderLearned();});
   document.addEventListener('tk:domains-rendered',enhanceDomains);
   /* 侧栏树是 fetch 回调里才出现的（晚于首屏渲染），而 /?path= 深链的文章
      渲染可能先完成——syncNavToNote 那时找不到域行就静默返回，之后没人补，
@@ -4495,6 +4797,13 @@ initialize();setInterval(refreshApp,10000);
  * 默认保持 mermaid 原始尺寸（清晰，纵向长图就靠页面滚动看），
  * 想一屏看全点「缩小」——等比缩小会让字变小，所以不默认缩
  * （2026-09-23 反馈：先是不限高太长、再是强行缩到看不见）。 */
+/* 窄屏下宽图会被压到读不清（实测：viewBox 宽 849px 的 Saga 补偿链图，在 390px
+   屏上只显示 326px，缩放 0.38，标注文字跟着缩到个位数像素）。pre 本身已是
+   overflow-x:auto，缺的是宽度下限——这里给每张图定一个"最小可读缩放 0.7"的
+   下限宽度，超出容器就横向滚动。各图的适配函数集中在这里，resize 时统一重算，
+   避免给每张图各挂一个监听。 */
+const mmdFitters = new Set();
+window.addEventListener('resize', () => { mmdFitters.forEach((fn) => fn()); });
 function enhanceMermaid(){
   document.querySelectorAll('pre.mermaid').forEach((pre) => {
     if (pre.dataset.mmd) return;
@@ -4527,6 +4836,26 @@ function enhanceMermaid(){
       else { svg.style.setProperty('max-height', h + 'px'); }
     };
     apply();
+    const fitWidth = () => {
+      svg = pre.querySelector('svg');
+      if (!svg) return;
+      const vb = (svg.getAttribute('viewBox') || '').trim().split(/[\s,]+/);
+      const natural = parseFloat(vb[2]);
+      const avail = pre.clientWidth;
+      if (!natural || !avail) return;
+      const floor = Math.round(natural * 0.7);
+      if (floor > avail) { svg.style.maxWidth = 'none'; svg.style.minWidth = floor + 'px'; }
+      else { svg.style.removeProperty('max-width'); svg.style.removeProperty('min-width'); }
+    };
+    fitWidth();
+    mmdFitters.add(fitWidth);
+    /* 点图放大：委托挂在容器上，避开工具条按钮；Mermaid 重绘会换掉 svg 节点，
+       所以在事件里重新取，不缓存引用。 */
+    wrap.addEventListener('click', (e) => {
+      if (e.target.closest('button')) return;
+      const current = pre.querySelector('svg');
+      if (current && (e.target === current || current.contains(e.target))) openSvgLightbox(current);
+    });
 
     bar.addEventListener('click', (e) => {
       const b = e.target.closest('button');

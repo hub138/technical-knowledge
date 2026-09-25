@@ -72,7 +72,7 @@ body.tk-host::before {
   top: 0; bottom: 0; left: 0;
   z-index: var(--z-sidebar);
   width: var(--sidebar-width);
-  padding: 21px 15px 20px;
+  padding: var(--space-5) var(--space-4) var(--space-5);
   display: flex;
   /* 域多起来之后一屏放不下——不滚动的话底部的域永远够不着。 */
   flex-direction: column;
@@ -238,7 +238,7 @@ body.tk-host::before {
 }
 a.has-children {
   position: relative;
-  padding-right: 30px;
+  padding-right: var(--space-8);
 }
 
 /* 箭头按钮：铺满整个父项行，点这一行的任何位置都在切换折叠
@@ -480,7 +480,6 @@ a.has-children {
      色块，与主题子项的方形左线在形状上分开。 */
   background: var(--color-accent-soft);
   border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  padding-right: 8px;
   box-shadow:
     var(--shadow-sm),
     inset 0 1px 2px rgba(20, 42, 35, 0.06);
@@ -674,7 +673,7 @@ a.has-children {
      （用户 2026-09-22 抓到的回归），恢复宽松但用显式值，不靠
      h1 的浏览器默认 margin 撑出 47px（那是 bug 不是设计）。 */
   margin: 0 0 32px;
-  padding: 40px 0 16px;
+  padding: var(--space-10) 0 var(--space-4);
   border-bottom: 0;
   /* 书页式收口线：不跑满整列，像印刷书籍里的决定线；用背景渐变而非
      border 实现，让缺口只在右侧。为什么 hero 用收口线而 view-head
@@ -758,7 +757,11 @@ a.has-children {
   border-radius: var(--radius-sm);
   background: var(--color-panel);
   color: var(--color-ink);
-  font: var(--weight-normal) var(--text-body) / 1.4 var(--font-sans);
+  /* 18px：与 .tk-search 真源同字号。这一条不带 .tk-search 类也能命中
+     （选择器只看父级 .page-toolbar），此前写死 --text-body 会把真源的
+     18px 又压回 16px —— 同一个搜索框两种形态两种字号就是这么来的。
+     几何差异（无图标、9px 内距）是这种形态自己的，保留不动。 */
+  font: var(--weight-normal) 18px / 1.4 var(--font-sans);
 }
 .page-toolbar input[type="search"]:focus {
   border-color: var(--color-accent);
@@ -810,9 +813,12 @@ a.has-children {
   color: var(--color-muted);
   pointer-events: none;
 }
+/* 18px（原 16）：顶栏是常驻入口，输入文字与图标跟 44px 的框比偏小，
+   用户 2026-09-25 反馈「字有点小」。字号放在皮肤真源里，全站搜索框一并变大，
+   页面不许再各自设 font-size。 */
 .tk-search span svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   display: block;
 }
 .tk-search input[type="search"] {
@@ -820,10 +826,12 @@ a.has-children {
   height: 44px;
   border: 1px solid var(--color-line);
   border-radius: var(--radius-sm);
-  padding: 0 12px 0 38px;
+  padding: 0 12px 0 40px;
   background: var(--color-panel);
   color: var(--color-ink);
-  font: var(--weight-normal) var(--text-body) / 1.4 var(--font-sans);
+  /* 18px（原 --text-body 16px）：顶栏搜索框是常驻入口，16px 在 44px 高的
+     框里偏小、看着像次要控件。改真源而不是改页面，全站搜索框同步变大。 */
+  font: var(--weight-normal) 18px / 1.4 var(--font-sans);
   /* 阴影从 0 1px 2px/.02 提到 --shadow-xs：入口页（projects/learning）
      的搜索框放在宽松留白的 hero 里，浅底浅描边让它成为整块视觉分量
      最轻的元素，模型评审（2026-09-24）实测「存在感弱、层次少于同区域
@@ -967,9 +975,9 @@ body.tk-host a:hover { text-decoration: none; }
    * 同一个"页面开头"在不同页忽高忽低，就是用户抓到的 bug1。
    * 统一规则：头部距顶一律 26px，真源在此，别处不许再覆盖。 */
   margin-top: 0;
-  padding-top: 26px;
-  margin-bottom: 20px;
-  padding-bottom: 16px;
+  padding-top: var(--space-6);
+  margin-bottom: var(--space-5);
+  padding-bottom: var(--space-4);
   border-bottom: 1px solid var(--color-line);
 /* 顶 26 / 底 16 / 头部底距 20 —— 与 hero 形态同值同源，五值规范
 * 见上方「页面头部规范」注释。改几何只改规范区，两形态同步。 */
@@ -993,7 +1001,7 @@ body.tk-host a:hover { text-decoration: none; }
 /* 说明段 p 的排版已并入上面的 .view-head p, .hero p 合并规则（唯一真源）。 */
 
 .view-head--plain {
-  padding-top: 26px; /* 与主定义同源，见上。--plain 只免去下边框，不免顶部留白。 */
+  padding-top: var(--space-6); /* 与主定义同源，见上。--plain 只免去下边框，不免顶部留白。 */
   padding-bottom: 0;
   border-bottom: 0;
   margin-bottom: 14px;
@@ -1013,7 +1021,7 @@ body.tk-host a:hover { text-decoration: none; }
  * .pano-empty、目录用 .skeleton、图谱和进度什么都没有 —— 同一状态
  * 四种长相。样式真源在此；DOM 由 shell.js 的 tkEmptyState() 生成。 */
 .view-empty {
-  margin: 30px 0;
+  margin: var(--space-8) 0;
   color: var(--color-faint);
   font-size: 13px;
 }
@@ -1179,7 +1187,10 @@ body.tk-host button {
   border: 1px solid transparent;
   border-radius: var(--radius-sm);
   color: var(--color-accent);
-  font-size: var(--text-small);
+  /* 15px（原 --text-small 13px）：这是首屏的行动入口（「浏览全部」「进入
+     学习中心」一类），用全站最小字号档是层级错位——它比同屏的正文还小，
+     读起来像脚注而不是按钮。最小档留给计数与元信息。 */
+  font-size: 15px;
   font-weight: var(--weight-semibold);
 }
 
@@ -1453,7 +1464,7 @@ body.tk-host button {
 /* 小屏：弹层贴边留呼吸感，底部让开小白条。 */
 @media (max-width: 560px) {
   .tk-fb-overlay { padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); align-items: end; }
-  .tk-fb-panel { max-height: 88vh; padding: 18px 16px; }
+  .tk-fb-panel { max-height: 88vh; padding: var(--space-5) var(--space-4); }
 }
 
 .tk-fb-panel {
@@ -1463,7 +1474,7 @@ body.tk-host button {
   background: var(--color-raised);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
-  padding: 22px 24px;
+  padding: var(--space-6) var(--space-6);
   box-shadow: var(--shadow-lg);
 }
 
@@ -1766,13 +1777,13 @@ body.tk-host button {
    * 底距 20 沿用桌面值（移动端无覆盖）。页面级的移动端 .hero 覆盖（31/25、32/25、34 等）
 * 已全部删除，只留这一条。改几何在规范「几何总表」里同步两形态。 */
   .tk-shell .hero:first-child {
-    margin-bottom: 28px;
-    padding: 32px 0 16px;
+    margin-bottom: var(--space-8);
+    padding: var(--space-8) var(--space-6);
   }
   /* 只有首页的主张句在手机上要单独收一档。其余页面走 --text-3xl，
      它在小屏本来就够小（clamp 的下界 26px），不用再覆盖。 */
   .hero--display h1 { font-size: 29px; line-height: 1.22; }
-  .purpose { margin-top: 18px; }
+  .purpose { margin-top: var(--space-5); }
 
   .tk-theme-toggle--fixed {
     top: 12px;
@@ -1792,7 +1803,7 @@ body.tk-host button {
   .tk-sidebar { padding-left: 13px; padding-right: 13px; }
   .tk-nav a { padding-left: 8px; padding-right: 8px; }
   .tk-nav-icon { display: none; }
-  .purpose { display: block; margin-top: 18px; padding: 12px 13px; }
+  .purpose { display: block; margin-top: var(--space-5); padding: var(--space-3) var(--space-3); }
   .purpose strong { display: block; margin-bottom: 3px; }
 }
 
@@ -1927,9 +1938,24 @@ textarea:focus-visible {
    所以这里改成等比缩放：mermaid 会给 svg 写死 style width/height（如
    style="width:319px"），必须用 !important 覆盖掉，再给 max-height，
    svg 有 viewBox 就会按原比例缩小，图完整、没有滚动条。 */
+/* 正文列表：浏览器默认 ul/ol 的上下 margin 是 1em（18px），不在间距阶梯内。
+   这里显式改为 --space-5，让段落与列表之间的留白和其余区块同一套刻度。 */
+#reader-body ul,
+#reader-body ol {
+  margin: var(--space-5) 0;
+  padding-left: var(--space-6);
+}
+#reader-body li {
+  margin: var(--space-2) 0;
+}
+#reader-body li > ul,
+#reader-body li > ol {
+  margin: var(--space-2) 0;
+}
+
 pre.mermaid{
-  margin:18px 0;
-  padding:16px;
+  margin:var(--space-5) 0;
+  padding:var(--space-4);
   background:var(--color-raised);
   border:1px solid var(--color-line);
   border-radius:8px;
@@ -1939,13 +1965,14 @@ pre.mermaid{
   font:inherit;
 }
 pre.mermaid svg{
-  width:auto !important;
+  width:100% !important;
   height:auto !important;
-  max-width:100%;
+  max-width:100% !important;
+  min-width:0 !important;
 }
 /* 图控件：放大 / 缩小 / 复制 / 拖高度。默认原尺寸（清晰），
    想一屏看全就点「缩小」——等比缩会变小，所以不默认缩。 */
-.mmd-figure{position:relative;margin:18px 0}
+.mmd-figure{position:relative;margin:var(--space-5) 0}
 .mmd-bar{
   position:absolute;top:6px;right:6px;z-index:2;display:flex;gap:4px;
   opacity:0;transition:opacity var(--duration-fast) var(--ease-out);
@@ -2036,3 +2063,249 @@ pre.mermaid svg{
 @media (max-width:1199px){ .dir-rail{ display:none; } }
 .dir-rail-list li a{ display:flex; justify-content:space-between; gap:8px; align-items:baseline; }
 .dir-rail-list li a em{ font-style:normal; font-size:var(--text-micro); color:var(--color-muted); flex:none; }
+
+/* ── 顶栏（.topbar）：全站唯一真源 ──────────────────────────────────────
+ * 病根记录（2026-09-25）：顶栏最早只写在主站 index.html 的内联 <style> 里，
+ * papers（论文追踪）、sources（优质好文）这类独立页面根本拿不到它，于是各自
+ * 在 hero 里挂了一个搜索框——同一个搜索框，在主站位于顶栏右上角，在这两页
+ * 掉到正文头部。跨页不一致就是这么来的：样式跟着页面走，而不是跟着组件走。
+ *
+ * 现在：结构由 shell.js 的 mountTopbar 生成，样式写在这里，页面零样式。
+ * 新增页面一律接顶栏，不许再在 hero 里另挂一个搜索框。
+ */
+.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:13px 30px;background:var(--color-bg-veil);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}
+/* 搜索框的位置是右上角：靠 margin-left:auto 顶到右侧，不在页面正文里。 */
+.topbar .search{margin-left:auto;flex:0 1 620px}
+.topbar .topbar-title{min-width:0;flex:0 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--text-h2);font-weight:var(--weight-semibold);color:var(--color-ink);padding-left:4px}
+.topbar-title[hidden]{display:none!important}
+/* 顶栏翻页槽：搜索框与标题叠在同一格里，下滑时像翻页一样互换。
+ * 为什么不用「整条顶栏收起」：收起让读者在下滑后失去搜索入口与位置感；
+ * 知乎式做法是顶栏常驻、内容换成当前页面标题（用户 2026-09-25 明确要求）。 */
+.topbar-slot{position:relative;flex:1 1 auto;height:44px;min-width:0;margin-right:calc(3 * var(--space-10))}
+.topbar-slot>.search,.topbar-slot>.topbar-title{position:absolute;top:0;right:0;width:100%;max-width:480px;margin-left:auto}
+.topbar-slot>.topbar-title{right:auto;left:0;display:flex;align-items:center;height:100%}
+@media (prefers-reduced-motion: no-preference){
+  .topbar-slot>.search,.topbar-slot>.topbar-title{transition:opacity .2s ease,transform .2s ease,max-width .2s ease}
+}
+.topbar-slot>.topbar-title{opacity:0;transform:translateY(10px);pointer-events:none}
+/* 2026-09-25：翻页改成「搜索框常驻 + 标题滑入」，不再互换。
+   旧行为是搜索框淡出、标题淡入二选一，下滑之后右侧 620px 整片空白，
+   用户反馈「太空了」，而且下滑后想搜还得往回滚。现在搜索框始终可见可点
+   （不能带 pointer-events:none），只把宽度从 620 收到 420 给标题腾位置，
+   标题仍从下方 10px 滑上来——动态上移的手感保留，填入的空白处由标题接住。 */
+.topbar.is-condensed .topbar-slot>.search{max-width:var(--tk-search-w,420px)}
+/* width:auto 必须显式：2085 行的 width:100% 与 right 约束冲突时
+   （over-constrained）left 被挤成负值，标题整个滑出屏外（papers 实测 -154）。 */
+.topbar.is-condensed .topbar-slot>.topbar-title{opacity:1;transform:none;right:var(--tk-title-right,436px);left:0;width:auto;max-width:none}
+/* 聚焦时把让出去的宽度拿回来：翻页态下搜索框仍是 420，但一开始输入就该
+   回到 620 的可用宽度（主站首页的 focus 伸长就是这套手感），不能因为
+   加了收窄就把「聚焦伸长」弄丢。 */
+.topbar.is-condensed .topbar-slot>.search:focus-within,
+.topbar.is-condensed>.search:focus-within{max-width:620px}
+/* 伸长后搜索框的左边界会压到标题上（两者都是绝对定位、标题在文档里靠后
+   所以盖在上层）。聚焦期间让标题按原路退回，输入结束再滑回来——退场用
+   进入的反向动画，不新增一套动作。:has 不支持时只是标题不退，不影响输入。 */
+@supports selector(:has(*)) {
+  /* 两种结构的居中方式不同，退场位移要各自叠加，不能共用一个 transform：
+     slot 版靠 align-items 居中（位移从 0 起），主站版靠 translateY(-50%)。 */
+  .topbar:has(.search:focus-within) .topbar-slot>.topbar-title{opacity:0;transform:translateY(10px)}
+  .topbar:has(.search:focus-within)>.topbar-title{opacity:0;transform:translateY(-50%) translateY(10px)}
+}
+/* 主站顶栏没有 -slot（历史结构）：同一套语义——搜索框常驻并让宽，标题滑入。 */
+@media (prefers-reduced-motion: no-preference){
+  .topbar>.search,.topbar>.topbar-title{transition:opacity .2s ease,transform .2s ease,max-width .2s ease}
+}
+.topbar.is-condensed>.search{max-width:var(--tk-search-w,420px)}
+/* 主站顶栏的标题不在 slot 里：绝对定位到左侧，不占 flex 位，
+   这样搜索框淡出时标题不会因为布局重排而横跳。 */
+.topbar>.topbar-title{position:absolute;left:30px;top:50%;opacity:0;transform:translateY(-50%) translateY(10px);pointer-events:none}
+/* 包含块修复（2026-09-25）：base.css 61 行把 .main 设成 position:relative，
+   主站标题 absolute 的包含块就成了 .main 而非 .topbar——left:30/right:N
+   全是相对 .main 算的，right 约束永远夹不住标题（实测标题 926px 伸进
+   搜索框 747px）。contain:layout 让 .topbar 成为自身 absolute 后代的
+   包含块，标题几何回归顶栏坐标系；sticky 定位行为不受影响。 */
+.topbar{contain:layout style}
+/* 标题绝对定位在左侧，搜索框收窄后常驻右侧。2026-09-25 二改：写死的
+   right:1010px 把长标题硬截断成省略号——用户否掉（「文字优先，哪怕是
+   搜索框消失或动态折叠」）。改为变量驱动：JS 量出标题自然宽度后按
+   --tk-search-w（搜索框让位后的宽）与 --tk-title-right（标题右界）下发，
+   搜索框 420→170→96px 三级让位，还放不下才截断（见 bindTopbarAutoHide）。 */
+.topbar.is-condensed>.topbar-title{opacity:1;transform:translateY(-50%);right:var(--tk-title-right,1010px);max-width:none}
+/* 下滑不再整条隐藏：顶栏是常驻导航，隐藏会让搜索与返回入口一起消失。 */
+.topbar.is-hidden{transform:none}
+@media(max-width:760px){
+  .topbar{padding:13px 15px;gap:10px}
+  .topbar-slot{margin-right:0}
+  .topbar .search,.topbar-slot>.search{flex-basis:100%;max-width:none}
+  /* 窄屏一行放不下「620 的搜索框 + 标题」：翻页后改成五五分，标题截断，
+     搜索框仍留在原位可以点（不再整块淡出）。 */
+  .topbar.is-condensed .topbar-slot>.search,.topbar.is-condensed>.search{max-width:52%}
+  .topbar.is-condensed .topbar-slot>.topbar-title{max-width:calc(48% - 12px)}
+  .topbar.is-condensed>.topbar-title{max-width:calc(48% - 12px)}
+}
+
+/* ── 顶栏槽位补齐（2026-09-25）─────────────────────────────────────────
+ * 实测（1440 宽、papers 页）：顶栏内容区 1120px，但 .topbar-slot 只占
+ * 1000px，搜索框又被 .tk-search 的 max-width 压到 480px —— 两处都不贴右，
+ * 看着像"搜索框没在右上角"。根因是 flex 项用 flex-basis:auto 时会被内容
+ * 宽度牵着走，加上另一条 .search 规则抢了 max-width。
+ * 这里用更高特异性钉死：槽位填满可用宽度，搜索框撑到 620 上限并靠右。 */
+.topbar .topbar-slot{flex:1 1 0;width:100%;min-width:0}
+.topbar .topbar-slot>.search{max-width:620px;width:100%;right:0;margin-left:auto}
+/* 上一条同款问题续：槽位还带着 margin-right:120px（来自全站布局给内容区留的
+   右侧留白），把搜索框又推离右边界 150px。顶栏槽位不需要这份留白。 */
+.topbar .topbar-slot{margin-right:0}
+/* 主站顶栏（无 .topbar-slot 的历史结构）：同一套右上角规范。
+   此前主站 .search 带 margin-right:118px、max-width 480px（为右侧工具按钮
+   预留，但那组按钮默认 hidden），结果是主站 480px/距右 148px，而 papers
+   620px/距右 30px —— 同一个搜索框在两个页面位置不同，就是这次的病根。 */
+.topbar>.search,main .topbar>.search{max-width:620px;margin-right:0;margin-left:auto}
+
+/* ── 触屏点击区（2026-09-25）─────────────────────────────────────────────
+ * 病根：侧栏导航与首屏按钮在桌面按鼠标精度设计（38px / 36px / 32px），
+ * 触屏没有光标，同样 32px 的行是"点两下才中一个"的目标（Apple/Android 的
+ * 触控下限都是 44px）。与顶栏搜索框那次是同一类：控件几何跟着一处写死，
+ * 换了一种输入方式就失效。
+ * 只提触屏（pointer: coarse）：桌面保持现有行距与信息密度，不做无差别放大。 */
+@media (pointer: coarse) {
+  .tk-nav a { min-height: 44px; }
+  .tk-nav a.tk-subnav-inline { min-height: 44px; }
+  .hero-links a,
+  .hero-links button { min-height: 44px; }
+}
+
+/* 触控目标尺寸（2026-09-25）：窄屏下 .mmd-btn（图表放大/缩小/复制图源码）
+   实测只有 26x28px，手指点不准——WCAG 2.5.5 与 iOS/Android 的触控目标建议
+   都是 ≥44px。桌面端鼠标精确，保持紧凑即可，只在窄屏放宽。 */
+@media(max-width:760px){
+  .mmd-btn{min-width:44px;min-height:44px;padding:6px 8px}
+}
+
+/* 文章页首屏属于正文（站点定稿 2026-09-23）：知识图谱是辅助模块，
+   HTML 里排在正文前，此处用 order 让正文先渲染，图谱落到正文之后。 */
+.reader-maincol{display:flex;flex-direction:column}
+.reader-maincol>.reader-body{order:1}
+.reader-maincol>.article-relations{order:2;border-top:1px solid var(--color-line);border-bottom:0;padding:16px 0 0;margin:24px 0 0}
+.reader-maincol>.reader-pager{order:3}
+.reader-maincol>.reader-reward{order:4}
+
+/* ── 文章阅读视图（2026-09-25 掘金学习改造）──────────────────────────────
+ * 参考 juejin.cn 文章页（post/7675273747710001206）量测：body #f2f3f5 灰底、
+ * 内容白卡 940px、正文列 756px、H1 32px、代码块深底 Menlo 16/28。
+ * 本站不搬蓝色：灰底与卡片层次学结构，颜色走自家 token。
+ * 挂点：body.tk-reading（切到文章视图时 shell 加上，见 index.html）。 */
+body.tk-reading .content{
+  background:var(--color-surface);
+}
+/* 正文白卡：头部与正文列同卡（掘金是标题+正文一张卡）。卡内左右 46px
+   （掘金 60px 的收窄版，本站正文 756px 加上卡内边距与右栏 248px 之和
+   必须塞进 1018px 容器），上下 34px。 */
+body.tk-reading .reader-head{
+  background:var(--color-panel);
+  border:1px solid var(--color-line);
+  border-bottom:0;
+  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
+  padding:34px 46px 22px;
+  margin-bottom:0;
+}
+/* 正文列白卡续体：头部卡的下缘由正文卡接住，两卡拼成一张。 */
+body.tk-reading .reader-layout{
+  background:var(--color-panel);
+  border:1px solid var(--color-line);
+  border-top:0;
+  border-radius:0 0 var(--radius-lg) var(--radius-lg);
+  padding:26px 46px 34px;
+}
+/* 卡内的翻页/图谱/反馈等块原来靠 body 底色分层，现在卡内自洽：
+   去掉它们的横向越界感，全部收在卡内边距里。 */
+body.tk-reading .reader-maincol>.article-relations{margin-top:24px}
+body.tk-reading .reader-pager,
+body.tk-reading .reader-reward{max-width:none}
+/* 右栏在卡外（掘金目录是独立卡）——grid 列宽不变，右栏自带卡片底，
+   与主卡之间靠 30px 列沟呼吸。 */
+body.tk-reading .reader-railcol{top:84px}
+/* 卡内代码块升级为掘金深色（浅色主题下；深色主题 token 已是深底）。 */
+body.tk-reading:not([data-theme=dark]) .reader-body .code-block{
+  background:#282c34;
+  border-color:#1e222a;
+  color:#dcdfe4;
+}
+body.tk-reading:not([data-theme=dark]) .reader-body .code-block code{
+  color:#dcdfe4;
+}
+body.tk-reading:not([data-theme=dark]) .reader-code .code-tools{
+  background:#21252b;
+  border-color:#1e222a;
+  color:#9da5b4;
+  border-radius:var(--radius-sm) var(--radius-sm) 0 0;
+}
+body.tk-reading:not([data-theme=dark]) .reader-code .code-block{
+  border-top-left-radius:0;border-top-right-radius:0;
+}
+body.tk-reading:not([data-theme=dark]) .code-language{
+  color:#61afef;
+  font-weight:var(--weight-semibold);
+}
+body.tk-reading:not([data-theme=dark]) .code-copy{
+  background:#2f333d;border-color:#3a3f4b;color:#c8ccd4;
+}
+body.tk-reading:not([data-theme=dark]) .code-copy:hover,
+body.tk-reading:not([data-theme=dark]) .code-copy:focus-visible{
+  background:#3a3f4b;border-color:#4a505c;color:#fff;
+}
+/* 掘金正文关键词蓝色在深底代码里走不了——保持本站海军蓝，只把行内代码
+   从「描边胶囊」改成掘金的「浅灰底」弱化处理，长代码不再打断阅读。 */
+body.tk-reading:not([data-theme=dark]) .reader-body code{
+  background:rgba(135,131,120,.15);
+  border:0;
+  color:#c7254e;
+  padding:2px 6px;
+  border-radius:4px;
+}
+/* 阅读浮动按钮组（点赞/反馈）：掘金左下圆形浮层，本站复用 FAB 通道。
+   结构由 index.html 注入 #reader-fabs，只在文章视图出现。 */
+.reader-fabs{
+  position:fixed;
+  /* fixed 侧栏占 0-260px 全高，left 必须从内容区起算（侧栏宽+24px），
+     放 80px 会被侧栏整块盖住、点击全部落在侧栏上（Playwright 实测命中
+     的是 tk-subtopic 链接）。 */
+  left:calc(var(--sidebar-width) + 24px);
+  bottom:calc(var(--float-lane) + 12px);
+  z-index:calc(var(--z-fab) - 2);
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.reader-fabs[hidden]{display:none}
+.reader-fab{
+  width:40px;height:40px;
+  display:grid;place-items:center;
+  border:1px solid var(--color-line);
+  border-radius:50%;
+  background:var(--color-panel);
+  color:var(--color-muted);
+  font:inherit;font-size:17px;line-height:1;cursor:pointer;
+  box-shadow:var(--shadow-md);
+  transition:color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+.reader-fab:hover{color:var(--color-accent);border-color:var(--color-accent-line);transform:translateY(-1px)}
+.reader-fab.on{color:var(--color-warm);border-color:var(--color-warm-line);background:var(--color-warm-soft)}
+.reader-fab .fab-count{position:absolute;top:-4px;right:-4px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--color-accent);color:var(--color-on-accent);font-size:10px;line-height:16px;font-variant-numeric:tabular-nums}
+.reader-fab{position:relative}
+/* 窄屏：右栏隐藏时主卡圆角全给回来；浮层按钮组不与 FAB 通道打架（左下）。 */
+@media(max-width:1199px){
+  body.tk-reading .reader-head{border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+  body.tk-reading .reader-layout{border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+}
+@media(max-width:760px){
+  body.tk-reading .reader-head{padding:24px 18px 16px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
+  body.tk-reading .reader-layout{padding:18px 14px 24px}
+  .reader-fabs{left:10px;bottom:calc(var(--float-lane) + 8px)}
+}@media print{
+  body.tk-reading .content{background:#fff}
+  body.tk-reading .reader-head,body.tk-reading .reader-layout{border:0;background:#fff;padding:0}
+  .reader-fabs{display:none}
+}
