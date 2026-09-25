@@ -651,7 +651,7 @@
 /* 图注：紧跟图片、以「图源」开头的那一段。居中、小字、弱化，与图片同属一个视觉单元，
    不与正文抢层级；颜色不靠色相单独承载信息，仍保留文字本身。类名由 enhanceReaderImages
    在渲染时打上，规则改在这里，不散在 JS 里。 */
-.reader-figure-caption{margin:-12px 0 var(--space-5);text-align:center;color:var(--color-muted);font-size:var(--text-sm);line-height:var(--leading-normal)}
+.reader-body p.reader-figure-caption{margin:-12px 0 var(--space-5);text-align:center;color:var(--color-muted);font-size:var(--text-small);line-height:var(--leading-normal)}
 .reader-figure-caption a{color:var(--color-muted);text-decoration:underline;text-underline-offset:2px}
 .reader-image{display:block;margin:var(--space-5) 0}
 .reader-image img{display:block;margin:0 auto}
@@ -843,9 +843,9 @@
    色点加同色 33% 外圈（box-shadow 模拟 halo，暗底上更醒目），
    附加语义行（圆越大笔记越多 / 已读 / 已读环）分隔线隔开。 */
 .graph-legend{display:flex;gap:12px 16px;flex-wrap:wrap;align-items:center;color:var(--color-muted);font-size:var(--text-sm);padding:8px 12px;margin-top:8px;background:var(--color-panel);border:1px solid var(--color-line);border-radius:8px}
-.graph-legend span{display:inline-flex;gap:7px;align-items:center}
-.graph-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;box-shadow:0 0 0 3px color-mix(in srgb, currentColor 22%, transparent)}
-.graph-legend i{background:currentColor}
+.graph-legend span{display:inline-flex;gap:7px;align-items:center;color:var(--color-muted)}
+.graph-legend i{width:9px;height:9px;border-radius:50%;display:inline-block;box-shadow:0 0 0 3px color-mix(in srgb, var(--dcolor, currentColor) 22%, transparent)}
+.graph-legend i{background:var(--dcolor, currentColor)}
 .graph-legend .gl-sem{padding-left:16px;border-left:1px solid var(--color-line)}
 /* ── 图谱侧边栏（点域/主题/笔记后右侧的文章卡片栏）──────────────
  * 用户诉求：点「基础设施 18」时不知道 18 是什么，右边要有一栏卡片
@@ -3655,7 +3655,7 @@ function renderNetwork(){
      box-shadow halo 用 color-mix 淡化同色。style 只写 color 一个属性。
      三个语义项（大小/已读/已读环）加 .gl-sem 类：CSS 里给首项前加
      分隔线，与六个域色项隔开。 */
-  $('#legend').innerHTML=domains.map((d,i)=>`<span style="color:${colors[i%colors.length]}"><i></i>${esc(tr(d))}</span>`).join('')
+  $('#legend').innerHTML=domains.map((d,i)=>`<span style="--dcolor:${colors[i%colors.length]}"><i></i>${esc(tr(d))}</span>`).join('')
     +`<span class="gl-sem" style="color:var(--color-muted)">${(window.TKI18N&&window.TKI18N.lang==='en')?'A bigger circle means more notes under the topic':'圆越大，主题下的笔记越多'}</span>`
     +`<span class="gl-sem" style="color:var(--color-muted)"><i style="background:var(--color-ok)"></i>${(window.TKI18N&&window.TKI18N.lang==='en')?'Learned':'已读'}</span>`
     +`<span class="gl-sem" style="color:var(--color-muted)"><i style="width:12px;height:12px;border-radius:50%;display:inline-block;border:3px solid var(--color-ok);border-top-color:transparent;transform:rotate(-45deg);box-shadow:none"></i>${(window.TKI18N&&window.TKI18N.lang==='en')?'topic mastery ring':'已读环'}</span>`;
