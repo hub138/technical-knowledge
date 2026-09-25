@@ -1167,6 +1167,17 @@ body .kbd-hint{display:none}}
 
 body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leading-normal)}
 
+/* 全局窄滚动条（学掘金：4px 细条+灰圆角 thumb；掘金量测 ::-webkit-scrollbar{width:4px}+thumb 圆角灰）。
+   5px 比 4px 略宽：Chromium 下 4px 的 hover 拖拽命中极难。track 透明（掘金 track 带 popup 底色，本站更干净）。
+   限定 pointer:fine：窄条难触摸，移动端保留原生粗滚动条。scrollbar-width:thin 兼容 Firefox。 */
+@media (pointer:fine){
+  *{scrollbar-width:thin;scrollbar-color:var(--color-line-strong) transparent}
+  *::-webkit-scrollbar{width:5px;height:5px}
+  *::-webkit-scrollbar-track{background:transparent}
+  *::-webkit-scrollbar-thumb{background:var(--color-line-strong);border-radius:3px}
+  *::-webkit-scrollbar-thumb:hover{background:var(--color-muted)}
+}
+
 .sidebar{background:var(--color-panel);padding:25px 16px 24px}
 .nav-actions{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;padding:14px 0 16px}
 .nav-actions button{padding:8px 4px;text-align:center;font-size:var(--text-sm);border:1px solid var(--color-line);background:var(--color-panel);color:var(--color-muted)}
