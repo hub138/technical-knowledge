@@ -491,6 +491,11 @@ a.has-children {
   color: var(--color-muted);
   font-size: var(--text-small);
   font-weight: var(--weight-normal);
+  /* 字体晚到时数字宽度会跳（实测 CLS 0.0178）：等宽数字 + 最小宽度，
+     fallback 与最终字体下的占位一致，行高不再因计数变宽而移动。 */
+  font-variant-numeric: tabular-nums;
+  min-width: 2.4em;
+  text-align: right;
 }
 
 .tk-sidebar-footer {

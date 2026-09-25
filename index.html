@@ -196,6 +196,13 @@
   font-family:var(--font-mono);word-break:break-all;
 }
 .digest{margin:34px 0 0;position:relative}
+/* 早报区异步加载：数据到达前先占住高度（实测渲染后 464px），
+ * 避免 hidden 取消时把下方整页内容推下去（实测 CLS 0.08）。
+ * hidden 属性自带的 display:none 会盖过 min-height 且不产生盒，
+ * 这里对「未就绪」的早报区显式还原 display:block，让 min-height
+ * 真正占位；确认无数据或加载失败时 JS 加 .digest-empty 隐藏并释放。 */
+#home-digest{display:block;min-height:464px}
+#home-digest.digest-empty{display:none}
 .digest-head{
   display:flex;align-items:baseline;gap:10px;margin:0 0 14px;
   flex-wrap:wrap;
@@ -764,6 +771,12 @@
 /* 竖线域列表的主题子列表：缩进延续左侧竖线，主题名 + 篇数。
    展开由主站注入（shell 渲染骨架，主站有笔记数据才有展开内容）。 */
 .tk-subtopics{display:grid;margin:2px 0 6px}
+/* 子列表由深链同步在树到齐后自动展开（功能性，保留）。展开瞬间会把
+   下方内容推下去（实测 CLS 0.0168，低于 0.1 良好线）。这里加一个
+   180ms 的淡入下滑，让读者把它感知为「目录主动展开」而不是内容跳动；
+   域计数已用 tabular-nums 消掉字体晚到的宽度跳变。 */
+.tk-subtopics{animation:sub-in .18s ease-out}
+@keyframes sub-in{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 .tk-subtopic{display:flex;justify-content:space-between;gap:8px;align-items:baseline;padding:5px 8px 5px 26px;margin-left:14px;border-left:1px solid var(--color-line);color:var(--color-ink-soft);font-size:var(--text-small);text-decoration:none}
 .tk-subtopic:first-child{border-top:0}
 .tk-subtopic:hover{color:var(--color-accent);border-left-color:var(--color-accent);background:var(--color-accent-soft)}
@@ -1965,6 +1978,7 @@ function renderDigest(items, status) {
   if (!items || !items.length) {
     if (status === "unconfigured") {
       box.hidden = false;
+      box.classList.remove('digest-empty');
       box.innerHTML = `<div class="digest-head">
         <h2>近七天优质好文</h2>
         <span class="digest-note">配好 BestBlogs 的 API Key 后，这里会列出它最近七天的早报</span>
@@ -1979,9 +1993,11 @@ function renderDigest(items, status) {
     }
     box.innerHTML = '';
     box.hidden = true;
+    box.classList.add('digest-empty');
     return;
   }
   box.hidden = false;
+  box.classList.remove('digest-empty');
   /* 按评分排序：说明里写着"评分排序"，但接口给的是按天交错的顺序 ——
    * 实测第一天 88 分排第一，93 分的最高分排在第 10 位。名实不符。
    * 同分的按发布时间新的在前：22 篇里 90 分就有 10 篇，分数只能分出
@@ -2200,6 +2216,7 @@ async function loadDigest() {
     digestCache = await response.json();
   } catch (err) {
     box.hidden = true;
+    box.classList.add('digest-empty');
     return;
   }
   /* 收藏列表单独取：它挂了不该拖垮早报展示，降级成无收藏态。 */
