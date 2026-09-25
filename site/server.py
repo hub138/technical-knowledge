@@ -34,6 +34,7 @@ import traceback
 import threading
 import time
 from http.cookies import SimpleCookie
+from html.parser import HTMLParser
 from pathlib import Path
 import urllib.request
 from urllib.parse import parse_qs, quote, unquote, urlsplit
@@ -42,6 +43,7 @@ from urllib.request import Request, urlopen
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
+from bs4 import BeautifulSoup
 
 # 同目录的兄弟模块。用显式路径插入而不是相对导入：server.py 会被
 # `python3 site/server.py` 直接跑，那时它不在包上下文里，相对导入会失败。
@@ -1716,80 +1718,134 @@ class Vault:
             return None
 
 
-def render_inline(source: str, vault: Vault, current: str) -> str:
-    tokens: dict[str, str] = {}
+class VideoEmbedMarkup(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.elements = []
+        self.source = ""
 
-    def token(value: str) -> str:
-        key = f"\x00{len(tokens)}\x00"
-        tokens[key] = value
-        return key
+    def handle_starttag(self, tag, attrs):
+        self.elements.append(tag)
+        if tag == "iframe":
+            self.source = dict(attrs).get("src") or ""
 
-    def image(match: re.Match[str]) -> str:
-        alt, src = match.group(1), match.group(2).strip()
-        if src.startswith(("http://", "https://")):
-            href = src
-        elif src.startswith("data:image/"):
-            href = src
+    def handle_endtag(self, tag):
+        self.elements.append("/" + tag)
+
+    def handle_data(self, data):
+        if data.strip():
+            self.elements.append("text")
+
+    def handle_comment(self, data):
+        self.elements.append("comment")
+
+
+def render_inline(source: str, vault: Vault, current: str, references: dict | None = None) -> str:
+    parser = MarkdownIt("commonmark", {"html": False})
+
+    def note_attributes(path, fragment=""):
+        attrs = {"href": "/?path=" + quote(path)}
+        if fragment:
+            attrs["href"] += "#" + quote(fragment)
         else:
-            candidate = (Path(current).parent / src).as_posix()
-            if vault.safe_file(candidate) is None:
-                return html.escape(match.group(0))
-            href = "/asset?path=" + quote(candidate)
-        return token(f'<img loading="lazy" src="{html.escape(href, quote=True)}" alt="{html.escape(alt, quote=True)}">')
+            attrs["data-note"] = path
+        return attrs
 
-    def link(match: re.Match[str]) -> str:
-        label, href = match.group(1), match.group(2).strip()
-        if href.endswith(".md") or href in vault.notes:
-            resolved = vault.resolve_note(href, current)
+    def wiki_rule(state, silent):
+        if state.linkLevel or not state.src.startswith("[[", state.pos):
+            return False
+        match = WIKILINK_RE.match(state.src, state.pos)
+        if not match:
+            return False
+        if not silent:
+            target = match.group(1).strip()
+            resolved = vault.resolve_note(target, current)
+            label = (match.group(2) or "").strip()
             if resolved:
-                return token(f'<a data-note="{html.escape(resolved, quote=True)}" href="/?path={quote(resolved)}">{html.escape(label)}</a>')
-        safe = href if href.startswith(("http://", "https://", "mailto:", "/", "?")) else "#"
-        extra = ' target="_blank" rel="noreferrer"' if safe != "#" else ""
-        return token(f'<a href="{html.escape(safe, quote=True)}"{extra}>{html.escape(label)}</a>')
+                note = vault.note(resolved) or {}
+                label = label or display_label(str(note.get("title") or "")) or Path(resolved).stem
+                fragment = match.group(0)[2:-2].split("|", 1)[0].partition("#")[2]
+                opening = state.push("link_open", "a", 1)
+                opening.attrs = note_attributes(resolved, fragment)
+                state.push("text", "", 0).content = label
+                state.push("link_close", "a", -1)
+            else:
+                opening = state.push("span_open", "span", 1)
+                opening.attrSet("class", "unresolved")
+                state.push("text", "", 0).content = "[[" + (label or target) + "]]"
+                state.push("span_close", "span", -1)
+        state.pos = match.end()
+        return True
 
-    def wiki(match: re.Match[str]) -> str:
-        target = match.group(1).strip()
-        explicit_label = (match.group(2) or "").strip()
-        resolved = vault.resolve_note(target, current)
-        if not resolved:
-            label = explicit_label or target
-            return token(f'<span class="unresolved">[[{html.escape(label)}]]</span>')
-        note = vault.note(resolved) or {}
-        label = explicit_label or display_label(str(note.get("title") or "")) or Path(resolved).stem
-        return token(f'<a data-note="{html.escape(resolved, quote=True)}" href="/?path={quote(resolved)}">{html.escape(label)}</a>')
+    def video_rule(state, silent):
+        if not state.src.startswith("<iframe", state.pos):
+            return False
+        end = state.src.find("</iframe>", state.pos)
+        if end < 0:
+            return False
+        markup = VideoEmbedMarkup()
+        markup.feed(state.src[state.pos:end + 9])
+        markup.close()
+        url = urlsplit(markup.source)
+        if markup.elements != ["iframe", "/iframe"] or url.scheme != "https" or url.netloc != "player.bilibili.com":
+            return False
+        if not silent:
+            state.push("knowledge_video", "", 0).content = markup.source
+        state.pos = end + 9
+        return True
 
-    source = re.sub(r"!\[([^\]]*)\]\(([^)]+)\)", image, source)
-    source = re.sub(r"`([^`]+)`", lambda m: token(f"<code>{html.escape(m.group(1))}</code>"), source)
-    source = WIKILINK_RE.sub(wiki, source)
-    source = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", link, source)
-    escaped = html.escape(source)
-    escaped = re.sub(r"\*\*([^*]+)\*\*", r"<strong>\1</strong>", escaped)
-    escaped = re.sub(r"(?<!\*)\*([^*]+)\*(?!\*)", r"<em>\1</em>", escaped)
-    # 白名单 iframe：剪藏的正文允许嵌 B 站播放器。整段转义后按转义形态识别，
-    # src 必须以 https://player.bilibili.com/ 开头，其余属性全部丢弃重建，
-    # 原文里混不进任何事件属性。CSP frame-src 是第二道闸，两边要对得上。
-    def iframe_token(match: re.Match[str]) -> str:
-        src_match = re.search(r'src=&quot;((?:[^&"]|&(?!quot;))*)&quot;', match.group(0))
-        if not src_match:
-            return match.group(0)
-        src = html.unescape(html.unescape(src_match.group(1)))
-        if not src.startswith("https://player.bilibili.com/"):
-            return match.group(0)
-        return token(
-            f'<div class="video-embed"><iframe src="{html.escape(src, quote=True)}" '
-            'title="Bilibili video player" frameborder="0" allowfullscreen '
-            'loading="lazy"></iframe></div>'
-        )
+    def video_render(tokens, index, options, env):
+        src = html.escape(tokens[index].content, quote=True)
+        return f'<div class="video-embed"><iframe src="{src}" title="Bilibili video player" frameborder="0" allowfullscreen loading="lazy"></iframe></div>'
 
-    escaped = re.sub(r"&lt;iframe\b[^&]*(?:&(?!gt;)[^&]*)*&gt;&lt;/iframe&gt;", iframe_token, escaped)
-    for key, value in tokens.items():
-        escaped = escaped.replace(html.escape(key), value)
-    return escaped
+    def link_render(tokens, index, options, env):
+        token = tokens[index]
+        href = token.attrGet("href") or ""
+        url = urlsplit(href)
+        if not token.attrGet("data-note") and not url.scheme and not url.netloc and url.path:
+            path = unquote(url.path)
+            if path.endswith(".md") or path in vault.notes:
+                resolved = vault.resolve_note(path, current)
+                if resolved:
+                    token.attrs.update(note_attributes(resolved, unquote(url.fragment)))
+        if url.scheme in {"http", "https"} or url.netloc:
+            token.attrSet("target", "_blank")
+            token.attrSet("rel", "noopener noreferrer")
+        return parser.renderer.renderToken(tokens, index, options, env)
+
+    def image_render(tokens, index, options, env):
+        token = tokens[index]
+        src = token.attrGet("src") or ""
+        url = urlsplit(src)
+        # /static/ 开头的是站点自己的资源（镜像后的配图），不是仓库里的相对文件。
+        # 走下面那段会被当成 vault 内路径解析并拒绝，图就只剩一行转义文本。
+        if not url.scheme and not url.netloc and url.path.startswith("/static/"):
+            token.attrSet("loading", "lazy")
+            return parser.renderer.image(tokens, index, options, env)
+        if not url.scheme and not url.netloc:
+            project = vault.root == PUBLIC_PROJECTS_ROOT.resolve()
+            if project and url.path.startswith('/projects/'):
+                candidate = unquote(url.path[len('/projects/'):])
+            else:
+                candidate = posixpath.normpath(posixpath.join(posixpath.dirname(current), unquote(url.path)))
+            if vault.safe_file(candidate) is None:
+                return html.escape(f"![{token.content}]({src})")
+            token.attrSet("src", ('/projects/' + quote(candidate)) if project else ('/asset?path=' + quote(candidate)))
+        token.attrSet("loading", "lazy")
+        return parser.renderer.image(tokens, index, options, env)
+
+    parser.inline.ruler.before("link", "knowledge_wiki", wiki_rule)
+    parser.inline.ruler.before("html_inline", "knowledge_video", video_rule)
+    parser.renderer.rules["knowledge_video"] = video_render
+    parser.renderer.rules["link_open"] = link_render
+    parser.renderer.rules["image"] = image_render
+    return parser.renderInline(source, references)
 
 
 def render_markdown(body: str, vault: Vault, current: str) -> str:
     parser = MarkdownIt("commonmark", {"html": False}).enable("table")
-    blocks = parser.parse(body)
+    references = {}
+    blocks = parser.parse(body, references)
     heading_ids: set[str] = set()
     quotes = []
 
@@ -1825,8 +1881,8 @@ def render_markdown(body: str, vault: Vault, current: str) -> str:
     def inline_rule(tokens, index, options, env):
         block = tokens[index]
         title = block.meta.get("callout_title")
-        prefix = f'<span class="callout-title">{render_inline(title, vault, current)}</span>' if title else ""
-        return prefix + render_inline(block.content, vault, current)
+        prefix = f'<span class="callout-title">{render_inline(title, vault, current, references)}</span>' if title else ""
+        return prefix + render_inline(block.content, vault, current, references)
 
     def code_rule(tokens, index, options, env):
         block = tokens[index]
@@ -1865,23 +1921,22 @@ def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes
     except (OSError, UnicodeError):
         return b""
     document_dir = posixpath.dirname(relative)
+    image_sizes = {}
 
     def image_markdown(match: re.Match[str]) -> str:
-        attributes = match.group(1)
-        src_match = re.search(r"\bsrc=[\"']([^\"']+)[\"']", attributes, flags=re.IGNORECASE)
-        alt_match = re.search(r"\balt=[\"']([^\"']*)[\"']", attributes, flags=re.IGNORECASE)
-        alt = alt_match.group(1) if alt_match else ""
-        if not src_match:
-            return ""
-        src = src_match.group(1)
-        if src.startswith(("http://", "https://", "data:", "//")):
-            return alt
-        resolved = posixpath.normpath(posixpath.join(document_dir, src))
-        if resolved.startswith(("..", "/")):
-            return alt
-        # 图片通过 /projects/<path> 提供（同一个只读路由），所以路径要带上
-        # projects/ 这一段；只写 /<path> 会落到站点根，404。
-        return f"![{alt}](/projects/{resolved})"
+        image = BeautifulSoup(match.group(0), 'html.parser').find('img')
+        alt = str(image.get('alt', ''))
+        src = str(image.get('src', ''))
+        if not src or urlsplit(src).scheme or src.startswith('//'):
+            return html.escape(alt)
+        resolved = posixpath.normpath(posixpath.join(document_dir, unquote(src)))
+        if resolved.startswith(('..', '/')):
+            return html.escape(alt)
+        image_url = '/projects/' + quote(resolved)
+        image_sizes[image_url] = {name: str(image[name]) for name in ('width', 'height')
+                                 if str(image.get(name, '')).isdigit() and 0 < int(image[name]) <= 4096}
+        label = alt.replace('[', r'\[').replace(']', r'\]')
+        return f'![{label}](<{image_url}>)'
 
     body = re.sub(r"<img\b([^>]*)>", image_markdown, body, flags=re.IGNORECASE)
     body = re.sub(r"<!--.*?-->", "", body, flags=re.DOTALL)
@@ -1892,19 +1947,57 @@ def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes
     project_vault = Vault(PUBLIC_PROJECTS_ROOT)
     rendered = render_markdown(body, project_vault, relative)
 
-    def project_asset_url(match: re.Match[str]) -> str:
-        relative_asset = unquote(match.group(1)).lstrip("/")
-        if not relative_asset or relative_asset.startswith((".", "..")):
-            return "#"
-        encoded_asset = quote(relative_asset, safe="/%:@-._~!$&'()*+,;=")
-        return f"/projects/{encoded_asset}"
-
-    rendered = re.sub(
-        r'href="/\?path=([^"]+)"', lambda m: f'href="{project_asset_url(m)}"', rendered
-    )
-    rendered = re.sub(
-        r'src="/asset\?path=([^"]+)"', lambda m: f'src="{project_asset_url(m)}"', rendered
-    )
+    document_body = BeautifulSoup(rendered, 'html.parser')
+    for text in list(document_body.find_all(string=True)):
+        if '<' not in text or text.find_parent(['code', 'pre']):
+            continue
+        fragment = BeautifulSoup(str(text), 'html.parser')
+        tags = fragment.find_all(True)
+        if tags and all(tag.name in {'b', 'strong', 'em', 'i', 'kbd', 'code', 'sub', 'sup'} for tag in tags):
+            for tag in tags:
+                tag.attrs = {}
+                if tag.name == 'b':
+                    tag.name = 'strong'
+                elif tag.name == 'i':
+                    tag.name = 'em'
+            text.replace_with(*list(fragment.contents))
+    headings = {node['id']: node for node in document_body.select('h1[id],h2[id],h3[id],h4[id],h5[id],h6[id]')}
+    aliases = {}
+    for ident in headings:
+        key = re.sub('-+', '-', ident).strip('-').lower()
+        aliases.setdefault(key, []).append(ident)
+    for link in document_body.select('a[href]'):
+        url = urlsplit(link['href'])
+        if url.scheme or url.netloc:
+            continue
+        fragment = unquote(url.fragment)
+        if not url.path and not url.query and fragment not in headings:
+            key = re.sub(r'[^\w\u4e00-\u9fff-]+', '-', fragment)
+            matches = aliases.get(re.sub('-+', '-', key).strip('-').lower(), [])
+            if len(matches) == 1:
+                link['href'] = '#' + quote(matches[0])
+        elif url.path == '/' and 'path' in parse_qs(url.query):
+            target = parse_qs(url.query)['path'][0]
+            if project_vault.safe_file(target):
+                link['href'] = '/projects/' + quote(target) + ('#' + quote(fragment) if fragment else '')
+        elif url.path and not url.path.startswith('/'):
+            target = posixpath.normpath(posixpath.join(document_dir, unquote(url.path)))
+            if project_vault.safe_file(target):
+                link['href'] = '/projects/' + quote(target) + ('#' + quote(fragment) if fragment else '')
+        link.attrs.pop('data-note', None)
+    for image in document_body.select('img[src]'):
+        if urlsplit(image['src']).hostname in {'img.shields.io', 'trendshift.io'}:
+            image.replace_with(str(image.get('alt', '')))
+            continue
+        for name, value in image_sizes.get(image['src'], {}).items():
+            image[name] = value
+        if image.has_attr('height') and not image.has_attr('width'):
+            image['style'] = f"height:{image['height']}px;width:auto"
+    for region in document_body.select('.table-wrap,.code-block'):
+        region['tabindex'] = '0'
+        region['role'] = 'region'
+        region['aria-label'] = '表格内容，可横向滚动' if region.name == 'div' else '代码内容，可横向滚动'
+    rendered = str(document_body)
 
     # The header used to be hardcoded to OpenMAIC, which leaked the wrong project
     # name onto every other README. Derive the way back from the document.
@@ -1923,37 +2016,56 @@ def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes
 <script src="/static/legacy-polyfills.js"></script><script src="/static/shell.js"></script>
 <style>
 /* 项目说明页用 .tk-shell 作为内容列，与站内其他页共用一套框架。 */
-.doc-top{{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:76px;border-bottom:1px solid var(--color-line);color:var(--color-muted);font-size:var(--text-small)}}
-.doc-top a{{font-weight:700;text-decoration:none}}
-.doc-body{{margin-top:27px;padding:30px 34px;background:var(--color-panel);border:1px solid var(--color-line);border-radius:var(--radius-sm);box-shadow:var(--shadow-sm);overflow-wrap:anywhere}}
-.doc-body h1,.doc-body h2,.doc-body h3,.doc-body h4{{line-height:1.35}}
-.doc-body h1{{margin:0 0 22px;font-size:31px}}
-.doc-body h2{{margin:31px 0 10px;padding-bottom:5px;border-bottom:1px solid var(--color-line);font-size:22px}}
-.doc-body h3{{margin:24px 0 7px;font-size:18px}}
-.doc-body p{{margin:12px 0;color:var(--color-ink-soft)}}
-.doc-body ul,.doc-body ol{{padding-left:24px;color:var(--color-ink-soft)}}
-.doc-body li{{margin:4px 0}}
-.doc-body img{{display:block;max-width:100%;height:auto;margin:13px auto;border:1px solid var(--color-line);border-radius:5px}}
-.doc-body p:has(>img){{display:inline-block;vertical-align:middle;margin:4px 7px}}
-.doc-body blockquote{{margin:16px 0;padding:8px 15px;border-left:3px solid var(--color-accent);background:var(--color-accent-soft);color:var(--color-muted)}}
-.doc-body code{{padding:1px 4px;border:1px solid var(--color-line);border-radius:3px;background:var(--color-surface);color:var(--color-accent);font-family:var(--font-mono);font-size:.9em}}
-.doc-body .code-block{{padding:15px;overflow:auto;border-radius:6px;background:#202724;color:#e6ece9;line-height:1.6}}
+.doc-top{{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:var(--space-4);max-width:808px;min-height:76px;border-bottom:1px solid var(--color-line);color:var(--color-muted);font-size:var(--text-body)}}
+.doc-top a{{font-weight:var(--weight-semibold)}}
+.doc-body{{max-width:808px;margin-top:var(--space-6);padding:var(--space-8);background:var(--color-panel);color:var(--color-ink-soft);border:1px solid var(--color-line);border-radius:var(--radius-sm);font-size:var(--text-lg);line-height:1.75;overflow-wrap:anywhere}}
+.doc-body h1,.doc-body h2,.doc-body h3,.doc-body h4{{line-height:1.35;color:var(--color-ink);scroll-margin-top:var(--space-6)}}
+.doc-body h1{{margin:0 0 var(--space-6);font-size:var(--text-h1)}}
+.doc-body h2{{margin:var(--space-8) 0 var(--space-4);padding-bottom:var(--space-2);border-bottom:1px solid var(--color-line);font-size:var(--text-h2)}}
+.doc-body h3{{margin:var(--space-6) 0 var(--space-2);font-size:var(--text-h3)}}
+.doc-body p{{margin:var(--space-4) 0}}
+.doc-body ul,.doc-body ol{{padding-left:var(--space-6)}}
+.doc-body li{{margin:var(--space-2) 0}}
+.doc-body img{{display:block;max-width:100%;height:auto;object-fit:contain;margin:var(--space-4) auto;border:1px solid var(--color-line);border-radius:var(--radius-sm)}}
+.doc-body img[height]{{display:inline-block;vertical-align:middle;margin:var(--space-2)}}
+body.tk-host .doc-body a{{color:var(--color-accent);text-decoration:underline;text-underline-offset:.2em}}
+.doc-body blockquote{{margin:var(--space-4) 0;padding:var(--space-2) var(--space-4);border-left:3px solid var(--color-accent);background:var(--color-accent-soft);color:inherit}}
+.doc-body code{{padding:1px var(--space-1);border:1px solid var(--color-line);border-radius:var(--radius-xs);background:var(--color-surface);color:var(--color-accent);font-family:var(--font-mono);font-size:1em}}
+.doc-body .code-block{{padding:var(--space-4);overflow:auto;border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-surface);color:var(--color-ink);font-size:var(--text-body);line-height:1.65}}
 .doc-body .code-block code{{padding:0;border:0;background:none;color:inherit}}
-.doc-body .callout{{padding:12px 15px;border:1px solid var(--color-accent-line);border-radius:6px;background:var(--color-accent-soft)}}
-.doc-body table{{border-collapse:collapse;width:100%;min-width:560px}}
-.doc-body .table-wrap{{overflow:auto;margin:15px 0}}
-.doc-body th,.doc-body td{{padding:8px 10px;border:1px solid var(--color-line);text-align:left;vertical-align:top}}
-.doc-body th{{background:var(--color-surface)}}
-@media(max-width:760px){{.doc-body{{margin-top:18px;padding:20px 17px}}.doc-body h1{{font-size:26px}}.doc-body h2{{font-size:20px}}}}
+.doc-body .callout{{padding:var(--space-3) var(--space-4);border:1px solid var(--color-accent-line);border-radius:var(--radius-sm);background:var(--color-accent-soft)}}
+.doc-body table{{border-collapse:collapse;width:100%;font:inherit}}
+.doc-body .table-wrap{{overflow:auto;overscroll-behavior:contain;margin:var(--space-4) 0}}
+.doc-body th,.doc-body td{{min-width:8em;padding:var(--space-3);border:1px solid var(--color-line);text-align:left;vertical-align:top;line-height:inherit}}
+.doc-body th{{background:var(--color-surface);color:var(--color-ink)}}
+.doc-body [tabindex]:focus-visible{{outline:2px solid var(--color-accent);outline-offset:2px}}
+@media(max-width:760px){{.doc-body{{margin-top:var(--space-4);padding:var(--space-4);font-size:var(--text-body)}}.doc-body h1{{font-size:var(--text-h1)}}}}
+@media print{{.doc-top,.tk-sidebar,.skip-link{{display:none}}.doc-body{{max-width:none;border:0;padding:0;color:black;background:white}}.doc-body .code-block{{white-space:pre-wrap;overflow-wrap:anywhere;color:black;background:white}}.doc-body th,.doc-body td{{min-width:0}}}}
 </style></head>
 <body class="tk-host">
+<a class="skip-link" href="#project-document">跳到正文</a>
 <aside class="tk-sidebar" id="tk-sidebar"></aside>
 <div class="tk-shell">
 <header class="doc-top"><span>{html.escape(title)}</span><a href="{back_href}">{back_label}</a></header>
-<main class="doc-body">{rendered}</main>
+<main id="project-document" class="doc-body" tabindex="-1">{rendered}</main>
 </div>
 <script>
-  document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({{ page: 'projects', auth: true }}));
+  document.addEventListener('DOMContentLoaded', () => {{
+    TKShell.sidebar({{ page: 'projects', auth: true }});
+    const navigate=(hash)=>{{
+      const target=document.getElementById(decodeURIComponent(hash.slice(1)));
+      if(!target)return false;
+      target.tabIndex=-1;target.scrollIntoView({{block:'start'}});target.focus({{preventScroll:true}});
+      return true;
+    }};
+    document.querySelectorAll('.doc-body a[href^="#"],.skip-link').forEach(link=>link.addEventListener('click',event=>{{
+      if(event.ctrlKey||event.metaKey||event.shiftKey||event.altKey)return;
+      const hash=link.getAttribute('href');
+      if(navigate(hash)){{event.preventDefault();if(location.hash!==hash)history.pushState({{}},'',hash)}}
+    }}));
+    window.addEventListener('hashchange',()=>navigate(location.hash));
+    if(location.hash)document.fonts.ready.then(()=>navigate(location.hash));
+  }});
 </script>
 </body></html>"""
     return document.encode("utf-8")
@@ -2077,7 +2189,9 @@ class Handler(BaseHTTPRequestHandler):
             "default-src 'self'; base-uri 'self'; form-action 'self'; "
             "frame-ancestors 'self'; img-src 'self' data: https:; "
             "style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; "
-            "connect-src 'self'; frame-src https://player.bilibili.com",
+            "connect-src 'self'; frame-src https://player.bilibili.com"
+            if not content_type.startswith('image/svg+xml') else
+            "sandbox; default-src 'none'; style-src 'unsafe-inline'; img-src data:; base-uri 'none'",
         )
         if download:
             # 中文文件名不能直接放进头（头是 latin-1），必须用 RFC 5987 的
@@ -2464,12 +2578,18 @@ class Handler(BaseHTTPRequestHandler):
             rel = unquote(path[len("/projects/") :])
             candidate = (REPOSITORY_ROOT / "projects" / rel).resolve()
             projects_root = (REPOSITORY_ROOT / "projects").resolve()
+            images = {'.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+                      '.gif': 'image/gif', '.webp': 'image/webp', '.avif': 'image/avif', '.svg': 'image/svg+xml'}
             if (
-                candidate.suffix.lower() not in {".md", ".markdown"}
+                candidate.suffix.lower() not in {'.md', '.markdown', *images}
                 or projects_root not in candidate.parents
+                or any(part.startswith('.') for part in Path(rel).parts)
                 or not candidate.is_file()
             ):
                 self.send_json({"error": "project document not found"}, 404)
+                return
+            if candidate.suffix.lower() in images:
+                self.send_bytes(candidate.read_bytes(), images[candidate.suffix.lower()])
                 return
             # 项目目录里的 Markdown 一律渲染成页面，而不是把原文丢给浏览器
             # —— 后者在浏览器里会变成纯文本下载，点「中文说明」的人看到的
@@ -2558,13 +2678,17 @@ class Handler(BaseHTTPRequestHandler):
             # The resolved parent must still be inside /static. Comparing to a
             # fixed set rather than merely "is under root" keeps a symlink or a
             # crafted name from reaching the repo root.
-            if file.parent != root and file.parent != root / "fonts":
+            if file.parent != root and file.parent != root / "fonts" and file.parent != root / "figures":
                 self.send_json({"error": "asset not found"}, 404)
                 return
             if not file.is_file():
                 self.send_json({"error": "asset not found"}, 404)
                 return
             allowed = {".css", ".js", ".mjs", ".map", ".woff2", ".woff", ".svg"}
+            # figures/ 是站内配图目录：文章引用的图镜像到这里，避免依赖外链
+            # （外链会被图源站限流，读者看到的是空图框）。只放行图片后缀。
+            if file.parent == root / "figures":
+                allowed = {".png", ".jpg", ".jpeg", ".webp", ".svg"}
             if file.suffix.lower() not in allowed:
                 self.send_json({"error": "asset not found"}, 404)
                 return
@@ -2578,6 +2702,32 @@ class Handler(BaseHTTPRequestHandler):
             if fav.is_file():
                 self.send_bytes(fav.read_bytes(), "image/svg+xml")
                 return
+        if path == "/robots.txt":
+            # 公网实例可以被搜索引擎收录；中台与工具启动路径明确排除。
+            # 局域网实例的 Bonjour 主名不被搜索引擎发现，多返回这个文件无害。
+            self.send_bytes(
+                b"User-agent: *\nDisallow: /insights\nDisallow: /api/insights\nDisallow: /launch\nSitemap: /sitemap.xml\n",
+                "text/plain; charset=utf-8",
+            )
+            return
+        if path == "/sitemap.xml":
+            # 收录范围与读者看到的首页一致：全部 listed 文章。
+            # 每次请求现场生成（几十毫秒），不引入缓存失效问题。
+            self.vault.refresh()
+            urls = []
+            for n in self.vault.notes.values():
+                if not n["listed"]:
+                    continue
+                loc = f"/?path={quote(str(n['path']))}"
+                urls.append(f"<url><loc>{html.escape(loc, quote=True)}</loc></url>")
+            body = (
+                '<?xml version="1.0" encoding="UTF-8"?>\n'
+                '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+                + "\n".join(urls)
+                + "\n</urlset>\n"
+            )
+            self.send_bytes(body.encode("utf-8"), "application/xml; charset=utf-8")
+            return
         if path == "/health":
             self.vault.refresh()
             bound_host = self.server.server_address[0]  # type: ignore[attr-defined]
@@ -3540,10 +3690,13 @@ def insights_freshness(vault) -> dict[str, object]:
             "action": action,
             "agent": str(event.get("agent") or ""),
             "note": str(event.get("note") or ""),
+            "ts": float(event.get("ts") or 0),
             "time": _day_key(float(event.get("ts") or 0)) + " " + time.strftime(
                 "%H:%M", time.localtime(float(event.get("ts") or 0))),
         })
-    recent.reverse()
+    # 按时间倒序：账本是追加写的，但同一次巡检里失败与成功的写入顺序取决于
+    # 文章顺序，照文件顺序展示会让「最近发生什么」读不出来
+    recent.sort(key=lambda r: float(r["ts"]), reverse=True)
 
     reports_dir = EDITORIAL_HOME / "reports"
     patrol_dates = []

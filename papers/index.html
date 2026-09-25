@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
     <title>论文追踪 · technical-knowledge</title>
     <meta name="description" content="追踪图数据系统与工程知识相关的 arXiv 论文：三层过滤、深度精读、与知识库条目互相引用，每日更新。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="工程知识库" />
+    <meta property="og:title" content="论文追踪 · technical-knowledge" />
+    <meta property="og:description" content="追踪图数据系统与工程知识相关的 arXiv 论文：三层过滤、深度精读、与知识库条目互相引用，每日更新。" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="论文追踪 · technical-knowledge" />
+    <meta name="twitter:description" content="追踪图数据系统与工程知识相关的 arXiv 论文：三层过滤、深度精读、与知识库条目互相引用，每日更新。" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="/static/tokens.css" />
     <link rel="stylesheet" href="/static/base.css" />
@@ -13,6 +20,13 @@
     <script src="/static/legacy-polyfills.js"></script><script src="/static/shell.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({ page: 'papers' }));
+      /* 顶栏（含搜索框）由 shell 统一生成：此前搜索框只挂在 hero 里，
+         与主站「搜索框在顶栏右上角」的位置不一致。这里把 hero 里那个框
+         搬进顶栏——搬的是位置，id 与筛选逻辑不动。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.mountTopbar({
+        title: '追踪新论文和解析',
+        reuse: document.querySelector('.page-toolbar .tk-search'),
+      }));
       document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
         where: () => '当前页面：<b>论文追踪</b>',
         title: () => '论文追踪',
@@ -780,7 +794,7 @@
 base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
              （间距由 .hero .page-toolbar 的 margin-top 统一给，页面零
              间距规则）。切标签时 JS 换 placeholder。 -->
-        <div class="page-toolbar">
+        <div class="page-toolbar" hidden>
           <label class="tk-search">
             <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
             <input type="search" id="pn-search" placeholder="搜标题或方向" autocomplete="off" />
