@@ -11,20 +11,31 @@ tags:
   - ai/reliability
   - ai/engineering
   - software/testing
+editorial_dims: [text]
 sources:
   - "实践证据档案（已脱敏）"
   - "https://modelcontextprotocol.io/specification/2025-06-18/basic" # historical baseline
   - "https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx"
-  - "https://opentelemetry.io/docs/concepts/observability-primer/"
-editorial_pass: 1
-editorial_at: 2026-09-24
-editorial_by: agent-A
-editorial_note: "补资源生命周期状态图，清三处二分对照与一处套话行"
+  - "https://opentelemetry.io/zh/docs/concepts/observability-primer/"
+editorial_pass: 2
+editorial_at: 2026-09-25
+editorial_by: agent-W
+editorial_note: "Spark 括注位置修正：两个专名共享同一解释"
 ---
 
 # 执行证据必须独立于 AI 结论
 
+## 要解决的问题
+
+Agent 报告"测试通过，可以提交"时，无法从这份结论里看出测试是否真的运行过、运行在哪个环境、退出码是多少。本篇回答：哪些记录必须由执行侧产生、模型输出在验证链条里处在什么位置、结论与记录不一致时按什么处理，以及缺少记录的提交怎样被拦下。
+
 ## 先看一个真实失败
+
+自我反思不能替代外部证据：模型检查自己的输出时，仍然是在用它自己的判断做判断，误差不会因此消失。真正可靠的循环里，反馈必须来自外部执行结果，而不是模型对自己答案的评价。
+
+![Reflexion 的循环结构：反馈来自外部评估，模型据此修正下一轮输出](/static/figures/arxiv-reflexion-的循环结构-反馈来自外部评估-模型据此修正下一轮输出.svg)
+
+*图示：反思循环（来源：arXiv 2303.11366 的 reflexion_tasks）。反馈源在模型之外，循环才有纠偏能力。*
 
 一个 Agent 改了 `pom.xml` 里的依赖版本，然后报告"测试通过，可以提交"。
 
@@ -34,7 +45,7 @@ editorial_note: "补资源生命周期状态图，清三处二分对照与一处
 
 这类失败不是模型不够聪明。**是职责边界放错了：让会写解释的人，同时拥有"什么算成功"的判定权。**
 
-验证的锚点：证据链要与结论对账——AI 结论引用的证据要能独立复核（重新跑命令、重新查日志得到同一份原始记录），复核对不上的结论按未验证处理，不进决策链。
+证据链要与结论对账——AI 结论引用的证据要能独立复核（重新跑命令、重新查日志得到同一份原始记录），复核对不上的结论按未验证处理，不进决策链。
 
 ## 边界应该划在哪
 
@@ -81,24 +92,24 @@ AI 可以提出"应该执行什么"和"结果可能意味着什么"，但不能�
 
 ```mermaid
 flowchart TD
-    A[任务领取资源<br/>worktree/端口/容器/凭据] --> B[登记 owner + generation + lease]
-    B --> C{任务结束}
-    C --> D{资源仍被引用?}
-    D -->|lease 有效| E[保留<br/>清理动作拒绝]
-    D -->|无人使用| F[清理并释放]
-    G[旧任务清理请求] -.->|验证活跃引用| B
+    A[任务领取资源<br/>worktree/端口/容器/凭据] -->|登记归属| B[owner、generation<br/>与 lease]
+    B -->|任务进入终态| C{任务结束}
+    C -->|判定归属| D{仍被引用?}
+    D -->|lease 有效| E[保留<br/>不清理]
+    D -->|无人使用| F[清理释放]
+    G[旧任务清理] -.->|验证活跃引用| B
 ```
 
 - 每个任务使用独立 worktree、运行目录、临时端口、容器/沙箱和凭据范围。
 - 任务结束时只清理自己持有且已确认无人使用的资源。
-- 为资源设置 owner、generation、lease/引用计数；旧任务不能删除新任务正在使用的 Git 元数据或缓存。
+- 为资源设置 owner、generation、lease（租约：带到期时间的占有权，过期即视为释放）与引用计数；旧任务不能删除新任务正在使用的 Git（版本控制系统）元数据或缓存。
 - 子进程、孙进程、容器和后台任务纳入同一生命周期树，超时后可追踪、终止和收尸。
 
 ### 执行事实
 
 - AI 声称执行过的每条命令必须对应真实的 `command_id`、启动时间、工作目录和进程记录。
 - 保存退出码、stdout、stderr、信号、超时原因和产物清单；日志不可只保留模型摘要。
-- “validate 成功”只能证明 validate 这个目标成功，不能投影为完整编译、测试或产品行为成功。
+- 「validate 成功」只能证明 validate 这个目标成功，不能投影为完整编译、测试或产品行为成功。
 - 对工具返回值进行 schema 校验；无结构文本只作为诊断证据，不作为状态机输入。
 
 ### 结果一致性
@@ -164,19 +175,19 @@ AI 很擅长为错误结论提供合理解释。所以要做的是让它读到�
 ## 事实门禁流程
 
 ```mermaid
-flowchart LR
-    A[AI 生成计划/命令/解释] --> B[框架 schema 校验]
-    B --> C[隔离执行与资源租约]
-    C --> D[采集进程/退出码/日志/产物]
-    D --> E[绑定项目、revision、attempt]
-    E --> F{证据足够?}
-    F -- 否 --> G[标记环境阻断/需人工]
-    F -- 是 --> H[把事实反馈给 AI]
-    H --> I[AI 选择下一步语义动作]
-    I --> C
+flowchart TD
+    A[AI 生成计划/命令/解释] -->|先校验结构| B[框架 schema 校验]
+    B -->|结构合法才执行| C[隔离执行与租约]
+    C -->|产出原始记录| D[采集进程/退出码<br/>日志/产物]
+    D -->|绑定上下文| E[绑定项目、revision<br/>与 attempt]
+    E -->|判定是否够用| F{证据足够?}
+    F -->|否| G[标记阻断需人工]
+    F -->|是| H[反馈事实]
+    H -->|基于事实| I[AI 选下一步动作]
+    I -->|进入下一轮| C
 ```
 
-框架不需要知道“这个测试是否有业务价值”，但必须知道“报告中这句话是否有真实执行证据”。这是一条比为每个项目硬编码测试规则更小、也更通用的边界。
+框架不需要知道「这个测试是否有业务价值」，但必须知道「报告中这句话是否有真实执行证据」。这是一条比为每个项目硬编码测试规则更小、也更通用的边界。
 
 ## 最小接口
 
@@ -198,7 +209,7 @@ Reporter
   -> render(only=projected_facts_and_supported_claims)
 ```
 
-Planner 可以动态生成构建画像、测试入口、依赖准备和回退方案；Executor 不必预先理解 Spark、Pulsar 或某种语言，只需执行受限命令并如实记录。若执行器缺少某类采集能力，应明确标记“无法证明”，而不是默认成功或失败。
+Planner（规划器，负责决定构建与测试方案的组件）可以动态生成构建画像、测试入口、依赖准备和回退方案；Executor 不必预先理解 Spark、Pulsar（两者都是分布式计算引擎）或某种语言，只需执行受限命令并如实记录。若执行器缺少某类采集能力，应明确标记「无法证明」，而不是默认成功或失败。
 
 ## 与 Agent 工程的关系
 
@@ -220,30 +231,26 @@ Planner 可以动态生成构建画像、测试入口、依赖准备和回退方
 
 ## 来源与证据边界
 
-本页的职责划分来自本库工作项目中的真实失败复盘，并抽象成跨项目原则；具体数值、进程管理实现和供应商 API 不能直接从原则推导。协议和可观测性标准仍需以对应版本的官方规范为准，例如 [MCP 历史基线（2025-06-18）](https://modelcontextprotocol.io/specification/2025-06-18/basic)、[MCP 2026-07-28 changelog](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx) 和 [OpenTelemetry observability primer](https://opentelemetry.io/docs/concepts/observability-primer/)。
+本页的职责划分来自本库工作项目中的真实失败复盘，并抽象成跨项目原则；具体数值、进程管理实现和供应商 API 不能直接从原则推导。协议和可观测性标准仍需以对应版本的官方规范为准，例如 [MCP 历史基线（2025-06-18）](https://modelcontextprotocol.io/specification/2025-06-18/basic)、[MCP 2026-07-28 changelog](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx) 和 [OpenTelemetry observability primer](https://opentelemetry.io/zh/docs/concepts/observability-primer/)。
 
 ### 直接案例到通用原则的映射
 
 | 原始案例事实 | 提炼后的长期原则 | 当前承载页 |
 | --- | --- | --- |
-| AI 实际运行命令但事件解析器未识别 | 声明必须绑定真实 command/process 事件；解析器失败标记 unknown，不反推“未执行” | 本页“执行事实” |
+| AI 实际运行命令但事件解析器未识别 | 声明必须绑定真实 command/process 事件；解析器失败标记 unknown，不反推「未执行」 | 本页「执行事实」 |
 | worktree 尚在使用却被其他任务清理 | 资源使用 owner + generation + lease；清理要验证活跃引用 | [[工程知识/后端系统：在并发、失败与变化中维持服务/分布式可靠性/租约必须配合FencingToken阻止过期持有者]] |
 | Maven validate 通过但 compile/test 未通过 | 事实只投影到真实执行的目标，禁止扩大成功范围 | [[工程知识/软件构建：让变化可以理解、验证与交付/测试与交付/测试策略从风险选择证据]] |
-| “测试不适用”掩盖依赖下载失败 | 语义结论必须引用构建/网络/权限证据，环境阻断与产品失败分开 | [[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/AI辅助研发必须形成证据闭环]] |
-| 后一次失败覆盖此前复现成功 | attempt 事件不可变，汇总状态单调且保留多维事实 | 本页“结果一致性” |
+| 「测试不适用」掩盖依赖下载失败 | 语义结论必须引用构建/网络/权限证据，环境阻断与产品失败分开 | [[工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/AI辅助研发必须形成证据闭环]] |
+| 后一次失败覆盖此前复现成功 | attempt 事件不可变，汇总状态单调且保留多维事实 | 本页「结果一致性」 |
 | 主进程终止后状态永远 running | 超时和孤儿检测必须有进程外 observer/lease | [[工程知识/后端系统：在并发、失败与变化中维持服务/任务与并发/任务生命周期必须覆盖进程、日志、超时与清理]] |
 
 案例细节经去重和脱敏后保存在 实践证据档案（已脱敏），主导航只暴露提炼后的机制与验证方法。
 
-相关：[[工程知识/软件构建：让变化可以理解、验证与交付/测试与交付/AI 做前端与设计：可验证的打磨回路]]
+同一条判据落在前端打磨上就是另一副样子：截图与交互检查同样要给出执行证据，读者可对照看 [[工程知识/软件构建：让变化可以理解、验证与交付/测试与交付/AI 做前端与设计：可验证的打磨回路]]。
 
 ## 验证
 
 最小验证：让 Agent 完成一次依赖版本改动的任务，断言提交记录里存在命令、退出码、diff 与测试报告，且这些记录由执行侧生成而非模型输出；人为修改模型给出的结论，断言门禁拒绝放行。
 
 独立性验证：把模型的自然语言结论清空后重跑核对流程，断言核对仍能依据退出码与产物给出同样的判定。
-
-## 要解决的问题
-
-Agent 报告"测试通过，可以提交"时，无法从这份结论里看出测试是否真的运行过、运行在哪个环境、退出码是多少。本篇回答：哪些记录必须由执行侧产生、模型输出在验证链条里处在什么位置、结论与记录不一致时按什么处理，以及缺少记录的提交怎样被拦下。
 

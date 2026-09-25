@@ -2038,6 +2038,15 @@ def render_project_markdown_page(path: Path, relative: str, title: str) -> bytes
             image[name] = value
         if image.has_attr('height') and not image.has_attr('width'):
             image['style'] = f"height:{image['height']}px;width:auto"
+        elif image.has_attr('height'):
+            # 上游 README 用 height 属性定高（DeepTutor 标志 height=56）时，
+            # 渲染器补的固有 width 会在 CSS height:auto 下把高度等比放大
+            # （width 543 撑出 height 533）。作者指定的尺寸优先：去掉固有
+            # 宽高，保留 height 属性并显式锁高，避免被 .doc-body img 的高
+            # 度自适应规则覆盖。
+            height_value = image['height']
+            image.attrs.pop('width', None)
+            image['style'] = f"height:{height_value}px;width:auto"
     for region in document_body.select('.table-wrap,.code-block'):
         region['tabindex'] = '0'
         region['role'] = 'region'
