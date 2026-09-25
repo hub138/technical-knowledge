@@ -703,7 +703,11 @@
 .reader-body li>p{margin:var(--space-2) 0}
 .reader-body blockquote>p:first-child{margin-top:var(--space-2)}
 .reader-body blockquote>p:last-child{margin-bottom:var(--space-2)}
-.reader-body blockquote{margin:var(--space-5) 0;border-left:3px solid var(--color-accent);padding:var(--space-2) var(--space-4) var(--space-2) var(--space-5);color:var(--color-muted);background:var(--color-surface)}
+.reader-body blockquote{margin:var(--space-5) 0;border-left:4px solid var(--color-accent);padding:var(--space-3) var(--space-5);color:var(--color-muted);background:var(--color-surface)}
+/* 引用块内首词强化（2026-09-26 三批，掘金学习）：本站 137 篇的要点块
+   都以「**要点**：」开头，掘金强调条里首词自带视觉锚；这里给首词上
+   accent 色加粗，让扫读时先落到「要点」两个字上。 */
+.reader-body blockquote>strong:first-child,.reader-body blockquote>p:first-child>strong:first-child{color:var(--color-accent)}
 /* 2026-09-25 掘金学习：引用块正文与引文层级分开——掘金引文实测 #666 弱化；
    本站用 muted(8:1) 保住对比度底线，同时与正文 ink-soft 拉开一档。 */
 .reader-body a{color:var(--color-accent)}
@@ -767,7 +771,7 @@
 .reader-outline a[data-level="3"]{padding-left:var(--space-6)}
 .reader-outline a[data-level="4"]{padding-left:var(--space-8)}
 .reader-outline a:hover,.reader-outline a:focus-visible{background:var(--color-accent-soft);color:var(--color-accent);border-radius:var(--radius-sm)}
-#reader-toc .toc-list a[aria-current="location"],#reader-outline-list a[aria-current="location"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:var(--weight-semibold);box-shadow:inset 3px 0 var(--color-accent);border-radius:var(--radius-xs)}
+#reader-toc .toc-list a[aria-current="location"],#reader-outline-list a[aria-current="location"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:var(--weight-medium);box-shadow:inset 3px 0 var(--color-accent);border-radius:var(--radius-xs)}
 #reader-outline-trigger[hidden]{display:none}
 @media(min-width:1200px){#reader-outline-trigger{display:none}}
 @media print{.reader-image-tools,.reader-outline{display:none}.reader-image[data-state="error"]{display:none}}
@@ -1493,7 +1497,7 @@ html[data-lang="en"] .home:empty::before{content:'Loading the library...'}
 
 .topbar .theme-toggle{position:absolute;right:30px;top:20px;z-index:var(--z-sidebar)}
 @media(max-width:760px){.topbar .theme-toggle{right:15px;top:13px}}/* 上一篇/下一篇翻页条：正文收尾处，左右两格，顺序与右栏同模块列表、目录页一致。 */
-.reader-pager{margin:30px 0 0;padding-top:16px;border-top:1px solid var(--color-line)}.pager-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pager-cell{display:flex;flex-direction:column;gap:3px;padding:11px 14px;border:1px solid var(--color-line);border-radius:8px;background:var(--color-panel);text-decoration:none;min-height:52px}.pager-cell:not(.pager-none):hover{border-color:var(--color-accent);background:var(--color-accent-soft)}.pager-next{text-align:right;align-items:flex-end}.pager-label{font-size:var(--text-small);color:var(--color-muted);font-weight:700}.pager-cell:not(.pager-none):hover .pager-label{color:var(--color-accent)}.pager-title{font-size:var(--text-body);font-weight:700;color:var(--color-ink-soft);line-height:1.4}.pager-cell:not(.pager-none):hover .pager-title{color:var(--color-accent)}.pager-none{opacity:.45;justify-content:center}@media(max-width:760px){.pager-grid{grid-template-columns:1fr}.pager-next{align-items:flex-start;text-align:left}}/* 读毕奖励条：滚到文末淡入一次，肯定句加累计已读数与阅读用时。 */
+.reader-pager{margin:30px 0 0;padding-top:16px;border-top:1px solid var(--color-line)}.pager-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.pager-cell{display:flex;flex-direction:column;gap:6px;padding:12px 14px;border:1px solid var(--color-line);border-radius:8px;background:var(--color-panel);text-decoration:none;min-height:52px}.pager-cell:not(.pager-none):hover{border-color:var(--color-accent);background:var(--color-accent-soft)}.pager-next{text-align:right;align-items:flex-end}.pager-label{align-self:flex-start;display:inline-block;padding:1px 8px;border-radius:var(--radius-xs);background:var(--color-surface);color:var(--color-muted);font-size:var(--text-2xs);font-weight:var(--weight-medium)}.pager-cell:not(.pager-none):hover .pager-label{color:var(--color-accent)}.pager-title{font-size:var(--text-body);font-weight:var(--weight-medium);color:var(--color-ink-soft);line-height:1.4}.pager-cell:not(.pager-none):hover .pager-title{color:var(--color-accent)}.pager-none{opacity:.45;justify-content:center}.pager-next .pager-label{align-self:flex-end}@media(max-width:760px){.pager-grid{grid-template-columns:1fr}.pager-next{align-items:flex-start;text-align:left}.pager-next .pager-label{align-self:flex-start}}/* 读毕奖励条：滚到文末淡入一次，肯定句加累计已读数与阅读用时。 */
 .reader-reward{margin:16px 0 0;padding:12px 16px;border:1px solid var(--color-accent-line);border-radius:8px;background:var(--color-accent-soft);display:none;align-items:center;gap:10px;opacity:0;transform:translateY(6px);transition:opacity .4s ease,transform .4s ease}.reader-reward.on{display:flex;opacity:1;transform:none}.reward-star{color:var(--color-accent);font-size:20px}.reward-text{display:flex;flex-direction:column;gap:1px;font-size:var(--text-body);color:var(--color-ink)}.reward-text b{font-size:var(--text-md);font-weight:800;color:var(--color-accent-ink)}/* 2026-09-24 二次反馈修复：.reader-toc 之前整栏 position:sticky，正文一滚
    目录整个浮起来压在下方「同模块文章」上（用户截图圈出重叠）。改为只有
    标题行悬浮：滚过目录列表后，悬浮的只有「本文目录 ▾」一行，点它仍能
