@@ -234,6 +234,10 @@
         color: var(--color-line-strong);
         font-weight: var(--weight-normal);
       }
+      /* 分隔点是文本节点，需过 AA：暗色档 line-strong 只有 1.94:1，换 faint。 */
+      :root[data-theme="dark"] .facts span + span::before {
+        color: var(--color-faint);
+      }
       .project-meta .verified {
         display: block;
         margin-bottom: 5px;

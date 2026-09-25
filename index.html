@@ -636,6 +636,13 @@
 .reader-sources a{color:var(--color-accent);text-decoration:none}
 .reader-sources a:hover{text-decoration:underline}
 .source-sep{margin:0 5px;color:var(--color-line-strong)}
+/* 分隔点是文本节点，需过 AA。--color-line-strong 的语义是边框色：浅色档
+   slate-300 恰好也能当分隔点用（浅色下没用它承载可读文字），暗色档 #3d4761
+   相对背景只有 1.94:1，直接复用就把分隔点拖到不达标。暗色下换成
+   --color-faint（5.6:1），保持「比正文暗一档」的视觉层级。 */
+:root[data-theme="dark"] .source-sep,
+:root[data-theme="dark"] .domain-topics i + i::before,
+:root[data-theme="dark"] .tool-facts span + span::before{color:var(--color-faint)}
 .source-toggle{margin-left:8px;padding:1px 8px;border:1px solid var(--color-line);border-radius:var(--radius-full);background:transparent;color:var(--color-muted);font:inherit;font-size:var(--text-xs);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
 .source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--color-accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{font-size:var(--text-small);display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 248px;column-gap:30px;align-items:start}.reader-railcol{grid-column:2;position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto}.reader-railcol .reader-toc{position:static;max-height:none;overflow:visible}.reader-railcol .reader-toc .rail-head{position:static}.reader-layout:has(#reader-toc[hidden]):has(#reader-siblings[hidden]){grid-template-columns:minmax(0,1fr) 0;column-gap:0}}/* 同模块文章 2026-09-24 从正文后移入右栏（目录下方）；同日晚改：目录与同模块包进 .reader-railcol 一列整体 sticky——原先只有目录 sticky，同模块折叠行是静态块，被网格自动放置到正文列末行，目录底与折叠行之间空出一整条空白（用户截图反馈「每个页面都这么空」的病根之一）。窄屏（≤1199px）右栏隐藏，回退为正文后的横排胶囊。字号 13px → 16px（一次反馈「字再大一点」）→ 18px（二次反馈）→ 16px（三次反馈嫌太大）；右栏 204px→248px 加宽（三次反馈「有点窄」）。 */
 /* 文章页收尾区宽度（2026-09-24 晚）：pager/reward/图谱区全在 maincol 里，
