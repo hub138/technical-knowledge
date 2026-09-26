@@ -24,6 +24,7 @@
    * 这是整套配色的基础：底暖、字冷、点缀暖，三者温度一致。 */
   --color-bg: #fefdfb;
   --color-surface: #fbf9f5; /* 比底再暖一档，用于衬底块 */
+  --color-bg-soft: #f7f3ec; /* 比 surface 再浅一档的柔底（papers 评分徽标衬底），仍属暖白系 */
   --color-panel: #ffffff;
   --color-raised: #ffffff;
   --color-overlay: rgba(15, 23, 42, 0.42);
@@ -292,6 +293,7 @@
   /* 深海军（15 23 42 = slate-900）、卡片 slate-800、边框 slate-700。 */
   --color-bg: #0f172a;
   --color-surface: #182034;
+  --color-bg-soft: #141b2e; /* 比 surface 深半档的柔底，暗色下不做更浅（会读成污渍） */
   --color-panel: #1e293b;
   --color-raised: #26334a;
   --color-overlay: rgba(2, 6, 16, 0.66);
@@ -520,6 +522,7 @@
 
   --color-bg: #131722;
   --color-surface: #171c29;
+  --color-bg-soft: #131824; /* 同上：第二套暗色主题的同语义值 */
   --color-panel: #1a2030;
   --color-raised: #202737;
   --color-overlay: rgba(8, 11, 18, 0.62);

@@ -790,12 +790,19 @@
 .code-copy:hover,.code-copy:focus-visible{background:var(--color-accent-soft);border-color:var(--color-accent)}
 .code-copy:disabled{cursor:not-allowed;opacity:.7}
 .code-copy-status,.mmd-copy-status{font-size:var(--text-small);color:var(--color-muted);overflow-wrap:anywhere}
+/* 折叠（2026-09-26 十六批，掘金学习）：超长代码默认收起，头部按钮展开/收回。
+   折叠态给 240px 视窗 + 底部渐隐，一眼读出「下面还有」；展开态不限制。 */
+.code-fold{min-height:30px;padding:var(--space-1) var(--space-2);border:0;background:none;color:var(--color-muted);font:inherit;font-size:var(--text-small);cursor:pointer;transition:color var(--duration-fast) var(--ease-out)}
+.code-fold:hover,.code-fold:focus-visible{color:var(--color-accent)}
+.reader-code.is-folded .reader-code-pre{position:relative;max-height:240px;overflow:hidden}
+.reader-code.is-folded .reader-code-pre::after{content:'';position:absolute;inset:auto 0 0 0;height:72px;background:linear-gradient(transparent,var(--color-surface));pointer-events:none}
+.reader-code.is-folded .code-block{border-bottom-left-radius:0;border-bottom-right-radius:0}
 @media(pointer:coarse){.code-copy{min-height:44px}}
 @media print{.code-tools{display:none}body.tk-host .reader-layout{display:block}body.tk-host .reader-railcol{display:none}.reader-code .code-block{border-radius:var(--radius-sm);white-space:pre-wrap;overflow-wrap:anywhere}body.tk-host .reader-body .table-wrap{overflow:visible}body.tk-host .reader-body th,body.tk-host .reader-body td{min-width:0;overflow-wrap:anywhere}}
 .reader-body .table-wrap::-webkit-scrollbar{height:var(--space-2)}
 .reader-body .table-wrap::-webkit-scrollbar-track{background:var(--color-surface)}
 .reader-body .table-wrap::-webkit-scrollbar-thumb{background:var(--color-line-strong);border-radius:var(--radius-full)}
-.reader-body table{border-collapse:collapse;width:100%;margin:0;font:inherit;color:inherit}
+.heading-anchor{opacity:0;margin-left:8px;color:var(--color-muted);text-decoration:none;font-weight:400;font-size:.8em;transition:opacity var(--duration-fast) var(--ease-out)}h2:hover .heading-anchor,h3:hover .heading-anchor,h4:hover .heading-anchor,.heading-anchor:focus-visible{opacity:1}.heading-anchor:hover{color:var(--color-accent)}@media(hover:none){.heading-anchor{opacity:.45}}.reader-body table{border-collapse:collapse;width:100%;margin:0;font:inherit;color:inherit}
 /* 剪藏的 B 站播放器：16:9 自适应容器，宽随正文列，不撑破行宽。 */
 .video-embed{position:relative;padding-top:56.25%;margin:var(--space-5) 0;border-radius:7px;overflow:hidden;border:1px solid var(--color-line);background:var(--color-surface)}
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
@@ -1355,6 +1362,18 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 :root[data-theme="dark"] .tool-facts .fact-stars{color:var(--color-star)}
 .secondary-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.secondary-card{background:var(--color-panel);border:1px solid var(--color-line);border-radius:7px;padding:18px;min-height:210px}.secondary-card h3{font-size:var(--text-lg);margin:0 0 4px}.secondary-card>p{font-size:var(--text-base);color:var(--color-ink-soft);margin:0 0 12px}.secondary-card .io-grid{margin:8px 0}
 .aux-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.aux-card{background:var(--color-panel);border:1px solid var(--color-line);border-radius:7px;padding:17px 18px;display:flex;flex-direction:column}.aux-card h3{font-size:var(--text-lg);margin:0 0 5px}.aux-card p{font-size:var(--text-base);color:var(--color-ink-soft);margin:0 0 10px}.aux-card .tool-facts{margin-top:auto;margin-bottom:10px}.aux-card .work-actions{margin-top:auto;margin-bottom:0}.aux-card a{font-size:var(--text-sm);font-weight:700;color:var(--color-accent);margin-right:12px}.aux-card .work-actions a{padding:6px 9px;border:1px solid var(--color-line);border-radius:5px;background:var(--color-panel);color:var(--color-accent);font-size:var(--text-sm);font-weight:700;margin-right:0}.aux-card .work-actions a:hover{border-color:var(--color-accent)}#home-clippings{grid-column:span 2}
+/* 主页的论文推荐（2026-09-26）。和「辅助理解」的卡片同一套语言（同样的
+圆角边框与间距），但排成一行条的竖列 —— 推荐回答的是「接下来读什么」，
+不是「有什么工具能点」，一屏五条扫过去比五张卡片轻。分数贴右端，
+和最上面那条标题同一基线，扫视时不用在行里来回找。 */
+.paper-rec-list{display:grid;gap:10px}
+.paper-rec{background:var(--color-panel);border:1px solid var(--color-line);border-radius:7px;padding:13px 15px}
+.paper-rec-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.paper-rec-head a{color:var(--color-ink);font-weight:700;font-size:var(--text-base);line-height:1.5}
+.paper-rec-head a:hover{color:var(--color-accent)}
+.paper-rec-score{display:inline-block;flex:0 0 auto;margin-left:auto;padding:1px 9px;border-radius:999px;background:var(--color-accent-soft);color:var(--color-accent-ink);font-size:var(--text-sm);font-weight:700;font-variant-numeric:tabular-nums}
+.paper-rec-why{margin:5px 0 0;color:var(--color-ink-soft);font-size:var(--text-sm);line-height:1.6}
+.paper-rec-meta{margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;color:var(--color-muted);font-size:var(--text-sm)}
 .sidebar-support{margin-top:17px;padding-top:14px;border-top:1px solid var(--color-line)}.sidebar-support p{margin:0 9px 5px;color:var(--color-muted);font-size:var(--text-2xs);font-weight:750;text-transform:uppercase}.sidebar-support button{display:flex;width:100%;justify-content:space-between;border:1px solid transparent;background:transparent;padding:8px 10px;border-radius:6px;color:var(--color-muted);font-size:var(--text-sm)}.sidebar-support button:hover,.sidebar-support button.active{background:var(--color-surface);border-color:var(--color-line);color:var(--color-muted)}
 .directory-head{padding-bottom:20px;margin-bottom:27px}.directory-head h2{font-size:var(--text-3xl)}.directory-head p{font-size:var(--text-base)}
 .sort button{padding:6px 10px;border-radius:5px}
@@ -1878,8 +1897,10 @@ function renderDirectory(){
   const upCount=new Map();
   for(const n of list){const u=upstreamOf(n);if(u)upCount.set(u,(upCount.get(u)||0)+1)}
   const ups=[...upCount].sort((a,b)=>b[1]-a[1]).slice(0,10);
-  const upBar=ups.length?('<div class="upstream-bar"><span class="upstream-label">按上游项目筛选</span>'+
-    '<a class="upstream-chip'+(state.upstream==='all'?' on':'')+'" data-up="all">全部</a>'+
+  const upBarLbl=(window.TKI18N&&window.TKI18N.lang==='en')?'Filter by upstream project':'按上游项目筛选';
+  const upAllLbl=(window.TKI18N&&window.TKI18N.lang==='en')?'All':'全部';
+  const upBar=ups.length?('<div class="upstream-bar"><span class="upstream-label">'+upBarLbl+'</span>'+
+    '<a class="upstream-chip'+(state.upstream==='all'?' on':'')+'" data-up="all">'+upAllLbl+'</a>'+
     ups.map(([u,c])=>'<a class="upstream-chip'+(state.upstream===u?' on':'')+'" data-up="'+esc(u)+'" title="'+esc(u)+' 的 '+c+' 篇">'+esc(u)+' '+c+'</a>').join('')+
     '</div>'):'';
   const filtered=(state.upstream&&state.upstream!=='all')?list.filter(n=>upstreamOf(n)===state.upstream):list;
@@ -1926,7 +1947,10 @@ function renderDirectory(){
     if(days<=30)return enLang?(days+' days left'):('剩 '+days+' 天到期');
     return '';
   };
-  const metaLine=n=>[(n.clip&&n.clip.author)?n.clip.author:'',showTopicInMeta?n.topic:'',TKShell.fmtWords(n.words),n.change_rate?tr(CHANGE_RATE_TEXT[n.change_rate]||n.change_rate):'',dueText(n)].filter(Boolean).map(v=>esc(v)).join(' · ');
+  /* 阅读时长（2026-09-26 掘金学习）：技术文章按 400 字/分钟折算，不足 1 分钟不显示，
+     避免「约 0 分钟」。与字数同源，不新增数据源。 */
+  const readingMin=w=>{const m=Math.round((Number(w)||0)/400);return m>0?('约 '+m+' 分钟'):''};
+  const metaLine=n=>[(n.clip&&n.clip.author)?n.clip.author:'',showTopicInMeta?n.topic:'',TKShell.fmtWords(n.words),readingMin(n.words),n.change_rate?tr(CHANGE_RATE_TEXT[n.change_rate]||n.change_rate):'',dueText(n)].filter(Boolean).map(v=>esc(v)).join(' · ');
   const sections=[...groups].sort(([a],[b])=>groupRank(a)-groupRank(b)||a.localeCompare(b,'zh-CN')).map(([g,items])=>{
     const rows=items.map(n=>`<article class="note-row" data-path="${esc(n.path)}"><div><h3>${mark(n.title)}</h3><div class="path">${metaLine(n)}</div></div><p>${q?mark(n.excerpt||''):esc(n.excerpt||'')}</p></article>`).join('');
     return `<section class="topic-section"><h3 class="topic-title"><span>${esc(g==='总览'?'入口':g)}</span><small>${items.length}</small></h3>${rows}</section>`;
@@ -1934,8 +1958,8 @@ function renderDirectory(){
   // 空结果给可执行的下一步，而不是一句"没有匹配内容"就结束。
   const empty=groups.size?'':
     `<div class="empty">${state.query?`<p class="empty-title">没有找到“${esc(q)}”</p>`:`<p class="empty-title">「${esc(state.domain)}」还没有匹配的内容</p>`}<p class="empty-hint">${state.query?'试试更短的关键词（如 “RAG”“缓存”），或按 <kbd>Esc</kbd> 清空搜索回到全部知识':'可能是筛选条件太窄，清掉筛选看看全部知识'}</p>${state.domain!=='all'?`<button type="button" class="empty-action" id="empty-clear-domain">清除「${esc(state.domain)}」筛选</button>`:''}</div>`;
-  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div>${(state.domain==='Clippings'&&state.topic==='all')?`<div class="clip-intro"><div class="clip-intro-text"><b>${en?'What this section is':'这个栏目是什么'}</b>${en?'External articles clipped from the web (mostly Bilibili videos), captured with <a href="https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf?hl=zh-CN" target="_blank" rel="noreferrer">Obsidian Web Clipper</a>. New clippings from the Mac sync here automatically; each one keeps its original author, publish date and source link.':'外部文章的剪藏归档，多数来自 B 站视频，用 <a href="https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf?hl=zh-CN" target="_blank" rel="noreferrer">Obsidian Web Clipper</a> 浏览器插件保存。Mac 端新剪的内容会自动同步到这里，每篇保留原文作者、发布日期与原文链接。'}</div></div>`:''}<div class="sort"><button data-sort="title" aria-pressed="${state.sort==='title'}" class="${state.sort==='title'?'active':''}">按标题<span class="sr-only"> ${state.sort==='title'?'（当前排序）':''}</span></button><button data-sort="updated" aria-pressed="${state.sort==='updated'}" class="${state.sort==='updated'?'active':''}">按更新<span class="sr-only"> ${state.sort==='updated'?'（当前排序）':''}</span></button><button data-sort="due" aria-pressed="${state.sort==='due'}" class="${state.sort==='due'?'active':''}">按即将到期<span class="sr-only"> ${state.sort==='due'?'（当前排序）':''}</span></button></div></div>${sections}${empty}`;
-  if(upBar)$('#directory').insertAdjacentHTML('afterbegin',upBar);
+  $('#directory').innerHTML=`<div class="directory-head"><div><h2>${esc(state.query?'搜索结果':state.topic!=='all'?state.topic:state.domain==='all'?'全部知识':state.domain)}</h2><p>${(window.TKI18N&&window.TKI18N.lang==='en')?(list.length+' notes · topics grouped by what they are about'):(list.length+' 篇 · 主题按知识对象归属')}</p><!-- 【rt25】同图谱计数：拼数字整串不命中，按语言分支。 --></div>${(state.domain==='Clippings'&&state.topic==='all')?`<div class="clip-intro"><div class="clip-intro-text"><b>${en?'What this section is':'这个栏目是什么'}</b>${en?'External articles clipped from the web (mostly Bilibili videos), captured with <a href="https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf?hl=zh-CN" target="_blank" rel="noreferrer">Obsidian Web Clipper</a>. New clippings from the Mac sync here automatically; each one keeps its original author, publish date and source link.':'外部文章的剪藏归档，多数来自 B 站视频，用 <a href="https://chromewebstore.google.com/detail/obsidian-web-clipper/cnjifjpddelmedmihgijeibhnjfabmlf?hl=zh-CN" target="_blank" rel="noreferrer">Obsidian Web Clipper</a> 浏览器插件保存。Mac 端新剪的内容会自动同步到这里，每篇保留原文作者、发布日期与原文链接。'}</div></div>`:''}<div class="sort"><button data-sort="title" aria-pressed="${state.sort==='title'}" class="${state.sort==='title'?'active':''}">按标题<span class="sr-only"> ${state.sort==='title'?'（当前排序）':''}</span></button><button data-sort="updated" aria-pressed="${state.sort==='updated'}" class="${state.sort==='updated'?'active':''}">按更新<span class="sr-only"> ${state.sort==='updated'?'（当前排序）':''}</span></button><button data-sort="due" aria-pressed="${state.sort==='due'}" class="${state.sort==='due'?'active':''}">按即将到期<span class="sr-only"> ${state.sort==='due'?'（当前排序）':''}</span></button></div></div>${upBar}${sections}${empty}`;
+  /* 筛选条已并入上方模板串（head 之后、列表之前）：它筛的是下面的列表，紧贴列表才符合视线顺序；原先 afterbegin 把它顶到 H2 上方，孤立悬在标题外，grid 自动放置还会把它排回头部块之前（2026-09-26 用户反馈） */
   const clearDomain=$('#empty-clear-domain');
   if(clearDomain)clearDomain.onclick=()=>select('all','all');
   /* ── 列表页右侧的目录栏 ────────────────────────────────────────
@@ -2535,7 +2559,47 @@ function heroLede(zh){
  * 唯一入口只剩搜索。恢复方式：侧栏树纳入 Clippings（服务端，垫底排序）；
  * 首页不放领域卡（保持 6 卡 = 6 领域文案，数字不打架），在「辅助理解」区加
  * 通栏 Clippings 卡（与知识库管理卡同为归档区先例）。domainCount() 口径不动。 */
-function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'&&d!=='知识库管理');const zhHome=!(window.TKI18N&&window.TKI18N.lang==='en');const t_=(zhText,enText)=>(zhHome?zhText:enText);const lede=heroLede(zhHome);const descriptions={'AI 系统工程：从模型能力到生产能力':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测','后端系统：在并发、失败与变化中维持服务':'请求、并发、消息、复制、一致性、故障恢复和基础设施','缺陷分析：从个案到体系':'从真实上游缺陷学判断、复现、合入与回归，每条案例都有上游 commit 可查','数据系统：在并发与故障中保存事实':'建模、SQL、事务、索引、CDC、流处理、治理和恢复','性能工程：从用户等待到资源瓶颈':'进程、CPU、GPU、内存、I/O、网络、观测和容量','软件构建：让变化可以理解、验证与交付':'架构、语言运行时、依赖、测试、CI/CD、发布和调试','知识库管理':'怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新'};$('#home').innerHTML=`<section class="hero hero--display" data-crop><div><h1>把技术原理读到能上手用</h1><p class="hero-lede"><span>${esc(lede.text)}</span><span class="hero-lede-lead">${esc(lede.lead)}</span></p></div><div class="hero-meta"><span class="hero-meta-item"><b>${engineeringCount().toLocaleString()}</b><i>${esc(t_('篇工程知识','notes'))}</i></span><span class="hero-meta-item"><b>${domainCount().toLocaleString()}</b><i>${esc(t_('个领域','domains'))}</i></span><span class="hero-meta-item"><b>${sourceCount().toLocaleString()}</b><i>${esc(t_('条来源','sources'))}</i></span></div></section><section class="claim-row"><section class="claim"><p class="claim-eyebrow">${esc(t_('知识','Notes'))}</p><p class="claim-lead">${esc(t_('一篇只回答一件事，四步读完能自己拍板','One note, one question, four steps to your own verdict'))}</p><p class="claim-sub">${esc(t_('每篇都从「没这套方案之前卡在哪」写到「什么情况下别用它」，数字带测试条件，结论带边界','Every note runs from what was stuck before to when to leave it alone, numbers carrying test conditions, conclusions carrying limits'))}</p><ul class="claim-list"><li><b>${esc(t_('卡在哪','What was stuck'))}</b><i>——</i><span>${esc(t_('没这套方案之前，问题怎么被绕过去','How the problem was worked around before'))}</span></li><li><b>${esc(t_('机制链条','The mechanism'))}</b><i>——</i><span>${esc(t_('从输入到输出的因果链，以及关键那一步发生了什么','The causal chain, and what happens at the decisive step'))}</span></li><li><b>${esc(t_('换掉什么假设','Which assumption it traded'))}</b><i>——</i><span>${esc(t_('为什么这样设计，代价转嫁给了谁','Why this design, and who pays the cost'))}</span></li><li><b>${esc(t_('别用它的场合','When to leave it alone'))}</b><i>——</i><span>${esc(t_('边界、反例，以及失效时会怎么坏','Limits, counter-examples, and how it fails'))}</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><div id="radar-slot" style="margin-bottom:18px"></div><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间排。Agent 相关的内容归在 AI 系统工程下，和上下文、检索、质量放在一起</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="${esc(t_('打开 '+d,'Open '+d))}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${t_(state.notes.filter(n=>n.category===d&&n.topic!=='归档').length+' 篇',state.notes.filter(n=>n.category===d&&n.topic!=='归档').length)}</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>${t_('从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。','Pick a preset path in the <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">Learning centre</a>, or go straight to a classroom or a tutor. Topics arrive pre-filled; the model is called only after you confirm')}</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><!-- 【反复迭代后结果·rt13】Agent 评估卡产出行重写：原文案与处理行逐字重复「把(模型/Agent 的)判断绑定到命令、日志、产物和测试」，两行信息量等于一行。产出行改为说清产出物本身（评估结论+回归清单），并补 t_ 翻译包裹。 --><section class="section"><h2>评估与工程</h2><p>评估原型回答"到底有没有变好"，把 Agent 的判断绑定到证据；开源的工程流程提供能直接照做的做法</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>${t_('按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试','Choose evaluation dimensions per task, binding model judgement to commands, logs, artifacts and tests')}</span></div><div class="io-row"><b>产出</b><span>${t_('带证据链的评估结论与回归清单；当前是设计约定与静态原型','Evaluation conclusions with evidence chains and regression checklists; currently a design convention and a static prototype')}</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看评估原型</a><a href="/?path=${encodeURIComponent('工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/Agent评估系统的设计约定.md')}">设计约定</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>${t_('需求对齐、研究、规格、TDD、代码审查和架构改进','Requirement alignment, research, specs, TDD, code review and architecture improvements')}</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>架构图和源码用来查清一个东西和其它东西的关系：它依赖什么、被谁依赖。需要的时候打开，不需要就跳过</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图</p><div class="work-actions"><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></div></article><article class="aux-card"><h3>知识库管理</h3><p>维护本站的元文档：怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新</p><div class="work-actions"><a class="wa-open" href="/?domain=${encodeURIComponent('知识库管理')}">打开元文档</a></div></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法</p><div class="work-actions"><a class="wa-open" href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口</a></div></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识</p><div class="work-actions"><a class="wa-open" href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史</a><a class="wa-open" href="/learn/history">查看收录方式</a></div></article><article class="aux-card" id="home-clippings"><h3>Clippings · 网页剪藏</h3><p>从网页剪藏收藏的外部好文章，原文完整保留</p><div class="work-actions"><a class="wa-open" href="/?domain=Clippings">打开剪藏区</a></div></article></div></section><div class="notice">先看懂一个领域，从知识领域卡片进入；想动手练，用学习工具；想知道系统到底有没有变好，看 Agent 评估</div>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});{const cc=document.querySelector('#home-clippings');if(cc)cc.onclick=e=>{e.preventDefault();select('Clippings','all')}}{const homeGraph=$('#home-graph');if(homeGraph)homeGraph.addEventListener('click',event=>{event.preventDefault();showGraph()});}renderAtlas();applyHomeStatus();retranslate();loadDigest()}
+function renderHome(){const domains=ordered(new Set(state.notes.map(n=>n.category))).filter(d=>d!=='总览'&&d!=='Clippings'&&d!=='知识库管理');const zhHome=!(window.TKI18N&&window.TKI18N.lang==='en');const t_=(zhText,enText)=>(zhHome?zhText:enText);const lede=heroLede(zhHome);const descriptions={'AI 系统工程：从模型能力到生产能力':'模型、训练、上下文、RAG、Agent、推理服务、平台、安全与评测','后端系统：在并发、失败与变化中维持服务':'请求、并发、消息、复制、一致性、故障恢复和基础设施','缺陷分析：从个案到体系':'从真实上游缺陷学判断、复现、合入与回归，每条案例都有上游 commit 可查','数据系统：在并发与故障中保存事实':'建模、SQL、事务、索引、CDC、流处理、治理和恢复','性能工程：从用户等待到资源瓶颈':'进程、CPU、GPU、内存、I/O、网络、观测和容量','软件构建：让变化可以理解、验证与交付':'架构、语言运行时、依赖、测试、CI/CD、发布和调试','知识库管理':'怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新'};$('#home').innerHTML=`<section class="hero hero--display" data-crop><div><h1>把技术原理读到能上手用</h1><p class="hero-lede"><span>${esc(lede.text)}</span><span class="hero-lede-lead">${esc(lede.lead)}</span></p></div><div class="hero-meta"><span class="hero-meta-item"><b>${engineeringCount().toLocaleString()}</b><i>${esc(t_('篇工程知识','notes'))}</i></span><span class="hero-meta-item"><b>${domainCount().toLocaleString()}</b><i>${esc(t_('个领域','domains'))}</i></span><span class="hero-meta-item"><b>${sourceCount().toLocaleString()}</b><i>${esc(t_('条来源','sources'))}</i></span></div></section><section class="claim-row"><section class="claim"><p class="claim-eyebrow">${esc(t_('知识','Notes'))}</p><p class="claim-lead">${esc(t_('一篇只回答一件事，四步读完能自己拍板','One note, one question, four steps to your own verdict'))}</p><p class="claim-sub">${esc(t_('每篇都从「没这套方案之前卡在哪」写到「什么情况下别用它」，数字带测试条件，结论带边界','Every note runs from what was stuck before to when to leave it alone, numbers carrying test conditions, conclusions carrying limits'))}</p><ul class="claim-list"><li><b>${esc(t_('卡在哪','What was stuck'))}</b><i>——</i><span>${esc(t_('没这套方案之前，问题怎么被绕过去','How the problem was worked around before'))}</span></li><li><b>${esc(t_('机制链条','The mechanism'))}</b><i>——</i><span>${esc(t_('从输入到输出的因果链，以及关键那一步发生了什么','The causal chain, and what happens at the decisive step'))}</span></li><li><b>${esc(t_('换掉什么假设','Which assumption it traded'))}</b><i>——</i><span>${esc(t_('为什么这样设计，代价转嫁给了谁','Why this design, and who pays the cost'))}</span></li><li><b>${esc(t_('别用它的场合','When to leave it alone'))}</b><i>——</i><span>${esc(t_('边界、反例，以及失效时会怎么坏','Limits, counter-examples, and how it fails'))}</span></li></ul></section><aside class="claim-quotes">${homeQuotes()}</aside></section><div id="radar-slot" style="margin-bottom:18px"></div><section class="digest" id="home-digest" hidden></section><section class="atlas"><div class="atlas-head"><div><h2>知识地形</h2><p id="atlas-note"></p></div><a class="atlas-open" href="/?view=graph" id="home-graph">打开完整图谱</a></div><div class="atlas-canvas" id="home-atlas" aria-label="知识领域分布图"></div></section><section class="section"><h2>知识领域</h2><p>按技术本身归类，不按课程或时间排。Agent 相关的内容归在 AI 系统工程下，和上下文、检索、质量放在一起</p><div class="domain-grid">${domains.map(d=>`<article class="domain-card" data-domain="${esc(d)}" tabindex="0" role="button" aria-label="${esc(t_('打开 '+d,'Open '+d))}"><h3>${esc(d)}</h3><p>${descriptions[d]||''}</p><span class="domain-topics">${orderedTopics(d,new Set(state.notes.filter(n=>n.category===d&&n.topic!=='归档').map(n=>n.topic))).slice(0,4).map(t=>`<i>${esc(t)}</i>`).join('')}</span><b>${t_(state.notes.filter(n=>n.category===d&&n.topic!=='归档').length+' 篇',state.notes.filter(n=>n.category===d&&n.topic!=='归档').length)}</b></article>`).join('')}</div></section><section class="section"><h2>学习与实践</h2><p>${t_('从 <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">学习中心</a> 选择预置路径，或直接进入课堂和导师。主题会预填，确认后才调用模型。','Pick a preset path in the <a href="/learn" target="_blank" rel="noopener noreferrer" style="color:var(--color-accent);font-weight:700">Learning centre</a>, or go straight to a classroom or a tutor. Topics arrive pre-filled; the model is called only after you confirm')}</p><div class="work-grid"><article class="work-card primary"><div class="work-head"><div><h3>OpenMAIC</h3><p>互动课堂与项目式学习</p></div><span class="status">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 37.5k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已部署 · 本机 3100</span><span class="fact-key">需访问码</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>一个要掌握的工程问题、学习目标或参考材料</span></div><div class="io-row"><b>处理</b><span>把目标拆成讲解、互动、测验、模拟、代码练习或 PBL 任务</span></div><div class="io-row"><b>产出</b><span>可操作课堂、即时反馈，以及改变约束后的迁移任务</span></div></div><div class="work-actions"><a href="/launch/openmaic?next=${encodeURIComponent('/?topic='+encodeURIComponent('围绕一个工程知识主题，先解释问题、本质和机制，再生成互动练习、反馈和迁移任务'))}" target="_blank" rel="noopener noreferrer">创建课堂</a><a href="/learn/openmaic" target="_blank" rel="noopener noreferrer">完整使用指南</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/OpenMAIC互动课堂与多智能体学习.md')}">实现与边界</a><a href="https://github.com/THU-MAIC/OpenMAIC" target="_blank" rel="noreferrer">GitHub ↗</a></div></article><article class="work-card primary research"><div class="work-head"><div><h3>DeepTutor</h3><p>资料研究、问答与掌握路径</p></div><span class="status login">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 39.9k</span><span class="fact-open">开源 · Apache-2.0</span><span class="fact-live">已部署 · 本机 3782</span><span class="fact-key">需登录本机账号</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>文档、知识库、问题、代码仓库或已有笔记</span></div><div class="io-row"><b>处理</b><span>按目标路由到 Chat、Research、Solve、Visualize 或 Mastery Path，并复用来源与记忆</span></div><div class="io-row"><b>产出</b><span>带来源回答、研究报告、笔记、问题集和可持续复习路径</span></div></div><div class="work-actions"><a href="/launch/deeptutor?next=${encodeURIComponent('/chat?prompt='+encodeURIComponent('请围绕我选择的工程主题，通过追问、例子和迁移练习帮助我真正掌握'))}" target="_blank" rel="noopener noreferrer">进入学习导师</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/DeepTutor多智能体学习伴侣.md')}">实现与边界</a><a href="https://github.com/HKUDS/DeepTutor" target="_blank" rel="noreferrer">GitHub ↗</a></div></article></div></section><!-- 【反复迭代后结果·rt13】Agent 评估卡产出行重写：原文案与处理行逐字重复「把(模型/Agent 的)判断绑定到命令、日志、产物和测试」，两行信息量等于一行。产出行改为说清产出物本身（评估结论+回归清单），并补 t_ 翻译包裹。 --><section class="section"><h2>评估与工程</h2><p>评估原型回答"到底有没有变好"，把 Agent 的判断绑定到证据；开源的工程流程提供能直接照做的做法</p><div class="secondary-grid"><article class="secondary-card"><div class="work-head"><div><h3>Agent 评估</h3><p>任务、Trace、证据与回归</p></div><span class="status design">原型期</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>任务目标、仓库版本、权限、预算和真实执行记录</span></div><div class="io-row"><b>处理</b><span>${t_('按任务选择评估维度，把模型判断绑定到命令、日志、产物和测试','Choose evaluation dimensions per task, binding model judgement to commands, logs, artifacts and tests')}</span></div><div class="io-row"><b>产出</b><span>${t_('带证据链的评估结论与回归清单；当前是设计约定与静态原型','Evaluation conclusions with evidence chains and regression checklists; currently a design convention and a static prototype')}</span></div></div><div class="work-actions"><a href="/apps/agent-evaluation/index.html" target="_blank" rel="noopener noreferrer">查看评估原型</a><a href="/?path=${encodeURIComponent('工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/Agent评估系统的设计约定.md')}">设计约定</a></div></article><article class="secondary-card"><div class="work-head"><div><h3>Matt Skills</h3><p>工程任务的可复用 Agent 流程</p></div><span class="status local">已安装</span></div><div class="tool-facts"><span class="fact-stars">⭐ 263.9k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 Skills</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><div class="io-grid"><div class="io-row"><b>输入</b><span>需求、设计文档、代码库与失败反馈</span></div><div class="io-row"><b>处理</b><span>${t_('需求对齐、研究、规格、TDD、代码审查和架构改进','Requirement alignment, research, specs, TDD, code review and architecture improvements')}</span></div><div class="io-row"><b>产出</b><span>边界清楚的实现、测试证据和可进入下一轮的反馈</span></div></div><div class="work-actions"><a href="/projects/mattpocock-skills/README.md" target="_blank" rel="noopener noreferrer">查看 Skills</a><a href="/learn/matt-skills">完整使用指南</a><a href="https://github.com/mattpocock/skills" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></article></div></section><section class="section"><h2>辅助理解</h2><p>架构图和源码用来查清一个东西和其它东西的关系：它依赖什么、被谁依赖。需要的时候打开，不需要就跳过</p><div class="aux-grid"><article class="aux-card"><h3>Archify · 可验证架构图</h3><div class="tool-facts"><span class="fact-stars">⭐ 65.4k</span><span class="fact-open">开源 · MIT</span><span class="fact-live">已安装 · 本机 CLI</span><span class="fact-none">无需 API Key</span><span>2026-09-17 核验</span></div><p>把系统描述或仓库证据变成类型化图，再经确定性校验生成可交互 HTML/SVG；用于需要精确校验的架构图</p><div class="work-actions"><a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener noreferrer">GitHub ↗</a><a href="/?path=${encodeURIComponent('知识库管理/归档/来源/论文与项目/Archify可验证技术图谱.md')}">Archify 方法</a></div></article><article class="aux-card"><h3>知识库管理</h3><p>维护本站的元文档：怎么写、怎么判断完善度、缺口怎么补、论文怎么追踪、来源怎么更新</p><div class="work-actions"><a class="wa-open" href="/?domain=${encodeURIComponent('知识库管理')}">打开元文档</a></div></article><article class="aux-card"><h3>项目与融合记录</h3><p>查看四个上游项目的源码位置、说明、当前状态和进入知识库的方法</p><div class="work-actions"><a class="wa-open" href="/projects" target="_blank" rel="noopener noreferrer">打开项目入口</a></div></article><article class="aux-card" id="home-history"><h3>课堂历史</h3><p>生成的课堂先在 OpenMAIC 中继续；复核后再整理进 Markdown 知识</p><div class="work-actions"><a class="wa-open" href="/launch/openmaic?next=%2F" target="_blank" rel="noopener noreferrer">打开课堂历史</a><a class="wa-open" href="/learn/history">查看收录方式</a></div></article><article class="aux-card" id="home-clippings"><h3>Clippings · 网页剪藏</h3><p>从网页剪藏收藏的外部好文章，原文完整保留</p><div class="work-actions"><a class="wa-open" href="/?domain=Clippings">打开剪藏区</a></div></article></div></section></section>
+<!-- 论文推荐：主页上唯一一块「外部新东西」。
+     其余几块都是本站自己的资产（领域、工具、剪藏），只有这里是外面进来的
+     论文 —— 首页需要一个能说明「这个库还在追新」的窗口。
+     整块 hidden：没评过分就不显示，首页摆一个空区块比不摆更糟。 -->
+<section class="section" id="home-papers" hidden>
+  <h2>论文推荐</h2>
+  <p>按模型评分挑出来的论文。评分由定时任务用多个模型批量产出，攒得越多越准；没有分数就不推</p>
+  <div class="paper-rec-list" id="home-paper-rec"></div>
+  <div class="work-actions"><a class="wa-open" href="/papers">去论文追踪页</a></div>
+</section><div class="notice">先看懂一个领域，从知识领域卡片进入；想动手练，用学习工具；想知道系统到底有没有变好，看 Agent 评估</div>`;document.querySelectorAll('.domain-card').forEach(card=>{card.onclick=()=>select(card.dataset.domain,'all');card.onkeydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();select(card.dataset.domain,'all')}}});{const cc=document.querySelector('#home-clippings');if(cc)cc.onclick=e=>{e.preventDefault();select('Clippings','all')}}{const homeGraph=$('#home-graph');if(homeGraph)homeGraph.addEventListener('click',event=>{event.preventDefault();showGraph()});}renderAtlas();applyHomeStatus();retranslate();loadDigest();loadPaperRecommend()}
+/* 主页论文推荐。只在真的拿到推荐时才把整块显示出来 ——
+   /api/paper/recommend 在没有评分时返回空 items，那种情况下首页这一块
+   应该彻底消失，而不是留一个「论文推荐」标题下面空着。 */
+async function loadPaperRecommend(){
+  const box=$('#home-papers');const list=$('#home-paper-rec');
+  if(!box||!list)return;
+  try{
+    const response=await fetch('/api/paper/recommend?limit=5',{cache:'no-store'});
+    if(!response.ok)throw new Error('unavailable');
+    const payload=await response.json();
+    const items=payload.items||[];
+    if(!items.length){box.hidden=true;return;}
+    const tr=TKShell.tr;
+    box.hidden=false;
+    list.innerHTML=items.map((it)=>{
+      const meta=[it.conference,it.subfield].filter(Boolean).join(' · ');
+      const tags=(it.tags||[]).slice(0,3).map((t)=>`<span class="note-tag">${esc(t)}</span>`).join('');
+      return '<article class="paper-rec">'
+        +'<div class="paper-rec-head">'
+        +'<a href="'+esc(it.url)+'" target="_blank" rel="noopener noreferrer">'+esc(it.title)+'</a>'
+        +'<span class="paper-rec-score" title="'+esc(tr('模型四维加权评分：主题相关·新意·证据·可落地'))+'">'+esc(it.overall)+'</span>'
+        +'</div>'
+        +(it.why?'<p class="paper-rec-why">'+esc(it.why)+'</p>':'')
+        +(meta||tags?'<div class="paper-rec-meta">'+esc(meta)+tags+'</div>':'')
+        +'</article>';
+    }).join('');
+  }catch(error){
+    box.hidden=true;   // 接口挂了也别在首页留一块空的
+  }
+}
 function bindSourceToggle(){
   /* 两类折叠按钮共用一个绑定：来源串的 .source-toggle（.source-more）
      和论据卡的 .cite-toggle（.cite-list 与 .cite-more）。 */
@@ -3035,18 +3099,18 @@ function renderReaderPager(note,modulePeers,prevNote,nextNote){
   pager.innerHTML=`<div class="pager-grid">${cell(prevNote,en?'Previous':'上一篇','prev')}${cell(nextNote,en?'Next':'下一篇','next')}</div>`;
   pager.querySelectorAll('a[data-note]').forEach(a=>a.onclick=openReaderLink);
 }
-/* ── 累计阅读时长（2026-09-24 用户要求）──────────────────────────
-   已读判定从「滚到文末即算」改为「单篇累计阅读 ≥ 60 秒」：同一篇文章
+/* ── 累计阅读时长（2026-09-24 用户要求；2026-09-26 门槛 60 秒 → 180 秒）──
+   已读判定从「滚到文末即算」改为「单篇累计阅读 ≥ 180 秒（3 分钟）」：同一篇文章
    多次访问的时长按路径累加（localStorage tk-reading-v1），页面切到后台
    （visibilitychange hidden）或离开阅读视图即结算暂停，回来继续累加。
    滚到文末但时长不够时，奖励条显示剩余秒数提示，攒够才弹出祝贺。 */
 const readingTime={
-  KEY:'tk-reading-v1',THRESHOLD:60,path:null,last:0,
+  KEY:'tk-reading-v1',THRESHOLD:180,path:null,last:0,
   load(){try{return JSON.parse(localStorage.getItem(this.KEY)||'{}')}catch(e){return{}}},
   save(d){try{localStorage.setItem(this.KEY,JSON.stringify(d))}catch(e){}},
   total(path){const d=this.load();let t=d[path]||0;
     /* 实时含当前段：判定时本次会话往往还没 stop 入账，只看已存值会
-       系统性偏小，60 秒门槛永远差一截。last 属于当前 path 才计入。 */
+    系统性偏小，180 秒门槛永远差一截。last 属于当前 path 才计入。 */
     if(this.path===path&&this.last)t+=(Date.now()-this.last)/1000;return t},
   fmt(sec){const en=window.TKI18N&&window.TKI18N.lang==='en';const m=Math.floor(sec/60),s=Math.round(sec%60);
     if(m<=0)return en?`${s}s`:`${s} 秒`;return en?`${m}m ${s}s`:`${m} 分 ${s} 秒`},
@@ -3092,12 +3156,12 @@ function maybeShowReaderReward(){
   const path=state.selected;
   const total=readingTime.total(path);
   const en=window.TKI18N&&window.TKI18N.lang==='en';
-  /* 满 60 秒才弹祝贺并记已读；不够时提示还差多少（同一篇只提示一次，
-     读者继续停留攒时长，跨过 60 秒的下次滚动即转正。 */
+  /* 满 180 秒（3 分钟）才弹祝贺并记已读；不够时提示还差多少（同一篇只提示一次，
+     读者继续停留攒时长，跨过 180 秒的下次滚动即转正。 */
   if(total<readingTime.THRESHOLD){
     if(!rewardState.hinted){rewardState.hinted=true;
       const need=Math.ceil(readingTime.THRESHOLD-total);
-      box.innerHTML=`<span class="reward-star">✦</span><span class="reward-text"><b>${en?'Keep reading…':'再读一会儿'}</b>${en?`Read for ${readingTime.fmt(Math.floor(total))} · ${need}s more to count as done`:`已读 ${readingTime.fmt(Math.floor(total))} · 累计满 1 分钟记为已读（还差 ${need} 秒）`}</span>`;
+      box.innerHTML=`<span class="reward-star">✦</span><span class="reward-text"><b>${en?'Keep reading…':'再读一会儿'}</b>${en?`Read for ${readingTime.fmt(Math.floor(total))} · ${need}s more to count as done`:`已读 ${readingTime.fmt(Math.floor(total))} · 累计满 3 分钟记为已读（还差 ${need} 秒）`}</span>`;
       box.hidden=false;requestAnimationFrame(()=>box.classList.add('on'))}
     return}
   const counts=TKShell.progress.counts();
@@ -3277,6 +3341,25 @@ function openSvgLightbox(svg){
   document.addEventListener('keydown',onKey);
   close.focus({preventScroll:true});
 }
+/* 标题锚点（2026-09-26 掘金学习）：hover 标题时在右侧露出 #，点它复制「能定位到这一节」的链接。
+   技术文章常被别人引用到某一节，没有锚点只能说「大概在中间」。 */
+function enhanceHeadingAnchors(body){
+  body.querySelectorAll('h2[id],h3[id],h4[id]').forEach(h=>{
+    if(h.querySelector('.heading-anchor'))return;
+    const a=document.createElement('a');
+    a.className='heading-anchor';a.href='#'+h.id;a.textContent='#';
+    a.title='复制这一节的链接';a.setAttribute('aria-label','复制这一节的链接');
+    a.addEventListener('click',ev=>{
+      ev.preventDefault();
+      const url=location.origin+location.pathname+location.search+'#'+h.id;
+      history.replaceState(null,'','#'+h.id);
+      if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(url);
+      const old=a.dataset.done;a.dataset.done='1';a.textContent='已复制';
+      setTimeout(()=>{a.textContent='#';delete a.dataset.done},1400);
+    });
+    h.appendChild(a);
+  });
+}
 function enhanceReaderImages(body){
   body.querySelectorAll('img').forEach((image,index)=>{
     if(image.closest('.reader-image')){image.dispatchEvent(new Event('reader-language'));return}
@@ -3350,6 +3433,7 @@ let readerScrollObserver=null;
 function enhanceReaderContent(){
   const body=$('#reader-body');
   enhanceReaderImages(body);
+  enhanceHeadingAnchors(body);
   if(readerScrollObserver)readerScrollObserver.disconnect();
   body.querySelectorAll('.code-block').forEach((pre,index)=>{
     const code=pre.querySelector('code');
@@ -3370,7 +3454,29 @@ function enhanceReaderContent(){
     button.textContent=readerText('复制代码','Copy code');
     button.setAttribute('aria-label',readerText(`复制第 ${index+1} 个代码块`,`Copy code block ${index+1}`));
     button.onclick=()=>copyReaderText(button,status,code.textContent);
-    tools.append(language,status,button);pre.before(frame);frame.append(tools,pre);
+    /* 结构顺序（十六批修复）：先 frame→tools→pre 组装完整体，再对长代码块
+       把 pre 包进 .reader-code-pre。此前先建 wrap 再 pre.before(frame)，pre
+       还在原文档位置，wrap 被插到 frame 外面，is-folded 的 max-height 全部落空
+       （实测 wrap 成了 reader-body 直接子级、包住整个 frame）。 */
+    const lineCount=code.textContent.split('\n').length;
+    const longCode=lineCount>18;
+    pre.before(frame);frame.append(tools,pre);
+    tools.append(language,status,button);
+    if(longCode){
+      const fold=document.createElement('button');fold.type='button';fold.className='code-fold';
+      const label=(expanded)=>expanded?readerText('收起','Collapse'):readerText(`展开全部 ${lineCount} 行`,`Expand all ${lineCount} lines`);
+      fold.textContent=label(false);
+      fold.setAttribute('aria-expanded','false');
+      const preWrap=document.createElement('div');preWrap.className='reader-code-pre';
+      pre.before(preWrap);preWrap.append(pre);
+      frame.classList.add('is-folded');
+      fold.onclick=()=>{
+        const expanded=frame.classList.toggle('is-folded')===false;
+        fold.textContent=label(expanded);
+        fold.setAttribute('aria-expanded',String(expanded));
+      };
+      tools.append(fold);
+    }
   });
   const scrollables=[...body.querySelectorAll('.table-wrap,.code-block')];
   const update=()=>scrollables.forEach((el,index)=>{

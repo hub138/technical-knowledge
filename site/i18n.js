@@ -1496,7 +1496,10 @@
     // ── projects/index.html ──
     "3100 运行中": { en: "3100 running" },
     "3782 运行中": { en: "3782 running" },
-    "上游源码：": { en: "Upstream source:" },
+"上游源码：": { en: "Upstream source:" },
+    "按上游项目筛选": { en: "Filter by upstream project" },
+    "为你推荐": { en: "Recommended" },
+    "我的收藏": { en: "My collection" },
     "互动课堂、测验、模拟、项目任务与反馈": { en: "Classroom, quizzes, simulation, project work and feedback" },
     "从这一页点进去，登录和主题都会自动带上": { en: "Everything here carries the sign-in and the topic with it" },
     /* 2026-09-22 i18n 修复：projects 页文案带句号（601/611 行），补带句号版本词条（双词条策略）。 */

@@ -2031,17 +2031,33 @@ pre.mermaid svg{
 
 /* 目录页的第二个分类维度：上游项目（与「主题」分组并列的横向筛选）。
  * 数据来自文章 frontmatter 的 sources，只有取得到上游项目的域才出现。 */
-.upstream-bar{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin:12px 0 2px; }
-.upstream-label{ font-size:var(--text-micro); color:var(--color-muted); margin-right:2px; }
-.upstream-chip{
-  padding:3px 10px; border-radius:var(--radius-full);
-  border:1px solid var(--color-line); background:var(--color-panel);
-  font-size:var(--text-small); color:var(--color-ink-soft);
-  cursor:pointer; text-decoration:none; white-space:nowrap;
-  max-width:220px; overflow:hidden; text-overflow:ellipsis;
+/* 2026-09-26 用户反馈「字太小、位置不好看」重做：
+ * 标签从 text-micro(12px) 提到 text-small(13px) 且加中黑，chip 从 13px 提到
+ * 14px（介于次级 13 与正文 16 之间：可点控件比辅助文字响半档，不与条目标题倒挂）、
+ * 热区加高到约 31px——筛选是页面主要操作之一，不该是全页最小的字。
+ * 二轮自检：16px 使 chip 比文章标题还大且折 3 行，收 14px 后两行内放下。
+ * 行位置由 JS 控制：渲染进 .directory-head 之后（标题区下、列表上），
+ * 不再 insertAdjacentHTML 顶到 H2 上方。 */
+.upstream-bar{
+  display:flex; flex-wrap:wrap; gap:7px; align-items:center;
+  margin:0 0 16px; padding:2px 0;
 }
-.upstream-chip:hover{ border-color:var(--color-accent-line); color:var(--color-accent); }
-.upstream-chip.on{ background:var(--color-accent); border-color:var(--color-accent); color:var(--color-on-accent); }
+.upstream-label{
+  font-size:var(--text-small); color:var(--color-ink-soft);
+  font-weight:var(--weight-medium); margin-right:4px;
+}
+.upstream-chip{
+  padding:5px 12px; border-radius:var(--radius-full);
+  border:1px solid var(--color-line); background:var(--color-panel);
+  font-size:14px; line-height:1.4; color:var(--color-ink-soft);
+  cursor:pointer; text-decoration:none; white-space:nowrap;
+  max-width:260px; overflow:hidden; text-overflow:ellipsis;
+  transition:border-color var(--duration-fast) var(--ease-out),
+             background var(--duration-fast) var(--ease-out),
+             color var(--duration-fast) var(--ease-out);
+}
+.upstream-chip:hover{ border-color:var(--color-accent-line); color:var(--color-accent); background:var(--color-accent-soft); }
+.upstream-chip.on{ background:var(--color-accent); border-color:var(--color-accent); color:var(--color-on-accent); font-weight:var(--weight-medium); }
 
 /* 目录页右侧的「本页主题」目录：与文章页 rail 同一套观感。
  * 宽屏时把内容区压出一列给它（sticky 跟随滚动），窄屏放不下就整条隐藏——
@@ -2050,8 +2066,8 @@ pre.mermaid svg{
   #directory{ display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:20px; align-items:start; }
   /* 主内容各块显式钉在第 1 列：目录栏不存在或内容不足时，自动放置会把
      头部块挤进右侧窄列（实测：排序按钮竖排 + 大片空白列）。 */
-  #directory>.upstream-bar,
   #directory>.directory-head,
+  #directory>.upstream-bar,
   #directory>.topic-section,
   #directory>.empty{ grid-column:1; }
   #directory>.dir-rail{ grid-column:2; grid-row:1 / span 999; position:sticky; top:14px; max-height:calc(100vh - 130px); overflow:auto; }
@@ -2061,6 +2077,10 @@ pre.mermaid svg{
   #directory>.dir-rail .rail-head{ font-size:var(--text-small); }
 }
 @media (max-width:1199px){ .dir-rail{ display:none; } }
+@media (max-width:760px){
+  .upstream-chip{ padding:5px 12px; font-size:var(--text-small); }
+  .upstream-label{ flex-basis:100%; }
+}
 .dir-rail-list li a{ display:flex; justify-content:space-between; gap:8px; align-items:baseline; }
 .dir-rail-list li a em{ font-style:normal; font-size:var(--text-micro); color:var(--color-muted); flex:none; }
 
@@ -2309,7 +2329,25 @@ body.tk-reading .reader-railcol{top:84px}
 @media(max-width:760px){
   body.tk-reading .reader-head{padding:24px 18px 16px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}
   body.tk-reading .reader-layout{padding:18px 14px 24px}
-  .reader-fabs{left:10px;bottom:calc(var(--float-lane) + 8px)}
+  /* 掘金移动端是底部全宽操作条（点赞/评论/收藏一行）；本站照此把左下
+     浮动按钮组改为底部条，正文不再被按钮压住（390px 实测按钮叠在
+     段落文字上，毛玻璃救不回可读性）。 */
+  .reader-fabs{
+    left:0;right:0;
+    bottom:0;
+    flex-direction:row;
+    justify-content:center;
+    gap:12px;
+    padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+    background:color-mix(in srgb, var(--color-panel) 88%, transparent);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border-top:1px solid var(--color-line);
+    box-shadow:0 -2px 8px rgba(15, 23, 42, 0.06);
+  }
+  .reader-fab{width:44px;height:44px;font-size:19px}
+  /* 底部条占据约 64px 高度，正文底部留出等高通道。 */
+  body.tk-reading .reader-layout{padding-bottom:calc(24px + 64px + env(safe-area-inset-bottom))}
 }@media print{
   body.tk-reading .content{background:#fff}
   body.tk-reading .reader-head,body.tk-reading .reader-layout{border:0;background:#fff;padding:0}
