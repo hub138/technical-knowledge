@@ -163,6 +163,127 @@ _SUMMARY_TTL = 30 * 86400  # 论文解读写完就不变了，缓存一个月足
 _enriching = [False]
 _summary_cache: dict[str, dict] = {}
 
+# 论文索引的每日自动刷新（2026-09-26）。
+#
+# 索引是入库资产，原先只在人手跑一次脚本时更新 —— 页面上的「索引抓取于」
+# 因此长期停在一个过去的日期，而页面自称「追踪新论文」。PaperNotes 的会议
+# 论文按批次放出，一天一次足够跟上，再密只是白打对方站。
+#
+# 为什么不走 cron：这台机器上站点是常驻服务，站内调度不必依赖系统定时器
+# 是否装好，也不必给部署的人多交代一件事。刷新仍然走 scripts/fetch-papernotes.py
+# 的 --if-stale 24，所以即便被重复触发（服务重启、和 cron 并存、手工补跑）
+# 也只会真抓一次 —— 幂等性放在脚本里，调用方不必各自判断新鲜度。
+PAPERNOTES_REFRESH_SCRIPT = REPOSITORY_ROOT / "scripts" / "fetch-papernotes.py"
+PAPERNOTES_REFRESH_HOURS = 24.0
+# 已经起过线程就不再起第二个。刷新要下载 8MB 并写 10MB，两个实例同时跑
+# 会争同一个输出文件。
+_papernotes_refreshing = [False]
+_papernotes_last_kick = [0.0]
+
+# 两次尝试之间的最小间隔。脚本自己会用 --if-stale 拒掉新鲜的情况，但那要
+# 先把 10MB 的索引读进内存才知道新不新鲜 —— 每个请求都这么做不划算。
+# 6 小时足够稀疏（一天最多 4 次），又不会让「刚抓过、但因为时区或时钟
+# 回拨被判成陈旧」的情形卡满一整天。
+_PAPERNOTES_KICK_INTERVAL = 6 * 3600
+
+
+def _run_refresh() -> subprocess.CompletedProcess[str]:
+    """跑一次抓取脚本。新鲜度判断在脚本里（--if-stale），这里只管跑。"""
+    return subprocess.run(
+        [sys.executable, str(PAPERNOTES_REFRESH_SCRIPT),
+         "--if-stale", f"{PAPERNOTES_REFRESH_HOURS:g}"],
+        cwd=str(REPOSITORY_ROOT),
+        capture_output=True, text=True, timeout=300,
+    )
+
+
+def _kick_papernotes_refresh() -> None:
+    """后台拉一次论文索引。够了就什么都不做 —— 判断在脚本里。"""
+    now = time.time()
+    if _papernotes_refreshing[0] or now - _papernotes_last_kick[0] < _PAPERNOTES_KICK_INTERVAL:
+        return
+    _papernotes_last_kick[0] = now
+    _papernotes_refreshing[0] = True
+
+    def run() -> None:
+        try:
+            # 失败重试一次。实测抓 PaperNotes 会偶发失败（一次 TLS 握手超时，
+            # 同一条命令紧接着再跑就成）—— 与 feeds.py 里 html 源的做法同一
+            # 个理由。索引一天才刷一次，一次偶发失败就是一整天的日期不前进，
+            # 重试的成本只是失败时才付。
+            result = _run_refresh()
+            if result.returncode != 0:
+                time.sleep(5)
+                result = _run_refresh()
+            note = (result.stdout or "").strip().splitlines()
+            tail = note[-1] if note else ""
+            if result.returncode == 0:
+                print(f"[papernotes] {tail}", flush=True)
+                return
+            # 失败不动现有索引：旧数据还在，页面照常工作，只是日期不前进。
+            #
+            # stderr 要留几行而不是一行：脚本崩在中间时，最后一行常常只是
+            # 「Traceback (most recent call last):」这种没有内容的框架行，
+            # 只看它等于什么都没看到，得往上翻才知道哪一句炸了。
+            err = (result.stderr or "").strip().splitlines()
+            print(f"[papernotes] refresh failed ({result.returncode}): {tail}",
+                  flush=True)
+            for line in err[-4:]:
+                print(f"[papernotes]   {line[:200]}", flush=True)
+        except (OSError, subprocess.SubprocessError) as error:
+            print(f"[papernotes] refresh error: {error}", flush=True)
+        finally:
+            _papernotes_refreshing[0] = False
+
+
+# 论文评分的定时补跑（2026-09-26）。
+#
+# 推荐位要能说清「凭什么推」，背后得有评分；评分由 scripts/score_papers.py
+# 定时批量产出。放在站内线程而不是 cron：这台机器站点是常驻服务，站内调度
+# 不必依赖系统定时器装没装好，和上面 papernotes 的每日刷新同一套路数。
+#
+# 默认**不开**：开起来就会持续吃模型额度，而多数时候人更想先手工跑一批
+# 看看这批分数靠不靠谱再让它自动跑。要开就起站前设 KNOWLEDGE_PAPER_SCORE=1。
+PAPER_SCORE_SCRIPT = REPOSITORY_ROOT / "scripts" / "score_papers.py"
+PAPER_SCORE_ENABLED = os.environ.get("KNOWLEDGE_PAPER_SCORE") == "1"
+PAPER_SCORE_INTERVAL = 3600.0
+PAPER_SCORE_LIMIT = 40
+
+
+def _paper_score_loop() -> None:
+    """每小时评一批。循环里 sleeps 在前，这样起站点半小时后才下线，
+    也不会在关站那一刻正好发起一次调用。"""
+    while True:
+        time.sleep(PAPER_SCORE_INTERVAL)
+        if not PAPER_SCORE_SCRIPT.exists():
+            continue
+        try:
+            result = subprocess.run(
+                [sys.executable, str(PAPER_SCORE_SCRIPT), "--limit", str(PAPER_SCORE_LIMIT)],
+                capture_output=True, text=True, timeout=1800, cwd=str(REPOSITORY_ROOT),
+            )
+            line = (result.stdout or "").strip().splitlines()
+            print(f"[paper-score] {line[-1] if line else 'ok'}", flush=True)
+        except subprocess.TimeoutExpired:
+            print("[paper-score] 这一批超时（30min），跳过", flush=True)
+        except Exception as error:
+            print(f"[paper-score] 失败：{error}", flush=True)
+
+
+def _kick_paper_score() -> None:
+    if not PAPER_SCORE_ENABLED:
+        return
+    threading.Thread(target=_paper_score_loop, name="paper-score", daemon=True).start()
+
+    try:
+        threading.Thread(target=run, daemon=True,
+                         name="papernotes-refresh").start()
+    except RuntimeError:
+        # 线程起不来（资源耗尽）时 run() 永远不会执行，它的 finally 也就
+        # 不会复位标志位 —— 不在这里兜住，这个刷新就永久卡死了。
+        _papernotes_refreshing[0] = False
+        print("[papernotes] refresh thread could not start", flush=True)
+
 
 _TRANSLATE_TIMEOUT = 90
 
@@ -1398,6 +1519,7 @@ class Vault:
         # Lazy: the 8.3MB PaperNotes index is only parsed if a page asks for
         # it. Pages that never touch the external list should not pay for it.
         self._papernotes: dict[str, object] | None = None
+        self._papernotes_mtime: float | None = None
 
     def _load_papers(self) -> dict[str, dict[str, object]]:
         """Load the arXiv registry, or an empty map if it is not there yet.
@@ -1444,18 +1566,33 @@ class Vault:
         The file is generated by scripts/fetch-papernotes.py and committed, so
         a clone without it still serves every page — the external list just
         comes back empty and the page says so.
+
+        The cache is keyed on the file's mtime, not just its presence. The
+        daily refresh rewrites this file underneath a long-lived server, and
+        without the mtime check a process that had already loaded the index
+        would keep serving yesterday's 23,802 papers after the file had grown
+        to 25,698 — the refresh would look like it did nothing.
         """
-        if getattr(self, "_papernotes", None) is not None:
-            return self._papernotes  # type: ignore[return-value]
+        _kick_papernotes_refresh()
+        _kick_paper_score()
+        try:
+            stamp = PAPERNOTES_INDEX.stat().st_mtime
+        except OSError:
+            stamp = 0.0
+        cached = getattr(self, "_papernotes", None)
+        if cached is not None and getattr(self, "_papernotes_mtime", None) == stamp:
+            return cached  # type: ignore[return-value]
         empty: dict[str, object] = {"total": 0, "papers": [], "tags": [], "conferences": []}
         try:
             payload = json.loads(PAPERNOTES_INDEX.read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError, UnicodeDecodeError):
             self._papernotes = empty
+            self._papernotes_mtime = stamp
             return empty
         papers = payload.get("papers")
         if not isinstance(papers, list) or not papers:
             self._papernotes = empty
+            self._papernotes_mtime = stamp
             return empty
         # 按会议新鲜度排，最新的在前。
         #
@@ -1562,6 +1699,7 @@ class Vault:
                 key=lambda item: (-item["count"], item["name"]),
             ),
         }
+        self._papernotes_mtime = stamp
         return self._papernotes
 
     def _attach_papers(self) -> None:

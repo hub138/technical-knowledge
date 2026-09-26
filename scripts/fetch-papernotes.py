@@ -26,6 +26,10 @@ Usage:
     python3 scripts/fetch-papernotes.py            # refresh and write
     python3 scripts/fetch-papernotes.py --check    # verify, exit 1 if unreadable
     python3 scripts/fetch-papernotes.py --dry      # report without writing
+    python3 scripts/fetch-papernotes.py --if-stale 24   # only fetch when >24h old
+
+The last form is what a daily timer calls: it is a no-op when the index is
+already fresh, so firing it more often than once a day costs nothing.
 """
 
 from __future__ import annotations
@@ -287,12 +291,57 @@ def summarise(index: dict) -> str:
     return "\n".join(lines)
 
 
+def index_age_hours() -> float | None:
+    """How old the checked-in index is, in hours. None if it cannot be told.
+
+    Age comes from the index's own `fetched_at` rather than the file's mtime:
+    mtime changes when the file is copied or checked out, which says nothing
+    about when the data was actually fetched. A fresh clone would look
+    seconds old and never refresh.
+    """
+    try:
+        payload = json.loads(INDEX.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return None
+    raw = payload.get("fetched_at")
+    if not isinstance(raw, str) or not raw:
+        return None
+    try:
+        stamp = datetime.datetime.fromisoformat(raw)
+    except ValueError:
+        return None
+    if stamp.tzinfo is None:
+        # 没带时区的按 UTC 读，与写入端一致（build() 写的是 UTC）。
+        stamp = stamp.replace(tzinfo=datetime.timezone.utc)
+    now = datetime.datetime.now(datetime.timezone.utc)
+    return (now - stamp).total_seconds() / 3600.0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true",
                         help="verify the checked-in index is readable and sane")
     parser.add_argument("--dry", action="store_true", help="report without writing")
+    # 2026-09-26 新增：定时抓取的入口。PaperNotes 的会议论文是按批次放出来的，
+    # 一天抓一次足够；但定时器可能被重复触发（服务重启、cron 与站内调度并存、
+    # 手工补跑），每次都真抓会白白打一次对方站。这个开关让「只在够旧时才抓」
+    # 成为脚本自己的能力 —— 调用方不必各自判断新鲜度，重复调用天然幂等。
+    parser.add_argument("--if-stale", type=float, metavar="HOURS", default=0.0,
+                        help="only fetch when the index is older than HOURS")
     args = parser.parse_args()
+
+    if args.if_stale > 0:
+        age = index_age_hours()
+        # 下限取 0，不是「小于就算新鲜」：fetched_at 若被写成未来时间（时钟
+        # 前跳、时区写错、手工改文件），年龄是负数，任何 if-stale 阈值都能
+        # 满足「< 阈值」，于是每次都判定新鲜、永远不再抓 —— 一个越用越错的
+        # 静默故障。负年龄按「不知道」处理，走抓取这一支。
+        if age is not None and 0 <= age < args.if_stale:
+            print(f"papernotes index is {age:.1f}h old "
+                  f"(< {args.if_stale:g}h) — nothing to do")
+            return
+        if age is None or (age is not None and age < 0):
+            print("papernotes index has no usable fetched_at — fetching")
 
     if args.check:
         # The check never touches the network: it verifies the file that is
@@ -341,8 +390,23 @@ def main() -> None:
 
     INDEX.parent.mkdir(parents=True, exist_ok=True)
     # indent=1 keeps the file diffable when a venue is added. 5MB is fine.
-    INDEX.write_text(json.dumps(index, ensure_ascii=False, indent=1) + "\n",
-                     encoding="utf-8")
+    #
+    # 原子写（2026-09-26）：这个索引 5MB，落盘要好几百毫秒，而站点每次请求
+    # 都可能读它。直接 write_text 会让读到一半的请求拿到截断的 JSON —— 页面
+    # 上表现为「论文列表空了」，而文件其实完好。先写同目录的临时文件再 rename，
+    # 读者要么看到旧版要么看到新版，不会看到中间态。临时文件放同目录，是因为
+    # rename 跨文件系统会退化成拷贝，原子性就没了。
+    payload = json.dumps(index, ensure_ascii=False, indent=1) + "\n"
+    tmp = INDEX.with_name(INDEX.name + ".tmp")
+    try:
+        tmp.write_text(payload, encoding="utf-8")
+        tmp.replace(INDEX)
+    except OSError:
+        try:
+            tmp.unlink()
+        except OSError:
+            pass
+        raise
     print(f"wrote {INDEX.relative_to(ROOT)} "
           f"({INDEX.stat().st_size / 1048576:.1f}MB)")
 
