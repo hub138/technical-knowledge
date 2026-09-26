@@ -2063,7 +2063,12 @@ pre.mermaid svg{
  * 宽屏时把内容区压出一列给它（sticky 跟随滚动），窄屏放不下就整条隐藏——
  * 挤在正文旁边不如没有。 */
 @media (min-width:1200px){
-  #directory{ display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:20px; align-items:start; }
+  #directory{ display:grid; grid-template-columns:minmax(0,1fr) 240px; column-gap:20px; row-gap:0; align-items:start; }
+/* 行间距交给各块自身 margin：#directory 用 span 999 粘侧栏，行数是虚的，
+   共用 gap 会给 998 个隐式空行各发 20px，撑出 2 万 px 可滚空白（2026-09-26 用户反馈）。 */
+#directory>.upstream-bar{ margin-bottom:16px; }
+#directory>.topic-section{ margin-bottom:24px; }
+#directory>.empty{ margin:24px 0; }
   /* 主内容各块显式钉在第 1 列：目录栏不存在或内容不足时，自动放置会把
      头部块挤进右侧窄列（实测：排序按钮竖排 + 大片空白列）。 */
   #directory>.directory-head,
