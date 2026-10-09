@@ -626,6 +626,18 @@ def digest(limit: int = 12, hours: str = "2m", pages: int = 4, force: bool = Fal
                 "cached": True,
                 "error": error,
             }
+        # 缓存也空了（配额刚耗尽、或服务重启后还没捞回缓存）→ 回退
+        # last-good 快照与 30 天库存。
+        #
+        # 2026-09-26 反馈：这个源此后读不到了（没续费/没 key），但**之前抓
+        # 下来的几百篇要一直在页面上，不能去掉**。原来这里直接返回空 items，
+        # 首页只留一句"这一站暂时读不到"，存量文件明明还在盘上却没被用上，
+        # 看着像文章被删了。存量是提前买好的保险：源一断，它就是这一块里
+        # 唯一还活着的东西。
+        fallback = _stale_result(error)
+        fallback["fetched_at"] = int(float(fallback.get("stale_since") or 0))
+        fallback["cached"] = True
+        return fallback
         # 失败也要记时间。
         #
         # 不记的话，配额耗尽的这段时间里服务每重启一次就重试一次（4 次调用），

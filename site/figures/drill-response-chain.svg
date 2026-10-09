@@ -1,0 +1,271 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 807 660" role="img" lang="zh-CN" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+<style>
+.c-grid { stroke: transparent; fill: none; }
+.c-mask { fill: #ffffff; stroke: none; }
+.c-frontend { fill: rgba(34, 211, 238, 0.15);   stroke: #0891b2; }
+.c-backend { fill: rgba(52, 211, 153, 0.18);    stroke: #059669; }
+.c-database { fill: rgba(167, 139, 250, 0.2);   stroke: #7c3aed; }
+.c-security { fill: rgba(251, 113, 133, 0.15);   stroke: #e11d48; }
+.c-messagebus { fill: rgba(251, 146, 60, 0.15); stroke: #ea580c; }
+.c-external { fill: rgba(148, 163, 184, 0.18);   stroke: #64748b; }
+.t-primary { fill: #0f172a; }
+.t-muted { fill: #475569; }
+.t-dim { fill: #94a3b8; }
+.t-backend { fill: #059669; }
+.t-database { fill: #7c3aed; }
+.t-security { fill: #e11d48; }
+svg .semantic-sigil { fill: none;
+      stroke: currentColor;
+      stroke-width: 1.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.76;
+      pointer-events: none; }
+svg .semantic-sigil > * { vector-effect: non-scaling-stroke; }
+svg .semantic-sigil .sigil-fill { fill: currentColor; stroke: none; }
+svg .s-frontend { color: #0891b2; }
+svg .s-backend { color: #059669; }
+svg .s-database { color: #7c3aed; }
+svg .s-security { color: #e11d48; }
+svg .s-messagebus { color: #ea580c; }
+svg .s-external { color: #64748b; }
+.a-default { stroke: #94a3b8; fill: none; }
+.a-emphasis { stroke: #059669; fill: none; }
+.a-security { stroke: #e11d48; fill: none; stroke-dasharray: 5,5; }
+.a-dashed { stroke: #7c3aed; fill: none; stroke-dasharray: 4,4; }
+.m-default { fill: #94a3b8; }
+.m-emphasis { fill: #059669; }
+.m-security { fill: #e11d48; }
+.m-dashed { fill: #7c3aed; }
+.c-lane { fill: rgba(248, 250, 252, 0.65); stroke: #cbd5e1; stroke-dasharray: 6,6; }
+</style>
+
+        <title id="archify-diagram-title">故障演练的六角色响应链与两条铁律</title>
+        <desc id="archify-diagram-description">由 Archify 生成的工作流图。</desc>
+        <!-- Definitions -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Swimlanes -->
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="751" height="106" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / 指挥与安全</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="178" width="751" height="106" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="200" class="t-dim" font-size="10" font-weight="600">02 / 注入侧</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="304" width="751" height="106" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="326" class="t-dim" font-size="10" font-weight="600">03 / 响应侧</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-3" x="40" y="430" width="751" height="106" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="452" class="t-dim" font-size="10" font-weight="600">04 / 记录与观察</text>
+
+        <!-- Phase headers -->
+
+
+        <!-- Workflow groups -->
+
+
+        <!-- Edge paths -->
+        <path data-edge-from="brief" data-edge-to="inject" data-edge-label="下令注入" data-edge-key="0" data-composition-points="140,120;214,120;214,220" d="M 140 120 L 214 120 L 214 220" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="inject" data-edge-to="respond" data-edge-label="故障生效" data-edge-key="1" data-composition-points="214,272;214,372;288,372" d="M 214 272 L 214 372 L 288 372" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="observer" data-edge-to="review" data-edge-label="评分" data-edge-key="2" data-composition-points="482.4,524;482.4,540;612.4,540;612.4,524" d="M 482.4 524 L 482.4 540 L 612.4 540 L 612.4 524" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="respond" data-edge-to="comms" data-edge-label="状态上报" data-edge-key="3" data-composition-points="380,372;436.4,372" d="M 380 372 L 436.4 372" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="respond" data-edge-to="scribe" data-edge-label="动作留痕" data-edge-key="4" data-composition-points="334,398;334,420;396,420;396,498;380,498" d="M 334 398 L 334 420 L 396 420 L 396 498 L 380 498" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="review" data-edge-to="inject" data-edge-label="手册更新进下一场" data-edge-key="5" data-composition-points="612.4,524;612.4,556;214,556;214,272" d="M 612.4 524 L 612.4 556 L 214 556 L 214 272" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="safe" data-edge-to="brief" data-edge-label="叫停" data-edge-key="6" data-composition-points="334,154;334,174;32,174;32,120;48,120" d="M 334 154 L 334 174 L 32 174 L 32 120 L 48 120" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="safe" data-edge-to="respond" data-edge-label="中止响应" data-edge-key="7" data-composition-points="380,120;396,120;396,260.2;334,260.2;334,346" d="M 380 120 L 396 120 L 396 260.2 L 334 260.2 L 334 346" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="scribe" data-edge-to="observer" data-edge-label="时间线" data-edge-key="8" data-composition-points="334,472;334,456;385.2,456;385.2,498;436.4,498" d="M 334 472 L 334 456 L 385.2 456 L 385.2 498 L 436.4 498" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <path data-edge-from="scribe" data-edge-to="review" data-edge-label="复盘材料" data-edge-key="9" data-composition-points="334,472;334,456;612.4,456;612.4,472" d="M 334 472 L 334 456 L 612.4 456 L 612.4 472" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+
+        <!-- Nodes -->
+        <g id="node-brief" data-node-id="brief" data-node-label="指挥 IC" tabindex="0" role="button" aria-label="聚焦指挥 IC，宣布目标与中止条件, 指挥与安全" aria-pressed="false" data-node-kind="security" data-node-sublabel="宣布目标与中止条件" data-node-context="指挥与安全">
+          <title>指挥 IC · 宣布目标与中止条件 · 指挥与安全</title>
+          <rect x="48" y="94" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="48" y="94" width="92" height="52" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(54 100) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="94" y="115" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">指挥 IC</text>
+          <text data-detail="context" x="94" y="132" class="t-muted" font-size="7.7" text-anchor="middle">宣布目标与中止条件</text>
+        </g>
+
+        <g id="node-safe" data-node-id="safe" data-node-label="安全官" tabindex="0" role="button" aria-label="聚焦安全官，越界即叫停, 指挥与安全" aria-pressed="false" data-node-kind="security" data-node-sublabel="越界即叫停" data-node-tag="绝对中止权" data-node-context="指挥与安全">
+          <title>安全官 · 越界即叫停 · 指挥与安全 · 绝对中止权</title>
+          <rect x="288" y="86" width="92" height="68" rx="6" class="c-mask"/>
+          <rect x="288" y="86" width="92" height="68" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(294 92) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="334" y="107" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">安全官</text>
+          <text data-detail="context" x="334" y="124" class="t-muted" font-size="8" text-anchor="middle">越界即叫停</text>
+        <text data-detail="fine" x="334" y="142" class="t-security" font-size="7" text-anchor="middle">绝对中止权</text>
+        </g>
+
+        <g id="node-inject" data-node-id="inject" data-node-label="注入操作员" tabindex="0" role="button" aria-label="聚焦注入操作员，按剧本注入, 注入侧" aria-pressed="false" data-node-kind="backend" data-node-sublabel="按剧本注入" data-node-context="注入侧">
+          <title>注入操作员 · 按剧本注入 · 注入侧</title>
+          <rect x="168" y="220" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="168" y="220" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(174 226) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="214" y="241" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">注入操作员</text>
+          <text data-detail="context" x="214" y="258" class="t-muted" font-size="8" text-anchor="middle">按剧本注入</text>
+        </g>
+
+        <g id="node-respond" data-node-id="respond" data-node-label="响应者" tabindex="0" role="button" aria-label="聚焦响应者，当作真实事故, 响应侧" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="当作真实事故" data-node-context="响应侧">
+          <title>响应者 · 当作真实事故 · 响应侧</title>
+          <rect x="288" y="346" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="288" y="346" width="92" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(294 352) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="334" y="367" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">响应者</text>
+          <text data-detail="context" x="334" y="384" class="t-muted" font-size="8" text-anchor="middle">当作真实事故</text>
+        </g>
+
+        <g id="node-comms" data-node-id="comms" data-node-label="通讯负责人" tabindex="0" role="button" aria-label="聚焦通讯负责人，状态通报, 响应侧" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="状态通报" data-node-context="响应侧">
+          <title>通讯负责人 · 状态通报 · 响应侧</title>
+          <rect x="436.4" y="346" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="436.4" y="346" width="92" height="52" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(442.4 352) scale(0.6875)">
+            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
+            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
+            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
+            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="482.4" y="367" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">通讯负责人</text>
+          <text data-detail="context" x="482.4" y="384" class="t-muted" font-size="8" text-anchor="middle">状态通报</text>
+        </g>
+
+        <g id="node-scribe" data-node-id="scribe" data-node-label="记录员" tabindex="0" role="button" aria-label="聚焦记录员，时间线打戳, 记录与观察" aria-pressed="false" data-node-kind="database" data-node-sublabel="时间线打戳" data-node-context="记录与观察">
+          <title>记录员 · 时间线打戳 · 记录与观察</title>
+          <rect x="288" y="472" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="288" y="472" width="92" height="52" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(294 478) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="334" y="493" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">记录员</text>
+          <text data-detail="context" x="334" y="510" class="t-muted" font-size="8" text-anchor="middle">时间线打戳</text>
+        </g>
+
+        <g id="node-observer" data-node-id="observer" data-node-label="观察员" tabindex="0" role="button" aria-label="聚焦观察员，五项指标评分, 记录与观察" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="五项指标评分" data-node-context="记录与观察">
+          <title>观察员 · 五项指标评分 · 记录与观察</title>
+          <rect x="436.4" y="472" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="436.4" y="472" width="92" height="52" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(442.4 478) scale(0.6875)">
+            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
+            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
+            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
+            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="482.4" y="493" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">观察员</text>
+          <text data-detail="context" x="482.4" y="510" class="t-muted" font-size="8" text-anchor="middle">五项指标评分</text>
+        </g>
+
+        <g id="node-review" data-node-id="review" data-node-label="复盘" tabindex="0" role="button" aria-label="聚焦复盘，行动项带负责人期限, 记录与观察" aria-pressed="false" data-node-kind="external" data-node-sublabel="行动项带负责人期限" data-node-context="记录与观察">
+          <title>复盘 · 行动项带负责人期限 · 记录与观察</title>
+          <rect x="566.4" y="472" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="566.4" y="472" width="92" height="52" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(572.4 478) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="612.4" y="493" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">复盘</text>
+          <text data-detail="context" x="612.4" y="510" class="t-muted" font-size="7.7" text-anchor="middle">行动项带负责人期限</text>
+        </g>
+
+        <!-- Edge labels -->
+        <g data-detail="context" data-edge-from="brief" data-edge-to="inject" data-edge-label="下令注入" data-edge-key="0">
+          <rect x="152.8" y="100" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="177" y="110" class="t-muted" font-size="8" text-anchor="middle">下令注入</text>
+        </g>
+        <g data-detail="context" data-edge-from="inject" data-edge-to="respond" data-edge-label="故障生效" data-edge-key="1">
+          <rect x="226.8" y="352" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="251" y="362" class="t-backend" font-size="8" text-anchor="middle">故障生效</text>
+        </g>
+        <g data-detail="context" data-edge-from="observer" data-edge-to="review" data-edge-label="评分" data-edge-key="2">
+          <rect x="532.4" y="520" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="547.4" y="530" class="t-backend" font-size="8" text-anchor="middle">评分</text>
+        </g>
+        <g data-detail="context" data-edge-from="respond" data-edge-to="comms" data-edge-label="状态上报" data-edge-key="3">
+          <rect x="384" y="352" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="408.2" y="362" class="t-muted" font-size="8" text-anchor="middle">状态上报</text>
+        </g>
+        <g data-detail="context" data-edge-from="respond" data-edge-to="scribe" data-edge-label="动作留痕" data-edge-key="4">
+          <rect x="340.8" y="400" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="365" y="410" class="t-database" font-size="8" text-anchor="middle">动作留痕</text>
+        </g>
+        <g data-detail="context" data-edge-from="review" data-edge-to="inject" data-edge-label="手册更新进下一场" data-edge-key="5">
+          <rect x="369.8" y="536" width="86.8" height="14" rx="3" class="c-mask"/>
+          <text x="413.2" y="546" class="t-database" font-size="8" text-anchor="middle">手册更新进下一场</text>
+        </g>
+        <g data-detail="context" data-edge-from="safe" data-edge-to="brief" data-edge-label="叫停" data-edge-key="6">
+          <rect x="168" y="154" width="30" height="14" rx="3" class="c-mask"/>
+          <text x="183" y="164" class="t-security" font-size="8" text-anchor="middle">叫停</text>
+        </g>
+        <g data-detail="context" data-edge-from="safe" data-edge-to="respond" data-edge-label="中止响应" data-edge-key="7">
+          <rect x="340.8" y="240.2" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="365" y="250.2" class="t-security" font-size="8" text-anchor="middle">中止响应</text>
+        </g>
+        <g data-detail="context" data-edge-from="scribe" data-edge-to="observer" data-edge-label="时间线" data-edge-key="8">
+          <rect x="340.20000000000005" y="436" width="38.8" height="14" rx="3" class="c-mask"/>
+          <text x="359.6" y="446" class="t-muted" font-size="8" text-anchor="middle">时间线</text>
+        </g>
+        <g data-detail="context" data-edge-from="scribe" data-edge-to="review" data-edge-label="复盘材料" data-edge-key="9">
+          <rect x="449" y="436" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="473.2" y="446" class="t-muted" font-size="8" text-anchor="middle">复盘材料</text>
+        </g>
+
+        <!-- Legend -->
+        <g data-legend="" data-legend-bridge="">
+          <text x="20" y="560" class="t-primary" font-size="12" font-weight="650">图例</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="用户界面" data-legend-x="20" data-legend-baseline="580" data-legend-width="78">
+            <rect x="20" y="572" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
+            <text x="42" y="580" class="t-muted" font-size="7.5" font-weight="500">用户界面</text>
+          </g>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Agent 逻辑" data-legend-x="105" data-legend-baseline="580" data-legend-width="87">
+            <rect x="105" y="572" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
+            <text x="127" y="580" class="t-muted" font-size="7.5" font-weight="500">Agent 逻辑</text>
+          </g>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="策略" data-legend-x="199" data-legend-baseline="580" data-legend-width="61">
+            <rect x="199" y="572" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
+            <text x="221" y="580" class="t-muted" font-size="7.5" font-weight="500">策略</text>
+          </g>
+          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="工具操作" data-legend-x="267" data-legend-baseline="580" data-legend-width="78">
+            <rect x="267" y="572" width="14" height="9" rx="2" class="c-messagebus" stroke-width="1"/>
+            <text x="289" y="580" class="t-muted" font-size="7.5" font-weight="500">工具操作</text>
+          </g>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="上下文 / 追踪" data-legend-x="352" data-legend-baseline="580" data-legend-width="100">
+            <rect x="352" y="572" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
+            <text x="374" y="580" class="t-muted" font-size="7.5" font-weight="500">上下文 / 追踪</text>
+          </g>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="外部系统" data-legend-x="459" data-legend-baseline="580" data-legend-width="78">
+            <rect x="459" y="572" width="14" height="9" rx="2" class="c-external" stroke-width="1"/>
+            <text x="481" y="580" class="t-muted" font-size="7.5" font-weight="500">外部系统</text>
+          </g>
+        </g>
+      </svg>

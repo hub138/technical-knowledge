@@ -118,3 +118,24 @@ vault.bak-*/
 /.editorial/
 .agent/tmp/
 .concurrent-guard/
+
+.scratch/
+
+# 内部名单/黑名单：不得随仓库公开（check_skill_drift 的敏感文件守卫要求）
+scripts/internal_names.txt
+**/internal_names.txt
+
+# 中间结果目录（配图/验收过程的临时产物）
+.work-img/
+
+# 企微通知去重状态（本地运行产物）与环境变量文件（webhook key 等只存本地，不进仓库）
+data/.wecom-notify-state.json
+data/.paper-scout-state.json
+.env
+*.env
+
+# 私享内容提示词（含读者个人项目背景与口径，只放主仓库非 git 目录；本条防误移入）
+scripts/paper-scout-prompt.md
+
+# AI 周报任务提示词：内含写作规范路径与站长个人口径，只留本地
+scripts/radar_weekly_prompt.md

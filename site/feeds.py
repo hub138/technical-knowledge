@@ -838,7 +838,15 @@ def _fetch_bestblogs(source: dict) -> tuple[list[dict], str]:
     status = result.get("status") or ""
     if status == "unconfigured":
         return [], "no_key"
-    if status != "ok":
+    if status != "ok" and not (result.get("items") or []):
+        # 源读不到（配额/网络/key 失效）但**手里还有存量** —— 不返回空。
+        #
+        # 2026-09-27：BestBlogs 此后读不到了（没续费），提前回填的那批
+        # 文章是站内唯一还在的内容。首页早报那块早先用
+        # bestblogs.digest 的失败回退（status=stale 也照常出文章），
+        # 这里却只要 status 不是 ok 就丢掉 items 返回空 —— 同一个源在
+        # 站内两处说法打架：首页列着文章，/sources 却写"读不到"。
+        # 有存量就用存量，空提示留给真的一篇都没有时。
         return [], result.get("error") or status or "unreachable"
     items = []
     for row in result.get("items") or []:

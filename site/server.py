@@ -83,6 +83,17 @@ from bs4 import BeautifulSoup
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import bestblogs  # noqa: E402  （必须在 sys.path 调整之后）
 import feeds  # noqa: E402  （必须在 sys.path 调整之后）
+import paper_scores
+import social  # noqa: E402  （论文收藏与推荐的数据层，无路由）
+from wecom_notify import notify_wecom  # noqa: E402  （企微群通知，脚本与服务端共用）
+
+SITE_LISTEN_HOST = "127.10.0.1"
+SITE_LISTEN_PORT = 28787
+
+
+def site_url(path_and_query: str = "") -> str:
+    """站点对外链接：通知消息里的「文章」跳转用。"""
+    return f"http://{SITE_LISTEN_HOST}:{SITE_LISTEN_PORT}/{path_and_query.lstrip('/')}"
 
 
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]")
@@ -102,10 +113,13 @@ AUTH_SERVICE = "knowledge-site-access"
 AUTH_MAX_AGE = 60 * 60 * 24 * 3650
 AUTH_FAILURE_WINDOW = 5 * 60
 AUTH_FAILURE_LIMIT = 5
-WECOM_SERVICE = "knowledge-site-wecom"
 FEEDBACK_MAX_CHARS = 4000
 FEEDBACK_RATE_WINDOW = 60
 FEEDBACK_RATE_LIMIT = 5
+# 评论发帖限流：同一个身份 30 秒一条。评论区是公共资源，
+# 没有限流的话一个人能在几秒内刷满一页。
+COMMENT_MIN_INTERVAL = 30.0
+_comment_recent: dict[str, float] = {}
 FEEDBACK_KINDS = ("bug", "confusing", "suggestion", "praise", "other")
 VISIT_RETENTION_DAYS = 180
 REPOSITORY_ROOT = Path(
@@ -293,17 +307,13 @@ def _model_credentials() -> tuple[str, str]:
 
     站点自己不持有模型凭据 —— 复用本机已有的配置，少一处要同步的
     秘密。读不到就返回空，翻译静默跳过，页面照常显示英文原题。
+
+    2026-09-26：这里原本还是"直连 Anthropic /v1/messages"。全站的模型调用
+    统一收口到部署机本地的桥接层之后不再自己拼请求 —— 端点、协议、
+    限流、输出清洗都由那一层管，站点只问"译出来没有"。桥接模块不入
+    仓库，公开环境缺了它，翻译自动降级为显示英文原题。
     """
-    try:
-        settings = json.loads(
-            (pathlib.Path.home() / ".claude" / "settings.json").read_text(encoding="utf-8")
-        )
-        env = settings.get("env") or {}
-        key = env.get("ANTHROPIC_AUTH_TOKEN") or env.get("ANTHROPIC_API_KEY") or ""
-        base = (env.get("ANTHROPIC_BASE_URL") or "").rstrip("/")
-        return base, key
-    except (OSError, ValueError):
-        return "", ""
+    return "", ""
 
 
 def _translate_titles(titles: list[str]) -> list[str]:
@@ -316,8 +326,8 @@ def _translate_titles(titles: list[str]) -> list[str]:
     """
     if not titles:
         return []
-    base, key = _model_credentials()
-    if not (base and key):
+    llm = _translate_client()
+    if llm is None:  # 桥接层没装 / 没有可用模型：显示英文原题，不报错
         return [""] * len(titles)
     numbered = "\n".join(f"{i + 1}. {t}" for i, t in enumerate(titles))
     prompt = (
@@ -328,34 +338,43 @@ def _translate_titles(titles: list[str]) -> list[str]:
         "  · 专有名词和模型名不译\n\n"
         + numbered
     )
-    payload = json.dumps({
-        "model": "claude-haiku-4-5-20251001",
-        "max_tokens": 4000,
-        "messages": [{"role": "user", "content": prompt}],
-    }).encode("utf-8")
-    request = urllib.request.Request(
-        base + "/v1/messages",
-        data=payload,
-        headers={
-            "x-api-key": key,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=_TRANSLATE_TIMEOUT) as response:
-            data = json.loads(response.read())
-    except Exception:
-        return [""] * len(titles)
-    text = ""
-    for block in data.get("content") or []:
-        if isinstance(block, dict) and block.get("type") == "text":
-            text += str(block.get("text") or "")
+    # 一次请求译一批。60 篇各发一次要 60 次调用，慢且容易撞限流。
+    text = llm.chat(prompt, tier="pro")
     out: list[str] = []
     for i in range(len(titles)):
         match = re.search(rf"^{i + 1}\.\s*(.+)$", text, re.M)
         out.append(match.group(1).strip() if match else "")
     return out
+
+
+_TRANSLATE_LLM = None
+
+
+def _client_uid(handler) -> str:
+    """浏览器自己生成的随机串（取回来，落盘前会哈希）。
+    没有就是空串——社交功能照样工作，只是同一人换浏览器会重名。"""
+    try:
+        return str((handler.headers or {}).get("X-Tk-Uid") or "").strip()
+    except Exception:
+        return ""
+
+
+def _translate_client():
+    """懒建翻译用的模型桥接。
+
+    部署机本地放一个桥接模块（不入仓库），站点进程 import 它拿到
+    统一的模型调用入口。公开环境没有这个模块 —— 翻译只是锦上添花，
+    缺了页面照样显示英文原题，所以这里吞掉 ImportError 并在之后
+    一律返回空译文。
+    """
+    global _TRANSLATE_LLM
+    if _TRANSLATE_LLM is None:
+        try:
+            from translate_bridge import TranslateBridge
+        except ImportError:
+            return None
+        _TRANSLATE_LLM = TranslateBridge(tier="pro")
+    return _TRANSLATE_LLM
 
 
 def _load_summary_cache() -> None:
@@ -837,6 +856,29 @@ def count_words(body: str) -> int:
     return cjk + latin
 
 
+# 发布门槛：自动写作的智能体按提示词先落「骨架文件」（frontmatter + 标题）
+# 占住路径，写完才算成品；智能体中途被限流或退出，骨架就剩个空壳。
+# 站点不能把空壳当文章展示（列表里出现「26 字 · 不易过时」，点进去啥都没有）。
+# 判据用正文字数：工程知识目录下不足 MIN_ARTICLE_WORDS 的按未完成处理，
+# 不进列表、不进搜索、不进图谱；智能体把正文写过线后自动出现，无需登记。
+# 阈值 500 与 article_selfcheck.py 的 ARTICLE_MIN_WORDS 保持同一数。
+MIN_ARTICLE_WORDS = 500
+
+
+def is_publishable(top_dir: str, words: int) -> bool:
+    """工程知识目录的完整性门槛：正文够字数才算文章，其余目录不设限。
+
+    top_dir 是 vault 下的一级目录名。四层结构（工程知识/域/主题/文章）里
+    category 是域名（如「缺陷分析：从个案到体系」），判一级目录才可靠。
+    Clippings（外部剪藏）、知识库管理（维护记录）本来就允许短，不拦。
+    智能体把正文写过线后文章自动出现，无需登记；status 不参与判定，
+    智能体经常忘记把写完的 draft 改成正式状态，靠它拦不住。
+    """
+    if top_dir != "工程知识":
+        return True
+    return words >= MIN_ARTICLE_WORDS
+
+
 def display_label(value: str) -> str:
     """来源/标签的展示清洗：去掉 Obsidian Templater 占位符等机器痕迹。
 
@@ -1172,31 +1214,6 @@ def describe_agent(user_agent: str) -> str:
     return label[:80]
 
 
-def wecom_webhook_key() -> str:
-    """Read the group-bot key from the Keychain. Never from a committed file."""
-    return read_keychain_secret(WECOM_SERVICE)
-
-
-def notify_wecom(summary: str) -> None:
-    """Push a notification, but never let a failure affect the caller.
-
-    Runs on a background thread from the request handler so a slow or down
-    webhook cannot delay the feedback response.
-    """
-    key = wecom_webhook_key()
-    if not key:
-        return
-    url = f"https://qyapi.weixin.qq.com/cgi-bin/webhook/send?key={key}"
-    payload = json_bytes({"msgtype": "text", "text": {"content": summary[:1900]}})
-    request = Request(url, data=payload, headers={"Content-Type": "application/json"})
-    try:
-        with urlopen(request, timeout=6) as response:
-            response.read()
-    except (OSError, HTTPError, URLError) as error:
-        # 通知失败不影响已经落盘的反馈，只记录日志。
-        print(f"[wecom] notify failed: {error}", flush=True)
-
-
 def learning_services_status() -> dict[str, object]:
     """Return capability state without exposing provider credentials.
 
@@ -1476,40 +1493,46 @@ class Vault:
             # 工程知识，混进图谱会把领域间真实关系淹掉，也不参与关系推断。
             # 按 category 判定而不是只认 frontmatter，新增文章无需作者记得加字段。
             exclude_from_graph = truthy(front.get("exclude_from_graph")) or category in {"知识库管理", "Clippings"}
+            # 字数 = 汉字逐字数 + 英文/数字按空格词数。纯非空白串分词对中文
+            # 严重失真（一段连续汉字只算 1 个词），列表和矩阵的字数展示
+            # 都依赖这个值。代码块里的内容也算正文工作量，不剔除。
+            # 发布门槛并进 listed：残篇（骨架占位、写到一半）不出现在
+            # 任何列表、搜索与图谱里，写过 500 字自动出现。
+            words = count_words(body)
+            listed = parts[0] in {"工程知识", "Clippings", "知识库管理"} or rel == "知识库首页.md"
+            if listed and not is_publishable(parts[0], words):
+                listed = False
             notes[rel] = {
-                "path": rel,
-                "title": title,
-                "category": category,
-                "topic": topic,
-                "exclude_from_graph": exclude_from_graph,
-                "type": scalar(front.get("type"), "note"),
-                "status": scalar(front.get("status"), "active"),
-                "updated": scalar(front.get("updated"), ""),
-                "review_after": scalar(front.get("review_after"), ""),
-                # review_at 是 review_after.py squash 写回时留下的核验日期。
-                # 现存 452 篇一篇都还没有（复查闭环刚接上），文章页按 updated
-                # 回退显示，不能因为字段缺失就不显示核验日期。
-                # review_by/review_note 不进这里：/api/notes 是全站最大的一笔
-                # 下载，只有文章页与中台用得到的字段不往列表里加
-                "review_at": scalar(front.get("review_at"), ""),
-                "change_rate": scalar(front.get("change_rate"), ""),
-                "confidence": scalar(front.get("confidence"), ""),
-                # 剪藏元数据：仅 Clippings 文章有值，/api/notes 按分类挑着输出。
-                # wiki 链接语法剥掉展示层（[[oil欧呦]] → oil欧呦）。
-                "clip_author": scalar(front.get("author")).replace("[[", "").replace("]]", ""),
-                "clip_published": scalar(front.get("published")),
-                "clip_source": scalar(front.get("source")),
-                "clip_description": scalar(front.get("description")),
-                "tags": tags,
-                "sources": front.get("sources", []) if isinstance(front.get("sources", []), list) else [],
-                "body": body,
-                "mtime": path.stat().st_mtime_ns,
-                # 字数 = 汉字逐字数 + 英文/数字按空格词数。纯非空白串分词对中文
-                # 严重失真（一段连续汉字只算 1 个词），列表和矩阵的字数展示
-                # 都依赖这个值。代码块里的内容也算正文工作量，不剔除。
-                "words": count_words(body),
-                "listed": parts[0] in {"工程知识", "Clippings", "知识库管理"} or rel == "知识库首页.md",
-            }
+                    "path": rel,
+                    "title": title,
+                    "category": category,
+                    "topic": topic,
+                    "exclude_from_graph": exclude_from_graph,
+                    "type": scalar(front.get("type"), "note"),
+                    "status": scalar(front.get("status"), "active"),
+                    "updated": scalar(front.get("updated"), ""),
+                    "review_after": scalar(front.get("review_after"), ""),
+                    # review_at 是 review_after.py squash 写回时留下的核验日期。
+                    # 现存 452 篇一篇都还没有（复查闭环刚接上），文章页按 updated
+                    # 回退显示，不能因为字段缺失就不显示核验日期。
+                    # review_by/review_note 不进这里：/api/notes 是全站最大的一笔
+                    # 下载，只有文章页与中台用得到的字段不往列表里加
+                    "review_at": scalar(front.get("review_at"), ""),
+                    "change_rate": scalar(front.get("change_rate"), ""),
+                    "confidence": scalar(front.get("confidence"), ""),
+                    # 剪藏元数据：仅 Clippings 文章有值，/api/notes 按分类挑着输出。
+                    # wiki 链接语法剥掉展示层（[[oil欧呦]] → oil欧呦）。
+                    "clip_author": scalar(front.get("author")).replace("[[", "").replace("]]", ""),
+                    "clip_published": scalar(front.get("published")),
+                    "clip_source": scalar(front.get("source")),
+                    "clip_description": scalar(front.get("description")),
+                    "tags": tags,
+                    "sources": front.get("sources", []) if isinstance(front.get("sources", []), list) else [],
+                    "body": body,
+                    "mtime": path.stat().st_mtime_ns,
+                    "words": words,
+                    "listed": listed,
+                }
         self.notes = notes
         self.by_stem = {}
         for rel, note in notes.items():
@@ -1999,6 +2022,13 @@ def render_inline(source: str, vault: Vault, current: str, references: dict | No
                 # 懒加载不再把后面的文字往下顶（长文里每张图加载都是一次跳动）。
                 token.attrSet("width", str(dimensions[0]))
                 token.attrSet("height", str(dimensions[1]))
+            # archify 精绘图的交互版标记：figures/ 下同名 .html 存在时，
+            # 给 <img> 打 data-interactive，前端 enhanceReaderImages 据此
+            # 在工具条上加「交互版」按钮（平移缩放 + 链路描摹动画）。
+            if local.suffix.lower() == ".svg" and local.parent.name == "figures":
+                interactive = local.with_suffix(".html")
+                if interactive.is_file():
+                    token.attrSet("data-interactive", "/static/figures/" + interactive.name)
             return parser.renderer.image(tokens, index, options, env)
         if not url.scheme and not url.netloc:
             project = vault.root == PUBLIC_PROJECTS_ROOT.resolve()
@@ -2920,14 +2950,26 @@ class Handler(BaseHTTPRequestHandler):
             allowed = {".css", ".js", ".mjs", ".map", ".woff2", ".woff", ".svg"}
             # figures/ 是站内配图目录：文章引用的图镜像到这里，避免依赖外链
             # （外链会被图源站限流，读者看到的是空图框）。只放行图片后缀。
+            # 2026-10-08 加 .html：archify 精绘的交互版图（自包含 HTML，含缩放
+            # 与链路描摹动画）也镜像在这里，文章工具条「交互版」指向它。
             if file.parent == root / "figures":
-                allowed = {".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif"}
+                allowed = {".png", ".jpg", ".jpeg", ".webp", ".svg", ".gif", ".html"}
             if file.suffix.lower() not in allowed:
                 self.send_json({"error": "asset not found"}, 404)
                 return
+            content = file.read_bytes()
+            # 镜像管线把部分 SVG 以 .png 后缀写入（内容是 <svg 开头）。
+            # 按声明后缀发 image/png 会让浏览器解码失败、图片空白，
+            # 这里按真实字节判定：SVG 文本一律发 image/svg+xml。
+            if content[:5] in (b"<svg ", b"<svg>", b"<?xml"):
+                mime = "image/svg+xml"
+            elif file.suffix.lower() == ".html":
+                mime = "text/html; charset=utf-8"
+            else:
+                mime = mimetypes.guess_type(file.name)[0] or "application/octet-stream"
             self.send_bytes(
-                file.read_bytes(),
-                mimetypes.guess_type(file.name)[0] or "application/octet-stream",
+                content,
+                mime,
                 etag=static_etag(file),
             )
             return
@@ -3144,6 +3186,22 @@ class Handler(BaseHTTPRequestHandler):
 
             active = bool(tag or conf or cat or sub or needle)
             matched = [p for p in all_papers if keep(p)] if active else all_papers
+            # 2026-09-26 补：按评分排序 / 只看已评。
+            # 2.5 万篇里模型一小时只评得动几十篇，列表默认按索引序取第一页，
+            # 评过的那些往往落在几百页之外 —— 分数落了库却永远不出现在页面上，
+            # 推荐也等于没有素材。给列表一个出口，让已评的分数能被看见。
+            # 分母不动，只是改变这一页怎么切、怎么排。
+            only_scored = (query.get("scored", [""])[0] or "") == "1"
+            sort_by_score = (query.get("sort", [""])[0] or "") == "score"
+            if only_scored or sort_by_score:
+                attached = paper_scores.attach_scores(matched)
+                if only_scored:
+                    attached = [p for p in attached if p.get("scored")]
+                if sort_by_score:
+                    attached = sorted(
+                        attached, key=lambda p: p.get("overall") or 0, reverse=True
+                    )
+                matched = attached
             page = matched[offset:offset + limit]
             self.send_json({
                 "total": len(matched),
@@ -3156,8 +3214,42 @@ class Handler(BaseHTTPRequestHandler):
                 "conferences": index.get("conferences") or [],
                 # 补上「一句话总结」和中文译名。只抓这一页，
                 # 抓过的按 url 存盘，第二次翻到就是零请求。
-                "papers": _enrich_papers(page),
+                # 再就地附评分与收藏态 —— 卡片要显示分数和收藏按钮的状态，
+                # 为此让前端单独发一次请求是没必要的往返。
+                "papers": paper_scores.attach_scores(_enrich_papers(page)),
             })
+            return
+        if path == "/api/paper/favorites":
+            entries = paper_scores.load_favorites()
+            entries.sort(key=lambda e: float(e.get("favorited_at") or 0), reverse=True)
+            self.send_json({"items": entries, "cap": paper_scores.FAVORITES_CAP})
+            return
+        if path == "/api/paper/recommend":
+            # 推荐位只给评过分的（见 paper_scores.recommend 的说明）。
+            # 一次最多 12 条：主页那一块放 6 条够了，多给只是让首屏变重。
+            try:
+                limit = min(12, max(1, int(query.get("limit", ["6"])[0])))
+            except ValueError:
+                limit = 6
+            self.send_json(paper_scores.recommend(limit=limit))
+            return
+        if path == "/api/comments":
+            # 评论全站公开可读（和 /api/favorites 一个语义）：点赞和讨论都是
+            # 这个知识库对外的一部分，不该只对站长可见。
+            params = parse_qs(urlsplit(self.path).query)
+            target = str((params.get("path") or [""])[0]).strip()
+            if not target:
+                self.send_json({"error": "缺少 path"}, 400)
+                return
+            self.send_json(social.comments_list(target))
+            return
+        if path == "/api/likes":
+            params2 = parse_qs(urlsplit(self.path).query)
+            target2 = str((params2.get("path") or [""])[0]).strip()
+            if not target2:
+                self.send_json({"error": "缺少 path"}, 400)
+                return
+            self.send_json(social.likes_overview(target2, _client_uid(self)))
             return
         if path == "/api/favorites":
             # 收藏夹是全站共享的，任何访客可读。
@@ -3231,6 +3323,27 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/sources":
             # BestBlogs 的公共订阅源目录（公众号列表）。
             self.send_json(bestblogs.sources())
+            return
+        if path == "/api/bestblogs/archive":
+            # 历史库存 —— 这个源此后读不到了（没续费/没 key），提前回填的
+            # 那批文章是这一块唯一还在的东西。给它们一个出口，否则就是死数据。
+            # 排序沿用「评分优先、同分最新」，和早报、收藏区是同一条规则。
+            try:
+                offset = max(0, int(query.get("offset", ["0"])[0]))
+            except ValueError:
+                offset = 0
+            try:
+                limit = min(100, max(1, int(query.get("limit", ["20"])[0])))
+            except ValueError:
+                limit = 20
+            rows = [r for r in bestblogs._load_archive() if isinstance(r, dict)]
+            rows.sort(key=bestblogs._archive_sort_key, reverse=True)
+            self.send_json({
+                "total": len(rows),
+                "offset": offset,
+                "limit": limit,
+                "items": rows[offset:offset + limit],
+            })
             return
         if path == "/api/feeds":
             # 外部源的最新几条，给 /sources 页面就地显示。
@@ -3452,6 +3565,39 @@ class Handler(BaseHTTPRequestHandler):
         if path == "/api/favorites/remove":
             self.handle_favorites_remove()
             return
+        if path == "/api/paper/favorites":
+            # 论文收藏。和文章收藏分家：字段不同、上限不同，混在一处
+            # 会让论文的收藏把文章收藏的 100 条额度顶掉。
+            body, error = self.read_json_body(32 * 1024)
+            if body is None:
+                self.send_json({"error": "invalid request"}, error or 400)
+                return
+            paper = body.get("paper") if isinstance(body.get("paper"), dict) else body
+            if not isinstance(paper, dict) or not str(paper.get("url") or "").strip():
+                self.send_json({"error": "缺少论文链接"}, 400)
+                return
+            ok, err = paper_scores.favorite_add(paper)
+            if ok:
+                self.send_json({"ok": True}, 201)
+            elif err == "already_favorited":
+                self.send_json({"ok": True, "favorited": True})
+            elif err == "favorites_full":
+                self.send_json(
+                    {"error": err, "message": f"论文收藏已满（上限 {paper_scores.FAVORITES_CAP} 篇）"},
+                    409,
+                )
+            else:
+                self.send_json({"error": err or "write_failed"}, 500)
+            return
+        if path == "/api/paper/favorites/remove":
+            body, error = self.read_json_body(8 * 1024)
+            if body is None:
+                self.send_json({"error": "invalid request"}, error or 400)
+                return
+            url = str(body.get("url") or "").strip()
+            removed = paper_scores.favorite_remove(url) if url else 0
+            self.send_json({"ok": removed == 1, "removed": max(removed, 0)})
+            return
         if path == "/api/digest/feature":
             # 站长钉选早报头条：仅运营者会话。id 空串 = 恢复评分自动。
             if not self.client_is_operator():
@@ -3471,6 +3617,74 @@ class Handler(BaseHTTPRequestHandler):
             elif log.exists():
                 log.unlink()
             self.send_json({"ok": True, "featured": furl or None})
+            return
+        if path == "/api/comments":
+            body2, error2 = self.read_json_body(16 * 1024)
+            if body2 is None:
+                self.send_json({"error": "invalid request"}, error2 or 400)
+                return
+            target3 = str(body2.get("path") or "").strip()
+            text3 = str(body2.get("text") or "").strip()
+            if not target3:
+                self.send_json({"error": "缺少文章"}, 400)
+                return
+            if not text3:
+                self.send_json({"error": "评论不能是空的"}, 400)
+                return
+            if len(text3) > social.COMMENT_MAX:
+                self.send_json({"error": "评论最多 %d 字" % social.COMMENT_MAX}, 400)
+                return
+            fingerprint = _client_uid(self)
+            now = time.time()
+            last = _comment_recent.get(fingerprint, 0.0)
+            if fingerprint and now - last < COMMENT_MIN_INTERVAL:
+                self.send_json({"error": "发得太快了，等一会儿再发"}, 429)
+                return
+            _comment_recent[fingerprint] = now
+            try:
+                item = social.comment_add(target3, text3, fingerprint, str(body2.get("author") or ""))
+            except ValueError:
+                self.send_json({"error": "评论不能是空的"}, 400)
+                return
+            self.send_json({"ok": True, "item": item}, 201)
+            note = self.vault.note(target3) if target3 else None
+            note_title = str(note["title"]) if note else target3.rsplit("/", 1)[-1]
+            summary = (
+                f"**💬 新评论** · [「{note_title}」]({site_url(f'?path={note['path']}' if note else target3)})\n"
+                f"> {str(body2.get('author') or '访客')}：{text3[:300]}\n"
+                f"<font color=\"comment\">{time.strftime('%m-%d %H:%M')}</font>"
+            )
+            threading.Thread(target=notify_wecom, args=(summary,), daemon=True).start()
+            return
+        if path == "/api/comments/remove":
+            body4, error4 = self.read_json_body(4 * 1024)
+            if body4 is None:
+                self.send_json({"error": "invalid request"}, error4 or 400)
+                return
+            cid = str(body4.get("id") or "").strip()
+            removed = social.comment_remove(cid, _client_uid(self)) if cid else False
+            self.send_json({"ok": bool(removed), "removed": removed}, 200 if removed else 404)
+            return
+        if path == "/api/likes":
+            body5, error5 = self.read_json_body(4 * 1024)
+            if body5 is None:
+                self.send_json({"error": "invalid request"}, error5 or 400)
+                return
+            target5 = str(body5.get("path") or "").strip()
+            if not target5:
+                self.send_json({"error": "缺少文章"}, 400)
+                return
+            like_result = social.toggle_like(target5, _client_uid(self))
+            if like_result.get("liked"):
+                # 只报新赞，不报取消：取消是噪声，群里没必要知道。
+                note5 = self.vault.note(target5) if target5 else None
+                title5 = str(note5["title"]) if note5 else target5.rsplit("/", 1)[-1]
+                note_path5 = str(note5["path"]) if note5 else target5
+                summary = (f"**👍 新「有用」** · [「{title5}」]({site_url(f'?path={note_path5}')})\n"
+                           f"<font color=\"comment\">第 {like_result.get('count')} 个赞 · "
+                           f"{time.strftime('%m-%d %H:%M')}</font>")
+                threading.Thread(target=notify_wecom, args=(summary,), daemon=True).start()
+            self.send_json(like_result)
             return
         if path == "/api/feedback":
             self.handle_feedback()
@@ -3644,11 +3858,18 @@ class Handler(BaseHTTPRequestHandler):
             "praise": "有用",
             "other": "其他",
         }
+        kind_icons = {"bug": "🐛", "confusing": "😵", "suggestion": "💡",
+                      "praise": "👍", "other": "📝"}
+        kind_color = "warning" if kind in ("bug", "confusing") else "info"
+        fpath = record.get("path") or ""
+        article_link = f"[「{record['title']}」]({site_url(f'?path={fpath}')})" if fpath else (record["title"] or "未关联文章")
         summary = (
-            f"【知识库反馈】{kind_labels.get(kind, kind)}"
-            f"{' · ' + record['title'] if record['title'] else ''}\n"
-            f"来自：{record['name'] or record['ip']}（{record['host_kind']}）\n"
-            f"{message[:400]}"
+            f"**{kind_icons.get(kind, '📝')} 反馈 · {kind_labels.get(kind, kind)}** "
+            f"<font color=\"{kind_color}\">{article_link}</font>\n"
+            f"> {message[:400]}\n"
+            f"<font color=\"comment\">来自 {record['name'] or record['ip']}（{record['host_kind']}）"
+            f"{' · 联系方式 ' + record['contact'] if record.get('contact') else ''}"
+            f" · {time.strftime('%m-%d %H:%M')}</font>"
         )
         threading.Thread(target=notify_wecom, args=(summary,), daemon=True).start()
         self.send_json({"ok": True, "message": "收到，谢谢反馈！"})

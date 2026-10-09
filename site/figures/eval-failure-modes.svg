@@ -1,0 +1,297 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 776" role="img" lang="zh-CN" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+<style>
+.c-grid { stroke: transparent; fill: none; }
+.c-mask { fill: #ffffff; stroke: none; }
+.c-frontend { fill: rgba(34, 211, 238, 0.15);   stroke: #0891b2; }
+.c-backend { fill: rgba(52, 211, 153, 0.18);    stroke: #059669; }
+.c-database { fill: rgba(167, 139, 250, 0.2);   stroke: #7c3aed; }
+.c-security { fill: rgba(251, 113, 133, 0.15);   stroke: #e11d48; }
+.c-messagebus { fill: rgba(251, 146, 60, 0.15); stroke: #ea580c; }
+.c-external { fill: rgba(148, 163, 184, 0.18);   stroke: #64748b; }
+.t-primary { fill: #0f172a; }
+.t-muted { fill: #475569; }
+.t-dim { fill: #94a3b8; }
+.t-backend { fill: #059669; }
+.t-database { fill: #7c3aed; }
+.t-security { fill: #e11d48; }
+.t-messagebus { fill: #ea580c; }
+svg .semantic-sigil { fill: none;
+      stroke: currentColor;
+      stroke-width: 1.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.76;
+      pointer-events: none; }
+svg .semantic-sigil > * { vector-effect: non-scaling-stroke; }
+svg .semantic-sigil .sigil-fill { fill: currentColor; stroke: none; }
+svg .s-frontend { color: #0891b2; }
+svg .s-backend { color: #059669; }
+svg .s-database { color: #7c3aed; }
+svg .s-security { color: #e11d48; }
+svg .s-messagebus { color: #ea580c; }
+svg .s-external { color: #64748b; }
+.a-default { stroke: #94a3b8; fill: none; }
+.a-emphasis { stroke: #059669; fill: none; }
+.a-security { stroke: #e11d48; fill: none; stroke-dasharray: 5,5; }
+.a-dashed { stroke: #7c3aed; fill: none; stroke-dasharray: 4,4; }
+.m-default { fill: #94a3b8; }
+.m-emphasis { fill: #059669; }
+.m-security { fill: #e11d48; }
+.m-dashed { fill: #7c3aed; }
+.c-security-group { fill: transparent; stroke: #e11d48; stroke-dasharray: 4,4; }
+.c-lane { fill: rgba(248, 250, 252, 0.65); stroke: #cbd5e1; stroke-dasharray: 6,6; }
+</style>
+
+        <title id="archify-diagram-title">评测采样的六种失效模式与对应检测</title>
+        <desc id="archify-diagram-description">由 Archify 生成的工作流图。</desc>
+        <!-- Definitions -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Swimlanes -->
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="712" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / 指标入口</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="176" width="712" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="exception-lane" data-composition-frame-id="lane-1-exception" x="46" y="182" width="700" height="92" rx="8" class="c-security-group" stroke-width="1"/>
+        <text x="54" y="198" class="t-security" font-size="10" font-weight="600">EX / 采样失真</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="300" width="712" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="exception-lane" data-composition-frame-id="lane-2-exception" x="46" y="306" width="700" height="92" rx="8" class="c-security-group" stroke-width="1"/>
+        <text x="54" y="322" class="t-security" font-size="10" font-weight="600">EX / 度量失真</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-3" x="40" y="424" width="712" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="exception-lane" data-composition-frame-id="lane-3-exception" x="46" y="430" width="700" height="92" rx="8" class="c-security-group" stroke-width="1"/>
+        <text x="54" y="446" class="t-security" font-size="10" font-weight="600">EX / 判定失真</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-4" x="40" y="548" width="712" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="570" class="t-dim" font-size="10" font-weight="600">05 / 处置</text>
+
+        <!-- Phase headers -->
+        <line x1="48" y1="35" x2="260" y2="35" class="a-default" stroke-width="1.1"/>
+        <rect x="48" y="27" width="212" height="16" rx="4" class="c-mask"/>
+        <text x="154" y="39" class="t-muted" font-size="8" font-weight="600" text-anchor="middle">输入</text>
+        <line x1="288" y1="35" x2="500" y2="35" class="a-emphasis" stroke-width="1.1"/>
+        <rect x="288" y="27" width="212" height="16" rx="4" class="c-mask"/>
+        <text x="394" y="39" class="t-backend" font-size="8" font-weight="600" text-anchor="middle">失效点</text>
+        <line x1="528" y1="35" x2="740" y2="35" class="a-dashed" stroke-width="1.1"/>
+        <rect x="528" y="27" width="212" height="16" rx="4" class="c-mask"/>
+        <text x="634" y="39" class="t-messagebus" font-size="8" font-weight="600" text-anchor="middle">检测与缓解</text>
+
+        <!-- Workflow groups -->
+
+
+        <!-- Edge paths -->
+        <path data-edge-from="calibrate" data-edge-to="decision" data-edge-key="0" data-composition-points="574,641;574,657;694,657;694,641" d="M 574 641 L 574 657 L 694 657 L 694 641" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="drift" data-edge-to="signif" data-edge-key="1" data-composition-points="488,243;574,243;574,465" d="M 488 243 L 574 243 L 574 465" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="leak" data-edge-to="drift" data-edge-key="2" data-composition-points="372,243;420,243" d="M 372 243 L 420 243" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="leaktest" data-edge-to="decision" data-edge-key="3" data-composition-points="334,641;334,657;694,657;694,641" d="M 334 641 L 334 657 L 694 657 L 694 641" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="misfit" data-edge-to="counter" data-edge-key="4" data-composition-points="500,367;516,367;516,615;500,615" d="M 500 367 L 516 367 L 516 615 L 500 615" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="misfit" data-edge-to="noise" data-edge-key="5" data-composition-points="447,393;447,484;380,484" d="M 447 393 L 447 484 L 380 484" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="noise" data-edge-to="calibrate" data-edge-key="6" data-composition-points="334,517;334,538;512,538;512,615;528,615" d="M 334 517 L 334 538 L 512 538 L 512 615 L 528 615" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="score" data-edge-to="leak" data-edge-key="7" data-composition-points="260,119;334,119;334,217" d="M 260 119 L 334 119 L 334 217" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="score" data-edge-to="misfit" data-edge-key="8" data-composition-points="221,145;221,367;408,367" d="M 221 145 L 221 367 L 408 367" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+        <path data-edge-from="suite" data-edge-to="leaktest" data-edge-label="季度轮换" data-edge-key="9" data-composition-points="140,119;156,119;156,668;334,668;334,641" d="M 140 119 L 156 119 L 156 668 L 334 668 L 334 641" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="suite" data-edge-to="score" data-edge-key="10" data-composition-points="140,119;168,119" d="M 140 119 L 168 119" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+
+        <!-- Nodes -->
+        <g id="node-suite" data-node-id="suite" data-node-label="测试集" tabindex="0" role="button" aria-label="聚焦测试集，有限采样, 指标入口 › 输入" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="有限采样" data-node-context="指标入口 › 输入">
+          <title>测试集 · 有限采样 · 指标入口 › 输入</title>
+          <rect x="48" y="93" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="48" y="93" width="92" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(54 99) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="94" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">测试集</text>
+          <text data-detail="context" x="94" y="131" class="t-muted" font-size="8" text-anchor="middle">有限采样</text>
+        </g>
+
+        <g id="node-score" data-node-id="score" data-node-label="评测分数" tabindex="0" role="button" aria-label="聚焦评测分数，被当成质量, 指标入口 › 输入" aria-pressed="false" data-node-kind="database" data-node-sublabel="被当成质量" data-node-context="指标入口 › 输入">
+          <title>评测分数 · 被当成质量 · 指标入口 › 输入</title>
+          <rect x="168" y="93" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="168" y="93" width="92" height="52" rx="6" class="c-database" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="database" class="semantic-sigil s-database" transform="translate(174 99) scale(0.6875)">
+            <ellipse cx="8" cy="4" rx="5" ry="2"/>
+            <path d="M3 4v8c0 1.1 2.2 2 5 2s5-.9 5-2V4M3 8c0 1.1 2.2 2 5 2s5-.9 5-2"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="214" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">评测分数</text>
+          <text data-detail="context" x="214" y="131" class="t-muted" font-size="8" text-anchor="middle">被当成质量</text>
+        </g>
+
+        <g id="node-leak" data-node-id="leak" data-node-label="测试集污染" tabindex="0" role="button" aria-label="聚焦测试集污染，训练数据见 过, 采样失真 › 失效点" aria-pressed="false" data-node-kind="security" data-node-sublabel="训练数据见 过" data-node-context="采样失真 › 失效点">
+          <title>测试集污染 · 训练数据见 过 · 采样失真 › 失效点</title>
+          <rect x="296" y="217" width="76" height="52" rx="6" class="c-mask"/>
+          <rect x="296" y="217" width="76" height="52" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(302 223) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="334" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">测试集污染</text>
+          <text data-detail="context" x="334" y="255" class="t-muted" font-size="8" text-anchor="middle">训练数据见 过</text>
+        </g>
+
+        <g id="node-drift" data-node-id="drift" data-node-label="分布偏移" tabindex="0" role="button" aria-label="聚焦分布偏移，离线≠在线, 采样失真 › 失效点" aria-pressed="false" data-node-kind="security" data-node-sublabel="离线≠在线" data-node-context="采样失真 › 失效点">
+          <title>分布偏移 · 离线≠在线 · 采样失真 › 失效点</title>
+          <rect x="420" y="217" width="68" height="52" rx="6" class="c-mask"/>
+          <rect x="420" y="217" width="68" height="52" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(426 223) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="454" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">分布偏移</text>
+          <text data-detail="context" x="454" y="255" class="t-muted" font-size="8" text-anchor="middle">离线≠在线</text>
+        </g>
+
+        <g id="node-misfit" data-node-id="misfit" data-node-label="指标错位" tabindex="0" role="button" aria-label="聚焦指标错位，优化了错的量, 度量失真 › 失效点" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="优化了错的量" data-node-context="度量失真 › 失效点">
+          <title>指标错位 · 优化了错的量 · 度量失真 › 失效点</title>
+          <rect x="408" y="341" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="408" y="341" width="92" height="52" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(414 347) scale(0.6875)">
+            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
+            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
+            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
+            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="454" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">指标错位</text>
+          <text data-detail="context" x="454" y="379" class="t-muted" font-size="8" text-anchor="middle">优化了错的量</text>
+        </g>
+
+        <g id="node-noise" data-node-id="noise" data-node-label="评估者偏差" tabindex="0" role="button" aria-label="聚焦评估者偏差，锚定与疲劳, 判定失真 › 失效点" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="锚定与疲劳" data-node-context="判定失真 › 失效点">
+          <title>评估者偏差 · 锚定与疲劳 · 判定失真 › 失效点</title>
+          <rect x="288" y="465" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="288" y="465" width="92" height="52" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(294 471) scale(0.6875)">
+            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
+            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
+            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
+            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="334" y="486" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">评估者偏差</text>
+          <text data-detail="context" x="334" y="503" class="t-muted" font-size="8" text-anchor="middle">锚定与疲劳</text>
+        </g>
+
+        <g id="node-signif" data-node-id="signif" data-node-label="显著性不足" tabindex="0" role="button" aria-label="聚焦显著性不足，样本太小, 判定失真 › 检测与缓解" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="样本太小" data-node-context="判定失真 › 检测与缓解">
+          <title>显著性不足 · 样本太小 · 判定失真 › 检测与缓解</title>
+          <rect x="538" y="465" width="72" height="52" rx="6" class="c-mask"/>
+          <rect x="538" y="465" width="72" height="52" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(544 471) scale(0.6875)">
+            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
+            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
+            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
+            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="574" y="486" class="t-primary" font-size="10.6" font-weight="600" text-anchor="middle">显著性不足</text>
+          <text data-detail="context" x="574" y="503" class="t-muted" font-size="8" text-anchor="middle">样本太小</text>
+        </g>
+
+        <g id="node-leaktest" data-node-id="leaktest" data-node-label="隐蔽集复测" tabindex="0" role="button" aria-label="聚焦隐蔽集复测，季度轮换 20%, 处置 › 失效点" aria-pressed="false" data-node-kind="backend" data-node-sublabel="季度轮换 20%" data-node-context="处置 › 失效点">
+          <title>隐蔽集复测 · 季度轮换 20% · 处置 › 失效点</title>
+          <rect x="288" y="589" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="288" y="589" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(294 595) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="334" y="610" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">隐蔽集复测</text>
+          <text data-detail="context" x="334" y="627" class="t-muted" font-size="8" text-anchor="middle">季度轮换 20%</text>
+        </g>
+
+        <g id="node-counter" data-node-id="counter" data-node-label="反指标" tabindex="0" role="button" aria-label="聚焦反指标，TSR 配轮数, 处置 › 失效点" aria-pressed="false" data-node-kind="backend" data-node-sublabel="TSR 配轮数" data-node-context="处置 › 失效点">
+          <title>反指标 · TSR 配轮数 · 处置 › 失效点</title>
+          <rect x="408" y="589" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="408" y="589" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(414 595) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="454" y="610" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">反指标</text>
+          <text data-detail="context" x="454" y="627" class="t-muted" font-size="8" text-anchor="middle">TSR 配轮数</text>
+        </g>
+
+        <g id="node-calibrate" data-node-id="calibrate" data-node-label="人工校准" tabindex="0" role="button" aria-label="聚焦人工校准，双盲+对照, 处置 › 检测与缓解" aria-pressed="false" data-node-kind="backend" data-node-sublabel="双盲+对照" data-node-context="处置 › 检测与缓解">
+          <title>人工校准 · 双盲+对照 · 处置 › 检测与缓解</title>
+          <rect x="528" y="589" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="528" y="589" width="92" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(534 595) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="574" y="610" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">人工校准</text>
+          <text data-detail="context" x="574" y="627" class="t-muted" font-size="8" text-anchor="middle">双盲+对照</text>
+        </g>
+
+        <g id="node-decision" data-node-id="decision" data-node-label="上线决策" tabindex="0" role="button" aria-label="聚焦上线决策，带置信区间, 处置 › 检测与缓解" aria-pressed="false" data-node-kind="external" data-node-sublabel="带置信区间" data-node-context="处置 › 检测与缓解">
+          <title>上线决策 · 带置信区间 · 处置 › 检测与缓解</title>
+          <rect x="648" y="589" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="648" y="589" width="92" height="52" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(654 595) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="694" y="610" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">上线决策</text>
+          <text data-detail="context" x="694" y="627" class="t-muted" font-size="8" text-anchor="middle">带置信区间</text>
+        </g>
+
+        <!-- Edge labels -->
+
+
+
+
+
+
+
+
+
+        <g data-detail="context" data-edge-from="suite" data-edge-to="leaktest" data-edge-label="季度轮换" data-edge-key="9">
+          <rect x="220.8" y="648" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="245" y="658" class="t-database" font-size="8" text-anchor="middle">季度轮换</text>
+        </g>
+
+
+        <!-- Legend -->
+        <g data-legend="" data-legend-bridge="">
+          <text x="20" y="676" class="t-primary" font-size="12" font-weight="650">图例</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="用户界面" data-legend-x="20" data-legend-baseline="696" data-legend-width="78">
+            <rect x="20" y="688" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
+            <text x="42" y="696" class="t-muted" font-size="7.5" font-weight="500">用户界面</text>
+          </g>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Agent 逻辑" data-legend-x="105" data-legend-baseline="696" data-legend-width="87">
+            <rect x="105" y="688" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
+            <text x="127" y="696" class="t-muted" font-size="7.5" font-weight="500">Agent 逻辑</text>
+          </g>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="策略" data-legend-x="199" data-legend-baseline="696" data-legend-width="61">
+            <rect x="199" y="688" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
+            <text x="221" y="696" class="t-muted" font-size="7.5" font-weight="500">策略</text>
+          </g>
+          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="工具操作" data-legend-x="267" data-legend-baseline="696" data-legend-width="78">
+            <rect x="267" y="688" width="14" height="9" rx="2" class="c-messagebus" stroke-width="1"/>
+            <text x="289" y="696" class="t-muted" font-size="7.5" font-weight="500">工具操作</text>
+          </g>
+          <g data-legend-semantic-kind="database" data-legend-kind="database" data-legend-label="上下文 / 追踪" data-legend-x="352" data-legend-baseline="696" data-legend-width="100">
+            <rect x="352" y="688" width="14" height="9" rx="2" class="c-database" stroke-width="1"/>
+            <text x="374" y="696" class="t-muted" font-size="7.5" font-weight="500">上下文 / 追踪</text>
+          </g>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="外部系统" data-legend-x="459" data-legend-baseline="696" data-legend-width="78">
+            <rect x="459" y="688" width="14" height="9" rx="2" class="c-external" stroke-width="1"/>
+            <text x="481" y="696" class="t-muted" font-size="7.5" font-weight="500">外部系统</text>
+          </g>
+        </g>
+      </svg>

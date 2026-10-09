@@ -2,7 +2,7 @@
 # 1. 重叠修复：目录列表不整栏 sticky，只标题行悬浮
 # 2. 目录折叠按钮可点、可收起
 # 3. 同模块改名「同模块文章」+ 字号 18px
-# 4. 奖励 60 秒累计门槛（跨访问累加、切后台暂停、切篇入账）
+# 4. 奖励 180 秒（3 分钟）累计门槛（跨访问累加、切后台暂停、切篇入账）
 from playwright.sync_api import sync_playwright
 
 BASE = "http://127.0.0.1:18788"
@@ -25,18 +25,19 @@ with sync_playwright() as p:
     pg.evaluate("openNote('Clippings/Codex 接管浏览器，自动化任务实战.md')")
     pg.wait_for_timeout(1200)
 
-    # ── 3. 改名 + 字号 ──
+    # ── 3. 改名 + 字号（2026-09-25 起右栏列表项统一 13px，标题行 16px）──
     head = pg.locator("#reader-siblings .rail-head span")
     check("同模块改名", head.inner_text().strip() == "同模块文章", head.inner_text())
     fs = pg.evaluate(
         "getComputedStyle(document.querySelector('#reader-siblings .rail-list a')).fontSize"
     )
-    check("同模块字号16px", fs == "16px", fs)
+    check("同模块字号13px", fs == "13px", fs)
 
-    # ── 2. 目录折叠 ──
+    # ── 2. 目录折叠（点击区=标题整行：箭头钮 pointer-events:none 是设计态，
+    #      点 rail-head 的标题文本才符合 2026-09-24 定的整行点击行为）──
     toc = pg.locator("#reader-toc")
     check("目录存在", toc.count() == 1 and toc.is_visible())
-    tog = pg.locator("#reader-toc .rail-toggle")
+    tog = pg.locator("#reader-toc .rail-head span")
     if tog.count() == 1:
         tog.click()
         pg.wait_for_timeout(150)
@@ -71,7 +72,7 @@ with sync_playwright() as p:
     )
     check("目录与同模块不重叠", overlap)
 
-    # ── 4. 60 秒累计门槛 ──
+    # ── 4. 180 秒（3 分钟）累计门槛 ──
     pg.evaluate("localStorage.removeItem('tk-reading-v1')")
     pg.evaluate("localStorage.removeItem('tk-progress-v1')")
     pg.evaluate("openNote('Clippings/Codex 接管浏览器，自动化任务实战.md')")
@@ -80,15 +81,15 @@ with sync_playwright() as p:
     pg.wait_for_timeout(500)
     reward = pg.locator("#reader-reward")
     txt = reward.inner_text() if reward.is_visible() else ""
-    check("不足60秒出提示不出祝贺", "再读一会儿" in txt and "很棒" not in txt, txt[:40])
-    check("不足60秒不记已读", pg.evaluate("localStorage.getItem('tk-progress-v1')") in (None, "{}"))
+    check("不足180秒出提示不出祝贺", "再读一会儿" in txt and "很棒" not in txt, txt[:40])
+    check("不足180秒不记已读", pg.evaluate("localStorage.getItem('tk-progress-v1')") in (None, "{}"))
 
-    # 模拟已有 50 秒累计（此前访问），本次再读 12 秒应跨过门槛
+    # 模拟已有 170 秒累计（此前访问），本次再读 12 秒应跨过门槛
     pg.evaluate(
         """(() => {
           const d = JSON.parse(localStorage.getItem('tk-reading-v1') || '{}');
           const path = 'Clippings/Codex 接管浏览器，自动化任务实战.md';
-          d[path] = (d[path] || 0) + 50;
+          d[path] = (d[path] || 0) + 170;
           localStorage.setItem('tk-reading-v1', JSON.stringify(d));
         })()"""
     )
@@ -96,9 +97,9 @@ with sync_playwright() as p:
     pg.evaluate("maybeShowReaderReward()")
     pg.wait_for_timeout(400)
     txt2 = reward.inner_text() if reward.is_visible() else ""
-    check("跨过60秒弹祝贺", "很棒" in txt2, txt2[:50])
+    check("跨过180秒弹祝贺", "很棒" in txt2, txt2[:50])
     prog = pg.evaluate("JSON.parse(localStorage.getItem('tk-progress-v1')||'{}').learned||{}")
-    check("满60秒记已读", "Clippings/Codex 接管浏览器，自动化任务实战.md" in prog)
+    check("满180秒记已读", "Clippings/Codex 接管浏览器，自动化任务实战.md" in prog)
     check("祝贺带累计用时", "分" in txt2 or "秒" in txt2, txt2[:60])
 
     # 切后台暂停计时：hidden 时 stop，期间不计入

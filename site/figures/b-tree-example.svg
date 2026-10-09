@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20001102//EN" "http://www.w3.org/TR/2000/CR-SVG-20001102/DTD/svg-20001102.dtd">
+<!-- This file was created by the DynamicDraw's "SVG Export" plug-in version 1.1.1.-->
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='221.029mm' height='61.029mm' viewBox='0 0 221.029 61.029'>
+<g style='stroke-linecap:round;stroke-linejoin:round'>
+<!-- start DynamicDraw object [1], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [1], type : FDOJ_RECT -->
+<rect x='75.514583' y='10.514583' width='10.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [1], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [2], type : FDOJ_RECT -->
+<rect x='80.514583' y='0.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='85.087630' y='7.379069'>23</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [2], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [3], type : FDOJ_RECT -->
+<rect x='90.514583' y='10.514583' width='10.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [3], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [4], type : FDOJ_RECT -->
+<rect x='95.514583' y='0.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='100.529981' y='7.379069'>71</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [4], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [5], type : FDOJ_RECT -->
+<rect x='105.514583' y='10.514583' width='10.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [5], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [6], type : FDOJ_RECT -->
+<rect x='110.514583' y='0.514583' width='15.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='117.251839' y='7.379069'>-</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [6], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [7], type : FDOJ_RECT -->
+<rect x='125.514583' y='0.514583' width='15.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='132.251839' y='7.379069'>-</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [7], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [8], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [8], type : FDOJ_RECT -->
+<rect x='120.514583' y='10.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [8], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [9], type : FDOJ_LINE -->
+<line x1='130.514583' y1='10.514583' x2='120.514583' y2='20.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [9], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [8], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [9], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [9], type : FDOJ_RECT -->
+<rect x='135.514583' y='10.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [9], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [10], type : FDOJ_LINE -->
+<line x1='145.514583' y1='10.514583' x2='135.514583' y2='20.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [10], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [9], type : FDOJ_GROUP -->
+</g><!-- group -->
+<!-- end DynamicDraw object [1], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [2], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [2], type : FDOJ_RECT -->
+<rect x='5.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='11.683398' y='47.379069'>8</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [2], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [3], type : FDOJ_RECT -->
+<rect x='20.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='25.701546' y='47.379069'>11</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [3], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [4], type : FDOJ_RECT -->
+<rect x='35.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='40.306738' y='47.379069'>19</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [4], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [5], type : FDOJ_RECT -->
+<rect x='50.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='57.251839' y='47.379069'>-</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [5], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [6], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [6], type : FDOJ_RECT -->
+<rect x='45.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [6], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [7], type : FDOJ_LINE -->
+<line x1='55.514583' y1='50.514583' x2='45.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [7], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [6], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [7], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [7], type : FDOJ_RECT -->
+<rect x='60.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [7], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [8], type : FDOJ_LINE -->
+<line x1='70.514583' y1='50.514583' x2='60.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [8], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [7], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [8], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [8], type : FDOJ_RECT -->
+<rect x='0.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [8], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [9], type : FDOJ_LINE -->
+<line x1='10.514583' y1='50.514583' x2='0.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [9], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [8], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [9], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [9], type : FDOJ_RECT -->
+<rect x='15.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [9], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [10], type : FDOJ_LINE -->
+<line x1='25.514583' y1='50.514583' x2='15.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [10], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [9], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [10], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [10], type : FDOJ_RECT -->
+<rect x='30.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [10], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [11], type : FDOJ_LINE -->
+<line x1='40.514583' y1='50.514583' x2='30.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [11], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [10], type : FDOJ_GROUP -->
+</g><!-- group -->
+<!-- end DynamicDraw object [2], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [3], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [3], type : FDOJ_RECT -->
+<rect x='80.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='85.131038' y='47.379069'>34</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [3], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [4], type : FDOJ_RECT -->
+<rect x='95.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='100.046289' y='47.379069'>44</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [4], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [5], type : FDOJ_RECT -->
+<rect x='110.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='115.122770' y='47.379069'>56</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [5], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [6], type : FDOJ_RECT -->
+<rect x='125.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='130.122770' y='47.379069'>57</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [6], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [7], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [7], type : FDOJ_RECT -->
+<rect x='120.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [7], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [8], type : FDOJ_LINE -->
+<line x1='130.514583' y1='50.514583' x2='120.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [8], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [7], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [8], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [8], type : FDOJ_RECT -->
+<rect x='135.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [8], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [9], type : FDOJ_LINE -->
+<line x1='145.514583' y1='50.514583' x2='135.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [9], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [8], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [9], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [9], type : FDOJ_RECT -->
+<rect x='75.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [9], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [10], type : FDOJ_LINE -->
+<line x1='85.514583' y1='50.514583' x2='75.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [10], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [9], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [10], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [10], type : FDOJ_RECT -->
+<rect x='90.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [10], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [11], type : FDOJ_LINE -->
+<line x1='100.514583' y1='50.514583' x2='90.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [11], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [10], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [11], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [11], type : FDOJ_RECT -->
+<rect x='105.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [11], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [12], type : FDOJ_LINE -->
+<line x1='115.514583' y1='50.514583' x2='105.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [12], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [11], type : FDOJ_GROUP -->
+</g><!-- group -->
+<!-- end DynamicDraw object [3], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [4], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [4], type : FDOJ_RECT -->
+<rect x='155.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='160.124837' y='47.379069'>75</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [4], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [5], type : FDOJ_RECT -->
+<rect x='170.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:white; stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='175.143441' y='47.379069'>92</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [5], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [6], type : FDOJ_RECT -->
+<rect x='185.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='192.251839' y='47.379069'>-</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [6], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [7], type : FDOJ_RECT -->
+<rect x='200.514583' y='40.514583' width='15.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<text style='font-size:6.304525'><tspan style='font-size:6.304525;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='207.251839' y='47.379069'>-</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [7], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [8], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [8], type : FDOJ_RECT -->
+<rect x='195.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [8], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [9], type : FDOJ_LINE -->
+<line x1='205.514583' y1='50.514583' x2='195.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [9], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [8], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [9], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [9], type : FDOJ_RECT -->
+<rect x='210.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [9], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [10], type : FDOJ_LINE -->
+<line x1='220.514583' y1='50.514583' x2='210.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [10], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [9], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [10], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [10], type : FDOJ_RECT -->
+<rect x='150.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [10], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [11], type : FDOJ_LINE -->
+<line x1='160.514583' y1='50.514583' x2='150.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [11], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [10], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [11], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [11], type : FDOJ_RECT -->
+<rect x='165.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [11], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [12], type : FDOJ_LINE -->
+<line x1='175.514583' y1='50.514583' x2='165.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [12], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [11], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [12], type : FDOJ_GROUP -->
+<g><!-- group -->
+<!-- start DynamicDraw object [12], type : FDOJ_RECT -->
+<rect x='180.514583' y='50.514583' width='10.000000' height='10.000000' style='fill:rgb(179,179,179); stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [12], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [13], type : FDOJ_LINE -->
+<line x1='190.514583' y1='50.514583' x2='180.514583' y2='60.514583' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [13], type : FDOJ_LINE -->
+</g><!-- group -->
+<!-- end DynamicDraw object [12], type : FDOJ_GROUP -->
+</g><!-- group -->
+<!-- end DynamicDraw object [4], type : FDOJ_GROUP -->
+<!-- start DynamicDraw object [5], type : FDOJ_POLY -->
+<polyline points='80.514583,15.514583 35.514583,40.514583 ' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<g style='stroke-linecap:square;stroke-linejoin:miter'><!-- group tag for arrow -->
+<polyline points='38.010788,39.413793 39.610172,40.336514 35.514583,40.514583 37.829481,37.131271 37.767967,38.976714 ' style='fill:black; stroke:black; stroke-width:0.000000'/>
+</g><!-- group tag for arrow -->
+<polyline points='' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [5], type : FDOJ_POLY -->
+<!-- start DynamicDraw object [6], type : FDOJ_POLY -->
+<polyline points='95.514583,15.514583 110.514583,40.514583 ' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<g style='stroke-linecap:square;stroke-linejoin:miter'><!-- group tag for arrow -->
+<polyline points='109.331243,38.056437 110.200169,36.427200 110.514583,40.514583 107.056029,38.313685 108.902497,38.313685 ' style='fill:black; stroke:black; stroke-width:0.000000'/>
+</g><!-- group tag for arrow -->
+<polyline points='' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [6], type : FDOJ_POLY -->
+<!-- start DynamicDraw object [7], type : FDOJ_POLY -->
+<polyline points='110.514583,15.514583 185.514583,40.514583 ' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<g style='stroke-linecap:square;stroke-linejoin:miter'><!-- group tag for arrow -->
+<polyline points='183.016384,39.418327 182.615829,37.615829 185.514583,40.514583 181.456327,41.094334 182.858270,39.892669 ' style='fill:black; stroke:black; stroke-width:0.000000'/>
+</g><!-- group tag for arrow -->
+<polyline points='' style='fill:none; stroke:black; stroke-width:0.500000'/>
+<!-- end DynamicDraw object [7], type : FDOJ_POLY -->
+<!-- start DynamicDraw object [8], type : FDOJ_RECT -->
+<rect x='30.514583' y='25.514583' width='20.000000' height='10.000000' style='fill:none; stroke:none; stroke-width:0.500000'/>
+<text style='font-size:4.729427'><tspan style='font-size:4.729427;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='34.797103' y='31.911914'>x &lt; 23</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [8], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [9], type : FDOJ_RECT -->
+<rect x='75.514583' y='25.514583' width='30.000000' height='10.000000' style='fill:none; stroke:none; stroke-width:0.500000'/>
+<text style='font-size:4.729427'><tspan style='font-size:4.729427;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='80.363265' y='31.911914'>23 &lt; x &lt; 71</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [9], type : FDOJ_RECT -->
+<!-- start DynamicDraw object [10], type : FDOJ_RECT -->
+<rect x='160.514583' y='25.514583' width='20.000000' height='10.000000' style='fill:none; stroke:none; stroke-width:0.500000'/>
+<text style='font-size:4.729427'><tspan style='font-size:4.729427;font-family:"Arial";font-weight:400'><tspan style='fill:black'><tspan x='164.799170' y='31.911914'>71 &lt; x</tspan></tspan>
+</tspan>
+</text>
+<!-- end DynamicDraw object [10], type : FDOJ_RECT -->
+</g><!-- stroke-linecap, etc -->
+</svg>

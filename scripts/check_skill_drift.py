@@ -79,9 +79,16 @@ def is_attribution_line(line: str) -> bool:
 
 
 def doc_files(root: Path):
+    # .patrol-scratch / .work 这类工作副本是整库内容的快照，扫它会把同一份库
+    # 内容重复判一遍，且副本里的路径与路由对不上站点代码，全是假违规
+    # （实测：.work/baseline 下一篇样例文里的 /api/tenants/... 被判"路由不存在"，
+    # 门禁因此常年红着，把真实漂移和这种噪声混在一起）。
+    SCRATCH_DIRS = {".patrol-scratch", ".work"}
     for p in sorted(root.rglob("*")):
         if p.is_file() and p.suffix in (".md", ".py", ".sh"):
             if "__pycache__" in p.parts:
+                continue
+            if SCRATCH_DIRS & set(p.parts):
                 continue
             yield p
 
@@ -393,6 +400,11 @@ def check_secret_files(skill_roots_list):
             violations.append(f"敏感文件 {f.name} 所在目录不在 git 仓内，无法验证忽略状态")
             continue
         rel = f.relative_to(gitroot).as_posix()
+        # 路径经过符号链接：git 拒绝对其求值（beyond a symbolic link），
+        # check-ignore / ls-files 都只能拿到失败退出码，于是任何黑名单文件
+        # 都会被判成"裸露"。这类目录属于别的仓，本守卫管不到，跳过。
+        if any((gitroot / part).is_symlink() for part in f.relative_to(gitroot).parents):
+            continue
         ignored = subprocess.run(["git", "check-ignore", "-q", rel], cwd=gitroot).returncode == 0
         tracked = subprocess.run(["git", "ls-files", "--error-unmatch", rel],
                                  cwd=gitroot, capture_output=True).returncode == 0
@@ -487,6 +499,10 @@ def main() -> int:
         main_roots = list(skill_roots(main_dir))
         for root in main_roots:
             siblings = [d for d in main_roots if d != root]
+            # governor SKILL.md 提到内嵌技能时按「.knowledge-skills/<名>」语境
+            # 写相对路径（`scripts/find_images.py` 指的是 article-illustration
+            # 下的脚本）。把 embed 根补进解析候选，这类引用才查得到真实文件。
+            siblings += [d for d in embed_roots if d != root]
             check_skill_tree(root, "skills/" + root.name, routes, errors, siblings)
         sync_check(embed, main_dir, warns)
 

@@ -714,7 +714,7 @@
     "把技术原理读到能上手用": { en: "Read the mechanism, then use it" },
     "知识领域": { en: "Domains" },
     "学习与实践": { en: "Learning and practice" },
-    "评估与工程": { en: "Evaluation and engineering" },
+    "验证与证据": { en: "Verification & evidence" },
     "辅助理解": { en: "Optional aids" },
     "保留资料": { en: "Retained material" },
 
@@ -799,6 +799,18 @@
     "✓ 标记已学": { en: "✓ Mark learned" },
     "✓ 已读": { en: "✓ Learned" },
     "标记已读": { en: "Mark mastered" },
+    "✓ 标记已读": { en: "✓ Mark mastered" },
+    /* 点赞与评论表单（reader-social 区块） */
+    "点赞与评论": { en: "Likes & comments" },
+    "你": { en: "You" },
+    "昵称": { en: "Nickname" },
+    "昵称（可不填）": { en: "Nickname (optional)" },
+    "评论内容": { en: "Comment" },
+    "说点什么…（最多 1000 字）": { en: "Say something… (up to 1000 chars)" },
+    "发布评论": { en: "Post comment" },
+    "评论": { en: "Comments" },
+    "最新": { en: "Newest" },
+    "最早": { en: "Oldest" },
     // ── Reader floating actions (added 2026-09-25: i18n_audit reported them missing) ──
     "这篇有用": { en: "This helped" },
     "这篇有用，记一笔（只保存在本浏览器）": { en: "This helped — take a note (this browser only)" },
@@ -1411,6 +1423,19 @@
       en: "This source is not reachable right now. The link above still works",
     },
     "暂时没有新内容。": { en: "Nothing new right now" },
+    "机制 → 观测 → 故障 → 修复 → 实践，顺序已排好": { en: "Mechanism to observation, to failure, to fixing, to practice - the order is already set" },
+    "论文推荐": { en: "Paper picks" },
+    "默认顺序": { en: "Default order" },
+    "按评分": { en: "By score" },
+    "只看已评": { en: "Scored only" },
+    "学习路线": { en: "Learning routes" },
+    "领域": { en: "Domain" },
+    "主题": { en: "Topics" },
+    "系统阅读路线": { en: "Reading roadmap" },
+    "全库阅读标注与进度，只保存在这台浏览器": { en: "Reading marks and progress for the whole library - kept in this browser only" },
+    "全库的已读与稍后读都在这里。与阅读页、学习路线共享同一份进度，任一处勾选、全站同步。": { en: "Every read and later-read mark in one place. Progress is shared with the reading page and the roadmap - tick one here and the whole site agrees" },
+    "选一到几个领域或主题，相关文章会自动排成一条路线：先懂机制，再看怎么观测，认得出故障，学得会修复，最后沉淀成实践——顺序已经排好，你不用挑，选多个还会并成一条更长的路线，进度一起算": { en: "Pick one domain or a few topics and the related articles line up into a reading roadmap: mechanism first, then observation, then recognising failure, then fixing, and finally practice. The order is set for you; pick several and the roadmap just gets longer, with progress counted across all of them" },
+    "点一下 chip 就加上或去掉一个条件，路线马上跟着变，想横向对比几个主题就把它们都选上": { en: "Tap a chip to add or drop a condition and the roadmap updates at once. To compare a few topics side by side, just select them all" },
     "更新于": { en: "Updated" },
     "刚刚更新": { en: "Updated just now" },
     // 资源页的分类目录。「全部」已在词典里（图谱页用过），不重复定义。
@@ -2610,7 +2635,23 @@
     STORAGE_KEY,
     /* Exposed so the audit script can report coverage without parsing source. */
     DICT,
-  };
+      // 2026-09-27 补：运行时扫出来的英文漏网点。这几句写死在 HTML / nav.js 里，
+    // i18n-dict 只查词典完整性 —— 查不出"HTML 改了、字典没跟"，只能靠运行时扫。
+    // 路线页那两句是 2026-09-27 改文案时漏掉的（自己引入的）。
+    "系统阅读路线": { en: "Reading roadmap" },
+    "全库阅读标注与进度，只保存在这台浏览器": {
+      en: "Reading marks and progress for the whole library - kept in this browser only",
+    },
+    "全库的已读与稍后读都在这里。与阅读页、学习路线共享同一份进度，任一处勾选、全站同步。": {
+      en: "Every read and later-read mark in one place. Progress is shared with the reading page and the roadmap - tick one here and the whole site agrees",
+    },
+    "选一到几个领域或主题，相关文章会自动排成一条路线：先懂机制，再看怎么观测，认得出故障，学得会修复，最后沉淀成实践——顺序已经排好，你不用挑，选多个还会并成一条更长的路线，进度一起算": {
+      en: "Pick one domain or a few topics and the related articles line up into a reading roadmap: mechanism first, then observation, then recognising failure, then fixing, and finally practice. The order is set for you; pick several and the roadmap just gets longer, with progress counted across all of them",
+    },
+    "点一下 chip 就加上或去掉一个条件，路线马上跟着变，想横向对比几个主题就把它们都选上": {
+      en: "Tap a chip to add or drop a condition and the roadmap updates at once. To compare a few topics side by side, just select them all",
+    },
+};
 
   /* Set the language attribute before the first paint so CSS can key off it,
      then translate whatever markup has already parsed. */

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="506" height="285" viewBox="55 79 506 285" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #ffffff" x="360" y="180" width="100" height="60"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="360" y="180" width="100" height="60"/>
+  </g>
+  <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="410" y="214.425">
+    <tspan x="410" y="214.425">Running</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="160" y="180" width="100" height="60"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="160" y="180" width="100" height="60"/>
+  </g>
+  <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="210" y="214.425">
+    <tspan x="210" y="214.425">Ready</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="460" y="80" width="100" height="60"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="460" y="80" width="100" height="60"/>
+  </g>
+  <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="510" y="114.425">
+    <tspan x="510" y="114.425">Dead</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="60" y="80" width="100" height="60"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="60" y="80" width="100" height="60"/>
+  </g>
+  <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="110" y="114.425">
+    <tspan x="110" y="114.425">New</tspan>
+  </text>
+  <g>
+    <rect style="fill: #ffffff" x="260" y="280" width="100" height="60"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x="260" y="280" width="100" height="60"/>
+  </g>
+  <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="310" y="314.425">
+    <tspan x="310" y="314.425">Blocked</tspan>
+  </text>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 260 210 C 300,180 320,180 351.2,203.4"/>
+    <polygon style="fill: #000000" points="348.2,207.4 359.2,209.4 354.2,199.4 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="348.2,207.4 359.2,209.4 354.2,199.4 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 410 240 C 400,280 400,280 368.8,303.4"/>
+    <polygon style="fill: #000000" points="365.8,299.4 360.8,309.4 371.8,307.4 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="365.8,299.4 360.8,309.4 371.8,307.4 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 260 310 C 220,280 220,280 212.668,250.672"/>
+    <polygon style="fill: #000000" points="217.519,249.459 210.243,240.97 207.817,251.884 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="217.519,249.459 210.243,240.97 207.817,251.884 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 160 110 C 200,140 200,140 207.332,169.328"/>
+    <polygon style="fill: #000000" points="202.481,170.541 209.757,179.03 212.183,168.116 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="202.481,170.541 209.757,179.03 212.183,168.116 "/>
+  </g>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 410 180 C 420,140 420,140 451.2,116.6"/>
+    <polygon style="fill: #000000" points="454.2,120.6 459.2,110.6 448.2,112.6 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="454.2,120.6 459.2,110.6 448.2,112.6 "/>
+  </g>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="200" y="140">
+    <tspan x="200" y="140">Admit</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="360" y="140">
+    <tspan x="360" y="140">Release</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="400" y="300">
+    <tspan x="400" y="300">Event wait</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:start;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="180" y="300">
+    <tspan x="180" y="300">Event</tspan>
+  </text>
+  <g>
+    <path style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" d="M 360 210 C 320,240 300,240 268.8,216.6"/>
+    <polygon style="fill: #000000" points="271.8,212.6 260.8,210.6 265.8,220.6 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="271.8,212.6 260.8,210.6 265.8,220.6 "/>
+  </g>
+  <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="310" y="180">
+    <tspan x="310" y="180">Dispatch</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:normal;font-weight:normal" x="310" y="251.9">
+    <tspan x="310" y="251.9">Timeout/Yield</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:end;font-size:12.8;font-family:sanserif;font-style:italic;font-weight:normal" x="140" y="214.425">
+    <tspan x="140" y="214.425">Ready queue</tspan>
+  </text>
+  <text style="fill: #000000;text-anchor:middle;font-size:12.8;font-family:sanserif;font-style:italic;font-weight:normal" x="310" y="360">
+    <tspan x="310" y="360">Wait queue</tspan>
+  </text>
+</svg>

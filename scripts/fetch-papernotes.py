@@ -45,6 +45,8 @@ import urllib.error
 import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "site"))
+from wecom_notify import notify_wecom_md  # noqa: E402  （企微群通知，脚本与服务端共用）
 INDEX = (
     ROOT / "vault" / "知识库管理" / "归档" / "来源" / "论文与项目"
     / "papernotes-index.json"
@@ -378,6 +380,8 @@ def main() -> None:
         docs = fetch()
     except (urllib.error.URLError, urllib.error.HTTPError, OSError) as error:
         print(f"cannot reach PaperNotes: {error}")
+        notify_wecom_md(f"**🚨 抓取失败 · papernotes** <font color=\"warning\">索引未刷新</font>\n"
+                        f"> {str(error)[:200]}")
         sys.exit(1)
 
     index = build(docs)
@@ -409,6 +413,9 @@ def main() -> None:
         raise
     print(f"wrote {INDEX.relative_to(ROOT)} "
           f"({INDEX.stat().st_size / 1048576:.1f}MB)")
+    notify_wecom_md(f"**✅ 索引已刷新 · papernotes**\n"
+                    f"<font color=\"comment\">📚 {len(docs):,} 篇 · {INDEX.stat().st_size / 1048576:.1f}MB · "
+                    f"{datetime.datetime.now().strftime('%m-%d %H:%M')}</font>")
 
 
 if __name__ == "__main__":

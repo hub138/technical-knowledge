@@ -93,8 +93,17 @@ PROBE = r"""
     // 3. 目录状态
     if(toc){
       var ts = getComputedStyle(toc);
+      /* 目录本身 static 不等于没吸顶：本站目录包在 .reader-railcol 里，
+         整列 sticky。只看元素自身会把正常实现报成缺陷，所以沿祖先链找。 */
+      var anchor = toc, stickyHost = null;
+      while(anchor && anchor !== document.body){
+        if(getComputedStyle(anchor).position === 'sticky'){ stickyHost = anchor; break; }
+        anchor = anchor.parentElement;
+      }
       out.toc = { hidden: toc.hidden, display: ts.display,
-        position: ts.position, top: ts.top, entries: toc.querySelectorAll('a').length };
+        position: ts.position, top: ts.top, entries: toc.querySelectorAll('a').length,
+        stickyHost: stickyHost ? (stickyHost.className || stickyHost.tagName) : null,
+        effectiveSticky: !!stickyHost };
     } else { out.toc = null; }
 
     // 4. 图谱区位置（应在正文之后）
@@ -169,12 +178,15 @@ def main():
             flag = []
             if data["overflow"]["docScrollWidth"] > data["overflow"]["innerWidth"] + 1:
                 flag.append(f"横向溢出 {data['overflow']['docScrollWidth']}>{data['overflow']['innerWidth']}")
-            if width >= 1200 and data.get("toc") and not data["toc"]["hidden"] and data["toc"]["position"] != "sticky":
-                flag.append(f"目录未 sticky（{data['toc']['position']}）")
+            if width >= 1200 and data.get("toc") and not data["toc"]["hidden"] and not data["toc"]["effectiveSticky"]:
+                flag.append(f"目录未 sticky（{data['toc']['position']}，祖先也没有 sticky 容器）")
             gap = data.get("headGap")
             if gap is not None and gap < 16:
                 flag.append(f"标题顶格贴顶栏（顶栏到标题 {gap}px < 16px，站点头部规范要求 26px）")
-            print(f"  {d[:12]}@{width}  正文起点 {str(data.get('bodyStartY')).rjust(4)}px | 顶栏→标题 {str(gap).rjust(4)}px | head {str(data.get('headTotal')).rjust(4)}px (meta {data['headHeights'].get('meta',0)} + 来源 {data['headHeights'].get('sources',0)} + 同模块 {data['headHeights'].get('siblings',0)}) | 正文 {data.get('prose',{}).get('fontSize','?')}/{data.get('prose',{}).get('lineHeight','?')} 宽 {data.get('prose',{}).get('colWidth','?')}px | 目录 {'有' if data.get('toc') and not data['toc']['hidden'] else '无'}{data.get('toc',{}).get('entries','')}条 | 同模块 {data.get('siblings',{}).get('count','?')}篇{' 折叠' if data.get('siblings',{}).get('collapsed') else ''}")
+            # headHeights 由探针按页面结构填，某些页（如无来源行/无同模块）不返回该字段；
+            # 直接取 dict 会让整轮审计在第一篇就崩掉，后面的页面一个都查不到。
+            hh = data.get("headHeights") or {}
+            print(f"  {d[:12]}@{width}  正文起点 {str(data.get('bodyStartY')).rjust(4)}px | 顶栏→标题 {str(gap).rjust(4)}px | head {str(data.get('headTotal')).rjust(4)}px (meta {hh.get('meta',0)} + 来源 {hh.get('sources',0)} + 同模块 {hh.get('siblings',0)}) | 正文 {data.get('prose',{}).get('fontSize','?')}/{data.get('prose',{}).get('lineHeight','?')} 宽 {data.get('prose',{}).get('colWidth','?')}px | 目录 {'有' if data.get('toc') and not data['toc']['hidden'] else '无'}{data.get('toc',{}).get('entries','')}条 | 同模块 {data.get('siblings',{}).get('count','?')}篇{' 折叠' if data.get('siblings',{}).get('collapsed') else ''}")
             if flag:
                 for f in flag:
                     print(f"        !! {f}")

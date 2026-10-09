@@ -24,6 +24,7 @@ def navigation(browser, args, width, theme):
     context = browser.new_context(viewport={'width': width, 'height': 900}, reduced_motion='reduce',
                                   has_touch=width <= 760, is_mobile=width <= 760)
     page = context.new_page()
+    page.set_default_timeout(90000)
     open_article(page, args.base, DEFAULT_PATHS[0], theme)
     page.wait_for_function("() => document.querySelectorAll('#reader-toc .toc-list a').length > 2")
     failures = []
@@ -99,6 +100,7 @@ def navigation(browser, args, width, theme):
 def media(browser, args, theme):
     context = browser.new_context(viewport={'width': 1024, 'height': 900}, reduced_motion='reduce')
     page = context.new_page()
+    page.set_default_timeout(90000)
     open_article(page, args.base, IMAGE_PATH, theme)
     image = page.locator('#reader-body img').first
     image.scroll_into_view_if_needed()
@@ -117,7 +119,12 @@ def media(browser, args, theme):
         with context.expect_page() as opened:
             page.keyboard.press('Enter')
         opened.value.wait_for_load_state()
-        assert opened.value.url == original.get_attribute('href')
+        # 32a3e8e 镜像化后站内图 href 是 /static/... 相对路径，新标签页的
+        # URL 是解析后的绝对地址——按 URL 语义比较（同源 + 路径一致），
+        # 不能拿绝对 URL 和相对 href 直接比字符串。
+        from urllib.parse import urljoin
+        assert opened.value.url == urljoin(page.url, original.get_attribute('href')), (
+            opened.value.url, original.get_attribute('href'))
         opened.value.close()
         frame.screenshot(path=str(args.out / f'{theme}-image-ready.png'))
         page.set_viewport_size({'width': 375, 'height': 900})

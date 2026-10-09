@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 VAULT = ROOT / "vault"
 
 # 案例页所在目录，用于"哪些页能作为案例回流来源"
-CASE_DIR_MARK = "缺陷分析入门到精通"
+CASE_DIR_MARK = "缺陷分析：从个案到体系"
 
 CASE_REF = re.compile(r"案例[一二三四五六七八九十百]+")
 CODE_BLOCK = re.compile(r"```")
@@ -133,7 +133,8 @@ def main() -> int:
     args = ap.parse_args()
 
     pages = [scan_page(p) for p in VAULT.rglob("*.md")
-             if p.is_file() and "归档" not in str(p)]
+             if p.is_file() and "归档" not in str(p) and "Clippings" not in str(p)
+             and "知识库管理" not in str(p)]
     cases = collect_cases()
 
     knowledge = [p for p in pages if not p["is_case"]]
@@ -161,6 +162,33 @@ def main() -> int:
     print(f"  无可运行示例 {no_code:>3} 篇  ({no_code*100//max(1,total)}%)")
     print(f"  无量化数字   {no_num:>3} 篇  ({no_num*100//max(1,total)}%)")
     print(f"  篇幅不足     {short:>3} 篇  ({short*100//max(1,total)}%)")
+
+    # 方向覆盖：按主题大类与二级目录统计已发布文章数。
+    # 页级审计看不出「某个方向整块没写」这类结构性缺口，必须在目录级补一列。
+    print()
+    print("方向覆盖（主题目录 × 已发布文章数，status: draft 不计，空目录即方向缺口）：")
+    eng = VAULT / "工程知识"
+    status_by_path: dict[str, str] = {}
+    for p in pages:
+        src = VAULT / p["path"]
+        text = src.read_text(encoding="utf-8")
+        meta, _ = parse_frontmatter(text)
+        status_by_path[p["path"]] = meta.get("status", "")
+    for theme in sorted(eng.iterdir()):
+        if not theme.is_dir():
+            continue
+        subdirs = sorted(d for d in theme.iterdir() if d.is_dir())
+        theme_active = sum(
+            1 for p in pages if p["path"].startswith(f"工程知识/{theme.name}/")
+            and status_by_path[p["path"]] not in ("draft", ""))
+        print(f"  {theme.name}  {theme_active} 篇")
+        for d in subdirs:
+            n = sum(
+                1 for p in pages
+                if p["path"].startswith(f"工程知识/{theme.name}/{d.name}/")
+                and status_by_path[p["path"]] not in ("draft", ""))
+            if n == 0:
+                print(f"      [空] {d.name}")
     print()
     print(f"优先补强清单（前 {args.top}）：")
     for p in knowledge[:args.top]:

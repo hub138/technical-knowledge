@@ -107,7 +107,15 @@ def collect() -> dict:
     for page in ROOT.rglob("*.html"):
         if "node_modules" in page.parts:
             continue
-        text = page.read_text(encoding="utf-8")
+        # img-cache 里存的是外部网页的原始抓取（可能是 GBK 等非 UTF-8 编码），
+        # 不是本站页面。以前照单全读，一份 GBK 缓存就让整条 link 门禁
+        # UnicodeDecodeError 崩掉，链接检查等于常年空跑。
+        if "img-cache" in page.parts:
+            continue
+        try:
+            text = page.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
         for m in HTML_PATH_RE.finditer(text):
             raw = m.group(1)
             if "${" in raw:  # built at runtime from the note list

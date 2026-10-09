@@ -8,16 +8,51 @@ screenshots: every text run below the WCAG AA threshold is reported.
 """
 from __future__ import annotations
 
+import os
+import shutil
 import subprocess
 import sys
 import tempfile
 from pathlib import Path
 
-CHROME = (
-    Path.home()
-    / ".cache/puppeteer/chrome-headless-shell/mac_arm-142.0.7444.175"
-    / "chrome-headless-shell-mac-arm64/chrome-headless-shell"
+# 浏览器按「显式指定 → 本机已装 → PATH」的顺序找，不要写死某一台机器的路径。
+#
+# 原来写死 macOS ARM 的 puppeteer 缓存目录，于是 dev（Linux）上必然
+# FileNotFoundError：对比度这一项在 check_all 里永远 0/N 通过，等于常年空跑，
+# 暗色对比度（曾实测到 1.36:1）就是这样漏掉的。
+_CHROME_CANDIDATES = (
+    "chrome-headless-shell",
+    "chromium-headless-shell",
+    "chromium",
+    "google-chrome",
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
 )
+
+
+def _resolve_chrome() -> Path:
+    explicit = os.environ.get("CHROME_HEADLESS_SHELL") or os.environ.get("CHROME_BIN")
+    if explicit:
+        return Path(explicit)
+    home = Path.home()
+    for directory in (
+        home / ".cache/puppeteer/chrome-headless-shell",
+        home / ".cache/ms-playwright/chromium_headless_shell-1223/chrome-headless-shell-linux64",
+        home / ".cache/ms-playwright",
+        home / ".cache/puppeteer",
+    ):
+        if not directory.is_dir():
+            continue
+        found = sorted(directory.rglob("chrome-headless-shell"))
+        if found:
+            return found[-1]
+    for name in _CHROME_CANDIDATES:
+        resolved = shutil.which(name)
+        if resolved:
+            return Path(resolved)
+    return Path(_CHROME_CANDIDATES[0])
+
+
+CHROME = _resolve_chrome()
 
 PROBE = r"""
 <script>

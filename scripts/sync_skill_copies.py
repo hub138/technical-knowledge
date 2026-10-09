@@ -54,12 +54,23 @@ def doc_files(root: Path):
 
 
 def pairs():
+    """按主副本枚举 skill，而不是按内嵌目录。
+
+    按内嵌枚举的话，内嵌侧没有的 skill（如新建的 skill-craft）永远同步不进去，
+    同步范围会永远停在第一次建内嵌目录时的那几个。
+    """
     agg = aggregate_root()
     out = []
-    for skill_dir in sorted(EMBED.iterdir()):
+    for skill_dir in sorted(agg.iterdir()):
         if not skill_dir.is_dir():
             continue
-        out.append((skill_dir, agg / skill_dir.name))
+        # technical-knowledge 是站点仓库本身，不是 skill；
+        # knowledge-site / memory 等目录没有 SKILL.md，同样跳过。
+        if skill_dir.name == REPO.name:
+            continue
+        if not (skill_dir / "SKILL.md").exists():
+            continue
+        out.append((EMBED / skill_dir.name, skill_dir))
     return out
 
 
@@ -126,6 +137,7 @@ def do_sync() -> int:
         for f in doc_files(embed_dir):
             other = main_dir / f.relative_to(embed_dir)
             if not other.exists():
+                other.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(f, other)
                 print(f"  内嵌→主副本（新建）  {embed_dir.name}/{f.relative_to(embed_dir)}")
                 n += 1
@@ -138,6 +150,7 @@ def do_sync() -> int:
         for f in doc_files(main_dir):
             dst = embed_dir / f.relative_to(main_dir)
             if not dst.exists():
+                dst.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(f, dst)
                 print(f"  主副本→内嵌（新建）  {embed_dir.name}/{f.relative_to(main_dir)}")
                 n += 1

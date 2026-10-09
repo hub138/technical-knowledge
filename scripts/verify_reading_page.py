@@ -17,14 +17,11 @@ with sync_playwright() as p:
     page.on("pageerror", lambda e: errs.append(str(e)))
     page.on("console", lambda m: errs.append(f"{m.type}: {m.text}") if m.type == "error" else None)
 
-    page.goto(BASE + "/panorama/reading", wait_until="domcontentloaded")
+    # 学习路线段：lp-* 元素在 /panorama/path（reading 页没有 lp 区块）
+    page.goto(BASE + "/panorama/path", wait_until="domcontentloaded")
     page.wait_for_timeout(3000)
     log("console_errors", errs[:3] if errs else "none")
-    log("h1", page.locator("h1").first.inner_text())
-    log("rd_jump_links", page.locator(".rd-jump a").count())
-    log("jump_current", page.evaluate("""() => { const a=document.querySelector('.rd-jump a[aria-current=page]'); return a?a.textContent.trim():'none'; }"""))
-    log("section_h2s", page.evaluate("() => [...document.querySelectorAll('.rd-sec h2')].map(e=>e.textContent).join(' | ')"))
-    log("progress_rows", page.locator("#progress-body a").count())
+    log("path_h1", page.locator("h1").first.inner_text())
     log("lp_items", page.locator("#lp-sections .lp-item").count())
     log("lp_stages", page.locator(".lp-stage").count())
     log("read_minutes", "分钟" in page.locator("#lp-sections").inner_text())
@@ -38,7 +35,6 @@ with sync_playwright() as p:
         page.wait_for_timeout(400)
     page.wait_for_timeout(1000)
     log("after_check_label", page.evaluate("() => document.getElementById('lp-progress-label').textContent"))
-    log("sync_to_reading", "已读" in page.locator("#progress-body").inner_text())
 
     page.click("#lp-hide-learned")
     page.wait_for_timeout(1000)
@@ -60,9 +56,18 @@ with sync_playwright() as p:
     page.screenshot(path=SHOTS + "/rd_final_dark.png", full_page=True)
     log("dark_bg", page.evaluate("() => getComputedStyle(document.body).backgroundColor"))
 
+    # 我的阅读段：rd-* / progress-body 在 /panorama/reading
+    page.goto(BASE + "/panorama/reading", wait_until="domcontentloaded")
+    page.wait_for_timeout(3000)
+    log("reading_h1", page.locator("h1").first.inner_text())
+    log("rd_jump_links", page.locator(".rd-jump a").count())
+    log("jump_current", page.evaluate("""() => { const a=document.querySelector('.rd-jump a[aria-current=page]'); return a?a.textContent.trim():'none'; }"""))
+    log("section_h2s", page.evaluate("() => [...document.querySelectorAll('.rd-sec h2')].map(e=>e.textContent).join(' | ')"))
+    log("progress_rows", page.locator("#progress-body a").count())
+
     ctx2 = browser.new_context(viewport={"width": 390, "height": 844})
     p2 = ctx2.new_page()
-    p2.goto(BASE + "/panorama/reading", wait_until="domcontentloaded")
+    p2.goto(BASE + "/panorama/path", wait_until="domcontentloaded")
     p2.wait_for_timeout(2500)
     log("hscroll_390", p2.evaluate("() => document.documentElement.scrollWidth - document.documentElement.clientWidth"))
     log("mobile_items", p2.locator("#lp-sections .lp-item").count())

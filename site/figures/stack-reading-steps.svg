@@ -1,0 +1,264 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 805 652" role="img" lang="zh-CN" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase">
+<style>
+.c-grid { stroke: transparent; fill: none; }
+.c-mask { fill: #ffffff; stroke: none; }
+.c-frontend { fill: rgba(34, 211, 238, 0.15);   stroke: #0891b2; }
+.c-backend { fill: rgba(52, 211, 153, 0.18);    stroke: #059669; }
+.c-cloud { fill: rgba(251, 191, 36, 0.18);      stroke: #d97706; }
+.c-security { fill: rgba(251, 113, 133, 0.15);   stroke: #e11d48; }
+.c-messagebus { fill: rgba(251, 146, 60, 0.15); stroke: #ea580c; }
+.c-external { fill: rgba(148, 163, 184, 0.18);   stroke: #64748b; }
+.t-primary { fill: #0f172a; }
+.t-muted { fill: #475569; }
+.t-dim { fill: #94a3b8; }
+.t-backend { fill: #059669; }
+.t-database { fill: #7c3aed; }
+.t-security { fill: #e11d48; }
+.t-messagebus { fill: #ea580c; }
+svg .semantic-sigil { fill: none;
+      stroke: currentColor;
+      stroke-width: 1.35;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.76;
+      pointer-events: none; }
+svg .semantic-sigil > * { vector-effect: non-scaling-stroke; }
+svg .semantic-sigil .sigil-fill { fill: currentColor; stroke: none; }
+svg .s-frontend { color: #0891b2; }
+svg .s-backend { color: #059669; }
+svg .s-cloud { color: #d97706; }
+svg .s-security { color: #e11d48; }
+svg .s-messagebus { color: #ea580c; }
+svg .s-external { color: #64748b; }
+.a-default { stroke: #94a3b8; fill: none; }
+.a-emphasis { stroke: #059669; fill: none; }
+.a-security { stroke: #e11d48; fill: none; stroke-dasharray: 5,5; }
+.a-dashed { stroke: #7c3aed; fill: none; stroke-dasharray: 4,4; }
+.m-default { fill: #94a3b8; }
+.m-emphasis { fill: #059669; }
+.m-security { fill: #e11d48; }
+.m-dashed { fill: #7c3aed; }
+.c-security-group { fill: transparent; stroke: #e11d48; stroke-dasharray: 4,4; }
+.c-lane { fill: rgba(248, 250, 252, 0.65); stroke: #cbd5e1; stroke-dasharray: 6,6; }
+</style>
+
+        <title id="archify-diagram-title">读堆栈三步法：从异常消息到两三层外的真因</title>
+        <desc id="archify-diagram-description">由 Archify 生成的工作流图。</desc>
+        <!-- Definitions -->
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-default" />
+          </marker>
+          <marker id="arrowhead-emphasis" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-emphasis" />
+          </marker>
+          <marker id="arrowhead-security" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-security" />
+          </marker>
+          <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" class="m-dashed" />
+          </marker>
+          <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+            <path d="M 40 0 L 0 0 0 40" class="c-grid" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+
+        <!-- Background Grid -->
+        <rect width="100%" height="100%" fill="url(#grid)" />
+
+        <!-- Swimlanes -->
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-0" x="40" y="52" width="749" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="74" class="t-dim" font-size="10" font-weight="600">01 / 堆栈证据</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-1" x="40" y="176" width="749" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="198" class="t-dim" font-size="10" font-weight="600">02 / 三步读法</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-2" x="40" y="300" width="749" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <text x="54" y="322" class="t-dim" font-size="10" font-weight="600">03 / 真因定位</text>
+
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="lane" data-composition-frame-id="lane-3" x="40" y="424" width="749" height="104" rx="10" class="c-lane" stroke-width="1"/>
+        <rect data-graph-role="structural-frame" data-composition-frame-kind="exception-lane" data-composition-frame-id="lane-3-exception" x="46" y="430" width="737" height="92" rx="8" class="c-security-group" stroke-width="1"/>
+        <text x="54" y="446" class="t-security" font-size="10" font-weight="600">EX / 误读陷阱</text>
+
+        <!-- Phase headers -->
+        <line x1="48" y1="35" x2="260" y2="35" class="a-default" stroke-width="1.1"/>
+        <rect x="48" y="27" width="212" height="16" rx="4" class="c-mask"/>
+        <text x="154" y="39" class="t-muted" font-size="8" font-weight="600" text-anchor="middle">看到</text>
+        <line x1="304" y1="35" x2="537" y2="35" class="a-emphasis" stroke-width="1.1"/>
+        <rect x="304" y="27" width="233" height="16" rx="4" class="c-mask"/>
+        <text x="420.5" y="39" class="t-backend" font-size="8" font-weight="600" text-anchor="middle">走回</text>
+        <line x1="565" y1="35" x2="777" y2="35" class="a-dashed" stroke-width="1.1"/>
+        <rect x="565" y="27" width="212" height="16" rx="4" class="c-mask"/>
+        <text x="671" y="39" class="t-messagebus" font-size="8" font-weight="600" text-anchor="middle">修对位置</text>
+
+        <!-- Workflow groups -->
+
+
+        <!-- Edge paths -->
+        <path data-edge-from="callers" data-edge-to="root" data-edge-key="0" data-composition-points="544,243;611,243;611,341" d="M 544 243 L 611 243 L 611 341" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="crash" data-edge-to="message" data-edge-key="1" data-composition-points="140,119;214,119;214,217" d="M 140 119 L 214 119 L 214 217" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="entryframe" data-edge-to="message" data-edge-label="从入口读起=迷路" data-edge-key="2" data-composition-points="214,465;214,269" d="M 214 465 L 214 269" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="libframe" data-edge-to="ownframe" data-edge-label="盯着库帧=白费" data-edge-key="3" data-composition-points="350,465;350,269" d="M 350 465 L 350 269" class="a-dashed" stroke-width="1.4" marker-end="url(#arrowhead-dashed)"/>
+        <path data-edge-from="message" data-edge-to="ownframe" data-edge-key="4" data-composition-points="262,243;290,243" d="M 262 243 L 290 243" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="ownframe" data-edge-to="callers" data-edge-key="5" data-composition-points="410,243;438,243" d="M 410 243 L 438 243" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="root" data-edge-to="fix" data-edge-key="6" data-composition-points="657,367;685,367" d="M 657 367 L 685 367" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <path data-edge-from="swallow" data-edge-to="fix" data-edge-label="盖住症状" data-edge-key="7" data-composition-points="657,491;731,491;731,393" d="M 657 491 L 731 491 L 731 393" class="a-security" stroke-width="1.4" marker-end="url(#arrowhead-security)"/>
+
+        <!-- Nodes -->
+        <g id="node-crash" data-node-id="crash" data-node-label="崩溃堆栈" tabindex="0" role="button" aria-label="聚焦崩溃堆栈，失败瞬间快照, 堆栈证据 › 看到" aria-pressed="false" data-node-kind="messagebus" data-node-sublabel="失败瞬间快照" data-node-context="堆栈证据 › 看到">
+          <title>崩溃堆栈 · 失败瞬间快照 · 堆栈证据 › 看到</title>
+          <rect x="48" y="93" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="48" y="93" width="92" height="52" rx="6" class="c-messagebus" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="messagebus" class="semantic-sigil s-messagebus" transform="translate(54 99) scale(0.6875)">
+            <path d="M2.5 4.5h11M2.5 8h11M2.5 11.5h11"/>
+            <circle cx="5" cy="4.5" r="1" class="sigil-fill"/>
+            <circle cx="10.5" cy="8" r="1" class="sigil-fill"/>
+            <circle cx="7" cy="11.5" r="1" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="94" y="114" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">崩溃堆栈</text>
+          <text data-detail="context" x="94" y="131" class="t-muted" font-size="8" text-anchor="middle">失败瞬间快照</text>
+        </g>
+
+        <g id="node-message" data-node-id="message" data-node-label="第一步 读异常" tabindex="0" role="button" aria-label="聚焦第一步 读异常，坏了什么, 三步读法 › 看到" aria-pressed="false" data-node-kind="frontend" data-node-sublabel="坏了什么" data-node-context="三步读法 › 看到">
+          <title>第一步 读异常 · 坏了什么 · 三步读法 › 看到</title>
+          <rect x="166" y="217" width="96" height="52" rx="6" class="c-mask"/>
+          <rect x="166" y="217" width="96" height="52" rx="6" class="c-frontend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="frontend" class="semantic-sigil s-frontend" transform="translate(172 223) scale(0.6875)">
+            <rect x="2" y="3" width="12" height="10" rx="2"/>
+            <path d="M2 6.5h12"/>
+            <circle cx="4.1" cy="4.8" r=".7" class="sigil-fill"/>
+            <circle cx="6.3" cy="4.8" r=".7" class="sigil-fill"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="214" y="238" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">第一步 读异常</text>
+          <text data-detail="context" x="214" y="255" class="t-muted" font-size="8" text-anchor="middle">坏了什么</text>
+        </g>
+
+        <g id="node-ownframe" data-node-id="ownframe" data-node-label="第二步 找自己的帧" tabindex="0" role="button" aria-label="聚焦第二步 找自己的帧，自有包名路径, 三步读法 › 走回" aria-pressed="false" data-node-kind="backend" data-node-sublabel="自有包名路径" data-node-context="三步读法 › 走回">
+          <title>第二步 找自己的帧 · 自有包名路径 · 三步读法 › 走回</title>
+          <rect x="290" y="217" width="120" height="52" rx="6" class="c-mask"/>
+          <rect x="290" y="217" width="120" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(296 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="350" y="238" class="t-primary" font-size="10.9" font-weight="600" text-anchor="middle">第二步 找自己的帧</text>
+          <text data-detail="context" x="350" y="255" class="t-muted" font-size="8" text-anchor="middle">自有包名路径</text>
+        </g>
+
+        <g id="node-callers" data-node-id="callers" data-node-label="第三步 沿链上行" tabindex="0" role="button" aria-label="聚焦第三步 沿链上行，两三层找赋值点, 三步读法 › 走回" aria-pressed="false" data-node-kind="backend" data-node-sublabel="两三层找赋值点" data-node-context="三步读法 › 走回">
+          <title>第三步 沿链上行 · 两三层找赋值点 · 三步读法 › 走回</title>
+          <rect x="438" y="217" width="106" height="52" rx="6" class="c-mask"/>
+          <rect x="438" y="217" width="106" height="52" rx="6" class="c-backend" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(444 223) scale(0.6875)">
+            <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="491" y="238" class="t-primary" font-size="10.8" font-weight="600" text-anchor="middle">第三步 沿链上行</text>
+          <text data-detail="context" x="491" y="255" class="t-muted" font-size="8" text-anchor="middle">两三层找赋值点</text>
+        </g>
+
+        <g id="node-root" data-node-id="root" data-node-label="真因帧" tabindex="0" role="button" aria-label="聚焦真因帧，坏数据源头, 真因定位 › 修对位置" aria-pressed="false" data-node-kind="security" data-node-sublabel="坏数据源头" data-node-context="真因定位 › 修对位置">
+          <title>真因帧 · 坏数据源头 · 真因定位 › 修对位置</title>
+          <rect x="565" y="341" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="565" y="341" width="92" height="52" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(571 347) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="611" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">真因帧</text>
+          <text data-detail="context" x="611" y="379" class="t-muted" font-size="8" text-anchor="middle">坏数据源头</text>
+        </g>
+
+        <g id="node-fix" data-node-id="fix" data-node-label="修对位置" tabindex="0" role="button" aria-label="聚焦修对位置，数据入口处, 真因定位 › 修对位置" aria-pressed="false" data-node-kind="cloud" data-node-sublabel="数据入口处" data-node-context="真因定位 › 修对位置">
+          <title>修对位置 · 数据入口处 · 真因定位 › 修对位置</title>
+          <rect x="685" y="341" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="685" y="341" width="92" height="52" rx="6" class="c-cloud" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="cloud" class="semantic-sigil s-cloud" transform="translate(691 347) scale(0.6875)">
+            <path d="M4.3 12.5h7.3a2.4 2.4 0 0 0 .2-4.8 4 4 0 0 0-7.5-1.3A3.1 3.1 0 0 0 4.3 12.5Z"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="731" y="362" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">修对位置</text>
+          <text data-detail="context" x="731" y="379" class="t-muted" font-size="8" text-anchor="middle">数据入口处</text>
+        </g>
+
+        <g id="node-entryframe" data-node-id="entryframe" data-node-label="入口帧" tabindex="0" role="button" aria-label="聚焦入口帧，离失败最远, 误读陷阱 › 看到" aria-pressed="false" data-node-kind="external" data-node-sublabel="离失败最远" data-node-context="误读陷阱 › 看到">
+          <title>入口帧 · 离失败最远 · 误读陷阱 › 看到</title>
+          <rect x="168" y="465" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="168" y="465" width="92" height="52" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(174 471) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="214" y="486" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">入口帧</text>
+          <text data-detail="context" x="214" y="503" class="t-muted" font-size="8" text-anchor="middle">离失败最远</text>
+        </g>
+
+        <g id="node-libframe" data-node-id="libframe" data-node-label="库帧" tabindex="0" role="button" aria-label="聚焦库帧，被海量使用, 误读陷阱 › 走回" aria-pressed="false" data-node-kind="external" data-node-sublabel="被海量使用" data-node-context="误读陷阱 › 走回">
+          <title>库帧 · 被海量使用 · 误读陷阱 › 走回</title>
+          <rect x="304" y="465" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="304" y="465" width="92" height="52" rx="6" class="c-external" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="external" class="semantic-sigil s-external" transform="translate(310 471) scale(0.6875)">
+            <rect x="2.5" y="5" width="8.5" height="8" rx="1.5"/>
+            <path d="M8 2.5h5.5V8M13.5 2.5 7.5 8.5"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="350" y="486" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">库帧</text>
+          <text data-detail="context" x="350" y="503" class="t-muted" font-size="8" text-anchor="middle">被海量使用</text>
+        </g>
+
+        <g id="node-swallow" data-node-id="swallow" data-node-label="except 吞异常" tabindex="0" role="button" aria-label="聚焦except 吞异常，把症状盖住, 误读陷阱 › 修对位置" aria-pressed="false" data-node-kind="security" data-node-sublabel="把症状盖住" data-node-context="误读陷阱 › 修对位置">
+          <title>except 吞异常 · 把症状盖住 · 误读陷阱 › 修对位置</title>
+          <rect x="565" y="465" width="92" height="52" rx="6" class="c-mask"/>
+          <rect x="565" y="465" width="92" height="52" rx="6" class="c-security" stroke-width="1.5"/>
+          <g aria-hidden="true" data-semantic-sigil="security" class="semantic-sigil s-security" transform="translate(571 471) scale(0.6875)">
+            <path d="M8 2.2 13 4v3.5c0 3.1-1.8 5.4-5 6.5-3.2-1.1-5-3.4-5-6.5V4Z"/>
+            <path d="m5.8 8 1.5 1.5 3-3"/>
+          </g>
+          <text data-node-label="" data-detail-anchor="" x="611" y="486" class="t-primary" font-size="10.7" font-weight="600" text-anchor="middle">except 吞异常</text>
+          <text data-detail="context" x="611" y="503" class="t-muted" font-size="8" text-anchor="middle">把症状盖住</text>
+        </g>
+
+        <!-- Edge labels -->
+
+
+        <g data-detail="context" data-edge-from="entryframe" data-edge-to="message" data-edge-label="从入口读起=迷路" data-edge-key="2">
+          <rect x="173" y="445" width="82" height="14" rx="3" class="c-mask"/>
+          <text x="214" y="455" class="t-database" font-size="8" text-anchor="middle">从入口读起=迷路</text>
+        </g>
+        <g data-detail="context" data-edge-from="libframe" data-edge-to="ownframe" data-edge-label="盯着库帧=白费" data-edge-key="3">
+          <rect x="313.8" y="445" width="72.4" height="14" rx="3" class="c-mask"/>
+          <text x="350" y="455" class="t-database" font-size="8" text-anchor="middle">盯着库帧=白费</text>
+        </g>
+
+
+
+        <g data-detail="context" data-edge-from="swallow" data-edge-to="fix" data-edge-label="盖住症状" data-edge-key="7">
+          <rect x="669.8" y="471" width="48.4" height="14" rx="3" class="c-mask"/>
+          <text x="694" y="481" class="t-security" font-size="8" text-anchor="middle">盖住症状</text>
+        </g>
+
+        <!-- Legend -->
+        <g data-legend="" data-legend-bridge="">
+          <text x="20" y="552" class="t-primary" font-size="12" font-weight="650">图例</text>
+          <g data-legend-semantic-kind="frontend" data-legend-kind="frontend" data-legend-label="用户界面" data-legend-x="20" data-legend-baseline="572" data-legend-width="78">
+            <rect x="20" y="564" width="14" height="9" rx="2" class="c-frontend" stroke-width="1"/>
+            <text x="42" y="572" class="t-muted" font-size="7.5" font-weight="500">用户界面</text>
+          </g>
+          <g data-legend-semantic-kind="backend" data-legend-kind="backend" data-legend-label="Agent 逻辑" data-legend-x="105" data-legend-baseline="572" data-legend-width="87">
+            <rect x="105" y="564" width="14" height="9" rx="2" class="c-backend" stroke-width="1"/>
+            <text x="127" y="572" class="t-muted" font-size="7.5" font-weight="500">Agent 逻辑</text>
+          </g>
+          <g data-legend-semantic-kind="security" data-legend-kind="security" data-legend-label="策略" data-legend-x="199" data-legend-baseline="572" data-legend-width="61">
+            <rect x="199" y="564" width="14" height="9" rx="2" class="c-security" stroke-width="1"/>
+            <text x="221" y="572" class="t-muted" font-size="7.5" font-weight="500">策略</text>
+          </g>
+          <g data-legend-semantic-kind="messagebus" data-legend-kind="messagebus" data-legend-label="工具操作" data-legend-x="267" data-legend-baseline="572" data-legend-width="78">
+            <rect x="267" y="564" width="14" height="9" rx="2" class="c-messagebus" stroke-width="1"/>
+            <text x="289" y="572" class="t-muted" font-size="7.5" font-weight="500">工具操作</text>
+          </g>
+          <g data-legend-semantic-kind="cloud" data-legend-kind="cloud" data-legend-label="云服务" data-legend-x="352" data-legend-baseline="572" data-legend-width="70">
+            <rect x="352" y="564" width="14" height="9" rx="2" class="c-cloud" stroke-width="1"/>
+            <text x="374" y="572" class="t-muted" font-size="7.5" font-weight="500">云服务</text>
+          </g>
+          <g data-legend-semantic-kind="external" data-legend-kind="external" data-legend-label="外部系统" data-legend-x="429" data-legend-baseline="572" data-legend-width="78">
+            <rect x="429" y="564" width="14" height="9" rx="2" class="c-external" stroke-width="1"/>
+            <text x="451" y="572" class="t-muted" font-size="7.5" font-weight="500">外部系统</text>
+          </g>
+        </g>
+      </svg>

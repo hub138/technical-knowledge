@@ -1932,12 +1932,7 @@ textarea:focus-visible {
   outline: none;
 }
 
-/* mermaid 图容器。走过一段弯路：先做了「限高 520px + 内部滚动」，图确实
-   不再把页面撑长，但读者得在框里下拉才能看全（2026-09-23 反馈「还要下拉」）。
-   滚动是错的解法——图应该整体缩小到一屏能看完。
-   所以这里改成等比缩放：mermaid 会给 svg 写死 style width/height（如
-   style="width:319px"），必须用 !important 覆盖掉，再给 max-height，
-   svg 有 viewBox 就会按原比例缩小，图完整、没有滚动条。 */
+/* mermaid 图容器：缩放策略与三档规则见下方 2026-09-26 注释块。 */
 /* 正文列表：浏览器默认 ul/ol 的上下 margin 是 1em（18px），不在间距阶梯内。
    这里显式改为 --space-5，让段落与列表之间的留白和其余区块同一套刻度。 */
 #reader-body ul,
@@ -1953,6 +1948,16 @@ textarea:focus-visible {
   margin: var(--space-2) 0;
 }
 
+/* 缩放策略（2026-09-26 重写）：
+   旧策略 width:100%!important 把每张图强制通栏，纵向窄图被横向拉满后
+   高度等比放大——188px 宽的三节点图被放到 3.1 倍（实测），既虚胖又把
+   长图顶出一屏。SVG 有 viewBox 时直接放大会让字虚糊，所以放大从不
+   是目标。新策略分三档：
+   1. 默认封顶不放大：图宽不超过自身自然尺寸（viewBox 宽），小图居中
+      原大显示，大图铺满栏宽后停住；
+   2. 竖向长图（高/宽 > 1.35）限高 78vh 等比缩到一屏能看全，横向滚动
+      只发生在「最小可读缩放 0.7」兜底（fitWidth）触发的窄屏场景；
+   3. 用户想看大图用工具条「＋」或点图开 lightbox，手动放大不受此限。 */
 pre.mermaid{
   margin:var(--space-5) 0;
   padding:var(--space-4);
@@ -1965,10 +1970,30 @@ pre.mermaid{
   font:inherit;
 }
 pre.mermaid svg{
-  width:100% !important;
-  height:auto !important;
+  /* 封顶不放大：svg 被写死自然宽度（见 enhanceMermaid 的 fitWidth），
+     这里 max-width:100% 只负责窄屏收缩；height:auto 保持等比 */
   max-width:100% !important;
+  height:auto !important;
   min-width:0 !important;
+}
+/* 竖向长图限高一屏（.mmd-tall 由 enhanceMermaid 按 viewBox 高宽比打标），
+   缩到容器内完整可见，不用下拉。width:auto 让 svg 盒子随 max-height
+   等比收缩（188×289 的图限高 702px 后盒子收成 457px 宽——写死宽会让
+   preserveAspectRatio 在盒内留白，字被撑大）。 */
+pre.mermaid.mmd-tall svg{
+  max-height:min(78vh,720px) !important;
+  width:auto !important;
+  max-width:100% !important;
+}
+/* 手动缩放态（工具条＋/－、拖把手）：解除限高与自然尺寸属性约束，
+   高度由 inline max-height 接管（h 范围 200-2400px），等比走 height:auto */
+pre.mermaid.mmd-zoomed svg{
+  /* fitWidth 写死的 inline width（如 188px）在此场景必须失效：
+     限高后盒子要随高度等比收窄，inline width 不带 !important，
+     被 width:auto !important 覆盖（层叠：带 important 的声明胜过
+     不带 important 的 inline style）。 */
+  width:auto !important;
+  max-width:100% !important;
 }
 /* 图控件：放大 / 缩小 / 复制 / 拖高度。默认原尺寸（清晰），
    想一屏看全就点「缩小」——等比缩会变小，所以不默认缩。 */
@@ -2098,7 +2123,7 @@ pre.mermaid svg{
  * 现在：结构由 shell.js 的 mountTopbar 生成，样式写在这里，页面零样式。
  * 新增页面一律接顶栏，不许再在 hero 里另挂一个搜索框。
  */
-.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:13px 30px;background:var(--color-bg-veil);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.topbar{display:flex;gap:14px;align-items:center;flex-wrap:nowrap;padding:13px 172px 13px 30px;background:var(--color-bg-veil);border-bottom:1px solid var(--color-line);position:sticky;top:0;z-index:var(--z-sticky);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .topbar h1{font-size:var(--text-xl);margin:0;white-space:nowrap}
 /* 搜索框的位置是右上角：靠 margin-left:auto 顶到右侧，不在页面正文里。 */
 .topbar .search{margin-left:auto;flex:0 1 620px}
@@ -2127,7 +2152,7 @@ pre.mermaid svg{
    回到 620 的可用宽度（主站首页的 focus 伸长就是这套手感），不能因为
    加了收窄就把「聚焦伸长」弄丢。 */
 .topbar.is-condensed .topbar-slot>.search:focus-within,
-.topbar.is-condensed>.search:focus-within{max-width:620px}
+.topbar.is-condensed>.search:focus-within{max-width:480px}
 /* 伸长后搜索框的左边界会压到标题上（两者都是绝对定位、标题在文档里靠后
    所以盖在上层）。聚焦期间让标题按原路退回，输入结束再滑回来——退场用
    进入的反向动画，不新增一套动作。:has 不支持时只是标题不退，不影响输入。 */
@@ -2177,15 +2202,26 @@ pre.mermaid svg{
  * 宽度牵着走，加上另一条 .search 规则抢了 max-width。
  * 这里用更高特异性钉死：槽位填满可用宽度，搜索框撑到 620 上限并靠右。 */
 .topbar .topbar-slot{flex:1 1 0;width:100%;min-width:0}
-.topbar .topbar-slot>.search{max-width:620px;width:100%;right:0;margin-left:auto}
+.topbar .topbar-slot>.search{max-width:480px;width:100%;right:0;margin-left:auto}
 /* 上一条同款问题续：槽位还带着 margin-right:120px（来自全站布局给内容区留的
    右侧留白），把搜索框又推离右边界 150px。顶栏槽位不需要这份留白。 */
 .topbar .topbar-slot{margin-right:0}
 /* 主站顶栏（无 .topbar-slot 的历史结构）：同一套右上角规范。
    此前主站 .search 带 margin-right:118px、max-width 480px（为右侧工具按钮
    预留，但那组按钮默认 hidden），结果是主站 480px/距右 148px，而 papers
-   620px/距右 30px —— 同一个搜索框在两个页面位置不同，就是这次的病根。 */
-.topbar>.search,main .topbar>.search{max-width:620px;margin-right:0;margin-left:auto}
+   620px/距右 30px —— 同一个搜索框在两个页面位置不同，就是这次的病根。
+   2026-09-26 二改：右上角常驻「语言 + 日夜」控件组（.tk-controls，
+   fixed 定位宽约 120px），搜索框 620px 时右缘直接压进控件 112px（实测
+   1410 vs 1298）。修法分两层：max-width 收回 480（与旧的主站规格一致，
+   聚焦伸长也改到 480，见下方 focus 规则）；顶栏右侧 padding 固定让出
+   142px（控件 120 + 22 边距），保证任何宽度下搜索框右缘都停在控件左边，
+   不再依赖每个页面各自记住预留。 */
+.topbar>.search,main .topbar>.search{max-width:480px;margin-right:0;margin-left:auto}
+/* 固定控件组悬浮在顶栏右上（.tk-controls fixed 宽约 120px + 22px 边距），
+   顶栏内容右缘让位已并入 .topbar 基础 padding（13px 172px 13px 30px），
+   slot 与非 slot 两种顶栏结构同时被约束，搜索框右缘停在控件左侧。 */
+.topbar.is-condensed .topbar-slot>.search:focus-within,
+.topbar.is-condensed>.search:focus-within{max-width:480px}
 
 /* ── 触屏点击区（2026-09-25）─────────────────────────────────────────────
  * 病根：侧栏导航与首屏按钮在桌面按鼠标精度设计（38px / 36px / 32px），
@@ -2212,8 +2248,12 @@ pre.mermaid svg{
 .reader-maincol{display:flex;flex-direction:column}
 .reader-maincol>.reader-body{order:1}
 .reader-maincol>.article-relations{order:2;border-top:1px solid var(--color-line);border-bottom:0;padding:16px 0 0;margin:24px 0 0}
-.reader-maincol>.reader-pager{order:3}
-.reader-maincol>.reader-reward{order:4}
+/* 2026-09-26：点赞与评论从 order 5 提到 4 —— 排在「上一篇/下一篇」**之前**。
+   读者滚到文末是想接着读/发一句，不是先被推去买上一篇。这条 order 会盖过
+   DOM 顺序（这里 maincol 是 flex 列），光挪 HTML 里的 <section> 位置没用。 */
+.reader-maincol>.reader-social{order:4}
+.reader-maincol>.reader-pager{order:5}
+.reader-maincol>.reader-reward{order:6}
 
 /* ── 文章阅读视图（2026-09-25 掘金学习改造）──────────────────────────────
  * 参考 juejin.cn 文章页（post/7675273747710001206）量测：body #f2f3f5 灰底、
@@ -2222,25 +2262,32 @@ pre.mermaid svg{
  * 挂点：body.tk-reading（切到文章视图时 shell 加上，见 index.html）。 */
 body.tk-reading .content{
   background:var(--color-surface);
+  /* 2026-10-08 三次反馈「还有分块的颜色 div」：此前容器白底但 max-width:1400
+     居中 + --gutter/浮动通道内距，四周各露一条 --color-page-muted 灰底条带，
+     与 #reader.open 白块拼成「分块拼色」。现阅读态容器通铺：白底吃满视口、
+     内距归零、无居中收窄——整页从顶栏到页脚一整张白纸，行宽由 .reader 控制。 */
+  max-width:none;
+  margin:0;
+  padding:0;
 }
 /* 正文白卡：头部与正文列同卡（掘金是标题+正文一张卡）。卡内左右 46px
    （掘金 60px 的收窄版，本站正文 756px 加上卡内边距与右栏 248px 之和
    必须塞进 1018px 容器），上下 34px。 */
+/* 2026-10-08 二次反馈：卡框体系拆除。头部与正文列不再各自包边（两张卡拼一张的旧方案整卡也有左右边框成竖线），改为无框平面：头部靠下边框分区，正文列直接铺在 #reader.open 白底上。 */
 body.tk-reading .reader-head{
-  background:var(--color-panel);
-  border:1px solid var(--color-line);
-  border-bottom:0;
-  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
-  padding:34px 46px 22px;
+  background:none;
+  border:0;
+  border-bottom:1px solid var(--color-line);
+  border-radius:0;
+  padding:0 0 22px;
   margin-bottom:0;
 }
 /* 正文列白卡续体：头部卡的下缘由正文卡接住，两卡拼成一张。 */
 body.tk-reading .reader-layout{
-  background:var(--color-panel);
-  border:1px solid var(--color-line);
-  border-top:0;
-  border-radius:0 0 var(--radius-lg) var(--radius-lg);
-  padding:26px 46px 34px;
+  background:none;
+  border:0;
+  border-radius:0;
+  padding:26px 0 34px;
 }
 /* 卡内的翻页/图谱/反馈等块原来靠 body 底色分层，现在卡内自洽：
    去掉它们的横向越界感，全部收在卡内边距里。 */
@@ -2328,8 +2375,7 @@ body.tk-reading .reader-railcol{top:84px}
 .reader-fab{position:relative}
 /* 窄屏：右栏隐藏时主卡圆角全给回来；浮层按钮组不与 FAB 通道打架（左下）。 */
 @media(max-width:1199px){
-  body.tk-reading .reader-head{border-radius:var(--radius-lg) var(--radius-lg) 0 0}
-  body.tk-reading .reader-layout{border-radius:0 0 var(--radius-lg) var(--radius-lg)}
+  /* 2026-10-08：卡框拆除后此处圆角规则随之作废，块保留占位便于后续加窄屏专属规则。 */
 }
 @media(max-width:760px){
   body.tk-reading .reader-head{padding:24px 18px 16px;border-radius:var(--radius-lg) var(--radius-lg) 0 0}

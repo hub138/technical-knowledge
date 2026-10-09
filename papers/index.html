@@ -322,86 +322,6 @@
        * 同一套视觉。
        */
       .tl-layout { display: block; }
-      .p-timeline { display: none; }
-      /* [hidden] 必须压得住下面的 display:block。
-         属性选择器（0,1,0）和 .p-timeline（0,1,0）同权重，靠后写的生效；
-         不显式写这条的话，外部收录视图里时间线会照常显示，
-         而它列的是本地那 44 篇的年份 —— 在那个视图里是干扰。 */
-      .p-timeline[hidden] { display: none !important; }
-      @media (min-width: 1280px) {
-        .tl-layout {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) 264px;
-          column-gap: 34px;
-          align-items: start;
-        }
-        /* 时间线隐藏时把那一列收掉。
-           只藏元素是不够的 —— 网格仍然留着 264px 的空列，正文右边多出
-           一条谁也不占的空白。:has() 让容器自己感知到子元素被隐藏。
-           （浏览器支持：Chrome 105+ / Safari 15.4+ / Firefox 121+，
-           不支持时退回两列布局，也就是现在这样，不会更坏。） */
-        .tl-layout:not(:has(.p-timeline:not([hidden]))) {
-          grid-template-columns: minmax(0, 1fr);
-        }
-        .p-timeline {
-          display: block;
-          position: sticky;
-          top: 96px;
-          max-height: calc(100vh - 130px);
-          overflow: auto;
-          font-size: var(--text-sm);
-        }
-        .p-timeline[hidden] { display: none !important; }
-      }
-      .p-timeline .rail-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        margin: 0 0 9px;
-        padding-bottom: 7px;
-        border-bottom: 1px solid var(--color-line);
-        color: var(--color-muted);
-        font-size: var(--text-xs);
-        font-weight: var(--weight-bold);
-        letter-spacing: 0.06em;
-      }
-      .p-timeline ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 1px; }
-      .p-timeline .tl-year {
-        margin: 12px 0 4px;
-        padding-left: 8px;
-        color: var(--color-ink);
-        font-size: var(--text-small);
-        font-weight: var(--weight-bold);
-        font-variant-numeric: tabular-nums;
-      }
-      .p-timeline .tl-year:first-child { margin-top: 0; }
-      .p-timeline a {
-        display: block;
-        padding: 4px 8px;
-        border-radius: var(--radius-xs);
-        color: var(--color-muted);
-        line-height: 1.45;
-        /* 两行封顶。只显示一行会把标题切在没意义的地方
-           （"AutoRAG: Automated Framework for" 就断了），
-           而完全不限行又会让年份分组失去节奏。两行是能认出论文的最少行数。 */
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .p-timeline a:hover { background: var(--color-accent-soft); color: var(--color-accent); }
-      .p-timeline a.read { color: var(--color-ink-soft); }
-      .p-timeline a.read::before {
-        content: "";
-        display: inline-block;
-        width: 5px;
-        height: 5px;
-        margin-right: 6px;
-        border-radius: 50%;
-        background: var(--color-accent);
-        vertical-align: middle;
-      }
 
       .paper-empty {
         padding: var(--space-10);
@@ -419,13 +339,29 @@
        * 现在主列表是 PaperNotes 的 2.3 万篇（到 ICLR 2026 / CVPR 2026），
        * 本地那 44 篇移到「已精读」子视图。
        */
+      /* 吸顶（2026-09-26）。这页列表长到两万五千条，切换视图的四个 tab
+         原本是 static —— 滚进列表深处之后想看「我的收藏」就得滚回顶部，
+         而「现在在哪一栏」也全靠记。做成 sticky 之后和首页的目录条是
+         同一套语言：吸在顶栏下面 72px、不透明底 + 下描边。
+         只吸这一条，不吸下面的筛选 chip 区 —— 筛选是条件不是导航。 */
       .pn-bar {
         display: flex;
         align-items: center;
         gap: var(--space-3);
-        flex-wrap: wrap;
+        /* 吸顶后必须单行：换行的话这条能窜到 105px 高，占掉小半个视口，
+           比没有吸顶更挡内容。窄屏让它横向滑，和首页目录条同一处理。 */
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        position: sticky;
+        top: 72px;
+        z-index: 20;
         margin: var(--space-4) 0 var(--space-3);
+        padding: 7px 0;
+        background: var(--color-bg);
+        box-shadow: 0 1px 0 var(--color-line-strong);
       }
+      .pn-bar::-webkit-scrollbar{display:none}
       /* 两个视图的切换按钮。
        *
        * 原来是 13px 的浅灰文字、67×32px 的小方块，读者反馈"完全不知道是啥"。
@@ -630,18 +566,47 @@
         color: var(--color-ink-soft);
         font-size: var(--text-base); font-weight: var(--weight-medium);
         line-height: 1.6;
-        /* 最多三行。
-         *
-         * 字放大之后，一条长总结能把整条撑到两百多 px，一屏只放得下三四条。
-         * 这里是列表，作用是"判断要不要点进去"，三行足够；要看全文点标题。
-         * 截断是有意的，所以标 data-clamp 让布局审计跳过。 */
+      }
+      /* 收起态截到三行，但**不再硬切**：三行是列表密度需要（一屏十几条），
+         被截掉的尾巴由「展开摘要」按钮补回来 —— 读者要读全，点一下即可。
+         只有真正超过三行的条目才挂 .is-clamped（JS 量 scrollHeight 判定），
+         短总结不显示按钮，也不进入截断布局。
+         .pn-summary-text 是承载截断的盒子，label 与 span 分开放，
+         量高度只量正文块，不受「AI总结」这个粗体前缀影响。 */
+      .pn-summary-text {
+        /* 必须是块级：inline 元素的 scrollHeight 恒为 0，量不出是否超三行，
+           那样所有条目都不会显示展开按钮（第一版就踩了这个坑）。 */
+        display: block;
+      }
+      .pn-summary.is-clamped .pn-summary-text {
         display: -webkit-box; -webkit-box-orient: vertical;
         -webkit-line-clamp: 3; overflow: hidden;
+      }
+      /* 展开后放开全文：清掉 -webkit-box 与行数限制，让它变回普通块级，
+         三行之外的内容自然流出来。 */
+      .pn-summary.is-clamped.is-open .pn-summary-text {
+        display: block; overflow: visible;
       }
       .pn-summary-label {
         color: var(--color-summary-label); font-weight: var(--weight-bold);
         margin-right: 6px;
+        /* 浮到左上角，让 .pn-summary-text（block）的首行文字环绕在它右侧，
+           保住「AI总结 正文…」内联的读法。text 必须是 block 才能被量出
+           是否超三行，但 block 会把 label 挤到上一行 —— float 解决这个矛盾。 */
+        float: left;
       }
+      .pn-summary-more {
+        display: inline-block;
+        margin: 4px 0 0 6px;
+        padding: 1px 0;
+        border: 0; background: none;
+        color: var(--color-accent);
+        font: inherit; font-size: var(--text-small);
+        cursor: pointer;
+        text-decoration: none;
+      }
+      .pn-summary-more:hover { text-decoration: underline; }
+      .pn-summary:not(.is-clamped) .pn-summary-more { display: none; }
       /* 每条是一张白卡。原来这里只有一条 border-bottom，没有底色 ——
        * 条目和页面底同色，读者只看到分隔线，看不出"这是一条"。
        *
@@ -668,6 +633,57 @@
         border-color: var(--color-accent-line);
         box-shadow: var(--shadow-sm);
         transform: translateY(-1px);
+      }
+      /* 卡片头：标题 + 右侧动作（评分徽章 / 收藏按钮）。
+         长标题必须能占满剩余宽度、把动作挤到同一行的右端 —— 头两版写成
+         普通 inline 流，标题一长按钮就被挤到下一行右上角，看着像两行内容
+         叠在一起。 */
+      .pn-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        flex-wrap: nowrap;
+      }
+      .pn-head > a { flex: 1 1 auto; min-width: 0; }
+      .pn-actions { flex: 0 0 auto; display: flex; align-items: center; gap: 6px; }
+      .pn-score {
+        flex: 0 0 auto;
+        padding: 1px 8px;
+        border: 1px solid var(--color-accent-line);
+        border-radius: 999px;
+        background: var(--color-accent-soft);
+        color: var(--color-accent-ink);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      .pn-score-low { color: var(--color-ink-soft); background: var(--color-bg-soft); }
+      .pn-fav {
+        flex: 0 0 auto;
+        padding: 3px 10px;
+        border: 1px solid var(--color-line-strong);
+        border-radius: var(--radius-sm);
+        background: var(--color-panel);
+        color: var(--color-ink-soft);
+        font-size: var(--text-sm);
+        font-weight: 700;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+      .pn-fav:hover { border-color: var(--color-accent); color: var(--color-accent); }
+      .pn-fav[aria-pressed="true"] {
+        border-color: var(--color-accent-line);
+        background: var(--color-accent-soft);
+        color: var(--color-accent-ink);
+      }
+      /* 移动端触摸目标（2026-09-26）。
+         移动端审计报 pn-fav 是 48×23 —— 23px 高的 pill，手指盖不住一半，
+         点在列表里又会误触上一行的标题。补到 36px 高、横向 padding 也放一点：
+         视觉上还是那个小胶囊，只是按得中。 */
+      @media (max-width: 900px) {
+        .pn-fav { padding: 8px 15px; min-height: 36px; font-size: var(--text-base); }
+        .pn-head { gap: 10px; }
       }
       .pn-row a {
         color: var(--color-ink);
@@ -752,6 +768,50 @@
       .pn-more:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
       .pn-empty { padding: var(--space-6) 0; color: var(--color-muted); text-align: center; }
 
+      /* 标题行：标题占了宽度，打分和收藏要贴右端。
+       * flex + flex-wrap 而不是绝对定位 —— 绝对定位在窄屏会把右侧按钮压到
+       * 标题上面去，而这一行是列表项最需要能换行的一行。 */
+      .pn-head {
+        display: flex; align-items: flex-start; justify-content: space-between;
+        gap: var(--space-3); flex-wrap: wrap;
+      }
+      .pn-head > a { flex: 1 1 260px; min-width: 0; }
+      .pn-actions { display: flex; align-items: center; gap: 8px; flex: 0 0 auto; }
+
+      /* 模型打的综合分。用主色淡底，和会议芯片（也是主色淡底）同一语言，
+       * 但形状不同（圆角胶囊 vs 方块芯片），同屏能分出「这是评价不是分类」。 */
+      .pn-score {
+        padding: 2px 10px; border-radius: 999px;
+        background: var(--color-accent-soft); color: var(--color-accent-ink);
+        font-size: var(--text-small); font-weight: var(--weight-semibold);
+        font-variant-numeric: tabular-nums; white-space: nowrap;
+      }
+      .pn-score-low { background: var(--color-surface); color: var(--color-muted); }
+
+      /* 收藏按钮：空心是没收藏，实心主色是已收藏。
+       * 不用星形图标 —— 站内这套芯片语言里，形状能说的用形状说，
+       * 一个方块按钮配一个字（收藏/已收）比一个星号清楚。 */
+      .pn-fav {
+        padding: 2px 10px; border: 1px solid var(--color-line-strong);
+        border-radius: var(--radius-xs); background: var(--color-panel);
+        color: var(--color-muted); font-size: var(--text-small);
+        white-space: nowrap; cursor: pointer;
+        transition: border-color var(--duration-base) var(--ease-out),
+          color var(--duration-base) var(--ease-out);
+      }
+      .pn-fav:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      .pn-fav[aria-pressed="true"] {
+        border-color: var(--color-accent-line); background: var(--color-accent-soft);
+        color: var(--color-accent-ink); font-weight: var(--weight-semibold);
+      }
+
+      /* 推荐理由。放在标题下面、元信息上面：读者先看这是谁的推荐（标题），
+       * 再看凭什么推（理由），最后才看分类标签。 */
+      .pn-why {
+        margin: 0; color: var(--color-ink-soft);
+        font-size: var(--text-small); line-height: 1.6;
+      }
+
       @media (max-width: 760px) {
         .method-pin { display: block; }
         .method-pin a { display: inline-block; margin-top: var(--space-3); }
@@ -812,6 +872,14 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
           <button type="button" class="pn-tab" id="tab-read" role="tab" aria-selected="false">
             已精读 <b id="tab-read-count"></b>
           </button>
+          <!-- 推荐与收藏是这一页后来加的两个视图，逻辑同前：
+               加工分、也复用同一个搜索框。 -->
+          <button type="button" class="pn-tab" id="tab-rec" role="tab" aria-selected="false">
+            为你推荐 <b id="tab-rec-count"></b>
+          </button>
+          <button type="button" class="pn-tab" id="tab-fav" role="tab" aria-selected="false">
+            我的收藏 <b id="tab-fav-count"></b>
+          </button>
         </div>
         <span class="pn-stat" id="pn-stat"></span>
         <!-- 已精读视图的筛选计数徽章（原来在 view-read 的工具栏里，
@@ -835,8 +903,19 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
       <div id="view-read" hidden>
         <div id="paper-list"></div>
       </div>
+      <!-- 为你推荐：模型评过分的那批里，按「评分 × 与你读过的方向的重合度」
+           排出来的。没评过分的不会出现在这一栏 —— 没有评分的推荐是瞎推。 -->
+      <div id="view-rec" hidden>
+        <div class="pn-list" id="rec-list"></div>
+        <p class="pn-empty" id="rec-note" hidden></p>
       </div>
-      <aside class="p-timeline" id="timeline" aria-label="时间线"></aside>
+      <!-- 我的收藏：论文版收藏夹。和早报那边的文章收藏是两套 storage，
+           字段不同（论文带会议、子领域、评分），也不该共用 100 条的上限。 -->
+      <div id="view-fav" hidden>
+        <div class="pn-list" id="fav-list"></div>
+        <button type="button" class="pn-more" id="fav-more" hidden></button>
+      </div>
+      </div>
     </div>
 
     <script>
@@ -1033,25 +1112,6 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
       /* 时间线用全部论文，不跟着搜索过滤 ——
          它的作用是"让我跳到别处"，跟着过滤就把去路也砍掉了。
          已深度解析的用圆点标出来。 */
-      function renderTimeline() {
-        const aside = $("#timeline");
-        if (!all.length) { aside.innerHTML = ""; return; }
-        let out = `<div class="rail-head">${esc(tr("时间线"))}<span>${all.length} ${esc(tr("篇"))}</span></div>`;
-        let year = null;
-        all.forEach((p) => {
-          const y = (p.published || "").slice(0, 4) || "—";
-          if (y !== year) {
-            if (year !== null) out += "</ul>";
-            out += `<div class="tl-year">${esc(y)}</div><ul>`;
-            year = y;
-          }
-          out += `<li><a href="/paper?id=${encodeURIComponent(p.id)}"`
-               + ` class="${p.has_deep_read ? "read" : ""}"`
-               + ` title="${esc(titleOf(p) || p.id)}">${esc(titleOf(p) || p.id)}</a></li>`;
-        });
-        if (year !== null) out += "</ul>";
-        aside.innerHTML = out;
-      }
 
       /* ── 外部收录（PaperNotes 的 2.3 万篇）──────────────────────────────
        *
@@ -1063,7 +1123,15 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
        * 否则「显示更多」之后改条件会留下上一种条件的残留。
        */
       const PAGE = 60;
-      const pn = { tag: "", conf: "", cat: "", sub: "", q: "", offset: 0, total: 0, grand: 0, busy: false };
+      const pn = { tag: "", conf: "", cat: "", sub: "", q: "", offset: 0, total: 0, grand: 0, busy: false,
+        /* 评分筛选（2026-09-26 补）：sort=按评分排序、onlyScored=只看已评。
+         * 模型一小时只评得动几十篇，默认列表按索引序取第一页，评过的都在几百页
+         * 之外 —— 分数入库却永远看不到。有了这两个开关，已评的那批能被捞出来。 */
+        sort: "score", onlyScored: false,
+        /* 收藏的内存态（url → true）。点收藏后立刻在这里置位，卡片马上变
+         * 「已收藏」；服务端那一次 POST 只管落盘，成功与否都不影响这个即时反馈。
+         * 刷新页面时由 /api/paper/favorites 灌一次。 */
+        favState: new Set() };
 
       function pnRow(paper) {
         // 会议 + 子领域 + 前几个标签。
@@ -1076,8 +1144,24 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
         const fold = (s) => s.toLowerCase().replace(/[\s/·、]+/g, "");
         const subKey = fold(sub);
         const tags = (paper.tags || []).filter((t) => fold(t) !== subKey).slice(0, 3);
+        /* 收藏态优先读前端内存里的 favState（刚点过收藏还没落盘的那一下
+         * 就要变），否则退回服务端给的 paper.fav —— 卡片渲染一次要等一次
+         * round trip 的话，点收藏会有一点"没反应"的断点。 */
+        const faved = pn.favState.has(paper.url);
         return `<article class="pn-row">
+          <div class="pn-head">
           <a href="${esc(paper.url)}" target="_blank" rel="noopener noreferrer">${esc(paper.title)}</a>
+          <span class="pn-actions">
+            ${paper.scored
+              ? `<span class="pn-score${(paper.overall || 0) < 70 ? " pn-score-low" : ""}" title="${esc(tr("模型按主题相关·新意·证据·可落地四维打分"))}">${esc(tr("评分"))} ${String(paper.overall)}</span>`
+              : ""}
+            ${/* data-meta 带上这张卡片的元信息：点收藏时一起 POST。只发 url
+                 的话，收藏夹里存下来的是个空壳 —— 标题、标签、总结都取不回来。
+                 （注释必须写成 ${} 里的，直接写在模板里会连着注释一起渲染成
+                 卡片上的一行字，这次截图就是这么抓出来的。） */""}
+            <button type="button" class="pn-fav" data-url="${esc(paper.url)}" data-meta="${esc(JSON.stringify({ title: paper.title, title_cn: paper.title_cn || "", conference: paper.conference || "", subfield: paper.subfield || "", tags: paper.tags || [], summary: paper.summary || "" }))}" aria-pressed="${faved ? "true" : "false"}">${esc(faved ? tr("已收藏") : tr("收藏"))}</button>
+          </span>
+          </div>
           ${/* 中文名。PaperNotes 只给英文标题，这一栏是模型译的 ——
                所以排在第二行、字号小一档：它是帮助理解的对译，
                不是论文自己的标题。译不出来就不显示这一行。 */""}
@@ -1093,8 +1177,187 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
                「AI总结」标记来渲染（和 /sources 那套同一个视觉）。
                2026-09-22 i18n 修复（勿删）：标签文案套 tr() 查词表（→ AI summary），
                与 /sources 正文卡同一翻译路径。 */""}
-                ${paper.summary ? `<p class="pn-summary" data-clamp><b class="pn-summary-label">${esc(tr("AI总结"))}</b><span>${renderSummary(paper.summary)}</span></p>` : ""}
+                ${paper.summary ? `<div class="pn-summary" data-clamp><b class="pn-summary-label">${esc(tr("AI总结"))}</b><span class="pn-summary-text">${renderSummary(paper.summary)}</span><button type="button" class="pn-summary-more" aria-expanded="false">${esc(tr("展开摘要"))}</button></div>` : ""}
         </article>`;
+      }
+
+      /* ---------------- AI 总结：三行收起，超出可展开 ----------------
+       *
+       * 为什么不是简单的 line-clamp：硬截断会把第三行切一半、尾巴挂个
+       * 「…」，读者看到的是半句话（截图反馈「很整齐但不全」）。这里保留
+       * 三行的紧凑（一屏十几条，这是列表的职责），但把被截掉的全文交给
+       * 一个「展开摘要」按钮 —— 想读全的点一下，读完能收起回到紧凑态。
+       *
+       * 只有正文真的超过三行才处理。判定用 clone 量「不截断时的自然高度」
+       * 对比「三行高度」，而不是直接读 scrollHeight：label 粗体前缀和
+       * 展开按钮都在同一个盒子里，会把 clientHeight 搅乱。 */
+      function pnMeasureSummaries(scope) {
+        scope.querySelectorAll(".pn-summary[data-clamp]:not([data-measured])").forEach((box) => {
+          const text = box.querySelector(".pn-summary-text");
+          if (!text) { box.setAttribute("data-measured", "1"); return; }
+          // 先量自然高度（此刻还没挂 is-clamped，是全文）。
+          const full = text.scrollHeight;
+          const line = parseFloat(getComputedStyle(text).lineHeight) || 24;
+          box.setAttribute("data-measured", "1");
+          if (full > line * 3 + 1) box.classList.add("is-clamped");
+          // 没超三行的：class 不加，按钮靠 CSS :not(.is-clamped) 隐藏。
+        });
+      }
+
+      /* 展开/收起走事件委托：列表会整段 innerHTML 重画、也会 append，
+         逐卡片绑监听会漏绑。 */
+      document.addEventListener("click", (event) => {
+        const btn = event.target && event.target.closest ? event.target.closest(".pn-summary-more") : null;
+        if (!btn) return;
+        event.preventDefault();
+        const box = btn.closest(".pn-summary");
+        if (!box) return;
+        const open = box.classList.toggle("is-open");
+        // is-open 时 text 取消三行截断（见 CSS），aria 与文案同步。
+        btn.setAttribute("aria-expanded", String(open));
+        btn.textContent = open ? tr("收起摘要") : tr("展开摘要");
+      });
+
+      /* ---------------- 收藏 ---------------- */
+
+      /* 收藏按钮走事件委托而不是每张卡片绑一次：
+         列表是整段 innerHTML 重画出来的，每次重画都重绑一遍监听会漏绑、
+         还会和旧节点一起漏删。一个委托管住整页所有卡片的按钮。 */
+      document.addEventListener("click", (event) => {
+        const button = event.target && event.target.closest ? event.target.closest(".pn-fav") : null;
+        if (!button || !button.dataset.url) return;
+        event.preventDefault();
+        toggleFav(button.dataset.url, button);
+      });
+
+      async function toggleFav(url, button) {
+        const nowFaved = !pn.favState.has(url);
+        /* 带上卡片上的元信息再 POST：服务端存的是快照，只有 url 的话
+           收藏列表渲染不出任何东西。 */
+        let meta = {};
+        try { meta = button && button.dataset.meta ? JSON.parse(button.dataset.meta) : {}; } catch (error) { meta = {}; }
+        const paper = Object.assign({}, meta, { url });
+        /* 先改界面再发请求。收藏是个即时动作 —— 等一个 round trip 才变字，
+           点的人会以为没点上。请求失败再回滚，并把原因说清楚。 */
+        if (nowFaved) pn.favState.add(url); else pn.favState.delete(url);
+        paintFavButton(button, nowFaved);
+        try {
+          const response = await fetch(nowFaved ? "/api/paper/favorites" : "/api/paper/favorites/remove", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            /* add 是 {"paper": {...}}（服务端要整份快照）；remove 是 {"url": ...}
+               （服务端只认顶层 url）。之前两个动作都发 {paper}，remove 把
+               body.paper 当不存在、url 取到空串，永远 removed:0 —— 收藏
+               取消不掉，按钮在「收藏/已收藏」之间假切换。 */
+            body: JSON.stringify(nowFaved ? { paper } : { url }),
+          });
+          if (!response.ok) throw new Error("failed");
+          await loadFavorites();  // 顺带把 tab 计数刷成服务端那一份，别和落盘结果打架
+        } catch (error) {
+          if (nowFaved) pn.favState.delete(url); else pn.favState.add(url);
+          paintFavButton(button, !nowFaved);
+          button.title = tr("收藏失败，服务端没写入");
+        }
+      }
+
+      function paintFavButton(button, faved) {
+        if (!button) return;
+        button.setAttribute("aria-pressed", faved ? "true" : "false");
+        button.textContent = faved ? tr("已收藏") : tr("收藏");
+        button.title = "";
+      }
+
+      let currentFavItems = [];
+
+      async function loadFavorites() {
+        try {
+          const response = await fetch("/api/paper/favorites", { cache: "no-store" });
+          if (!response.ok) throw new Error("unavailable");
+          const payload = await response.json();
+          const items = payload.items || [];
+          pn.favState = new Set(items.map((e) => (e.item && e.item.url) || "").filter(Boolean));
+          currentFavItems = items;
+          const count = $("#tab-fav-count");
+          if (count) count.textContent = String(items.length);
+          paintFavList(items);
+        } catch (error) {
+          // 收藏读不到不该让整页开不了：卡片照常显示，只是按钮状态不保证。
+        }
+      }
+
+      function paintFavList(items) {
+        if (!items) return;
+        const needle = pn.q.trim().toLowerCase();
+        const shown = needle
+          ? items.filter((e) => {
+              const item = e.item || {};
+              return String(item.title || "").toLowerCase().includes(needle)
+                || String(item.url || "").toLowerCase().includes(needle);
+            })
+          : items;
+        $("#fav-list").innerHTML = shown.map(favRow).join("")
+          || `<div class="pn-empty">${esc(needle ? tr("收藏里没有匹配的论文。") : tr("还没有收藏论文。翻到外面看到感兴趣的，点卡片上的「收藏」就留在这里了。"))}</div>`;
+      }
+
+      /* 收藏条目只是个快照（url/标题/会议/标签），没有评分数据。
+         不另写一套卡片 —— 套一层壳转给 pnRow，视觉和外部列表保持同一套。 */
+      function favRow(entry) {
+        const item = entry.item || {};
+        return pnRow({
+          url: item.url, title: item.title, title_cn: item.title_cn,
+          conference: item.conference, subfield: item.subfield, tags: item.tags,
+          summary: item.summary, scored: false, overall: 0, fav: true,
+        });
+      }
+
+      /* ---------------- 推荐 ---------------- */
+
+      let currentRecItems = [];
+
+      function recRow(it) {
+        const tags = (it.tags || []).map((t) => `<span class="pn-tag">${esc(t)}</span>`).join("");
+        const sub = it.subfield ? `<span class="pn-sub">${esc(it.subfield)}</span>` : "";
+        const conf = it.conference ? `<span class="pn-conf">${esc(it.conference)}</span>` : "";
+        return `<article class="pn-row">
+          <div class="pn-head">
+            <a href="${esc(it.url)}" target="_blank" rel="noopener noreferrer">${esc(it.title)}</a>
+            <span class="pn-actions">
+              <span class="pn-score" title="${esc(tr("模型四维加权：主题相关·新意·证据·可落地"))}">${esc(tr("评分"))} ${String(it.overall)}</span>
+              <button type="button" class="pn-fav" data-url="${esc(it.url)}" data-meta="${esc(JSON.stringify({ title: it.title, title_cn: it.title_cn || "", conference: it.conference || "", subfield: it.subfield || "", tags: it.tags || [], summary: it.summary || "" }))}" aria-pressed="${pn.favState.has(it.url) ? "true" : "false"}">${esc(pn.favState.has(it.url) ? tr("已收藏") : tr("收藏"))}</button>
+            </span>
+          </div>
+          ${it.title_cn ? `<p class="pn-title-cn">${esc(it.title_cn)}</p>` : ""}
+          ${it.why ? `<p class="pn-why">${esc(it.why)}</p>` : ""}
+          <div class="pn-meta">${conf}${sub}${tags}</div>
+        </article>`;
+      }
+
+      async function loadRecommend() {
+        try {
+          const response = await fetch("/api/paper/recommend?limit=12", { cache: "no-store" });
+          if (!response.ok) throw new Error("unavailable");
+          const payload = await response.json();
+          currentRecItems = payload.items || [];
+          paintRecList(currentRecItems);
+          const note = $("#rec-note");
+          note.hidden = false;
+          note.textContent = payload.note
+            || `${tr("已评")} ${String(payload.scored_total || 0)} ${tr("篇参与推荐")} · `
+              + `${tr("评分由脚本定时产出，评的越多这一栏越准")}`;
+        } catch (error) {
+          $("#rec-list").innerHTML = `<div class="pn-empty">${esc(tr("推荐接口读不到（需要 data/paper-scores.json）。先跑 scripts/score_papers.py。"))}</div>`;
+        }
+      }
+
+      function paintRecList(items) {
+        if (!items) return;
+        const needle = pn.q.trim().toLowerCase();
+        const shown = needle
+          ? items.filter((it) => String(it.title || "").toLowerCase().includes(needle)
+              || String(it.url || "").toLowerCase().includes(needle))
+          : items;
+        $("#rec-list").innerHTML = shown.map(recRow).join("")
+          || `<div class="pn-empty">${esc(tr("暂时没有可推荐的论文（还没有评过分，或全都收藏过了）。"))}</div>`;
       }
 
       /* 一句话总结里的数学公式。
@@ -1212,6 +1475,16 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
                 data-kind="conf" data-name="${esc(c.name)}"
                 aria-pressed="${pn.conf === c.name ? "true" : "false"}">${esc(c.name)} <b>${c.count.toLocaleString()}</b></button>`).join("")}
             </div>
+          </div>
+          <div class="pn-filter-row">
+            <p class="pn-filter-label">${esc(tr("评分"))}</p>
+            <div class="pn-filter-chips">
+              <!-- 2026-09-27 改：默认就按评分（有分在前、无分垫底），所以「默认顺序」
+                   「按评分」两个排序按钮撤掉 —— 它们现在做的事一样，留着只是多两个选项。
+                   排序本身在下面 pn.sort 的默认 ""→"score" 里。 -->
+              <button type="button" class="pn-chip" data-kind="only-scored"
+                aria-pressed="${pn.onlyScored ? "true" : "false"}">${esc(tr("只看已评"))}</button>
+            </div>
           </div>`;
         $("#pn-filters").querySelectorAll("button").forEach((button) => {
           button.onclick = () => {
@@ -1227,6 +1500,12 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
               pn.sub = "";
             } else if (button.dataset.kind === "conf") {
               pn.conf = pn.conf === button.dataset.name ? "" : button.dataset.name;
+            } else if (button.dataset.kind === "score") {
+              /* 评分排序是服务端切页切的：2.5 万篇里本地排不动前 60 条以外
+               * 的，跨页顺序必须跟着 offset 走，不然"显示更多"会排重复。 */
+              pn.sort = button.dataset.score || "";
+            } else if (button.dataset.kind === "only-scored") {
+              pn.onlyScored = !pn.onlyScored;
             }
             pn.offset = 0;
             $("#pn-list").innerHTML = "";
@@ -1244,6 +1523,8 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
         if (pn.cat) params.set("cat", pn.cat);
         if (pn.sub) params.set("sub", pn.sub);
         if (pn.q) params.set("q", pn.q);
+        if (pn.sort) params.set("sort", pn.sort);
+        if (pn.onlyScored) params.set("scored", "1");
         try {
           const response = await fetch(`/api/papernotes?${params}`, { cache: "no-store" });
           if (!response.ok) throw new Error("unavailable");
@@ -1261,6 +1542,11 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
           else list.innerHTML = rows || `<div class="pn-empty">${esc(tr("没有匹配的论文。"))}</div>`;
           // 公式要在 innerHTML 之后渲染：占位符这时候才在 DOM 里。
           renderMath(list);
+          // 量一遍每条 AI 总结：正文超过三行的才挂 .is-clamped 并显示
+          // 「展开摘要」。放在 renderMath 之后 —— 公式渲染会改变行高，
+          // 量早了会误判。只处理本批新增、还没量过的（避免重复 append 时
+          // 又把读者已经展开的条目收回）。
+          pnMeasureSummaries(list);
           pn.offset += (payload.papers || []).length;
           const more = $("#pn-more");
           more.hidden = pn.offset >= pn.total;
@@ -1300,14 +1586,20 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
         clearTimeout(pnTimer);
         const value = event.currentTarget.value;
         pnTimer = setTimeout(() => {
-          const inRead = !$("#view-read").hidden;
-          if (inRead) {
+          const view = pnCurrentView();
+          if (view === "read") {
             render();
           } else {
             pn.q = value.trim();
-            pn.offset = 0;
-            $("#pn-list").innerHTML = "";
-            loadExternal();
+            if (view === "external") {
+              pn.offset = 0;
+              $("#pn-list").innerHTML = "";
+              loadExternal();
+            } else if (view === "fav") {
+              paintFavList(currentFavItems);   // 收藏是服务端全量给的，本地过滤足够
+            } else if (view === "rec") {
+              paintRecList(currentRecItems);
+            }
           }
         }, 250);
       };
@@ -1328,24 +1620,40 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
 
       /* 两个视图切换。外部收录是默认 —— 它是这页的主内容，
          一个想看新论文的人不该先看到本地那 44 篇。 */
-      function pnShowExternal(show) {
-        $("#view-external").hidden = !show;
-        $("#view-read").hidden = show;
-        $("#timeline").hidden = show;
-        $("#tab-external").setAttribute("aria-selected", String(show));
-        $("#tab-read").setAttribute("aria-selected", String(!show));
+      function pnCurrentView() {
+        if (!$("#view-external").hidden) return "external";
+        if (!$("#view-read").hidden) return "read";
+        if (!$("#view-rec").hidden) return "rec";
+        return "fav";
+      }
+
+      /* 四个视图切换。外部收录是默认 —— 它是这页的主内容，
+         一个想看新论文的人不该先看到本地那 44 篇。
+         推荐/收藏两个视图是切过去才拉数据的：它们在后台线程里跑，
+         首屏不该为它们多等一次请求。 */
+      function pnShowView(name) {
+        $("#view-external").hidden = name !== "external";
+        $("#view-read").hidden = name !== "read";
+        $("#view-rec").hidden = name !== "rec";
+        $("#view-fav").hidden = name !== "fav";
+        for (const pair of [["#tab-external", "external"], ["#tab-read", "read"],
+                            ["#tab-rec", "rec"], ["#tab-fav", "fav"]]) {
+          $(pair[0]).setAttribute("aria-selected", String(pair[1] === name));
+        }
         /* hero 头部共用搜索框随视图换语境：placeholder 告诉读者
            这一框此刻筛的是什么；已精读的计数徽章（pn-bar 里）只在
            该视图显示。搜索框值不动 —— 切视图不清词，读者换个口径
            继续筛是常见路径。 */
-        $("#pn-search").placeholder = show
-          ? "搜标题或方向"
-          : "搜标题、作者、arXiv 编号";
-        $("#paper-count").hidden = show;
+        $("#pn-search").placeholder = name === "read"
+          ? "搜标题、作者、arXiv 编号"
+          : "搜标题或方向";
+        $("#paper-count").hidden = name !== "read";
+        if (name === "rec") loadRecommend();
+        if (name === "fav") loadFavorites();
       }
-      $("#tab-external").onclick = () => pnShowExternal(true);
+      $("#tab-external").onclick = () => pnShowView("external");
       $("#tab-read").onclick = () => {
-        pnShowExternal(false);
+        pnShowView("read");
         /* 外部收录是默认 tab，render() 在它显示时就跑过一遍了 —— 那一遍是在
          * 隐藏容器里，入场动画白白放掉，等读者切过来什么也看不到。
          * 这里把标志复位再画一次，让动画落在真正被看到的那一刻。 */
@@ -1355,9 +1663,11 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
           render();
         }
       };
+      $("#tab-rec").onclick = () => pnShowView("rec");
+      $("#tab-fav").onclick = () => pnShowView("fav");
       // 初始状态显式设一次。只靠 onclick 的话首屏是"两个视图都显示"的
       // 默认状态 —— 外部列表和时间线同时在，而时间线列的是本地旧论文。
-      pnShowExternal(true);
+      pnShowView("external");
 
       async function load() {
         try {
@@ -1373,7 +1683,6 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
           return;
         }
         renderPin();
-        renderTimeline();
         render();
       }
 
@@ -1384,16 +1693,23 @@ base.css 的 .tk-search 规范，放置走 hero 内的 .page-toolbar
          够不到这些节点，所以语言切换后要自己重画一遍。 */
       document.addEventListener("tk:lang", () => {
         renderPin();
-        renderTimeline();
         render();
         // 外部列表也是 JS 生成的，但它由服务端排序分页，
         // 重画只能整批重拉 —— 语言只影响界面字，不影响内容。
         pn.offset = 0;
         $("#pn-list").innerHTML = "";
         loadExternal();
+        // 推荐和收藏的卡片也是 JS 生成的，界面字变了要跟着重画；
+        // 内容不用重拉（语言只影响界面字）。
+        if (!$("#view-fav").hidden) paintFavList(currentFavItems);
+        if (!$("#view-rec").hidden) paintRecList(currentRecItems);
       });
       load();
       loadExternal();
+      /* 收藏态先拿一次：外部列表的卡片上都有收藏按钮，
+         在 favState 灌进来之前，已收藏的那几张会显示成「收藏」。
+         这一趟和 loadExternal 并发，通常比首屏列表先到。 */
+      loadFavorites();
     </script>
   
 

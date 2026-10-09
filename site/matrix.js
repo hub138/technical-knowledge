@@ -176,7 +176,7 @@
              "software/testing", "backend/testing", "testing", "quality",
              "operations", "operations/process", "reproducibility", "ai/reproducibility",
              "research/gaps", "research/freshness", "source/case-study", "source/index"],
-      types: ["playbook", "guide", "note", "worklog", "project", "index", "practice"]
+      types: ["playbook", "guide", "project", "practice"]
     },
     {
       id: "mech", name: "机制原理", name_en: "Mechanisms", hint: "它到底是怎么工作的", hint_en: "how it actually works",
@@ -184,8 +184,8 @@
              "ai/alignment", "ai/multimodal", "deep-learning", "memory-model",
              "knowledge-graph", "vector-search", "information-retrieval", "retrieval",
              "systems", "methodology", "learning"],
-      types: ["concept", "principle", "research", "overview", "map", "comparison",
-              "evolution", "design", "architecture", "paper", "paper-analysis", "mechanism"]
+      types: ["concept", "principle", "overview", "map", "comparison",
+              "evolution", "design", "architecture", "mechanism"]
     },
     {
       id: "vocab", name: "词汇与词源", name_en: "Vocabulary & etymology", hint: "名字从哪来、怎么记", hint_en: "where the names come from",
