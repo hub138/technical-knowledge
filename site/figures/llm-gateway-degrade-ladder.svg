@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 620" role="img" lang="zh-CN" aria-labelledby="lad-title lad-desc">
+<title id="lad-title">LLM 网关降级阶梯</title>
+<desc id="lad-desc">请求按语义缓存、小模型、跳过 RAG、友好拒绝四级依次尝试，每级命中即返回，全部未命中落友好拒绝。</desc>
+<defs>
+<marker id="la" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/></marker>
+<marker id="lag" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#059669"/></marker>
+<marker id="lar" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto"><polygon points="0 0, 10 3.5, 0 7" fill="#e11d48"/></marker>
+</defs>
+<rect width="760" height="620" fill="#ffffff"/>
+<style>
+.b { font-family: 'PingFang SC','Microsoft YaHei',sans-serif; fill: #0f172a; font-size: 13.5px; font-weight: 600; }
+.s { font-family: 'PingFang SC','Microsoft YaHei',sans-serif; fill: #475569; font-size: 11px; }
+.ok { fill: rgba(5,150,105,0.12); stroke: #059669; stroke-width: 1.5; }
+.no { fill: rgba(225,29,72,0.08); stroke: #e11d48; stroke-width: 1.5; }
+.dz { fill: rgba(148,163,184,0.15); stroke: #64748b; stroke-width: 1.5; }
+.lvl { font-family: 'PingFang SC','Microsoft YaHei',sans-serif; fill: #94a3b8; font-size: 12px; font-weight: 700; }
+</style>
+<g transform="translate(150 24)">
+<rect class="dz" width="460" height="62" rx="8"/>
+<text x="230" y="26" text-anchor="middle" class="b">后端全部不可用</text>
+<text x="230" y="46" text-anchor="middle" class="s">错误率超限 · P99 超限 · 预算耗尽 · 主动降级</text>
+</g>
+<g transform="translate(40 140)">
+<rect class="dz" width="250" height="66" rx="8"/>
+<text x="125" y="26" text-anchor="middle" class="b">① 语义缓存</text>
+<text x="125" y="46" text-anchor="middle" class="s">有相似历史请求?</text>
+</g>
+<g transform="translate(470 140)">
+<rect class="ok" width="250" height="66" rx="8"/>
+<text x="125" y="26" text-anchor="middle" class="b">返回缓存结果</text>
+<text x="125" y="46" text-anchor="middle" class="s">适合 FAQ 类重复问题</text>
+</g>
+<g transform="translate(40 258)">
+<rect class="dz" width="250" height="66" rx="8"/>
+<text x="125" y="26" text-anchor="middle" class="b">② 模型降级</text>
+<text x="125" y="46" text-anchor="middle" class="s">小模型质量可接受?</text>
+</g>
+<g transform="translate(470 258)">
+<rect class="ok" width="250" height="66" rx="8"/>
+<text x="125" y="26" text-anchor="middle" class="b">返回小模型结果</text>
+<text x="125" y="46" text-anchor="middle" class="s">GPT-4 → GPT-3.5 · 70B → 7B</text>
+</g>
+<g transform="translate(40 376)">
+<rect class="dz" width="250" height="66" rx="8"/>
+<text x="125" y="26" text-anchor="middle" class="b">③ 简化处理</text>
+<text x="125" y="46" text-anchor="middle" class="s">跳过 RAG，时效可优先?</text>
+</g>
+<g transform="translate(470 376)">
+<rect class="ok" width="250" height="66" rx="8"/>
+<text x="125" y="26" text-anchor="middle" class="b">返回自身知识回答</text>
+<text x="125" y="46" text-anchor="middle" class="s">牺牲检索增强保可用</text>
+</g>
+<g transform="translate(40 494)">
+<rect class="no" width="250" height="66" rx="8"/>
+<text x="125" y="26" text-anchor="middle" class="b">④ 友好拒绝</text>
+<text x="125" y="46" text-anchor="middle" class="s">「服务繁忙，请稍后再试」</text>
+</g>
+<line x1="380" y1="86" x2="380" y2="132" stroke="#64748b" stroke-width="2" marker-end="url(#la)"/>
+<line x1="380" y1="204" x2="380" y2="250" stroke="#64748b" stroke-width="2" marker-end="url(#la)"/>
+<text x="395" y="232" class="s">未命中</text>
+<line x1="380" y1="322" x2="380" y2="368" stroke="#64748b" stroke-width="2" marker-end="url(#la)"/>
+<text x="395" y="350" class="s">不可用</text>
+<line x1="380" y1="440" x2="380" y2="486" stroke="#64748b" stroke-width="2" marker-end="url(#la)"/>
+<text x="395" y="468" class="s">不可接受</text>
+<line x1="290" y1="173" x2="462" y2="173" stroke="#059669" stroke-width="2" marker-end="url(#lag)"/>
+<text x="376" y="166" text-anchor="middle" class="s">命中</text>
+<line x1="290" y1="291" x2="462" y2="291" stroke="#059669" stroke-width="2" marker-end="url(#lag)"/>
+<text x="376" y="284" text-anchor="middle" class="s">可用</text>
+<line x1="290" y1="409" x2="462" y2="409" stroke="#059669" stroke-width="2" marker-end="url(#lag)"/>
+<text x="376" y="402" text-anchor="middle" class="s">可接受</text>
+<text x="30" y="30" class="lvl">轻</text>
+<text x="30" y="540" class="lvl">重</text>
+<line x1="24" y1="40" x2="24" y2="530" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
+</svg>
