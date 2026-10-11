@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="470" viewBox="0 0 820 470" font-family="'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+    <marker id="arrowBlue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563EB"/>
+    </marker>
+    <marker id="arrowGreen" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#059669"/>
+    </marker>
+    <marker id="arrowRed" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#DC2626"/>
+    </marker>
+  </defs>
+  <rect width="820" height="470" fill="#FFFFFF"/>
+  <text x="410" y="36" text-anchor="middle" font-size="17" font-weight="700" fill="#1F2937">长任务状态机：五个状态，三条不可逆终态</text>
+
+  <rect x="60" y="200" width="120" height="54" rx="9" fill="#F8FAFC" stroke="#475569" stroke-width="1.6"/>
+  <text x="120" y="224" text-anchor="middle" font-size="13.5" font-weight="600" fill="#1F2937">queued</text>
+  <text x="120" y="243" text-anchor="middle" font-size="10.5" fill="#6B7280">已受理排队中</text>
+
+  <rect x="270" y="200" width="120" height="54" rx="9" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.6"/>
+  <text x="330" y="224" text-anchor="middle" font-size="13.5" font-weight="600" fill="#1E3A8A">running</text>
+  <text x="330" y="243" text-anchor="middle" font-size="10.5" fill="#6B7280">worker 执行中</text>
+
+  <rect x="500" y="80" width="140" height="54" rx="9" fill="#ECFDF5" stroke="#059669" stroke-width="1.6"/>
+  <text x="570" y="104" text-anchor="middle" font-size="13.5" font-weight="600" fill="#065F46">succeeded</text>
+  <text x="570" y="123" text-anchor="middle" font-size="10.5" fill="#065F46">resultUrl 稳定可取</text>
+
+  <rect x="500" y="200" width="140" height="54" rx="9" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.6"/>
+  <text x="570" y="224" text-anchor="middle" font-size="13.5" font-weight="600" fill="#991B1B">failed</text>
+  <text x="570" y="243" text-anchor="middle" font-size="10.5" fill="#991B1B">带错误码与重试标记</text>
+
+  <rect x="500" y="320" width="140" height="54" rx="9" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.6"/>
+  <text x="570" y="344" text-anchor="middle" font-size="13.5" font-weight="600" fill="#991B1B">canceled</text>
+  <text x="570" y="363" text-anchor="middle" font-size="10.5" fill="#991B1B">检查点后显式退出</text>
+
+  <line x1="60" y1="292" x2="60" y2="258" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="72" y="284" font-size="11.5" fill="#1F2937" font-weight="600">提交返回 202</text>
+
+  <line x1="182" y1="227" x2="266" y2="227" stroke="#475569" stroke-width="1.6" marker-end="url(#arrow)"/>
+  <text x="224" y="216" text-anchor="middle" font-size="11.5" fill="#1F2937" font-weight="600">worker 认领</text>
+
+  <line x1="374" y1="200" x2="496" y2="120" stroke="#059669" stroke-width="1.7" marker-end="url(#arrowGreen)"/>
+  <text x="418" y="150" font-size="11.5" fill="#065F46" font-weight="600">执行完成</text>
+
+  <line x1="392" y1="227" x2="496" y2="227" stroke="#DC2626" stroke-width="1.7" marker-end="url(#arrowRed)"/>
+  <text x="444" y="216" text-anchor="middle" font-size="11.5" fill="#991B1B" font-weight="600">执行失败</text>
+
+  <line x1="374" y1="254" x2="496" y2="334" stroke="#DC2626" stroke-width="1.7" stroke-dasharray="6 4" marker-end="url(#arrowRed)"/>
+  <text x="408" y="316" font-size="11.5" fill="#991B1B" font-weight="600">检查点后取消</text>
+
+  <rect x="672" y="168" width="128" height="128" rx="9" fill="#FEF2F2" stroke="#DC2626" stroke-width="1.4" stroke-dasharray="5 4"/>
+  <text x="736" y="192" text-anchor="middle" font-size="12" font-weight="600" fill="#991B1B">终态只进不出</text>
+  <text x="736" y="214" text-anchor="middle" font-size="10.5" fill="#B91C1C">改回 running</text>
+  <text x="736" y="232" text-anchor="middle" font-size="10.5" fill="#B91C1C">= 调用方基于</text>
+  <text x="736" y="250" text-anchor="middle" font-size="10.5" fill="#B91C1C">终态做的补偿</text>
+  <text x="736" y="268" text-anchor="middle" font-size="10.5" fill="#B91C1C">全部作废</text>
+
+  <line x1="642" y1="107" x2="668" y2="180" stroke="#DC2626" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrowRed)"/>
+  <line x1="642" y1="227" x2="668" y2="227" stroke="#DC2626" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrowRed)"/>
+  <line x1="642" y1="347" x2="668" y2="286" stroke="#DC2626" stroke-width="1.4" stroke-dasharray="4 3" marker-end="url(#arrowRed)"/>
+
+  <rect x="105" y="398" width="610" height="52" rx="8" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="5 4"/>
+  <text x="410" y="419" text-anchor="middle" font-size="12" fill="#6B7280">失败要带稳定错误码（UPSTREAM_TIMEOUT、INPUT_INVALID）供调用方决定重提还是报警，</text>
+  <text x="410" y="437" text-anchor="middle" font-size="12" fill="#6B7280">失败后重跑必须创建新任务，取消走显式 cancel 接口</text>
+</svg>

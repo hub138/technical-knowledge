@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="500" viewBox="0 0 820 500" font-family="'PingFang SC','Microsoft YaHei','Noto Sans CJK SC',sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <rect width="820" height="500" fill="#FFFFFF"/>
+  <text x="410" y="36" text-anchor="middle" font-size="17" font-weight="700" fill="#1F2937">显存失效按崩点时点分型：曲线形态对准对策</text>
+
+  <line x1="70" y1="86" x2="70" y2="400" stroke="#CBD5E1" stroke-width="1.4"/>
+  <line x1="70" y1="400" x2="770" y2="400" stroke="#CBD5E1" stroke-width="1.4" marker-end="url(#arrow)"/>
+  <text x="752" y="420" text-anchor="end" font-size="11.5" fill="#64748B">训练步数</text>
+  <text x="58" y="246" text-anchor="middle" font-size="11.5" fill="#64748B" transform="rotate(-90 58 246)">显存占用</text>
+
+  <polyline points="86,352 120,318 150,318 185,284 220,284 260,252 300,252 340,222 385,222 430,196 475,196 520,174 565,174 610,158 655,158 700,148 745,148" fill="none" stroke="#DC2626" stroke-width="2.2"/>
+  <circle cx="745" cy="148" r="5" fill="#DC2626"/>
+  <text x="745" y="132" text-anchor="end" font-size="12" font-weight="600" fill="#991B1B">斜坡爬升后崩：碎片累积</text>
+
+  <polyline points="86,372 140,372 190,306 240,306 290,306 340,306 390,306 440,306 490,306 540,306 590,306 640,306 690,306 745,306" fill="none" stroke="#2563EB" stroke-width="2.2"/>
+  <polyline points="282,306 290,272 298,306" fill="none" stroke="#2563EB" stroke-width="2"/>
+  <polyline points="532,306 540,272 548,306" fill="none" stroke="#2563EB" stroke-width="2"/>
+  <circle cx="540" cy="272" r="5" fill="#2563EB"/>
+  <text x="548" y="258" font-size="12" font-weight="600" fill="#1E40AF">保存瞬间叠尖峰，周期复现：保存窗口</text>
+
+  <polyline points="86,368 130,368 175,368 220,368 265,368 310,368 355,368 400,368 445,368 490,368 535,368 580,368 625,368 670,368 700,300" fill="none" stroke="#059669" stroke-width="2.2"/>
+  <circle cx="700" cy="300" r="5" fill="#059669"/>
+  <text x="700" y="286" text-anchor="middle" font-size="12" font-weight="600" fill="#065F46">随机崩点：峰值样本</text>
+
+  <line x1="150" y1="86" x2="150" y2="400" stroke="#7C3AED" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <circle cx="150" cy="368" r="5" fill="#7C3AED"/>
+  <text x="162" y="112" font-size="12" font-weight="600" fill="#4C1D95">第一步就崩：激活峰值</text>
+  <text x="162" y="130" font-size="11" fill="#6B7280">4096 能跑、32K 爆，减 batch 无效</text>
+
+  <rect x="96" y="430" width="624" height="52" rx="8" fill="#F9FAFB" stroke="#D1D5DB" stroke-dasharray="5 4"/>
+  <text x="410" y="450" text-anchor="middle" font-size="12" fill="#6B7280">定位顺序：先把报错时刻对到显存曲线的形态上（台阶 / 斜坡 / 尖峰 / 第一步），</text>
+  <text x="410" y="468" text-anchor="middle" font-size="12" fill="#6B7280">再选对策——把每种崩法都当「放不下」去减 batch，吞吐损失了病根还在</text>
+</svg>
