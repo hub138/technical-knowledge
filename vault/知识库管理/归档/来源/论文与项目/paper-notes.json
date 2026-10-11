@@ -1,13 +1,13 @@
 {
- "generated": "2026-09-18",
+ "generated": "2026-10-08",
  "source": "arXiv abstracts; derived by scripts/build-paper-notes.py",
  "note": "L1 fields are extracted from each paper's own abstract, which is kept alongside them for checking. L2 deep reads are written by hand into 归档/来源/论文与项目/解析/ and never generated, because an abstract does not contain the technical detail, ablations, limitations or reproduction steps a deep read must state.",
  "stats": {
-  "papers": 44,
-  "with_key_result": 12,
+  "papers": 67,
+  "with_key_result": 20,
   "with_deep_read": 1,
   "without_chinese_title": 0,
-  "with_untranslated_field": 0
+  "with_untranslated_field": 23
  },
  "papers": {
   "1508.07909": {
@@ -28,9 +28,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
      "title": "Token、Embedding 与表示学习连接数据和模型",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -65,9 +65,9 @@
    "key_result": "In this work, we address these challenges and finally realize the promise of conditional computation, achieving greater than 1000x improvements in model capacity with only minor losses in computational efficiency on modern GPU clusters.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
      "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -103,37 +103,37 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/AI系统工程：把模型能力变成生产能力.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/AI系统工程：把模型能力变成生产能力.md",
      "title": "AI 系统工程：把模型能力变成生产能力",
      "domain": "",
      "topic": "",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/Transformer如何把序列建模成可扩展计算.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/Transformer如何把序列建模成可扩展计算.md",
      "title": "Transformer 如何把序列建模成可扩展计算",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/位置编码和长上下文限制有效利用.md",
      "title": "位置编码和长上下文限制有效利用",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型与上下文/模型提出候选，系统定义正确性.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/模型提出候选，系统定义正确性.md",
      "title": "模型提出候选，系统定义正确性",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型与上下文",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
      "title": "预训练、后训练、RAG 与工具改变不同层次",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型与上下文",
      "kind": "evidence"
     }
@@ -152,6 +152,84 @@
    "title_en": "Attention Is All You Need",
    "problem_zh": "本文把 Transformer 成功应用于英语成分句法分析，在训练数据充足和有限两种情况下都表现良好，说明它能很好地泛化到其他任务。",
    "approach_zh": "提出一种新的简洁网络架构 Transformer，完全基于注意力机制，彻底去掉了循环和卷积。",
+   "result_zh": ""
+  },
+  "1710.03740": {
+   "id": "1710.03740",
+   "title": "Mixed Precision Training",
+   "authors": [
+    "Paulius Micikevicius",
+    "Sharan Narang",
+    "Jonah Alben",
+    "Gregory Diamos",
+    "Erich Elsen",
+    "David Garcia",
+    "Boris Ginsburg",
+    "Michael Houston",
+    "Oleksii Kuchaiev",
+    "Ganesh Venkatesh",
+    "Hao Wu"
+   ],
+   "published": "2017-10-10",
+   "primary": "cs.AI",
+   "url": "https://arxiv.org/abs/1710.03740",
+   "abstract": "Deep neural networks have enabled progress in a wide variety of applications. Growing the size of the neural network typically results in improved accuracy. As model sizes grow, the memory and compute requirements for training these models also increases. We introduce a technique to train deep neural networks using half precision floating point numbers. In our technique, weights, activations and gradients are stored in IEEE half-precision format. Half-precision floating numbers have limited numerical range compared to single-precision numbers. We propose two techniques to handle this loss of information. Firstly, we recommend maintaining a single-precision copy of the weights that accumulates the gradients after each optimizer step. This single-precision copy is rounded to half-precision format during training. Secondly, we propose scaling the loss appropriately to handle the loss of information with half-precision gradients. We demonstrate that this approach works for a wide variety of models including convolution neural networks, recurrent neural networks and generative adversarial networks. This technique works for large scale models with more than 100 million parameters trained on large datasets. Using this approach, we can reduce the memory consumption of deep learning models by nearly 2x. In future processors, we can also expect a significant computation speedup using half-precision hardware units.",
+   "overview": "Deep neural networks have enabled progress in a wide variety of applications.",
+   "problem": "Half-precision floating numbers have limited numerical range compared to single-precision numbers.",
+   "approach": "We introduce a technique to train deep neural networks using half precision floating point numbers.",
+   "key_result": "Using this approach, we can reduce the memory consumption of deep learning models by nearly 2x.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/混合精度与数值稳定：低位宽训练的溢出与下溢管理.md",
+     "title": "混合精度与数值稳定：低位宽训练的溢出与下溢管理",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "混合精度训练：低位宽下的数值保持",
+   "title_en": "Mixed Precision Training",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "1803.09010": {
+   "id": "1803.09010",
+   "title": "Datasheets for Datasets",
+   "authors": [
+    "Timnit Gebru",
+    "Jamie Morgenstern",
+    "Briana Vecchione",
+    "Jennifer Wortman Vaughan",
+    "Hanna Wallach",
+    "Hal Daumé",
+    "Kate Crawford"
+   ],
+   "published": "2018-03-23",
+   "primary": "cs.DB",
+   "url": "https://arxiv.org/abs/1803.09010",
+   "abstract": "The machine learning community currently has no standardized process for documenting datasets, which can lead to severe consequences in high-stakes domains. To address this gap, we propose datasheets for datasets. In the electronics industry, every component, no matter how simple or complex, is accompanied with a datasheet that describes its operating characteristics, test results, recommended uses, and other information. By analogy, we propose that every dataset be accompanied with a datasheet that documents its motivation, composition, collection process, recommended uses, and so on. Datasheets for datasets will facilitate better communication between dataset creators and dataset consumers, and encourage the machine learning community to prioritize transparency and accountability.",
+   "overview": "The machine learning community currently has no standardized process for documenting datasets, which can lead to severe consequences in high-stakes domains.",
+   "problem": "",
+   "approach": "To address this gap, we propose datasheets for datasets.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/数据与MLOps/训练数据治理：来源、许可与污染决定语料的长期价值.md",
+     "title": "训练数据治理：来源、许可与污染决定语料的长期价值",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "数据与MLOps",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Datasheets for Datasets：给数据集写出厂说明",
+   "title_en": "Datasheets for Datasets",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "1904.09751": {
@@ -174,9 +252,16 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/解码采样决定生成行为而不是知识本身.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/解码与采样参数：概率分布到生成文本的控制面.md",
+     "title": "解码与采样参数：概率分布到生成文本的控制面",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/解码采样决定生成行为而不是知识本身.md",
      "title": "解码采样决定生成行为而不是知识本身",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -206,9 +291,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/Token、Embedding与表示学习连接数据和模型.md",
      "title": "Token、Embedding 与表示学习连接数据和模型",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -240,9 +325,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/分布式训练与并行策略如何切分模型.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/分布式训练与并行策略如何切分模型.md",
      "title": "分布式训练与并行策略如何切分模型",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -280,16 +365,16 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
      "title": "Scaling Law 把训练预算分配成可测量假设",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/预训练数据决定模型能力上限.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/预训练数据决定模型能力上限.md",
      "title": "预训练数据决定模型能力上限",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -327,9 +412,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
      "title": "混合检索、重排与查询改写各自解决什么问题",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -377,37 +462,51 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/AI系统工程：把模型能力变成生产能力.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/AI系统工程：把模型能力变成生产能力.md",
      "title": "AI 系统工程：把模型能力变成生产能力",
      "domain": "",
      "topic": "",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/知识与检索/RAG数据管道从文档到可引用证据.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/RAG数据管道从文档到可引用证据.md",
      "title": "RAG 数据管道从文档到可引用证据",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/知识与检索/RAG的核心是选择可引用证据.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/RAG的核心是选择可引用证据.md",
      "title": "RAG 的核心是选择可引用证据",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/RAG的新鲜度与权限传播：撤回的数据不能再被检索到.md",
+     "title": "RAG的新鲜度与权限传播：撤回的数据不能再被检索到",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/生态与选型/精调与RAG的边界：什么时候微调更划算.md",
+     "title": "精调与RAG的边界：什么时候微调更划算",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "生态与选型",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
      "title": "预训练、后训练、RAG 与工具改变不同层次",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型与上下文",
      "kind": "evidence"
     }
@@ -427,7 +526,7 @@
    "problem_zh": "但模型访问和精确操纵知识的能力仍然有限，因此在知识密集型任务上，表现落后于为任务专门设计的架构。",
    "approach_zh": "提出 RAG 模型：参数记忆是一个预训练的 seq2seq 模型，非参数记忆是一个维基百科稠密向量索引，通过预训练的神经检索器访问。",
    "result_zh": "",
-   "deep_read": "# RAG：把参数记忆和非参数记忆拼起来\n\n> **这份解读是不完整的，缺的部分明确标出来了。**\n> 下面每个模块都注明它来自摘要还是正文。标 `[待读全文]` 的段落我还没有\n> 拿到全文，不替它编内容 —— 摘要里没有消融设置、超参和失败案例，\n> 凭摘要补出来的每一句都可能是错的，而读者分辨不出来。\n\n## 1 背景与问题\n\n**动机。** 大规模预训练语言模型把事实知识存在参数里，在各类下游任务上微调后\n能达到当时的最高水平。但**它们访问和精确操纵知识的能力仍然有限** —— 在知识密集型\n任务上，表现反而落后于为任务专门设计的架构。此外，为模型决策提供出处、\n以及更新模型的世界知识，都还是未解决的问题。\n\n**核心问题。** 能不能把\"存在参数里的记忆\"和\"存在外部索引里的记忆\"结合起来，\n让模型既能生成流畅文本，又能在需要事实时取用可更新的外部证据？\n\n**直觉洞见。** 参数记忆像\"训练时记住的东西\"，非参数记忆像\"手边可以翻的资料\"。\n前者稳定但难更新、难追溯；后者可更新、可给出处，但本身不会说话。\n把两者接在一起，就是在生成时让模型边写边查。\n\n一个已知的相关尝试是\"带可微访问机制的预训练模型\"，但它此前**只在抽取式任务上\n被研究过**，没有做成通用方案。\n\n## 2 核心方法\n\n摘要能确认的设计决策有三条：\n\n1. **两种记忆的组合方式。** 参数记忆是一个预训练的 seq2seq 模型；\n   非参数记忆是一个用预训练神经检索器访问的**维基百科稠密向量索引**。\n   注意非参数那一侧选的是维基百科索引，而不是任意文档 —— 这决定了它的\n   知识边界是\"维基百科覆盖的\"，也决定了更新方式是重建索引。\n\n2. **两种 RAG 形式，区别在检索结果的复用粒度。**\n   - 一种在**整个生成序列**上条件于同一批检索到的段落；\n   - 另一种**每个 token** 都可以用不同的段落。\n   这是这篇论文里最值得注意的设计分歧：前者更稳，后者更灵活，\n   代价是训练的复杂度和推理时的检索开销。\n\n3. **通用微调配方。** 论文的定位是\"通用配方\"，即 RAG 不是为某个任务定制的\n   架构，而是在预训练模型上做的可迁移改造。\n\n`[待读全文]` 检索器与被检索索引的具体结构、段落如何切分与编码、\n两种形式各自的训练目标与损失、训练时检索结果是否参与梯度回传，\n这些摘要里都没有。它们决定了这套方法能不能被复现，必须在正文里确认。\n\n## 3 技术细节\n\n`[待读全文]` 摘要没有给出任何公式、超参或算法步骤。这一节在此论文上依赖正文，\n现在留空。\n\n## 4 实验与结果\n\n摘要明确报告了三件事：\n\n| 结论 | 摘要原文依据 |\n|---|---|\n| 在三个开放域问答任务上达到当时最高水平 | \"set the state-of-the-art on three open domain QA tasks\" |\n| 优于纯参数的 seq2seq 模型 | \"outperforming parametric seq2seq models\" |\n| 优于任务专用的「检索-抽取」架构 | \"task-specific retrieve-and-extract architectures\" |\n| 生成质量更具体、更多样、更符合事实 | \"generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline\" |\n\n**关键发现的性质**：这里是**方向性结论**（超过、优于、更具体），\n摘要里**没有给出具体数值**。三个任务各提升了多少、用的是哪些数据集、\n生成质量的\"更符合事实\"怎么量化，都要回正文。\n\n这对使用这篇论文是有影响的：它足以支撑\"RAG 这条路线值得走\"这个判断，\n**不足以支撑\"RAG 在你的场景能提升多少\"这个判断**。后者必须自己测。\n\n`[待读全文]` 三件套的具体名称、指标定义、对比基线版本、消融结果、\n超参设置。\n\n## 5 局限性\n\n摘要自述的边界（可直接引用）：\n\n1. **非参数记忆是维基百科稠密向量索引** —— 意味着知识覆盖受限于该索引，\n   且更新一次的成本取决于重建索引的代价，不是改一行数据。\n2. **当时只在通用配方层面验证** —— 论文说这是\"通用配方的探索\"，\n   在具体领域的迁移效果需要单独验证。\n\n从摘要可以推理、但需要正文确认的：\n\n3. **两条检索路径都会有失败模式** —— 检索不到正确证据时，模型仍会生成流畅的\n   错误内容。这是后来 RAG 评测里要分离\"检索质量\"和\"生成质量\"的原因。\n4. **每个 token 用不同段落的方案** 推理开销更高，长生成任务上尤其明显。\n\n`[待读全文]` 论文自己列出的局限性章节、失败案例分析、以及作者对\n\"什么时候不该用 RAG\"的说明。\n\n## 6 复现指南\n\n`[待读全文]` 摘要未提供环境、代码骨架和步骤。这篇论文有公开实现，\n补这一节时应当以官方仓库为准，而不是从摘要推断。\n\n---\n\n## 依赖这篇论文的知识\n\n本库有 5 篇知识把这篇论文作为论据：\n\n- [[工程知识/AI 系统工程/知识与检索/RAG的核心是选择可引用证据]]\n- [[工程知识/AI 系统工程/知识与检索/RAG数据管道从文档到可引用证据]]\n- [[工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取]]\n- [[工程知识/AI 系统工程/模型与上下文/预训练、后训练、RAG与工具改变不同层次]]\n- [[工程知识/AI 系统工程/AI系统工程：把模型能力变成生产能力]]\n\n这些页面引用的是本文第 4 节那条\"方向性结论\"。如果后续读全文发现\n具体数值与这些页面的表述有出入，以论文为准，并回来更新这几页。\n\n## 怎么把这份解读补全\n\n按 [[知识库管理/方法/论文怎么追踪怎么解析]] 的 L2 规范，缺的是第 2、3、4 节的\n正文级细节。补齐时需要：\n\n1. 读全文（arXiv 上有 PDF）\n2. 找到论文自述的局限性章节，替换第 5 节的推理部分\n3. 从正文抄出三件套名称与指标数值，回填第 4 节的表格\n4. 把 `status: partial` 改成 `status: complete`，并把 `confidence` 提到 high"
+   "deep_read": "# RAG：把参数记忆和非参数记忆拼起来\n\n这是一篇论文的解读稿，缺的部分都明确标了出来。读完这篇你能知道哪些结论来自摘要、哪些来自正文，以及哪几段还没读到全文。\n\n\n> **这份解读是不完整的，缺的部分明确标出来了。**\n> 下面每个模块都注明它来自摘要还是正文。标 `[待读全文]` 的段落我还没有\n> 拿到全文，不替它编内容 —— 摘要里没有消融设置、超参和失败案例，\n> 凭摘要补出来的每一句都可能是错的，而读者分辨不出来。\n\n## 1 背景与问题\n\n**动机。** 大规模预训练（用海量文本先训练出通用语言能力、之后再适配下游任务）语言模型把事实知识存在参数里，在各类下游任务上微调（在预训练模型上用小数据继续训练以适配具体任务）后\n能达到当时的最高水平。但**它们访问和精确操纵知识的能力仍然有限** —— 在知识密集型\n任务上，表现反而落后于为任务专门设计的架构。此外，为模型决策提供出处、\n以及更新模型的世界知识，都还是未解决的问题。\n\n**核心问题。** 能不能把\"存在参数里的记忆\"和\"存在外部索引里的记忆\"结合起来，\n让模型既能生成流畅文本，又能在需要事实时取用可更新的外部证据？\n\n**直觉洞见。** 参数记忆像\"训练时记住的东西\"，非参数记忆像\"手边可以翻的资料\"。\n前者稳定但难更新、难追溯；后者可更新、可给出处，但本身不会说话。\n把两者接在一起，就是在生成时让模型边写边查。\n\n一个已知的相关尝试是\"带可微访问机制的预训练模型\"，但它此前**只在抽取式任务上\n被研究过**，没有做成通用方案。\n\n## 2 核心方法\n\n摘要能确认的设计决策有三条：\n\n1. **两种记忆的组合方式。** 参数记忆是一个预训练的 seq2seq 模型；\n   非参数记忆是一个用预训练神经检索器访问的**维基百科稠密向量索引**。\n   注意非参数那一侧选的是维基百科索引，而不是任意文档 —— 这决定了它的\n   知识边界是\"维基百科覆盖的\"，也决定了更新方式是重建索引。\n\n2. **两种 RAG（Retrieval-Augmented Generation，检索增强生成：先检索资料再让模型基于资料回答） 形式，区别在检索结果的复用粒度。**\n   - 一种在**整个生成序列**上条件于同一批检索到的段落；\n   - 另一种**每个 token** 都可以用不同的段落。\n   这是这篇论文里最值得注意的设计分歧：前者更稳，后者更灵活，\n   代价是训练的复杂度和推理时的检索开销。\n\n3. **通用微调配方。** 论文的定位是\"通用配方\"，即 RAG 不是为某个任务定制的\n   架构，而是在预训练模型上做的可迁移改造。\n\n`[待读全文]` 检索器与被检索索引的具体结构、段落如何切分与编码、\n两种形式各自的训练目标与损失、训练时检索结果是否参与梯度回传，\n这些摘要里都没有。它们决定了这套方法能不能被复现，必须在正文里确认。\n\n## 3 技术细节\n\n`[待读全文]` 摘要没有给出任何公式、超参或算法步骤。这一节在此论文上依赖正文，\n现在留空。\n\n## 4 实验与结果\n\n摘要明确报告了三件事：\n\n| 结论 | 摘要原文依据 |\n|---|---|\n| 在三个开放域问答任务上达到当时最高水平 | \"set the state-of-the-art on three open domain QA tasks\" |\n| 优于纯参数的 seq2seq 模型 | \"outperforming parametric seq2seq models\" |\n| 优于任务专用的「检索-抽取」架构 | \"task-specific retrieve-and-extract architectures\" |\n| 生成质量更具体、更多样、更符合事实 | \"generate more specific, diverse and factual language than a state-of-the-art parametric-only seq2seq baseline\" |\n\n**关键发现的性质**：这里是**方向性结论**（超过、优于、更具体），\n摘要里**没有给出具体数值**。三个任务各提升了多少、用的是哪些数据集、\n生成质量的\"更符合事实\"怎么量化，都要回正文。\n\n这对使用这篇论文是有影响的：它足以支撑\"RAG 这条路线值得走\"这个判断，\n**不足以支撑\"RAG 在你的场景能提升多少\"这个判断**。后者必须自己测。\n\n`[待读全文]` 三件套的具体名称、指标定义、对比基线版本、消融结果、\n超参设置。\n\n## 5 局限性\n\n摘要自述的边界（可直接引用）：\n\n1. **非参数记忆是维基百科稠密向量索引** —— 意味着知识覆盖受限于该索引，\n   且更新一次的成本取决于重建索引的代价，不是改一行数据。\n2. **当时只在通用配方层面验证** —— 论文说这是\"通用配方的探索\"，\n   在具体领域的迁移效果需要单独验证。\n\n从摘要可以推理、但需要正文确认的：\n\n3. **两条检索路径都会有失败模式** —— 检索不到正确证据时，模型仍会生成流畅的\n   错误内容。这是后来 RAG 评测里要分离\"检索质量\"和\"生成质量\"的原因。\n4. **每个 token（模型处理文本的最小单位，约相当于一个词或半个词） 用不同段落的方案** 推理开销更高，长生成任务上尤其明显。\n\n`[待读全文]` 论文自己列出的局限性章节、失败案例分析、以及作者对\n\"什么时候不该用 RAG\"的说明。\n\n## 6 复现指南\n\n`[待读全文]` 摘要未提供环境、代码骨架和步骤。这篇论文有公开实现，\n补这一节时应当以官方仓库为准，而不是从摘要推断。\n\n---\n\n## 哪些知识依赖这篇论文\n\n本库有 5 篇知识把这篇论文作为论据：\n\n- [[工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/RAG的核心是选择可引用证据]]\n- [[工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/RAG数据管道从文档到可引用证据]]\n- [[工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取]]\n- [[工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/预训练、后训练、RAG与工具改变不同层次]]\n- [[工程知识/AI 系统工程：从模型能力到生产能力/AI系统工程：把模型能力变成生产能力]]\n\n这些页面引用的是本文第 4 节那条\"方向性结论\"。如果后续读全文发现\n具体数值与这些页面的表述有出入，以论文为准，并回来更新这几页。\n\n## 怎么把这份解读补全\n\n按 [[知识库管理/方法/论文怎么追踪怎么解析]] 的 L2 规范，缺的是第 2、3、4 节的\n正文级细节。补齐时需要：\n\n1. 读全文（arXiv 上有 PDF）\n2. 找到论文自述的局限性章节，替换第 5 节的推理部分\n3. 从正文抄出三件套名称与指标数值，回填第 4 节的表格\n4. 把 `status: partial` 改成 `status: complete`，并把 `confidence` 提到 high"
   },
   "2101.03961": {
    "id": "2101.03961",
@@ -447,9 +546,16 @@
    "key_result": "Finally, we advance the current scale of language models by pre-training up to trillion parameter models on the \"Colossal Clean Crawled Corpus\" and achieve a 4x speedup over the T5-XXL model.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
      "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/MoE路由的工程问题：负载不均与显存碎片.md",
+     "title": "MoE路由的工程问题：负载不均与显存碎片",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -489,9 +595,9 @@
    "key_result": "Our approach allows us to perform training iterations on a model with 1 trillion parameters at 502 petaFLOP/s on 3072 GPUs with achieved per-GPU throughput of 52% of theoretical peak.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/分布式训练与并行策略如何切分模型.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/分布式训练与并行策略如何切分模型.md",
      "title": "分布式训练与并行策略如何切分模型",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -526,9 +632,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/质量与运营/RAG评测要分离检索质量与生成质量.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/RAG评测要分离检索质量与生成质量.md",
      "title": "RAG 评测要分离检索质量与生成质量",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "质量与运营",
      "kind": "evidence"
     }
@@ -562,9 +668,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/位置编码和长上下文限制有效利用.md",
      "title": "位置编码和长上下文限制有效利用",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -575,6 +681,170 @@
    "title_en": "RoFormer: Enhanced Transformer with Rotary Position Embedding",
    "problem_zh": "",
    "approach_zh": "提出旋转位置编码（RoPE），以更有效地利用位置信息。",
+   "result_zh": ""
+  },
+  "2104.14337": {
+   "id": "2104.14337",
+   "title": "Dynabench: Rethinking Benchmarking in NLP",
+   "authors": [
+    "Douwe Kiela",
+    "Max Bartolo",
+    "Yixin Nie",
+    "Divyansh Kaushik",
+    "Atticus Geiger",
+    "Zhengxuan Wu",
+    "Bertie Vidgen",
+    "Grusha Prasad",
+    "Amanpreet Singh",
+    "Pratik Ringshia",
+    "Zhiyi Ma",
+    "Tristan Thrush",
+    "Sebastian Riedel",
+    "Zeerak Waseem",
+    "Pontus Stenetorp",
+    "Robin Jia",
+    "Mohit Bansal",
+    "Christopher Potts",
+    "Adina Williams"
+   ],
+   "published": "2021-04-07",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2104.14337",
+   "abstract": "We introduce Dynabench, an open-source platform for dynamic dataset creation and model benchmarking. Dynabench runs in a web browser and supports human-and-model-in-the-loop dataset creation: annotators seek to create examples that a target model will misclassify, but that another person will not. In this paper, we argue that Dynabench addresses a critical need in our community: contemporary models quickly achieve outstanding performance on benchmark tasks but nonetheless fail on simple challenge examples and falter in real-world scenarios. With Dynabench, dataset creation, model development, and model assessment can directly inform each other, leading to more robust and informative benchmarks. We report on four initial NLP tasks, illustrating these concepts and highlighting the promise of the platform, and address potential objections to dynamic benchmarking as a new standard for the field.",
+   "overview": "We introduce Dynabench, an open-source platform for dynamic dataset creation and model benchmarking.",
+   "problem": "In this paper, we argue that Dynabench addresses a critical need in our community: contemporary models quickly achieve outstanding performance on benchmark tasks but nonetheless fail on simple challenge examples and falter in real-world scenarios.",
+   "approach": "We introduce Dynabench, an open-source platform for dynamic dataset creation and model benchmarking.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/评测集的构建与维护决定所有评测的地基.md",
+     "title": "评测集的构建与维护决定所有评测的地基",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "质量与运营",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Dynabench：重新思考 NLP 基准测试",
+   "title_en": "Dynabench: Rethinking Benchmarking in NLP",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2106.09685": {
+   "id": "2106.09685",
+   "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+   "authors": [
+    "Edward J. Hu",
+    "Yelong Shen",
+    "Phillip Wallis",
+    "Zeyuan Allen-Zhu",
+    "Yuanzhi Li",
+    "Shean Wang",
+    "Lu Wang",
+    "Weizhu Chen"
+   ],
+   "published": "2021-06-17",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2106.09685",
+   "abstract": "An important paradigm of natural language processing consists of large-scale pre-training on general domain data and adaptation to particular tasks or domains. As we pre-train larger models, full fine-tuning, which retrains all model parameters, becomes less feasible. Using GPT-3 175B as an example -- deploying independent instances of fine-tuned models, each with 175B parameters, is prohibitively expensive. We propose Low-Rank Adaptation, or LoRA, which freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks. Compared to GPT-3 175B fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times. LoRA performs on-par or better than fine-tuning in model quality on RoBERTa, DeBERTa, GPT-2, and GPT-3, despite having fewer trainable parameters, a higher training throughput, and, unlike adapters, no additional inference latency. We also provide an empirical investigation into rank-deficiency in language model adaptation, which sheds light on the efficacy of LoRA. We release a package that facilitates the integration of LoRA with PyTorch models and provide our implementations and model checkpoints for RoBERTa, DeBERTa, and GPT-2 at https://github.com/microsoft/LoRA.",
+   "overview": "An important paradigm of natural language processing consists of large-scale pre-training on general domain data and adaptation to particular tasks or domains.",
+   "problem": "Using GPT-3 175B as an example -- deploying independent instances of fine-tuned models, each with 175B parameters, is prohibitively expensive.",
+   "approach": "We propose Low-Rank Adaptation, or LoRA, which freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks.",
+   "key_result": "Compared to GPT-3 175B fine-tuned with Adam, LoRA can reduce the number of trainable parameters by 10,000 times and the GPU memory requirement by 3 times.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/LoRA与参数高效微调：改行为不改基座.md",
+     "title": "LoRA与参数高效微调：改行为不改基座",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "LoRA：低秩适配实现大模型低成本微调",
+   "title_en": "LoRA: Low-Rank Adaptation of Large Language Models",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2110.10668": {
+   "id": "2110.10668",
+   "title": "Evaluating the Evaluation Metrics for Style Transfer: A Case Study in Multilingual Formality Transfer",
+   "authors": [
+    "Eleftheria Briakou",
+    "Sweta Agrawal",
+    "Joel Tetreault",
+    "Marine Carpuat"
+   ],
+   "published": "2021-10-20",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2110.10668",
+   "abstract": "While the field of style transfer (ST) has been growing rapidly, it has been hampered by a lack of standardized practices for automatic evaluation. In this paper, we evaluate leading ST automatic metrics on the oft-researched task of formality style transfer. Unlike previous evaluations, which focus solely on English, we expand our focus to Brazilian-Portuguese, French, and Italian, making this work the first multilingual evaluation of metrics in ST. We outline best practices for automatic evaluation in (formality) style transfer and identify several models that correlate well with human judgments and are robust across languages. We hope that this work will help accelerate development in ST, where human evaluation is often challenging to collect.",
+   "overview": "While the field of style transfer (ST) has been growing rapidly, it has been hampered by a lack of standardized practices for automatic evaluation.",
+   "problem": "",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/评测集的构建与维护：从场景采样到难度分层.md",
+     "title": "评测集的构建与维护：从场景采样到难度分层",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "质量与运营",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "风格迁移评测指标的再评测：多语言正式度案例",
+   "title_en": "Evaluating the Evaluation Metrics for Style Transfer: A Case Study in Multilingual Formality Transfer",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2202.03629": {
+   "id": "2202.03629",
+   "title": "Survey of Hallucination in Natural Language Generation",
+   "authors": [
+    "Ziwei Ji",
+    "Nayeon Lee",
+    "Rita Frieske",
+    "Tiezheng Yu",
+    "Dan Su",
+    "Yan Xu",
+    "Etsuko Ishii",
+    "Yejin Bang",
+    "Delong Chen",
+    "Wenliang Dai",
+    "Ho Shu Chan",
+    "Andrea Madotto",
+    "Pascale Fung"
+   ],
+   "published": "2022-02-08",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2202.03629",
+   "abstract": "Natural Language Generation (NLG) has improved exponentially in recent years thanks to the development of sequence-to-sequence deep learning technologies such as Transformer-based language models. This advancement has led to more fluent and coherent NLG, leading to improved development in downstream tasks such as abstractive summarization, dialogue generation and data-to-text generation. However, it is also apparent that deep learning based generation is prone to hallucinate unintended text, which degrades the system performance and fails to meet user expectations in many real-world scenarios. To address this issue, many studies have been presented in measuring and mitigating hallucinated texts, but these have never been reviewed in a comprehensive manner before. In this survey, we thus provide a broad overview of the research progress and challenges in the hallucination problem in NLG. The survey is organized into two parts: (1) a general overview of metrics, mitigation methods, and future directions; (2) an overview of task-specific research progress on hallucinations in the following downstream tasks, namely abstractive summarization, dialogue generation, generative question answering, data-to-text generation, machine translation, and visual-language generation; and (3) hallucinations in large language models (LLMs). This survey serves to facilitate collaborative efforts among researchers in tackling the challenge of hallucinated texts in NLG.",
+   "overview": "Natural Language Generation (NLG) has improved exponentially in recent years thanks to the development of sequence-to-sequence deep learning technologies such as Transformer-based language models.",
+   "problem": "However, it is also apparent that deep learning based generation is prone to hallucinate unintended text, which degrades the system performance and fails to meet user expectations in many real-world scenarios.",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/幻觉的工程边界——哪些场景模型不该被单独信任.md",
+     "title": "幻觉的工程边界——哪些场景模型不该被单独信任",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "质量与运营",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "自然语言生成中的幻觉综述",
+   "title_en": "Survey of Hallucination in Natural Language Generation",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2203.02155": {
@@ -612,23 +882,30 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/人在环路要设在不可逆的决策点.md",
+     "title": "人在环路要设在不可逆的决策点",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "质量与运营",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/后训练对齐与微调改变行为边界.md",
      "title": "后训练对齐与微调改变行为边界",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型与上下文/模型提出候选，系统定义正确性.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/模型提出候选，系统定义正确性.md",
      "title": "模型提出候选，系统定义正确性",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型与上下文",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/预训练、后训练、RAG与工具改变不同层次.md",
      "title": "预训练、后训练、RAG 与工具改变不同层次",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型与上下文",
      "kind": "evidence"
     }
@@ -641,40 +918,45 @@
    "approach_zh": "本文展示了一条让语言模型在广泛任务上对齐用户意图的路径：用人类反馈做微调。",
    "result_zh": ""
   },
-  "2203.10050": {
-   "id": "2203.10050",
-   "title": "SURF: Semi-supervised Reward Learning with Data Augmentation for Feedback-efficient Preference-based Reinforcement Learning",
+  "2203.05482": {
+   "id": "2203.05482",
+   "title": "Model soups: averaging weights of multiple fine-tuned models improves accuracy without increasing inference time",
    "authors": [
-    "Jongjin Park",
-    "Younggyo Seo",
-    "Jinwoo Shin",
-    "Honglak Lee",
-    "Pieter Abbeel",
-    "Kimin Lee"
+    "Mitchell Wortsman",
+    "Gabriel Ilharco",
+    "Samir Yitzhak Gadre",
+    "Rebecca Roelofs",
+    "Raphael Gontijo-Lopes",
+    "Ari S. Morcos",
+    "Hongseok Namkoong",
+    "Ali Farhadi",
+    "Yair Carmon",
+    "Simon Kornblith",
+    "Ludwig Schmidt"
    ],
-   "published": "2022-03-18",
+   "published": "2022-03-10",
    "primary": "cs.LG",
-   "url": "https://arxiv.org/abs/2203.10050",
-   "abstract": "Preference-based reinforcement learning (RL) has shown potential for teaching agents to perform the target tasks without a costly, pre-defined reward function by learning the reward with a supervisor's preference between the two agent behaviors. However, preference-based learning often requires a large amount of human feedback, making it difficult to apply this approach to various applications. This data-efficiency problem, on the other hand, has been typically addressed by using unlabeled samples or data augmentation techniques in the context of supervised learning. Motivated by the recent success of these approaches, we present SURF, a semi-supervised reward learning framework that utilizes a large amount of unlabeled samples with data augmentation. In order to leverage unlabeled samples for reward learning, we infer pseudo-labels of the unlabeled samples based on the confidence of the preference predictor. To further improve the label-efficiency of reward learning, we introduce a new data augmentation that temporally crops consecutive subsequences from the original behaviors. Our experiments demonstrate that our approach significantly improves the feedback-efficiency of the state-of-the-art preference-based method on a variety of locomotion and robotic manipulation tasks.",
-   "overview": "Preference-based reinforcement learning (RL) has shown potential for teaching agents to perform the target tasks without a costly, pre-defined reward function by learning the reward with a supervisor's preference between the two agent behaviors.",
-   "problem": "However, preference-based learning often requires a large amount of human feedback, making it difficult to apply this approach to various applications.",
-   "approach": "Motivated by the recent success of these approaches, we present SURF, a semi-supervised reward learning framework that utilizes a large amount of unlabeled samples with data augmentation.",
-   "key_result": "",
+   "url": "https://arxiv.org/abs/2203.05482",
+   "abstract": "The conventional recipe for maximizing model accuracy is to (1) train multiple models with various hyperparameters and (2) pick the individual model which performs best on a held-out validation set, discarding the remainder. In this paper, we revisit the second step of this procedure in the context of fine-tuning large pre-trained models, where fine-tuned models often appear to lie in a single low error basin. We show that averaging the weights of multiple models fine-tuned with different hyperparameter configurations often improves accuracy and robustness. Unlike a conventional ensemble, we may average many models without incurring any additional inference or memory costs -- we call the results \"model soups.\" When fine-tuning large pre-trained models such as CLIP, ALIGN, and a ViT-G pre-trained on JFT, our soup recipe provides significant improvements over the best model in a hyperparameter sweep on ImageNet. The resulting ViT-G model, which attains 90.94% top-1 accuracy on ImageNet, achieved a new state of the art. Furthermore, we show that the model soup approach extends to multiple image classification and natural language processing tasks, improves out-of-distribution performance, and improves zero-shot performance on new downstream tasks. Finally, we analytically relate the performance similarity of weight-averaging and logit-ensembling to flatness of the loss and confidence of the predictions, and validate this relation empirically. Code is available at https://github.com/mlfoundations/model-soups.",
+   "overview": "The conventional recipe for maximizing model accuracy is to (1) train multiple models with various hyperparameters and (2) pick the individual model which performs best on a held-out validation set, discarding the remainder.",
+   "problem": "",
+   "approach": "We show that averaging the weights of multiple models fine-tuned with different hyperparameter configurations often improves accuracy and robustness.",
+   "key_result": "The resulting ViT-G model, which attains 90.94% top-1 accuracy on ImageNet, achieved a new state of the art.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/数据与MLOps/数据集、特征与模型版本必须可追溯.md",
-     "title": "数据集、特征与模型版本必须可追溯",
-     "domain": "AI系统",
-     "topic": "数据与MLOps",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/蒸馏与模型合并：用小模型承接已验证的能力.md",
+     "title": "蒸馏与模型合并：用小模型承接已验证的能力",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
      "kind": "evidence"
     }
    ],
    "cites_survey": [],
    "has_deep_read": false,
-   "title_zh": "SURF：用数据增强的半监督奖励学习",
-   "title_en": "SURF: Semi-supervised Reward Learning with Data Augmentation for Feedback-efficient Preference-based Reinforcement Learning",
-   "problem_zh": "基于偏好的学习往往需要大量人类反馈，使得这类方法难以应用到多种场景。",
-   "approach_zh": "受这些方法近期成功的启发，提出 SURF：一个半监督奖励学习框架，利用大量未标注样本配合数据增强。",
+   "title_zh": "Model soups：多微调模型权重平均免费提精度",
+   "title_en": "Model soups: averaging weights of multiple fine-tuned models improves accuracy without increasing inference time",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2203.15556": {
@@ -714,16 +996,16 @@
    "key_result": "As a highlight, Chinchilla reaches a state-of-the-art average accuracy of 67.5% on the MMLU benchmark, greater than a 7% improvement over Gopher.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/Scaling Law把训练预算分配成可测量假设.md",
      "title": "Scaling Law 把训练预算分配成可测量假设",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/预训练数据决定模型能力上限.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/预训练数据决定模型能力上限.md",
      "title": "预训练数据决定模型能力上限",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -744,36 +1026,37 @@
    "approach_zh": "",
    "result_zh": "一个亮点：Chinchilla 在 MMLU 基准上取得 67.5% 的平均准确率，比 Gopher 提升超过 7%。"
   },
-  "2204.07196": {
-   "id": "2204.07196",
-   "title": "Testing distributional assumptions of learning algorithms",
+  "2204.01075": {
+   "id": "2204.01075",
+   "title": "Data Cards: Purposeful and Transparent Dataset Documentation for Responsible AI",
    "authors": [
-    "Ronitt Rubinfeld",
-    "Arsen Vasilyan"
+    "Mahima Pushkarna",
+    "Andrew Zaldivar",
+    "Oddur Kjartansson"
    ],
-   "published": "2022-04-14",
-   "primary": "cs.LG",
-   "url": "https://arxiv.org/abs/2204.07196",
-   "abstract": "There are many high dimensional function classes that have fast agnostic learning algorithms when assumptions on the distribution of examples can be made, such as Gaussianity or uniformity over the domain. But how can one be confident that data indeed satisfies such assumption, so that one can trust in output quality of the agnostic learning algorithm? We propose a model by which to systematically study the design of tester-learner pairs $(\\mathcal{A},\\mathcal{T})$, such that if the distribution on examples in the data passes the tester $\\mathcal{T}$ then one can safely trust the output of the agnostic learner $\\mathcal{A}$ on the data. To demonstrate the power of the model, we apply it to the classical problem of agnostically learning halfspaces under the standard Gaussian distribution and present a tester-learner pair with combined run-time of $n^{\\tilde{O}(1/ε^4)}$. This qualitatively matches that of the best known ordinary agnostic learning algorithms for this task. In contrast, finite sample Gaussianity testers do not exist for the $L_1$ and EMD distance measures. A key step is to show that half-spaces are well-approximated with low-degree polynomials relative to distributions with low-degree moments close to those of a Gaussian. We also go beyond spherically-symmetric distributions, and give a tester-learner pair for halfspaces under the uniform distribution on $\\{0,1\\}^n$ with combined run-time of $n^{\\tilde{O}(1/ε^4)}$. This is achieved using polynomial approximation theory and critical index machinery. We also show there exist some well-studied settings where $2^{\\tilde{O}(\\sqrt{n})}$ run-time agnostic learning algorithms are available, yet the combined run-times of tester-learner pairs must be as high as $2^{Ω(n)}$. On that account, the design of tester-learner pairs is a research direction in its own right independent of standard agnostic learning.",
-   "overview": "There are many high dimensional function classes that have fast agnostic learning algorithms when assumptions on the distribution of examples can be made, such as Gaussianity or uniformity over the domain.",
-   "problem": "To demonstrate the power of the model, we apply it to the classical problem of agnostically learning halfspaces under the standard Gaussian distribution and present a tester-learner pair with combined run-time of $n^{\\tilde{O}(1/ε^4)}$.",
-   "approach": "We propose a model by which to systematically study the design of tester-learner pairs $(\\mathcal{A},\\mathcal{T})$, such that if the distribution on examples in the data passes the tester $\\mathcal{T}$ then one can safely trust the output of the agnostic learner $\\mathcal{A}$ on the data.",
+   "published": "2022-04-03",
+   "primary": "cs.HC",
+   "url": "https://arxiv.org/abs/2204.01075",
+   "abstract": "As research and industry moves towards large-scale models capable of numerous downstream tasks, the complexity of understanding multi-modal datasets that give nuance to models rapidly increases. A clear and thorough understanding of a dataset's origins, development, intent, ethical considerations and evolution becomes a necessary step for the responsible and informed deployment of models, especially those in people-facing contexts and high-risk domains. However, the burden of this understanding often falls on the intelligibility, conciseness, and comprehensiveness of the documentation. It requires consistency and comparability across the documentation of all datasets involved, and as such documentation must be treated as a user-centric product in and of itself. In this paper, we propose Data Cards for fostering transparent, purposeful and human-centered documentation of datasets within the practical contexts of industry and research. Data Cards are structured summaries of essential facts about various aspects of ML datasets needed by stakeholders across a dataset's lifecycle for responsible AI development. These summaries provide explanations of processes and rationales that shape the data and consequently the models, such as upstream sources, data collection and annotation methods; training and evaluation methods, intended use; or decisions affecting model performance. We also present frameworks that ground Data Cards in real-world utility and human-centricity. Using two case studies, we report on desirable characteristics that support adoption across domains, organizational structures, and audience groups. Finally, we present lessons learned from deploying over 20 Data Cards.",
+   "overview": "As research and industry moves towards large-scale models capable of numerous downstream tasks, the complexity of understanding multi-modal datasets that give nuance to models rapidly increases.",
+   "problem": "However, the burden of this understanding often falls on the intelligibility, conciseness, and comprehensiveness of the documentation.",
+   "approach": "In this paper, we propose Data Cards for fostering transparent, purposeful and human-centered documentation of datasets within the practical contexts of industry and research.",
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/混合检索、重排与查询改写各自解决什么问题.md",
-     "title": "混合检索、重排与查询改写各自解决什么问题",
-     "domain": "AI系统",
-     "topic": "知识与检索",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/数据与MLOps/训练数据治理：来源、许可与污染决定语料的长期价值.md",
+     "title": "训练数据治理：来源、许可与污染决定语料的长期价值",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "数据与MLOps",
      "kind": "evidence"
     }
    ],
    "cites_survey": [],
    "has_deep_read": false,
-   "title_zh": "学习算法的分布假设检验",
-   "title_en": "Testing distributional assumptions of learning algorithms",
-   "problem_zh": "为展示该模型的能力，把它用于标准高斯分布下不可知地学习半空间这一经典问题，给出一个检验器-学习器组合，合计运行时间为 n^{Õ(1/ε⁴)}。",
-   "approach_zh": "提出一个模型来系统研究检验器-学习器对 (A, T) 的设计：如果数据分布通过了检验器 T，就可以放心地信任不可知学习器 A 在该数据上的输出。",
+   "title_zh": "Data Cards：面向负责任 AI 的数据集文档",
+   "title_en": "Data Cards: Purposeful and Transparent Dataset Documentation for Responsible AI",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2205.14135": {
@@ -794,7 +1077,15 @@
    "problem": "Approximate attention methods have attempted to address this problem by trading off model quality to reduce the compute complexity, but often do not achieve wall-clock speedup.",
    "approach": "We propose FlashAttention, an IO-aware exact attention algorithm that uses tiling to reduce the number of memory reads/writes between GPU high bandwidth memory (HBM) and GPU on-chip SRAM.",
    "key_result": "FlashAttention trains Transformers faster than existing baselines: 15% end-to-end wall-clock speedup on BERT-large (seq.",
-   "cites_evidence": [],
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/FlashAttention是IO感知的精确算法，不是近似.md",
+     "title": "FlashAttention是IO感知的精确算法，不是近似",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    }
+   ],
    "cites_survey": [
     {
      "path": "知识库管理/归档/AI系统内容缺口研究.md",
@@ -810,6 +1101,40 @@
    "problem_zh": "近似注意力方法试图用牺牲模型质量来降低计算复杂度，但往往拿不到实际的墙上时间加速。",
    "approach_zh": "提出 FlashAttention，一种考虑 IO 的精确注意力算法，通过分块减少 GPU 高带宽显存（HBM）与片上 SRAM 之间的读写次数。",
    "result_zh": "FlashAttention 训练 Transformer 比现有基线更快：在 BERT-large 上端到端墙上时间加速 15%。"
+  },
+  "2208.07339": {
+   "id": "2208.07339",
+   "title": "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale",
+   "authors": [
+    "Tim Dettmers",
+    "Mike Lewis",
+    "Younes Belkada",
+    "Luke Zettlemoyer"
+   ],
+   "published": "2022-08-15",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2208.07339",
+   "abstract": "Large language models have been widely adopted but require significant GPU memory for inference. We develop a procedure for Int8 matrix multiplication for feed-forward and attention projection layers in transformers, which cut the memory needed for inference by half while retaining full precision performance. With our method, a 175B parameter 16/32-bit checkpoint can be loaded, converted to Int8, and used immediately without performance degradation. This is made possible by understanding and working around properties of highly systematic emergent features in transformer language models that dominate attention and transformer predictive performance. To cope with these features, we develop a two-part quantization procedure, LLM.int8(). We first use vector-wise quantization with separate normalization constants for each inner product in the matrix multiplication, to quantize most of the features. However, for the emergent outliers, we also include a new mixed-precision decomposition scheme, which isolates the outlier feature dimensions into a 16-bit matrix multiplication while still more than 99.9% of values are multiplied in 8-bit. Using LLM.int8(), we show empirically it is possible to perform inference in LLMs with up to 175B parameters without any performance degradation. This result makes such models much more accessible, for example making it possible to use OPT-175B/BLOOM on a single server with consumer GPUs. We open-source our software.",
+   "overview": "Large language models have been widely adopted but require significant GPU memory for inference.",
+   "problem": "However, for the emergent outliers, we also include a new mixed-precision decomposition scheme, which isolates the outlier feature dimensions into a 16-bit matrix multiplication while still more than 99.9% of values are multiplied in 8-bit.",
+   "approach": "We develop a procedure for Int8 matrix multiplication for feed-forward and attention projection layers in transformers, which cut the memory needed for inference by half while retaining full precision performance.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/模型量化的精度经济学：位宽精度与显存的三角.md",
+     "title": "模型量化的精度经济学：位宽精度与显存的三角",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "LLM.int8()：把 Transformer 矩阵乘降到 8 位",
+   "title_en": "LLM.int8(): 8-bit Matrix Multiplication for Transformers at Scale",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
   },
   "2210.03629": {
    "id": "2210.03629",
@@ -833,10 +1158,59 @@
    "key_result": "On two interactive decision making benchmarks (ALFWorld and WebShop), ReAct outperforms imitation and reinforcement learning methods by an absolute success rate of 34% and 10% respectively, while being prompted with only one or two in-context examples.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型与上下文/上下文工程是在有限预算内构造决策现场.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/AI辅助研发必须形成证据闭环.md",
+     "title": "AI 辅助研发必须形成证据闭环",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/ReAct计划执行搜索：三种行动范式的适用边界.md",
+     "title": "ReAct计划执行搜索：三种行动范式的适用边界",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/上下文工程是在有限预算内构造决策现场.md",
      "title": "上下文工程是在有限预算内构造决策现场",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型与上下文",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/后端系统：在并发、失败与变化中维持服务/基础设施/基础设施选型先比较责任边界与故障模型.md",
+     "title": "基础设施选型先比较责任边界与故障模型",
+     "domain": "后端系统：在并发、失败与变化中维持服务",
+     "topic": "基础设施",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/性能工程：从用户等待到资源瓶颈/性能工程：从用户等待到资源瓶颈.md",
+     "title": "性能工程：从用户等待到资源瓶颈",
+     "domain": "",
+     "topic": "",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/性能工程：从用户等待到资源瓶颈/观测与诊断/性能问题定位.md",
+     "title": "性能问题定位方法",
+     "domain": "性能工程：从用户等待到资源瓶颈",
+     "topic": "观测与诊断",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/软件构建：让变化可以理解、验证与交付/架构与代码/架构组织高成本决策与演进边界.md",
+     "title": "架构组织高成本决策与演进边界",
+     "domain": "软件构建：让变化可以理解、验证与交付",
+     "topic": "架构与代码",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/后端系统：在并发、失败与变化中维持服务/任务与并发/调度必须同时处理优先级、公平与背压.md",
+     "title": "调度必须同时处理优先级、公平与背压",
+     "domain": "后端系统：在并发、失败与变化中维持服务",
+     "topic": "任务与并发",
      "kind": "evidence"
     }
    ],
@@ -909,7 +1283,15 @@
    "problem": "However, existing methods cannot maintain accuracy and hardware efficiency at the same time.",
    "approach": "We propose SmoothQuant, a training-free, accuracy-preserving, and general-purpose post-training quantization (PTQ) solution to enable 8-bit weight, 8-bit activation (W8A8) quantization for LLMs.",
    "key_result": "",
-   "cites_evidence": [],
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/模型量化的精度经济学：位宽精度与显存的三角.md",
+     "title": "模型量化的精度经济学：位宽精度与显存的三角",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    }
+   ],
    "cites_survey": [
     {
      "path": "知识库管理/归档/AI系统内容缺口研究.md",
@@ -942,7 +1324,15 @@
    "problem": "",
    "approach": "In this work we introduce speculative decoding - an algorithm to sample from autoregressive models faster without any changes to the outputs, by computing several tokens in parallel.",
    "key_result": "",
-   "cites_evidence": [],
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/投机采样与推测解码：小模型带路大模型确认.md",
+     "title": "投机采样与推测解码：小模型带路大模型确认",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
    "cites_survey": [
     {
      "path": "知识库管理/归档/AI系统内容缺口研究.md",
@@ -993,6 +1383,42 @@
    "approach_zh": "提出通过「假设文档嵌入」（HyDE）来转换问题。",
    "result_zh": ""
   },
+  "2302.01318": {
+   "id": "2302.01318",
+   "title": "Accelerating Large Language Model Decoding with Speculative Sampling",
+   "authors": [
+    "Charlie Chen",
+    "Sebastian Borgeaud",
+    "Geoffrey Irving",
+    "Jean-Baptiste Lespiau",
+    "Laurent Sifre",
+    "John Jumper"
+   ],
+   "published": "2023-02-02",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2302.01318",
+   "abstract": "We present speculative sampling, an algorithm for accelerating transformer decoding by enabling the generation of multiple tokens from each transformer call. Our algorithm relies on the observation that the latency of parallel scoring of short continuations, generated by a faster but less powerful draft model, is comparable to that of sampling a single token from the larger target model. This is combined with a novel modified rejection sampling scheme which preserves the distribution of the target model within hardware numerics. We benchmark speculative sampling with Chinchilla, a 70 billion parameter language model, achieving a 2-2.5x decoding speedup in a distributed setup, without compromising the sample quality or making modifications to the model itself.",
+   "overview": "We present speculative sampling, an algorithm for accelerating transformer decoding by enabling the generation of multiple tokens from each transformer call.",
+   "problem": "",
+   "approach": "We present speculative sampling, an algorithm for accelerating transformer decoding by enabling the generation of multiple tokens from each transformer call.",
+   "key_result": "We benchmark speculative sampling with Chinchilla, a 70 billion parameter language model, achieving a 2-2.5x decoding speedup in a distributed setup, without compromising the sample quality or making modifications to the model itself.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/投机采样与推测解码：小模型带路大模型确认.md",
+     "title": "投机采样与推测解码：小模型带路大模型确认",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "投机采样：加速大模型逐词解码",
+   "title_en": "Accelerating Large Language Model Decoding with Speculative Sampling",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
   "2302.12173": {
    "id": "2302.12173",
    "title": "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection",
@@ -1014,9 +1440,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/安全与治理/提示注入和工具越权是不同威胁.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/安全与治理/提示注入和工具越权是不同威胁.md",
      "title": "提示注入和工具越权是不同威胁",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "安全与治理",
      "kind": "evidence"
     }
@@ -1027,6 +1453,48 @@
    "title_en": "Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection",
    "problem_zh": "",
    "approach_zh": "展示处理检索到的提示可以达到任意代码执行的效果，操纵应用的功能，并控制其他 API 是否以及如何被调用。",
+   "result_zh": ""
+  },
+  "2303.09752": {
+   "id": "2303.09752",
+   "title": "CoLT5: Faster Long-Range Transformers with Conditional Computation",
+   "authors": [
+    "Joshua Ainslie",
+    "Tao Lei",
+    "Michiel de Jong",
+    "Santiago Ontañón",
+    "Siddhartha Brahma",
+    "Yury Zemlyanskiy",
+    "David Uthus",
+    "Mandy Guo",
+    "James Lee-Thorp",
+    "Yi Tay",
+    "Yun-Hsuan Sung",
+    "Sumit Sanghai"
+   ],
+   "published": "2023-03-17",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2303.09752",
+   "abstract": "Many natural language processing tasks benefit from long inputs, but processing long documents with Transformers is expensive -- not only due to quadratic attention complexity but also from applying feedforward and projection layers to every token. However, not all tokens are equally important, especially for longer documents. We propose CoLT5, a long-input Transformer model that builds on this intuition by employing conditional computation, devoting more resources to important tokens in both feedforward and attention layers. We show that CoLT5 achieves stronger performance than LongT5 with much faster training and inference, achieving SOTA on the long-input SCROLLS benchmark. Moreover, CoLT5 can effectively and tractably make use of extremely long inputs, showing strong gains up to 64k input length.",
+   "overview": "Many natural language processing tasks benefit from long inputs, but processing long documents with Transformers is expensive -- not only due to quadratic attention complexity but also from applying feedforward and projection layers to every token.",
+   "problem": "Many natural language processing tasks benefit from long inputs, but processing long documents with Transformers is expensive -- not only due to quadratic attention complexity but also from applying feedforward and projection layers to every token.",
+   "approach": "We propose CoLT5, a long-input Transformer model that builds on this intuition by employing conditional computation, devoting more resources to important tokens in both feedforward and attention layers.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/蒸馏与模型合并：用小模型承接已验证的能力.md",
+     "title": "蒸馏与模型合并：用小模型承接已验证的能力",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "CoLT5：条件计算让长文 Transformer 更快",
+   "title_en": "CoLT5: Faster Long-Range Transformers with Conditional Computation",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2303.11366": {
@@ -1050,9 +1518,9 @@
    "key_result": "For example, Reflexion achieves a 91% pass@1 accuracy on the HumanEval coding benchmark, surpassing the previous state-of-the-art GPT-4 that achieves 80%.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/Agent与工作流/反思要有外部锚点.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/反思要有外部锚点.md",
      "title": "反思要有外部锚点，否则只是自我说服",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "Agent与工作流",
      "kind": "evidence"
     }
@@ -1064,6 +1532,49 @@
    "problem_zh": "语言智能体很难快速有效地从试错中学习，因为传统强化学习需要大量训练样本和昂贵的模型微调。",
    "approach_zh": "提出 Reflexion，不通过更新权重，而是通过语言反馈来强化语言智能体。",
    "result_zh": "在 HumanEval 编程基准上，Reflexion 取得 91% 的 pass@1 准确率，超过此前最好的 GPT-4（80%）。"
+  },
+  "2304.03442": {
+   "id": "2304.03442",
+   "title": "Generative Agents: Interactive Simulacra of Human Behavior",
+   "authors": [
+    "Joon Sung Park",
+    "Joseph C. O'Brien",
+    "Carrie J. Cai",
+    "Meredith Ringel Morris",
+    "Percy Liang",
+    "Michael S. Bernstein"
+   ],
+   "published": "2023-04-07",
+   "primary": "cs.HC",
+   "url": "https://arxiv.org/abs/2304.03442",
+   "abstract": "Believable proxies of human behavior can empower interactive applications ranging from immersive environments to rehearsal spaces for interpersonal communication to prototyping tools. In this paper, we introduce generative agents--computational software agents that simulate believable human behavior. Generative agents wake up, cook breakfast, and head to work; artists paint, while authors write; they form opinions, notice each other, and initiate conversations; they remember and reflect on days past as they plan the next day. To enable generative agents, we describe an architecture that extends a large language model to store a complete record of the agent's experiences using natural language, synthesize those memories over time into higher-level reflections, and retrieve them dynamically to plan behavior. We instantiate generative agents to populate an interactive sandbox environment inspired by The Sims, where end users can interact with a small town of twenty five agents using natural language. In an evaluation, these generative agents produce believable individual and emergent social behaviors: for example, starting with only a single user-specified notion that one agent wants to throw a Valentine's Day party, the agents autonomously spread invitations to the party over the next two days, make new acquaintances, ask each other out on dates to the party, and coordinate to show up for the party together at the right time. We demonstrate through ablation that the components of our agent architecture--observation, planning, and reflection--each contribute critically to the believability of agent behavior. By fusing large language models with computational, interactive agents, this work introduces architectural and interaction patterns for enabling believable simulations of human behavior.",
+   "overview": "Believable proxies of human behavior can empower interactive applications ranging from immersive environments to rehearsal spaces for interpersonal communication to prototyping tools.",
+   "problem": "",
+   "approach": "In this paper, we introduce generative agents--computational software agents that simulate believable human behavior.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/记忆写入治理：来源、主体与过期决定记忆的可信度.md",
+     "title": "记忆写入治理：来源、主体与过期决定记忆的可信度",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/跨会话状态的一致性先于记忆的长度.md",
+     "title": "跨会话状态的一致性先于记忆的长度",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "生成式智能体：人类行为的交互式模拟",
+   "title_en": "Generative Agents: Interactive Simulacra of Human Behavior",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
   },
   "2304.08485": {
    "id": "2304.08485",
@@ -1084,9 +1595,9 @@
    "key_result": "When fine-tuned on Science QA, the synergy of LLaVA and GPT-4 achieves a new state-of-the-art accuracy of 92.53%.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
      "title": "多模态模型把不同输入映射到共同推理接口",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -1098,6 +1609,46 @@
    "problem_zh": "",
    "approach_zh": "首次尝试用纯语言的 GPT-4 生成多模态的语言-图像指令跟随数据。",
    "result_zh": "在 Science QA 上微调后，LLaVA 与 GPT-4 的配合达到 92.53% 的新最高准确率。"
+  },
+  "2305.05176": {
+   "id": "2305.05176",
+   "title": "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance",
+   "authors": [
+    "Lingjiao Chen",
+    "Matei Zaharia",
+    "James Zou"
+   ],
+   "published": "2023-05-09",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2305.05176",
+   "abstract": "There is a rapidly growing number of large language models (LLMs) that users can query for a fee. We review the cost associated with querying popular LLM APIs, e.g. GPT-4, ChatGPT, J1-Jumbo, and find that these models have heterogeneous pricing structures, with fees that can differ by two orders of magnitude. In particular, using LLMs on large collections of queries and text can be expensive. Motivated by this, we outline and discuss three types of strategies that users can exploit to reduce the inference cost associated with using LLMs: 1) prompt adaptation, 2) LLM approximation, and 3) LLM cascade. As an example, we propose FrugalGPT, a simple yet flexible instantiation of LLM cascade which learns which combinations of LLMs to use for different queries in order to reduce cost and improve accuracy. Our experiments show that FrugalGPT can match the performance of the best individual LLM (e.g. GPT-4) with up to 98% cost reduction or improve the accuracy over GPT-4 by 4% with the same cost. The ideas and findings presented here lay a foundation for using LLMs sustainably and efficiently.",
+   "overview": "There is a rapidly growing number of large language models (LLMs) that users can query for a fee.",
+   "problem": "In particular, using LLMs on large collections of queries and text can be expensive.",
+   "approach": "As an example, we propose FrugalGPT, a simple yet flexible instantiation of LLM cascade which learns which combinations of LLMs to use for different queries in order to reduce cost and improve accuracy.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/推理服务的单位请求成本从token定价推出来.md",
+     "title": "推理服务的单位请求成本从token定价推出来",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/模型路由与级联：小模型过滤大模型兜底的省钱结构.md",
+     "title": "模型路由与级联：小模型过滤大模型兜底的省钱结构",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "FrugalGPT：在降本的同时用好大语言模型",
+   "title_en": "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
   },
   "2305.06983": {
    "id": "2305.06983",
@@ -1123,9 +1674,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -1136,6 +1687,43 @@
    "title_en": "Active Retrieval Augmented Generation",
    "problem_zh": "在长文本生成这类更一般的场景中，需要在生成过程中持续收集信息，只在开头检索一次是不够的。",
    "approach_zh": "提出 FLARE（Forward-Looking Active REtrieval），迭代地用对下一句的预测来预估后续内容，再以此为查询检索文档；若生成的句子含有低置信度词元，就检索并重写。",
+   "result_zh": ""
+  },
+  "2305.10601": {
+   "id": "2305.10601",
+   "title": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models",
+   "authors": [
+    "Shunyu Yao",
+    "Dian Yu",
+    "Jeffrey Zhao",
+    "Izhak Shafran",
+    "Thomas L. Griffiths",
+    "Yuan Cao",
+    "Karthik Narasimhan"
+   ],
+   "published": "2023-05-17",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2305.10601",
+   "abstract": "Language models are increasingly being deployed for general problem solving across a wide range of tasks, but are still confined to token-level, left-to-right decision-making processes during inference. This means they can fall short in tasks that require exploration, strategic lookahead, or where initial decisions play a pivotal role. To surmount these challenges, we introduce a new framework for language model inference, Tree of Thoughts (ToT), which generalizes over the popular Chain of Thought approach to prompting language models, and enables exploration over coherent units of text (thoughts) that serve as intermediate steps toward problem solving. ToT allows LMs to perform deliberate decision making by considering multiple different reasoning paths and self-evaluating choices to decide the next course of action, as well as looking ahead or backtracking when necessary to make global choices. Our experiments show that ToT significantly enhances language models' problem-solving abilities on three novel tasks requiring non-trivial planning or search: Game of 24, Creative Writing, and Mini Crosswords. For instance, in Game of 24, while GPT-4 with chain-of-thought prompting only solved 4% of tasks, our method achieved a success rate of 74%. Code repo with all prompts: https://github.com/princeton-nlp/tree-of-thought-llm.",
+   "overview": "Language models are increasingly being deployed for general problem solving across a wide range of tasks, but are still confined to token-level, left-to-right decision-making processes during inference.",
+   "problem": "Language models are increasingly being deployed for general problem solving across a wide range of tasks, but are still confined to token-level, left-to-right decision-making processes during inference.",
+   "approach": "To surmount these challenges, we introduce a new framework for language model inference, Tree of Thoughts (ToT), which generalizes over the popular Chain of Thought approach to prompting language models, and enables exploration over coherent units of text (thoughts) that serve as intermediate steps toward problem so…",
+   "key_result": "For instance, in Game of 24, while GPT-4 with chain-of-thought prompting only solved 4% of tasks, our method achieved a success rate of 74%.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/缺陷分析：从个案到体系/影响判断/修复优先级排序修复顺序的决策框架.md",
+     "title": "修复优先级排序修复顺序的决策框架",
+     "domain": "缺陷分析：从个案到体系",
+     "topic": "影响判断",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "思维树：把推理组织成可回溯的分支探索",
+   "title_en": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2305.18290": {
@@ -1159,9 +1747,16 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/LoRA与参数高效微调：改行为不改基座.md",
+     "title": "LoRA与参数高效微调：改行为不改基座",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/后训练对齐与微调改变行为边界.md",
      "title": "后训练对齐与微调改变行为边界",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -1205,9 +1800,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/后训练对齐与微调改变行为边界.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/后训练对齐与微调改变行为边界.md",
      "title": "后训练对齐与微调改变行为边界",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -1243,7 +1838,15 @@
    "problem": "However, the astronomical model size and the limited hardware resource pose significant deployment challenges.",
    "approach": "We propose Activation-aware Weight Quantization (AWQ), a hardware-friendly approach for LLM low-bit weight-only quantization.",
    "key_result": "With kernel fusion and platform-aware weight packing, TinyChat offers more than 3x speedup over the Huggingface FP16 implementation on both desktop and mobile GPUs.",
-   "cites_evidence": [],
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/模型量化的精度经济学：位宽精度与显存的三角.md",
+     "title": "模型量化的精度经济学：位宽精度与显存的三角",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    }
+   ],
    "cites_survey": [
     {
      "path": "知识库管理/归档/AI系统内容缺口研究.md",
@@ -1288,9 +1891,9 @@
    "key_result": "Our results reveal that strong LLM judges like GPT-4 can match both controlled and crowdsourced human preferences well, achieving over 80% agreement, the same level of agreement between humans.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/Agent与工作流/反思要有外部锚点.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/反思要有外部锚点.md",
      "title": "反思要有外部锚点，否则只是自我说服",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "Agent与工作流",
      "kind": "evidence"
     }
@@ -1343,9 +1946,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/位置编码和长上下文限制有效利用.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/位置编码和长上下文限制有效利用.md",
      "title": "位置编码和长上下文限制有效利用",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -1356,6 +1959,96 @@
    "title_en": "Benchmarking Neural Network Training Algorithms",
    "problem_zh": "要让训练真正提速，需要新的基准来解决训练算法经验对比中的三个基本问题：如何判定训练完成并精确测量训练时间；如何在固定资源下公平比较；以及如何排除实现细节带来的差异。",
    "approach_zh": "提出 AlgoPerf 训练算法基准：在固定硬件上跑多个负载，以「出结果的时间」为指标，具备竞争性。",
+   "result_zh": ""
+  },
+  "2307.03172": {
+   "id": "2307.03172",
+   "title": "Lost in the Middle: How Language Models Use Long Contexts",
+   "authors": [
+    "Nelson F. Liu",
+    "Kevin Lin",
+    "John Hewitt",
+    "Ashwin Paranjape",
+    "Michele Bevilacqua",
+    "Fabio Petroni",
+    "Percy Liang"
+   ],
+   "published": "2023-07-06",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2307.03172",
+   "abstract": "While recent language models have the ability to take long contexts as input, relatively little is known about how well they use longer context. We analyze the performance of language models on two tasks that require identifying relevant information in their input contexts: multi-document question answering and key-value retrieval. We find that performance can degrade significantly when changing the position of relevant information, indicating that current language models do not robustly make use of information in long input contexts. In particular, we observe that performance is often highest when relevant information occurs at the beginning or end of the input context, and significantly degrades when models must access relevant information in the middle of long contexts, even for explicitly long-context models. Our analysis provides a better understanding of how language models use their input context and provides new evaluation protocols for future long-context language models.",
+   "overview": "While recent language models have the ability to take long contexts as input, relatively little is known about how well they use longer context.",
+   "problem": "",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/上下文工程的分层设计：系统提示工具结果与记忆.md",
+     "title": "上下文工程的分层设计：系统提示工具结果与记忆",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/多轮对话要管理上下文而不是累积.md",
+     "title": "多轮对话要管理上下文而不是累积它",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "迷失在中间：长上下文里模型如何使用信息",
+   "title_en": "Lost in the Middle: How Language Models Use Long Contexts",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2307.09702": {
+   "id": "2307.09702",
+   "title": "Efficient Guided Generation for Large Language Models",
+   "authors": [
+    "Brandon T. Willard",
+    "Rémi Louf"
+   ],
+   "published": "2023-07-19",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2307.09702",
+   "abstract": "In this article we show how the problem of neural text generation can be constructively reformulated in terms of transitions between the states of a finite-state machine. This framework leads to an efficient approach to guiding text generation with regular expressions and context-free grammars by allowing the construction of an index over a language model's vocabulary. The approach is model agnostic, allows one to enforce domain-specific knowledge and constraints, and enables the construction of reliable interfaces by guaranteeing the structure of the generated text. It adds little overhead to the token sequence generation process and significantly outperforms existing solutions. An implementation is provided in the open source Python library Outlines",
+   "overview": "In this article we show how the problem of neural text generation can be constructively reformulated in terms of transitions between the states of a finite-state machine.",
+   "problem": "In this article we show how the problem of neural text generation can be constructively reformulated in terms of transitions between the states of a finite-state machine.",
+   "approach": "In this article we show how the problem of neural text generation can be constructively reformulated in terms of transitions between the states of a finite-state machine.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/模型提出候选，系统定义正确性.md",
+     "title": "模型提出候选，系统定义正确性",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/结构化输出与约束解码：schema约束形状，事实另需验证.md",
+     "title": "结构化输出与约束解码：schema约束形状，事实另需验证",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/结构化输出的约束解码：让模型输出可解析.md",
+     "title": "结构化输出的约束解码：让模型输出可解析",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "GE：可控引导解码避开事实错误",
+   "title_en": "Efficient Guided Generation for Large Language Models",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2308.08155": {
@@ -1387,16 +2080,16 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/Agent与工作流/任务分解的质量决定Agent的上限.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/任务分解的质量决定Agent的上限.md",
      "title": "任务分解的质量决定 Agent 的上限",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "Agent与工作流",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/Agent与工作流/多智能体只在能并行或需要独立上下文时才值得.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/多智能体只在能并行或需要独立上下文时才值得.md",
      "title": "多智能体只在能并行或需要独立上下文时才值得",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "Agent与工作流",
      "kind": "evidence"
     }
@@ -1433,9 +2126,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/多模态模型把不同输入映射到共同推理接口.md",
      "title": "多模态模型把不同输入映射到共同推理接口",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -1472,23 +2165,44 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/AI系统工程：把模型能力变成生产能力.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/AI系统工程：把模型能力变成生产能力.md",
      "title": "AI 系统工程：把模型能力变成生产能力",
      "domain": "",
      "topic": "",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/推理服务与平台/批处理、KV缓存、量化与并行如何改变服务容量.md",
-     "title": "批处理、KV 缓存、量化与并行如何改变服务容量",
-     "domain": "AI系统",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/Agent的缓存与结果复用.md",
+     "title": "Agent 的缓存与结果复用",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "质量与运营",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/FlashAttention是IO感知的精确算法，不是近似.md",
+     "title": "FlashAttention是IO感知的精确算法，不是近似",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "推理服务与平台",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/KV缓存与上下文长度的显存账：为什么长上下文贵.md",
+     "title": "KV缓存与上下文长度的显存账：为什么长上下文贵",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/批处理、KV缓存、量化与并行如何改变服务容量.md",
+     "title": "批处理、KV 缓存、量化与并行如何改变服务容量",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/推理服务的核心矛盾是延迟、吞吐、显存与质量.md",
      "title": "推理服务的核心矛盾是延迟、吞吐、显存与质量",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "推理服务与平台",
      "kind": "evidence"
     }
@@ -1528,9 +2242,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/质量与运营/RAG评测要分离检索质量与生成质量.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/RAG评测要分离检索质量与生成质量.md",
      "title": "RAG 评测要分离检索质量与生成质量",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "质量与运营",
      "kind": "evidence"
     }
@@ -1541,6 +2255,43 @@
    "title_en": "Ragas: Automated Evaluation of Retrieval Augmented Generation",
    "problem_zh": "评测 RAG 架构很困难，因为要同时考虑多个维度：检索系统能否找到相关且聚焦的上下文、LLM 能否忠实地利用这些上下文，以及生成本身的质量。",
    "approach_zh": "提出 Ragas（Retrieval Augmented Generation Assessment），一个无需参考答案即可评测 RAG 管道的框架。",
+   "result_zh": ""
+  },
+  "2310.08560": {
+   "id": "2310.08560",
+   "title": "MemGPT: Towards LLMs as Operating Systems",
+   "authors": [
+    "Charles Packer",
+    "Sarah Wooders",
+    "Kevin Lin",
+    "Vivian Fang",
+    "Shishir G. Patil",
+    "Ion Stoica",
+    "Joseph E. Gonzalez"
+   ],
+   "published": "2023-10-12",
+   "primary": "cs.AI",
+   "url": "https://arxiv.org/abs/2310.08560",
+   "abstract": "Large language models (LLMs) have revolutionized AI, but are constrained by limited context windows, hindering their utility in tasks like extended conversations and document analysis. To enable using context beyond limited context windows, we propose virtual context management, a technique drawing inspiration from hierarchical memory systems in traditional operating systems that provide the appearance of large memory resources through data movement between fast and slow memory. Using this technique, we introduce MemGPT (Memory-GPT), a system that intelligently manages different memory tiers in order to effectively provide extended context within the LLM's limited context window, and utilizes interrupts to manage control flow between itself and the user. We evaluate our OS-inspired design in two domains where the limited context windows of modern LLMs severely handicaps their performance: document analysis, where MemGPT is able to analyze large documents that far exceed the underlying LLM's context window, and multi-session chat, where MemGPT can create conversational agents that remember, reflect, and evolve dynamically through long-term interactions with their users. We release MemGPT code and data for our experiments at https://memgpt.ai.",
+   "overview": "Large language models (LLMs) have revolutionized AI, but are constrained by limited context windows, hindering their utility in tasks like extended conversations and document analysis.",
+   "problem": "Large language models (LLMs) have revolutionized AI, but are constrained by limited context windows, hindering their utility in tasks like extended conversations and document analysis.",
+   "approach": "To enable using context beyond limited context windows, we propose virtual context management, a technique drawing inspiration from hierarchical memory systems in traditional operating systems that provide the appearance of large memory resources through data movement between fast and slow memory.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型与上下文/上下文工程的分层设计：系统提示工具结果与记忆.md",
+     "title": "上下文工程的分层设计：系统提示工具结果与记忆",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型与上下文",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "MemGPT：把 LLM 当操作系统来管内存",
+   "title_en": "MemGPT: Towards LLMs as Operating Systems",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2310.11511": {
@@ -1563,9 +2314,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -1584,6 +2335,46 @@
    "title_en": "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection",
    "problem_zh": "检索增强生成（RAG）这类把相关知识检索出来补给语言模型的做法，能减少上述问题。",
    "approach_zh": "提出 Self-RAG 框架，通过检索与自我反思提升语言模型的质量和事实性。",
+   "result_zh": ""
+  },
+  "2312.10997": {
+   "id": "2312.10997",
+   "title": "Retrieval-Augmented Generation for Large Language Models: A Survey",
+   "authors": [
+    "Yunfan Gao",
+    "Yun Xiong",
+    "Xinyu Gao",
+    "Kangxiang Jia",
+    "Jinliu Pan",
+    "Yuxi Bi",
+    "Yi Dai",
+    "Jiawei Sun",
+    "Meng Wang",
+    "Haofen Wang"
+   ],
+   "published": "2023-12-18",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2312.10997",
+   "abstract": "Large Language Models (LLMs) showcase impressive capabilities but encounter challenges like hallucination, outdated knowledge, and non-transparent, untraceable reasoning processes. Retrieval-Augmented Generation (RAG) has emerged as a promising solution by incorporating knowledge from external databases. This enhances the accuracy and credibility of the generation, particularly for knowledge-intensive tasks, and allows for continuous knowledge updates and integration of domain-specific information. RAG synergistically merges LLMs' intrinsic knowledge with the vast, dynamic repositories of external databases. This comprehensive review paper offers a detailed examination of the progression of RAG paradigms, encompassing the Naive RAG, the Advanced RAG, and the Modular RAG. It meticulously scrutinizes the tripartite foundation of RAG frameworks, which includes the retrieval, the generation and the augmentation techniques. The paper highlights the state-of-the-art technologies embedded in each of these critical components, providing a profound understanding of the advancements in RAG systems. Furthermore, this paper introduces up-to-date evaluation framework and benchmark. At the end, this article delineates the challenges currently faced and points out prospective avenues for research and development.",
+   "overview": "Large Language Models (LLMs) showcase impressive capabilities but encounter challenges like hallucination, outdated knowledge, and non-transparent, untraceable reasoning processes.",
+   "problem": "Large Language Models (LLMs) showcase impressive capabilities but encounter challenges like hallucination, outdated knowledge, and non-transparent, untraceable reasoning processes.",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/多模态RAG：图表、PDF与音频的证据不能只靠文本化.md",
+     "title": "多模态RAG：图表、PDF与音频的证据不能只靠文本化",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "RAG 综述：检索增强生成的全景图谱",
+   "title_en": "Retrieval-Augmented Generation for Large Language Models: A Survey",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2401.04088": {
@@ -1627,16 +2418,23 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/MoE用稀疏激活换取参数容量和通信复杂度.md",
      "title": "MoE 用稀疏激活换取参数容量和通信复杂度",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/模型基础与训练/预训练数据决定模型能力上限.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/MoE路由的工程问题：负载不均与显存碎片.md",
+     "title": "MoE路由的工程问题：负载不均与显存碎片",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "模型基础与训练",
+     "kind": "evidence"
+    },
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/模型基础与训练/预训练数据决定模型能力上限.md",
      "title": "预训练数据决定模型能力上限",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "模型基础与训练",
      "kind": "evidence"
     }
@@ -1673,9 +2471,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/向量数据库不是RAG本身.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/向量数据库不是RAG本身.md",
      "title": "向量数据库不是 RAG 本身",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -1707,9 +2505,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -1751,16 +2549,16 @@
    "key_result": "On question-answering tasks that involve complex, multi-step reasoning, we show state-of-the-art results; for example, by coupling RAPTOR retrieval with the use of GPT-4, we can improve the best performance on the QuALITY benchmark by 20% in absolute accuracy.",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
      "title": "GraphRAG 适合关系与全局问题但成本更高",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -1780,6 +2578,81 @@
    "problem_zh": "多数现有方法只从语料里检索短的连续片段，难以形成对文档整体脉络的理解。",
    "approach_zh": "递归地对文本块做嵌入、聚类和摘要，自底向上构建一棵具有不同摘要层级的树。",
    "result_zh": "取得当前最佳效果：把 RAPTOR 检索与 GPT-4 结合，在 QuALITY 基准上把最好成绩提升了 20 个百分点（绝对准确率）。"
+  },
+  "2402.01030": {
+   "id": "2402.01030",
+   "title": "Executable Code Actions Elicit Better LLM Agents",
+   "authors": [
+    "Xingyao Wang",
+    "Yangyi Chen",
+    "Lifan Yuan",
+    "Yizhe Zhang",
+    "Yunzhu Li",
+    "Hao Peng",
+    "Heng Ji"
+   ],
+   "published": "2024-02-01",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2402.01030",
+   "abstract": "Large Language Model (LLM) agents, capable of performing a broad range of actions, such as invoking tools and controlling robots, show great potential in tackling real-world challenges. LLM agents are typically prompted to produce actions by generating JSON or text in a pre-defined format, which is usually limited by constrained action space (e.g., the scope of pre-defined tools) and restricted flexibility (e.g., inability to compose multiple tools). This work proposes to use executable Python code to consolidate LLM agents' actions into a unified action space (CodeAct). Integrated with a Python interpreter, CodeAct can execute code actions and dynamically revise prior actions or emit new actions upon new observations through multi-turn interactions. Our extensive analysis of 17 LLMs on API-Bank and a newly curated benchmark shows that CodeAct outperforms widely used alternatives (up to 20% higher success rate). The encouraging performance of CodeAct motivates us to build an open-source LLM agent that interacts with environments by executing interpretable code and collaborates with users using natural language. To this end, we collect an instruction-tuning dataset CodeActInstruct that consists of 7k multi-turn interactions using CodeAct. We show that it can be used with existing data to improve models in agent-oriented tasks without compromising their general capability. CodeActAgent, finetuned from Llama2 and Mistral, is integrated with Python interpreter and uniquely tailored to perform sophisticated tasks (e.g., model training) using existing libraries and autonomously self-debug.",
+   "overview": "Large Language Model (LLM) agents, capable of performing a broad range of actions, such as invoking tools and controlling robots, show great potential in tackling real-world challenges.",
+   "problem": "Large Language Model (LLM) agents, capable of performing a broad range of actions, such as invoking tools and controlling robots, show great potential in tackling real-world challenges.",
+   "approach": "We show that it can be used with existing data to improve models in agent-oriented tasks without compromising their general capability.",
+   "key_result": "Our extensive analysis of 17 LLMs on API-Bank and a newly curated benchmark shows that CodeAct outperforms widely used alternatives (up to 20% higher success rate).",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/代码智能体需要结构索引、任务探索与运行证据.md",
+     "title": "代码智能体需要结构索引、任务探索与运行证据",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "CodeAct：用可执行代码统一智能体的动作空间",
+   "title_en": "Executable Code Actions Elicit Better LLM Agents",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2403.02310": {
+   "id": "2403.02310",
+   "title": "Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve",
+   "authors": [
+    "Amey Agrawal",
+    "Nitin Kedia",
+    "Ashish Panwar",
+    "Jayashree Mohan",
+    "Nipun Kwatra",
+    "Bhargav S. Gulavani",
+    "Alexey Tumanov",
+    "Ramachandran Ramjee"
+   ],
+   "published": "2024-03-04",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2403.02310",
+   "abstract": "Each LLM serving request goes through two phases. The first is prefill which processes the entire input prompt and produces the first output token and the second is decode which generates the rest of output tokens, one-at-a-time. Prefill iterations have high latency but saturate GPU compute due to parallel processing of the input prompt. In contrast, decode iterations have low latency but also low compute utilization because a decode iteration processes only a single token per request. This makes batching highly effective for decodes and consequently for overall throughput. However, batching multiple requests leads to an interleaving of prefill and decode iterations which makes it challenging to achieve both high throughput and low latency. We introduce an efficient LLM inference scheduler, Sarathi-Serve, to address this throughput-latency tradeoff. Sarathi-Serve introduces chunked-prefills which splits a prefill request into near equal sized chunks and creates stall-free schedules that adds new requests in a batch without pausing ongoing decodes. Stall-free scheduling unlocks the opportunity to improve throughput with large batch sizes while minimizing the effect of batching on latency. Furthermore, uniform batches in Sarathi-Serve ameliorate the imbalance between iterations resulting in minimal pipeline bubbles. Our techniques yield significant improvements in inference performance across models and hardware under tail latency constraints. For Mistral-7B on single A100 GPUs, we achieve 2.6x higher serving capacity and up to 3.7x higher serving capacity for the Yi-34B model on two A100 GPUs as compared to vLLM. When used with pipeline parallelism on Falcon-180B, Sarathi-Serve provides up to 5.6x gain in the end-to-end serving capacity. The source code for Sarathi-Serve is available at https://github.com/microsoft/sarathi-serve.",
+   "overview": "Each LLM serving request goes through two phases.",
+   "problem": "However, batching multiple requests leads to an interleaving of prefill and decode iterations which makes it challenging to achieve both high throughput and low latency.",
+   "approach": "We introduce an efficient LLM inference scheduler, Sarathi-Serve, to address this throughput-latency tradeoff.",
+   "key_result": "For Mistral-7B on single A100 GPUs, we achieve 2.6x higher serving capacity and up to 3.7x",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/Prefill与Decode决定LLM服务如何调度.md",
+     "title": "Prefill 与 Decode 决定 LLM 服务如何调度",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Sarathi-Serve：LLM 推理吞吐与延迟的调和",
+   "title_en": "Taming Throughput-Latency Tradeoff in LLM Inference with Sarathi-Serve",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
   },
   "2403.14403": {
    "id": "2403.14403",
@@ -1801,9 +2674,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -1814,6 +2687,41 @@
    "title_en": "Adaptive-RAG: Learning to Adapt Retrieval-Augmented Large Language Models through Question Complexity",
    "problem_zh": "已有方法面对不同复杂度的问题时，要么用多余的计算开销处理简单问题，要么处理不了复杂的多步问题；而用户的请求并不总是落在「简单」或「复杂」的某一端。",
    "approach_zh": "提出自适应问答框架，按问题复杂度在从最简到最复杂的策略之间动态选择，交给检索增强的 LLM 执行。",
+   "result_zh": ""
+  },
+  "2404.12272": {
+   "id": "2404.12272",
+   "title": "Who Validates the Validators? Aligning LLM-Assisted Evaluation of LLM Outputs with Human Preferences",
+   "authors": [
+    "Shreya Shankar",
+    "J. D. Zamfirescu-Pereira",
+    "Björn Hartmann",
+    "Aditya G. Parameswaran",
+    "Ian Arawjo"
+   ],
+   "published": "2024-04-18",
+   "primary": "cs.HC",
+   "url": "https://arxiv.org/abs/2404.12272",
+   "abstract": "Due to the cumbersome nature of human evaluation and limitations of code-based evaluation, Large Language Models (LLMs) are increasingly being used to assist humans in evaluating LLM outputs. Yet LLM-generated evaluators simply inherit all the problems of the LLMs they evaluate, requiring further human validation. We present a mixed-initiative approach to ``validate the validators'' -- aligning LLM-generated evaluation functions (be it prompts or code) with human requirements. Our interface, EvalGen, provides automated assistance to users in generating evaluation criteria and implementing assertions. While generating candidate implementations (Python functions, LLM grader prompts), EvalGen asks humans to grade a subset of LLM outputs; this feedback is used to select implementations that better align with user grades. A qualitative study finds overall support for EvalGen but underscores the subjectivity and iterative process of alignment. In particular, we identify a phenomenon we dub \\emph{criteria drift}: users need criteria to grade outputs, but grading outputs helps users define criteria. What is more, some criteria appears \\emph{dependent} on the specific LLM outputs observed (rather than independent criteria that can be defined \\emph{a priori}), raising serious questions for approaches that assume the independence of evaluation from observation of model outputs. We present our interface and implementation details, a comparison of our algorithm with a baseline approach, and implications for the design of future LLM evaluation assistants.",
+   "overview": "Due to the cumbersome nature of human evaluation and limitations of code-based evaluation, Large Language Models (LLMs) are increasingly being used to assist humans in evaluating LLM outputs.",
+   "problem": "Due to the cumbersome nature of human evaluation and limitations of code-based evaluation, Large Language Models (LLMs) are increasingly being used to assist humans in evaluating LLM outputs.",
+   "approach": "We present a mixed-initiative approach to ``validate the validators'' -- aligning LLM-generated evaluation functions (be it prompts or code) with human requirements.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/质量与运营/可靠生成需要结构、证据、拒答与回归.md",
+     "title": "可靠生成需要结构、证据、拒答与回归",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "质量与运营",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "谁来校验校验者：LLM 评测与人类偏好对齐",
+   "title_en": "Who Validates the Validators? Aligning LLM-Assisted Evaluation of LLM Outputs with Human Preferences",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2404.16130": {
@@ -1841,16 +2749,16 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/GraphRAG适合关系与全局问题但成本更高.md",
      "title": "GraphRAG 适合关系与全局问题但成本更高",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     },
     {
-     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -1861,6 +2769,127 @@
    "title_en": "From Local to Global: A Graph RAG Approach to Query-Focused Summarization",
    "problem_zh": "RAG 在面向整个语料的全局问题上会失效，比如「这份数据的主要主题是什么」。这类问题本质是查询聚焦摘要，而不是显式的检索任务。",
    "approach_zh": "为兼顾两种对立方法的优点，提出 GraphRAG：一种基于图的问答方法，在私有语料上同时应对问题的开放性和原文的规模。",
+   "result_zh": ""
+  },
+  "2406.18665": {
+   "id": "2406.18665",
+   "title": "RouteLLM: Learning to Route LLMs with Preference Data",
+   "authors": [
+    "Isaac Ong",
+    "Amjad Almahairi",
+    "Vincent Wu",
+    "Wei-Lin Chiang",
+    "Tianhao Wu",
+    "Joseph E. Gonzalez",
+    "M Waleed Kadous",
+    "Ion Stoica"
+   ],
+   "published": "2024-06-26",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2406.18665",
+   "abstract": "Large language models (LLMs) exhibit impressive capabilities across a wide range of tasks, yet the choice of which model to use often involves a trade-off between performance and cost. More powerful models, though effective, come with higher expenses, while less capable models are more cost-effective. To address this dilemma, we propose several efficient router models that dynamically select between a stronger and a weaker LLM during inference, aiming to optimize the balance between cost and response quality. We develop a training framework for these routers leveraging human preference data and data augmentation techniques to enhance performance. Our evaluation on widely-recognized benchmarks shows that our approach significantly reduces costs-by over 2 times in certain cases-without compromising the quality of responses. Interestingly, our router models also demonstrate significant transfer learning capabilities, maintaining their performance even when the strong and weak models are changed at test time. This highlights the potential of these routers to provide a cost-effective yet high-performance solution for deploying LLMs.",
+   "overview": "Large language models (LLMs) exhibit impressive capabilities across a wide range of tasks, yet the choice of which model to use often involves a trade-off between performance and cost.",
+   "problem": "",
+   "approach": "To address this dilemma, we propose several efficient router models that dynamically select between a stronger and a weaker LLM during inference, aiming to optimize the balance between cost and response quality.",
+   "key_result": "Our evaluation on widely-recognized benchmarks shows that our approach significantly reduces costs-by over 2 times in certain cases-without compromising the quality of responses.",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/推理服务与平台/模型路由与级联：小模型过滤大模型兜底的省钱结构.md",
+     "title": "模型路由与级联：小模型过滤大模型兜底的省钱结构",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "推理服务与平台",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "RouteLLM：用偏好数据学习模型路由",
+   "title_en": "RouteLLM: Learning to Route LLMs with Preference Data",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2407.01219": {
+   "id": "2407.01219",
+   "title": "Searching for Best Practices in Retrieval-Augmented Generation",
+   "authors": [
+    "Xiaohua Wang",
+    "Zhenghua Wang",
+    "Xuan Gao",
+    "Feiran Zhang",
+    "Yixin Wu",
+    "Zhibo Xu",
+    "Tianyuan Shi",
+    "Zhengyuan Wang",
+    "Shizheng Li",
+    "Qi Qian",
+    "Ruicheng Yin",
+    "Changze Lv",
+    "Xiaoqing Zheng",
+    "Xuanjing Huang"
+   ],
+   "published": "2024-07-01",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2407.01219",
+   "abstract": "Retrieval-augmented generation (RAG) techniques have proven to be effective in integrating up-to-date information, mitigating hallucinations, and enhancing response quality, particularly in specialized domains. While many RAG approaches have been proposed to enhance large language models through query-dependent retrievals, these approaches still suffer from their complex implementation and prolonged response times. Typically, a RAG workflow involves multiple processing steps, each of which can be executed in various ways. Here, we investigate existing RAG approaches and their potential combinations to identify optimal RAG practices. Through extensive experiments, we suggest several strategies for deploying RAG that balance both performance and efficiency. Moreover, we demonstrate that multimodal retrieval techniques can significantly enhance question-answering capabilities about visual inputs and accelerate the generation of multimodal content using a \"retrieval as generation\" strategy.",
+   "overview": "Retrieval-augmented generation (RAG) techniques have proven to be effective in integrating up-to-date information, mitigating hallucinations, and enhancing response quality, particularly in specialized domains.",
+   "problem": "While many RAG approaches have been proposed to enhance large language models through query-dependent retrievals, these approaches still suffer from their complex implementation and prolonged response times.",
+   "approach": "",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/多模态RAG：图表、PDF与音频的证据不能只靠文本化.md",
+     "title": "多模态RAG：图表、PDF与音频的证据不能只靠文本化",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "知识与检索",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "寻找 RAG 的最佳实践",
+   "title_en": "Searching for Best Practices in Retrieval-Augmented Generation",
+   "problem_zh": "",
+   "approach_zh": "",
+   "result_zh": ""
+  },
+  "2407.10627": {
+   "id": "2407.10627",
+   "title": "Arena Learning: Build Data Flywheel for LLMs Post-training via Simulated Chatbot Arena",
+   "authors": [
+    "Haipeng Luo",
+    "Qingfeng Sun",
+    "Can Xu",
+    "Pu Zhao",
+    "Qingwei Lin",
+    "Jianguang Lou",
+    "Shifeng Chen",
+    "Yansong Tang",
+    "Weizhu Chen"
+   ],
+   "published": "2024-07-15",
+   "primary": "cs.CL",
+   "url": "https://arxiv.org/abs/2407.10627",
+   "abstract": "Assessing the effectiveness of large language models (LLMs) presents substantial challenges. The method of conducting human-annotated battles in an online Chatbot Arena is a highly effective evaluative technique. However, this approach is limited by the costs and time required for human annotation. In this paper, we introduce Arena Learning, an innovative offline strategy designed to simulate these arena battles using AI-driven annotations to evaluate battle outcomes, thus facilitating the continuous improvement of the target model through both supervised fine-tuning and reinforcement learning. Arena Learning comprises two key elements. First, it ensures precise evaluations and maintains consistency between offline simulations and online competitions via WizardArena, a pipeline developed to accurately predict the Elo rankings of various models using a meticulously designed offline test set. Our results demonstrate that WizardArena's predictions closely align with those from the online Arena. Second, it involves the continuous improvement of training data based on the battle results and the refined model. We establish a data flywheel to iteratively update the training data by highlighting the weaknesses of the target model based on its battle results, enabling it to learn from the strengths of multiple different models. We apply Arena Learning to train our target model, WizardLM-$β$, and demonstrate significant performance enhancements across various metrics. This fully automated training and evaluation pipeline sets the stage for continuous advancements in various LLMs via post-training. Notably, Arena Learning plays a pivotal role in the success of WizardLM-2, and this paper serves both as an exploration of its efficacy and a foundational study for future discussions related to WizardLM-2 and its derivatives.",
+   "overview": "Assessing the effectiveness of large language models (LLMs) presents substantial challenges.",
+   "problem": "Assessing the effectiveness of large language models (LLMs) presents substantial challenges.",
+   "approach": "In this paper, we introduce Arena Learning, an innovative offline strategy designed to simulate these arena battles using AI-driven annotations to evaluate battle outcomes, thus facilitating the continuous improvement of the target model through both supervised fine-tuning and reinforcement learning.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/数据与MLOps/数据飞轮的工程闭环：日志回流清洗与标注.md",
+     "title": "数据飞轮的工程闭环：日志回流清洗与标注",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "数据与MLOps",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "Arena Learning：用模拟对话竞技场给 LLM 后训练造数据飞轮",
+   "title_en": "Arena Learning: Build Data Flywheel for LLMs Post-training via Simulated Chatbot Arena",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   },
   "2410.20878": {
@@ -1882,9 +2911,9 @@
    "key_result": "",
    "cites_evidence": [
     {
-     "path": "工程知识/AI 系统工程/知识与检索/检索从一次查询演进为有状态的证据获取.md",
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/知识与检索/检索从一次查询演进为有状态的证据获取.md",
      "title": "检索从一次查询演进为有状态的证据获取",
-     "domain": "AI系统",
+     "domain": "AI 系统工程：从模型能力到生产能力",
      "topic": "知识与检索",
      "kind": "evidence"
     }
@@ -1895,6 +2924,50 @@
    "title_en": "AutoRAG: Automated Framework for optimization of Retrieval Augmented Generation Pipeline",
    "problem_zh": "",
    "approach_zh": "提出 AutoRAG 框架，针对给定数据集自动找出合适的 RAG 模块组合。",
+   "result_zh": ""
+  },
+  "2506.08837": {
+   "id": "2506.08837",
+   "title": "Design Patterns for Securing LLM Agents against Prompt Injections",
+   "authors": [
+    "Luca Beurer-Kellner",
+    "Beat Buesser",
+    "Ana-Maria Creţu",
+    "Edoardo Debenedetti",
+    "Daniel Dobos",
+    "Daniel Fabian",
+    "Marc Fischer",
+    "David Froelicher",
+    "Kathrin Grosse",
+    "Daniel Naeff",
+    "Ezinwanne Ozoani",
+    "Andrew Paverd",
+    "Florian Tramèr",
+    "Václav Volhejn"
+   ],
+   "published": "2025-06-10",
+   "primary": "cs.LG",
+   "url": "https://arxiv.org/abs/2506.08837",
+   "abstract": "As AI agents powered by Large Language Models (LLMs) become increasingly versatile and capable of addressing a broad spectrum of tasks, ensuring their security has become a critical challenge. Among the most pressing threats are prompt injection attacks, which exploit the agent's resilience on natural language inputs -- an especially dangerous threat when agents are granted tool access or handle sensitive information. In this work, we propose a set of principled design patterns for building AI agents with provable resistance to prompt injection. We systematically analyze these patterns, discuss their trade-offs in terms of utility and security, and illustrate their real-world applicability through a series of case studies.",
+   "overview": "As AI agents powered by Large Language Models (LLMs) become increasingly versatile and capable of addressing a broad spectrum of tasks, ensuring their security has become a critical challenge.",
+   "problem": "As AI agents powered by Large Language Models (LLMs) become increasingly versatile and capable of addressing a broad spectrum of tasks, ensuring their security has become a critical challenge.",
+   "approach": "In this work, we propose a set of principled design patterns for building AI agents with provable resistance to prompt injection.",
+   "key_result": "",
+   "cites_evidence": [
+    {
+     "path": "工程知识/AI 系统工程：从模型能力到生产能力/Agent与工作流/工具是受约束的能力，不是提示词里的函数名.md",
+     "title": "工具是受约束的能力，不是提示词里的函数名",
+     "domain": "AI 系统工程：从模型能力到生产能力",
+     "topic": "Agent与工作流",
+     "kind": "evidence"
+    }
+   ],
+   "cites_survey": [],
+   "has_deep_read": false,
+   "title_zh": "面向 LLM 智能体防提示注入的设计模式",
+   "title_en": "Design Patterns for Securing LLM Agents against Prompt Injections",
+   "problem_zh": "",
+   "approach_zh": "",
    "result_zh": ""
   }
  }

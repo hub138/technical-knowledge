@@ -90,10 +90,19 @@ from wecom_notify import notify_wecom  # noqa: E402  （企微群通知，脚本
 SITE_LISTEN_HOST = "127.10.0.1"
 SITE_LISTEN_PORT = 28787
 
+# 通知消息里的链接要能点开。SITE_LISTEN_HOST 是 nginx 反代背后的监听地址
+# （127.0.0.1），发出去别人打不开；对外写可访问的主机名，从环境变量
+# KNOWLEDGE_SITE_PUBLIC_URL 读，各部署自行配置（仓库不写死任何主机名）。
+# 未配置时退化为根相对路径：链接点不开，但通知照发、服务不受影响。
+SITE_PUBLIC_URL = os.environ.get("KNOWLEDGE_SITE_PUBLIC_URL", "").strip().rstrip("/")
+
 
 def site_url(path_and_query: str = "") -> str:
-    """站点对外链接：通知消息里的「文章」跳转用。"""
-    return f"http://{SITE_LISTEN_HOST}:{SITE_LISTEN_PORT}/{path_and_query.lstrip('/')}"
+    """站点对外链接：通知消息里的「文章」跳转用。
+
+    只用于通知。站内跳转继续用相对路径，不受这里影响。
+    """
+    return f"{SITE_PUBLIC_URL}/{path_and_query.lstrip('/')}"
 
 
 WIKILINK_RE = re.compile(r"\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]")
@@ -252,9 +261,11 @@ def _kick_papernotes_refresh() -> None:
 
 # 论文评分的定时补跑（2026-09-26）。
 #
-# 推荐位要能说清「凭什么推」，背后得有评分；评分由 scripts/score_papers.py
-# 定时批量产出。放在站内线程而不是 cron：这台机器站点是常驻服务，站内调度
-# 不必依赖系统定时器装没装好，和上面 papernotes 的每日刷新同一套路数。
+# 推荐位要能说清「凭什么推」，背后得有评分；评分由 score_papers.py
+# 定时批量产出（该脚本依赖部署机本地的模型池，不入公开仓库，公开
+# clone 里这个循环按脚本存在性自动空转）。放在站内线程而不是 cron：
+# 常驻服务的站内调度不必依赖系统定时器装没装好，和上面 papernotes
+# 的每日刷新同一套路数。
 #
 # 默认**不开**：开起来就会持续吃模型额度，而多数时候人更想先手工跑一批
 # 看看这批分数靠不靠谱再让它自动跑。要开就起站前设 KNOWLEDGE_PAPER_SCORE=1。

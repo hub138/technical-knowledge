@@ -26,6 +26,7 @@ from __future__ import annotations
 import http.client
 import importlib.util
 import json
+import shutil
 import subprocess
 import tempfile
 import threading
@@ -152,6 +153,49 @@ class AuthenticationTests(unittest.TestCase):
         page = self.request("GET", "/")
         self.assertEqual(page[0], 200)
         self.assertIn("no-cache", page[1].get("Cache-Control", ""))
+
+    def test_static_etag_and_conditional_get(self) -> None:
+        """静态资源必须带 ETag，If-None-Match 命中回 304 空响应体。
+
+        no-cache 的 js/css 过去每次浏览都全量重传（i18n.js 200KB），
+        协商命中的收益就是把 200KB 变成几百字节的头。守住三件事：
+        200 带 ETag、命中 304 且无 body、文件变化后 ETag 失效回 200。"""
+        first = self.request("GET", "/static/base.css")
+        if first[0] != 200:
+            first = self.request("GET", "/site/base.css")
+        self.assertEqual(first[0], 200)
+        etag = first[1].get("ETag", "")
+        self.assertTrue(etag, "静态响应必须携带 ETag")
+
+        revalidated = self.request(
+            "GET", "/static/base.css", headers={"If-None-Match": etag}
+        )
+        if revalidated[0] == 404:
+            revalidated = self.request(
+                "GET", "/site/base.css", headers={"If-None-Match": etag}
+            )
+        self.assertEqual(revalidated[0], 304)
+        self.assertEqual(revalidated[2], b"")
+        self.assertIn("Cache-Control", revalidated[1])
+
+        stale = self.request(
+            "GET", "/static/base.css",
+            headers={"If-None-Match": 'W/"deadbeef-0"'},
+        )
+        if stale[0] == 404:
+            stale = self.request(
+                "GET", "/site/base.css", headers={"If-None-Match": 'W/"deadbeef-0"'}
+            )
+        self.assertEqual(stale[0], 200)
+
+        wildcard = self.request(
+            "GET", "/static/base.css", headers={"If-None-Match": "*"}
+        )
+        if wildcard[0] == 404:
+            wildcard = self.request(
+                "GET", "/site/base.css", headers={"If-None-Match": "*"}
+            )
+        self.assertEqual(wildcard[0], 304)
 
     def test_external_clients_cannot_reach_openmaic_without_the_site_password(self) -> None:
         """模型凭据只属于本机。非本机地址的请求必须弹回登录页,不能拿到
@@ -620,6 +664,134 @@ class VisitStatsTests(unittest.TestCase):
         self.assertEqual(int(top["dwell"]), 60)
 
 
+class FreshnessInsightsTests(unittest.TestCase):
+    """知识保鲜聚合：到期口径、认领中、近 7 天结论、最近一次巡检与发布门禁。
+
+    三个事实源各给一份假数据（假 vault、假 .editorial），直接调聚合函数。
+    临时目录放在仓库内的 .agent/tmp（已 gitignore），不碰真实台账。
+    """
+
+    def setUp(self) -> None:
+        base = ROOT / ".agent" / "tmp"
+        base.mkdir(parents=True, exist_ok=True)
+        self.tmp = Path(tempfile.mkdtemp(dir=base, prefix="freshness-"))
+        self.vault_root = self.tmp / "vault"
+        (self.vault_root / "工程知识" / "域" / "主题").mkdir(parents=True)
+        self.editorial = self.tmp / ".editorial"
+        (self.editorial / "claims").mkdir(parents=True)
+        (self.editorial / "reports").mkdir(parents=True)
+        self.original_home = SERVER_MODULE.EDITORIAL_HOME
+        SERVER_MODULE.EDITORIAL_HOME = self.editorial
+
+    def tearDown(self) -> None:
+        SERVER_MODULE.EDITORIAL_HOME = self.original_home
+        shutil.rmtree(self.tmp, ignore_errors=True)
+
+    def _day(self, offset_days: int) -> str:
+        return time.strftime("%Y-%m-%d", time.localtime(time.time() + offset_days * 86400))
+
+    def _note(self, name: str, review_after: str, *, status: str = "active",
+              review_at: str = "") -> None:
+        lines = [
+            "---",
+            f"title: {name}",
+            "type: concept",
+            f"status: {status}",
+            f"updated: {self._day(-400)}",
+            f"review_after: {review_after}",
+            "change_rate: high",
+        ]
+        if review_at:
+            lines.append(f"review_at: {review_at}")
+        lines += ["---", "", f"# {name}", "", "正文。"]
+        (self.vault_root / "工程知识" / "域" / "主题" / f"{name}.md").write_text(
+            "\n".join(lines), encoding="utf-8")
+
+    def _freshness(self) -> dict[str, object]:
+        return SERVER_MODULE.insights_freshness(SERVER_MODULE.Vault(self.vault_root))
+
+    def test_due_and_soon_skip_draft_and_deprecated(self) -> None:
+        """到期口径与 review_after.py 一致：draft 与 deprecated 不算欠着复查。"""
+        self._note("已过期", self._day(-3))
+        self._note("三十天内", self._day(10))
+        self._note("远期", self._day(200), review_at=self._day(-5))
+        self._note("草稿已过期", self._day(-3), status="draft")
+        self._note("淘汰已过期", self._day(-3), status="deprecated")
+        self._note("坏日期", "随便写的")
+        data = self._freshness()
+        self.assertEqual(data["due"], 1)
+        self.assertEqual(data["soon"], 1)
+        self.assertEqual(data["soon_days"], 30)
+        self.assertEqual(data["tracked"], 3)
+        self.assertEqual(data["reviewed"], 1)
+
+    def test_week_counts_split_conclusions_from_failures(self) -> None:
+        """三种结论从 review-squash 取，失败从巡检自己的判定取，互不重复计数。"""
+        self._note("一篇", self._day(-3))
+        now = time.time()
+        events = [
+            {"action": "review-squash", "result": "ok", "path": "a.md", "ts": now - 60},
+            {"action": "review-squash", "result": "changed", "path": "b.md", "ts": now - 120},
+            {"action": "review-squash", "result": "skip", "path": "c.md", "ts": now - 180},
+            {"action": "freshness-patrol", "result": "失败", "path": "d.md", "ts": now - 240},
+            # 巡检写回成功时也记一条，它不能把 review-squash 的结论算第二次
+            {"action": "freshness-patrol", "result": "ok", "path": "a.md", "ts": now - 59},
+            # 八天前的结论超出七天窗口
+            {"action": "review-squash", "result": "ok", "path": "e.md", "ts": now - 8 * 86400},
+            {"action": "review-claim", "path": "f.md", "ts": now - 300},
+        ]
+        with (self.editorial / "ledger.jsonl").open("w", encoding="utf-8") as handle:
+            for event in events:
+                handle.write(json.dumps(event, ensure_ascii=False) + "\n")
+        data = self._freshness()
+        self.assertEqual(data["week"], {"ok": 1, "changed": 1, "skip": 1, "failed": 1})
+        self.assertEqual([r["path"] for r in data["recent"]][0], "a.md")
+
+    def test_claims_and_last_patrol_are_reported(self) -> None:
+        """认领中读 claims/；最近一次巡检读 reports/ 里的日期文件名。"""
+        self._note("一篇", self._day(-3))
+        (self.editorial / "claims" / "one.json").write_text(json.dumps({
+            "path": "域/主题/一篇.md", "agent": "agent-A", "ts": time.time() - 7200,
+        }, ensure_ascii=False), encoding="utf-8")
+        (self.editorial / "claims" / "two.json").write_text(json.dumps({
+            "path": "域/主题/另一篇.md", "agent": "freshness-patrol",
+            "kind": "review", "ts": time.time() - 600,
+        }, ensure_ascii=False), encoding="utf-8")
+        (self.editorial / "reports" / "2026-09-20.md").write_text("旧报告", encoding="utf-8")
+        (self.editorial / "reports" / "2026-09-24.md").write_text("新报告", encoding="utf-8")
+        (self.editorial / "reports" / "deploy-20260924-1200.md").write_text("发布", encoding="utf-8")
+        data = self._freshness()
+        self.assertEqual(data["claimed"], 2)
+        kinds = {c["kind"] for c in data["claims"]}
+        self.assertEqual(kinds, {"", "review"})
+        self.assertEqual(data["last_patrol"], "2026-09-24")
+        self.assertTrue(data["last_patrol_at"])
+        # deploy-*.md 不是巡检报告，不能被当成最近一次巡检
+        self.assertEqual(data["patrol_reports"], ["2026-09-20", "2026-09-24"])
+
+    def test_blocked_release_surfaces_its_reason(self) -> None:
+        """门禁拦下发布时，中台要显示原因——否则只有旧版本在跑这件事没人知道。"""
+        self._note("一篇", self._day(-3))
+        (self.editorial / "reports" / "deploy-latest.json").write_text(json.dumps({
+            "ts": time.time(), "blocked": True, "stage": "pytest",
+            "reason": "tests 失败：3 个用例不通过",
+            "report": "deploy-20260924-1200.md", "revision": "abc1234",
+        }, ensure_ascii=False), encoding="utf-8")
+        deploy = self._freshness()["deploy"]
+        self.assertTrue(deploy["blocked"])
+        self.assertEqual(deploy["stage"], "pytest")
+        self.assertIn("tests 失败", deploy["reason"])
+        self.assertTrue(deploy["time"])
+
+    def test_missing_editorial_home_is_not_an_error(self) -> None:
+        """台账目录不存在（新克隆）时聚合照常返回零值，不抛错。"""
+        SERVER_MODULE.EDITORIAL_HOME = self.tmp / "不存在"
+        self._note("一篇", self._day(-3))
+        data = self._freshness()
+        self.assertEqual(data["claimed"], 0)
+        self.assertEqual(data["last_patrol"], "")
+        self.assertEqual(data["deploy"], {})
+
 class OriginLocalTests(unittest.TestCase):
     """本机判定必须认得「隧道送进来的回环流量」。
 
@@ -693,7 +865,7 @@ class ReaderPagerTests(unittest.TestCase):
 
     def test_siblings_container_lives_in_right_rail(self) -> None:
         """同模块在 reader-layout 第二列（目录之后），正文列有翻页区与奖励条。"""
-        layout = re.search(r'<div class="reader-layout">(.{0,900}?)</div><div id="reader-sources-mobile"', self.html, re.DOTALL)
+        layout = re.search(r'<div class="reader-layout">(.{0,3000}?)</div><div id="reader-sources-mobile"', self.html, re.DOTALL)
         self.assertIsNotNone(layout, "reader-layout 结构不存在")
         inner = layout.group(1)
         self.assertIn('<div class="reader-maincol">', inner)
@@ -736,6 +908,11 @@ class ReaderPagerTests(unittest.TestCase):
         fence_re = re.compile(r"```.*?```|~~~.*?~~~", re.DOTALL)
         unresolved: list[str] = []
         for relative, note in self.vault.notes.items():
+            # 只看站内笔记。剪藏/论文追踪存的是第三方原文（B 站转写、论文
+            # 摘录），正文里的 [[...]] 常常是原文自带的语法残留，本来就不
+            # 该按站内部落链接的规矩来判。
+            if not relative.startswith(("工程知识/", "知识库管理/")):
+                continue
             prose = fence_re.sub("", str(note["body"]))
             for target, _label in SERVER_MODULE.WIKILINK_RE.findall(prose):
                 if not self.vault.resolve_note(target, relative):
@@ -745,7 +922,9 @@ class ReaderPagerTests(unittest.TestCase):
     def test_vault_never_contains_internal_product_names(self) -> None:
         """内部产品名绝不能出现在 vault 的任何文件里——正文、标题、文件名、
         链接都算。发布红线:名字进了仓库等于宣告内部产品存在这些缺陷。"""
-        banned = re.compile(r"tbase|tchouse|csig", re.IGNORECASE)
+        # 加词边界：驼峰类名里的 tBase（如 Apache Pulsar 的 AbstractBaseDispatcher）
+        # 会被裸 tbase 命中，那是误报不是泄密。红线要挡的是独立出现的内部产品代号。
+        banned = re.compile(r"\b(?:tbase|tchouse|csig)\b", re.IGNORECASE)
         version = re.compile(r"v\d+\.\d+\.\d+\.\d+")
         hits = []
         for path in (ROOT / "vault").rglob("*.md"):
@@ -1022,6 +1201,18 @@ class FeedTests(unittest.TestCase):
             {s["key"] for s in FEEDS_MODULE.FEEDS},
         )
 
+    def test_snapshot_carries_fetch_times(self) -> None:
+        """每个源带自己的 fetched_at（只在抓成功时前移），顶层带磁盘快照时刻。
+
+        来源页要显示「这一站最近一次成功抓取是什么时候」。顶层 fetched_at 是
+        请求时刻，恒等于现在——拿它当「更新于」永远显示「刚刚」，数据放了三天
+        也看不出来，所以 saved_at 必须在。
+        """
+        payload = FEEDS_MODULE.snapshot()
+        self.assertIn("saved_at", payload)
+        for source in payload["sources"]:
+            self.assertIn("fetched_at", source)
+
     def test_feeds_declare_a_known_kind(self) -> None:
         for source in FEEDS_MODULE.FEEDS:
             self.assertIn(source["kind"], {"rss", "atom", "html", "api", "none", "podcast"}, source["key"])
@@ -1130,10 +1321,24 @@ class BestBlogsRequestTests(unittest.TestCase):
 
         self.respond_with(None, "quota")
 
+        # 别让磁盘上的 last-good 存量插一脚：有存量时 digest 走的是
+        # _stale_result() 回退（返回 stale 而不是错误状态），这条断言就变成
+        # 看机器上有没有抓过一次。临时掐掉存量，测的才是「抓失败」本身。
+
         digest_cache_backup = dict(BESTBLOGS_MODULE._CACHE)
         BESTBLOGS_MODULE._CACHE.clear()
         BESTBLOGS_MODULE._CACHE.update({"at": 0.0, "items": [], "status": "unknown", "ttl": 0.0})
-        result = BESTBLOGS_MODULE.digest(limit=3, force=True)
+        # 存量兜底有两层（last-good → 30 天 archive），两层都有货的话
+        # _stale_result() 就永远回退到 stale/archive，这条断言看不到错误状态。
+        last_good_backup = BESTBLOGS_MODULE._load_last_good
+        archive_backup = BESTBLOGS_MODULE._load_archive
+        BESTBLOGS_MODULE._load_last_good = lambda: {}
+        BESTBLOGS_MODULE._load_archive = lambda: []
+        try:
+            result = BESTBLOGS_MODULE.digest(limit=3, force=True)
+        finally:
+            BESTBLOGS_MODULE._load_last_good = last_good_backup
+            BESTBLOGS_MODULE._load_archive = archive_backup
         self.assertEqual(result.get("status"), "quota")
         self.assertLessEqual(
             float(BESTBLOGS_MODULE._CACHE.get("ttl") or 0), retry,

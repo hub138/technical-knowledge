@@ -1,173 +1,123 @@
-# -*- coding: utf-8 -*-
-"""多智能体并发写同一批文件时的写入互斥与内容校验。
-
-lock   拿独占锁，拿不到说明有人在改
-unlock 释放锁
-fp     打印内容指纹
-check  写入前校验内容是否被改动过
-"""
-from __future__ import annotations
-
 import argparse
+import fcntl
 import hashlib
+import hmac
 import json
 import os
 import pathlib
-import sys
+import secrets
 import time
+from contextlib import contextmanager
 
-LOCK_DIR_NAME = ".concurrent-guard"
+import frontmatter
+
+LOCK_DIR_NAME = '.concurrent-guard'
 DEFAULT_TTL_MIN = 30
 
 
-def repo_root_of(path: pathlib.Path):
-    cur = path if path.is_dir() else path.parent
-    for base in [cur] + list(cur.parents):
-        if (base / ".git").exists():
-            return base
-    return None
-
-
-def ensure_ignored(root: pathlib.Path) -> None:
-    gi = root / ".gitignore"
-    line = LOCK_DIR_NAME + "/"
-    if gi.exists():
-        text = gi.read_text(encoding="utf-8")
-        if line in text.split("\n"):
-            return
-        sep = "" if (text == "" or text.endswith("\n")) else "\n"
-        gi.write_text(text + sep + line + "\n", encoding="utf-8")
+def state_dir(path):
+    path = path.resolve()
+    explicit = os.environ.get('CONCURRENT_GUARD_HOME')
+    if explicit:
+        root = pathlib.Path(explicit).resolve()
     else:
-        gi.write_text(line + "\n", encoding="utf-8")
+        parent = next((p for p in path.parents if (p / '.git').exists()), path.parent)
+        root = parent / LOCK_DIR_NAME
+    root.mkdir(parents=True, exist_ok=True)
+    return root
 
 
-def state_dir(path: pathlib.Path) -> pathlib.Path:
-    root = repo_root_of(path)
-    if root is not None:
-        d = root / LOCK_DIR_NAME
-    else:
-        d = pathlib.Path.home() / ".concurrent-guard"
-    d.mkdir(parents=True, exist_ok=True)
-    if root is not None:
-        ensure_ignored(root)
-    return d
+def lock_path(path, state):
+    key = hashlib.sha1(str(path.resolve()).encode()).hexdigest()[:16]
+    return state / (key + '.lock')
 
 
-def lock_path(path: pathlib.Path, state: pathlib.Path) -> pathlib.Path:
-    key = hashlib.sha1(str(path.resolve()).encode("utf-8")).hexdigest()[:16]
-    return state / (key + ".lock")
+def content_fp(path, whole=False):
+    raw = path.read_bytes()
+    if not whole and path.suffix == '.md':
+        raw = frontmatter.loads(raw.decode('utf-8')).content.encode('utf-8')
+    return hashlib.sha256(raw).hexdigest()
 
 
-def content_fp(path: pathlib.Path) -> str:
-    return hashlib.sha1(path.read_bytes()).hexdigest()[:12]
+@contextmanager
+def mutex(path):
+    gate = path.with_suffix('.mutex')
+    with gate.open('a') as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
-def open_exclusive(lp: pathlib.Path) -> int:
-    return os.open(str(lp), os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
-
-
-def cmd_lock(args) -> int:
-    p = pathlib.Path(args.path)
-    if not p.exists():
-        print("文件不存在: %s" % p, file=sys.stderr)
+def main():
+    ap = argparse.ArgumentParser(description='文件认领与指纹校验；锁操作互斥，释放需要身份和 token')
+    sub = ap.add_subparsers(dest='command', required=True)
+    for name in ('lock', 'unlock', 'renew', 'fp', 'check'):
+        parser = sub.add_parser(name)
+        parser.add_argument('path', type=pathlib.Path)
+        if name in ('lock', 'unlock', 'renew'):
+            parser.add_argument('--agent', required=True)
+        if name in ('unlock', 'renew'):
+            parser.add_argument('--token', required=True)
+        if name == 'lock':
+            parser.add_argument('--ttl-min', type=float, default=DEFAULT_TTL_MIN)
+        if name in ('lock', 'fp', 'check'):
+            parser.add_argument('--whole', action='store_true', help='包括 frontmatter 的全文指纹')
+        if name == 'check':
+            parser.add_argument('--fp', required=True)
+    args = ap.parse_args()
+    path = args.path.resolve()
+    if not path.is_file():
+        print('不是文件: %s' % path)
         return 2
-    sd = state_dir(p)
-    lp = lock_path(p, sd)
-    fp = content_fp(p)
-    payload = json.dumps({
-        "path": str(p.resolve()),
-        "agent": args.agent,
-        "pid": os.getpid(),
-        "ts": time.time(),
-        "fp": fp,
-    }, ensure_ascii=False)
-    try:
-        fd = open_exclusive(lp)
-    except FileExistsError:
-        info = json.loads(lp.read_text(encoding="utf-8"))
-        age = (time.time() - float(info.get("ts", 0))) / 60.0
-        if age <= args.ttl_min:
-            print("文件已被占用，禁止并行写入。\n"
-                  "  持有者 %s（pid %s），已持有 %.1f 分钟。\n"
-                  "  锁文件 %s\n"
-                  "  换一个目标，或确认对方已中断后加 --ttl-min 0 抢占。"
-                  % (info.get("agent"), info.get("pid"), age, lp), file=sys.stderr)
+    if args.command in ('fp', 'check'):
+        current = content_fp(path, args.whole)
+        if args.command == 'fp':
+            print(current)
+            return 0
+        if current != args.fp:
+            print('文件已变化；基线 %s，当前 %s' % (args.fp, current))
+            return 4
+        print('OK 内容未变')
+        return 0
+    record = lock_path(path, state_dir(path))
+    with mutex(record):
+        info = json.loads(record.read_text(encoding='utf-8')) if record.exists() else None
+        now = time.time()
+        if args.command == 'lock':
+            if args.ttl_min < 0:
+                ap.error('--ttl-min 必须非负')
+            if info and now - info['ts'] <= info.get('ttl_min', DEFAULT_TTL_MIN) * 60:
+                print('文件已被 %s 占用' % info['agent'])
+                return 3
+            payload = {'path': str(path), 'agent': args.agent, 'token': secrets.token_hex(24),
+                       'ts': now, 'ttl_min': args.ttl_min, 'fp': content_fp(path, args.whole)}
+            with record.open('w', encoding='utf-8') as handle:
+                json.dump(payload, handle, ensure_ascii=False)
+                handle.flush()
+                os.fsync(handle.fileno())
+            print(json.dumps(payload, ensure_ascii=False))
+            return 0
+        if info is None:
+            print('没有锁记录')
+            return 1
+        # compare_digest 接受 str 时只认 ASCII，中文 agent 名会抛 TypeError 而不是返回 False；
+        # 那会让 lock 成功、unlock 必崩，锁永远释放不掉。统一按 UTF-8 字节比。
+        if not hmac.compare_digest(info['agent'].encode('utf-8'), args.agent.encode('utf-8')) or \
+                not hmac.compare_digest(str(info.get('token', '')).encode('utf-8'),
+                                        args.token.encode('utf-8')):
+            print('认领身份或 token 不一致，禁止操作')
             return 3
-        print("抢占过期锁（原持有者 %s，持有 %.1f 分钟，超过 %d 分钟）"
-              % (info.get("agent"), age, args.ttl_min))
-        os.unlink(lp)
-        fd = open_exclusive(lp)
-    with os.fdopen(fd, "w", encoding="utf-8") as fh:
-        fh.write(payload)
-    print("LOCKED fp=%s" % fp)
+        if args.command == 'unlock':
+            record.unlink()
+            print('UNLOCKED')
+        else:
+            info['ts'] = now
+            record.write_text(json.dumps(info, ensure_ascii=False), encoding='utf-8')
+            print('RENEWED')
     return 0
 
 
-def cmd_unlock(args) -> int:
-    p = pathlib.Path(args.path)
-    lp = lock_path(p, state_dir(p))
-    if not lp.exists():
-        print("没有锁记录: %s" % p, file=sys.stderr)
-        return 1
-    os.unlink(lp)
-    print("UNLOCKED")
-    return 0
-
-
-def cmd_fp(args) -> int:
-    p = pathlib.Path(args.path)
-    if not p.exists():
-        print("文件不存在: %s" % p, file=sys.stderr)
-        return 2
-    print(content_fp(p))
-    return 0
-
-
-def cmd_check(args) -> int:
-    p = pathlib.Path(args.path)
-    cur = content_fp(p)
-    if cur != args.fp:
-        print("内容已被改动，禁止覆盖。\n"
-              "  基线 %s，当前 %s。\n"
-              "  重读全文，把外部改动并进本轮再写入。"
-              % (args.fp, cur), file=sys.stderr)
-        return 4
-    print("OK 内容未变，可以写入")
-    return 0
-
-
-def build_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(
-        description="多智能体并发写文件的互斥锁与内容校验",
-        formatter_class=argparse.RawDescriptionHelpFormatter)
-    sub = ap.add_subparsers(dest="cmd", required=True)
-
-    lk = sub.add_parser("lock", help="拿独占锁")
-    lk.add_argument("path")
-    lk.add_argument("--agent", default="agent-unknown")
-    lk.add_argument("--ttl-min", type=int, default=DEFAULT_TTL_MIN,
-                    help="锁超过多少分钟视为过期可抢占")
-    lk.set_defaults(func=cmd_lock)
-
-    ul = sub.add_parser("unlock", help="释放锁")
-    ul.add_argument("path")
-    ul.set_defaults(func=cmd_unlock)
-
-    fp = sub.add_parser("fp", help="打印内容指纹")
-    fp.add_argument("path")
-    fp.set_defaults(func=cmd_fp)
-
-    ck = sub.add_parser("check", help="写入前校验内容是否被改动")
-    ck.add_argument("path")
-    ck.add_argument("--fp", required=True)
-    ck.set_defaults(func=cmd_check)
-    return ap
-
-
-def main() -> int:
-    args = build_parser().parse_args()
-    return args.func(args)
-
-
-if __name__ == "__main__":
-    sys.exit(main())
+if __name__ == '__main__':
+    raise SystemExit(main())

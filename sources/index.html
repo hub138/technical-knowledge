@@ -15,6 +15,13 @@
     <script src="/static/sources.js"></script>
     <script>
       document.addEventListener('DOMContentLoaded', () => TKShell.sidebar({ page: 'sources' }));
+      /* 顶栏（含搜索框）由 shell 统一生成：此前搜索框只挂在 hero 里，
+         与主站「搜索框在顶栏右上角」的位置不一致。这里把 hero 里那个框
+         搬进顶栏——搬的是位置，id 与筛选逻辑不动。 */
+      document.addEventListener('DOMContentLoaded', () => TKShell.mountTopbar({
+        title: '优质好文',
+        reuse: document.querySelector('.page-toolbar .tk-search'),
+      }));
       document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
         where: () => '当前页面：<b>外部资源</b>',
         title: () => '外部资源',
@@ -517,12 +524,13 @@ base.css 的 .page-toolbar 规范，但 [hidden] 兜底属于本页卡片
         background: var(--color-accent-line);
       }
       .src-toc-sites a:hover .src-toc-dot { background: var(--color-accent); }
+      /* 2026-10-01 反馈目录整体偏小：栏体字号 13(--text-small)→14px。
+         速览名与 feed 名从 13px semibold 提到 14px；13px 留给计数。 */
+      .src-toc { font-size: 14px; }
       .src-toc-name {
         flex: 1; min-width: 0;
         overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        /* 2026-09-24 反馈「字有点小、没加粗」：站名是速览的主角色，
-           13px semibold 与下方 feed 名同档，数字保持小一档作次级。 */
-        font-size: var(--text-small); font-weight: var(--weight-semibold);
+        font-size: 1em; font-weight: var(--weight-semibold);
         color: var(--color-ink);
       }
       .src-toc-num {
@@ -538,38 +546,27 @@ base.css 的 .page-toolbar 规范，但 [hidden] 兜底属于本页卡片
         display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2);
         margin: 0 0 var(--space-1); padding: 0 2px; /* 2026-09-22 归格：3→4 */
         color: var(--color-ink);
-        font-size: var(--text-small); font-weight: var(--weight-semibold);
+        /* 2026-10-01 随栏体字号提到 14px，与上方速览名同档 */
+        font-size: 1em; font-weight: var(--weight-semibold);
       }
-      /* 文章条目：圆点紧贴文字。
-         第一版缩进 18px，圆点和文字之间空了一大截，看着像两列错位。
+      /* 文章条目：不带任何符号，纯文字一行一条（2026-10-01 反馈条目
+         前的小圆点不好看，删除；左侧内边距随之与右侧对称归 8pt）。
          标题允许两行（data-clamp 声明是有意截断，布局审计据此放行）——
          窄栏里一行放不下中文长标题，一行省略号比两行截断丢的信息多。 */
       .src-toc-items { margin: 1px 0 2px; padding: 0; list-style: none; display: grid; }
       .src-toc-items a {
-        /* 2026-09-22 单行截断（速览栏定位，第 5 次写入，前 4 次被并行
-         * AI 覆盖）：280px 右栏 54 条两行截断，栏体过长行距过挤（实测
-         * 截图）。改 1 行省略号——标题开头是扫读锚点，尾部信息密度低，
+        /* 2026-09-22 单行截断：标题开头是扫读锚点，尾部信息密度低，
          * 主栏卡片有完整标题，右栏只需「大概哪条在哪」。 */
         display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;
-        position: relative;
-        /* 2026-09-22 8pt 归格：3/6/3/13 → 4/8/4/12（4pt 半格），圆点 left 5→8 */
-        padding: var(--space-1) var(--space-2) var(--space-1) var(--space-3);
+        padding: var(--space-1) var(--space-2);
         border-radius: var(--radius-xs);
         /* 2026-09-22 改进 3：行高 1.45→1.55——小字（12-13px）标准行高
          * 1.6-1.8，速览列表取 1.55 平衡密度与舒适（typography 准则）。 */
         color: var(--color-muted); line-height: 1.55; text-decoration: none;
         overflow: hidden; overflow-wrap: anywhere;
       }
-      .src-toc-items a::before {
-        /* 2026-09-22 随单行截断调整：圆点对齐单行文字垂直中心 */
-        content: ""; position: absolute; left: 8px; top: 50%;
-        width: 3px; height: 3px; margin-top: -1.5px;
-        border-radius: 50%; background: var(--color-faint);
-      }
       .src-toc-items a:hover { background: var(--color-accent-soft); color: var(--color-ink); }
-      .src-toc-items a:hover::before { background: var(--color-accent); }
       .src-toc-items a.is-current { color: var(--color-accent-ink); font-weight: var(--weight-medium); }
-      .src-toc-items a.is-current::before { background: var(--color-accent); }
       /* 从目录跳过去的目标闪一下，让读者知道"到了就是这里"。 */
       [data-toc-flash] { animation: toc-flash 1.3s var(--ease-out); }
       @keyframes toc-flash {
@@ -586,12 +583,12 @@ base.css 的 .page-toolbar 规范，但 [hidden] 兜底属于本页卡片
  * 1600 唯一的作用是在宽屏把内容推得更靠边、留出一侧 139px 的死白。
  * 2026-09-20 删除，宽度由 base.css 的 1400 统一管。
  *
- * 右栏 280：300 里放一行中文长标题太挤（现在条目允许两行，280 够）。
+ * 右栏 320（2026-10-01 反馈目录整体偏小，280→320 配合字号 13→14）。
  * 断点 1080 与 .src-rich 的单列断点对齐，避免"两栏但卡片单列"的过渡态。 */
 @media (min-width: 1080px) {
   .src-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-columns: minmax(0, 1fr) 320px;
     column-gap: var(--space-6);
     align-items: start;
   }
@@ -601,7 +598,9 @@ base.css 的 .page-toolbar 规范，但 [hidden] 兜底属于本页卡片
     top: 88px;
     max-height: calc(100vh - 124px);
     overflow: auto;
-    font-size: var(--text-small);
+    /* 2026-10-01 反馈目录整体偏小：13(--text-small)→14。前文 :529 同值
+     * 一并保留（窄屏时目录隐藏，仅此媒体查询生效），后续调字号只改这里。 */
+    font-size: 14px;
     scrollbar-width: thin;
     /* 2026-09-22 改进 5：补滚动条配色。thin 已设但无色，暗色下默认
      * 亮灰轨在深海军底上扎眼（dark mode 常见遗漏，标准清单明确列过）。
@@ -687,9 +686,10 @@ base.css 的 .page-toolbar 规范，但 [hidden] 兜底属于本页卡片
         <!-- 搜索：为什么这页要有 —— 列表聚合了各站最新文章，标题几十条，
              右侧目录只能按站跳，按关键词找一篇只能滚动。
 皮肤走 base.css 的 .tk-search 规范（全站唯一真源）；
-             放置走 hero 内的 .page-toolbar，间距由 .hero .page-toolbar
-             统一给，本页零间距样式。 -->
-        <div class="page-toolbar">
+             放置：2026-09-25 起由 shell.mountTopbar 搬进全站顶栏（右上角），
+             与主站同一个位置。本页 hero 里这一段保留只为提供结构与 id，
+             hidden 由 shell 在搬走后解除，页面零间距样式。 -->
+        <div class="page-toolbar" hidden>
           <label class="tk-search">
             <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/></svg></span>
             <input type="search" id="src-search" placeholder="搜站点、说明或文章标题" autocomplete="off" />

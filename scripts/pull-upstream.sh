@@ -1,13 +1,16 @@
 # Mac 侧上游拉取脚本：与 dev 的 update-knowledge.sh 对等。
 # GitHub 是唯一枢纽——dev/Mac 各自只 pull、各自 push，永不互相直连。
-# 被 com.leoqqian.knowledge-pull LaunchAgent 每分钟调用（/bin/sh 显式解释）。
+# 被拉取代理 LaunchAgent 每分钟调用（/bin/sh 显式解释）。
+# 用法：从 LaunchAgent 的 ProgramArguments 传仓库绝对路径进来，
+# 或者在下面一行写死部署机上的绝对路径。
 #
 # 三条安全阀：
 # 1. 工作区有未提交改动 → 直接跳过（Obsidian 正在写作时不搅局）；
 # 2. 本地领先（有 commit 没 push）→ 跳过（绝不自动动用户的本地提交）；
 # 3. 分叉（两边都有对方没有的提交）→ 只报警不硬合并，人工处理。
 set -eu
-cd /Users/leoqqian/Developer/technical-knowledge
+REPO="${1:-$(cd "$(dirname "$0")/.." && pwd -P)}"
+cd "$REPO"
 if ! git diff --quiet || ! git diff --cached --quiet; then
     exit 0
 fi

@@ -21,8 +21,10 @@ User=<运行用户>
 WorkingDirectory=<仓库根>
 Environment=KNOWLEDGE_REPO=<仓库根>
 Environment=EDITORIAL_AGENT=freshness-patrol
-# 派发命令可换：codebuddy 之外的非交互 CLI 只要接受「最后一个参数是提示词」即可
-Environment=FRESHNESS_AGENT_CMD=codebuddy -p --dangerously-skip-permissions
+# 派发命令可换：任何接受「最后一个参数是提示词」的非交互 AI CLI 都行。
+# 巡检器会在命令后面追加 -w <仓库根> -p <提示词>；需要模型选择或回退链时，
+# 按巡检器脚本文档追加相应 Environment 项（凭据由 CLI 自行持久化，不写进这里）。
+Environment=FRESHNESS_AGENT_CMD=<非交互 CLI 命令与参数，提示词由巡检器追加>
 ExecStart=/usr/bin/python3 <仓库根>/../knowledge-governor/scripts/freshness_patrol.py --soon-days 14 --limit 3
 # 巡检有失败篇时退出码为 1：报告里已写明失败原因，单元本身不需要重试，
 # 明天的 timer 会再跑一次（失败篇的认领锁已被释放，下一轮可以重新派发）

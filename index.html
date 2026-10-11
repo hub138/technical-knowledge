@@ -653,7 +653,7 @@
 :root[data-theme="dark"] .domain-topics i + i::before,
 :root[data-theme="dark"] .tool-facts span + span::before{color:var(--color-faint)}
 .source-toggle{margin-left:8px;padding:1px 8px;border:1px solid var(--color-line);border-radius:var(--radius-full);background:transparent;color:var(--color-muted);font:inherit;font-size:var(--text-xs);cursor:pointer;transition:border-color var(--duration-fast) var(--ease-out),color var(--duration-fast) var(--ease-out)}
-.source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--color-accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{font-size:var(--text-small);display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(0,1fr) 264px;column-gap:64px;align-items:start;padding-left:0;padding-right:0;/* 2026-09-25：右栏 248→216、左右内距 46→24，把宽度让给正文；2026-09-26 二次反馈「同模块文章显得好窄」，216→240 折中——标题两行省略后 240px 一行约容 16 字，长名换行不截断 */}.reader-railcol{grid-column:2;position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto}.reader-railcol .reader-toc{position:static;max-height:none;overflow:visible}.reader-railcol .reader-toc .rail-head{position:static}.reader-layout:has(#reader-toc[hidden]):has(#reader-siblings[hidden]){grid-template-columns:minmax(0,1fr) 0;column-gap:0}}/* 同模块文章 2026-09-24 从正文后移入右栏（目录下方）；同日晚改：目录与同模块包进 .reader-railcol 一列整体 sticky——原先只有目录 sticky，同模块折叠行是静态块，被网格自动放置到正文列末行，目录底与折叠行之间空出一整条空白（用户截图反馈「每个页面都这么空」的病根之一）。窄屏（≤1199px）右栏隐藏，回退为正文后的横排胶囊。字号 13px → 16px（一次反馈「字再大一点」）→ 18px（二次反馈）→ 16px（三次反馈嫌太大）；右栏 204px→248px 加宽（三次反馈「有点窄」）。 */
+.source-toggle:hover{border-color:var(--color-accent);color:var(--color-accent)}.reader-sources a{color:var(--color-accent);margin-right:9px}.reader-layout{display:block}@media(max-width:1199px){.reader-toc{font-size:var(--text-small);display:none}}@media(min-width:1200px){.reader-layout{display:grid;grid-template-columns:minmax(660px,1fr) 264px;column-gap:56px;align-items:start;padding-left:0;padding-right:0;/* 2026-09-25：右栏 248→216、左右内距 46→24，把宽度让给正文；2026-09-26 二次反馈「同模块文章显得好窄」，216→240 折中——标题两行省略后 240px 一行约容 16 字，长名换行不截断 */}.reader-railcol{grid-column:2;position:sticky;top:96px;max-height:calc(100vh - 130px);overflow:auto}.reader-railcol .reader-toc{position:static;max-height:none;overflow:visible}.reader-railcol .reader-toc .rail-head{position:static}.reader-layout:has(#reader-toc[hidden]):has(#reader-siblings[hidden]){grid-template-columns:minmax(0,1fr) 0;column-gap:0}}/* 同模块文章 2026-09-24 从正文后移入右栏（目录下方）；同日晚改：目录与同模块包进 .reader-railcol 一列整体 sticky——原先只有目录 sticky，同模块折叠行是静态块，被网格自动放置到正文列末行，目录底与折叠行之间空出一整条空白（用户截图反馈「每个页面都这么空」的病根之一）。窄屏（≤1199px）右栏隐藏，回退为正文后的横排胶囊。字号 13px → 16px（一次反馈「字再大一点」）→ 18px（二次反馈）→ 16px（三次反馈嫌太大）；右栏 204px→248px 加宽（三次反馈「有点窄」）。 */
 /* 文章页收尾区宽度（2026-09-24 晚）：pager/reward/图谱区全在 maincol 里，
    统一锚定正文列宽——图谱区宽度真源是 .article-relations 的
    max-width:740px；pager/reward 自身无宽度约束，靠下面这行收口。
@@ -674,7 +674,7 @@
    * 它是一条可点的导航，不是脚注 —— 灰到读不出"这里能点"就等于没有。
    * 悬停时才变主色，用它来表示"当前指向哪一条"。 */
   .rail-list a{display:block;padding:5px 8px;border-radius:5px;color:var(--color-ink-soft);text-decoration:none;line-height:1.5}.rail-list a:hover{background:var(--color-accent-soft);color:var(--color-accent)}.rail-list a[aria-current="page"]{background:var(--color-accent-soft);color:var(--color-accent);font-weight:700}.rail-list .rail-group{margin:9px 0 3px;padding-left:8px;color:var(--color-muted);font-size:var(--text-2xs);font-weight:700;letter-spacing:.05em}.toc-list a{padding-left:8px}.toc-list a[data-level="3"]{padding-left:21px;font-size:var(--text-sm);color:var(--color-muted)}.toc-list a[data-level="4"]{padding-left:34px;font-size:var(--text-sm);color:var(--color-muted)}.reader-siblings.collapsed .rail-list,.reader-toc.collapsed .rail-list{display:none}/* 悬浮标题行下方透缝补底：折叠行标题与内容衔接处给标题行下沿加投影级背景，滚动中列表项从标题下滑过时不再露出字头。 */.rail-head::after{content:"";position:absolute;left:0;right:0;top:100%;height:6px;background:linear-gradient(var(--color-panel),rgba(255,255,255,0));pointer-events:none}/* ── 右栏两块卡片化 + 目录条目单行省略（2026-09-25）── 起因：小节标题被写成整段正文时（实测最长 351 字），目录条目连带右栏一起被撑变形。 修数据之外这里加视觉兜底：条目一律单行省略，再长的标题也只占一行，不破版。 「本文目录」与「同模块文章」是两块各自独立的折叠卡片，默认都展开。 */.reader-toc,.reader-siblings{background:none;border:0;border-radius:0;padding:0 2px 0 0;margin-bottom:14px}.reader-siblings{margin-bottom:0}/* 2026-10-08 用户反馈「每个文章都有两个框的感觉」：右栏两块原各自带白底+边框（2026-09-25 卡片化），与主卡并排后一屏三框。改为无框融入主卡同色白底，仅保留标题行下边框分层。 2026-10-08 巡检二次修正：单行省略把 42 字篇名截断，同模块文章的核心信息就是篇名，条目恢复 2 行 clamp。 */.rail-list a{white-space:normal;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow-wrap:anywhere;word-break:break-word}.rail-list a[aria-current="location"]{box-shadow:inset 3px 0 0 var(--color-accent);background:var(--color-accent-soft);color:var(--color-accent);font-weight:700}.toc-list a[data-level="2"]{font-weight:600;color:var(--color-ink)}
-.reader-body{max-width:756px;/* 2026-09-25：740→756，对齐掘金正文列宽；库内正文实测 646px 远窄于掘金，长行代码与表格挤在中间，两侧空得慌 */min-width:0;font-size:var(--text-lg);line-height:1.75;color:var(--color-ink-soft);overflow-wrap:anywhere}
+.reader-body{max-width:min(100%,900px);/* 2026-09-25：740→756，对齐掘金正文列宽；库内正文实测 646px 远窄于掘金，长行代码与表格挤在中间，两侧空得慌。2026-10-08 四次反馈：正文列弹性化后行宽同步放开到 min(100%,900px)——版心 1660 时行宽吃满弹性列与右栏之间的空当，中缝不再堆 300px 死白；900px 是长行可读上限（约 55 个中文字），窄屏仍由 100% 兜住 */min-width:0;font-size:var(--text-lg);line-height:1.75;color:var(--color-ink-soft);overflow-wrap:anywhere}
 .reader-body h1{font-size:var(--text-h1)}
 .reader-body h2{font-size:var(--text-h2);border-bottom:1px solid color-mix(in srgb, var(--color-line) 55%, transparent);padding-bottom:var(--space-2);margin:var(--space-8) 0 var(--space-4)}
 /* H3 此前与正文同为 18px（--text-h3 与 .reader-body 的 --text-lg 同值），
@@ -788,6 +788,9 @@
 .reader-image-status{margin-right:auto;color:var(--color-muted)}
 .reader-image-open,.reader-image-retry{min-height:44px;padding:var(--space-2) var(--space-3);border:1px solid var(--color-line);border-radius:var(--radius-sm);background:var(--color-panel);color:var(--color-accent);font:inherit;cursor:pointer}
 .reader-image-open:hover,.reader-image-retry:hover{border-color:var(--color-accent);background:var(--color-accent-soft)}
+/* 交互版按钮（2026-10-08）：accent 软底，与「查看原图」按钮区分——
+   它是 archify 精绘图专属的升级入口（平移缩放 + 链路描摹动画）。 */
+.reader-image-interactive{background:var(--color-accent-soft);border-color:var(--color-accent-line);font-weight:var(--weight-semibold)}
 .reader-image-retry[hidden]{display:none}
 .reader-image[data-state="error"]{padding:var(--space-4);border:1px solid var(--color-warm-line);border-radius:var(--radius-sm);background:var(--color-warn-soft)}
 .reader-image[data-state="error"] img{display:none}
@@ -1441,8 +1444,9 @@ body{background:var(--color-bg);font-size:var(--text-md);line-height:var(--leadi
 .note-row{border:1px solid var(--color-line);border-radius:6px!important;padding:14px 16px;background:var(--color-panel);box-shadow:0 1px 2px rgba(20,42,35,.02)}
 .note-row:hover{background:var(--color-panel);border-color:var(--color-accent-line);transform:translateX(2px)}
 .note-row h3{font-size:var(--text-sm)}.note-row .path{color:var(--color-muted)}.note-row p{font-size:var(--text-base)}
-/* 2026-10-08：1126 → 1400，版心吃满 .content 容器（容器本身封顶 1400），正文右侧不再留死白；卡内边距 32 → 40 与容器 --gutter 同量级。 */
-.reader{max-width:1400px;margin:0 auto;padding:0 var(--gutter) 0 calc(var(--gutter) + var(--float-lane))}
+/* 2026-10-08：1126 → 1400，版心吃满 .content 容器（容器本身封顶 1400），正文右侧不再留死白；卡内边距 32 → 40 与容器 --gutter 同量级。
+   2026-10-08 四次反馈（用户截图红框）：宽屏（1680/1920）下 .content 解禁到 1660，版心仍封 1400 居中 → 正文列被压到 992px，正文与右栏之间挤出一整条 300px 中缝大空白。现版心放宽到 1660 吃满 .content，grid 列改 minmax(660px,1fr) 让正文列弹性吃宽，右栏固定 264 贴右——中缝回归 64px 列沟的正常尺度。 */
+.reader{max-width:1220px;margin:0 auto;padding:0 var(--gutter) 0 calc(var(--gutter) + var(--float-lane))}
 /* ── 掘金式文章卡（2026-09-25）──────────────────────────────
  * 掘金文章页的结构是「灰底 + 白卡 + 投影」：页面衬底深一档，正文放在一张
  * 白色卡片里，读者的阅读区域与页面背景立刻分层。本站此前文章区与背景
@@ -1862,7 +1866,14 @@ $('#directory').style.display=view==='directory'?'':'none';$('#reader').classLis
    统一按「没有日期」处理，排在有日期的后面。目录排序与剩余天数两处共用同一判据。 */
 const ISO_DAY=/^\d{4}-\d{2}-\d{2}$/;
 const dueKey=n=>ISO_DAY.test(n.review_after||'')?n.review_after:'9999-12-31';
-function noteList(){const q=state.query.toLowerCase();return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!q||[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(q))).sort((a,b)=>{
+/* 模糊搜索：整串子串匹配升级成多关键词 AND 匹配。空格分词，每个词都要
+   命中同一篇的检索字段才入选，词序不限——「缓存 redis」能搜到标题含
+   redis、正文含缓存的文章，整串子串匹配搜不到（2026-10-08 用户反馈
+   「搜索框不支持模糊搜索匹配」）。检索字段沿用 title/path/topic/
+   search_text/tags 五项，搜索文本是正文前 600 字。 */
+const tokenizeQuery=raw=>[...new Set(raw.trim().toLowerCase().split(/\s+/).filter(Boolean))];
+const noteMatches=(n,terms)=>terms.every(t=>[n.title,n.path,n.topic,n.search_text,(n.tags||[]).join(' ')].join(' ').toLowerCase().includes(t));
+function noteList(){const terms=tokenizeQuery(state.query);return state.notes.filter(n=>n.category!=='总览'&&(state.domain==='all'||n.category===state.domain)&&(state.topic==='all'||n.topic===state.topic)&&(!terms.length||noteMatches(n,terms))).sort((a,b)=>{
   if(state.sort==='updated')return (b.updated||'').localeCompare(a.updated||'')||a.title.localeCompare(b.title,'zh-CN');
   /* 「即将到期」按 review_after 升序：已过复查日的排最前，30 天内到期的紧跟其后，
      没有日期的沉底。只认 YYYY-MM-DD：模板文件里写的是 {{date:YYYY-MM-DD}} 这类占位串，
@@ -2059,13 +2070,27 @@ function renderDirectory(){
   for(const n of filtered){const k=state.sort==='due'?'即将到期':(state.domain==='all'?n.category:n.topic);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(n)}
   const groupRank=g=>state.domain==='all'?(order.indexOf(g)<0?999:order.indexOf(g)):(topicOrder[state.domain]||[]).indexOf(g)<0?999:(topicOrder[state.domain]||[]).indexOf(g);
   // 命中片段高亮：让"为什么这篇被搜出来"直接可见，而不是只列出标题。
+  // 模糊搜索后每个关键词独立高亮：从左往右扫，命中处插入 <mark>，重叠的
+  // 词（如「缓存」「缓存雪崩」）只标记第一个，避免 mark 嵌套。
   const q=state.query.trim();
+  const terms=tokenizeQuery(q);
   const mark=text=>{
     const raw=String(text==null?'':text);
-    if(!q)return esc(raw);
-    const at=raw.toLowerCase().indexOf(q.toLowerCase());
-    if(at<0)return esc(raw);
-    return esc(raw.slice(0,at))+'<mark class="hit">'+esc(raw.slice(at,at+q.length))+'</mark>'+esc(raw.slice(at+q.length));
+    if(!terms.length)return esc(raw);
+    const hits=[];
+    for(const t of terms){
+      const at=raw.toLowerCase().indexOf(t);
+      if(at>=0)hits.push([at,at+t.length]);
+    }
+    if(!hits.length)return esc(raw);
+    hits.sort((a,b)=>a[0]-b[0]);
+    let out='',pos=0;
+    for(const[start,end]of hits){
+      if(start<pos)continue;
+      out+=esc(raw.slice(pos,start))+'<mark class="hit">'+esc(raw.slice(start,end))+'</mark>';
+      pos=end;
+    }
+    return out+esc(raw.slice(pos));
   };
   // 元信息行各段过滤空值再拼接，避免 change_rate 为空时留悬空的「主题 · 」。
   // 字数格式化用全局 fmtWords（口径说明见定义处）。
@@ -3776,11 +3801,22 @@ function enhanceReaderImages(body){
     const tools=document.createElement('span');tools.className='reader-image-tools';
     const status=document.createElement('span');status.className='reader-image-status';status.setAttribute('role','status');
     const original=document.createElement('a');original.className='reader-image-open';original.href=source;original.target='_blank';original.rel='noopener noreferrer';
+    /* archify 精绘图的「交互版」入口（2026-10-08）：渲染管线检测到 figures/ 下
+       存在同名 .html 时给 img 打 data-interactive。静态 SVG 是给版面看的快照，
+       交互页里有平移缩放与链路描摹动画——架构图的阅读方式本来就是先看整体
+       再顺着链路走一遍，只给静态图丢掉了后一半。新窗口打开，不打断阅读。 */
+    const interactiveSrc=image.getAttribute('data-interactive');
+    let interactive=null;
+    if(interactiveSrc){
+      interactive=document.createElement('a');interactive.className='reader-image-open reader-image-interactive';
+      interactive.href=interactiveSrc;interactive.target='_blank';interactive.rel='noopener noreferrer';
+    }
     const retry=document.createElement('button');retry.type='button';retry.className='reader-image-retry';retry.hidden=true;
     const update=()=>{
       const failed=frame.dataset.state==='error';
       original.textContent=readerText('查看原图','View original');
       original.setAttribute('aria-label',readerText(`查看第 ${index+1} 张原图`,`View original image ${index+1}`));
+      if(interactive){interactive.textContent=readerText('交互版','Interactive');interactive.setAttribute('aria-label',readerText(`打开第 ${index+1} 张图的交互版（可缩放、可演示链路动画）`,`Open interactive diagram ${index+1} (zoom and animate flows)`));}
       retry.textContent=readerText('重新加载图片','Reload image');
       retry.hidden=!failed;
       status.textContent=failed?readerText('图片加载失败，请重新加载或查看原图','Image failed to load. Retry or view the original.'):
@@ -3788,6 +3824,7 @@ function enhanceReaderImages(body){
       if(failed)status.textContent+=' '+image.alt;
     };
     image.before(frame);frame.append(image,tools);tools.append(status,original,retry);
+    if(interactive)tools.append(interactive);
     /* 图源说明段（正文中以「图源」或「图：」开头的那一段）与图片同属一个
        视觉单元，在这里打上类名，样式交给 CSS，不在 JS 里写死视觉。 */
     const holder=frame.parentElement;

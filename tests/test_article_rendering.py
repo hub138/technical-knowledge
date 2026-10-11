@@ -28,7 +28,17 @@ class ArticleRenderingTests(unittest.TestCase):
         self.assertIsNotNone(label.parent.find('a', attrs={'data-note': True}), '子列表中的站内链接必须可用')
 
     def test_repeated_headings_have_distinct_ids(self):
-        document = self.render(REPEATED_NOTE)
+        # 用固定文本渲染，不读真实笔记：那篇「案例四十四」会被定时 patrol
+        # 自动改写（2026-09-27 18:17 就把三个「### 机制」改没了），测试一依赖
+        # 真实文件就会被自动流程打红 —— 它该测的是"重复标题 id 是否有 distinct
+        # 后缀"，不是某篇笔记此刻长什么样。
+        body = (
+            "### 机制\n第一种。\n\n"
+            "### 机制\n第二种。\n\n"
+            "### 机制\n第三种。\n"
+        )
+        document = BeautifulSoup(
+            SERVER_MODULE.render_markdown(body, self.vault, 'defect/case.md'), 'html.parser')
         headings = [node for node in document.select('h3') if node.get_text() == '机制']
         self.assertEqual(len(headings), 3)
         self.assertEqual(len({node['id'] for node in headings}), 3)
@@ -70,6 +80,59 @@ class ArticleRenderingTests(unittest.TestCase):
                 self.assertEqual(document.select('script,[onclick],[onload],[onerror]'), [])
                 checked += 1
         self.assertGreater(checked, 400)
+
+    def test_emphasis_preserves_sql_wildcard(self):
+        document = self.render('工程知识/数据系统：在并发与故障中保存事实/查询与索引/列存与向量化执行：OLAP引擎快的两个来源.md')
+        self.assertIn('SELECT * 是列存的反模式', [node.get_text() for node in document.select('strong')])
+
+    def test_real_inline_code_preserves_literal_markdown(self):
+        parser = SERVER_MODULE.MarkdownIt('commonmark', {'html': False}).enable('table')
+        checked = 0
+        for path in self.vault.notes:
+            if not path.startswith('工程知识/'):
+                continue
+            note = self.vault.note(path)
+            for block in parser.parse(note['body']):
+                if block.type != 'inline' or not block.children:
+                    continue
+                expected = [token.content for token in block.children if token.type == 'code_inline']
+                if not expected:
+                    continue
+                with self.subTest(path=path, source=block.content[:60]):
+                    rendered = SERVER_MODULE.render_inline(block.content, self.vault, path)
+                    document = BeautifulSoup(rendered, 'html.parser')
+                    self.assertEqual([node.get_text() for node in document.select('code')], expected)
+                    self.assertEqual(document.select('code a,code img,code strong,code em'), [])
+                    checked += 1
+        self.assertGreater(checked, 100)
+
+    def test_real_inline_emphasis_matches_commonmark(self):
+        parser = SERVER_MODULE.MarkdownIt('commonmark', {'html': False}).enable('table')
+        checked = 0
+        for path in self.vault.notes:
+            if not path.startswith('工程知识/'):
+                continue
+            for block in parser.parse(self.vault.note(path)['body']):
+                if block.type != 'inline' or '[[' in block.content or '<iframe' in block.content:
+                    continue
+                expected = BeautifulSoup(parser.renderInline(block.content), 'html.parser')
+                actual = BeautifulSoup(SERVER_MODULE.render_inline(block.content, self.vault, path), 'html.parser')
+                with self.subTest(path=path, source=block.content[:60]):
+                    for tag in ('strong', 'em'):
+                        self.assertEqual([node.get_text() for node in actual.select(tag)],
+                                         [node.get_text() for node in expected.select(tag)])
+                    for link in actual.select('a[target="_blank"]'):
+                        self.assertIn('noopener', link.get('rel', []))
+                        self.assertIn('noreferrer', link.get('rel', []))
+                    checked += 1
+        self.assertGreater(checked, 1000)
+
+    def test_clipped_video_keeps_only_allowed_attributes(self):
+        document = self.render('Clippings/自学两个月Agent，复盘思考.md')
+        frames = document.select('.video-embed iframe')
+        self.assertEqual(len(frames), 1)
+        self.assertTrue(frames[0]['src'].startswith('https://player.bilibili.com/'))
+        self.assertEqual(set(frames[0].attrs), {'src', 'title', 'frameborder', 'allowfullscreen', 'loading'})
 
     def test_callout_keeps_custom_title_and_body(self):
         document = self.render('知识库管理/归档/来源/实践证据/AI研发迭代框架案例.md')

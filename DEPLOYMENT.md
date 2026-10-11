@@ -2,14 +2,14 @@
 
 ## 本机入口（2026-09-22 起：转发隧道，唯一服务在 dev）
 
-Mac 的 knowledge-site 进程已停用；8787 端口由
-`com.leoqqian.knowledge-forward` LaunchAgent 接管——SSH 本地转发
-`-L 0.0.0.0:8787:127.10.0.1:28787`，把 localhost:8787 与
-macbook-pro-2.local:8787 的请求送到 dev 的站点。URL 不变，内容与
-数据统一落在 dev（含中台，运营者密码登录一次管 14 天）。Mac 断网
-或 dev 重启时隧道自动重连（KeepAlive）。
+开发机（Mac）的 knowledge-site 进程已停用；8787 端口由 LaunchAgent 接管的 SSH
+本地转发送到 dev 实例（`-L 0.0.0.0:8787:127.10.0.1:28787`）。URL 不变，内容与
+数据统一落在 dev（含中台，运营者密码登录一次管 14 天）。Mac 断网或 dev 重启时
+隧道自动重连（KeepAlive）。
 
-vault 仍在 Mac 上编辑并 push（dev 每 5 分钟自动拉取），创作流程不变。反向同样成立：在 dev 上开发并 push 后，Mac 侧 com.leoqqian.knowledge-pull（每 60 秒）自动拉取；有未提交改动时 Mac 侧跳过拉取，不搅局。
+vault 仍在 Mac 上编辑并 push（dev 每 5 分钟自动拉取），创作流程不变。反向同样
+成立：在 dev 上开发并 push 后，Mac 侧拉取代理（每 60 秒）自动拉取；有未提交
+改动时 Mac 侧跳过拉取，不搅局。
 Mac 的历史访问数据已合并进 dev 的 data/visits.jsonl。
 OpenMAIC/DeepTutor 两个学习工具仍跑在 Mac（各自独立 LaunchAgent），
 从转发站点的"创建课堂"跳转 `localhost:3100/3782` 可直达；
@@ -42,6 +42,21 @@ http://MacBook-Pro-2.local:8787/
 `knowledge-update.timer` 每 5 分钟从 GitHub main 拉取。推完代码 5 分钟内自动上线，
 需要立刻生效就手动 `systemctl restart knowledge-site`。
 
+**发布门禁（2026-09-25 起）**：`scripts/deploy/update-knowledge.sh` 不再拉取后直接重启。
+候选版本先进临时 worktree（`.editorial/deploy/candidate-<时间>`），在那里跑
+`python3 -m pytest tests -q`，再用 `knowledge-governor/scripts/check_knowledge.sh`
+对候选版本的知识库做内容检测，两道都过且 ERROR 为 0 才 `git pull --ff-only` 并重启。
+任一道不过就什么都不做：工作目录留在旧版本，线上进程继续服务，原因写进
+`.editorial/reports/deploy-<时间>.md`，中台 `/insights` 的「知识保鲜」板块显示
+「最近一次发布被门禁拦下：原因」。WARN 不阻断（过复查日、缺 tags 这类天天都有），
+只记进报告。仓库路径由脚本位置推导，重启命令可用 `KNOWLEDGE_RESTART_CMD` 覆盖
+（测试用它换成写标记文件，不碰 systemd）。
+
+**新鲜度巡检（2026-09-25 起）**：`knowledge-governor/scripts/freshness_patrol.py`
+每天把到期文章派给 AI 复查并校验写回结果，systemd 模板在 `deploy/`
+（`knowledge-freshness-patrol.service` 与 `.timer`，每天 09:00）。模板只是模板，
+安装由人做。手动试跑用 `--dry-run --today YYYY-MM-DD`，它只写任务卡与报告。
+
 **回环别名约定（2026-09-22 起）**：反代/隧道把外部流量接到 `127.10.0.1`，服务端
 `origin_is_local(源, 目的)` 对落在这个别名上的连接一律判非本机——中台（/insights）、
 工具启动密码门禁都依赖它。只看来源地址会把经代理进来的访客（源恒为 127.0.0.1）
@@ -56,7 +71,7 @@ http://MacBook-Pro-2.local:8787/
 不同权：站点密码只解锁工具启动，读不了中台；运营者密码两者都解锁。
 不配置时行为退回纯本机判定。
 
-Mac 的 `com.leoqqian.knowledge-tunnel`（SSH 反向隧道）已下线：dev 实例接管公网入口
+dev 实例的 SSH 反向隧道已下线：dev 实例接管公网入口
 后，隧道抢不到 28787，留着只会崩溃循环。plist 保留（转发目标已改为
 `127.10.0.1:8787`）备查；若要复活隧道，macOS 需先 `sudo ifconfig lo0 alias 127.10.0.1`
 （Linux 的 127/8 天然可用，macOS 不是）。

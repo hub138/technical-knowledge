@@ -20,74 +20,74 @@ sources:
 
 # Agent 应用工程技术核验
 
+这篇是来源核验稿，只采用官方规范、官方文档、官方仓库和原始论文。读完这篇你能知道哪些结论有官方依据，哪些要按复查时间重新验证。
+
 > 核验基准日：**2026-09-03**。只采用官方规范、官方文档、官方仓库和原始论文。本文是来源核验稿，不把厂商宣称等同于跨场景结论；版本事实需要按 `review_after` 复查。
 
-## 结论
+## 这篇的结论是什么
 
-Agent 应用工程不是某个框架的使用教程，而是把概率性的模型决策接入确定性软件系统的工程。最值得长期维护的知识结构是：
+Agent 应用工程不是某个框架的使用教程，而是**把概率性的模型决策接入确定性软件系统的工程**。最值得长期维护的知识结构是：
 
 1. **模型交互**：输入、输出、推理、工具调用和结构化约定；
 2. **上下文状态**：工作上下文、会话状态、长期记忆和外部知识；
-3. **行动系统**：工具、MCP、远程 Agent、权限与副作用；
+3. **行动系统**：工具、MCP（Model Context Protocol，模型上下文协议）、远程 Agent、权限与副作用；
 4. **执行系统**：编排、持久化、异步任务、重试、取消和恢复；
 5. **可信系统**：证据、评测、追踪、安全策略和人工接管。
 
 模型、SDK、协议和框架只是这些能力的当前实现。知识库应以能力和不变量为主干，把具体版本放在可替换的“当前实现”层。
 
 ```mermaid
-flowchart LR
-    I[目标与输入] --> C[上下文与状态]
+flowchart TD
+    I[目标与输入] --> C[上下文]
     C --> M[模型决策]
     M --> O[编排器]
-    O --> T[工具与外部 Agent]
+    O --> T[工具与 Agent]
     T --> E[执行证据]
-    E --> O
-    O --> V[策略、验证与审批]
-    V --> R[结果或可恢复状态]
-    O -.轨迹.-> Q[评测与可观测性]
-    T -.调用记录.-> Q
-    R -.任务结果.-> Q
+    E -->|继续| O
+    O --> V[策略审批]
+    V --> R[结果或恢复]
+    R -.轨迹.-> Q[评测可观测]
 ```
 
-## 稳定主轴与时效层
+## 哪些该长期掌握、哪些要持续核验
 
 | 层次 | 应长期掌握 | 需要持续核验 |
 | --- | --- | --- |
 | 模型交互 | 工具调用循环、schema 校验、错误语义、成本与延迟权衡 | 模型名、上下文窗口、推理参数、托管工具 |
 | 上下文 | 选择、压缩、隔离、来源、token 预算 | Provider 的状态保存、缓存与 compaction 接口 |
-| 记忆 | 工作状态与长期知识分离；写入、读取、纠错、删除策略 | SDK session/memory API、托管存储期限 |
+| 记忆 | 工作状态与长期知识分离；写入、读取、纠错、删除策略 | SDK（Software Development Kit，软件开发工具包） session/memory API、托管存储期限 |
 | 工具 | 最小能力、明确输入输出、幂等、副作用分级 | MCP 规范、Provider 内置工具、工具搜索接口 |
 | 编排 | 状态机、checkpoint、事件日志、重放、补偿、人工接管 | Agent SDK、LangGraph、ADK 等框架 API |
-| 检索 | 数据治理、召回、排序、引用、时效与 ACL | embedding、reranker、GraphRAG 和 agentic retrieval 实现 |
+| 检索 | 数据治理、召回、排序、引用、时效与 ACL（Access Control List，访问控制列表：逐条列出谁可以对资源做什么） | embedding、reranker、GraphRAG 和 agentic retrieval 实现 |
 | 质量 | 任务结果、轨迹、组件、安全和成本联合评测 | 具体 benchmark、grader、评测平台 |
 | 安全 | 模型外授权、隔离、完整仲裁、审计 | 新攻击方式、协议授权规范、供应链公告 |
 
-## 模型、Responses 与工具调用
+## 模型、Responses 与工具调用是什么关系
 
-### 稳定原理
+### 这部分有哪些稳定原理
 
-- 模型产生的是**调用建议**，应用才是执行主体。应用负责参数校验、身份、权限、超时、重试、幂等和结果持久化。
+- 模型产生的是**调用建议**，应用才是执行主体。应用负责参数校验、身份、权限、超时、重试、幂等（同一操作执行多次与执行一次效果相同）和结果持久化。
 - 结构化输出只证明结果符合 schema，不证明事实正确或动作被允许；业务约束必须二次验证。
 - 模型路由应由任务评测、延迟、成本、数据策略和能力要求驱动，不按“最新最大模型”单点决定。
-- 工具描述是模型看到的 API 约定。工具数量增长后，应做命名空间、候选集过滤或动态加载，而不是把全部 schema 永久塞入上下文。
+- 工具描述是模型看到的 API 约定。工具数量增长后，应做命名空间、候选集过滤或动态加载，而不是**把全部 schema 永久塞入上下文**。
 
-### 截至基准日的事实
+### 截至基准日能确认哪些事实
 
 - OpenAI 当前新集成的主接口是 **Responses API**；它统一承载 function calling、托管搜索、远程 MCP、shell/computer use 等工具。`tool_search` 是特定新模型能力，不能抽象成所有 Provider 都支持的通用协议。[Using tools](https://developers.openai.com/api/docs/guides/tools)
 - Responses 可用 `previous_response_id` 延续响应链，也可与 Conversations API 使用持久 conversation；二者是 Provider 状态接口，不应成为业务任务唯一状态源。[Conversation state](https://developers.openai.com/api/docs/guides/conversation-state)
 - **Assistants API 已于 2026-08-26 下线**，官方替代是 Responses API 与 Conversations API。[Assistants migration guide](https://developers.openai.com/api/docs/assistants/migration) · [Deprecations](https://developers.openai.com/api/docs/deprecations)
-- 当前 OpenAI 模型目录变化很快；生产配置应记录实际请求模型和返回模型，能锁快照时锁快照，并在升级前跑同一评测集。[Model catalog](https://developers.openai.com/api/docs/models)
+- 当前 OpenAI 模型目录变化很快；生产配置应记录实际请求模型和返回模型，能锁快照（某一时刻的完整只读副本）时锁快照，并在升级前跑同一评测集。[Model catalog](https://developers.openai.com/api/docs/models)
 
-### 工程验收
+### 工程验收该验什么
 
 - 每次运行绑定 `provider/model snapshot/prompt/tool schema/code revision`。
 - 工具调用保存原始参数、校验后参数、执行者、授权主体、退出状态和产物引用。
 - 并行调用必须定义依赖、冲突和合并规则；写操作默认串行或使用并发控制。
-- 拒绝、截断、内容过滤、限流、超时和工具错误是不同状态，不可折叠成“模型失败”。
+- 拒绝、截断、内容过滤、限流（限制单位时间内放行的请求数量）、超时和工具错误是不同状态，不可折叠成“模型失败”。
 
-## 上下文与记忆
+## 上下文与记忆这一段讲什么
 
-### 四种不同状态
+### 上下文与记忆有哪四种状态
 
 | 状态 | 作用 | 生命周期 | 关键风险 |
 | --- | --- | --- | --- |
@@ -96,15 +96,15 @@ flowchart LR
 | 运行状态 | checkpoint、重试次数、锁、审批和产物句柄 | 一次可恢复执行 | 重复副作用、版本不兼容 |
 | 长期记忆 | 用户偏好、事实、经验和跨会话知识 | 跨任务 | 过期、污染、隐私、无法删除 |
 
-上下文窗口不是记忆数据库。长上下文仍可能因信息位置和干扰而退化；原始研究显示相关信息位于上下文中部时性能可能显著下降。[Lost in the Middle](https://arxiv.org/abs/2307.03172)
+上下文窗口（模型一次能读入的最大文本长度）不是记忆数据库。长上下文仍可能因信息位置和干扰而退化；原始研究显示相关信息位于上下文中部时性能可能显著下降。[Lost in the Middle](https://arxiv.org/abs/2307.03172)
 
 长期记忆至少需要：来源、主体、写入理由、置信度、创建/访问时间、过期策略、纠错和删除入口。模型可提出记忆候选，但持久写入应经过应用规则；敏感事实不能因一次对话自动升级为永久记忆。
 
 OpenAI Conversations、`previous_response_id`、SDK sessions 和数据库 checkpoint 是不同层次的机制。Provider 保存了对话，不等于保存了业务锁、审批、幂等键和真实执行事实。[OpenAI conversation state](https://developers.openai.com/api/docs/guides/conversation-state) · [OpenAI Agents SDK sessions](https://openai.github.io/openai-agents-python/sessions/)
 
-## MCP 与 A2A
+## MCP 与 A2A（Agent2Agent 协议，Google 主推的 Agent 间协作协议） 各自解决什么
 
-### 分工
+### MCP 与 A2A 怎么分工
 
 | 接口 | 解决什么问题 | 不解决什么问题 |
 | --- | --- | --- |
@@ -112,23 +112,23 @@ OpenAI Conversations、`previous_response_id`、SDK sessions 和数据库 checkp
 | MCP | Host 与外部工具、资源、提示的标准连接 | 业务授权、可信身份、远程 Agent 协作语义 |
 | A2A | 独立远程 Agent 的发现、消息、任务和状态协作 | 本地工具执行、内部工作流编排 |
 
-### MCP 当前状态
+### MCP 当前进展到哪一版
 
-- 当前已发布规范版本为 **2026-07-28**。核心改为无状态请求/响应，移除协议级 session 和初始化握手；状态需求通过显式句柄表达。[MCP 2026-07-28 specification](https://modelcontextprotocol.io/specification/2026-07-28) · [Release announcement](https://blog.modelcontextprotocol.io/posts/2026-07-28/)
+- 当前已发布规范版本为 **2026-07-28**。核心改为无状态请求/响应，移除协议级 session 和初始化握手；状态需求通过显式句柄（程序持有的资源引用标识）表达。[MCP 2026-07-28 specification](https://modelcontextprotocol.io/specification/2026-07-28) · [Release announcement](https://blog.modelcontextprotocol.io/posts/2026-07-28/)
 - `server/discover`、每请求版本/能力元数据、MRTR、缓存提示和 header 路由是该版本的重要变化；Tasks 是官方扩展，不是核心协议。[2026-07-28 changelog](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx)
-- Roots、Sampling、Logging、HTTP+SSE 和 OAuth Dynamic Client Registration 已进入弃用路径；新实现不应继续把它们作为主架构。[MCP changelog: Deprecated](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx#deprecated)
+- Roots、Sampling、Logging、HTTP+SSE（Server-Sent Events，服务器单向推送协议，比 WebSocket 简单） 和 OAuth（第三方授权协议、不交密码也能授权访问资源） Dynamic Client Registration 已进入弃用路径；新实现不应继续把它们作为主架构。[MCP changelog: Deprecated](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/changelog.mdx#deprecated)
 
-### A2A 当前状态
+### A2A 当前进展到哪一版
 
 - 当前规范主版本为 **1.0**，固定规范页为 v1.0.0；官方仓库的 patch 修订和发布时间需要在每次复查时重新核验。它定义 Agent Card、Message、Task、Artifact、流式更新、推送通知、取消、版本协商和多种协议绑定。[A2A v1.0.0 specification](https://a2a-protocol.org/v1.0.0/specification/) · [A2A releases](https://github.com/a2aproject/A2A/releases)
 - A2A 适合跨服务、跨团队、独立部署的 Agent。单进程中的角色拆分不需要 A2A；普通函数或工作流节点更简单、可测。
 - Agent Card 和协议认证只建立接口与身份基础，业务资源授权仍由服务端执行。远程 Agent 输出应按第三方输入处理。
 
-### 共同边界
+### 两者共同的边界在哪
 
 协议标准化不等于可信。无论 MCP 还是 A2A，都必须校验服务身份、协议版本、能力清单、租户、scope、数据出站范围、超时和审计。模型不能自行扩大工具集或凭据范围。
 
-## Agent 运行时与编排
+## Agent 的运行时和编排长什么样
 
 Agent 最小循环可以表达为：
 
@@ -137,20 +137,20 @@ Agent 最小循环可以表达为：
          -> 保存结果和证据 -> 判断完成、继续、暂停或失败
 ```
 
-### 选择原则
+### 编排方式按什么原则选
 
-- 路径确定、规则稳定：用普通代码、DAG 或状态机。
+- 路径确定、规则稳定：用普通代码、DAG（Directed Acyclic Graph，有向无环图：任务依赖关系的常用表达） 或状态机。
 - 路径不确定、需要根据环境反馈选工具：在局部节点引入模型决策。
 - 多 Agent 只有在权限、上下文、部署、专业能力或并行性确实不同的时候才有价值；“角色扮演数量”不是架构质量。
-- 框架是减少实现成本的运行时，不是业务状态、权限或正确性的来源。
+- 框架是减少实现成本的运行时（程序实际运行时发生的阶段），不是业务状态、权限或正确性的来源。
 
 ReAct 提出的“推理与行动交错”是 Agent 循环的重要研究来源，但生产系统应保存动作和观察，不依赖暴露或持久化模型的私有推理文本。[ReAct](https://arxiv.org/abs/2210.03629)
 
-OpenAI Agents SDK、LangGraph、Google ADK、Microsoft Agent Framework 等都覆盖模型、工具、状态、编排或 tracing 的一部分。选择时比较持久化语义、恢复边界、错误模型、可观测性和 Provider 耦合，而不是比较抽象类数量。[OpenAI Agents SDK](https://github.com/openai/openai-agents-python) · [LangGraph](https://github.com/langchain-ai/langgraph) · [Google ADK](https://github.com/google/adk-python) · [Microsoft Agent Framework](https://github.com/microsoft/agent-framework)
+OpenAI Agents SDK、LangGraph、Google ADK（Agent Development Kit，Google 的智能体开发框架）、Microsoft Agent Framework 等都覆盖模型、工具、状态、编排或 tracing 的一部分。选择时比较持久化语义、恢复边界、错误模型、可观测性（通过系统对外输出判断内部状态的能力）和 Provider 耦合，而不是比较抽象类数量。[OpenAI Agents SDK](https://github.com/openai/openai-agents-python) · [LangGraph](https://github.com/langchain-ai/langgraph) · [Google ADK](https://github.com/google/adk-python) · [Microsoft Agent Framework](https://github.com/microsoft/agent-framework)
 
-## RAG 与 Agentic Retrieval
+## RAG 和 Agentic Retrieval 差别在哪儿
 
-### 演进的本质
+### 检索演进的本质是什么
 
 ```text
 一次检索
@@ -167,20 +167,20 @@ OpenAI Agents SDK、LangGraph、Google ADK、Microsoft Agent Framework 等都覆
 - Adaptive-RAG 按问题复杂度在不检索、单步和迭代策略之间选择。[Adaptive-RAG](https://arxiv.org/abs/2403.14403)
 - RAPTOR 和 GraphRAG 分别面向层次化长文档与语料级全局问题；它们是针对特定查询结构的索引/检索策略，不是所有 RAG 的默认升级。[RAPTOR](https://arxiv.org/abs/2401.18059) · [GraphRAG](https://arxiv.org/abs/2404.16130)
 
-因此，**agentic retrieval** 最合理的定义是：把检索变成有状态、可评测的决策过程。它不等于“用了 Agent 框架”，也不等于“循环越多越先进”。
+检索的差距不在"多循环几次"，而在有没有把查过什么、还缺什么记下来并据此决定下一步；没有这些记录，循环多少次都还是单次查询。因此，**agentic retrieval** 最合理的定义是：把检索变成有状态、可评测的决策过程。它不等于**“用了 Agent 框架”**，也不等于**“循环越多越先进”**。
 
-### 必须分别评测
+### 哪几项必须分开评测
 
 - 语料覆盖、解析成功率、ACL 和删除传播；
 - query rewriting 是否保留意图；
-- recall@k、MRR/nDCG、reranker 效果；
-- 证据支持率、引用准确率和拒答质量；
+- recall@k、MRR（Mean Reciprocal Rank，平均倒数排名：检索质量指标）/nDCG、reranker 效果；
+- 证据支持率、引用准确率（预测或判断正确的比例）和拒答质量；
 - 迭代检索的任务收益、额外延迟和成本；
 - 索引、embedding、reranker 和文档 revision 的可重放性。
 
-“向量数据库”“知识图谱”“长上下文”都是可选组件，不应独立成为 RAG 成熟度等级。
+“向量数据库（专门存向量并按相似度检索的数据库）”“知识图谱”“长上下文”都是可选组件，不应独立成为 RAG 成熟度等级。
 
-## 评测
+## Agent 评测至少分哪四层
 
 Agent 评测至少分四层：
 
@@ -195,11 +195,11 @@ Agent 评测至少分四层：
 
 LLM grader 适合规模化语义判断，但需用人工标注集校准，并监控偏置和漂移。可由确定性程序验证的事实（退出码、数据库状态、测试结果、文件哈希）不应交给 LLM grader。
 
-轨迹评测能够定位结果失败发生在哪一步；OpenAI 的 trace grading 文档也把 trace 定义为端到端决策、工具调用和步骤日志。[Trace grading](https://developers.openai.com/api/docs/guides/trace-grading) 原始 benchmark 可帮助理解任务设计，但旧榜单成绩不能替代自身场景回归集。[AgentBench](https://arxiv.org/abs/2308.03688) · [SWE-bench](https://arxiv.org/abs/2310.06770)
+轨迹评测能够定位结果失败发生在哪一步；OpenAI 的 trace grading 文档也把 trace 定义为端到端决策、工具调用和步骤日志。[Trace grading](https://developers.openai.com/api/docs/guides/trace-grading) 原始 benchmark 可帮助理解任务设计，但旧榜单成绩不能替代自身场景回归集。[AgentBench](https://arxiv.org/abs/2308.03688) · [SWE（Software Engineering，软件工程）-bench](https://arxiv.org/abs/2310.06770)
 
 **时效提醒**：OpenAI 当前文档把 Agent Builder 和 Evals 列在 Legacy APIs；具体迁移或下线日期应以官方弃用页的当前条目为准。无论托管产品是否变化，eval-driven development 仍是独立的工程方法：任务夹具、轨迹、确定性证据和回归门禁不能绑定到某个托管界面。[OpenAI deprecations](https://developers.openai.com/api/docs/deprecations)
 
-## 可观测性与证据
+## 一条 trace 该能回答什么
 
 一个 Agent trace 应能回答：谁以什么版本启动了什么任务，模型看到了哪些受控输入，提出了什么工具调用，实际执行了什么，产生了哪些产物，策略为何允许或拒绝，最终结果如何被验证。
 
@@ -214,17 +214,17 @@ LLM grader 适合规模化语义判断，但需用人工标注集校准，并监
 
 OpenTelemetry 已有 GenAI inference、retrieval、memory、agent、workflow 和 tool span 的语义约定，但当前 Agent/GenAI 约定状态仍为 **Development**。可以参考字段含义，不应在内部数据模型中硬编码未经版本隔离的实验字段。[GenAI agent spans](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md) · [GenAI spans](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-spans.md)
 
-日志和 trace 可能包含 prompt、工具参数、文档和个人信息。默认记录标识、摘要、哈希与受控产物引用；完整内容应按敏感度选择性采集、脱敏、加密和限期保存。
+日志和 trace 可能包含 prompt、工具参数、文档和个人信息。默认记录标识、摘要、哈希（把任意长度数据压成固定长度指纹、不可逆）与受控产物引用；完整内容应按敏感度选择性采集、脱敏（遮盖敏感字段的部分内容、保留可辨识形态）、加密和限期保存。
 
-## 安全、权限与事实门禁
+## 稳定的职责边界是什么
 
 稳定的职责边界是：
 
 > AI 负责语义理解、方案选择和失败分析；系统负责身份、权限、隔离、执行、证据、一致性和资源上限。
 
-这不是削弱 Agent，而是防止“模型说已完成”直接成为系统事实。
+这不是削弱 Agent，而是**防止“模型说已完成”直接成为系统事实**。
 
-### 必要控制
+### 必须做哪些控制
 
 - 不可信网页、邮件、文档、检索结果和远程 Agent 输出都带污染标记，不能升级为高优先级指令。
 - 权限在工具或下游服务中按用户、租户、资源和动作完整仲裁；不要让模型决定自己是否有权。
@@ -234,9 +234,9 @@ OpenTelemetry 已有 GenAI inference、retrieval、memory、agent、workflow 和
 - 审批界面显示真实动作、对象、影响和差异，不能只显示模型生成的解释。
 - 结果由执行记录和独立验证器确认；后续失败不能覆盖已经确认的成功事实。
 
-OpenAI 安全文档明确指出 prompt injection 可通过工具导致数据泄露或错误动作，并建议使用结构化节点间数据、工具审批、隔离、trace 与 eval；同时强调这些措施不能完全消除风险。[Safety in building agents](https://developers.openai.com/api/docs/guides/agent-builder-safety) OWASP 把过多功能、过多权限和过多自主性归为 Excessive Agency 的根因，并建议在下游系统执行完整仲裁。[OWASP Excessive Agency](https://owasp.org/www-project-top-10-for-large-language-model-applications/2_0_vulns/LLM06_ExcessiveAgency.html)
+OpenAI 安全文档明确指出 prompt injection 可通过工具导致数据泄露或错误动作，并建议使用结构化节点间数据、工具审批、隔离、trace 与 eval；同时强调这些措施不能完全消除风险。[Safety in building agents](https://developers.openai.com/api/docs/guides/agent-builder-safety) OWASP（Open Web Application Security Project，开放 Web 应用安全项目，发布漏洞清单） 把过多功能、过多权限和过多自主性归为 Excessive Agency 的根因，并建议在下游系统执行完整仲裁（由第三方投票打破平局、决定归属的机制）。[OWASP Excessive Agency](https://owasp.org/www-project-top-10-for-large-language-model-applications/2_0_vulns/LLM06_ExcessiveAgency.html)
 
-## 长任务、异步与状态恢复
+## 长任务的连接保持等于状态恢复吗
 
 Provider 的 background mode 解决连接保持与异步轮询，不等于业务级 durable execution。OpenAI background response 可查询、取消和续接流，但仍有数据保存和 Provider 生命周期约束。[Background mode](https://developers.openai.com/api/docs/guides/background)
 
@@ -248,11 +248,11 @@ Provider 的 background mode 解决连接保持与异步轮询，不等于业务
 - 幂等键和 outbox/inbox 防止重放副作用；
 - 分步骤超时、全局 deadline、取消传播和资源回收；
 - 人工审批可暂停数小时或数天，恢复时校验代码、prompt、工具与权限版本；
-- 恢复后不重复已经确认的副作用；不确定状态进入 reconciliation，而不是盲目重试。
+- 恢复后不重复已经确认的副作用；不确定状态进入 reconciliation，而不是**盲目重试**。
 
-LangGraph 文档明确提示恢复时节点可能从头执行，因此副作用必须幂等；OpenAI Agents SDK 的 `RunState` 支持序列化与恢复，但持久化内容及版本兼容仍由应用负责。[LangGraph interrupts](https://langchain-ai.github.io/langgraph/concepts/breakpoints/) · [OpenAI Agents SDK HITL](https://openai.github.io/openai-agents-python/human_in_the_loop/)
+LangGraph 文档明确提示恢复时节点可能从头执行，因此副作用（操作对外部状态产生的额外影响）必须幂等；OpenAI Agents SDK 的 `RunState` 支持序列化（把内存对象转成可存储或传输的字节格式的过程）与恢复，但持久化内容及版本兼容仍由应用负责。[LangGraph interrupts](https://langchain-ai.github.io/langgraph/concepts/breakpoints/) · [OpenAI Agents SDK HITL（Human-In-The-Loop，人在环路：关键决策交给人确认）](https://openai.github.io/openai-agents-python/human_in_the_loop/)
 
-## 不应作为知识库主轴的名词
+## 哪些名词不该当知识库主轴
 
 | 名词 | 处理方式 | 原因 |
 | --- | --- | --- |
@@ -271,9 +271,9 @@ LangGraph 文档明确提示恢复时节点可能从头执行，因此副作用�
 | Microsoft AutoGen | 归入维护/迁移 | 官方已进入 maintenance mode，新项目推荐 Microsoft Agent Framework。[AutoGen repository](https://github.com/microsoft/autogen) |
 | MCP HTTP+SSE / protocol session | 只留迁移说明 | 新规范已弃用 HTTP+SSE，并移除协议级 session |
 
-## 推荐的知识库架构
+## 这个主题该重构成哪几个领域
 
-Agent 应用工程主题应重构为以下六个并列领域，而不是把 MCP、RAG、模型名和框架平铺在一起：
+Agent 应用工程主题应重构为以下六个并列领域，而不是**把 MCP、RAG、模型名和框架平铺在一起：**
 
 ```text
 Agent 应用工程
@@ -305,7 +305,7 @@ Agent 应用工程
 
 模型目录、SDK、框架、协议和论文放在这些主题的“当前实现/演进证据”中，不单独主导分类。
 
-## 版本与来源登记
+## 版本与来源登记有什么要求
 
 以下均于 **2026-09-06** 访问；版本号只记录当日可核验快照，不能替代发布门禁。
 
@@ -325,6 +325,6 @@ Agent 应用工程
 | Microsoft AutoGen | maintenance mode | [Official repository](https://github.com/microsoft/autogen) | 迁移计划与安全修复 |
 | OWASP GenAI Top 10 | 2026 当前发布 | [Official project](https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/) | Agentic 风险与缓解更新 |
 
-## 复查规则
+## 多久复查一次、复查什么
 
-每月复查模型目录、OpenAI deprecations、MCP/A2A 固定版本规范、Agent SDK release 和 OpenTelemetry GenAI schema。出现下列事件时立即更新相关主题：正式版/破坏性版本、弃用或下线、安全公告、协议状态变化、评测基线显著变化。只有新名词、营销发布或单一 benchmark 提升，不足以进入主知识结构。
+每月复查模型目录、OpenAI deprecations、MCP/A2A 固定版本规范、Agent SDK release 和 OpenTelemetry GenAI schema。出现下列事件时立即更新相关主题：正式版/破坏性版本、弃用或下线、安全公告、协议状态变化、评测基线（正常状态下的指标水平、用来对比异常）显著变化。只有新名词、营销发布或单一 benchmark 提升，不足以进入主知识结构。

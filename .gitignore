@@ -137,5 +137,42 @@ data/.paper-scout-state.json
 # 私享内容提示词（含读者个人项目背景与口径，只放主仓库非 git 目录；本条防误移入）
 scripts/paper-scout-prompt.md
 
+# 私享雷达脚本：PROJECT_ROOTS 写死本机 mr_six 项目路径，借鉴点服务个人项目，永不入 GitHub
+scripts/private_paper_scout.py
+
+# 内部工具链脚本：依赖部署机本地的内部平台（模型池、agent CLI），公开环境
+# 装不上这些依赖，脚本留在本地与本机 crontab 里跑，不入 GitHub
+scripts/score_papers.py
+scripts/run_agent_task.py
+scripts/review_by_llm.py
+scripts/verify_review_fixes.py
+scripts/score_papers_prompt.md
+score_papers_prompt.md
+score_result.json
+
+# 本地工作现场：评审中间稿、认领锁、基线快照与临时目录，都不是源码
+after-*.md
+before-*.md
+seq-125-*
+.Trash-0/
+.before6/
+.claim6.txt
+.edit-tmp/
+.review-out*/
+.verify_scratch/
+.work/
+.work-10/
+.work-10-baseline.py
+/.review6.log
+/.bak6/
+
 # AI 周报任务提示词：内含写作规范路径与站长个人口径，只留本地
 scripts/radar_weekly_prompt.md
+
+# 指向本地聚合层主副本的符号链接：目标是本机绝对路径，公开 clone 无效且泄
+# 露机器目录结构，永不入 GitHub
+.knowledge-skills/knowledge-governor
+
+# 翻译桥接模块：包装部署机本地的模型池，公开环境没有这层依赖。
+# 缺了它 server.py 捕获 ImportError，翻译自动降级为显示英文原题
+site/translate_bridge.py

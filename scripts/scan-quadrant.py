@@ -2,7 +2,7 @@ from pathlib import Path
 import re, json, sys
 
 ROOT = Path(sys.argv[1] if len(sys.argv) > 1 else
-            "/Users/leoqqian/Developer/technical-knowledge/vault/工程知识")
+            Path(__file__).resolve().parents[1] / "vault" / "工程知识")
 
 docs = [p for p in ROOT.rglob("*.md") if p.is_file()]
 

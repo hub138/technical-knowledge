@@ -56,21 +56,67 @@
         font-weight: var(--weight-semibold);
         margin-bottom: var(--space-2);
       }
-      .lp-select-row select {
-        width: 100%;
-        /* 16px 是 iOS Safari 的分界：小于它聚焦时整页自动放大。 */
-        font-size: 16px;
-        min-height: 44px;
-        border: 1px solid var(--color-line);
-        border-radius: 5px;
-        padding: 8px 10px;
-        outline: 0;
-        background: var(--color-panel);
-        color: var(--color-ink);
+      /* 领域/主题原来是两条原生 select：宽 1000 多像素的一条白条，选项藏在
+         系统弹层里，既不好看也不能多选。换成一排可点的 chip —— 选项只有
+         6 个和 11 个，摊开比收起来更好（一眼看全，不用点开才知道有什么），
+         顺带避开了自定义下拉那套打开/关闭/Esc/焦点/aria 的边界处理。 */
+      .lp-rowhead {
+        display: flex;
+        align-items: center;
+        gap: 10px;
       }
-      .lp-select-row select:focus {
-        border-color: var(--color-ok);
-        box-shadow: 0 0 0 3px #08766316;
+      .lp-rowhead .lp-label {
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        margin-bottom: 0;
+      }
+      .lp-clear {
+        margin-left: auto;
+        padding: 2px 8px;
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        background: var(--color-panel);
+        color: var(--color-muted);
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        cursor: pointer;
+      }
+      .lp-clear:hover { color: var(--color-ink); border-color: var(--color-accent-line); }
+      .lp-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin-top: var(--space-2);
+      }
+      .lp-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-height: 32px;
+        padding: 5px 13px;
+        border: 1px solid var(--color-line);
+        border-radius: 999px;
+        background: var(--color-panel);
+        color: var(--color-ink-soft);
+        font-size: var(--text-small);
+        font-weight: var(--weight-semibold);
+        cursor: pointer;
+        transition:
+          background var(--duration-base) var(--ease-out),
+          border-color var(--duration-base) var(--ease-out),
+          color var(--duration-base) var(--ease-out);
+      }
+      .lp-chip:hover { border-color: var(--color-accent-line); color: var(--color-ink); }
+      .lp-chip.on {
+        background: var(--color-accent);
+        border-color: var(--color-accent);
+        color: var(--color-on-accent);
+      }
+      .lp-chip-count { font-variant-numeric: tabular-nums; opacity: 0.75; }
+      .lp-empty-tip {
+        padding: 14px 0;
+        color: var(--color-muted);
+        font-size: var(--text-body);
       }
       .lp-kinds {
         display: flex;
@@ -375,20 +421,26 @@
     <div class="tk-shell">
       <section class="hero">
         <h1 id="lp-title">系统阅读路线</h1>
-        <p id="lp-desc">选一个领域和主题，把这一主题的文章排出一条路线：先懂机制，再看怎么观测，认得出故障，学得会修复，最后沉淀成实践。顺序已排好，不用自己挑。换主题即换路线，进度按主题分别显示。</p>
+        <p id="lp-desc">选一到几个领域或主题，相关文章会自动排成一条路线：先懂机制，再看怎么观测，认得出故障，学得会修复，最后沉淀成实践——顺序已经排好，你不用挑，选多个还会并成一条更长的路线，进度一起算</p>
       </section>
         <section id="lp-main" class="lp-main">
           <h2>学习路线</h2>
-          <p class="rd-sec-intro">选一个领域和主题，把这一主题的文章排出一条路线：先懂机制，再看怎么观测，认得出故障，学得会修复，最后沉淀成实践。顺序已排好，不用自己挑。换主题即换路线，进度按主题分别显示。</p>
+          <p class="rd-sec-intro">点一下 chip 就加上或去掉一个条件，路线马上跟着变，想横向对比几个主题就把它们都选上</p>
           <div class="lp-loading" id="lp-loading">正在加载学习路线数据…</div>
           <form class="lp-picker" id="lp-picker">
             <div class="lp-select-row">
-              <label for="lp-domain">领域</label>
-              <select id="lp-domain"></select>
+              <div class="lp-rowhead">
+                <span class="lp-label" id="lp-domain-label">领域</span>
+                <button type="button" class="lp-clear" id="lp-clear-domain" hidden>清空</button>
+              </div>
+              <div class="lp-chips" id="lp-domain" role="group" aria-labelledby="lp-domain-label"></div>
             </div>
             <div class="lp-select-row">
-              <label for="lp-topic">主题</label>
-              <select id="lp-topic"></select>
+              <div class="lp-rowhead">
+                <span class="lp-label" id="lp-topic-label">主题</span>
+                <button type="button" class="lp-clear" id="lp-clear-topic" hidden>清空</button>
+              </div>
+              <div class="lp-chips" id="lp-topic" role="group" aria-labelledby="lp-topic-label"></div>
             </div>
             <fieldset>
               <legend>要学哪几段</legend>
@@ -417,7 +469,7 @@
 
       <script>
           /* ═══ 第二分区：学习路线（从 path.html 迁移，逻辑不变） ═══ */
-          var LP = { notes: [], domain: "", topic: "", kinds: {}, expanded: {}, hideLearned: false };
+          var LP = { notes: [], domains: [], topics: [], kinds: {}, expanded: {}, hideLearned: false };
           var LEARN_ORDER = ["mech", "obs", "fail", "fix", "prac", "vocab"];
           var DEFAULT_ON = { mech: true, obs: true, fail: true, fix: true, prac: true, vocab: false };
           var EXPAND = 5;
@@ -454,11 +506,15 @@
             });
             return out.sort(function (a, b) { return a.localeCompare(b, "zh-CN"); });
           }
-          function topicList(items, domain) {
+          function topicList(items, domains) {
+            /* 领域可以多选了，主题列表跟着并起来：选中的几个域里所有主题
+               都摆出来，每个主题后面带它在这几个域里的合计篇数。 */
+            var picked = domains || [];
+            if (typeof picked === "string") picked = [picked];
             var seen = new Set();
             var out = [];
             items.forEach(function (n) {
-              if (n.category !== domain) return;
+              if (picked.length && picked.indexOf(n.category) < 0) return;
               if (!seen.has(n.topic)) { seen.add(n.topic); out.push({ name: n.topic, count: 1 }); }
               else {
                 for (var i = 0; i < out.length; i++) if (out[i].name === n.topic) out[i].count++;
@@ -470,7 +526,9 @@
             return window.TKMatrix.classify(n).kind;
           }
           function stages() {
-            var items = visibleNotes().filter(function (n) { return n.category === LP.domain && n.topic === LP.topic; });
+            var items = visibleNotes().filter(function (n) {
+              return LP.domains.indexOf(n.category) >= 0 && LP.topics.indexOf(n.topic) >= 0;
+            });
             var out = [];
             LEARN_ORDER.forEach(function (id) {
               if (!LP.kinds[id]) return;
@@ -624,6 +682,10 @@
           }
           function render() {
             var sts = stages();
+            /* 一个都没选时整块路线区是空的 —— 给句人话，别留一片白。
+               注意这个提示挂在 picker 后面（同层），不是塞进路线区里：
+               picker 自己会一直显示，提示跟着它走才不会和路线区抢位置。 */
+            showEmptyTip(!LP.domains.length || !LP.topics.length);
             renderContinue(sts);
             renderSections(sts);
           }
@@ -644,36 +706,60 @@
               host.appendChild(label);
             });
           }
-          function renderDomains(items) {
-            var sel = document.getElementById("lp-domain");
-            var domains = domainList(items);
-            sel.innerHTML = "";
-            domains.forEach(function (d) {
-              var opt = document.createElement("option");
-              opt.value = d;
-              opt.textContent = d;
-              if (d === LP.domain) opt.selected = true;
-              sel.appendChild(opt);
+          /* chips 的公共渲染：一个 chip = 一个可切换的筛选值。
+             aria-pressed 而不是 .on 单独 Class —— 读屏器要靠它知道"现在选中了没"。 */
+          function renderChips(hostId, values, picked, withCount) {
+            var host = document.getElementById(hostId);
+            if (!host) return;
+            host.innerHTML = "";
+            values.forEach(function (v) {
+              var name = typeof v === "string" ? v : v.name;
+              var count = typeof v === "string" ? 0 : v.count;
+              var chip = document.createElement("button");
+              chip.type = "button";
+              chip.className = "lp-chip" + (picked.indexOf(name) >= 0 ? " on" : "");
+              chip.setAttribute("aria-pressed", String(picked.indexOf(name) >= 0));
+              chip.textContent = name;
+              chip.dataset.value = name;
+              if (withCount && count) {
+                var num = document.createElement("span");
+                num.className = "lp-chip-count";
+                num.textContent = "（" + count + " 篇）";
+                chip.appendChild(num);
+              }
+              host.appendChild(chip);
             });
-            LP.domain = sel.value;
+          }
+          function renderClear() {
+            var d = document.getElementById("lp-clear-domain");
+            var tp = document.getElementById("lp-clear-topic");
+            if (d) d.hidden = !LP.domains.length;
+            if (tp) tp.hidden = !LP.topics.length;
+          }
+          function renderDomains(items) {
+            renderChips("lp-domain", domainList(items), LP.domains, false);
+            renderClear();
           }
           function renderTopics(items) {
-            var sel = document.getElementById("lp-topic");
-            var topics = topicList(items, LP.domain);
-            sel.innerHTML = "";
-            topics.forEach(function (t) {
-              var opt = document.createElement("option");
-              opt.value = t.name;
-              opt.textContent = t.name + "（" + t.count + " 篇）";
-              if (t.name === LP.topic) opt.selected = true;
-              sel.appendChild(opt);
-            });
-            LP.topic = sel.value;
+            renderChips("lp-topic", topicList(items, LP.domains), LP.topics, true);
+            renderClear();
+          }
+          /* 空态：一个都没选时给句人话，不要留一片白 */
+          function showEmptyTip(show) {
+            var old = document.querySelector(".lp-empty-tip");
+            if (old) old.remove();
+            if (!show) return;
+            var tip = document.createElement("p");
+            tip.className = "lp-empty-tip";
+            tip.textContent = "先选领域和主题（两个都能多选）。多选时路线会把这几条合在一起排，进度也一起算。";
+            var picker = document.getElementById("lp-picker");
+            if (picker) picker.parentNode.appendChild(tip);
           }
           function syncUrl() {
             var q = new URLSearchParams();
-            if (LP.domain) q.set("domain", LP.domain);
-            if (LP.topic) q.set("topic", LP.topic);
+            /* 逗号分隔的多值。单值（老书签）没逗号，解析照旧成立。 */
+            if (LP.domains.length) q.set("domain", LP.domains.join(","));
+            if (LP.topics.length) q.set("topic", LP.topics.join(","));
             /* 锚点必须留着：#rd-path 是侧栏区分「学习路线 / 我的阅读」的
                依据，replaceState 把它抹掉会让高亮跳回「我的阅读」。 */
             history.replaceState({}, "", "/panorama/path" + (q.toString() ? "?" + q.toString() : ""));
@@ -681,29 +767,47 @@
           function saveLast() {
             try {
               localStorage.setItem(LAST_KEY, JSON.stringify({
-                domain: LP.domain,
-                topic: LP.topic,
+                domains: LP.domains,
+                topics: LP.topics,
                 kinds: LP.kinds,
               }));
             } catch (e) { /* 存储被禁时静默跳过，不影响页面功能。 */ }
           }
 
-          document.getElementById("lp-domain").addEventListener("change", function (event) {
-            LP.domain = event.target.value;
-            LP.topic = "";
-            LP.expanded = {};
+          /* 领域/主题改为多选：点一下加一个、再点一下去掉一个，
+             和「要学哪几段」那排 checkbox 一个手感。 */
+          ["lp-domain", "lp-topic"].forEach(function (hostId) {
+            var host = document.getElementById(hostId);
+            if (!host) return;
+            host.addEventListener("click", function (event) {
+              var chip = event.target.closest ? event.target.closest(".lp-chip") : null;
+              if (!chip) return;
+              var value = chip.dataset.value;
+              var list = hostId === "lp-domain" ? LP.domains : LP.topics;
+              var at = list.indexOf(value);
+              if (at >= 0) list.splice(at, 1);
+              else list.push(value);
+              LP.expanded = {};
+              var items = visibleNotes();
+              renderDomains(items);
+              renderTopics(items);
+              syncUrl();
+              saveLast();
+              render();
+            });
+          });
+          document.getElementById("lp-clear-domain").addEventListener("click", function () {
+            LP.domains = []; LP.topics = []; LP.expanded = {};
+            var items = visibleNotes();
+            renderDomains(items); renderTopics(items);
+            syncUrl(); saveLast(); render();
+          });
+          document.getElementById("lp-clear-topic").addEventListener("click", function () {
+            LP.topics = []; LP.expanded = {};
             renderTopics(visibleNotes());
-            syncUrl();
-            saveLast();
-            render();
+            syncUrl(); saveLast(); render();
           });
-          document.getElementById("lp-topic").addEventListener("change", function (event) {
-            LP.topic = event.target.value;
-            LP.expanded = {};
-            syncUrl();
-            saveLast();
-            render();
-          });
+          /* 主题行点击已在上面对 lp-topic 容器统一委托，这里不重复绑。 */
           document.getElementById("lp-kinds").addEventListener("change", function (event) {
             var id = event.target.dataset.kind;
             if (!id) return;
@@ -733,12 +837,16 @@
           var params = new URLSearchParams(location.search);
           var last = null;
           try { last = JSON.parse(localStorage.getItem(LAST_KEY) || "null"); } catch (e) { last = null; }
+          var splitList = function (raw) {
+            if (!raw) return [];
+            return String(raw).split(",").filter(function (s) { return s.trim(); });
+          };
           if (params.get("domain")) {
-            LP.domain = params.get("domain");
-            LP.topic = params.get("topic") || "";
-          } else if (last && last.domain) {
-            LP.domain = last.domain;
-            LP.topic = last.topic || "";
+            LP.domains = splitList(params.get("domain"));
+            LP.topics = splitList(params.get("topic"));
+          } else if (last && last.domains) {
+            LP.domains = splitList(last.domains);
+            LP.topics = splitList(last.topics);
             if (last.kinds) {
               Object.keys(LP.kinds).forEach(function (kk) {
                 if (typeof last.kinds[kk] === "boolean") LP.kinds[kk] = last.kinds[kk];

@@ -19,12 +19,22 @@
       subnav: window.TK_NAV.subitems,
       auth: true,
       }));
-      /* 全站搜索框：放在「我现在想学」表单之后。两者分工不同 —— 表单是选
-         主题去生成课堂，搜索是找已写好的文章，回车带词去主站 /?q=。 */
-      document.addEventListener('DOMContentLoaded', () => TKShell.mountSearch({
-        selector: '.hero .page-toolbar',
-        id: 'learn-search',
-      }));
+      /* 全站搜索框：与主站同一个位置（顶栏右上角）。两者分工不同 —— hero 里的
+         表单是选主题去生成课堂，搜索是找已写好的文章，回车带词去主站 /?q=。
+         2026-09-25 之前它挂在 hero 的 .page-toolbar 里，和主站「搜索框在顶栏
+         右上角」不一致（papers / sources 同款问题），现改为由 shell 生成顶栏、
+         把 mountSearch 生成的这个框原样搬进去（搬位置，id 与行为不动）。 */
+      document.addEventListener('DOMContentLoaded', () => {
+        TKShell.mountSearch({
+          selector: '.hero .page-toolbar',
+          id: 'learn-search',
+        });
+        const box = document.querySelector('#learn-search');
+        TKShell.mountTopbar({
+          title: '学习中心',
+          reuse: box && box.closest('.tk-search'),
+        });
+      });
       /* 反馈入口与主站是同一个组件，收到的意见进同一个收件箱。 */
       document.addEventListener('DOMContentLoaded', () => TKShell.feedback({
         where: () => '当前页面：<b>' + (((document.querySelector('.tk-context h2') || {}).textContent || '').trim() || document.title) + '</b>',
@@ -469,13 +479,35 @@
     </style>
   <style>:root[data-theme="dark"] .panel,:root[data-theme="dark"] .job,:root[data-theme="dark"] .service,:root[data-theme="dark"] .card,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .topic-card{background:var(--color-panel)!important}:root[data-theme="dark"] .callout{background:var(--color-accent-soft)!important}:root[data-theme="dark"] .callout.warning{background:var(--color-warm-soft)!important}:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card{background:var(--color-panel)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] button.primary,:root[data-theme="dark"] .primary{color:var(--color-on-accent)!important}
 </style>
-<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article{background:var(--color-panel)!important}:root[data-theme="dark"] .button,:root[data-theme="dark"] button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .button.primary,:root[data-theme="dark"] .primary,:root[data-theme="dark"] button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
+<style id="tk-dark-surfaces">:root[data-theme="dark"] .topic-box,:root[data-theme="dark"] .hero,:root[data-theme="dark"] .purpose,:root[data-theme="dark"] .service,:root[data-theme="dark"] .panel,:root[data-theme="dark"] .section,:root[data-theme="dark"] .callout,:root[data-theme="dark"] .stage,:root[data-theme="dark"] .rules li,:root[data-theme="dark"] .job,:root[data-theme="dark"] .entry,:root[data-theme="dark"] .card,:root[data-theme="dark"] .note-row,:root[data-theme="dark"] .topic-card,:root[data-theme="dark"] .path,:root[data-theme="dark"] .path-intro,:root[data-theme="dark"] .project,:root[data-theme="dark"] .project-meta,:root[data-theme="dark"] .guide,:root[data-theme="dark"] .box,:root[data-theme="dark"] article{background:var(--color-panel)!important}:root[data-theme="dark"] .tk-shell .button,:root[data-theme="dark"] .tk-shell button{background:var(--color-panel)!important;color:var(--color-ink)!important;border-color:var(--color-line)!important}:root[data-theme="dark"] .tk-shell .button.primary,:root[data-theme="dark"] .tk-shell .primary,:root[data-theme="dark"] .tk-shell button[type="submit"]{background:var(--color-accent)!important;color:var(--color-on-accent)!important;border-color:var(--color-accent)!important}:root[data-theme="dark"] b,:root[data-theme="dark"] strong{color:var(--color-ink)!important}</style>
 <style>:root[data-theme="dark"] .cost{color:var(--color-warm-ink)!important}</style>
+<style>
+/* 2026-09-26：学习中心 hero 顶格。
+ *
+ * 首页早先修好的 hero--display 只解决了一部分 —— 它在浅色下够看，
+ * 深色主题里 :root[data-theme="dark"] .hero 与 .purpose / .topic-box /
+ * .panel 共用同一块背景色（实测都是 rgb(26,32,48)），hero 和下面那行
+ * 「知识库和这里的区别」连成一片，没有边界，看上去就是顶到边。
+ * 光斑 ::before 只盖住左右上角，中间照旧，所以兜不住。
+ *
+ * 这里只给学习中心这一处补一条分隔线，选择器限定 .tk-shell 直接首子
+ * 元素 —— 首页 hero 在 #home 里、不是 .tk-shell 的直接子元素，首页
+ * 那份已修好的视觉一个像素都不动。 */
+.tk-shell > .hero:first-child {
+  border-bottom: 1px solid var(--color-line);
+  padding-bottom: var(--space-6);
+}
+</style>
 </head>
   <body class="tk-host">
     <aside class="tk-sidebar" id="tk-sidebar"></aside>
     <div class="tk-shell">
-      <section class="hero">
+      <!-- 2026-09-26：学习中心这里原本只是裸 .hero —— 首页早先修好的
+           hero--display（光斑 ::before）没覆盖到它，深色主题下 .hero 与
+           .purpose/.topic-box 共用同一块背景色，hero 和下面那行连成一片，
+           看不出边界，像是顶格。补上首页同款 class 与 data-crop 声明
+           （光斑会溢出 hero 盒，layout_audit 靠 data-crop 跳过这处有意出血）。 -->
+      <section class="hero hero--display" data-crop>
         <div>
           <h1>从知识点走到真正会用</h1>
           <p>
