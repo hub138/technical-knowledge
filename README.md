@@ -279,3 +279,9 @@ authorised to redistribute into the knowledge base, the graph, or a commit.
 - 对外唯一入口：站点 nginx 监听 28788，任何情况下不改端口、不改域名。
 - 后端内部进程端口可自由变更，只影响上游地址，访客不可见。
 - 需要让改动生效时重启后端实例，不动 nginx、不动对外端口。
+
+## Agent 工程技能已迁移
+
+`agent_foundation`（Agent 工程知识体系与多 agent 编排技能）已合并到
+[agent-skills](https://github.com/hub138/agent-skills)，本仓库不再保留副本，
+避免两处维护不一致。请到该仓库的 `agent_foundation/` 与 `agent-ops/` 目录获取。
